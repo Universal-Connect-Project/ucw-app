@@ -1,5 +1,3 @@
-// import * as mocked from '../../../shared/connect/fireflyApiBridge';
-
 describe('Test Connect Routes', () => {
   test('Test sendAnalyticsEvent route', async () => {
     // TODO: Figure out error with mock
