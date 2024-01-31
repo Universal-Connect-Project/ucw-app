@@ -1,18 +1,12 @@
 import {
-  Challenge,
-  Connection,
-  ConnectionStatus,
-  Context,
   Institution,
-  ProviderApiClient,
-  VcType,
 } from '../../shared/contract';
 import * as config from '../config';
 import * as logger from '../infra/logger';
 
 import { ProviderApiBase } from '../providers';
 
-export class VcsService extends ProviderApiBase{
+export class VcsService extends ProviderApiBase {
   constructor(req: any){
     super(req)
   }
@@ -40,9 +34,6 @@ export class VcsService extends ProviderApiBase{
     connection_id: string | null,
     credentials: Array<Credential>
   ) {
-    // console.log(context);
-    // console.log(institution_id);
-    // console.log(connection_id);
     institution_id = this.context.institution_id || institution_id;
     connection_id = this.context.connection_id || connection_id;
     if (connection_id) {

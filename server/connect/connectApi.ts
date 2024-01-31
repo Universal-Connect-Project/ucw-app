@@ -1,13 +1,9 @@
-import {Credential, Member, MemberResponse} from 'interfaces/contract'
+import {Member, MemberResponse} from 'interfaces/contract'
 import {
-  Challenge,
   ChallengeType,
   Connection,
   ConnectionStatus,
-  Context,
   Institution,
-  ProviderApiClient,
-  VcType,
 } from '../../shared/contract';
 import * as logger from '../infra/logger';
 
@@ -112,8 +108,6 @@ export class ConnectApi extends ProviderApiBase{
   }
 
   async updateMember(member: Member): Promise<MemberResponse> {
-    // console.log(member);
-    // console.log(member.mfa);
     if(this.context.current_job_id && member.credentials?.length > 0){
       await this.answerChallenge(
         member.guid,
@@ -124,8 +118,6 @@ export class ConnectApi extends ProviderApiBase{
             response: c.value
           };
           let challenge = member.mfa.credentials.find(m => m.guid === c.guid) // widget posts everything back
-          // console.log(challenge)
-          // console.log(ret)
           switch(challenge.type){
             case 0:
               ret.type = ChallengeType.QUESTION

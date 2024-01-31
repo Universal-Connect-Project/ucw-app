@@ -148,17 +148,6 @@ export interface Pagination {
   total_pages?: number;
 }
 
-export enum EventEnum {
-  INIT,
-  INSTITUTION_LIST,
-  SELECT_INSTITUTION,
-  LOGIN,
-  CHALLENGED,
-  SUCCEEDED,
-  FAILED,
-  ERROR,
-}
-
 export interface ProviderApiClient {
   ResolveUserId(id: string): Promise<string>;
   GetInstitutionById(id: string): Promise<Institution>;

@@ -3,7 +3,7 @@ import { get } from 'axios';
 const baseUrl = 'http://127.0.0.1:8080/';
 
 describe('Test Routes', () => {
-  test('Test Default route', async () => {
+  test('Default route', async () => {
     const res = await get(baseUrl);
 
     expect(res).toBeTruthy();
@@ -12,7 +12,7 @@ describe('Test Routes', () => {
     expect(res.data).toContain('Web site created using create-react-app');
   });
 
-  test('Test PING route', async () => {
+  test('PING route', async () => {
     const res = await get(`${baseUrl}ping`);
 
     expect(res).toBeTruthy();
