@@ -1,15 +1,15 @@
-import {Member, MemberResponse} from 'interfaces/contract'
+import { type Member, type MemberResponse } from 'interfaces/contract'
 import {
   ChallengeType,
-  Connection,
+  type Connection,
   ConnectionStatus,
-  Institution,
-} from '../../shared/contract';
-import * as logger from '../infra/logger';
+  type Institution
+} from '../../shared/contract'
+import * as logger from '../infra/logger'
 
-import { ProviderApiBase } from '../providers';
+import { ProviderApiBase } from '../providers'
 
-function mapInstitution(ins: Institution){
+function mapInstitution (ins: Institution) {
   return ({
     guid: ins.id,
     code: ins.id,
@@ -18,22 +18,22 @@ function mapInstitution(ins: Institution){
     logo_url: ins.logo_url,
     instructional_data: {},
     credentials: [] as any[],
-    supports_oauth: ins.oauth || ins.name?.indexOf('Oauth') >= 0,
+    supports_oauth: ins.oauth || ins.name?.includes('Oauth'),
     providers: ins.providers,
     provider: ins.provider
     // credentials: credentials?.map((c: any) => ({
     //   guid: c.id,
     //   ...c
     // }))
-  });
+  })
 }
 
-function mapConnection(connection: Connection): Member{
+function mapConnection (connection: Connection): Member {
   return {
-    //...connection, 
-    institution_guid: connection.institution_code, 
-    guid: connection.id, 
-    connection_status: connection.status || ConnectionStatus.CREATED, //?
+    // ...connection,
+    institution_guid: connection.institution_code,
+    guid: connection.id,
+    connection_status: connection.status ?? ConnectionStatus.CREATED, // ?
     most_recent_job_guid: connection.status === ConnectionStatus.CONNECTED ? null : connection.cur_job_id,
     is_oauth: connection.is_oauth,
     oauth_window_uri: connection.oauth_window_uri,
@@ -42,59 +42,59 @@ function mapConnection(connection: Connection): Member{
     user_guid: connection.user_id,
     mfa: {
       credentials: connection.challenges?.map(c => {
-          let ret = {
-            guid: c.id,
-            credential_guid: c.id,
-            label: c.question,
-            type: c.type,
-            options: [] as any[]
-          } as any;
-          switch(c.type){
-            case ChallengeType.QUESTION:
-              ret.type = 0;
-              ret.label = (c.data as any[])?.[0].value || c.question;
-              break;
-            case ChallengeType.TOKEN:
-              ret.type = 2; // ?
-              ret.label = `${c.question}: ${c.data}`
-              break;
-            case ChallengeType.IMAGE:
-              ret.type = 13;
-              ret.meta_data = (c.data as string).startsWith('data:image') ? c.data : ('data:image/png;base64, ' + c.data);
-              break;
-            case ChallengeType.OPTIONS:
-              ret.type = 2;
-              ret.options = (c.data as any[]).map(d => ({
-                guid: d.key,
-                label: d.key,
-                value: d.value,
-                credential_guid: c.id
-              }));
-              break;
-            case ChallengeType.IMAGE_OPTIONS:
-              ret.type = 14;
-              ret.options = (c.data as any[]).map(d => ({
-                guid: d.key,
-                label: d.key,
-                data_uri: d.value,
-                credential_guid: c.id
-              }));
-              break;
-          }
-          return ret;
+        const ret = {
+          guid: c.id,
+          credential_guid: c.id,
+          label: c.question,
+          type: c.type,
+          options: [] as any[]
+        } as any
+        switch (c.type) {
+          case ChallengeType.QUESTION:
+            ret.type = 0
+            ret.label = (c.data as any[])?.[0].value || c.question
+            break
+          case ChallengeType.TOKEN:
+            ret.type = 2 // ?
+            ret.label = `${c.question}: ${c.data}`
+            break
+          case ChallengeType.IMAGE:
+            ret.type = 13
+            ret.meta_data = (c.data as string).startsWith('data:image') ? c.data : ('data:image/png;base64, ' + c.data)
+            break
+          case ChallengeType.OPTIONS:
+            ret.type = 2
+            ret.options = (c.data as any[]).map(d => ({
+              guid: d.key,
+              label: d.key,
+              value: d.value,
+              credential_guid: c.id
+            }))
+            break
+          case ChallengeType.IMAGE_OPTIONS:
+            ret.type = 14
+            ret.options = (c.data as any[]).map(d => ({
+              guid: d.key,
+              label: d.key,
+              data_uri: d.value,
+              credential_guid: c.id
+            }))
+            break
         }
+        return ret
+      }
       )
     }
   } as any
 }
 
-export class ConnectApi extends ProviderApiBase{
-  constructor(req: any){
+export class ConnectApi extends ProviderApiBase {
+  constructor (req: any) {
     super(req)
   }
 
-  async addMember(memberData: Member): Promise<MemberResponse> {
-    let connection = await this.createConnection({
+  async addMember (memberData: Member): Promise<MemberResponse> {
+    const connection = await this.createConnection({
       institution_id: memberData.institution_guid,
       is_oauth: memberData.is_oauth,
       skip_aggregation: memberData.skip_aggregation && memberData.is_oauth,
@@ -103,44 +103,44 @@ export class ConnectApi extends ProviderApiBase{
         id: c.guid,
         value: c.value
       }))
-    });
-    return {member: mapConnection(connection)}
+    })
+    return { member: mapConnection(connection) }
   }
 
-  async updateMember(member: Member): Promise<MemberResponse> {
-    if(this.context.current_job_id && member.credentials?.length > 0){
+  async updateMember (member: Member): Promise<MemberResponse> {
+    if (this.context.current_job_id && member.credentials?.length > 0) {
       await this.answerChallenge(
         member.guid,
         member.credentials.map(c => {
-          let ret = {
+          const ret = {
             id: c.guid,
             type: c.type,
             response: c.value
-          };
-          let challenge = member.mfa.credentials.find(m => m.guid === c.guid) // widget posts everything back
-          switch(challenge.type){
+          }
+          const challenge = member.mfa.credentials.find(m => m.guid === c.guid) // widget posts everything back
+          switch (challenge.type) {
             case 0:
               ret.type = ChallengeType.QUESTION
-              break;
+              break
             case 13:
               ret.type = ChallengeType.IMAGE
-              break;
+              break
             case 2:
               ret.type = c.value ? ChallengeType.OPTIONS : ChallengeType.TOKEN
-              if(c.value){
-                ret.response = challenge.options.find((o:any) => o.guid === c.value)?.value
-                if(!ret.response){
+              if (c.value) {
+                ret.response = challenge.options.find((o: any) => o.guid === c.value)?.value
+                if (!ret.response) {
                   logger.error('Unexpected challege option: ${c.value}', challenge)
                 }
               }
-              break;
+              break
           }
-          return ret;
+          return ret
         })
       )
-      return {member};
-    }else{
-      let connection = await this.updateConnection({
+      return { member }
+    } else {
+      const connection = await this.updateConnection({
         job_type: this.context.job_type,
         id: member.guid,
         credentials: member.credentials.map(c => ({
@@ -148,59 +148,66 @@ export class ConnectApi extends ProviderApiBase{
           value: c.value
         }))
       })
-      return {member: mapConnection(connection)};
+      return { member: mapConnection(connection) }
     }
   }
-  async loadMembers(): Promise<Member[]> {
-    if(this.context.connection_id){
-      let focusedMember = await this.getConnection(this.context.connection_id);
-      return [mapConnection(focusedMember)];
+
+  async loadMembers (): Promise<Member[]> {
+    if (this.context.connection_id) {
+      const focusedMember = await this.getConnection(this.context.connection_id)
+      return [mapConnection(focusedMember)]
     }
     return []
   }
-  async loadMemberByGuid(memberGuid: string): Promise<MemberResponse> {
-    let mfa = await this.getConnectionStatus(memberGuid);
-    if(!mfa?.institution_code){
-      let connection = await this.getConnection(memberGuid);
-      return {member: mapConnection({...mfa, ...connection})};
+
+  async loadMemberByGuid (memberGuid: string): Promise<MemberResponse> {
+    const mfa = await this.getConnectionStatus(memberGuid)
+    if (!mfa?.institution_code) {
+      const connection = await this.getConnection(memberGuid)
+      return { member: mapConnection({ ...mfa, ...connection }) }
     }
-    return {member: mapConnection({...mfa})};
-  }
-  async getOauthWindowUri(memberGuid: string){
-    let ret = await this.loadMemberByGuid(memberGuid);
-    return ret?.member?.oauth_window_uri;
+    return { member: mapConnection({ ...mfa }) }
   }
 
-  async deleteMember(member: Member): Promise<void> {
+  async getOauthWindowUri (memberGuid: string) {
+    const ret = await this.loadMemberByGuid(memberGuid)
+    return ret?.member?.oauth_window_uri
+  }
+
+  async deleteMember (member: Member): Promise<void> {
     await this.deleteConnection(member.guid)
   }
 
-  async getMemberCredentials(memberGuid: string): Promise<any> {
-    const crs = await this.getConnectionCredentials(memberGuid);
-    return {credentials: crs.map(c => ({
-      ...c,
-      guid: c.id,
-      field_type: c.field_type === 'PASSWORD' ? 1 : 3,
-    }))};
+  async getMemberCredentials (memberGuid: string): Promise<any> {
+    const crs = await this.getConnectionCredentials(memberGuid)
+    return {
+      credentials: crs.map(c => ({
+        ...c,
+        guid: c.id,
+        field_type: c.field_type === 'PASSWORD' ? 1 : 3
+      }))
+    }
   }
 
-  async getInstitutionCredentials(guid: string): Promise<any> {
-    let crs = await super.getInstitutionCredentials(guid);
-    return {credentials: crs.map(c => ({
-      ...c,
-      guid: c.id,
-      field_type: c.field_type === 'PASSWORD' ? 1 : 3,
-    }))}
+  async getInstitutionCredentials (guid: string): Promise<any> {
+    const crs = await super.getInstitutionCredentials(guid)
+    return {
+      credentials: crs.map(c => ({
+        ...c,
+        guid: c.id,
+        field_type: c.field_type === 'PASSWORD' ? 1 : 3
+      }))
+    }
   }
 
-  async loadInstitutions(query: string): Promise<any> {
-    const ret = await this.search(query);
-    return ret.map(mapInstitution);
+  async loadInstitutions (query: string): Promise<any> {
+    const ret = await this.search(query)
+    return ret.map(mapInstitution)
   }
 
-  async loadInstitutionByGuid(guid: string): Promise<any> {
-    let inst = await this.getInstitution(guid)
-    return {institution: mapInstitution(inst)};
+  async loadInstitutionByGuid (guid: string): Promise<any> {
+    const inst = await this.getInstitution(guid)
+    return { institution: mapInstitution(inst) }
   }
 
   // loadInstitutionByCode(code: string): Promise<Institution> {
@@ -208,14 +215,14 @@ export class ConnectApi extends ProviderApiBase{
   //   throw new Error('Method not implemented.');
   // }
 
-  async loadPopularInstitutions(query: string) {
-    this.context.updated = true;
-    this.context.provider = null;
-    let ret = await this.institutions();
+  async loadPopularInstitutions (query: string) {
+    this.context.updated = true
+    this.context.provider = null
+    const ret = await this.institutions()
     return ret.institutions.map(mapInstitution)
   }
 
-  async loadDiscoveredInstitutions(): Promise<Institution[]> {
+  async loadDiscoveredInstitutions (): Promise<Institution[]> {
     return []
   }
 }
