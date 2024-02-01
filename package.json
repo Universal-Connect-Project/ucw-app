@@ -5,6 +5,8 @@
   "scripts": {
     "server": "npx ts-node server/server.js",
     "lint:fix": "eslint --fix --ext .js,.ts",
+    "coverage": "npm test -- --verbose --coverage --watchAll",
+    "test-clear": "npm test -- --clearCache",
     "keys": "node -e 'console.log(`key: ${crypto.randomBytes(32).toString(\"hex\")}\n IV: ${crypto.randomBytes(16).toString(\"hex\")}`)'"
   },
   "dependencies": {
