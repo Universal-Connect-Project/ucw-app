@@ -1,8 +1,8 @@
 module.exports = {
-  createClient(){
+  createClient () {
     return {
-      connect(){
-        return Promise.resolve('mocked')
+      async connect () {
+        return await Promise.resolve('mocked')
       }
     }
   }

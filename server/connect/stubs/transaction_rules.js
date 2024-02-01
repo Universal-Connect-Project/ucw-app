@@ -1,1 +1,1 @@
-module.exports = {"transaction_rules":[]}
+module.exports = { transaction_rules: [] }

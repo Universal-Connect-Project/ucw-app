@@ -8,10 +8,13 @@
     "noImplicitAny": true,
     "outDir": "dist",
     "types": ["node"],
-    "allowJs": true
+    "allowJs": true,
+    "strictNullChecks": false // TODO: change this to true and fix all errors
   },
   "include": [
-    "server"
+    "server",
+    ".eslintrc.json",
+    "jest.config.js"
   ],
   "exclude": ["dist", "node_modules", "./build"]
 }

@@ -1,27 +1,27 @@
-const fs = require('fs');
+const fs = require('fs')
 
-async function readFile(path){
-  return new Promise((resolve, reject) => {
-    if(fileReadCache.content){
-      let currentTime = new Date();
-      var difference = currentTime.getTime() - fileReadCache.time.getTime(); 
-      var resultInSeconds = Math.round(difference / 1000);
-      if(resultInSeconds <= 30){
+async function readFile (path) {
+  return await new Promise((resolve, reject) => {
+    if (fileReadCache.content) {
+      const currentTime = new Date()
+      const difference = currentTime.getTime() - fileReadCache.time.getTime()
+      const resultInSeconds = Math.round(difference / 1000)
+      if (resultInSeconds <= 30) {
         resolve(fileReadCache.content)
         return
       }
     }
     fs.readFile(
-      path, 
-      'utf8', 
+      path,
+      'utf8',
       (err, content) => {
-        if(err){
-          reject(err);
+        if (err) {
+          reject(err)
         }
-        fileReadCache.time = new Date();
-        resolve(content);
+        fileReadCache.time = new Date()
+        resolve(content)
       }
-    );
+    )
   })
 }
 
