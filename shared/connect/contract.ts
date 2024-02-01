@@ -63,7 +63,7 @@ export interface Member {
   aggregated_at?: string | null
   background_aggregation_is_disabled?: boolean
   connection_status?: string | null | number //
-  guid: string | null //
+  guid: string
   id?: string | null
   institution_code?: string | null
   is_being_aggregated?: boolean | null //

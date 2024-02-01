@@ -12,7 +12,7 @@ export interface Context {
   current_job_id?: string
   user_id?: string
   resolved_user_id?: string
-  provider?: string
+  provider?: string | null
   job_type?: string
   partner?: string
   single_account_select?: boolean
@@ -76,7 +76,7 @@ export interface Challenge {
   external_id?: string
   question?: string | null
   data?: string | KeyValuePair[]
-  type: ChallengeType
+  type?: ChallengeType
   response?: string | number[]
 }
 

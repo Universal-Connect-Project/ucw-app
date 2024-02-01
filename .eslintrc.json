@@ -1,11 +1,10 @@
 {
-  // "parser": "@babel/eslint-parser",
   "extends": "standard-with-typescript",
-  // "plugins": ["jest"],
   "rules": {
     // "no-console": "off",
     // "jsx-max-props-per-line": 0
-    // "@typescript-eslint/no-explicit-any": ["off"]
+    // "@typescript-eslint/no-explicit-any": ["off"],
+    "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-unsafe-argument": ["off"]
   },
   "settings": {

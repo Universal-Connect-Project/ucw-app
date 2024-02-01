@@ -3,7 +3,8 @@ import {
   ChallengeType,
   type Connection,
   ConnectionStatus,
-  type Institution
+  type Institution,
+  Challenge
 } from '../../shared/contract'
 import * as logger from '../infra/logger'
 
@@ -96,29 +97,29 @@ export class ConnectApi extends ProviderApiBase {
   async addMember (memberData: Member): Promise<MemberResponse> {
     const connection = await this.createConnection({
       institution_id: memberData.institution_guid,
-      is_oauth: memberData.is_oauth,
-      skip_aggregation: memberData.skip_aggregation && memberData.is_oauth,
+      is_oauth: (memberData.is_oauth ?? false),
+      skip_aggregation: (memberData.skip_aggregation ?? false) && (memberData.is_oauth ?? false),
       initial_job_type: this.context.job_type || 'agg',
       credentials: memberData.credentials?.map(c => ({
         id: c.guid,
         value: c.value
-      }))
+      })) ?? []
     })
     return { member: mapConnection(connection) }
   }
 
   async updateMember (member: Member): Promise<MemberResponse> {
-    if (this.context.current_job_id && member.credentials?.length > 0) {
+    if (this.context.current_job_id && member.credentials !== undefined) {
       await this.answerChallenge(
         member.guid,
         member.credentials.map(c => {
-          const ret = {
+          const ret: Challenge = {
             id: c.guid,
-            type: c.type,
+            type: c.field_type,
             response: c.value
           }
-          const challenge = member.mfa.credentials.find(m => m.guid === c.guid) // widget posts everything back
-          switch (challenge.type) {
+          const challenge = member.mfa?.credentials.find(m => m.guid === c.guid) // widget posts everything back
+          switch (challenge?.type) {
             case 0:
               ret.type = ChallengeType.QUESTION
               break
@@ -128,7 +129,7 @@ export class ConnectApi extends ProviderApiBase {
             case 2:
               ret.type = c.value ? ChallengeType.OPTIONS : ChallengeType.TOKEN
               if (c.value) {
-                ret.response = challenge.options.find((o: any) => o.guid === c.value)?.value
+                ret.response = challenge?.options.find((o: any) => o.guid === c.value)?.value
                 if (!ret.response) {
                   logger.error('Unexpected challege option: ${c.value}', challenge)
                 }
@@ -143,7 +144,7 @@ export class ConnectApi extends ProviderApiBase {
       const connection = await this.updateConnection({
         job_type: this.context.job_type,
         id: member.guid,
-        credentials: member.credentials.map(c => ({
+        credentials: member.credentials?.map(c => ({
           id: c.guid,
           value: c.value
         }))
