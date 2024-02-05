@@ -7,12 +7,6 @@ This repo is a full stack application which anyone can clone and self-host as a 
 2. copy .env.example
 3. Follow Initial setup for getting environment variables
 4. run `docker-compose up`
-5. load a widget url `http://localhost:8080/?job_type=agg&auth=${authCode}`
-6. listen for postmessages to get the `user_guid` and `member_guid`.
-7. Retrieve data from the server in standard [VerifiableCredentials](https://www.w3.org/TR/vc-data-model/) format
-  * Identity - `http://localhost:8080/api/user/:user_guid/member/:member_guid/customers`
-  * Verification - `http://localhost:8080/api/user/:user_guid/member/:member_guid/accounts`
-  * Transactions - `http://localhost:8080/api/user/:user_guid/member/:member_guid/accounts/:account_guid/transactions`
 
 
 #### Initial setup
@@ -23,7 +17,7 @@ This repo is a full stack application which anyone can clone and self-host as a 
 5. Fill in the `UcpAuthClientId`, `UcpAuthClientSecret` and `UcpAuthEncryptionKey` in the `.env` file with the values provided by login page.
 
 *Please remember that secrets are passed through environment variables instead of hardcoded in the js file.*
-DO NOT put any credentials in any of the js files. If you do so, it could accidentally get committed and leaked to public.
+DO NOT put any credentials in any of the js files. If you do so, it could accidentally get committed and leaked to the public.
 USE `.env` FILE
 
 *UCP credentials are required for authentication and secret exchange, storage (redis-like session cache) and analytics services.*
