@@ -218,6 +218,9 @@ export class ProviderApiBase {
 
   async getOauthState (connection_id: string) {
     const connection = await this.getConnectionStatus(connection_id)
+    if(!connection){
+      return {}
+    }
     const ret = {
       guid: connection_id,
       inbound_member_guid: connection_id,
