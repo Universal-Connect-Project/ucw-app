@@ -84,7 +84,7 @@ export class ProviderApiBase {
   }
 
   async init () {
-    this.searchApi = new SearchClient(this.context.auth?.token, this.context.partner)
+    this.searchApi = new SearchClient(this.context.auth?.token)
     if (this.context.auth?.token) {
       const { iv, token } = this.context.auth
       const storageClient = new StorageClient(token)
