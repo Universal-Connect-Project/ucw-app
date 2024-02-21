@@ -12,11 +12,12 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint'],
   parserOptions: {
-    ecmaVersion: "latest",
+    ecmaVersion: 'latest',
     sourceType: 'module',
   },
   ignorePatterns: ['src/public/static/vue3.js'],
   rules: {
+    quotes: ['error', 'single', { 'avoidEscape': true }],
     'semi': [2, 'always'],
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',

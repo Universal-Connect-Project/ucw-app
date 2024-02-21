@@ -230,24 +230,25 @@ export class SophtronApi implements ProviderApiClient {
       case 'failed':
         status = ConnectionStatus.FAILED;
         break;
-      case 'AccountsReady':
+      case 'AccountsReady': {
         let jobType = job.JobType.toLowerCase();
-        if(single_account_select 
+        if (single_account_select
             && (!job.AccountID || job.AccountID === '00000000-0000-0000-0000-000000000000')
             && (jobType === 'authallaccounts' || jobType === 'refreshauthall')
-            ){
+        ) {
           let accounts = await this.apiClientV1.getUserInstitutionAccounts(memberId);
           challenge.id = 'single_account_select';
           challenge.external_id = 'single_account_select';
           challenge.type = ChallengeType.OPTIONS;
           challenge.question = 'Please select an account to proceed:';
           challenge.data = accounts.map(
-            (a:any) => ({ key: `${a.AccountName} ${a.AccountNumber}`, value: a.AccountID })
+              (a: any) => ({key: `${a.AccountName} ${a.AccountNumber}`, value: a.AccountID})
           );
-        }else{
+        } else {
           status = ConnectionStatus.CREATED;
         }
         break;
+      }
       default:
         if (job.SecurityQuestion) {
           challenge.id = 'SecurityQuestion';

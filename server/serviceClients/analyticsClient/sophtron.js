@@ -1,3 +1,5 @@
+import { buildSophtronAuthCode } from '../../utils';
+
 const http = require('../../infra/http');
 const config = require('../../config');
 

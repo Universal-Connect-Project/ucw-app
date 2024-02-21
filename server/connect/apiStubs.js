@@ -21,7 +21,7 @@ module.exports = function (app) {
     res.sendFile(__dirname + '/stubs/member.json');
   });
   app.get(`${ApiEndpoints.MEMBERS}/:member_guid/credentials`, async (req, res) => {
-    const ret = await connectService.getMemberCredentials(req.params.member_guid);
+    const ret = await req.connectService.getMemberCredentials(req.params.member_guid);
     res.send(ret);
   });
   app.get(`${ApiEndpoints.INSTITUTIONS}/:institution_guid/credentials`, async (req, res) => {

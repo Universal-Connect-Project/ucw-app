@@ -1,4 +1,5 @@
 const fs = require('fs');
+const fileReadCache = {};
 
 async function readFile (path) {
   return await new Promise((resolve, reject) => {
