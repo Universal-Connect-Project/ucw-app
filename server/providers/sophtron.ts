@@ -122,7 +122,7 @@ export class SophtronApi implements ProviderApiClient {
           label: ins?.InstitutionDetail?.LoginFormPassword || 'Password',
           field_type: 'PASSWORD',
           field_name: 'PASSWORD'
-        })
+        });
     }
     return ret;
   }
@@ -143,16 +143,16 @@ export class SophtronApi implements ProviderApiClient {
     request: CreateConnectionRequest,
     userId: string
   ): Promise<Connection | undefined> {
-    let job_type = mapJobType(request.initial_job_type?.toLowerCase())
+    let job_type = mapJobType(request.initial_job_type?.toLowerCase());
     if(!job_type){
-      return
+      return;
     }
     const username = request.credentials.find(
       (item) => item.id === 'username'
     )!.value;
     const passwordField = request.credentials.find(
       (item) => item.id === 'password'
-    )
+    );
     // if password field wasn't available, it should be a 'none' type
     const password = passwordField? passwordField.value : 'None';
     const ret = await this.apiClient.createMember(userId, job_type, username, password, request.institution_id);
@@ -176,9 +176,9 @@ export class SophtronApi implements ProviderApiClient {
     request: UpdateConnectionRequest,
     userId: string
   ): Promise<Connection> {
-    let job_type = mapJobType('agg') //TODO
+    let job_type = mapJobType('agg'); //TODO
     if(!job_type){
-      return
+      return;
     }
     const username = request.credentials!.find(
       (item) => item.id === 'username'
@@ -332,7 +332,7 @@ export class SophtronApi implements ProviderApiClient {
         }
         break;
       default:
-        logger.error('Wrong challenge answer received', c)
+        logger.error('Wrong challenge answer received', c);
         return false;
     }
     return true;
@@ -342,15 +342,15 @@ export class SophtronApi implements ProviderApiClient {
     logger.debug('Resolving UserId: ' + user_id);
     const sophtronUser = await this.apiClient.getCustomerByUniqueName(user_id);
     if(sophtronUser){
-      logger.trace(`Found existing sophtron customer ${sophtronUser.CustomerID}`)
-      return sophtronUser.CustomerID
+      logger.trace(`Found existing sophtron customer ${sophtronUser.CustomerID}`);
+      return sophtronUser.CustomerID;
     }
-    logger.trace(`Creating sophtron user ${user_id}`)
-    let ret = await this.apiClient.createCustomer(user_id)
+    logger.trace(`Creating sophtron user ${user_id}`);
+    let ret = await this.apiClient.createCustomer(user_id);
     if(ret){
-      return ret.CustomerID
+      return ret.CustomerID;
     }
-    logger.trace(`Failed creating sophtron user, using user_id: ${user_id}`)
+    logger.trace(`Failed creating sophtron user, using user_id: ${user_id}`);
     return user_id;
   }
 }

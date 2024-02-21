@@ -13,7 +13,8 @@
   },
   "include": [
     "server",
-    ".eslintrc.json",
+    "shared",
+    ".eslintrc.js",
     "jest.config.js"
   ],
   "exclude": ["dist", "node_modules", "./build"]

@@ -55,4 +55,4 @@ export const ApiEndpoints = {
   USER_COMMUNICATION_PROFILE: '/user_communication_profile',
   USER_FEATURES: '/user_features', // have 
   USER_PROFILES: '/user_profiles',
-}
+};

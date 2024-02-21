@@ -38,7 +38,7 @@ export class AkoyaApi implements ProviderApiClient {
       url: null,
       oauth: true,
       provider: this.apiClient.apiConfig.provider
-    })
+    });
   }
 
   async ListInstitutionCredentials(id: string): Promise<Array<Credential>> {
@@ -65,7 +65,7 @@ export class AkoyaApi implements ProviderApiClient {
       oauth_window_uri: this.apiClient.getOauthUrl(request.institution_id, this.apiClient.client_redirect_url, request_id),
       provider: this.apiClient.apiConfig.provider,
       status: ConnectionStatus.PENDING
-    }
+    };
     await this.db.set(request_id, obj);
     return obj;
   }
@@ -98,20 +98,20 @@ export class AkoyaApi implements ProviderApiClient {
 
   static async HandleOauthResponse(request: any): Promise<Connection> {
     const { state: request_id, code } = request;
-    logger.info(`Received akoya oauth redirect response ${request_id}`)
-    const db = new StorageClient(request_id.substring(0, request_id.length - 32))
-    let connection = await db.get(request_id)
+    logger.info(`Received akoya oauth redirect response ${request_id}`);
+    const db = new StorageClient(request_id.substring(0, request_id.length - 32));
+    let connection = await db.get(request_id);
     if(!connection){
       return null;
     }
     if(code){
-      connection.status = ConnectionStatus.CONNECTED
-      connection.guid = connection.institution_code
-      connection.id = connection.institution_code
-      connection.user_id = code
+      connection.status = ConnectionStatus.CONNECTED;
+      connection.guid = connection.institution_code;
+      connection.id = connection.institution_code;
+      connection.user_id = code;
     }
     // console.log(connection)
-    await db.set(request_id, connection)
+    await db.set(request_id, connection);
     return connection;
   }
 }

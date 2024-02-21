@@ -28,4 +28,4 @@ module.exports = {
       institutionId: '102176'
     }
   }
-}
+};

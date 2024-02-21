@@ -17,4 +17,4 @@ module.exports = {
       connection_status: 'CONNECTED'
     }
   ]
-}
+};
