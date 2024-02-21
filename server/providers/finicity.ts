@@ -39,7 +39,7 @@ export class FinicityApi implements ProviderApiClient {
       url: ins?.urlHomeApp,
       oauth: true,
       provider: this.apiClient.apiConfig.provider
-    }
+    };
   }
 
   async ListInstitutionCredentials(id: string): Promise<Array<Credential>> {
@@ -68,7 +68,7 @@ export class FinicityApi implements ProviderApiClient {
       oauth_window_uri: await this.apiClient.generateConnectLiteUrl(request.institution_id, user_id, request_id),
       provider: this.apiClient.apiConfig.provider,
       status: ConnectionStatus.PENDING
-    }
+    };
     await this.db.set(request_id, obj);
     return obj;
   }
@@ -100,21 +100,21 @@ export class FinicityApi implements ProviderApiClient {
     logger.debug('Resolving UserId: ' + user_id);
     const finicityUser = await this.apiClient.getCustomer(user_id);
     if(finicityUser){
-      logger.trace(`Found existing finicity customer ${finicityUser.id}`)
-      return finicityUser.id
+      logger.trace(`Found existing finicity customer ${finicityUser.id}`);
+      return finicityUser.id;
     }
-    logger.trace(`Creating finicity user ${user_id}`)
-    let ret = await this.apiClient.createCustomer(user_id)
+    logger.trace(`Creating finicity user ${user_id}`);
+    let ret = await this.apiClient.createCustomer(user_id);
     if(ret){
-      return ret.id
+      return ret.id;
     }
-    logger.trace(`Failed creating finicity user, using user_id: ${user_id}`)
+    logger.trace(`Failed creating finicity user, using user_id: ${user_id}`);
     return user_id;
   }
 
   static async HandleOauthResponse(request: any): Promise<Connection> {
     const {connection_id, eventType, reason, code} = request;
-    const db = new StorageClient(connection_id.split(';')[0])
+    const db = new StorageClient(connection_id.split(';')[0]);
     let institutionLoginId = false;
     switch(eventType){
       case 'added':
@@ -131,17 +131,17 @@ export class FinicityApi implements ProviderApiClient {
         }
       
     }
-    logger.info(`Received finicity webhook response ${connection_id}`)
-    let connection = await db.get(connection_id)
+    logger.info(`Received finicity webhook response ${connection_id}`);
+    let connection = await db.get(connection_id);
     if(!connection){
       return null;
     }
     if(institutionLoginId){
-      connection.status = ConnectionStatus.CONNECTED
-      connection.guid = connection_id
-      connection.id = `${institutionLoginId}`
+      connection.status = ConnectionStatus.CONNECTED;
+      connection.guid = connection_id;
+      connection.id = `${institutionLoginId}`;
     }
-    await db.set(connection_id, connection)
+    await db.set(connection_id, connection);
     return connection;
   }
 
@@ -162,7 +162,7 @@ export class FinicityApi implements ProviderApiClient {
         oauth_window_uri: await this.apiClient.generateConnectFixUrl(id, user_id, request_id),
         provider: this.apiClient.apiConfig.provider,
         status: ConnectionStatus.PENDING
-      }
+      };
       await this.db.set(request_id, obj);
       return obj;
     }

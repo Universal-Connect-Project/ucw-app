@@ -1,12 +1,12 @@
-import { buildSophtronAuthCode } from '../../utils'
-const config = require('../../config')
-const logger = require('../../infra/logger')
-const http = require('../../infra/http')
+import { buildSophtronAuthCode } from '../../utils';
+const config = require('../../config');
+const logger = require('../../infra/logger');
+const http = require('../../infra/http');
 
 module.exports = class SophtronBaseClient {
-  apiConfig
+  apiConfig;
   constructor (apiConfig) {
-    this.apiConfig = apiConfig
+    this.apiConfig = apiConfig;
   }
 
   getAuthHeaders (method, path) {
@@ -20,30 +20,30 @@ module.exports = class SophtronBaseClient {
     // }
     return {
       Authorization: buildSophtronAuthCode(method, path, this.apiConfig.clientId, this.apiConfig.secret)
-    }
+    };
   }
 
   async post (path, data) {
-    const authHeader = this.getAuthHeaders('post', path)
-    const ret = await http.post(this.apiConfig.endpoint + path, data, authHeader)
-    return ret
+    const authHeader = this.getAuthHeaders('post', path);
+    const ret = await http.post(this.apiConfig.endpoint + path, data, authHeader);
+    return ret;
   }
 
   async get (path) {
-    const authHeader = this.getAuthHeaders('get', path)
-    const ret = await http.get(this.apiConfig.endpoint + path, authHeader)
-    return ret
+    const authHeader = this.getAuthHeaders('get', path);
+    const ret = await http.get(this.apiConfig.endpoint + path, authHeader);
+    return ret;
   }
 
   async put (path, data) {
-    const authHeader = this.getAuthHeaders('put', path)
-    const ret = await http.put(this.apiConfig.endpoint + path, data, authHeader)
-    return ret
+    const authHeader = this.getAuthHeaders('put', path);
+    const ret = await http.put(this.apiConfig.endpoint + path, data, authHeader);
+    return ret;
   }
 
   async del (path) {
-    const authHeader = this.getAuthHeaders('delete', path)
-    const ret = await http.del(this.apiConfig.endpoint + path, authHeader)
-    return ret
+    const authHeader = this.getAuthHeaders('delete', path);
+    const ret = await http.del(this.apiConfig.endpoint + path, authHeader);
+    return ret;
   }
-}
+};

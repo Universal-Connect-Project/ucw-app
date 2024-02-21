@@ -26,4 +26,4 @@ module.exports = {
     eventId: '1688829063731-09493ef4b934040cc17b18c4',
     payload: {}
   }
-}
+};

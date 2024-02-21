@@ -22,7 +22,7 @@ import {
   MxPlatformApiFactory,
   MemberResponseBody,
 } from '../serviceClients/mxClient';
-import * as config from '../config'
+import * as config from '../config';
 import { StorageClient } from'../serviceClients/storageClient';
 
 function fromMxInstitution(ins: InstitutionResponse, provider: string): Institution {
@@ -96,7 +96,7 @@ export class MxApi implements ProviderApiClient {
 
   async ListConnections(userId: string): Promise<Connection[]> {
     const res = await this.apiClient.listMembers(userId);
-    return res.data.members.map( (m) => fromMxInstitution(m, this.provider))
+    return res.data.members.map( (m) => fromMxInstitution(m, this.provider));
   }
 
   async ListConnectionCredentials(memberId: string, userId: string): Promise<Credential[]> {
@@ -110,10 +110,10 @@ export class MxApi implements ProviderApiClient {
   ): Promise<Connection> {
     const entityId = request.institution_id;
     const existings = await this.apiClient.listMembers(userId);
-    const existing = existings.data.members.find(m => m.institution_code === entityId)
+    const existing = existings.data.members.find(m => m.institution_code === entityId);
     if(existing){
-      logger.info(`Found existing member for institution ${entityId}, deleting`)
-      await this.apiClient.deleteMember(existing.guid, userId)
+      logger.info(`Found existing member for institution ${entityId}, deleting`);
+      await this.apiClient.deleteMember(existing.guid, userId);
       // return this.UpdateConnectionInternal({
       //   id: existing.guid,
       //   ...request,
@@ -274,7 +274,7 @@ export class MxApi implements ProviderApiClient {
     jobId: string,
     userId: string
   ): Promise<boolean> {
-    console.log(request)
+    console.log(request);
     const res = await this.apiClient.resumeAggregation(request.id!, userId, {
       member: {
         challenges: request.challenges!.map((item, idx) => ({
@@ -289,19 +289,19 @@ export class MxApi implements ProviderApiClient {
   async ResolveUserId(user_id: string){
     logger.debug('Resolving UserId: ' + user_id);
     let res = await this.apiClient.listUsers(1, 10, user_id);
-    const mxUser = res.data?.users?.find(u => u.id === user_id)
+    const mxUser = res.data?.users?.find(u => u.id === user_id);
     if(mxUser){
-      logger.trace(`Found existing mx user ${mxUser.guid}`)
-      return mxUser.guid
+      logger.trace(`Found existing mx user ${mxUser.guid}`);
+      return mxUser.guid;
     }
-    logger.trace(`Creating mx user ${user_id}`)
+    logger.trace(`Creating mx user ${user_id}`);
     let ret = await this.apiClient.createUser({
       user: {id: user_id,}
-    })
+    });
     if(ret?.data?.user){
-      return ret.data.user.guid
+      return ret.data.user.guid;
     }
-    logger.trace(`Failed creating mx user, using user_id: ${user_id}`)
+    logger.trace(`Failed creating mx user, using user_id: ${user_id}`);
     return user_id;
   }
 
@@ -312,7 +312,7 @@ export class MxApi implements ProviderApiClient {
       await db.set(member_guid, {
         error: true,
         error_reason
-      })
+      });
     }
     return {
       id: member_guid,

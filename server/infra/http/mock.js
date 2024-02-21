@@ -1,4 +1,4 @@
-const http = require('./real')
+const http = require('./real');
 
 const mfaRes = [
   {
@@ -15,8 +15,8 @@ const mfaRes = [
   { LastStatus: 'AccountsReady' },
   // {SuccessFlag: false},
   { SuccessFlag: true }
-]
-let counter = 0
+];
+let counter = 0;
 
 const mocks = {
   get: {
@@ -27,7 +27,7 @@ const mocks = {
     // 'v1/user/' + id
     // v1/userprofile
     default: (url) => {
-      console.log(`default mock get: ${url}`)
+      console.log(`default mock get: ${url}`);
     }
   },
   wget: {
@@ -35,8 +35,8 @@ const mocks = {
     '/api/institutions': (url) => http.wget(url),
     '/api/institution/resolve': (url) => http.wget(url),
     default: (url) => {
-      console.log(`Default mock wget: ${url}`)
-      return http.wget(url)
+      console.log(`Default mock wget: ${url}`);
+      return http.wget(url);
     }
   },
   post: {
@@ -93,14 +93,14 @@ const mocks = {
     ],
     '/api/Job/GetJobByID': () => {
       // return {JobID: 'MockedJobId', SuccessFlag: false,  LastStep: 'TokenMethods', LastStatus: 'Timeout'};
-      const mfa = mfaRes[counter % mfaRes.length]
-      counter++
+      const mfa = mfaRes[counter % mfaRes.length];
+      counter++;
       return {
         ...mfa,
         JobID: 'MockedJobID',
         UserInstitutionID: 'MockedUserInstitutionID'
         // SuccessFlag: true,
-      }
+      };
     },
     '/api/Job/UpdateJobSecurityAnswer': () => ({}),
     '/api/Job/UpdateJobTokenInput': () => ({}),
@@ -109,30 +109,30 @@ const mocks = {
       // http.wget('http://localhost:63880/hang')
     },
     default: (url) => {
-      console.log(`default mock post: ${url}`)
+      console.log(`default mock post: ${url}`);
     }
   }
-}
+};
 
 async function getMocks (method, fullUrl) {
-  const path = new URL(fullUrl).pathname
-  console.log(`Mocking: ${method} ${fullUrl}, path: ${path}`)
+  const path = new URL(fullUrl).pathname;
+  console.log(`Mocking: ${method} ${fullUrl}, path: ${path}`);
   if (mocks[method][path]) {
-    return await Promise.resolve(mocks[method][path](fullUrl))
+    return await Promise.resolve(mocks[method][path](fullUrl));
   }
-  return await Promise.resolve(mocks[method].default(fullUrl))
+  return await Promise.resolve(mocks[method].default(fullUrl));
 }
 
 module.exports = {
   async get (url) {
-    return await getMocks('get', url)
+    return await getMocks('get', url);
   },
   async wget (url) {
-    return await getMocks('wget', url)
+    return await getMocks('wget', url);
   },
   async post (url) {
-    return await getMocks('post', url)
+    return await getMocks('post', url);
   },
   stream: http.stream,
   buildAuthCode: http.buildAuthCode
-}
+};

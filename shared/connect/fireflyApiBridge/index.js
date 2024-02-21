@@ -4,13 +4,13 @@ const config = require('../../../server/config');
 let context = {
   user_id: config.MxDemoUserId
 };
-let api = new ConnectApi({context})
+let api = new ConnectApi({context});
 
 async function sendStubData(fileName){
   return new Promise((resolve, reject) => {
-    const data = require(`services/stubs/${fileName}`)
-    resolve(data)
-  })
+    const data = require(`services/stubs/${fileName}`);
+    resolve(data);
+  });
 }
 const stub = {
   loadMaster: () => sendStubData('data_master'),
@@ -34,30 +34,30 @@ const stub = {
   sendAnalyticsEvent: () => Promise.resolve(''),
   closeAnalyticsSession: () => Promise.resolve(''),
   logout: () => Promise.resolve(''),
-}
+};
 let bridge = {...stub};
 for(const name of Object.getOwnPropertyNames(Object.getPrototypeOf(api))){
-  bridge[name] = () => api[name]
+  bridge[name] = () => api[name];
 }
 module.exports = new Proxy(bridge, {
   get(target, prop) {
     if(stub[prop]){
       return async function(){
-        console.log(`Calling stub method: ${prop}`)
-        const ret = await stub[prop].apply(null, arguments)
-        console.log(JSON.stringify(ret))
+        console.log(`Calling stub method: ${prop}`);
+        const ret = await stub[prop].apply(null, arguments);
+        console.log(JSON.stringify(ret));
         return ret;
-      }
+      };
     }
     if(api[prop]){
       return async function(){
-        console.log(`Calling api method: ${prop}`)
+        console.log(`Calling api method: ${prop}`);
         try{
-          const ret = await api[prop].apply(api, arguments)
+          const ret = await api[prop].apply(api, arguments);
           //console.log(JSON.stringify(ret))
           switch(prop){
             case 'loadTransactionRules':
-              return ret.transaction_rules
+              return ret.transaction_rules;
             case 'addMember':
               return ret;
             case 'loadMemberByGuid':
@@ -74,29 +74,29 @@ module.exports = new Proxy(bridge, {
               return {
                 accounts: ret.accounts,
                 members: ret.members,
-              }
+              };
             case 'loadInstitutionByGuid':
             case 'loadInstitutionByCode':
               return {
                 ...ret.institution,
                 // Remove extra level of nesting
                 credentials: ret.institution.credentials.map(credential => credential.credential),
-              }
+              };
             case 'loadJob':
               return ret.job;
-            };
+            }
           return ret;
         }catch(err){
           console.log(err.message || JSON.stringify(err));
         }
-      }
+      };
     }
     if(prop !== '$$typeof'){
-      console.log(`Unstubbed method retrieved ${prop}`)
+      console.log(`Unstubbed method retrieved ${prop}`);
     }
     return function() {
-      console.log(`Unstubbed method called ${prop}`)
-      return Promise.resolve('')
-    }
+      console.log(`Unstubbed method called ${prop}`);
+      return Promise.resolve('');
+    };
   }
-})
+});

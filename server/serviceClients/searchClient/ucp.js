@@ -9,12 +9,12 @@ export class SearchClient{
   }
 
   async institutions(name, providers){
-    providers = providers || []
+    providers = providers || [];
     let url = `${config.SearchEndpoint}institutions?query=${encodeURIComponent(name || '')}&providers=${providers.join(';')}`;
-    return http.get(url, {Authorization: `token ${this.token}`})
+    return http.get(url, {Authorization: `token ${this.token}`});
   }
 
   resolve(id){
-    return http.get(`${config.SearchEndpoint}institution/resolve?id=${id}`, {Authorization: `token ${this.token}`})
+    return http.get(`${config.SearchEndpoint}institution/resolve?id=${id}`, {Authorization: `token ${this.token}`});
   }
 }

@@ -14,4 +14,4 @@ module.exports = [
     supports_transaction_history: true,
     url: 'https://gringotts.qa.internal.mx/'
   }
-]
+];
