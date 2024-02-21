@@ -15,7 +15,7 @@ import {
   type ProviderApiClient,
   VcType,
   type CreateConnectionRequest,
-  type UpdateConnectionRequest
+  type UpdateConnectionRequest,
 } from '../../shared/contract';
 import { AnalyticsClient } from '../serviceClients/analyticsClient';
 import { SearchClient } from '../serviceClients/searchClient';
@@ -97,7 +97,7 @@ export class ProviderApiBase {
           conf.token = token;
           this.serviceClient = getApiClient(this.context?.provider, {
             ...conf,
-            storageClient
+            storageClient,
           });
           this.providers = Object.values(conf).filter((v: any) => v.available).map((v: any) => v.provider);
           return true;
@@ -136,7 +136,7 @@ export class ProviderApiBase {
   async resolveInstitution (id: string): Promise<Institution> {
     this.context.updated = true;
     const ret = {
-      id
+      id,
     } as any;
     if (!this.context.provider || (this.context.institution_uid && this.context.institution_uid != id && this.context.institution_id != id)) {
       const resolved = await this.searchApi.resolve(id);
@@ -204,10 +204,10 @@ export class ProviderApiBase {
     return await this.serviceClient.AnswerChallenge(
       {
         id: connection_id || this.context.connection_id,
-        challenges
+        challenges,
       },
       this.context.current_job_id,
-      this.getUserId()
+      this.getUserId(),
     );
   }
 
@@ -218,14 +218,14 @@ export class ProviderApiBase {
 
   async getOauthState (connection_id: string) {
     const connection = await this.getConnectionStatus(connection_id);
-    if(!connection){
+    if (!connection) {
       return {};
     }
     const ret = {
       guid: connection_id,
       inbound_member_guid: connection_id,
       outbound_member_guid: connection_id,
-      auth_status: connection.status === ConnectionStatus.PENDING ? 1 : ConnectionStatus.CONNECTED ? 2 : 3
+      auth_status: connection.status === ConnectionStatus.PENDING ? 1 : ConnectionStatus.CONNECTED ? 2 : 3,
     } as any;
     if (ret.auth_status === 3) {
       ret.error_reason = connection.status;
@@ -237,8 +237,8 @@ export class ProviderApiBase {
     const state = await this.getOauthState(memberGuid);
     return {
       oauth_states: [
-        state.oauth_state
-      ]
+        state.oauth_state,
+      ],
     };
   }
 
@@ -278,7 +278,7 @@ export class ProviderApiBase {
     }
     return {
       ...ret,
-      provider
+      provider,
     };
   }
 

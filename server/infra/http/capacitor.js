@@ -6,7 +6,7 @@ async function wget (url) {
   const options = {
     url,
     webFetchExtra: { mode: 'no-cors' },
-    responseType: 'text'
+    responseType: 'text',
   };
   const res = await Http.get(options).catch((error) => {
     logger.error(`error from ${url}`, error);
@@ -22,7 +22,7 @@ async function get (url, headers, returnFullResObject) {
     url,
     headers,
     webFetchExtra: { mode: 'no-cors' },
-    responseType: 'text'
+    responseType: 'text',
   };
   const res = await Http.get(options).catch((error) => {
     logger.error(`error from ${url}`, error);
@@ -39,7 +39,7 @@ async function post (url, data, headers, returnFullResObject) {
     headers: { 'content-type': 'application/json', ...headers },
     webFetchExtra: { mode: 'no-cors' },
     responseType: 'text',
-    data: data || {}
+    data: data || {},
   };
   // console.log(data)
   // logger.debug('posting: ' + options.url);
@@ -55,5 +55,5 @@ async function post (url, data, headers, returnFullResObject) {
 module.exports = {
   get,
   wget,
-  post
+  post,
 };

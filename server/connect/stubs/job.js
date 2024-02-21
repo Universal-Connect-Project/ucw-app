@@ -10,6 +10,6 @@ module.exports = {
     job_type: 0,
     finished_at: 1680125639,
     started_at: 1680125637,
-    updated_at: 1680125639
-  }
+    updated_at: 1680125639,
+  },
 };

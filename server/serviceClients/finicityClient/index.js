@@ -7,7 +7,7 @@ function makeFinicityAuthHeaders (apiConfig, tokenRes) {
     'Finicity-App-Key': apiConfig.appKey,
     'Finicity-App-Token': tokenRes.token,
     'Content-Type': 'application/json',
-    accept: 'application/json'
+    accept: 'application/json',
   };
 }
 
@@ -19,12 +19,12 @@ export default class FinicityClient {
   getAuthToken () {
     return axios.post(this.apiConfig.basePath + '/aggregation/v2/partners/authentication', {
       partnerId: this.apiConfig.partnerId,
-      partnerSecret: this.apiConfig.secret
+      partnerSecret: this.apiConfig.secret,
     }, {
       headers: {
         'Finicity-App-Key': this.apiConfig.appKey,
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     }).then(res => res.data).catch(err => {
       logger.error('Error at finicityClient.getAuthToken', err?.response?.data);
     });
@@ -74,8 +74,8 @@ export default class FinicityClient {
       {
         fromDate: Date.parse(fromDate) / 1000,
         toDate: Date.parse(toDate) / 1000,
-        limit: 2
-      }
+        limit: 2,
+      },
     );
   }
 
@@ -87,7 +87,7 @@ export default class FinicityClient {
       institutionId,
       redirectUri: `${config.HostUrl}/oauth/${this.apiConfig.provider}/redirect_from?connection_id=${request_id}`,
       webhook: `${config.WebhookHostUrl}/webhook/${this.apiConfig.provider}/?connection_id=${request_id}`,
-      webhookContentType: 'application/json'
+      webhookContentType: 'application/json',
       // 'singleUseUrl': true,
       // 'experience': 'default',
     }).then(ret => ret.link);
@@ -101,7 +101,7 @@ export default class FinicityClient {
       institutionLoginId,
       redirectUri: `${config.HostUrl}/oauth/${this.apiConfig.provider}/redirect_from?connection_id=${request_id}`,
       webhook: `${config.WebhookHostUrl}/webhook/${this.apiConfig.provider}/?connection_id=${request_id}`,
-      webhookContentType: 'application/json'
+      webhookContentType: 'application/json',
     }).then(ret => ret.link);
   }
 
@@ -112,7 +112,7 @@ export default class FinicityClient {
       lastName: 'Smith',
       // applicationId: '123456789',
       phone: '1-801-984-4200',
-      email: 'myname@mycompany.com'
+      email: 'myname@mycompany.com',
     });
   }
 
@@ -134,14 +134,14 @@ export default class FinicityClient {
       const headers = makeFinicityAuthHeaders(this.apiConfig, token);
       this.axios = axios.create({
         baseURL: this.apiConfig.basePath,
-        headers
+        headers,
       });
     }
     const ret = await this.axios.request({
       url,
       method,
       params,
-      data
+      data,
     })
       .then(res => res.data)
       .catch(err => {

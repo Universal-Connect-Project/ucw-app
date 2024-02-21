@@ -10,8 +10,8 @@ module.exports = {
       title: 'Test Instructions',
       description: '<a href="https://google.com" id="instructional_text">A Test Link</a>',
       steps: [
-        'Go to <a href="https://google.com" id="instructional_text_steps">Google</a>'
-      ]
+        'Go to <a href="https://google.com" id="instructional_text_steps">Google</a>',
+      ],
     },
     is_being_aggregated: true,
     is_manual: false,
@@ -56,9 +56,9 @@ module.exports = {
           display_name: null,
           status_code: 200,
           job_guid: 'JOB-241266ed-803a-4841-8a8a-0f37551e8f56',
-          options: []
-        }
-      ]
+          options: [],
+        },
+      ],
     },
     most_recent_job_guid: 'JOB-f758c317-1107-45b9-814a-dab4215bf365',
     needs_updated_credentials: false,
@@ -99,16 +99,16 @@ module.exports = {
             display_name: null,
             status_code: 200,
             job_guid: 'JOB-f758c317-1107-45b9-814a-dab4215bf365',
-            options: []
-          }
-        ]
-      }
+            options: [],
+          },
+        ],
+      },
     },
     revision: 16,
     user_guid: 'USR-810d4e82-750f-4c2a-a194-8c9b2897c629',
     oauth_window_uri: null,
     verification_is_enabled: true,
     tax_statement_is_enabled: false,
-    successfully_aggregated_at: null
-  }
+    successfully_aggregated_at: null,
+  },
 };

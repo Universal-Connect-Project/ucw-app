@@ -50,7 +50,7 @@ module.exports = function (app) {
     const data = await req.vcsService.login(
       req.body.institution_id,
       req.body.connection_id,
-      req.body.credentials
+      req.body.credentials,
     );
     if (data) {
       // res.context.connection_id = data.cur_job_id;
@@ -68,7 +68,7 @@ module.exports = function (app) {
   app.post('/api/answerChallenge', async (req, res) => {
     const data = await req.vcsService.answerChallenge(
       req.body.id,
-      req.body.challenges
+      req.body.challenges,
     );
     res.send(data || {});
   });

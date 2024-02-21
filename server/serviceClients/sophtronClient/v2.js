@@ -21,7 +21,7 @@ module.exports = class SophtronV2Client extends SophtronBaseClient {
     return await this.post('/v2/customers', {
       UniqueID: unique_name,
       Source: `Universal_Widget_${config.HostUrl}`,
-      Name: 'UniversalWidget_Customer'
+      Name: 'UniversalWidget_Customer',
     });
   }
 
@@ -33,14 +33,14 @@ module.exports = class SophtronV2Client extends SophtronBaseClient {
     return await this.post(`/v2/customers/${customerId}/members/${job_type}`, {
       UserName: username,
       Password: password,
-      InstitutionID: institution_id
+      InstitutionID: institution_id,
     });
   }
 
   async updateMember (customerId, memberId, job_type, username, password) {
     return await this.put(`/v2/customers/${customerId}/members/${memberId}/${job_type}`, {
       UserName: username,
-      Password: password
+      Password: password,
     });
   }
 
