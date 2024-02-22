@@ -18,5 +18,6 @@ module.exports = {
   },
   moduleNameMapper: {
     '^axios$': require.resolve('axios'),
-  }
-}
+  },
+  exclude: ['node_modules'],
+};
