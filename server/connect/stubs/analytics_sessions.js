@@ -5,6 +5,6 @@ module.exports = {
     browser_name: 'Chrome',
     browser_version: '111.0.0.0',
     product_name: 'Individual Widget',
-    product_version: '1.0.0'
-  }
+    product_version: '1.0.0',
+  },
 };

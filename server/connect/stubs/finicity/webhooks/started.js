@@ -17,13 +17,13 @@ module.exports = {
     'x-b3-traceid': '513f66f40b0bcc46babfd1c18a08c277',
     'x-b3-spanid': 'f3a307e76b652d50',
     'x-b3-sampled': '1',
-    traceparent: '00-513f66f40b0bcc46babfd1c18a08c277-f3a307e76b652d50-01'
+    traceparent: '00-513f66f40b0bcc46babfd1c18a08c277-f3a307e76b652d50-01',
   },
   path: '/webhook/finicity_sandbox/f0105b8f-a7a4-4665-98e2-09e116804951',
   body: {
     customerId: '6030781868',
     eventType: 'started',
     eventId: '1688829063731-09493ef4b934040cc17b18c4',
-    payload: {}
-  }
+    payload: {},
+  },
 };

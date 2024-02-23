@@ -9,14 +9,14 @@ function makeAkoyaAuthHeaders (apiConfig) {
   return {
     Authorization: `Basic ${CryptoJS.enc.Base64.stringify(words)}`,
     'content-type': 'application/x-www-form-urlencoded',
-    accept: 'application/json'
+    accept: 'application/json',
   };
 }
 
 function makeAkoyaBearerHeaders (token) {
   return {
     Authorization: `Bearer ${token}`,
-    accept: 'application/json'
+    accept: 'application/json',
   };
 }
 
@@ -26,7 +26,7 @@ export default class AkoyaClient {
     this.client_redirect_url = `${config.HostUrl}/oauth/${this.apiConfig.provider}/redirect_from`;
     this.authParams = {
       client_id: apiConfig.clientId,
-      client_secret: apiConfig.secret
+      client_secret: apiConfig.secret,
     };
   }
 

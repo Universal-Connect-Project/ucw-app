@@ -5,7 +5,7 @@ const levels = {
   trace: 0,
   info: 1,
   warning: 2,
-  error: 3
+  error: 3,
 };
 
 function startDoc () {
@@ -14,7 +14,7 @@ function startDoc () {
     Component: config.Component,
     Env: config.Env || 'development',
     Request: {},
-    '@timestamp': new Date().toISOString()
+    '@timestamp': new Date().toISOString(),
   };
 }
 

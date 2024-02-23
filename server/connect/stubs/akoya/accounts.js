@@ -8,10 +8,10 @@ module.exports = {
         currency: {
           currencyCode: 'USD',
           currencyRate: 0,
-          originalCurrencyCode: 'USD'
+          originalCurrencyCode: 'USD',
         },
-        nickname: 'INDIVIDUAL'
-      }
+        nickname: 'INDIVIDUAL',
+      },
     },
     {
       investmentAccount: {
@@ -21,10 +21,10 @@ module.exports = {
         currency: {
           currencyCode: 'USD',
           currencyRate: 0,
-          originalCurrencyCode: 'USD'
+          originalCurrencyCode: 'USD',
         },
-        nickname: 'Cash Management-Individual'
-      }
-    }
-  ]
+        nickname: 'Cash Management-Individual',
+      },
+    },
+  ],
 };

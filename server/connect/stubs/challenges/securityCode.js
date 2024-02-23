@@ -14,13 +14,13 @@ module.exports = {
       type: 'OPTIONS',
       options: [{
         label: 'Text me at (•••)•••-8582 ()',
-        value: 'td_bank_text'
+        value: 'td_bank_text',
       }, {
         label: 'Call me at (•••)•••-8582 ()',
-        value: 'td_bank_call'
-      }
-      ]
-    }
-    ]
-  }
+        value: 'td_bank_call',
+      },
+      ],
+    },
+    ],
+  },
 };

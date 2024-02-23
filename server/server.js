@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const limiter = RateLimit({
   windowMs: 10 * 60 * 1000,
-  max: 5000 // max average 500 requests per windowMs
+  max: 5000, // max average 500 requests per windowMs
 });
 app.use(limiter);
 
@@ -50,7 +50,7 @@ const pageQueries = new RegExp([
   'single_account_select',
   'update_credentials',
   'server',
-  'is_mobile_webview'
+  'is_mobile_webview',
 ].map(r => `\\$${r}`).join('|'), 'g');
 function renderDefaultPage (req, res, html) {
   if (req.query.connection_id && !req.query.provider) {

@@ -1,4 +1,3 @@
-// import { get } from 'axios';
 const axios = require('axios');
 
 jest.mock('axios');

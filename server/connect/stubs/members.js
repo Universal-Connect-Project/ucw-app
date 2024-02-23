@@ -14,7 +14,7 @@ module.exports = {
       metadata: null,
       name: 'Gringotts',
       successfully_aggregated_at: '2023-03-01T16:46:06Z',
-      connection_status: 'CONNECTED'
-    }
-  ]
+      connection_status: 'CONNECTED',
+    },
+  ],
 };
