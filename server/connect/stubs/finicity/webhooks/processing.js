@@ -17,7 +17,7 @@ module.exports = {
     'x-b3-traceid': 'afd7418bc7f0ac40a2214f947870b23b',
     'x-b3-spanid': 'a022d23582645673',
     'x-b3-sampled': '1',
-    traceparent: '00-afd7418bc7f0ac40a2214f947870b23b-a022d23582645673-01'
+    traceparent: '00-afd7418bc7f0ac40a2214f947870b23b-a022d23582645673-01',
   },
   path: '/webhook/finicity_sandbox/f0105b8f-a7a4-4665-98e2-09e116804951',
   body: {
@@ -25,7 +25,7 @@ module.exports = {
     eventType: 'processing',
     eventId: '1688829079076-762bbd85f01689ccfa615f7f',
     payload: {
-      institutionId: '102176'
-    }
-  }
+      institutionId: '102176',
+    },
+  },
 };

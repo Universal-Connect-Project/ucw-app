@@ -6,17 +6,17 @@ import { encrypt, decrypt } from '../utils';
 declare global {
   namespace Express {
     interface Request {
-      context?: import('../../shared/contract').Context;
+      context?: import('../../shared/contract').Context
     }
     interface Response {
-      context?: import('../../shared/contract').Context;
+      context?: import('../../shared/contract').Context
     }
   }
 }
 
-function get(req: Request) {
+function get (req: Request) {
   if (req.headers.meta?.length > 0) {
-    const decrypted = decrypt(<string>req.headers.meta, config.CryptoKey, config.CryptoIv);
+    const decrypted = decrypt((req.headers.meta as string), config.CryptoKey, config.CryptoIv);
     req.context = JSON.parse(decrypted);
     req.context.updated = false;
   } else {
@@ -25,16 +25,16 @@ function get(req: Request) {
   return req.context;
 }
 
-function set(res: Response) {
-  if(res.context.updated){
+function set (res: Response) {
+  if (res.context.updated) {
     res.set('meta', encrypt(JSON.stringify(res.context), config.CryptoKey, config.CryptoIv));
   }
 }
 
-export function contextHandler(
+export function contextHandler (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   res.context = get(req);
   // console.log('context res: ' + req.path)

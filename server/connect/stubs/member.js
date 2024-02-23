@@ -9,7 +9,7 @@ module.exports = {
     instructional_data: {
       title: null,
       description: 'This is my instructional text. It includes a <a href="https://www.mx.com" id="instructional_text">link</a> that you can click.',
-      steps: []
-    }
-  }
+      steps: [],
+    },
+  },
 };

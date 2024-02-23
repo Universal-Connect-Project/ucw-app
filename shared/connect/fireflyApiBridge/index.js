@@ -1,61 +1,61 @@
 const { ConnectApi } = require('../../../server/connect/connectApi');
 const config = require('../../../server/config');
 
-let context = {
-  user_id: config.MxDemoUserId
+const context = {
+  user_id: config.MxDemoUserId,
 };
-let api = new ConnectApi({context});
+const api = new ConnectApi({ context });
 
-async function sendStubData(fileName){
-  return new Promise((resolve, reject) => {
+async function sendStubData (fileName) {
+  return await new Promise((resolve, reject) => {
     const data = require(`services/stubs/${fileName}`);
     resolve(data);
   });
 }
 const stub = {
-  loadMaster: () => sendStubData('data_master'),
-  loadTransactionRules: () => sendStubData('transaction_rules'),
-  instrumentation: () => sendStubData('instrumentation'),
-  loadUserFeatures: () => sendStubData('user_features'),
-  createAnalyticsSession: () => sendStubData('analytics_sessions'),
-  loadJob: (guid) => Promise.resolve({
+  loadMaster: async () => await sendStubData('data_master'),
+  loadTransactionRules: async () => await sendStubData('transaction_rules'),
+  instrumentation: async () => await sendStubData('instrumentation'),
+  loadUserFeatures: async () => await sendStubData('user_features'),
+  createAnalyticsSession: async () => await sendStubData('analytics_sessions'),
+  loadJob: async (guid) => await Promise.resolve({
     guid,
     job_type: 0, // must
   }),
-  //loadPopularInstitutions: () => sendStubData('favorite'),
-  
-  extendSession: () => Promise.resolve(''),
-  loadOffer: () => Promise.resolve(''),
-  dismissOffer: () => Promise.resolve(''),
-  loadAgreement: () => Promise.resolve(''),
-  createNewFeatureVisit: () => Promise.resolve(''),
-  closeFeatureVisit: () => Promise.resolve(''),
-  sendAnalyticsPageview: () => Promise.resolve(''),
-  sendAnalyticsEvent: () => Promise.resolve(''),
-  closeAnalyticsSession: () => Promise.resolve(''),
-  logout: () => Promise.resolve(''),
+  // loadPopularInstitutions: () => sendStubData('favorite'),
+
+  extendSession: async () => await Promise.resolve(''),
+  loadOffer: async () => await Promise.resolve(''),
+  dismissOffer: async () => await Promise.resolve(''),
+  loadAgreement: async () => await Promise.resolve(''),
+  createNewFeatureVisit: async () => await Promise.resolve(''),
+  closeFeatureVisit: async () => await Promise.resolve(''),
+  sendAnalyticsPageview: async () => await Promise.resolve(''),
+  sendAnalyticsEvent: async () => await Promise.resolve(''),
+  closeAnalyticsSession: async () => await Promise.resolve(''),
+  logout: async () => await Promise.resolve(''),
 };
-let bridge = {...stub};
-for(const name of Object.getOwnPropertyNames(Object.getPrototypeOf(api))){
+const bridge = { ...stub };
+for (const name of Object.getOwnPropertyNames(Object.getPrototypeOf(api))) {
   bridge[name] = () => api[name];
 }
 module.exports = new Proxy(bridge, {
-  get(target, prop) {
-    if(stub[prop]){
-      return async function(){
+  get (target, prop) {
+    if (stub[prop]) {
+      return async function () {
         console.log(`Calling stub method: ${prop}`);
         const ret = await stub[prop].apply(null, arguments);
         console.log(JSON.stringify(ret));
         return ret;
       };
     }
-    if(api[prop]){
-      return async function(){
+    if (api[prop]) {
+      return async function () {
         console.log(`Calling api method: ${prop}`);
-        try{
+        try {
           const ret = await api[prop].apply(api, arguments);
-          //console.log(JSON.stringify(ret))
-          switch(prop){
+          // console.log(JSON.stringify(ret))
+          switch (prop) {
             case 'loadTransactionRules':
               return ret.transaction_rules;
             case 'addMember':
@@ -84,19 +84,19 @@ module.exports = new Proxy(bridge, {
               };
             case 'loadJob':
               return ret.job;
-            }
+          }
           return ret;
-        }catch(err){
+        } catch (err) {
           console.log(err.message || JSON.stringify(err));
         }
       };
     }
-    if(prop !== '$$typeof'){
+    if (prop !== '$$typeof') {
       console.log(`Unstubbed method retrieved ${prop}`);
     }
-    return function() {
+    return async function () {
       console.log(`Unstubbed method called ${prop}`);
-      return Promise.resolve('');
+      return await Promise.resolve('');
     };
-  }
+  },
 });

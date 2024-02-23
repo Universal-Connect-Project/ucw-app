@@ -5,7 +5,7 @@ export const ApiEndpoints = {
   APPDATA: '/raja/data?type=master', // have
   ANALYTICS_EVENTS: '/analytics_events',
   ANALYTICS_PAGEVIEW: '/analytics_pageviews',
-  ANALYTICS_SESSION: '/analytics_sessions', // have 
+  ANALYTICS_SESSION: '/analytics_sessions', // have
   BLOCKED_ROUTING_NUMBERS: '/blocked_routing_numbers',
   BUDGETS: '/budgets',
   CATEGORIES: '/categories',
@@ -23,7 +23,7 @@ export const ApiEndpoints = {
   GOALS: '/goals',
   HEALTH_SCORES: '/health_scores',
   HOLDINGS: '/holdings',
-  INSTRUMENTATION: '/instrumentation', // have 
+  INSTRUMENTATION: '/instrumentation', // have
   JOBS: '/jobs', // investigating
   INSTITUTIONS: '/institutions', // have
   LOGOUT: '/logout',
@@ -49,10 +49,10 @@ export const ApiEndpoints = {
   SYNC_ACCOUNTS: '/members/refresh_all',
   TAGGINGS: '/taggings',
   TAGS: '/tags',
-  TRANSACTION_RULES: '/transaction_rules', // have 
+  TRANSACTION_RULES: '/transaction_rules', // have
   TRANSACTIONS: '/transactions',
   USER: '/user',
   USER_COMMUNICATION_PROFILE: '/user_communication_profile',
-  USER_FEATURES: '/user_features', // have 
+  USER_FEATURES: '/user_features', // have
   USER_PROFILES: '/user_profiles',
 };

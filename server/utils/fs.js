@@ -21,11 +21,11 @@ async function readFile (path) {
         }
         fileReadCache.time = new Date();
         resolve(content);
-      }
+      },
     );
   });
 }
 
 module.exports = {
-  readFile
+  readFile,
 };

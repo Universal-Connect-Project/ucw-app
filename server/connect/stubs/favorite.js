@@ -12,6 +12,6 @@ module.exports = [
     supports_account_verification: true,
     supports_oauth: false,
     supports_transaction_history: true,
-    url: 'https://gringotts.qa.internal.mx/'
-  }
+    url: 'https://gringotts.qa.internal.mx/',
+  },
 ];

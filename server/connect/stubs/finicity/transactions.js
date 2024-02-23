@@ -18,7 +18,7 @@ module.exports = {
       createdDate: 1688729564,
       categorization: [Object],
       sharesPerContract: 0,
-      optionSharesPerContract: 0
+      optionSharesPerContract: 0,
     },
     {
       id: 27127346107,
@@ -33,7 +33,7 @@ module.exports = {
       createdDate: 1688729564,
       categorization: [Object],
       sharesPerContract: 0,
-      optionSharesPerContract: 0
-    }
-  ]
+      optionSharesPerContract: 0,
+    },
+  ],
 };

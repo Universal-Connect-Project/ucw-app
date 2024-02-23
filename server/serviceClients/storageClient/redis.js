@@ -3,7 +3,7 @@ const logger = require('../../infra/logger');
 const { createClient } = require('redis');
 
 const redisClient = createClient({
-  url: config.RedisServer
+  url: config.RedisServer,
 });
 
 const useRedis = config.Env !== 'dev' && config.Env !== 'mocked' && config.Env !== 'local';
