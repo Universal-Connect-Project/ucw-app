@@ -10,8 +10,8 @@ module.exports = {
       title: 'Test Instructions',
       description: '<a href="https://google.com" id="instructional_text">A Test Link</a>',
       steps: [
-        'Go to <a href="https://google.com" id="instructional_text_steps">Google</a>',
-      ],
+        'Go to <a href="https://google.com" id="instructional_text_steps">Google</a>'
+      ]
     },
     login_url: null,
     name: 'Gringotts',
@@ -30,8 +30,8 @@ module.exports = {
           label: 'Username',
           meta_data: null,
           optional: false,
-          options: null,
-        },
+          options: null
+        }
       },
       {
         credential: {
@@ -42,9 +42,9 @@ module.exports = {
           label: 'Password',
           meta_data: null,
           optional: false,
-          options: null,
-        },
-      },
-    ],
-  },
+          options: null
+        }
+      }
+    ]
+  }
 };

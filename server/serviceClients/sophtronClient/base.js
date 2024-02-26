@@ -19,7 +19,7 @@ module.exports = class SophtronBaseClient {
     //   };
     // }
     return {
-      Authorization: buildSophtronAuthCode(method, path, this.apiConfig.clientId, this.apiConfig.secret),
+      Authorization: buildSophtronAuthCode(method, path, this.apiConfig.clientId, this.apiConfig.secret)
     };
   }
 

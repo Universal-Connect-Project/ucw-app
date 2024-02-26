@@ -34,7 +34,7 @@ const config = {
 
   UcpAuthClientId: '', // https://login.universalconnectproject.org/
   UcpAuthClientSecret: '',
-  UcpAuthEncryptionKey: '',
+  UcpAuthEncryptionKey: ''
 
 };
 

@@ -1,5 +1,5 @@
 import {
-  type Institution,
+  type Institution
 } from '../../shared/contract';
 import * as config from '../config';
 import * as logger from '../infra/logger';
@@ -12,7 +12,7 @@ export class VcsService extends ProviderApiBase {
   }
 
   async selectInstitution (
-    institution: Institution,
+    institution: Institution
   ) {
     logger.debug(`Selecting institution ${institution.id}`);
     // if (institution.provider) {
@@ -32,7 +32,7 @@ export class VcsService extends ProviderApiBase {
   async login (
     institution_id: string,
     connection_id: string | null,
-    credentials: Credential[],
+    credentials: Credential[]
   ) {
     institution_id = this.context.institution_id || institution_id;
     connection_id = this.context.connection_id || connection_id;
@@ -40,8 +40,8 @@ export class VcsService extends ProviderApiBase {
       const res = await this.updateConnection(
         {
           id: connection_id,
-          credentials,
-        },
+          credentials
+        }
       );
       return res;
     }
@@ -50,17 +50,17 @@ export class VcsService extends ProviderApiBase {
         {
           institution_id,
           credentials,
-          initial_job_type: this.context.job_type,
-        },
+          initial_job_type: this.context.job_type
+        }
       );
       if (res) {
         return res;
       }
       logger.error(
-        `failed creating connection with instituionId : ${institution_id}`,
+        `failed creating connection with instituionId : ${institution_id}`
       );
       return {
-        error: `failed creating connection with instituionId : ${institution_id}`,
+        error: `failed creating connection with instituionId : ${institution_id}`
       };
     }
     return { error: 'Unable to find instituion, invalid parameters provided' };

@@ -17,11 +17,11 @@ module.exports = {
     'x-b3-traceid': '66f62034218da84ec403cd06c324284d',
     'x-b3-spanid': 'd89844f3af4943e7',
     'x-b3-sampled': '1',
-    traceparent: '00-66f62034218da84ec403cd06c324284d-d89844f3af4943e7-01',
+    traceparent: '00-66f62034218da84ec403cd06c324284d-d89844f3af4943e7-01'
   },
   path: '/webhook/finicity_sandbox/f0105b8f-a7a4-4665-98e2-09e116804951',
   body: {
     eventType: 'ping',
-    payload: {},
-  },
+    payload: {}
+  }
 };
