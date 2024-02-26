@@ -7,7 +7,7 @@ module.exports = {
     label: 'Username',
     meta_data: null,
     optional: false,
-    options: null,
+    options: null
   }, {
     display_order: 2,
     field_name: 'PASSWORD',
@@ -16,7 +16,7 @@ module.exports = {
     label: 'Password',
     meta_data: null,
     optional: false,
-    options: null,
-  },
-  ],
+    options: null
+  }
+  ]
 };

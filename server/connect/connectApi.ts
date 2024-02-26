@@ -4,7 +4,7 @@ import {
   type Connection,
   ConnectionStatus,
   type Institution,
-  type Challenge,
+  Challenge
 } from '../../shared/contract';
 import * as logger from '../infra/logger';
 
@@ -21,7 +21,7 @@ function mapInstitution (ins: Institution) {
     credentials: [] as any[],
     supports_oauth: ins.oauth || ins.name?.includes('Oauth'),
     providers: ins.providers,
-    provider: ins.provider,
+    provider: ins.provider
     // credentials: credentials?.map((c: any) => ({
     //   guid: c.id,
     //   ...c
@@ -48,7 +48,7 @@ function mapConnection (connection: Connection): Member {
           credential_guid: c.id,
           label: c.question,
           type: c.type,
-          options: [] as any[],
+          options: [] as any[]
         } as any;
         switch (c.type) {
           case ChallengeType.QUESTION:
@@ -69,7 +69,7 @@ function mapConnection (connection: Connection): Member {
               guid: d.key,
               label: d.key,
               value: d.value,
-              credential_guid: c.id,
+              credential_guid: c.id
             }));
             break;
           case ChallengeType.IMAGE_OPTIONS:
@@ -78,14 +78,14 @@ function mapConnection (connection: Connection): Member {
               guid: d.key,
               label: d.key,
               data_uri: d.value,
-              credential_guid: c.id,
+              credential_guid: c.id
             }));
             break;
         }
         return ret;
-      },
-      ),
-    },
+      }
+      )
+    }
   } as any;
 }
 
@@ -102,8 +102,8 @@ export class ConnectApi extends ProviderApiBase {
       initial_job_type: this.context.job_type || 'agg',
       credentials: memberData.credentials?.map(c => ({
         id: c.guid,
-        value: c.value,
-      })) ?? [],
+        value: c.value
+      })) ?? []
     });
     return { member: mapConnection(connection) };
   }
@@ -116,7 +116,7 @@ export class ConnectApi extends ProviderApiBase {
           const ret: Challenge = {
             id: c.guid,
             type: c.field_type,
-            response: c.value,
+            response: c.value
           };
           const challenge = member.mfa?.credentials.find(m => m.guid === c.guid); // widget posts everything back
           switch (challenge?.type) {
@@ -137,7 +137,7 @@ export class ConnectApi extends ProviderApiBase {
               break;
           }
           return ret;
-        }),
+        })
       );
       return { member };
     } else {
@@ -146,8 +146,8 @@ export class ConnectApi extends ProviderApiBase {
         id: member.guid,
         credentials: member.credentials?.map(c => ({
           id: c.guid,
-          value: c.value,
-        })),
+          value: c.value
+        }))
       });
       return { member: mapConnection(connection) };
     }
@@ -185,8 +185,8 @@ export class ConnectApi extends ProviderApiBase {
       credentials: crs.map(c => ({
         ...c,
         guid: c.id,
-        field_type: c.field_type === 'PASSWORD' ? 1 : 3,
-      })),
+        field_type: c.field_type === 'PASSWORD' ? 1 : 3
+      }))
     };
   }
 
@@ -196,8 +196,8 @@ export class ConnectApi extends ProviderApiBase {
       credentials: crs.map(c => ({
         ...c,
         guid: c.id,
-        field_type: c.field_type === 'PASSWORD' ? 1 : 3,
-      })),
+        field_type: c.field_type === 'PASSWORD' ? 1 : 3
+      }))
     };
   }
 

@@ -3,7 +3,7 @@ import * as path from 'path';
 const { instrumentation } = require('../providers');
 const { contextHandler } = require('../infra/context.ts');
 const { ApiEndpoints } = require('../../shared/connect/ApiEndpoint.js');
-const { ConnectionStatus } = require('../../shared/contract.ts');
+const {ConnectionStatus} = require('../../shared/contract.ts');
 const stubs = require('./instrumentations.js');
 const config = require('../config');
 const logger = require('../infra/logger');
@@ -93,8 +93,8 @@ module.exports = function (app) {
     res.send({
       job: {
         guid: req.params.guid,
-        job_type: 0, // must
-      },
+        job_type: 0 // must
+      }
     });
   });
 
@@ -111,7 +111,7 @@ module.exports = function (app) {
   app.get(ApiEndpoints.MEMBERS, async (req, res) => {
     const ret = await req.connectService.loadMembers();
     res.send({
-      members: ret,
+      members: ret
     });
   });
 
@@ -149,7 +149,7 @@ module.exports = function (app) {
       app_url,
       redirect: 'true',
       error_reason,
-      member_guid: ret?.id,
+      member_guid: ret?.id
     };
 
     const oauthParams = new RegExp(Object.keys(queries).map(r => `\\$${r}`).join('|'), 'g');

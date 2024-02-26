@@ -8,7 +8,7 @@ module.exports = {
       should_notify_user: false,
       user_guid: '241266ed-803a-4841-8a8a-0f37551e8f56',
       created_at: '2022-09-07T19:20:11.000Z',
-      updated_at: '2022-12-13T23:29:34.000Z',
+      updated_at: '2022-12-13T23:29:34.000Z'
     },
     {
       feature_guid: '241266ed-803a-4841-8a8a-0f37551e8f56',
@@ -18,7 +18,7 @@ module.exports = {
       should_notify_user: true,
       user_guid: '241266ed-803a-4841-8a8a-0f37551e8f56',
       created_at: '2022-10-05T18:01:51.000Z',
-      updated_at: '2022-10-05T18:01:51.000Z',
+      updated_at: '2022-10-05T18:01:51.000Z'
     },
     {
       feature_guid: '241266ed-803a-4841-8a8a-0f37551e8f56',
@@ -28,7 +28,7 @@ module.exports = {
       should_notify_user: true,
       user_guid: '241266ed-803a-4841-8a8a-0f37551e8f56',
       created_at: '2022-10-10T20:41:23.000Z',
-      updated_at: '2022-10-10T20:41:23.000Z',
+      updated_at: '2022-10-10T20:41:23.000Z'
     },
     {
       feature_guid: '241266ed-803a-4841-8a8a-0f37551e8f56',
@@ -38,7 +38,7 @@ module.exports = {
       should_notify_user: false,
       user_guid: '241266ed-803a-4841-8a8a-0f37551e8f56',
       created_at: '2022-10-19T16:39:51.000Z',
-      updated_at: '2023-01-04T18:43:37.000Z',
+      updated_at: '2023-01-04T18:43:37.000Z'
     },
     {
       feature_guid: '241266ed-803a-4841-8a8a-0f37551e8f56',
@@ -48,7 +48,7 @@ module.exports = {
       should_notify_user: true,
       user_guid: '241266ed-803a-4841-8a8a-0f37551e8f56',
       created_at: '2022-10-25T20:46:51.000Z',
-      updated_at: '2023-01-03T17:32:45.000Z',
+      updated_at: '2023-01-03T17:32:45.000Z'
     },
     {
       feature_guid: '241266ed-803a-4841-8a8a-0f37551e8f56',
@@ -58,7 +58,7 @@ module.exports = {
       should_notify_user: false,
       user_guid: '241266ed-803a-4841-8a8a-0f37551e8f56',
       created_at: '2022-12-09T20:56:17.000Z',
-      updated_at: '2022-12-09T20:56:17.000Z',
+      updated_at: '2022-12-09T20:56:17.000Z'
     },
     {
       feature_guid: '241266ed-803a-4841-8a8a-0f37551e8f56',
@@ -68,7 +68,7 @@ module.exports = {
       should_notify_user: false,
       user_guid: '241266ed-803a-4841-8a8a-0f37551e8f56',
       created_at: '2023-02-10T19:22:59.000Z',
-      updated_at: '2023-02-10T19:22:59.000Z',
-    },
-  ],
+      updated_at: '2023-02-10T19:22:59.000Z'
+    }
+  ]
 };
