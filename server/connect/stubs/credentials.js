@@ -23,4 +23,4 @@ module.exports = {
     total_entries: 2,
     total_pages: 1
   }
-};
+}

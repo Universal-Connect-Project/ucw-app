@@ -134,4 +134,4 @@ module.exports = {
   address: {
     bullseye: 'http://localhost:3001'
   }
-};
+}

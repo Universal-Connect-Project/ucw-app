@@ -7,4 +7,4 @@ module.exports = {
     product_name: 'Individual Widget',
     product_version: '1.0.0'
   }
-};
+}

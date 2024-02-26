@@ -27,11 +27,11 @@ import { StorageClient } from '../serviceClients/storageClient'
 
 function fromMxInstitution (ins: InstitutionResponse, provider: string): Institution {
   return {
-    id: ins.code!,
-    logo_url: ins.medium_logo_url ?? ins.small_logo_url!,
-    name: ins.name!,
-    oauth: ins.supports_oauth!,
-    url: ins.url!,
+    id: ins.code,
+    logo_url: ins.medium_logo_url ?? ins.small_logo_url,
+    name: ins.name,
+    oauth: ins.supports_oauth,
+    url: ins.url,
     provider
   }
 }
@@ -39,10 +39,10 @@ function fromMxInstitution (ins: InstitutionResponse, provider: string): Institu
 function mapCredentials (mxCreds: CredentialsResponseBody): Credential[] {
   if (mxCreds.credentials != null) {
     return mxCreds.credentials.map(item => ({
-      id: item.guid!,
-      label: item.field_name!,
-      field_type: item.field_type!,
-      field_name: item.field_name!
+      id: item.guid,
+      label: item.field_name,
+      field_type: item.field_type,
+      field_name: item.field_name
     }))
   } else {
     return []
@@ -51,8 +51,8 @@ function mapCredentials (mxCreds: CredentialsResponseBody): Credential[] {
 
 function fromMxMember (member: MemberResponse, provider: string): Connection {
   return {
-    id: member.guid!,
-    cur_job_id: member.guid!,
+    id: member.guid,
+    cur_job_id: member.guid,
     // institution_code: entityId, // TODO
     institution_code: member.institution_code, // TODO
     is_oauth: member.is_oauth,
@@ -86,7 +86,7 @@ export class MxApi implements ProviderApiClient {
 
   async GetInstitutionById (id: string): Promise<Institution> {
     const res = await this.apiClient.readInstitution(id)
-    const ins = res.data.institution!
+    const ins = res.data.institution
     return fromMxInstitution(ins, this.provider)
   }
 
@@ -115,10 +115,10 @@ export class MxApi implements ProviderApiClient {
   ): Promise<Connection> {
     const entityId = request.institution_id
     const existings = await this.apiClient.listMembers(userId)
-    const existing = existings.data.members!.find(m => m.institution_code === entityId)
+    const existing = existings.data.members.find(m => m.institution_code === entityId)
     if (existing != null) {
       logger.info(`Found existing member for institution ${entityId}, deleting`)
-      await this.apiClient.deleteMember(existing.guid!, userId)
+      await this.apiClient.deleteMember(existing.guid, userId)
       // return this.UpdateConnectionInternal({
       //   id: existing.guid,
       //   ...request,
@@ -142,12 +142,12 @@ export class MxApi implements ProviderApiClient {
       }
     } as any)
     // console.log(memberRes)
-    const member = memberRes.data.member!
+    const member = memberRes.data.member
     // console.log(member)
     if (request.initial_job_type === 'verify') {
-      await this.apiClient.verifyMember(member.id!, userId)
+      await this.apiClient.verifyMember(member.id, userId)
     } else if (request.initial_job_type === 'identify') {
-      await this.apiClient.identifyMember(member.id!, userId)
+      await this.apiClient.identifyMember(member.id, userId)
     }
     return fromMxMember(member, this.provider)
   }
@@ -162,11 +162,11 @@ export class MxApi implements ProviderApiClient {
   ): Promise<Connection> {
     const ret = await this.UpdateConnectionInternal(request, userId)
     if (request.job_type === 'verify') {
-      await this.apiClient.verifyMember(request.id!, userId)
+      await this.apiClient.verifyMember(request.id, userId)
     } else if (request.job_type === 'identify') {
-      await this.apiClient.identifyMember(request.id!, userId)
+      await this.apiClient.identifyMember(request.id, userId)
     } else {
-      await this.apiClient.aggregateMember(request.id!, userId)
+      await this.apiClient.aggregateMember(request.id, userId)
     }
     return ret
   }
@@ -175,9 +175,9 @@ export class MxApi implements ProviderApiClient {
     request: UpdateConnectionRequest,
     userId: string
   ): Promise<Connection> {
-    const ret = await this.apiClient.updateMember(request.id!, userId, {
+    const ret = await this.apiClient.updateMember(request.id, userId, {
       member: {
-        credentials: request.credentials!.map(
+        credentials: request.credentials.map(
           (credential) =>
             ({
               guid: credential.id,
@@ -186,7 +186,7 @@ export class MxApi implements ProviderApiClient {
         )
       }
     })
-    const member = ret.data.member!
+    const member = ret.data.member
     return fromMxMember(member, this.provider)
   }
 
@@ -195,9 +195,9 @@ export class MxApi implements ProviderApiClient {
     userId: string
   ): Promise<Connection> {
     const res = await this.apiClient.readMember(connectionId, userId)
-    const member = res.data.member!
+    const member = res.data.member
     return {
-      id: member.guid!,
+      id: member.guid,
       institution_code: member.institution_code,
       is_oauth: member.is_oauth,
       oauth_window_uri: member.oauth_window_uri,
@@ -213,16 +213,16 @@ export class MxApi implements ProviderApiClient {
     userId: string
   ): Promise<Connection> {
     const res = await this.apiClient.readMemberStatus(memberId, userId)
-    const member = res.data.member!
-    let status = member.connection_status!
+    const member = res.data.member
+    let status = member.connection_status
     const oauthStatus = await this.db.get(member.guid)
     if (oauthStatus?.error != null) {
       status = ConnectionStatus[ConnectionStatus.REJECTED]
     }
     return {
       provider: this.provider,
-      id: member.guid!,
-      cur_job_id: member.guid!,
+      id: member.guid,
+      cur_job_id: member.guid,
       user_id: userId,
       // is_oauth: member.is_oauth,
       // oauth_window_uri: member.oauth_window_uri,
@@ -247,7 +247,7 @@ export class MxApi implements ProviderApiClient {
             challenge.type = ChallengeType.OPTIONS
             challenge.question = item.label
             challenge.data = (item.options ?? []).map((o) => ({
-              key: o.label ?? o.value!,
+              key: o.label ?? o.value,
               value: o.value
             }))
             break
@@ -263,7 +263,7 @@ export class MxApi implements ProviderApiClient {
             // console.log(c)
             challenge.type = ChallengeType.IMAGE_OPTIONS
             challenge.data = (item.image_options ?? []).map((io) => ({
-              key: io.label ?? io.value!,
+              key: io.label ?? io.value,
               value: io.data_uri ?? io.value
             }))
             break
@@ -281,9 +281,9 @@ export class MxApi implements ProviderApiClient {
     userId: string
   ): Promise<boolean> {
     console.log(request)
-    await this.apiClient.resumeAggregation(request.id!, userId, {
+    await this.apiClient.resumeAggregation(request.id, userId, {
       member: {
-        challenges: request.challenges!.map((item, idx) => ({
+        challenges: request.challenges.map((item, idx) => ({
           guid: item.id ?? `${idx}`,
           value: item.response as string
         }))
@@ -298,14 +298,14 @@ export class MxApi implements ProviderApiClient {
     const mxUser = res.data?.users?.find(u => u.id === userId)
     if (mxUser != null) {
       logger.trace(`Found existing mx user ${mxUser.guid}`)
-      return mxUser.guid!
+      return mxUser.guid
     }
     logger.trace(`Creating mx user ${userId}`)
     const ret = await this.apiClient.createUser({
       user: { id: userId }
     })
     if (ret?.data?.user != null) {
-      return ret.data.user.guid!
+      return ret.data.user.guid
     }
     logger.trace(`Failed creating mx user, using user_id: ${userId}`)
     return userId

@@ -71,4 +71,4 @@ module.exports = {
       updated_at: '2023-02-10T19:22:59.000Z'
     }
   ]
-};
+}

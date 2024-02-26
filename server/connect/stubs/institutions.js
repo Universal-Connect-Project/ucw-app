@@ -16,4 +16,4 @@ module.exports = {
       url: 'https://gringotts.qa.internal.mx/'
     }
   ]
-};
+}
