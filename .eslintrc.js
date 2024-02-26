@@ -1,26 +1,32 @@
 module.exports = {
   root: true,
   env: {
-    'browser': true,
-    'node': true,
-    'es6': true,
-    'jest': true
+    browser: true,
+    node: true,
+    es6: true,
+    jest: true
   },
   extends: [
-    'eslint:recommended'
+    'standard-with-typescript'
   ],
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint'],
+  plugins: [
+    '@typescript-eslint'
+  ],
   parserOptions: {
+    project: './tsconfig.json',
     ecmaVersion: 'latest',
-    sourceType: 'module',
+    sourceType: 'module'
   },
-  ignorePatterns: ['src/public/static/vue3.js'],
+  ignorePatterns: [
+    '.eslintrc.js',
+    'jest.config.js'
+  ],
   rules: {
-    quotes: ['error', 'single', { 'avoidEscape': true }],
-    'semi': [2, 'always'],
+    '@typescript-eslint/explicit-function-return-type': 'off', // TODO: remove later
+    '@typescript-eslint/no-unsafe-argument': ['off'], // TODO: remove later
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-unused-vars': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
   }
-};
+}
