@@ -10,4 +10,4 @@ module.exports = {
     updated_at: '2023-03-31T21:08:39+00:00',
     user_guid: 'USR-241266ed-803a-4841-8a8a-0f37551e8f56'
   }
-};
+}

@@ -12,4 +12,4 @@ module.exports = {
     started_at: 1680125637,
     updated_at: 1680125639
   }
-};
+}

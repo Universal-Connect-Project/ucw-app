@@ -1,1 +1,1 @@
-export * from './ucp';
+export * from './ucp'

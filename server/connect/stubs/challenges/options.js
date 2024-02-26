@@ -295,4 +295,4 @@ module.exports = {
     tax_statement_is_enabled: false,
     successfully_aggregated_at: null
   }
-};
+}

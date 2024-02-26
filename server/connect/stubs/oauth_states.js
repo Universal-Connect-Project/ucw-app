@@ -34,4 +34,4 @@ module.exports = {
       user_guid: 'USR-241266ed-803a-4841-8a8a-0f37551e8f56'
     }
   ]
-};
+}
