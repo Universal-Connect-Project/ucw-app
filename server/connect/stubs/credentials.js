@@ -6,7 +6,7 @@ module.exports = {
       label: 'Username',
       display_order: 1,
       field_type: 'LOGIN',
-      type: 'LOGIN',
+      type: 'LOGIN'
     },
     {
       field_name: 'PASSWORD',
@@ -14,13 +14,13 @@ module.exports = {
       label: 'Password',
       display_order: 2,
       field_type: 'PASSWORD',
-      type: 'PASSWORD',
-    },
+      type: 'PASSWORD'
+    }
   ],
   pagination: {
     current_page: 1,
     per_page: 10,
     total_entries: 2,
-    total_pages: 1,
-  },
+    total_pages: 1
+  }
 };

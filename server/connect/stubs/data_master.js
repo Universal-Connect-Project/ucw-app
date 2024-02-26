@@ -5,7 +5,7 @@ module.exports = {
     name: '241266ed-803a-4841-8a8a-0f37551e8f56',
     urls: null,
     has_atrium_api: false,
-    has_limited_institutions: false,
+    has_limited_institutions: false
   },
   client_color_scheme: {
     primary_100: null,
@@ -15,7 +15,7 @@ module.exports = {
     primary_500: null,
     primary_color: '',
     secondary_color: '',
-    widget_brand_color: null,
+    widget_brand_color: null
   },
   client_communication_profile: {
     alerts_display_name: null,
@@ -44,7 +44,7 @@ module.exports = {
     transaction_is_international_notifications_enabled: false,
     user_summary_notifications_enabled: false,
     verification_email_enabled: false,
-    welcome_email_enabled: false,
+    welcome_email_enabled: false
   },
   client_profile: {
     account_verification_is_enabled: true,
@@ -78,7 +78,7 @@ module.exports = {
     uses_custom_popular_institution_list: false,
     uses_mobile_sign_on_tokens: true,
     uses_oauth: true,
-    default_institution_guid: '241266ed-803a-4841-8a8a-0f37551e8f56',
+    default_institution_guid: '241266ed-803a-4841-8a8a-0f37551e8f56'
   },
   user: {
     guid: '241266ed-803a-4841-8a8a-0f37551e8f56',
@@ -99,7 +99,7 @@ module.exports = {
     postal_code: null,
     sex: null,
     uses_single_sign_on: false,
-    created_at: 1663453526,
+    created_at: 1663453526
   },
   user_profile: {
     guid: '241266ed-803a-4841-8a8a-0f37551e8f56',
@@ -116,7 +116,7 @@ module.exports = {
     has_closed_transactions_widget_help_state: false,
     has_closed_trends_widget_help_state: false,
     uses_detailed_notifications: false,
-    user_guid: '241266ed-803a-4841-8a8a-0f37551e8f56',
+    user_guid: '241266ed-803a-4841-8a8a-0f37551e8f56'
   },
   user_communication_profile: {
     client_guid: '241266ed-803a-4841-8a8a-0f37551e8f56',
@@ -129,9 +129,9 @@ module.exports = {
     summary_email_enabled: null,
     user_guid: '241266ed-803a-4841-8a8a-0f37551e8f56',
     created_at: 1660673527,
-    updated_at: 1660673527,
+    updated_at: 1660673527
   },
   address: {
-    bullseye: 'http://localhost:3001',
-  },
+    bullseye: 'http://localhost:3001'
+  }
 };

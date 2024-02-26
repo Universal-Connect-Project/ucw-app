@@ -17,7 +17,7 @@ module.exports = {
     'x-b3-traceid': 'ee8f1740171057ec74015a4d0bdee2c6',
     'x-b3-spanid': '1e4d1378f76ba636',
     'x-b3-sampled': '1',
-    traceparent: '00-ee8f1740171057ec74015a4d0bdee2c6-1e4d1378f76ba636-01',
+    traceparent: '00-ee8f1740171057ec74015a4d0bdee2c6-1e4d1378f76ba636-01'
   },
   path: '/webhook/finicity_sandbox/f0105b8f-a7a4-4665-98e2-09e116804951',
   body: {
@@ -39,7 +39,7 @@ module.exports = {
         lastUpdatedDate: 0,
         currency: 'USD',
         institutionLoginId: 6026370998,
-        displayPosition: 1,
+        displayPosition: 1
       }, {
         id: '6055993965',
         number: '212121',
@@ -53,7 +53,7 @@ module.exports = {
         lastUpdatedDate: 0,
         currency: 'USD',
         institutionLoginId: 6026370998,
-        displayPosition: 2,
+        displayPosition: 2
       }, {
         id: '6055993966',
         number: '222222',
@@ -67,7 +67,7 @@ module.exports = {
         lastUpdatedDate: 0,
         currency: 'USD',
         institutionLoginId: 6026370998,
-        displayPosition: 3,
+        displayPosition: 3
       }, {
         id: '6055993967',
         number: '333333',
@@ -81,10 +81,10 @@ module.exports = {
         lastUpdatedDate: 0,
         currency: 'USD',
         institutionLoginId: 6026370998,
-        displayPosition: 4,
-      },
+        displayPosition: 4
+      }
       ],
-      oauth: true,
-    },
-  },
+      oauth: true
+    }
+  }
 };

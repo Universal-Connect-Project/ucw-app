@@ -10,8 +10,8 @@ module.exports = {
       title: 'Test Instructions',
       description: '<a href="https://google.com" id="instructional_text">A Test Link</a>',
       steps: [
-        'Go to <a href="https://google.com" id="instructional_text_steps">Google</a>',
-      ],
+        'Go to <a href="https://google.com" id="instructional_text_steps">Google</a>'
+      ]
     },
     is_being_aggregated: true,
     is_manual: false,
@@ -68,7 +68,7 @@ module.exports = {
               updated_at: '2023-03-30T22:23:05.000+00:00',
               external_guid: null,
               data_uri: null,
-              status_code: 200,
+              status_code: 200
             },
             {
               nullify: null,
@@ -81,7 +81,7 @@ module.exports = {
               updated_at: '2023-03-30T22:23:05.000+00:00',
               external_guid: null,
               data_uri: null,
-              status_code: 200,
+              status_code: 200
             },
             {
               nullify: null,
@@ -94,7 +94,7 @@ module.exports = {
               updated_at: '2023-03-30T22:23:05.000+00:00',
               external_guid: null,
               data_uri: null,
-              status_code: 200,
+              status_code: 200
             },
             {
               nullify: null,
@@ -107,7 +107,7 @@ module.exports = {
               updated_at: '2023-03-30T22:23:05.000+00:00',
               external_guid: null,
               data_uri: null,
-              status_code: 200,
+              status_code: 200
             },
             {
               nullify: null,
@@ -120,7 +120,7 @@ module.exports = {
               updated_at: '2023-03-30T22:23:05.000+00:00',
               external_guid: null,
               data_uri: null,
-              status_code: 200,
+              status_code: 200
             },
             {
               nullify: null,
@@ -133,7 +133,7 @@ module.exports = {
               updated_at: '2023-03-30T22:23:05.000+00:00',
               external_guid: null,
               data_uri: null,
-              status_code: 200,
+              status_code: 200
             },
             {
               nullify: null,
@@ -146,11 +146,11 @@ module.exports = {
               updated_at: '2023-03-30T22:23:05.000+00:00',
               external_guid: null,
               data_uri: null,
-              status_code: 200,
-            },
-          ],
-        },
-      ],
+              status_code: 200
+            }
+          ]
+        }
+      ]
     },
     most_recent_job_guid: 'JOB-241266ed-803a-4841-8a8a-0f37551e8f56',
     needs_updated_credentials: false,
@@ -203,7 +203,7 @@ module.exports = {
                 updated_at: '2023-03-30T22:23:05.000+00:00',
                 external_guid: null,
                 data_uri: null,
-                status_code: 200,
+                status_code: 200
               },
               {
                 nullify: null,
@@ -216,7 +216,7 @@ module.exports = {
                 updated_at: '2023-03-30T22:23:05.000+00:00',
                 external_guid: null,
                 data_uri: null,
-                status_code: 200,
+                status_code: 200
               },
               {
                 nullify: null,
@@ -229,7 +229,7 @@ module.exports = {
                 updated_at: '2023-03-30T22:23:05.000+00:00',
                 external_guid: null,
                 data_uri: null,
-                status_code: 200,
+                status_code: 200
               },
               {
                 nullify: null,
@@ -242,7 +242,7 @@ module.exports = {
                 updated_at: '2023-03-30T22:23:05.000+00:00',
                 external_guid: null,
                 data_uri: null,
-                status_code: 200,
+                status_code: 200
               },
               {
                 nullify: null,
@@ -255,7 +255,7 @@ module.exports = {
                 updated_at: '2023-03-30T22:23:05.000+00:00',
                 external_guid: null,
                 data_uri: null,
-                status_code: 200,
+                status_code: 200
               },
               {
                 nullify: null,
@@ -268,7 +268,7 @@ module.exports = {
                 updated_at: '2023-03-30T22:23:05.000+00:00',
                 external_guid: null,
                 data_uri: null,
-                status_code: 200,
+                status_code: 200
               },
               {
                 nullify: null,
@@ -281,18 +281,18 @@ module.exports = {
                 updated_at: '2023-03-30T22:23:05.000+00:00',
                 external_guid: null,
                 data_uri: null,
-                status_code: 200,
-              },
-            ],
-          },
-        ],
-      },
+                status_code: 200
+              }
+            ]
+          }
+        ]
+      }
     },
     revision: 3,
     user_guid: 'USR-241266ed-803a-4841-8a8a-0f37551e8f56',
     oauth_window_uri: null,
     verification_is_enabled: true,
     tax_statement_is_enabled: false,
-    successfully_aggregated_at: null,
-  },
+    successfully_aggregated_at: null
+  }
 };

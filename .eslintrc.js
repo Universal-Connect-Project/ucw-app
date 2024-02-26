@@ -1,44 +1,26 @@
-// import stylistic from '@stylistic/eslint-plugin';
-
 module.exports = {
   root: true,
   env: {
-    browser: true,
-    node: true,
-    es6: true,
-    jest: true,
+    'browser': true,
+    'node': true,
+    'es6': true,
+    'jest': true
   },
   extends: [
-    'standard-with-typescript',
+    'eslint:recommended'
   ],
   parser: '@typescript-eslint/parser',
-  plugins: [
-    '@typescript-eslint',
-    '@stylistic',
-    // { '@stylistic': stylistic }
-  ],
+  plugins: ['@typescript-eslint'],
   parserOptions: {
-    project: './tsconfig.json',
     ecmaVersion: 'latest',
     sourceType: 'module',
   },
-  ignorePatterns: [],
+  ignorePatterns: ['src/public/static/vue3.js'],
   rules: {
-    semi: 'off',
-    '@typescript-eslint/semi': ['warn', 'always'],
-
-    'comma-dangle': 'off',
-    '@typescript-eslint/comma-dangle': 'off',
-    '@stylistic/comma-dangle': ['error', 'always-multiline'],
-
-    'eol-last': 'off',
-    '@stylistic/eol-last': ['error', 'always'],
-
-    'no-trailing-spaces': 'off',
-    '@typescript-eslint/quotes': ['error', 'single', { avoidEscape: true }],
-
+    quotes: ['error', 'single', { 'avoidEscape': true }],
+    'semi': [2, 'always'],
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-unused-vars': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-  },
+  }
 };

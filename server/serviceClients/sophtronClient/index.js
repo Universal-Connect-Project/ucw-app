@@ -15,7 +15,7 @@ module.exports = class SophtronClient extends SophtronBaseClient {
 
   async getUserInstitutionById (id) {
     return await this.post('/UserInstitution/GetUserInstitutionByID', {
-      UserInstitutionID: id,
+      UserInstitutionID: id
     });
   }
 
@@ -24,13 +24,13 @@ module.exports = class SophtronClient extends SophtronBaseClient {
   // }
   async deleteUserInstitution (id) {
     return await this.post('/UserInstitution/DeleteUserInstitution', {
-      UserInstitutionID: id,
+      UserInstitutionID: id
     });
   }
 
   async getUserInstitutionAccounts (userInstitutionID) {
     return await this.post('/UserInstitution/GetUserInstitutionAccounts', {
-      UserInstitutionID: userInstitutionID,
+      UserInstitutionID: userInstitutionID
     });
   }
 
@@ -41,7 +41,7 @@ module.exports = class SophtronClient extends SophtronBaseClient {
 
   async getInstitutionByRoutingNumber (number) {
     return await this.post('/Institution/GetInstitutionByRoutingNumber', {
-      RoutingNumber: number,
+      RoutingNumber: number
     });
   }
 
@@ -51,7 +51,7 @@ module.exports = class SophtronClient extends SophtronBaseClient {
       const data = await this.post('/Institution/GetInstitutionByName', {
         InstitutionName: name,
         Extensive: true,
-        InstitutionType: 'All',
+        InstitutionType: 'All'
       });
       if (data?.length > 0) {
         return data
@@ -70,7 +70,7 @@ module.exports = class SophtronClient extends SophtronBaseClient {
   async jobSecurityAnswer (jobId, answer) {
     const ret = await this.post('/Job/UpdateJobSecurityAnswer', {
       JobID: jobId,
-      SecurityAnswer: JSON.stringify(answer),
+      SecurityAnswer: JSON.stringify(answer)
     });
     return ret === 0 ? {} : { error: 'SecurityAnswer failed' };
   }
@@ -80,7 +80,7 @@ module.exports = class SophtronClient extends SophtronBaseClient {
       JobID: jobId,
       TokenChoice: tokenChoice,
       TokenInput: tokenInput,
-      VerifyPhoneFlag: verifyPhoneFlag,
+      VerifyPhoneFlag: verifyPhoneFlag
     });
     return ret === 0 ? {} : { error: 'TokenInput failed' };
   }
@@ -88,7 +88,7 @@ module.exports = class SophtronClient extends SophtronBaseClient {
   async jobCaptchaInput (jobId, input) {
     const ret = await this.post('/Job/UpdateJobCaptchaInput', {
       JobID: jobId,
-      CaptchaInput: input,
+      CaptchaInput: input
     });
     return ret === 0 ? {} : { error: 'Captcha failed' };
   }
@@ -99,7 +99,7 @@ module.exports = class SophtronClient extends SophtronBaseClient {
       UserName: username,
       Password: password,
       InstitutionID: institutionId,
-      UserID: this.apiConfig.clientId,
+      UserID: this.apiConfig.clientId
     };
     return await this.post(url, data);
   }
@@ -110,7 +110,7 @@ module.exports = class SophtronClient extends SophtronBaseClient {
       UserName: username,
       Password: password,
       InstitutionID: institutionId,
-      UserID: this.apiConfig.clientId,
+      UserID: this.apiConfig.clientId
     };
     return await this.post(url, data);
   }
@@ -121,7 +121,7 @@ module.exports = class SophtronClient extends SophtronBaseClient {
       UserName: username,
       Password: password,
       InstitutionID: institutionId,
-      UserID: this.apiConfig.clientId,
+      UserID: this.apiConfig.clientId
     };
     return await this.post(url, data);
   }
@@ -132,7 +132,7 @@ module.exports = class SophtronClient extends SophtronBaseClient {
       UserName: username,
       Password: password,
       InstitutionID: institutionId,
-      UserID: this.apiConfig.clientId,
+      UserID: this.apiConfig.clientId
     };
     return await this.post(url, data);
   }
@@ -140,14 +140,14 @@ module.exports = class SophtronClient extends SophtronBaseClient {
   async createUserInstitutionWithFullAccountNumbers (
     username,
     password,
-    institutionId,
+    institutionId
   ) {
     const url = '/UserInstitution/CreateUserInstitutionWithFullAccountNumbers';
     const data = {
       UserName: username,
       Password: password,
       InstitutionID: institutionId,
-      UserID: this.apiConfig.clientId,
+      UserID: this.apiConfig.clientId
     };
     return await this.post(url, data);
   }
@@ -157,7 +157,7 @@ module.exports = class SophtronClient extends SophtronBaseClient {
     return await this.post(url, {
       UserName: username,
       Password: password,
-      InstitutionID: institutionId,
+      InstitutionID: institutionId
     });
   }
 
@@ -166,7 +166,7 @@ module.exports = class SophtronClient extends SophtronBaseClient {
     return await this.post(url, {
       UserName: username,
       Password: password,
-      UserInstitutionID: userInstitutionID,
+      UserInstitutionID: userInstitutionID
     });
   }
 
@@ -193,7 +193,7 @@ module.exports = class SophtronClient extends SophtronBaseClient {
 
   ping = () => {
     return http.get(
-      `${this.apiConfig.endpoint}/UserInstitution/Ping`,
+      `${this.apiConfig.endpoint}/UserInstitution/Ping`
     );
   };
 };

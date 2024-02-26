@@ -10,7 +10,7 @@ function stream (url, data, target) {
     method: data ? 'post' : 'get',
     data,
     url,
-    responseType: 'stream',
+    responseType: 'stream'
   })
     .then((res) => {
       // logger.debug(`Received stream response from ${url}`);
@@ -80,5 +80,5 @@ module.exports = {
   post: config.UseAxios ? post : capacitor.post,
   put: config.UseAxios ? put : capacitor.put,
   del: config.UseAxios ? del : capacitor.del,
-  stream,
+  stream
 };

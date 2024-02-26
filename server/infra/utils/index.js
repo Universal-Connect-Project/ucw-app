@@ -53,7 +53,7 @@ function decodeAuthToken (input) {
     return {
       provider: arr[0],
       token: arr[1],
-      iv: arr[2],
+      iv: arr[2]
     };
   } catch (err) {
     return input;
@@ -65,5 +65,5 @@ module.exports = {
   decrypt,
   hmac,
   buildSophtronAuthCode,
-  decodeAuthToken,
+  decodeAuthToken
 };

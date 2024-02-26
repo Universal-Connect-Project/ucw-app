@@ -20,10 +20,10 @@ module.exports = {
     lastTransactionDate: 1688729563,
     institutionLoginId: 6026370998,
     detail: {
-      availableCashBalance: 0,
+      availableCashBalance: 0
     },
     accountNickname: 'IRA',
-    marketSegment: 'personal',
+    marketSegment: 'personal'
   }, {
     id: '6055993965',
     number: '212121',
@@ -45,10 +45,10 @@ module.exports = {
     lastTransactionDate: 1688729563,
     institutionLoginId: 6026370998,
     detail: {
-      availableCashBalance: 0,
+      availableCashBalance: 0
     },
     accountNickname: '401K',
-    marketSegment: 'personal',
+    marketSegment: 'personal'
   }, {
     id: '6055993966',
     number: '222222',
@@ -70,11 +70,11 @@ module.exports = {
     lastTransactionDate: 1688729566,
     institutionLoginId: 6026370998,
     detail: {
-      availableBalanceAmount: 0,
+      availableBalanceAmount: 0
     },
     accountNickname: 'Savings',
     oldestTransactionDate: 1673098529,
-    marketSegment: 'personal',
+    marketSegment: 'personal'
   }, {
     id: '6055993967',
     number: '333333',
@@ -100,11 +100,11 @@ module.exports = {
       cashAdvanceBalance: 0,
       currentBalance: -1952.71,
       paymentMinAmount: 0,
-      statementCloseBalance: 0,
+      statementCloseBalance: 0
     },
     accountNickname: 'Credit Card',
     oldestTransactionDate: 1673098529,
-    marketSegment: 'personal',
-  },
-  ],
+    marketSegment: 'personal'
+  }
+  ]
 };
