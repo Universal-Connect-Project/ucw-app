@@ -318,7 +318,7 @@ export class MxApi implements ProviderApiClient {
       await db.set(member_guid, {
         error: true,
         error_reason
-      });
+      })
     }
     return {
       id: member_guid,

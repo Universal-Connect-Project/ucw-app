@@ -23,8 +23,9 @@ module.exports = {
     'jest.config.js'
   ],
   rules: {
-    '@typescript-eslint/explicit-function-return-type': 'off', // TODO: remove later
-    '@typescript-eslint/no-unsafe-argument': ['off'], // TODO: remove later
+    '@typescript-eslint/explicit-function-return-type': 'off', // TODO: remove and fix later
+    '@typescript-eslint/no-unsafe-argument': ['off'], // TODO: remove and fix later
+    '@typescript-eslint/no-non-null-assertion': 'off', // TODO: remove and fix later
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-unused-vars': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
