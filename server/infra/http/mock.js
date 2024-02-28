@@ -1,4 +1,8 @@
-const http = require('./real')
+import {
+  stream as _stream,
+  buildAuthCode as _buildAuthCode,
+  wget as _wget
+} from './real'
 
 const mfaRes = [
   {
@@ -32,11 +36,11 @@ const mocks = {
   },
   wget: {
     // '/widget/preferences/paystand.json': (url) => ({fish: false, contactEmail: 'contact@paystand.com', valid: true}),
-    '/api/institutions': (url) => http.wget(url),
-    '/api/institution/resolve': (url) => http.wget(url),
-    default: (url) => {
+    '/api/institutions': async (url) => await _wget(url),
+    '/api/institution/resolve': async (url) => await _wget(url),
+    default: async (url) => {
       console.log(`Default mock wget: ${url}`)
-      return http.wget(url)
+      return await _wget(url)
     }
   },
   post: {
@@ -106,7 +110,7 @@ const mocks = {
     '/api/Job/UpdateJobTokenInput': () => ({}),
     '/api/Job/UpdateJobCaptcha': () => ({}),
     '/api/v1/securecallback': () => {
-      // http.wget('http://localhost:63880/hang')
+      // _wget('http://localhost:63880/hang')
     },
     default: (url) => {
       console.log(`default mock post: ${url}`)
@@ -117,22 +121,20 @@ const mocks = {
 async function getMocks (method, fullUrl) {
   const path = new URL(fullUrl).pathname
   console.log(`Mocking: ${method} ${fullUrl}, path: ${path}`)
-  if (mocks[method][path]) {
+  if (mocks[method][path] != null) {
     return await Promise.resolve(mocks[method][path](fullUrl))
   }
   return await Promise.resolve(mocks[method].default(fullUrl))
 }
 
-module.exports = {
-  async get (url) {
-    return await getMocks('get', url)
-  },
-  async wget (url) {
-    return await getMocks('wget', url)
-  },
-  async post (url) {
-    return await getMocks('post', url)
-  },
-  stream: http.stream,
-  buildAuthCode: http.buildAuthCode
+export async function get (url) {
+  return await getMocks('get', url)
 }
+export async function wget (url) {
+  return await getMocks('wget', url)
+}
+export async function post (url) {
+  return await getMocks('post', url)
+}
+export const stream = _stream
+export const buildAuthCode = _buildAuthCode

@@ -1,7 +1,6 @@
 import { buildSophtronAuthCode } from '../../utils'
-
-const http = require('../../infra/http')
-const config = require('../../config')
+import { post } from '../../infra/http'
+import config from '../../config'
 
 export class AnalyticsClient {
   token
@@ -16,7 +15,7 @@ export class AnalyticsClient {
 
   async post (path, data) {
     const phrase = buildSophtronAuthCode('get', path, config.SophtronClientId, config.SophtronClientSecret)
-    const ret = await http.post(config.AnalyticsServiceEndpoint + path, data, { Authorization: phrase, IntegrationKey: this.token })
+    const ret = await post(config.AnalyticsServiceEndpoint + path, data, { Authorization: phrase, IntegrationKey: this.token })
     return ret
   }
 }

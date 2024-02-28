@@ -1,4 +1,4 @@
-import { CryptoAlgorithm } from '../config'
+import config from '../config'
 import { algo, enc } from 'crypto-js'
 import { createCipheriv, createDecipheriv } from 'crypto'
 
@@ -16,10 +16,10 @@ export function buildSophtronAuthCode (httpMethod, url, apiUserID, secret) {
   return authString
 }
 
-const algorithm = CryptoAlgorithm
+const algorithm = config.CryptoAlgorithm
 
 export function encrypt (text, keyHex, ivHex) {
-  if (!text) {
+  if (text == null || text === '') {
     return ''
   }
   const key = Buffer.from(keyHex, 'hex')
@@ -31,7 +31,7 @@ export function encrypt (text, keyHex, ivHex) {
 }
 
 export function decrypt (text, keyHex, ivHex) {
-  if (!text) {
+  if (text == null || text === '') {
     return ''
   }
   const key = Buffer.from(keyHex, 'hex')

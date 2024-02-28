@@ -1,6 +1,5 @@
 import type { NextFunction, Request, Response } from 'express'
-import * as config from '../config'
-import * as logger from './logger'
+import config from '../config'
 import { encrypt, decrypt } from '../utils'
 
 declare global {

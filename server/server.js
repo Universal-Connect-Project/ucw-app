@@ -1,23 +1,27 @@
-require('dotenv').config({ override: true })
-const express = require('express')
-const bodyParser = require('body-parser')
-const path = require('path')
-const config = require('./config')
-const http = require('./infra/http')
-const logger = require('./infra/logger')
-const useConnect = require('./connect/connectApiExpress')
-const useVcs = require('./incubationVcs/vcsServiceExpress')
-const { readFile } = require('./utils/fs')
-const RateLimit = require('express-rate-limit')
-require('express-async-errors')
+import 'dotenv/config'
+/* eslint-disable @typescript-eslint/no-misused-promises */
+import express, { static as _static } from 'express'
+import { json, urlencoded } from 'body-parser'
+import { join } from 'path'
+import config from './config'
+// import http from './infra/http'
+import { wget as _wget, stream } from './infra/http'
+// import { wget as _wget, stream } from './infra/http/real'
+import { error as _error, info } from './infra/logger'
+import useConnect from './connect/connectApiExpress'
+// import useVcs from './incubationVcs/vcsServiceExpress'
+import { readFile } from './utils/fs'
+import RateLimit from 'express-rate-limit'
+import 'express-async-errors'
+// import asyncify from 'express-asyncify'
 
 process.on('unhandledRejection', (error) => {
-  logger.error(`unhandledRejection: ${error.message}`, error)
+  _error(`unhandledRejection: ${error.message}`, error)
 })
 process.removeAllListeners('warning') // remove the noise caused by capacitor-community/http fetch plugin
 const app = express()
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(json())
+app.use(urlencoded({ extended: true }))
 
 const limiter = RateLimit({
   windowMs: 10 * 60 * 1000,
@@ -32,7 +36,7 @@ app.get('/ping', function (req, res) {
 useConnect(app)
 // useVcs(app);
 app.use(function (err, req, res, next) {
-  logger.error(`Unhandled error on ${req.method} ${req.path}: `, err)
+  _error(`Unhandled error on ${req.method} ${req.path}: `, err)
   res.status(500)
   res.send(err.message)
 })
@@ -53,40 +57,42 @@ const pageQueries = new RegExp([
   'is_mobile_webview'
 ].map(r => `\\$${r}`).join('|'), 'g')
 function renderDefaultPage (req, res, html) {
-  if (req.query.connection_id && !req.query.provider) {
+  if (req.query.connection_id != null && (req.query.provider == null || req.query.provider === '')) {
     delete req.query.connection_id
   }
-  res.send(html.replaceAll(pageQueries, q => encodeURIComponent(req.query[q.substring(1)] || '')))
+  res.send(html.replaceAll(pageQueries, q => encodeURIComponent(req.query[q.substring(1)] ?? '')))
 }
 
 if (config.ResourcePrefix !== 'local') {
-  app.get('/', function (req, res) {
-    logger.info(`serving resources from ${config.ResourcePrefix}`)
+  console.log('\nthing', config.ResourcePrefix, '\n')
+  app.get('/', async function (req, res) {
+    info(`serving resources from ${config.ResourcePrefix}`)
     req.metricsPath = '/catchall'
     const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}${req.path}`
-    http.wget(resourcePath).then(html => { renderDefaultPage(req, res, html) })
+    console.log('resourcePath', resourcePath, '\n\n')
+    await _wget(resourcePath).then(html => { renderDefaultPage(req, res, html) })
   })
-  app.get('*', function (req, res) {
-    logger.info(`serving resources from ${config.ResourcePrefix}`)
+  app.get('*', async function (req, res) {
+    info(`serving resources from ${config.ResourcePrefix}`)
     req.metricsPath = '/catchall'
     const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}${req.path}`
     if (!req.path.includes('_next/webpack-hmr')) {
-      http.stream(resourcePath, null, res)
+      await stream(resourcePath, null, res)
     } else {
       res.sendStatus(404)
     }
   })
 } else {
-  logger.info('using local resources from "../build"')
+  info('using local resources from "../build"')
   app.get('/', async (req, res) => {
-    const filePath = path.join(__dirname, '../', 'build', 'index.html')
+    const filePath = join(__dirname, '../', 'build', 'index.html')
     const html = await readFile(filePath)
     renderDefaultPage(req, res, html)
   })
-  app.get('*', express.static(path.join(__dirname, '../build')))
+  app.get('*', _static(join(__dirname, '../build')))
 }
 
 app.listen(config.Port, () => {
   const message = `Server is running on port ${config.Port}, env: ${config.Env}`
-  logger.info(message)
+  info(message)
 })

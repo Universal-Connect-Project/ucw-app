@@ -1,7 +1,6 @@
 import { buildSophtronAuthCode, decrypt } from '../../utils'
-const config = require('../../config')
-const logger = require('../../infra/logger')
-const http = require('../../infra/http')
+import config from '../../config'
+import { get } from '../../infra/http'
 
 export class AuthClient {
   token
@@ -22,7 +21,7 @@ export class AuthClient {
 
   async get (path) {
     const phrase = buildSophtronAuthCode('get', path, config.SophtronClientId, config.SophtronClientSecret)
-    const ret = await http.get(config.AuthServiceEndpoint + path, { Authorization: phrase, IntegrationKey: this.token })
+    const ret = await get(config.AuthServiceEndpoint + path, { Authorization: phrase, IntegrationKey: this.token })
     return ret
   }
 }

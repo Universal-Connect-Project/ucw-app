@@ -1,6 +1,7 @@
-const config = require('../../config')
-const logger = require('../../infra/logger')
-const { createClient } = require('redis')
+import { createClient } from 'redis'
+import config from '../../config'
+
+import { info, debug } from '../../infra/logger'
 
 const redisClient = createClient({
   url: config.RedisServer
@@ -10,7 +11,9 @@ const useRedis = config.Env !== 'dev' && config.Env !== 'mocked' && config.Env !
 
 if (useRedis) {
   redisClient.connect().then(() => {
-    logger.info('Redis connection established with server: ' + config.RedisServer)
+    info('Redis connection established with server: ' + config.RedisServer)
+  }).catch(() => {
+    info('No redis connection')
   })
 }
 
@@ -24,16 +27,16 @@ export class StorageClient {
   }
 
   async get (key) {
-    logger.debug(`Redis get: ${key}, ready: ${redisClient.isReady}`)
+    debug(`Redis get: ${key}, ready: ${redisClient.isReady}`)
     if (useRedis && redisClient.isReady) {
       const ret = await redisClient.get(key)
-      return ret ? JSON.parse(ret) : null
+      return ret != null ? JSON.parse(ret) : null
     }
     return await Promise.resolve(localCache[key])
   }
 
   async set (key, obj) {
-    logger.debug(`Redis set: ${key}, ready: ${redisClient.isReady}`)
+    debug(`Redis set: ${key}, ready: ${redisClient.isReady}`)
     if (useRedis && redisClient.isReady) {
       return await redisClient.set(key, JSON.stringify(obj), { EX: config.RedisCacheTimeSeconds })
     }

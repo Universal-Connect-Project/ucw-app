@@ -1,12 +1,7 @@
-const logger = require('../../infra/logger')
-const http = require('../../infra/http')
-const SophtronBaseClient = require('./base')
+import SophtronBaseClient from './base'
+import { get } from '../../infra/http'
 
-module.exports = class SophtronClient extends SophtronBaseClient {
-  constructor (apiConfig) {
-    super(apiConfig)
-  }
-
+export default class SophtronClient extends SophtronBaseClient {
   async getUserIntegrationKey () {
     const data = { Id: this.apiConfig.clientId }
     const ret = await this.post('/User/GetUserIntegrationKey', data)
@@ -46,8 +41,7 @@ module.exports = class SophtronClient extends SophtronBaseClient {
   }
 
   async getInstitutionsByName (name) {
-    // console.log(name);
-    if ((name || '').length > 0) {
+    if ((name ?? '').length > 0) {
       const data = await this.post('/Institution/GetInstitutionByName', {
         InstitutionName: name,
         Extensive: true,
@@ -191,8 +185,8 @@ module.exports = class SophtronClient extends SophtronBaseClient {
     return await this.post(url, { AccountID: accountId, JobID: jobId })
   }
 
-  ping = () => {
-    return http.get(
+  ping = async () => {
+    return await get(
       `${this.apiConfig.endpoint}/UserInstitution/Ping`
     )
   }

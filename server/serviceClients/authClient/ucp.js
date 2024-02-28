@@ -1,8 +1,6 @@
 import { decrypt } from '../../utils'
-
-const config = require('../../config')
-const logger = require('../../infra/logger')
-const http = require('../../infra/http')
+import config from '../../config'
+import { get } from '../../infra/http'
 
 export class AuthClient {
   token
@@ -22,7 +20,7 @@ export class AuthClient {
 
   async get (path) {
     const phrase = 'basic ' + Buffer.from(`${config.UcpAuthClientId}:${config.UcpAuthClientSecret}`).toString('base64')
-    const ret = await http.get(config.AuthServiceEndpoint + path, { Authorization: phrase, token: this.token })
+    const ret = await get(config.AuthServiceEndpoint + path, { Authorization: phrase, token: this.token })
     return ret
   }
 }

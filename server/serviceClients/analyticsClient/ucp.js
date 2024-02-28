@@ -1,5 +1,5 @@
-const http = require('../../infra/http')
-const config = require('../../config')
+import { post } from '../../infra/http'
+import config from '../../config'
 
 export class AnalyticsClient {
   token
@@ -13,7 +13,7 @@ export class AnalyticsClient {
   }
 
   async post (path, data) {
-    const ret = await http.post(config.AnalyticsServiceEndpoint + path, data, { Authorization: `token ${this.token}` })
+    const ret = await post(config.AnalyticsServiceEndpoint + path, data, { Authorization: `token ${this.token}` })
     return ret
   }
 }

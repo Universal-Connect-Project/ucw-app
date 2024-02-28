@@ -1,4 +1,4 @@
-import { type Member, type MemberResponse } from 'interfaces/contract'
+import type { Member, MemberResponse } from 'interfaces/contract'
 import {
   ChallengeType,
   type Connection,
@@ -19,7 +19,7 @@ function mapInstitution (ins: Institution) {
     logo_url: ins.logo_url,
     instructional_data: {},
     credentials: [] as any[],
-    supports_oauth: ins.oauth || ins.name?.includes('Oauth'),
+    supports_oauth: ins.oauth ?? ins.name?.includes('Oauth'),
     providers: ins.providers,
     provider: ins.provider
     // credentials: credentials?.map((c: any) => ({
@@ -154,7 +154,7 @@ export class ConnectApi extends ProviderApiBase {
   }
 
   async loadMembers (): Promise<Member[]> {
-    if (this.context.connection_id) {
+    if (this.context.connection_id != null && this.context.connection_id !== '') {
       const focusedMember = await this.getConnection(this.context.connection_id)
       return [mapConnection(focusedMember)]
     }

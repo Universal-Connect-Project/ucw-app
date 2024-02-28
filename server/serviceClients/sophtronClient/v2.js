@@ -1,25 +1,19 @@
-const config = require('../../config')
-const logger = require('../../infra/logger')
-const http = require('../../infra/http')
-const SophtronBaseClient = require('./base')
+import SophtronBaseClient from './base'
+import config from '../../config'
 
-module.exports = class SophtronV2Client extends SophtronBaseClient {
-  constructor (apiConfig) {
-    super(apiConfig)
-  }
-
+export default class SophtronV2Client extends SophtronBaseClient {
   async getCustomer (customerId) {
     return await this.get(`/v2/customers/${customerId}`)
   }
 
-  async getCustomerByUniqueName (unique_name) {
-    const arr = await this.get(`/v2/customers?uniqueID=${unique_name}`)
+  async getCustomerByUniqueName (uniqueName) {
+    const arr = await this.get(`/v2/customers?uniqueID=${uniqueName}`)
     return arr?.[0]
   }
 
-  async createCustomer (unique_name) {
+  async createCustomer (uniqueName) {
     return await this.post('/v2/customers', {
-      UniqueID: unique_name,
+      UniqueID: uniqueName,
       Source: `Universal_Widget_${config.HostUrl}`,
       Name: 'UniversalWidget_Customer'
     })
@@ -29,23 +23,23 @@ module.exports = class SophtronV2Client extends SophtronBaseClient {
     return await this.get(`/v2/customers/${customerId}/members/${memberId}`)
   }
 
-  async createMember (customerId, job_type, username, password, institution_id) {
-    return await this.post(`/v2/customers/${customerId}/members/${job_type}`, {
+  async createMember (customerId, jobType, username, password, institutionId) {
+    return await this.post(`/v2/customers/${customerId}/members/${jobType}`, {
       UserName: username,
       Password: password,
-      InstitutionID: institution_id
+      InstitutionID: institutionId
     })
   }
 
-  async updateMember (customerId, memberId, job_type, username, password) {
-    return await this.put(`/v2/customers/${customerId}/members/${memberId}/${job_type}`, {
+  async updateMember (customerId, memberId, jobType, username, password) {
+    return await this.put(`/v2/customers/${customerId}/members/${memberId}/${jobType}`, {
       UserName: username,
       Password: password
     })
   }
 
-  async refreshMember (customerId, memberId, job_type) {
-    return await this.post(`/v2/customers/${customerId}/members/${memberId}/${job_type}`)
+  async refreshMember (customerId, memberId, jobType) {
+    return await this.post(`/v2/customers/${customerId}/members/${memberId}/${jobType}`)
   }
 
   async deleteMember (customerId, memberId) {

@@ -1,7 +1,7 @@
-const fs = require('fs')
-const { ApiEndpoints } = require('../../shared/connect/ApiEndpoint.js')
+/* eslint-disable @typescript-eslint/no-var-requires */
+import { ApiEndpoints } from '../../shared/connect/ApiEndpoint.js'
 
-module.exports = function (app) {
+export default function (app) {
   app.post('/feature_visits', async (req, res) => {
     res.sendStatus(200)
   })

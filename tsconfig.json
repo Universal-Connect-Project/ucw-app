@@ -7,13 +7,15 @@
     "module": "commonjs",
     "noImplicitAny": true,
     "outDir": "dist",
+    "esModuleInterop": true,
     "types": ["node"],
     "allowJs": true,
     "strictNullChecks": false // TODO: change this to true and fix all errors
   },
   "include": [
     "server",
-    "jest.config.js"
+    "jest.config.js",
+    "shared/connect/fireflyApiBridge/index.js",
   ],
   "exclude": ["dist", "node_modules", "./build"]
 }
