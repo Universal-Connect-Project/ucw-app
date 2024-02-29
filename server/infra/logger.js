@@ -1,4 +1,4 @@
-const config = require('../config')
+import config from '../config'
 
 const levels = {
   debug: -1,
@@ -12,7 +12,7 @@ function startDoc () {
   return {
     Level: 'trace',
     Component: config.Component,
-    Env: config.Env || 'development',
+    Env: config.Env ?? 'development',
     Request: {},
     '@timestamp': new Date().toISOString()
   }
@@ -35,18 +35,18 @@ function logDoc (doc) {
 
 function logMessage (message, level, data, isError) {
   const doc = startDoc()
-  doc.Level = level || doc.Level
+  doc.Level = level ?? doc.Level
   doc.Message = message
-  if (isError && data) {
-    doc.Error = { message: data.message || data, stack: data.stack }
+  if (isError != null && data != null) {
+    doc.Error = { message: data.message ?? data, stack: data.stack }
   } else {
     doc.Data = data
   }
   logDoc(doc)
 }
 
-exports.error = (message, error) => { logMessage(message, 'error', error, true) }
-exports.info = (message, data) => { logMessage(message, 'info', data) }
-exports.warning = (message, data) => { logMessage(message, 'warning', data) }
-exports.trace = (message, data) => { logMessage(message, 'trace', data) }
-exports.debug = (message, data) => { logMessage(message, 'debug', data) }
+export function error (message, error) { logMessage(message, 'error', error, true) }
+export function info (message, data) { logMessage(message, 'info', data) }
+export function warning (message, data) { logMessage(message, 'warning', data) }
+export function trace (message, data) { logMessage(message, 'trace', data) }
+export function debug (message, data) { logMessage(message, 'debug', data) }

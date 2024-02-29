@@ -1,23 +1,23 @@
 import { ConnectApi } from './connectApi'
 import * as path from 'path'
-const { instrumentation } = require('../providers')
-const { contextHandler } = require('../infra/context.ts')
-const { ApiEndpoints } = require('../../shared/connect/ApiEndpoint.js')
-const { ConnectionStatus } = require('../../shared/contract.ts')
-const stubs = require('./instrumentations.js')
-const config = require('../config')
-const logger = require('../infra/logger')
-const http = require('../infra/http')
-const { readFile } = require('../utils/fs')
+import { instrumentation } from '../providers'
+import { contextHandler } from '../infra/context.ts'
+import { ApiEndpoints } from '../../shared/connect/ApiEndpoint.js'
+import { ConnectionStatus } from '../../shared/contract.ts'
+import stubs from './instrumentations.js'
+import config from '../config'
+import { info } from '../infra/logger'
+import { wget } from '../infra/http'
+import { readFile } from '../utils/fs'
 
-module.exports = function (app) {
+export default function (app) {
   stubs(app)
   app.use(contextHandler)
   app.use(async (req, res, next) => {
-    if (req.path === '/' || req.path.startsWith('/example') || req.path.startsWith('/static')) return next()
+    if (req.path === '/' || req.path.startsWith('/example') === true || req.path.startsWith('/static') === true) return next()
     req.connectService = new ConnectApi(req)
-    if (await req.connectService.init()) {
-      if (!req.context.resolved_user_id) {
+    if (await req.connectService.init() != null) {
+      if (req.context.resolved_user_id == null || req.context.resolved_user_id === '') {
         req.context.resolved_user_id = await req.connectService.ResolveUserId(req.context.user_id)
       }
     }
@@ -25,10 +25,11 @@ module.exports = function (app) {
   })
 
   app.post('/analytics*', async (req, res) => {
-    if (config.AnalyticsServiceEndpoint) {
+    if (config.AnalyticsServiceEndpoint !== '' && config.AnalyticsServiceEndpoint != null) {
       const ret = await req.connectService.analytics(req.path, req.body)
       res.send(ret)
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       res.send(require('./stubs/analytics_sessions.js'))
     }
   })
@@ -64,7 +65,7 @@ module.exports = function (app) {
     // res.sendFile(__dirname + '/stubs/member.json')
   })
   app.delete(`${ApiEndpoints.MEMBERS}/:member_guid`, async (req, res) => {
-    res.sendFile(__dirname + '/stubs/member.json')
+    res.sendFile(path.join(__dirname, '/stubs/member.json'))
     // let ret = await req.connectService.deleteMember(req.params.member_guid)
     // res.send(ret)
   })
@@ -85,7 +86,7 @@ module.exports = function (app) {
     res.send(ret)
   })
   app.get(ApiEndpoints.INSTITUTIONS, async (req, res) => {
-    const ret = await req.connectService.loadInstitutions(req.query.search_name || req.query.routing_number)
+    const ret = await req.connectService.loadInstitutions(req.query.search_name ?? req.query.routing_number)
     res.send(ret)
   })
   app.get('/jobs/:guid', async (req, res) => {
@@ -132,17 +133,19 @@ module.exports = function (app) {
 
   app.all('/webhook/:provider/*', async function (req, res) {
     const { provider } = req.params
-    logger.info(`received web hook at: ${req.path}`, req.query)
+    info(`received web hook at: ${req.path}`, req.query)
     // console.log(req.body)
     const ret = await ConnectApi.handleOauthResponse(provider, req.params, req.query, req.body)
     res.send(ret)
   })
 
   app.get('/oauth/:provider/redirect_from/', async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const { member_guid, error_reason } = req.query
     const { provider } = req.params
     const ret = await ConnectApi.handleOauthResponse(provider, req.params, req.query)
     const metadata = JSON.stringify({ member_guid, error_reason })
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const app_url = `mx://oauth_complete?metadata=${encodeURIComponent(metadata)}`
     const queries = {
       status: ret?.status === ConnectionStatus.CONNECTED ? 'success' : 'error',
@@ -154,12 +157,12 @@ module.exports = function (app) {
 
     const oauthParams = new RegExp(Object.keys(queries).map(r => `\\$${r}`).join('|'), 'g')
     function mapOauthParams (queries, res, html) {
-      res.send(html.replaceAll(oauthParams, q => queries[q.substring(1)] || ''))
+      res.send(html.replaceAll(oauthParams, q => queries[q.substring(1)] ?? ''))
     }
 
     if (config.ResourcePrefix !== 'local') {
       const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}/oauth/success.html`
-      http.wget(resourcePath).then(html => { mapOauthParams(queries, res, html) })
+      await wget(resourcePath).then(html => { mapOauthParams(queries, res, html) })
     } else {
       const filePath = path.join(__dirname, '../', 'build', 'oauth/success.html')
       const html = await readFile(filePath)

@@ -1,13 +1,13 @@
-const config = require('../../config')
-const logger = require('../../infra/logger')
-const http = require('../../infra/http')
+import { enc } from 'crypto-js'
+import config from '../../config'
+import { get, post } from '../../infra/http'
+
 const version = 'v2'
-const CryptoJS = require('crypto-js')
 
 function makeAkoyaAuthHeaders (apiConfig) {
-  const words = CryptoJS.enc.Utf8.parse(`${apiConfig.clientId}:${apiConfig.secret}`)
+  const words = enc.Utf8.parse(`${apiConfig.clientId}:${apiConfig.secret}`)
   return {
-    Authorization: `Basic ${CryptoJS.enc.Base64.stringify(words)}`,
+    Authorization: `Basic ${enc.Base64.stringify(words)}`,
     'content-type': 'application/x-www-form-urlencoded',
     accept: 'application/json'
   }
@@ -30,52 +30,52 @@ export default class AkoyaClient {
     }
   }
 
-  getOauthUrl (institution_id, client_redirect_url, state) {
-    return `https://${this.apiConfig.basePath}/auth?connector=${institution_id}&client_id=${this.apiConfig.clientId}&redirect_uri=${client_redirect_url}&state=${state}&response_type=code&scope=openid email profile offline_access`
+  getOauthUrl (institutionId, clientRedirectUrl, state) {
+    return `https://${this.apiConfig.basePath}/auth?connector=${institutionId}&client_id=${this.apiConfig.clientId}&redirect_uri=${clientRedirectUrl}&state=${state}&response_type=code&scope=openid email profile offline_access`
   }
 
-  getIdToken (authCode) {
+  async getIdToken (authCode) {
     const body = { grant_type: 'authorization_code', code: authCode, redirect_uri: this.client_redirect_url }
     // let body = `grant_type=authorization_code&code=${authCode}`; //&redirect_uri=${this.client_redirect_url}
-    return this.post('token', body)
+    return await this.post('token', body)
   }
 
-  refreshToken (existingRefreshToken) {
-    return this.post('token', { grant_type: 'refresh_token', refresh_token: existingRefreshToken, client_id: this.apiConfig.clientId, client_secret: this.apiConfig.secret })
+  async refreshToken (existingRefreshToken) {
+    return await this.post('token', { grant_type: 'refresh_token', refresh_token: existingRefreshToken, client_id: this.apiConfig.clientId, client_secret: this.apiConfig.secret })
   }
 
-  getAccountInfo (institution_id, accountIds, token) {
-    return this.get(`accounts-info/${version}/${institution_id}`, token)
+  async getAccountInfo (institutionId, accountIds, token) {
+    return await this.get(`accounts-info/${version}/${institutionId}`, token)
       .then(res => res.accounts)
   }
 
-  getBalances (institution_id, token) {
-    return this.get(`balances/${version}/${institution_id}`, token)
+  async getBalances (institutionId, token) {
+    return await this.get(`balances/${version}/${institutionId}`, token)
   }
 
-  getInvestments (institution_id, token) {
-    return this.get(`accounts/${version}/${institution_id}`, token)
+  async getInvestments (institutionId, token) {
+    return await this.get(`accounts/${version}/${institutionId}`, token)
   }
 
-  getPayments (institution_id, accountId, token) {
-    return this.get(`payments/${version}/${institution_id}/${accountId}/payment-networks`, token)
+  async getPayments (institutionId, accountId, token) {
+    return await this.get(`payments/${version}/${institutionId}/${accountId}/payment-networks`, token)
   }
 
-  getTransactions (institution_id, accountId, token) {
-    return this.get(`transactions/${version}/${institution_id}/${accountId}?offset=0&limit=50`, token)
+  async getTransactions (institutionId, accountId, token) {
+    return await this.get(`transactions/${version}/${institutionId}/${accountId}?offset=0&limit=50`, token)
   }
 
-  getCustomerInfo (institution_id, token) {
-    return this.get(`customers/${version}/${institution_id}/current`, token)
+  async getCustomerInfo (institutionId, token) {
+    return await this.get(`customers/${version}/${institutionId}/current`, token)
   }
 
-  post (path, body) {
+  async post (path, body) {
     const headers = makeAkoyaAuthHeaders(this.apiConfig)
-    return http.post(`https://${this.apiConfig.basePath}/${path}`, body, headers)
+    return await post(`https://${this.apiConfig.basePath}/${path}`, body, headers)
   }
 
-  get (path, token) {
+  async get (path, token) {
     const headers = makeAkoyaBearerHeaders(token)
-    return http.get(`https://${this.apiConfig.productPath}/${path}`, headers)
+    return await get(`https://${this.apiConfig.productPath}/${path}`, headers)
   }
 }

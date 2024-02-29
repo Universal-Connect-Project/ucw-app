@@ -1,9 +1,8 @@
-const { VcsService } = require('./vcsService')
-const { instrumentation } = require('../providers')
-const { contextHandler } = require('../infra/context.ts')
-const logger = require('../infra/logger')
+import { VcsService } from './vcsService'
+import { instrumentation } from '../providers'
+import { contextHandler } from '../infra/context.ts'
 
-module.exports = function (app) {
+export default function (app) {
   app.use(contextHandler)
   app.post('/api/context', async (req, res) => {
     // res.context = req.body;
@@ -17,12 +16,12 @@ module.exports = function (app) {
     await instrumentation(req.context, req.body)
     res.send(req.body)
     return {}
-  }),
+  })
   app.use(async (req, res, next) => {
-    if (req.path.startsWith('/api') && req.path !== '/api/context') {
+    if (req.path.startsWith('/api') === true && req.path !== '/api/context') {
       req.vcsService = new VcsService(req)
-      if (await req.vcsService.init()) {
-        if (!req.context.resolved_user_id) {
+      if (await req.vcsService.init() != null) {
+        if (req.context.resolved_user_id == null || req.context.resolved_user_id === '') {
           req.context.resolved_user_id = await req.vcsService.ResolveUserId(req.context.user_id)
         }
       }
@@ -31,7 +30,7 @@ module.exports = function (app) {
   })
   app.post('/api/search', async (req, res) => {
     const { query } = req.body
-    if (query && query.length >= 3) {
+    if (query != null && query.length >= 3) {
       const data = await req.vcsService.search(query)
       res.send({ institutions: data })
     } else {
@@ -52,7 +51,7 @@ module.exports = function (app) {
       req.body.connection_id,
       req.body.credentials
     )
-    if (data) {
+    if (data != null) {
       // res.context.connection_id = data.cur_job_id;
       // res.context.institution_id =
       // res.context.institution_id || data.institution_id;
@@ -70,6 +69,6 @@ module.exports = function (app) {
       req.body.id,
       req.body.challenges
     )
-    res.send(data || {})
+    res.send(data ?? {})
   })
 }

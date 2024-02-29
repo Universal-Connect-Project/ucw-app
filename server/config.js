@@ -41,7 +41,7 @@ const config = {
 const arr = Object.keys(config)
 for (let i = 0; i < arr.length; i++) {
   const key = arr[i]
-  config[key] = processEnv[key.toUpperCase()] || config[key]
+  config[key] = processEnv[key.toUpperCase()] ?? config[key]
 }
 
-module.exports = config
+export default config

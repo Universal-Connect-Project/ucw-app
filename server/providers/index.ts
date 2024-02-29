@@ -1,22 +1,21 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { MxApi } from './mx'
 import { SophtronApi } from './sophtron'
 import { AkoyaApi } from './akoya'
 import { FinicityApi } from './finicity'
-import * as config from '../config.js'
+import config from '../config.js'
 import * as logger from '../infra/logger'
-import {
-  type Challenge,
-  ChallengeType,
-  type Credential,
-  type Connection,
-  ConnectionStatus,
-  type Context,
-  type Institution,
-  type ProviderApiClient,
-  VcType,
-  type CreateConnectionRequest,
-  type UpdateConnectionRequest
+import type {
+  Challenge,
+  Credential,
+  Connection,
+  Context,
+  Institution,
+  ProviderApiClient,
+  CreateConnectionRequest,
+  UpdateConnectionRequest
 } from '../../shared/contract'
+import { ConnectionStatus } from '../../shared/contract'
 import { AnalyticsClient } from '../serviceClients/analyticsClient'
 import { SearchClient } from '../serviceClients/searchClient'
 import { AuthClient } from '../serviceClients/authClient'
@@ -24,7 +23,6 @@ import { StorageClient } from '../serviceClients/storageClient'
 import { decodeAuthToken } from '../utils'
 
 function getApiClient (provider: string, config: any): ProviderApiClient {
-  // console.log(config)
   switch (provider) {
     case 'mx':
       return new MxApi(config, false)
@@ -58,16 +56,16 @@ export async function instrumentation (context: Context, input: any) {
       return false
     }
   }
-  if (input.current_member_guid && input.current_provider) {
+  if ((Boolean(input.current_member_guid)) && (Boolean(input.current_provider))) {
     context.provider = input.current_provider
     context.connection_id = input.current_member_guid
   }
-  if (input.auth) {
+  if (input.auth != null) {
     context.auth = decodeAuthToken(input.auth)
   }
   context.partner = input.current_partner
-  context.job_type = input.job_type || 'agg'
-  context.oauth_referral_source = input.oauth_referral_source || 'BROWSER'
+  context.job_type = input.job_type ?? 'agg'
+  context.oauth_referral_source = input.oauth_referral_source ?? 'BROWSER'
   context.single_account_select = input.single_account_select
   context.updated = true
   return true
@@ -85,11 +83,11 @@ export class ProviderApiBase {
 
   async init () {
     this.searchApi = new SearchClient(this.context.auth?.token)
-    if (this.context.auth?.token) {
+    if (this.context.auth?.token != null) {
       const { iv, token } = this.context.auth
       const storageClient = new StorageClient(token)
       this.analyticsClient = new AnalyticsClient(token)
-      if (iv) {
+      if (iv != null && iv !== '') {
         try {
           const authApi = new AuthClient(token)
           const conf = await authApi.getSecretExchange(iv)
@@ -123,7 +121,7 @@ export class ProviderApiBase {
     this.context.updated = true
     this.context.provider = null
     const q = query as any
-    if (q.search_name) {
+    if (q.search_name != null && q.search_name !== '') {
       query = q.search_name
     }
     if (query?.length >= 3) {
@@ -140,7 +138,7 @@ export class ProviderApiBase {
     } as any
     if (!this.context.provider || (this.context.institution_uid && this.context.institution_uid != id && this.context.institution_id != id)) {
       const resolved = await this.searchApi.resolve(id)
-      if (resolved) {
+      if (resolved != null) {
         logger.debug(`resolved institution ${id} to provider ${resolved.provider} ${resolved.target_id}`)
         this.context.provider = resolved.provider
         this.context.institution_uid = id
@@ -150,7 +148,7 @@ export class ProviderApiBase {
         ret.logo_url = resolved.logo_url
       }
     }
-    if (!this.context.provider) {
+    if (this.context.provider == null || this.context.provider === '') {
       this.context.provider = config.DefaultProvider
     }
     await this.init()
@@ -160,12 +158,13 @@ export class ProviderApiBase {
   }
 
   async getInstitution (guid: string): Promise<any> {
+    console.log('here')
     const resolved = await this.resolveInstitution(guid)
     const inst = await this.serviceClient.GetInstitutionById(resolved.id)
-    if (inst) {
-      inst.name = resolved.name || inst.name
-      inst.url = resolved?.url || inst.url?.trim()
-      inst.logo_url = resolved?.logo_url || inst.logo_url?.trim()
+    if (inst != null) {
+      inst.name = resolved.name ?? inst.name
+      inst.url = resolved?.url ?? inst.url?.trim()
+      inst.logo_url = resolved?.logo_url ?? inst.logo_url?.trim()
     }
     return inst
   }
@@ -203,7 +202,7 @@ export class ProviderApiBase {
   async answerChallenge (connection_id: string, challenges: Challenge[]) {
     return await this.serviceClient.AnswerChallenge(
       {
-        id: connection_id || this.context.connection_id,
+        id: connection_id ?? this.context.connection_id,
         challenges
       },
       this.context.current_job_id,
@@ -218,7 +217,7 @@ export class ProviderApiBase {
 
   async getOauthState (connection_id: string) {
     const connection = await this.getConnectionStatus(connection_id)
-    if (!connection) {
+    if (connection == null) {
       return {}
     }
     const ret = {

@@ -1,19 +1,13 @@
-const config = require('../../config')
-const logger = require('../../infra/logger')
-const http = require('../../infra/http')
-const SophtronBaseClient = require('./base')
+import { get } from '../../infra/http'
+import SophtronBaseClient from './base'
 
-module.exports = class SophtronVcClient extends SophtronBaseClient {
-  constructor (apiConfig) {
-    super(apiConfig)
-  }
-
+export default class SophtronVcClient extends SophtronBaseClient {
   async getVc (path, userId) {
     const headers = { IntegrationKey: this.apiConfig.token }
-    if (userId) {
+    if (userId != null) {
       headers.DidAuth = userId
     }
-    const ret = await http.get(`${this.apiConfig.vcEndpoint}vc/${path}`, headers)
+    const ret = await get(`${this.apiConfig.vcEndpoint}vc/${path}`, headers)
     return ret
   }
 }

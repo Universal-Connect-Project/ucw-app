@@ -1,24 +1,22 @@
+import type {
+  Challenge,
+  Connection,
+  CreateConnectionRequest,
+  Credential,
+  Institution,
+  ProviderApiClient,
+  UpdateConnectionRequest
+} from '@/../../shared/contract'
 import {
-  type Challenge,
   ChallengeType,
-  type Connection,
-  ConnectionStatus,
-  type CreateConnectionRequest,
-  type Credential,
-  type Institution,
-  Institutions,
-  type ProviderApiClient,
-  type UpdateConnectionRequest,
-  VcType
+  ConnectionStatus
 } from '@/../../shared/contract'
 
-import * as config from '../config'
-import * as logger from '../infra/logger'
-import * as http from '../infra/http'
-
-const SophtronClient = require('../serviceClients/sophtronClient/v2')
-const SophtronVcClient = require('../serviceClients/sophtronClient/vc')
-const SophtronClientV1 = require('../serviceClients/sophtronClient')
+import config from '../config'
+import { debug, trace, error as _error } from '../infra/logger'
+import SophtronClient from '../serviceClients/sophtronClient/v2'
+import SophtronVcClient from '../serviceClients/sophtronClient/vc'
+import SophtronClientV1 from '../serviceClients/sophtronClient'
 
 const uuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
@@ -69,7 +67,7 @@ function mapJobType (input: string) {
       return 'aggregate_identity'
     default:
       // TODO create without job?
-      logger.error(`Invalid job type ${input}`)
+      _error(`Invalid job type ${input}`)
       break
   }
 }
@@ -78,8 +76,6 @@ export class SophtronApi implements ProviderApiClient {
   apiClient: any
   apiClientV1: any
   vcClient: any
-
-  httpClient = http
 
   constructor (config: any) {
     const { sophtron } = config
@@ -111,7 +107,7 @@ export class SophtronApi implements ProviderApiClient {
     const ret = [
       {
         id: 'username',
-        label: ins?.InstitutionDetail?.LoginFormUserName || 'User name',
+        label: ins?.InstitutionDetail?.LoginFormUserName ?? 'User name',
         field_type: 'LOGIN',
         field_name: 'LOGIN'
       }
@@ -119,7 +115,7 @@ export class SophtronApi implements ProviderApiClient {
     if (ins?.InstitutionDetail?.LoginFormPassword !== 'None') {
       ret.push({
         id: 'password',
-        label: ins?.InstitutionDetail?.LoginFormPassword || 'Password',
+        label: ins?.InstitutionDetail?.LoginFormPassword ?? 'Password',
         field_type: 'PASSWORD',
         field_name: 'PASSWORD'
       })
@@ -333,25 +329,25 @@ export class SophtronApi implements ProviderApiClient {
         }
         break
       default:
-        logger.error('Wrong challenge answer received', c)
+        _error('Wrong challenge answer received', c)
         return false
     }
     return true
   }
 
   async ResolveUserId (user_id: string) {
-    logger.debug('Resolving UserId: ' + user_id)
+    debug('Resolving UserId: ' + user_id)
     const sophtronUser = await this.apiClient.getCustomerByUniqueName(user_id)
     if (sophtronUser) {
-      logger.trace(`Found existing sophtron customer ${sophtronUser.CustomerID}`)
+      trace(`Found existing sophtron customer ${sophtronUser.CustomerID}`)
       return sophtronUser.CustomerID
     }
-    logger.trace(`Creating sophtron user ${user_id}`)
+    trace(`Creating sophtron user ${user_id}`)
     const ret = await this.apiClient.createCustomer(user_id)
     if (ret) {
       return ret.CustomerID
     }
-    logger.trace(`Failed creating sophtron user, using user_id: ${user_id}`)
+    trace(`Failed creating sophtron user, using user_id: ${user_id}`)
     return user_id
   }
 }

@@ -22,7 +22,7 @@ import {
   Configuration,
   MxPlatformApiFactory
 } from '../serviceClients/mxClient'
-import * as config from '../config'
+import config from '../config'
 import { StorageClient } from '../serviceClients/storageClient'
 
 function fromMxInstitution (ins: InstitutionResponse, provider: string): Institution {

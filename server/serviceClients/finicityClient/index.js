@@ -1,6 +1,6 @@
-const config = require('../../config')
-const logger = require('../../infra/logger')
-const axios = require('axios')
+import config from '../../config'
+import { error } from '../../infra/logger'
+import { create, post } from 'axios'
 
 function makeFinicityAuthHeaders (apiConfig, tokenRes) {
   return {
@@ -17,7 +17,7 @@ export default class FinicityClient {
   }
 
   getAuthToken () {
-    return axios.post(this.apiConfig.basePath + '/aggregation/v2/partners/authentication', {
+    return post(this.apiConfig.basePath + '/aggregation/v2/partners/authentication', {
       partnerId: this.apiConfig.partnerId,
       partnerSecret: this.apiConfig.secret
     }, {
@@ -26,7 +26,7 @@ export default class FinicityClient {
         'Content-Type': 'application/json'
       }
     }).then(res => res.data).catch(err => {
-      logger.error('Error at finicityClient.getAuthToken', err?.response?.data)
+      error('Error at finicityClient.getAuthToken', err?.response?.data)
     })
   }
 
@@ -42,8 +42,8 @@ export default class FinicityClient {
     return await this.get('aggregation/v1/customers')
   }
 
-  async getCustomer (unique_name) {
-    return await this.get(`aggregation/v1/customers?username=${unique_name}`)
+  async getCustomer (uniqueName) {
+    return await this.get(`aggregation/v1/customers?username=${uniqueName}`)
       .then(ret => ret.customers?.[0])
   }
 
@@ -79,35 +79,35 @@ export default class FinicityClient {
     )
   }
 
-  async generateConnectLiteUrl (institutionId, customerId, request_id) {
+  async generateConnectLiteUrl (institutionId, customerId, requestId) {
     return await this.post('connect/v2/generate/lite', {
       language: 'en-US',
       partnerId: this.apiConfig.partnerId,
       customerId,
       institutionId,
-      redirectUri: `${config.HostUrl}/oauth/${this.apiConfig.provider}/redirect_from?connection_id=${request_id}`,
-      webhook: `${config.WebhookHostUrl}/webhook/${this.apiConfig.provider}/?connection_id=${request_id}`,
+      redirectUri: `${config.HostUrl}/oauth/${this.apiConfig.provider}/redirect_from?connection_id=${requestId}`,
+      webhook: `${config.WebhookHostUrl}/webhook/${this.apiConfig.provider}/?connection_id=${requestId}`,
       webhookContentType: 'application/json'
       // 'singleUseUrl': true,
       // 'experience': 'default',
     }).then(ret => ret.link)
   }
 
-  async generateConnectFixUrl (institutionLoginId, customerId, request_id) {
+  async generateConnectFixUrl (institutionLoginId, customerId, requestId) {
     return await this.post('connect/v2/generate/fix', {
       language: 'en-US',
       partnerId: this.apiConfig.partnerId,
       customerId,
       institutionLoginId,
-      redirectUri: `${config.HostUrl}/oauth/${this.apiConfig.provider}/redirect_from?connection_id=${request_id}`,
-      webhook: `${config.WebhookHostUrl}/webhook/${this.apiConfig.provider}/?connection_id=${request_id}`,
+      redirectUri: `${config.HostUrl}/oauth/${this.apiConfig.provider}/redirect_from?connection_id=${requestId}`,
+      webhook: `${config.WebhookHostUrl}/webhook/${this.apiConfig.provider}/?connection_id=${requestId}`,
       webhookContentType: 'application/json'
     }).then(ret => ret.link)
   }
 
-  async createCustomer (unique_name) {
+  async createCustomer (uniqueName) {
     return await this.post(`aggregation/v2/customers/${this.apiConfig.provider === 'finicity_sandbox' ? 'testing' : 'active'}`, {
-      username: unique_name,
+      username: uniqueName,
       firstName: 'John',
       lastName: 'Smith',
       // applicationId: '123456789',
@@ -129,10 +129,10 @@ export default class FinicityClient {
   }
 
   async request (method, url, params, data) {
-    if (!this.axios) {
+    if (this.axios == null) {
       const token = await this.getAuthToken()
       const headers = makeFinicityAuthHeaders(this.apiConfig, token)
-      this.axios = axios.create({
+      this.axios = create({
         baseURL: this.apiConfig.basePath,
         headers
       })
