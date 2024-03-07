@@ -11,6 +11,7 @@ import {
   ChallengeType,
   ConnectionStatus
 } from '@/../../shared/contract'
+import { mapJobType } from '../../server/utils'
 
 import config from '../config'
 import { debug, trace, error as _error } from '../infra/logger'
@@ -30,45 +31,6 @@ function fromSophtronInstitution (ins: any): Institution | undefined {
     name: ins.InstitutionName,
     url: ins.URL,
     provider: 'sophtron'
-  }
-}
-
-function mapJobType (input: string) {
-  switch (input) {
-    case 'agg':
-    case 'aggregation':
-    case 'aggregate':
-    case 'add':
-    case 'utils':
-    case 'util':
-    case 'demo':
-    case 'vc_transactions':
-    case 'vc_transaction':
-      return 'aggregate'
-    case 'all':
-    case 'everything':
-    case 'aggregate_all':
-    case 'aggregate_everything':
-    case 'agg_all':
-    case 'agg_everything':
-      return 'aggregate_identity_verification'
-    case 'fullhistory':
-    case 'aggregate_extendedhistory':
-      return 'aggregate_extendedhistory'
-    case 'auth':
-    case 'bankauth':
-    case 'verify':
-    case 'verification':
-    case 'vc_account':
-    case 'vc_accounts':
-      return 'verification'
-    case 'identify':
-    case 'vc_identity':
-      return 'aggregate_identity'
-    default:
-      // TODO create without job?
-      _error(`Invalid job type ${input}`)
-      break
   }
 }
 
@@ -139,8 +101,8 @@ export class SophtronApi implements ProviderApiClient {
     request: CreateConnectionRequest,
     userId: string
   ): Promise<Connection | undefined> {
-    const job_type = mapJobType(request.initial_job_type?.toLowerCase())
-    if (!job_type) {
+    const jobType = mapJobType(request.initial_job_type?.toLowerCase())
+    if (jobType == null) {
       return
     }
     const username = request.credentials.find(
@@ -151,7 +113,7 @@ export class SophtronApi implements ProviderApiClient {
     )
     // if password field wasn't available, it should be a 'none' type
     const password = passwordField ? passwordField.value : 'None'
-    const ret = await this.apiClient.createMember(userId, job_type, username, password, request.institution_id)
+    const ret = await this.apiClient.createMember(userId, jobType, username, password, request.institution_id)
     if (ret) {
       return {
         id: ret.MemberID,

@@ -22,6 +22,7 @@ import {
   Configuration,
   MxPlatformApiFactory
 } from '../serviceClients/mxClient'
+import { mapJobType } from '../../server/utils'
 import config from '../config'
 import { StorageClient } from '../serviceClients/storageClient'
 
@@ -114,6 +115,7 @@ export class MxApi implements ProviderApiClient {
     request: CreateConnectionRequest,
     userId: string
   ): Promise<Connection> {
+    const jobType = mapJobType(request.initial_job_type?.toLowerCase())
     const entityId = request.institution_id
     const existings = await this.apiClient.listMembers(userId)
     const existing = existings.data.members.find(m => m.institution_code === entityId)
@@ -131,7 +133,7 @@ export class MxApi implements ProviderApiClient {
       referral_source: 'APP', // request.is_oauth ? 'APP' : '',
       client_redirect_url: request.is_oauth ? `${config.HostUrl}/oauth/${this.provider}/redirect_from?token=${this.token}` : null,
       member: {
-        skip_aggregation: request.skip_aggregation || ['verify', 'auth', 'identify'].includes(request.initial_job_type),
+        skip_aggregation: request.skip_aggregation || jobType !== 'aggregate',
         is_oauth: request.is_oauth,
         credentials: request.credentials?.map(
           (c) => ({
@@ -145,9 +147,9 @@ export class MxApi implements ProviderApiClient {
     // console.log(memberRes)
     const member = memberRes.data.member
     // console.log(member)
-    if (['verify', 'auth'].includes(request.initial_job_type)) {
+    if (['verification', 'aggregate_identity_verification'].includes(jobType)) {
       await this.apiClient.verifyMember(member.guid, userId)
-    } else if (request.initial_job_type === 'identify') {
+    } else if (jobType === 'aggregate_identity') {
       await this.apiClient.identifyMember(member.guid, userId)
     }
     return fromMxMember(member, this.provider)
@@ -165,7 +167,7 @@ export class MxApi implements ProviderApiClient {
     if (request.job_type === 'verify') {
       ret = await this.apiClient.verifyMember(request.id, userId)
     } else if (request.job_type === 'identify') {
-      // this only gets called if include_identity=true in url_params
+      // this only gets called if job_type=aggregate_identity_verification
       ret = await this.apiClient.identifyMember(request.id, userId, { data: { member: { include_transactions: true }}})
     } else {
       ret = await this.apiClient.aggregateMember(request.id, userId)
