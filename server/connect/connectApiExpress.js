@@ -46,7 +46,7 @@ export default function (app) {
     const ret = await req.connectService.updateMember(req.body)
     res.send(ret)
   })
-  app.get(`${ApiEndpoints.MEMBERS}/:member_guid/`, async (req, res) => {
+  app.get(`${ApiEndpoints.MEMBERS}/:member_guid`, async (req, res) => {
     // res.send(require('./stubs/member.js'))
     // return;
     const ret = await req.connectService.loadMemberByGuid(req.params.member_guid)
@@ -111,6 +111,17 @@ export default function (app) {
 
   app.get(ApiEndpoints.MEMBERS, async (req, res) => {
     const ret = await req.connectService.loadMembers()
+    res.send({
+      members: ret
+    })
+  })
+
+  app.post(`${ApiEndpoints.MEMBERS}/:member_guid/identify`, async (req, res) => {
+    console.log('hitting Identify')
+    const ret = await req.connectService.updateConnection(
+      { id: req.params.member_guid, job_type: 'identify' },
+      req.context.resolved_user_id
+    )
     res.send({
       members: ret
     })

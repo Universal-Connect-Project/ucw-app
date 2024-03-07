@@ -55,6 +55,7 @@ function fromMxMember (member: MemberResponse, provider: string): Connection {
     cur_job_id: member.guid,
     // institution_code: entityId, // TODO
     institution_code: member.institution_code, // TODO
+    is_being_aggregated: member.is_being_aggregated,
     is_oauth: member.is_oauth,
     oauth_window_uri: member.oauth_window_uri,
     provider
@@ -128,7 +129,7 @@ export class MxApi implements ProviderApiClient {
     // console.log(request)
     const memberRes = await this.apiClient.createMember(userId, {
       referral_source: 'APP', // request.is_oauth ? 'APP' : '',
-      client_redirect_url: request.is_oauth ? `${config.HostUrl}/oauth/${this.provider}/redirect_from?token=${this.token}`: null,
+      client_redirect_url: request.is_oauth ? `${config.HostUrl}/oauth/${this.provider}/redirect_from?token=${this.token}` : null,
       member: {
         skip_aggregation: request.skip_aggregation || ['verify', 'auth', 'identify'].includes(request.initial_job_type),
         is_oauth: request.is_oauth,
@@ -160,15 +161,16 @@ export class MxApi implements ProviderApiClient {
     request: UpdateConnectionRequest,
     userId: string
   ): Promise<Connection> {
-    const ret = await this.UpdateConnectionInternal(request, userId)
+    let ret
     if (request.job_type === 'verify') {
-      await this.apiClient.verifyMember(request.id, userId)
+      ret = await this.apiClient.verifyMember(request.id, userId)
     } else if (request.job_type === 'identify') {
-      await this.apiClient.identifyMember(request.id, userId)
+      // this only gets called if include_identity=true in url_params
+      ret = await this.apiClient.identifyMember(request.id, userId, { data: { member: { include_transactions: true }}})
     } else {
-      await this.apiClient.aggregateMember(request.id, userId)
+      ret = await this.apiClient.aggregateMember(request.id, userId)
     }
-    return ret
+    return fromMxMember(ret.data.member, this.provider)
   }
 
   async UpdateConnectionInternal (
@@ -200,6 +202,7 @@ export class MxApi implements ProviderApiClient {
       id: member.guid,
       institution_code: member.institution_code,
       is_oauth: member.is_oauth,
+      is_being_aggregated: member.is_being_aggregated,
       oauth_window_uri: member.oauth_window_uri,
       provider: this.provider,
       user_id: userId

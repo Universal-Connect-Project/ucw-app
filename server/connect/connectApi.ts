@@ -99,7 +99,7 @@ export class ConnectApi extends ProviderApiBase {
       institution_id: memberData.institution_guid,
       is_oauth: (memberData.is_oauth ?? false),
       skip_aggregation: (memberData.skip_aggregation ?? false) && (memberData.is_oauth ?? false),
-      initial_job_type: this.context.job_type || 'agg',
+      initial_job_type: this.context.job_type ?? 'agg',
       credentials: memberData.credentials?.map(c => ({
         id: c.guid,
         value: c.value
@@ -163,7 +163,7 @@ export class ConnectApi extends ProviderApiBase {
 
   async loadMemberByGuid (memberGuid: string): Promise<MemberResponse> {
     const mfa = await this.getConnectionStatus(memberGuid)
-    if (!mfa?.institution_code) {
+    if (mfa?.institution_code == null) {
       const connection = await this.getConnection(memberGuid)
       return { member: mapConnection({ ...mfa, ...connection }) }
     }
