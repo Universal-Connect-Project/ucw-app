@@ -16,7 +16,6 @@ import { mapJobType } from '../../server/utils'
 import config from '../config'
 import { debug, trace, error as _error } from '../infra/logger'
 import SophtronClient from '../serviceClients/sophtronClient/v2'
-import SophtronVcClient from '../serviceClients/sophtronClient/vc'
 import SophtronClientV1 from '../serviceClients/sophtronClient'
 
 const uuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
@@ -37,13 +36,11 @@ function fromSophtronInstitution (ins: any): Institution | undefined {
 export class SophtronApi implements ProviderApiClient {
   apiClient: any
   apiClientV1: any
-  vcClient: any
 
   constructor (config: any) {
     const { sophtron } = config
     this.apiClient = new SophtronClient(sophtron)
     this.apiClientV1 = new SophtronClientV1(sophtron)
-    this.vcClient = new SophtronVcClient(sophtron)
   }
 
   async clearConnection (vc: any, id: string, userID: string) {

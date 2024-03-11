@@ -152,17 +152,16 @@ export default function (app) {
 
   app.get('/oauth/:provider/redirect_from/', async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { member_guid, error_reason } = req.query
     const { provider } = req.params
     const ret = await ConnectApi.handleOauthResponse(provider, req.params, req.query)
-    const metadata = JSON.stringify({ member_guid, error_reason })
+    const metadata = JSON.stringify({ member_guid: ret?.id, error_reason: ret?.error })
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    const app_url = `mx://oauth_complete?metadata=${encodeURIComponent(metadata)}`
+    const app_url = `${ret?.scheme}://oauth_complete?metadata=${encodeURIComponent(metadata)}`
     const queries = {
       status: ret?.status === ConnectionStatus.CONNECTED ? 'success' : 'error',
       app_url,
-      redirect: 'true',
-      error_reason,
+      redirect: ret?.oauth_referral_source?.toLowerCase() === 'browser' ? 'false' : 'true',
+      error_reason: ret?.error,
       member_guid: ret?.id
     }
 
