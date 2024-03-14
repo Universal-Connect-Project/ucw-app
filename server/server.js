@@ -66,7 +66,6 @@ function renderDefaultPage (req, res, html) {
 }
 
 if (config.ResourcePrefix !== 'local') {
-  console.log('\n----> config.ResourcePrefix', config.ResourcePrefix, '\n')
   app.get('/', async function (req, res) {
     info(`serving resources from ${config.ResourcePrefix}`)
     req.metricsPath = '/catchall'
@@ -94,6 +93,7 @@ if (config.ResourcePrefix !== 'local') {
 }
 
 app.listen(config.Port, () => {
-  const message = `Server is running on port ${config.Port}, env: ${config.Env}`
+  const message = `Server is running on port ${config.Port}, env: ${config.Env}\n`
+  console.log(message)
   info(message)
 })
