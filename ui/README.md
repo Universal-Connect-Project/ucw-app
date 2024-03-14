@@ -7,7 +7,7 @@ In order to do local development, run the following commands from the root of th
 cd ./ui
 ```
 ```
-npm i
+npm ci
 ```
 ```
 npm run dev
