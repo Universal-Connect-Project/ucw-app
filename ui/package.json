@@ -4,13 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "npx cross-env BROWSER=none && vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ucp-npm/components": "file:../../../_npm-test/_package/ucp-npm-components-0.0.1.tgz",
+    "@ucp-npm/components": "file:../../../_npm-test/ucw-npm-package/ucp-npm-components-0.0.1.tgz",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
   },
