@@ -16,7 +16,7 @@ const config = {
   Demo: true,
   DefaultProvider: 'sophtron',
   LogLevel: 'debug',
-  Port: '8080',
+  Port: '8081',
   Env: 'pre', // mocked
   Version: '',
   UseAxios: true,
