@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ucp-npm/components": "file:../../../_npm-test/ucw-npm-package/ucp-npm-components-0.0.1.tgz",
+    "@ucp-npm/components": "^0.0.4-beta",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
   },
