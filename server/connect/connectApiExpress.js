@@ -136,10 +136,11 @@ export default function (app) {
   })
 
   app.post('/members/:member_guid/unthrottled_aggregate', async (req, res) => {
-    res.send({ member: { job_guid: 'JOB-179e7c31-53d6-4cfb-b95d-6b2686d1b817', status: 8 } }) // RECONNECTED?
-
-    // let ret = await req.connectService.updateMember(req.body);
-    // res.send(ret)
+    const ret = await req.connectService.updateConnection(
+      { id: req.params.member_guid, job_type: 'aggregate' },
+      req.context.resolved_user_id
+    )
+    res.send(ret)
   })
 
   app.all('/webhook/:provider/*', async function (req, res) {
