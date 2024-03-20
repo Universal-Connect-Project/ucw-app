@@ -1,3 +1,3 @@
-#!/bin/env bash
+#!/bin/bash
 
-docker build -t uvcs .
+docker build -t ucw-app .

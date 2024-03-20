@@ -86,12 +86,14 @@ if (config.ResourcePrefix !== 'local') {
   info('using local resources from "../ui/dist"')
   app.get('/', async (req, res) => {
     const filePath = join(__dirname, '../ui', 'dist', 'index.html')
+    console.log('filePath', filePath)
     const html = await readFile(filePath)
     renderDefaultPage(req, res, html)
   })
   app.get('*', _static(join(__dirname, '../ui/dist')))
 }
 
+// app.listen(config.Port, config.Env === 'prod' ? '0.0.0.0' : 'localhost', () => {
 app.listen(config.Port, () => {
   const message = `Server is running on port ${config.Port}, env: ${config.Env}\n`
   console.log(message)

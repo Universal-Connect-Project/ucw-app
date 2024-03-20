@@ -1,9 +1,10 @@
 {
   "name": "ucw-app",
   "version": "0.1.0",
-  "private": true,
   "scripts": {
-    "server": "npx ts-node server/server.js",
+    "server": "ts-node server/server.js",
+    "ui": "cd ./ui && npm run dev",
+    "docker:run": "concurrently \"npm run server\" \"npm run ui\"",
     "lint:fix": "eslint . --fix --ext .js,.ts",
     "coverage": "npm test -- --verbose --coverage --watchAll",
     "test": "jest --no-coverage",

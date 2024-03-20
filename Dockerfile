@@ -1,21 +1,41 @@
-FROM node:18 
+FROM alpine:3.19
+ENV NODE_VERSION 20.11.1
+
+RUN apk add --no-cache nodejs npm
+RUN npm config set registry https://registry.npmjs.org/
+
+# Support packages
+RUN npm install -g ts-node concurrently
 
 WORKDIR /app
 
+# Server
+COPY package.json package-lock.json /app/
+RUN npm ci --verbose
+
+# Test...
+RUN mkdir ./ui
+COPY ./ui/package.json ./ui/package-lock.json /app/ui/
+RUN cd /app/ui &&  \
+    npm ci
+# End test
+
 COPY ./ ./
 
-RUN npm ci --legacy-peer-deps
-RUN npm run build
-RUN sed -i '312s/.*/            return input;/' /app/node_modules/@capacitor-community/http/android/src/main/java/com/getcapacitor/plugin/http/HttpRequestHandler.java
-RUN sed -i '35s/.*/return try JSONSerialization.jsonObject(with: data, options: [.mutableContainers, .fragmentsAllowed])/' /app/node_modules/@capacitor-community/http/ios/Plugin/HttpRequestHandler.swift
-    
-RUN npm install -g nodemon ts-node
+# Test 2
+RUN cd /app/ui &&  \
+    npm run build
+# End test 2
+
+## UI
+#RUN cd ./ui &&  \
+#    npm ci &&  \
+#    npm run build
 
 ENV Env prod
 ENV Port 8080
-ENV ResourcePrefix 'local'
+ENV ResourcePrefix 'http://localhost:5173'
 
-EXPOSE 8080
+EXPOSE 8080 5173
 
-# CMD [ "nodemon", "./server/server.js" ]
-CMD nodemon
+CMD ["npm", "run", "docker:run"]
