@@ -13,24 +13,15 @@ WORKDIR /app
 COPY package.json package-lock.json /app/
 RUN npm ci --verbose
 
-# Test...
 RUN mkdir ./ui
 COPY ./ui/package.json ./ui/package-lock.json /app/ui/
 RUN cd /app/ui &&  \
     npm ci
-# End test
 
 COPY ./ ./
 
-# Test 2
 RUN cd /app/ui &&  \
     npm run build
-# End test 2
-
-## UI
-#RUN cd ./ui &&  \
-#    npm ci &&  \
-#    npm run build
 
 ENV Env prod
 ENV Port 8080
