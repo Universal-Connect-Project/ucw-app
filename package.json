@@ -3,8 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "server": "ts-node server/server.js",
-    "ui": "cd ./ui && npm run dev",
-    "docker:run": "concurrently \"npm run server\" \"npm run ui\"",
+    "server:debug": "node --inspect -r ts-node/register ./server/server.js",
     "lint:fix": "eslint . --fix --ext .js,.ts",
     "coverage": "npm test -- --verbose --coverage --watchAll",
     "test": "jest --no-coverage",

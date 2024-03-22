@@ -1,0 +1,35 @@
+version: '3.8'
+#networks:
+#  main-network:
+#    name: main-network
+#    driver: host
+
+services:
+  server:
+    container_name: ucw-app-server
+    build: .
+    network_mode: host
+#    networks:
+#      - main-network
+    ports:
+      - "8080:8080"
+      - "6379:6379"
+    environment:
+      - PORT=8080
+      - REDIS_SERVER=redis://localhost:6379
+      - REDIS_CACHE_TIME=600
+      - RESOURCE_PREFIX=http://localhost:5173
+  ui:
+    container_name: ucw-app-ui
+    build: ./ui
+    network_mode: host
+#    networks:
+#      - main-network
+    ports:
+      - '5173:5173'
+    environment:
+      - NODE_ENV=production
+      - PORT=5173
+
+volumes:
+  app:

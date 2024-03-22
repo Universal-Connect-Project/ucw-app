@@ -11,10 +11,8 @@ RUN npm ci
 
 COPY ./ ./
 
-ENV Env prod
-ENV Port 8080
-ENV ResourcePrefix 'http://localhost:5173'
+RUN npm run build
 
-EXPOSE 8080 6379
+EXPOSE 5173
 
-CMD ["npm", "run", "server"]
+CMD ["npm", "run", "preview"]

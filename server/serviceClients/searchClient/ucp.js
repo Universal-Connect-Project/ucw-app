@@ -11,7 +11,6 @@ export class SearchClient {
   async institutions (name, providers) {
     providers = providers ?? []
     const url = `${config.SearchEndpoint}institutions?query=${encodeURIComponent(name ?? '')}&providers=${providers.join(';')}`
-    console.log('\ntoken', this.token, '\n\n')
     return await get(url, { Authorization: `token ${this.token}` })
   }
 

@@ -1,7 +1,7 @@
 import { createClient } from 'redis'
 import config from '../../config'
 
-import { info, debug } from '../../infra/logger'
+import { info, debug, error } from '../../infra/logger'
 
 const redisClient = createClient({
   url: config.RedisServer
@@ -12,7 +12,8 @@ const useRedis = config.Env !== 'dev' && config.Env !== 'mocked' && config.Env !
 if (useRedis) {
   redisClient.connect().then(() => {
     info('Redis connection established with server: ' + config.RedisServer)
-  }).catch(() => {
+  }).catch((reason) => {
+    error('Failed to connect to redis server: ' + reason)
     info('No redis connection')
   })
 }
