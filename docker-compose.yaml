@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+
+  server:
+    depends_on: [cache, ui]
+    container_name: ucw-app-server
+    restart: on-failure
+    build: .
+    network_mode: host
+#    ports:
+#      - '8080:8080'
+
+  ui:
+    container_name: ucw-app-ui
+    restart: on-failure
+    build: ./ui
+    network_mode: host
+#    ports:
+#      - '5173:5173'
+
+  cache:
+    container_name: ucw-app-cache
+    image: redis:7.2-alpine
+    restart: always
+    network_mode: host
+#    ports:
+#      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - cache:/data
+
+volumes:
+  cache:
+    driver: local

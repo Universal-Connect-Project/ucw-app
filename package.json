@@ -1,9 +1,9 @@
 {
   "name": "ucw-app",
   "version": "0.1.0",
-  "private": true,
   "scripts": {
-    "server": "npx ts-node server/server.js",
+    "server": "ts-node server/server.js",
+    "server:debug": "node --inspect -r ts-node/register ./server/server.js",
     "lint:fix": "eslint . --fix --ext .js,.ts",
     "coverage": "npm test -- --verbose --coverage --watchAll",
     "test": "jest --no-coverage",

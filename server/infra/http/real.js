@@ -46,13 +46,12 @@ export function handleResponse (promise, url, method, returnFullResObject) {
 }
 
 export async function wget (url) {
-  console.log('wget from real')
   debug(`wget request: ${url}`)
   try {
     const response = await _get(url)
     return response.data
   } catch (error) {
-    _error(`error ${method} from ${url}`, error)
+    _error(`error from ${url}`, error)
     throw error
   }
 }
@@ -63,7 +62,7 @@ export async function get (url, headers) {
     const response = await _get(url, { headers })
     return response.data
   } catch (error) {
-    _error(`error ${method} from ${url}`, error)
+    _error(`error from ${url}`, error)
     throw error
   }
 }
@@ -73,7 +72,7 @@ export async function del (url, headers, returnFullResObject) {
     const response = await _delete(url, { headers })
     return response.data
   } catch (error) {
-    _error(`error ${method} from ${url}`, error)
+    _error(`error from ${url}`, error)
     throw error
   }
 }
@@ -83,7 +82,7 @@ export async function put (url, data, headers, returnFullResObject) {
     const response = await _put(url, data, { headers })
     return response.data
   } catch (error) {
-    _error(`error ${method} from ${url}`, error)
+    _error(`error from ${url}`, error)
     throw error
   }
 }
@@ -93,7 +92,7 @@ export async function post (url, data, headers, returnFullResObject) {
     const response = await _post(url, data, { headers })
     return response.data
   } catch (error) {
-    _error(`error ${method} from ${url}`, error)
+    _error(`error from ${url}`, error)
     throw error
   }
 }

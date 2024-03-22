@@ -25,7 +25,7 @@ const config = {
   CryptoAlgorithm: 'aes-256-cbc',
   RedisServer: 'redis://localhost:6379',
   RedisCacheTimeSeconds: 600,
-  ResourcePrefix: 'http://127.0.0.1:3000',
+  ResourcePrefix: 'http://localhost:5173',
   // ResourcePrefix: 'local',
   ResourceVersion: '', // 'development'
 

@@ -2,14 +2,17 @@
 
 This repo is a full stack application which anyone can clone and self-host as a way to serve the connect widget via a url which can then be loaded into an iframe.
 
-#### Getting Started (in development)
+## Getting Started (in production)
+
+*Coming soon* - A dockerized version of this project will be available soon, on Dockerhub.
+
+## Getting Started (in development)
 1. clone the repo
 2. copy .env.example
 3. Follow Initial setup for getting environment variables
 4. run `docker-compose up`
 
-
-#### Initial setup
+## Initial setup
 1. Run `npm run keys` to generate a new set of `key` and `IV` values.
 2. Fill in the `CryptoKey` and `CryptoIv` in your newly created `.env` file with the generated `key` and `IV`.
 3. Sign up for a UCP client account: [here](https://login.universalconnectproject.org/) (the `Click here to login` link navigates to the aws hosted login page where sign up option is available).
