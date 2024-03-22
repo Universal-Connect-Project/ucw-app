@@ -9,7 +9,6 @@ services:
     build: .
     networks:
       - ucw
-#    network_mode: host
     ports:
       - '8080:8080'
     env_file:
@@ -24,7 +23,6 @@ services:
     build: ./ui
     networks:
       - ucw
-#    network_mode: host
     ports:
       - '5173:5173'
 
@@ -32,7 +30,6 @@ services:
     container_name: ucw-app-cache
     image: redis:7.2-alpine
     restart: always
-#    network_mode: host
     networks:
       - ucw
     ports:
