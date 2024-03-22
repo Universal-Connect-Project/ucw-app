@@ -1,35 +1,35 @@
 version: '3.8'
-#networks:
-#  main-network:
-#    name: main-network
-#    driver: host
 
 services:
+
   server:
+    depends_on: [cache, ui]
     container_name: ucw-app-server
+    restart: on-failure
     build: .
     network_mode: host
-#    networks:
-#      - main-network
-    ports:
-      - "8080:8080"
-      - "6379:6379"
-    environment:
-      - PORT=8080
-      - REDIS_SERVER=redis://localhost:6379
-      - REDIS_CACHE_TIME=600
-      - RESOURCE_PREFIX=http://localhost:5173
+#    ports:
+#      - '8080:8080'
+
   ui:
     container_name: ucw-app-ui
+    restart: on-failure
     build: ./ui
     network_mode: host
-#    networks:
-#      - main-network
-    ports:
-      - '5173:5173'
-    environment:
-      - NODE_ENV=production
-      - PORT=5173
+#    ports:
+#      - '5173:5173'
+
+  cache:
+    container_name: ucw-app-cache
+    image: redis:7.2-alpine
+    restart: always
+    network_mode: host
+#    ports:
+#      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - cache:/data
 
 volumes:
-  app:
+  cache:
+    driver: local
