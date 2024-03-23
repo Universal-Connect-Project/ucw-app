@@ -29,7 +29,7 @@ services:
   cache:
     container_name: ucw-app-cache
     image: redis:7.2-alpine
-    restart: always
+    restart: on-failure
     networks:
       - ucw
     ports:
