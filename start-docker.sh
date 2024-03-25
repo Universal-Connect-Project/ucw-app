@@ -1,3 +1,3 @@
-#!/bin/env bash
+#!/bin/bash
 
-docker run -p8080:8080 -e Env=dev --env-file ${BASH_SOURCE%/*}/.env uvcs
+docker run --name ucw-app-server --network host -e .env ucw-app

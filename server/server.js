@@ -66,35 +66,34 @@ function renderDefaultPage (req, res, html) {
 }
 
 if (config.ResourcePrefix !== 'local') {
-  console.log('\nappUrl', config.ResourcePrefix, '\n')
   app.get('/', async function (req, res) {
     info(`serving resources from ${config.ResourcePrefix}`)
     req.metricsPath = '/catchall'
     const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}${req.path}`
-    console.log('resourcePath', resourcePath, '\n\n')
     await _wget(resourcePath).then(html => { renderDefaultPage(req, res, html) })
   })
   app.get('*', async function (req, res) {
     info(`serving resources from ${config.ResourcePrefix}`)
     req.metricsPath = '/catchall'
     const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}${req.path}`
-    if (!req.path.includes('_next/webpack-hmr')) {
+    if (!req.path.includes('-hmr')) {
       await stream(resourcePath, null, res)
     } else {
       res.sendStatus(404)
     }
   })
 } else {
-  info('using local resources from "../build"')
+  info('using local resources from "../ui/dist"')
   app.get('/', async (req, res) => {
-    const filePath = join(__dirname, '../', 'build', 'index.html')
+    const filePath = join(__dirname, '../ui', 'dist', 'index.html')
     const html = await readFile(filePath)
     renderDefaultPage(req, res, html)
   })
-  app.get('*', _static(join(__dirname, '../build')))
+  app.get('*', _static(join(__dirname, '../ui/dist')))
 }
 
 app.listen(config.Port, () => {
-  const message = `Server is running on port ${config.Port}, env: ${config.Env}`
+  const message = `Server is running on port ${config.Port}, env: ${config.Env}\n`
+  console.log(message)
   info(message)
 })

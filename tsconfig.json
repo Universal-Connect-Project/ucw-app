@@ -13,9 +13,9 @@
     "strictNullChecks": false // TODO: change this to true and fix all errors
   },
   "include": [
-    "server",
+    "server/**/*",
     "jest.config.js",
     "shared/connect/fireflyApiBridge/index.js",
   ],
-  "exclude": ["dist", "node_modules", "./build"]
+  "exclude": ["dist", "node_modules", "./ui/dist", "./ui/node_modules"],
 }
