@@ -7,25 +7,33 @@ services:
     container_name: ucw-app-server
     restart: on-failure
     build: .
-    network_mode: host
-#    ports:
-#      - '8080:8080'
+    networks:
+      - ucw
+    ports:
+      - '8080:8080'
+    env_file:
+      - .env
+    environment:
+      RedisServer: "redis://cache:6379"
+      ResourcePrefix: "http://ui:5173"
 
   ui:
     container_name: ucw-app-ui
     restart: on-failure
     build: ./ui
-    network_mode: host
-#    ports:
-#      - '5173:5173'
+    networks:
+      - ucw
+    ports:
+      - '5173:5173'
 
   cache:
     container_name: ucw-app-cache
     image: redis:7.2-alpine
-    restart: always
-    network_mode: host
-#    ports:
-#      - '6379:6379'
+    restart: on-failure
+    networks:
+      - ucw
+    ports:
+      - '6379:6379'
     command: redis-server --save 20 1 --loglevel warning
     volumes:
       - cache:/data
@@ -33,3 +41,6 @@ services:
 volumes:
   cache:
     driver: local
+
+networks:
+  ucw:
