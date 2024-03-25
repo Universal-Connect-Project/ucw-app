@@ -3,7 +3,7 @@ import { MxApi } from './mx'
 import { SophtronApi } from './sophtron'
 import { AkoyaApi } from './akoya'
 import { FinicityApi } from './finicity'
-import config from '../config.js'
+import config from '../config'
 import * as logger from '../infra/logger'
 import type {
   Challenge,

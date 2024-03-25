@@ -66,7 +66,7 @@ function renderDefaultPage (req, res, html) {
 }
 
 if (config.ResourcePrefix !== 'local') {
-  console.log('\nthing', config.ResourcePrefix, '\n')
+  console.log('\nappUrl', config.ResourcePrefix, '\n')
   app.get('/', async function (req, res) {
     info(`serving resources from ${config.ResourcePrefix}`)
     req.metricsPath = '/catchall'
