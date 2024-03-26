@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker run --name ucw-app-server --network host -e .env ucw-app
+docker run --name ucw-app-server --network host --env-file .env ucw-app
