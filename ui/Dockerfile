@@ -8,6 +8,7 @@ WORKDIR /app
 # Server
 COPY package.json package-lock.json /app/
 RUN npm ci --only=production
+RUN npm i -g vite@5.2.6
 
 COPY ./ ./
 
