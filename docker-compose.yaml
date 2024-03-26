@@ -7,6 +7,7 @@ services:
     container_name: ucw-app-server
     restart: on-failure
     build: .
+    image: universalconnectfoundation/ucw-app:v0.0.1
     networks:
       - ucw
     ports:
@@ -21,6 +22,7 @@ services:
     container_name: ucw-app-ui
     restart: on-failure
     build: ./ui
+    image: universalconnectfoundation/ucw-ui:v0.0.1
     networks:
       - ucw
     ports:
@@ -30,6 +32,10 @@ services:
     container_name: ucw-app-cache
     image: redis:7.2-alpine
     restart: on-failure
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
     networks:
       - ucw
     ports:
