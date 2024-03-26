@@ -1,5 +1,2 @@
 #.dockerignore
 node_modules
-.env
-.husky
-.github
