@@ -11,10 +11,12 @@ RUN npm ci --only=production
 
 COPY ./ ./
 
+RUN npm install -g ts-node
+
 ENV Env prod
 ENV Port 8080
 ENV ResourcePrefix 'http://localhost:5173'
 
 EXPOSE 8080 6379
 
-CMD ["npm", "run", "server"]
+CMD ["ts-node", "server/server.js"]
