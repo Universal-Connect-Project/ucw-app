@@ -2,6 +2,7 @@
   "name": "ucw-app",
   "version": "0.1.0",
   "scripts": {
+    "cypress": "cypress open",
     "server": "ts-node server/server.js",
     "server:debug": "node --inspect -r ts-node/register ./server/server.js",
     "lint:fix": "eslint . --fix --ext .js,.ts",
@@ -59,7 +60,7 @@
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "babel-plugin-js-logger": "^1.0.17",
     "customize-cra": "^1.0.0",
-    "cypress": "^13.6.2",
+    "cypress": "^13.7.1",
     "eslint": "^8.56.0",
     "eslint-config-mx": "^4.0.0",
     "eslint-config-standard-with-typescript": "^43.0.1",
