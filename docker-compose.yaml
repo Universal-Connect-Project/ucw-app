@@ -7,12 +7,13 @@ services:
     container_name: ucw-app-server
     restart: on-failure
     healthcheck:
-      test: ["CMD", "curl", "http://server:8080"]
-      interval: 10s
+      test: ["CMD", "wget", "http://server:8080/ping"]
+      start_period: 5s
+      interval: 20s
       timeout: 5s
       retries: 3
     build: .
-    image: universalconnectfoundation/ucw-app:v0.0.1
+    image: universalconnectfoundation/ucw-app:v0.0.2
     networks:
       - ucw
     ports:
@@ -27,12 +28,13 @@ services:
     container_name: ucw-app-ui
     restart: on-failure
     healthcheck:
-      test: ["CMD", "curl", "http://ui:5173"]
-      interval: 10s
+      test: ["CMD", "wget", "http://ui:5173"]
+      start_period: 5s
+      interval: 20s
       timeout: 5s
       retries: 3
     build: ./ui
-    image: universalconnectfoundation/ucw-ui:v0.0.1
+    image: universalconnectfoundation/ucw-ui:v0.0.2
     networks:
       - ucw
     ports:
@@ -44,7 +46,8 @@ services:
     restart: on-failure
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
+      start_period: 5s
+      interval: 20s
       timeout: 5s
       retries: 3
     networks:
