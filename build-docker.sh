@@ -1,5 +1,5 @@
 #!/bin/bash
 
 TAG=$1
-[ -z "$TAG" ] && TAG="v0.0.1"
+[ -z "$TAG" ] && TAG="dev"
 docker build -t universalconnectfoundation/ucw-app:${TAG} .
