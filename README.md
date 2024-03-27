@@ -8,9 +8,15 @@ This repo is a full stack application which anyone can clone and self-host as a 
 
 ## Getting Started (in development)
 1. clone the repo
-2. copy .env.example
-3. Follow Initial setup for getting environment variables
-4. run `docker-compose up`
+2. npm install
+3. copy .env.example
+
+```
+cp ./.env.example ./.env
+```
+
+4. Follow Initial setup for getting environment variables
+5. run `docker-compose up` or `npm run server`
 
 ## Initial setup
 1. Run `npm run keys` to generate a new set of `key` and `IV` values.
