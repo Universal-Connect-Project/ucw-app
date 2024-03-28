@@ -12,8 +12,6 @@ fi
 
 CONTAINER_NAME=$(docker ps -a -q -f name=$NAME)
 
-echo "Starting container: $CONTAINER_NAME"
-
 if [[ -n "$CONTAINER_NAME" && $(docker inspect -f '{{.State.Running}}' $CONTAINER_NAME) = "true" ]]; then
   IS_RUNNING="true"
 fi
@@ -24,19 +22,28 @@ elif [[ -n "$CONTAINER_NAME" ]]; then
   IS_CREATED="true"
 fi
 
-echo ""
-echo "Container: $CONTAINER_NAME"
-echo "Is running: $IS_RUNNING"
-echo "Is created: $IS_CREATED"
-echo ""
-
 if [ "$IS_RUNNING" = "true" ]; then
   echo "Container is already running: ${CONTAINER_NAME}"
   exit 1
 elif [ "$IS_CREATED" = "true" ]; then
   CMD="docker start -a ${CONTAINER_NAME}"
 else
-  CMD="docker run --name ${NAME} -p 5173:5173 ${NAME}"
+  CMD="docker run --pull never --name ${NAME} -p 5173:5173 ${NAME}"
 fi
 
 eval $CMD
+ERROR=$?
+
+if [ $ERROR -ne 0 ]; then
+  echo "------------------------------"
+  echo "Unable to start container."
+
+  if [ $ERROR -eq 125 ]; then
+    echo "Perhaps the image isn't built yet? Please build the image, by running './build-docker.sh', and try again."
+  else
+    echo "Error: $ERROR"
+  fi
+
+  echo "------------------------------"
+  exit 1
+fi
