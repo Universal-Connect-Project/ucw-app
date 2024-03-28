@@ -93,7 +93,7 @@ if (config.ResourcePrefix !== 'local') {
 }
 
 app.listen(config.Port, () => {
-  const message = `Server is running on port ${config.Port}, env: ${config.Env}\n`
+  const message = `Server is running on port ${config.Port}, Env: ${config.Env}`
   console.log(message)
   info(message)
 })
