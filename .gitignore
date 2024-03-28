@@ -2,6 +2,7 @@
 test.js
 test.ts
 .env
+cypress.env.json
 # Logs
 logs
 *.log

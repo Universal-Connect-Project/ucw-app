@@ -1,5 +1,21 @@
 import '@testing-library/cypress/add-commands'
 
+import crypto from 'crypto'
+import providerCredentials from './providerCredentials'
+
+const encrypt = (text: string, keyHex: string, ivHex: string) => {
+  if (!text) {
+    return ''
+  }
+
+  const key = Buffer.from(keyHex, 'hex')
+  const iv = Buffer.from(ivHex, 'hex')
+  const cipher = crypto.createCipheriv('aes-256-cbc', key, iv)
+  let encrypted = cipher.update(text)
+  encrypted = Buffer.concat([encrypted, cipher.final()])
+  return encrypted.toString('hex')
+}
+
 // ***********************************************
 // This example commands.ts shows you how to
 // create various custom commands and overwrite
@@ -12,11 +28,24 @@ import '@testing-library/cypress/add-commands'
 //
 //
 Cypress.Commands.add('setAuthCode' as any, () => {
-  cy.request('http://localhost:8088/example/getAuthCode').then(response => {
-    const authCode = response.body
-    cy.wrap(authCode).as('authCode')
+  const key = Buffer.from(Cypress.env('ucp_encryption_key'), 'base64').toString('hex')
+  const iv = crypto.randomBytes(16).toString('hex')
+  const body = { Payload: encrypt(JSON.stringify(providerCredentials), key, iv) }
+
+  console.log(providerCredentials)
+
+  cy.request({
+    body,
+    headers: {
+      Authorization: 'basic ' + Buffer.from(`${Cypress.env('ucp_client_id')}:${Cypress.env('ucp_client_secret')}`).toString('base64')
+    },
+    method: 'POST',
+    url: 'https://login.universalconnectproject.org/api/secretexchange'
+  }).then((response) => {
+    const str = `ucp;${response.body.Token};${iv}`
+    const authCode = Buffer.from(str).toString('base64')
+
     Cypress.env('authCode', authCode)
-    expect(response.status).to.eq(200)
   })
 })
 
