@@ -13,7 +13,7 @@ To get started, clone the repo, follow the steps in `Initial Setup`, below to se
 docker-compose up
 ```
 
-That's it! If you have questions, please reach out to us on [GitHub Discussions]().
+That's it! If you have questions, please reach out to us.
 
 The images for this repo are available on [DockerHub](https://hub.docker.com/repositories/universalconnectfoundation)
 
