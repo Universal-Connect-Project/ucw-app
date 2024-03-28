@@ -28,7 +28,7 @@ if [ "$IS_RUNNING" = "true" ]; then
 elif [ "$IS_CREATED" = "true" ]; then
   CMD="docker start -a ${CONTAINER_NAME}"
 else
-  CMD="docker run --pull never --name ${NAME} --network host --env-file .env ${NAME}"
+  CMD="docker run -rm --pull never --name ${NAME} --network host --env-file .env ${NAME}"
 fi
 
 eval $CMD
