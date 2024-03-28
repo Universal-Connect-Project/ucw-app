@@ -1,3 +1,6 @@
+# NOTE: This Dockerfile is not meant to be run alone.
+# Please run `docker compose up` from the root of the project to run the docker environment for this project.
+
 FROM node:20 as builder
 
 WORKDIR /app

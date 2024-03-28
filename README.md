@@ -4,7 +4,18 @@ This repo is a full stack application which anyone can clone and self-host as a 
 
 ## Getting Started (in production)
 
-*Coming soon* - A dockerized version of this project will be available soon, on Dockerhub.
+This repo is a full stack application which anyone can clone and self-host as a way to serve the connect widget.
+
+To get started, clone the repo, follow the steps in `Initial Setup`, below to set up your .env file, and then run the following command:
+
+*This assumes you have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) already installed.*
+```
+docker-compose up
+```
+
+That's it! If you have questions, please reach out to us on [GitHub Discussions]().
+
+The images for this repo are available on [DockerHub](https://hub.docker.com/repositories/universalconnectfoundation)
 
 ## Getting Started (in development)
 1. clone the repo
@@ -36,13 +47,3 @@ USE `.env` FILE
 * You might see an error about failure to connect redis, the widget doesn't rely on redis to start, but some providers logic require an redis intance, to fix this error you can either: 
 - start a local redis instance, this way it will be avaliable at localhost:6379 and the widget will use it
 - Or set in `.env` Env=dev, this way the redis client will use local in-mem object to handle the cache and remove the error, however, this is just for some testing, the cached values won't expire and also will be cleared on server restart. 
-
-## Docker
-
-We will soon have a published image for this project on [DockerHub](https://hub.docker.com).
-
-Until then, the easiest way to run this project, is to use `docker-compose`. This assumes you have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) installed.
-
-You should also follow the `Initial Setup` step, above. 
-
-Once you have completed the initial setup, and installed docker and docker-compose, you can run `docker compose up` to build and run the necessary docker containers, and have access to the application. 
