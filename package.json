@@ -29,7 +29,6 @@
     "js-logger": "^1.6.1",
     "redis": "^4.6.12",
     "stream-browserify": "^3.0.0",
-    "ts-node": "^10.9.2",
     "uuid": "^9.0.1"
   },
   "eslintConfig": {
@@ -71,6 +70,7 @@
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
     "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },
   "lint-staged": {

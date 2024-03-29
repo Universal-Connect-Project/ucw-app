@@ -16,16 +16,16 @@ RUN npm run build
 FROM alpine:3.19.1 as web
 ENV NODE_VERSION 20.11.1
 
-RUN apk --update --no-cache add nodejs npm wget
+RUN apk --update --no-cache add nodejs npm
 
 WORKDIR /app
 
 COPY package.json package-lock.json vite.config.ts /app/
 RUN npm ci --only=production &&  \
-    npm i -g vite@5.2.6
+    npm i -g serve@14.2.1
 
 COPY --from=builder /app/dist /app/dist
 
-EXPOSE 5173
+EXPOSE ${ResourcePort}
 
-CMD ["npm", "run", "preview"]
+CMD ["sh", "-c", "serve -p ${ResourcePort} /app/dist"]
