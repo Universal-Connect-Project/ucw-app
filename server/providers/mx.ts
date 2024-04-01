@@ -26,6 +26,8 @@ import { mapJobType } from '../../server/utils'
 import config from '../config'
 import { StorageClient } from '../serviceClients/storageClient'
 
+const EXTENDED_HISTORY_NOT_SUPPORTED_MSG = "Member's institution does not support extended transaction history."
+
 function fromMxInstitution (ins: InstitutionResponse, provider: string): Institution {
   return {
     id: ins.code,
@@ -147,11 +149,19 @@ export class MxApi implements ProviderApiClient {
     // console.log(memberRes)
     const member = memberRes.data.member
     // console.log(member)
-    if (['verification', 'aggregate_identity_verification'].includes(jobType)) {
-      await this.apiClient.verifyMember(member.guid, userId)
-    } else if (jobType === 'aggregate_identity') {
-      await this.apiClient.identifyMember(member.guid, userId)
+    if (!request?.is_oauth) {
+      if (['verification', 'aggregate_identity_verification'].includes(jobType)) {
+        const updatedMemberRes = await this.apiClient.verifyMember(member.guid, userId)
+        return fromMxMember(updatedMemberRes.data.member, this.provider)
+      } else if (job_type === 'aggregate_identity') {
+        const updatedMemberRes = await this.apiClient.identifyMember(member.guid, userId)
+        return fromMxMember(updatedMemberRes.data.member, this.provider)
+      } else if (job_type === 'aggregate_extendedhistory') {
+        const updatedMemberRes = await this.apiClient.extendHistory(member.guid, userId)
+        return fromMxMember(updatedMemberRes.data.member, this.provider)
+      }
     }
+
     return fromMxMember(member, this.provider)
   }
 
@@ -164,14 +174,24 @@ export class MxApi implements ProviderApiClient {
     userId: string
   ): Promise<Connection> {
     let ret
-    if (request.job_type === 'verify') {
+    if (request.job_type === 'verification') {
       ret = await this.apiClient.verifyMember(request.id, userId)
-    } else if (request.job_type === 'identify') {
-      // this only gets called if job_type=aggregate_identity_verification
-      ret = await this.apiClient.identifyMember(request.id, userId, { data: { member: { include_transactions: true }}})
+    } else if (request.job_type === 'aggregate_identity') {
+      ret = await this.apiClient.identifyMember(request.id, userId, { data: { member: { include_transactions: true } } })
+    } else if (request.job_type === 'aggregate_extendedhistory') {
+      ret = await this.apiClient.extendHistory(request.id, userId)
     } else {
       ret = await this.apiClient.aggregateMember(request.id, userId)
     }
+
+    if (ret.data?.error) {
+      if (ret.data.error.message === EXTENDED_HISTORY_NOT_SUPPORTED_MSG) {
+        ret = await this.apiClient.aggregateMember(request.id, userId)
+      } else {
+        return { id: request.id, error_message: ret.data.error.message }
+      }
+    }
+
     return fromMxMember(ret.data.member, this.provider)
   }
 
