@@ -153,10 +153,10 @@ export class MxApi implements ProviderApiClient {
       if (['verification', 'aggregate_identity_verification'].includes(jobType)) {
         const updatedMemberRes = await this.apiClient.verifyMember(member.guid, userId)
         return fromMxMember(updatedMemberRes.data.member, this.provider)
-      } else if (job_type === 'aggregate_identity') {
+      } else if (jobType === 'aggregate_identity') {
         const updatedMemberRes = await this.apiClient.identifyMember(member.guid, userId)
         return fromMxMember(updatedMemberRes.data.member, this.provider)
-      } else if (job_type === 'aggregate_extendedhistory') {
+      } else if (jobType === 'aggregate_extendedhistory') {
         const updatedMemberRes = await this.apiClient.extendHistory(member.guid, userId)
         return fromMxMember(updatedMemberRes.data.member, this.provider)
       }
