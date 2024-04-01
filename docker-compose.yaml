@@ -7,7 +7,7 @@ services:
     container_name: ucw-app-server
     restart: on-failure
     healthcheck:
-      test: ["CMD", "wget", "http://server:8080/ping"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://server:${Port}/ping"]
       start_period: 5s
       interval: 20s
       timeout: 5s
@@ -17,18 +17,18 @@ services:
     networks:
       - ucw
     ports:
-      - '8080:8080'
+      - "${Port}:${Port}"
     env_file:
       - .env
     environment:
-      RedisServer: "redis://cache:6379"
-      ResourcePrefix: "http://ui:5173"
+      RedisServer: "redis://cache:${RedisPort}"
+      ResourcePrefix: "http://ui:${ResourcePort}"
 
   ui:
     container_name: ucw-app-ui
     restart: on-failure
     healthcheck:
-      test: ["CMD", "wget", "http://ui:5173"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://ui:${ResourcePort}"]
       start_period: 5s
       interval: 20s
       timeout: 5s
@@ -38,7 +38,9 @@ services:
     networks:
       - ucw
     ports:
-      - '5173:5173'
+      - "${ResourcePort}:${ResourcePort}"
+    environment:
+      ResourcePort: "${ResourcePort}"
 
   cache:
     container_name: ucw-app-cache
@@ -53,7 +55,7 @@ services:
     networks:
       - ucw
     ports:
-      - '6379:6379'
+      - "${RedisPort}:${RedisPort}"
     command: redis-server --save 20 1 --loglevel warning
     volumes:
       - cache:/data

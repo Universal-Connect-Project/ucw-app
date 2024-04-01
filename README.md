@@ -6,11 +6,11 @@ This repo is a full stack application which anyone can clone and self-host as a 
 
 This repo is a full stack application which anyone can clone and self-host as a way to serve the connect widget.
 
-To get started, clone the repo, follow the steps in `Initial Setup`, below to set up your .env file, and then run the following command:
+To get started, clone the repo, follow the steps in `Initial Setup`, below to set up your .env file, and then run the following command, from the root of the project:
 
 *This assumes you have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) already installed.*
 ```
-docker-compose up
+docker compose --env-file .env up
 ```
 
 That's it! If you have questions, please reach out to us.
