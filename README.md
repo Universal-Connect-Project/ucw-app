@@ -25,7 +25,7 @@ The images for this repo are available on [DockerHub](https://hub.docker.com/rep
 5. Go back to the root directory: `cd ..`
 6. Copy `.env.example`: `cp ./.env.example ./.env`
 7. Follow "Initial setup" (below) for setting-up some required environment variables
-8. Finally, run: `npm run combined`
+8. Finally, run: `npm run ucw-app`
 
 ## Initial setup
 1. Run `npm run keys` to generate a new set of `key` and `IV` values.
