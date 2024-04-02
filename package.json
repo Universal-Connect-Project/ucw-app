@@ -4,6 +4,8 @@
   "scripts": {
     "server": "ts-node server/server.js",
     "server:debug": "node --inspect -r ts-node/register ./server/server.js",
+    "widget": "cd ./ui && npm run dev",
+    "combined": "npx --yes npm-run-all --parallel server widget",
     "lint:fix": "eslint . --fix --ext .js,.ts",
     "coverage": "npm test -- --verbose --coverage --watchAll",
     "test": "jest --no-coverage",

@@ -10,7 +10,7 @@ To get started, clone the repo, follow the steps in `Initial Setup`, below to se
 
 *This assumes you have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) already installed.*
 ```
-docker compose --env-file .env up
+docker compose up
 ```
 
 That's it! If you have questions, please reach out to us.
@@ -19,15 +19,13 @@ The images for this repo are available on [DockerHub](https://hub.docker.com/rep
 
 ## Getting Started (in development)
 1. clone the repo
-2. npm install
-3. copy .env.example
-
-```
-cp ./.env.example ./.env
-```
-
-4. Follow Initial setup for getting environment variables
-5. run `docker-compose up` or `npm run server`
+2. Run `npm ci`
+3. Go into the `ui` directory: `cd ./ui`
+4. Run `npm ci` in the `ui` directory
+5. Go back to the root directory: `cd ..`
+6. Copy `.env.example`: `cp ./.env.example ./.env`
+7. Follow "Initial setup" (below) for setting-up some required environment variables
+8. Finally, run: `npm run combined`
 
 ## Initial setup
 1. Run `npm run keys` to generate a new set of `key` and `IV` values.
