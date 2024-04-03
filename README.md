@@ -45,3 +45,15 @@ USE `.env` FILE
 * You might see an error about failure to connect redis, the widget doesn't rely on redis to start, but some providers logic require an redis intance, to fix this error you can either: 
 - start a local redis instance, this way it will be avaliable at localhost:6379 and the widget will use it
 - Or set in `.env` Env=dev, this way the redis client will use local in-mem object to handle the cache and remove the error, however, this is just for some testing, the cached values won't expire and also will be cleared on server restart. 
+
+## Publish to Docker
+
+To publish to DockerHub, first run `docker compose up`, 
+then run 
+    `docker push universalconnectfoundation/ucw-app:v<version>`
+and 
+    `docker push universalconnectfoundation/ucw-ui:v<version>`
+
+You must be logged in to DockerHub, and a member of the UCP organization.
+
+`<version>` must mach the respective version listed in the `docker-compose.yaml` file.
