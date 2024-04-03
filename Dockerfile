@@ -9,7 +9,7 @@ RUN apk --update --no-cache add nodejs npm
 WORKDIR /app
 
 COPY package.json package-lock.json tsconfig.json tsconfig.paths.json /app/
-RUN npm ci --only=production &&  \
+RUN npm ci --omit=dev &&  \
     npm i -g ts-node
 
 COPY ./server ./server

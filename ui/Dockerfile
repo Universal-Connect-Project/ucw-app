@@ -21,7 +21,7 @@ RUN apk --update --no-cache add nodejs npm
 WORKDIR /app
 
 COPY package.json package-lock.json vite.config.ts /app/
-RUN npm ci --only=production &&  \
+RUN npm ci --omit=dev &&  \
     npm i -g serve@14.2.1
 
 COPY --from=builder /app/dist /app/dist
