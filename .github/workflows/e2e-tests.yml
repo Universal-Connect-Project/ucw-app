@@ -17,14 +17,14 @@ jobs:
       - name: 'Create env file'
         run: |
           touch .env
-          echo DEFAULTPROVIDER=${{ secrets.DEFAULTPROVIDER }} >> .env
-          echo DEMO=${{ secrets.DEMO }} >> .env
-          echo ENV=${{ secrets.ENV }} >> .env
-          echo HOSTURL=${{ secrets.HOSTURL }} >> .env
-          echo WEBHOOKHOSTURL=${{ secrets.WEBHOOKHOSTURL }} >> .env
-          echo LOGLEVEL=${{ secrets.LOGLEVEL }} >> .env
-          echo PORT=${{ secrets.PORT }} >> .env
-          echo RESOURCEPREFIX=${{ secrets.RESOURCEPREFIX }} >> .env
+          echo DEFAULTPROVIDER=${{ vars.DEFAULTPROVIDER }} >> .env
+          echo DEMO=${{ vars.DEMO }} >> .env
+          echo ENV=${{ vars.ENV }} >> .env
+          echo HOSTURL=${{ vars.HOSTURL }} >> .env
+          echo WEBHOOKHOSTURL=${{ vars.WEBHOOKHOSTURL }} >> .env
+          echo LOGLEVEL=${{ vars.LOGLEVEL }} >> .env
+          echo PORT=${{ vars.PORT }} >> .env
+          echo RESOURCEPREFIX=${{ vars.RESOURCEPREFIX }} >> .env
           echo CRYPTOIV=${{ secrets.CRYPTOIV }} >> .env
           echo CRYPTOKEY=${{ secrets.CRYPTOKEY }} >> .env
           echo UCPAUTHCLIENTID=${{ secrets.UCP_CLIENT_ID }} >> .env
@@ -44,3 +44,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           start: npm run ucw-app
+          wait-on: "http://localhost:8080"
+          wait-on-timeout: 120
