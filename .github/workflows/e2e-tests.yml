@@ -25,6 +25,7 @@ jobs:
           echo LOGLEVEL=${{ vars.LOGLEVEL }} >> .env
           echo PORT=${{ vars.PORT }} >> .env
           echo RESOURCEPREFIX=${{ vars.RESOURCEPREFIX }} >> .env
+          echo RESOURCEVERSION="" >> .env
           echo CRYPTOIV=${{ secrets.CRYPTOIV }} >> .env
           echo CRYPTOKEY=${{ secrets.CRYPTOKEY }} >> .env
           echo UCPAUTHCLIENTID=${{ secrets.UCP_CLIENT_ID }} >> .env
@@ -45,4 +46,3 @@ jobs:
         with:
           start: npm run ucw-app
           wait-on: "http://localhost:8080"
-          wait-on-timeout: 120
