@@ -27,7 +27,7 @@ jobs:
           echo CRYPTOIV=${{ secrets.CRYPTOIV }} >> .env
           echo CRYPTOKEY=${{ secrets.CRYPTOKEY }} >> .env
           echo UCPAUTHCLIENTID=${{ secrets.UCP_CLIENT_ID }} >> .env
-          echo UCPAUTHCLIENTSSECRET=${{ secrets.UCP_CLIENT_SECRET }} >> .env
+          echo UCPAUTHCLIENTSECRET=${{ secrets.UCP_CLIENT_SECRET }} >> .env
           echo UCPAUTHENCRYPTIONKEY=${{ secrets.UCP_ENCRYPTION_KEY }} >> .env
           cat .env
       - name: Cypress run
@@ -43,5 +43,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           start: npm run ucw-app
-          wait-on: "http://localhost:8080/"
+          wait-on: "http://127.0.0.1:8080"
           wait-on-timeout: 120
