@@ -5,6 +5,8 @@
     "cypress": "cypress open",
     "server": "ts-node server/server.js",
     "server:debug": "node --inspect -r ts-node/register ./server/server.js",
+    "widget": "cd ./ui && npm run dev",
+    "ucw-app": "npx --yes npm-run-all --parallel server widget",
     "lint:fix": "eslint . --fix --ext .js,.ts",
     "coverage": "npm test -- --verbose --coverage --watchAll",
     "test": "jest --no-coverage",
@@ -18,19 +20,18 @@
     "@capacitor-community/http": "^1.4.1",
     "@types/express": "^4.17.21",
     "assert-browserify": "^2.0.0",
-    "axios": "^1.6.0",
+    "axios": "^1.6.8",
     "buffer-browserify": "^0.2.5",
     "crypto-browserify": "^3.12.0",
     "crypto-js": "^4.2.0",
     "dotenv": "^16.3.1",
-    "express": "^4.18.2",
+    "express": "^4.19.2",
     "express-async-errors": "^3.1.1",
     "express-rate-limit": "^7.0.2",
     "husky": "^9.0.11",
     "js-logger": "^1.6.1",
     "redis": "^4.6.12",
     "stream-browserify": "^3.0.0",
-    "ts-node": "^10.9.2",
     "uuid": "^9.0.1"
   },
   "eslintConfig": {
@@ -73,6 +74,7 @@
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
     "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },
   "lint-staged": {

@@ -10,6 +10,8 @@ import { info } from '../infra/logger'
 import { wget } from '../infra/http'
 import { readFile } from '../utils/fs'
 
+const AGGREGATION_JOB_TYPE = 0
+
 export default function (app) {
   stubs(app)
   app.use(contextHandler)
@@ -89,14 +91,22 @@ export default function (app) {
     const ret = await req.connectService.loadInstitutions(req.query.search_name ?? req.query.routing_number)
     res.send(ret)
   })
-  app.get('/jobs/:guid', async (req, res) => {
-    // this doesn't seem to affect anything as long as there is a response
-    res.send({
-      job: {
-        guid: req.params.guid,
-        job_type: 0 // must
+  app.get('/jobs/:member_guid', async (req, res) => {
+    if (['mx_int', 'mx'].includes(req.context.provider)) {
+      if (req.params.member_guid === 'null') {
+        res.send({ job: { guid: 'none', job_type: AGGREGATION_JOB_TYPE } })
+        return
       }
-    })
+      const ret = await req.connectService.loadMemberByGuid(req.params.member_guid)
+      res.send(ret)
+    } else {
+      res.send({
+        job: {
+          guid: req.params.member_guid,
+          job_type: AGGREGATION_JOB_TYPE
+        }
+      })
+    }
   })
 
   app.get('/oauth_states', async (req, res) => {
@@ -117,9 +127,28 @@ export default function (app) {
   })
 
   app.post(`${ApiEndpoints.MEMBERS}/:member_guid/identify`, async (req, res) => {
-    console.log('hitting Identify')
     const ret = await req.connectService.updateConnection(
-      { id: req.params.member_guid, job_type: 'identify' },
+      { id: req.params.member_guid, job_type: 'aggregate_identity' },
+      req.context.resolved_user_id
+    )
+    res.send({
+      members: ret
+    })
+  })
+
+  app.post(`${ApiEndpoints.MEMBERS}/:member_guid/verify`, async (req, res) => {
+    const ret = await req.connectService.updateConnection(
+      { id: req.params.member_guid, job_type: 'verification' },
+      req.context.resolved_user_id
+    )
+    res.send({
+      members: ret
+    })
+  })
+
+  app.post(`${ApiEndpoints.MEMBERS}/:member_guid/history`, async (req, res) => {
+    const ret = await req.connectService.updateConnection(
+      { id: req.params.member_guid, job_type: 'aggregate_extendedhistory' },
       req.context.resolved_user_id
     )
     res.send({
@@ -140,7 +169,9 @@ export default function (app) {
       { id: req.params.member_guid, job_type: 'aggregate' },
       req.context.resolved_user_id
     )
-    res.send(ret)
+    res.send({
+      members: ret
+    })
   })
 
   app.all('/webhook/:provider/*', async function (req, res) {

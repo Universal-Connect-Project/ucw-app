@@ -1,18 +1,31 @@
-FROM alpine:3.19.1
-ENV NODE_VERSION 20.11.1
+# NOTE: This Dockerfile is not meant to be run alone.
+# Please run `docker compose up` from the root of the project to run the docker environment for this project.
 
-RUN apk add --no-cache nodejs npm
+FROM node:20 as builder
 
 WORKDIR /app
 
-# Server
 COPY package.json package-lock.json /app/
-RUN npm ci --only=production
+
+RUN npm ci
 
 COPY ./ ./
 
 RUN npm run build
 
-EXPOSE 5173
+FROM alpine:3.19.1 as web
+ENV NODE_VERSION 20.11.1
 
-CMD ["npm", "run", "preview"]
+RUN apk --update --no-cache add nodejs npm
+
+WORKDIR /app
+
+COPY package.json package-lock.json vite.config.ts /app/
+RUN npm ci --omit=dev &&  \
+    npm i -g serve@14.2.1
+
+COPY --from=builder /app/dist /app/dist
+
+EXPOSE ${ResourcePort}
+
+CMD ["sh", "-c", "serve -p ${ResourcePort} /app/dist"]

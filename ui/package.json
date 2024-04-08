@@ -11,12 +11,11 @@
   },
   "dependencies": {
     "@types/node": "^20.11.16",
-    "@ucp-npm/components": "^0.0.4-beta",
+    "@ucp-npm/components": "^0.0.6-beta",
     "@vitejs/plugin-react": "^4.2.1",
     "@vitejs/plugin-react-swc": "^3.6.0",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "vite": "^5.0.8"
+    "react-dom": "^16.13.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
@@ -27,6 +26,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "prettier": "^3.2.5",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "vite": "^5.2.6"
   }
 }
