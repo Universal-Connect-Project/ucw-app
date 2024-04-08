@@ -32,8 +32,6 @@ Cypress.Commands.add('setAuthCode' as any, () => {
   const iv = crypto.randomBytes(16).toString('hex')
   const body = { Payload: encrypt(JSON.stringify(providerCredentials), key, iv) }
 
-  console.log(providerCredentials)
-
   cy.request({
     body,
     headers: {
