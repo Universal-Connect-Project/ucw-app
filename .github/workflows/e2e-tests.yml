@@ -27,3 +27,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           start: npm run ucw-app
+          wait-on: "http://localhost:8080/"
+          wait-on-timeout: 120
