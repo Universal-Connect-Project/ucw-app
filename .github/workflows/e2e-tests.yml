@@ -14,6 +14,22 @@ jobs:
           node-version: "lts/*"
       - run: npm ci
       - run: cd ./ui && npm ci
+      - name: 'Create env file'
+        run: |
+          touch .env
+          echo DEFAULTPROVIDER=${{ secrets.DEFAULTPROVIDER }} >> .env
+          echo DEMO=${{ secrets.DEMO }} >> .env
+          echo ENV=${{ secrets.ENV }} >> .env
+          echo HOSTURL=${{ secrets.HOSTURL }} >> .env
+          echo LOGLEVEL=${{ secrets.LOGLEVEL }} >> .env
+          echo PORT=${{ secrets.PORT }} >> .env
+          echo RESOURCEPREFIX=${{ secrets.RESOURCEPREFIX }} >> .env
+          echo CRYPTOIV=${{ secrets.CRYPTOIV }} >> .env
+          echo CRYPTOKEY=${{ secrets.CRYPTOKEY }} >> .env
+          echo UCPAUTHCLIENTID=${{ secrets.UCP_CLIENT_ID }} >> .env
+          echo UCPAUTHCLIENTSSECRET=${{ secrets.UCP_CLIENT_SECRET }} >> .env
+          echo UCPAUTHENCRYPTIONKEY=${{ secrets.UCP_ENCRYPTION_KEY }} >> .env
+          cat .env
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
