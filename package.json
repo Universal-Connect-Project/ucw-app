@@ -1,6 +1,6 @@
 {
   "name": "ucw-app",
-  "version": "0.1.0",
+  "version": "0.0.7-beta",
   "scripts": {
     "server": "ts-node server/server.js",
     "server:debug": "node --inspect -r ts-node/register ./server/server.js",
