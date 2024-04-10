@@ -1,5 +1,5 @@
 const processEnv = {}
-const envs = { ...process.env, ...(process as Record<string, any>).client_envs  }
+const envs = { ...process.env, ...(process as Record<string, any>).client_envs }
 
 Object.keys(envs).forEach((k) => {
   (processEnv as Record<string, any>)[k.toUpperCase()] = envs[k]
@@ -11,34 +11,34 @@ const nonSensitiveSharedConfig = {
   AnalyticsServiceEndpoint: 'https://analytics.universalconnectproject.org/api/',
   Component: 'UniversalWidget',
   ServiceName: 'universal_widget',
-  CryptoAlgorithm: 'aes-256-cbc',
+  CryptoAlgorithm: 'aes-256-cbc'
 }
 
 const keysToPullFromEnv = [
-  "SophtronClientId",
-  "SophtronClientSecret",
+  'SophtronClientId',
+  'SophtronClientSecret',
 
-  "UcpAuthClientId",
-  "UcpAuthClientSecret",
-  "UcpAuthEncryptionKey",
+  'UcpAuthClientId',
+  'UcpAuthClientSecret',
+  'UcpAuthEncryptionKey',
 
-  "CryptoKey",
-  "CryptoIv",
+  'CryptoKey',
+  'CryptoIv',
 
-  "Demo",
-  "DefaultProvider",
-  "Port",
+  'Demo',
+  'DefaultProvider',
+  'Port',
 
-  "HostUrl",
-  "WebhookHostUrl",
-  "LogLevel",
-  
-  "Env",
+  'HostUrl',
+  'WebhookHostUrl',
+  'LogLevel',
 
-  "RedisServer",
-  "RedisCacheTimeSeconds",
-  "ResourcePrefix",
-  "ResourceVersion",
+  'Env',
+
+  'RedisServer',
+  'RedisCacheTimeSeconds',
+  'ResourcePrefix',
+  'ResourceVersion'
 ]
 
 const config: Record<string, any> = keysToPullFromEnv.reduce((acc, envKey) => {
@@ -50,4 +50,4 @@ const config: Record<string, any> = keysToPullFromEnv.reduce((acc, envKey) => {
   ...nonSensitiveSharedConfig
 })
 
-export default config;
+export default config

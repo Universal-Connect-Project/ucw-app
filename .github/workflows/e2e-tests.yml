@@ -1,0 +1,48 @@
+
+name: E2E Tests
+
+on: pull_request
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*"
+      - run: npm ci
+      - run: cd ./ui && npm ci
+      - name: 'Create env file'
+        run: |
+          touch .env
+          echo DEFAULTPROVIDER=${{ vars.DEFAULTPROVIDER }} >> .env
+          echo DEMO=${{ vars.DEMO }} >> .env
+          echo ENV=${{ vars.ENV }} >> .env
+          echo HOSTURL=${{ vars.HOSTURL }} >> .env
+          echo WEBHOOKHOSTURL=${{ vars.WEBHOOKHOSTURL }} >> .env
+          echo LOGLEVEL=${{ vars.LOGLEVEL }} >> .env
+          echo PORT=${{ vars.PORT }} >> .env
+          echo RESOURCEPREFIX=${{ vars.RESOURCEPREFIX }} >> .env
+          echo RESOURCEVERSION="" >> .env
+          echo CRYPTOIV=${{ secrets.CRYPTOIV }} >> .env
+          echo CRYPTOKEY=${{ secrets.CRYPTOKEY }} >> .env
+          echo UCPAUTHCLIENTID=${{ secrets.UCP_CLIENT_ID }} >> .env
+          echo UCPAUTHCLIENTSECRET=${{ secrets.UCP_CLIENT_SECRET }} >> .env
+          echo UCPAUTHENCRYPTIONKEY=${{ secrets.UCP_ENCRYPTION_KEY }} >> .env
+          cat .env
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        env:
+          CYPRESS_ucp_client_id: ${{ secrets.UCP_CLIENT_ID }}
+          CYPRESS_ucp_client_secret: ${{ secrets.UCP_CLIENT_SECRET }}
+          CYPRESS_ucp_encryption_key: ${{ secrets.UCP_ENCRYPTION_KEY }}
+          CYPRESS_sophtron_api_user_id: ${{ secrets.SOPHTRON_API_USER_ID }}
+          CYPRESS_sophtron_api_user_secret: ${{ secrets.SOPHTRON_API_USER_SECRET }}
+          CYPRESS_mx_client_id: ${{ secrets.MX_CLIENT_ID }}
+          CYPRESS_mx_api_secret: ${{ secrets.MX_API_SECRET }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          start: npm run ucw-app
+          wait-on: "http://localhost:8080"
