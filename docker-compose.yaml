@@ -13,7 +13,7 @@ services:
       timeout: 5s
       retries: 3
     build: .
-    image: universalconnectfoundation/ucw-app:v0.0.6-beta
+    image: universalconnectfoundation/ucw-app:v0.0.7-beta
     networks:
       - ucw
     ports:
@@ -34,7 +34,7 @@ services:
       timeout: 5s
       retries: 3
     build: ./ui
-    image: universalconnectfoundation/ucw-ui:v0.0.6-beta
+    image: universalconnectfoundation/ucw-ui:v0.0.7-beta
     networks:
       - ucw
     ports:
