@@ -15,15 +15,21 @@ const nonSensitiveSharedConfig = {
 }
 
 const keysToPullFromEnv = [
+  "CryptoKey",
+  "CryptoIv",
+
+  "AuthProvider", //supported: ucp, local, sophtron
+  // fill the corresponding credentials below if the auth provider is to be used
+
+  "LocalAuthEncryptionKey", // shared encryption key with caller to encrypt the auth phraze
+  "LocalAuthPhrase", // a static auth phraze to be encrypted by the key above at caller side. 
+  
   "SophtronClientId",
   "SophtronClientSecret",
 
   "UcpAuthClientId",
   "UcpAuthClientSecret",
   "UcpAuthEncryptionKey",
-
-  "CryptoKey",
-  "CryptoIv",
 
   "Demo",
   "DefaultProvider",
@@ -39,6 +45,7 @@ const keysToPullFromEnv = [
   "RedisCacheTimeSeconds",
   "ResourcePrefix",
   "ResourceVersion",
+  
 ]
 
 const config: Record<string, any> = keysToPullFromEnv.reduce((acc, envKey) => {
