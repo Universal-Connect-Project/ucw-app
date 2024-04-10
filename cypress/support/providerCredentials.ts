@@ -3,7 +3,7 @@ const providerCredentials = {
     username: Cypress.env('mx_client_id'),
     password: Cypress.env('mx_api_secret'),
     basePath: 'https://int-api.mx.com',
-    vcEndpoint: 'https://int-api.mx.com/',
+    vcEndpoint: 'https://int-api.mx.com',
     provider: 'mx_int',
     available: true
   },
@@ -11,7 +11,7 @@ const providerCredentials = {
     username: Cypress.env('mx_client_id_prod'),
     password: Cypress.env('mx_api_secret_prod'),
     basePath: 'https://api.mx.com',
-    vcEndpoint: 'https://api.mx.com/',
+    vcEndpoint: 'https://api.mx.com',
     provider: 'mx',
     available: true
   },
