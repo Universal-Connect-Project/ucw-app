@@ -31,3 +31,6 @@ coverage/
 # OS files
 .DS_Store
 .Thumbs.db
+
+cypress.env.json
+cypress/screenshots/
