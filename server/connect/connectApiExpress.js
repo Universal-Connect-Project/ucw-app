@@ -27,7 +27,7 @@ export default function (app) {
   })
 
   app.post('/analytics*', async (req, res) => {
-    if (config.AnalyticsServiceEndpoint !== '' && config.AnalyticsServiceEndpoint != null) {
+    if (config.Env !== 'test' && config.AnalyticsServiceEndpoint !== '' && config.AnalyticsServiceEndpoint != null) {
       const ret = await req.connectService.analytics(req.path, req.body)
       res.send(ret)
     } else {

@@ -1,5 +1,5 @@
 describe('Should connect to an Institution through happy path', () => {
-  before(() => {
+  beforeEach(() => {
     cy.setAuthCode()
   })
 
