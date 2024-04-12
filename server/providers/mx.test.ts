@@ -4,6 +4,7 @@ import { institutionData } from '../../test/testData/institution'
 import { MxApi } from './mx'
 import { INSTITUTION_BY_ID_PATH } from '../../test/handlers'
 import { institutionCredentialsData } from '../../test/testData/institutionCredentials'
+import { membersData } from '../../test/testData/members'
 
 const mxApiInt = new MxApi({
   mxInt: {
@@ -82,6 +83,33 @@ describe('mx provider', () => {
           field_type: secondCredential.field_type,
           label: secondCredential.field_name
         }])
+      })
+    })
+
+    describe('ListConnections', () => {
+      const [firstMember, secondMember] = membersData.members
+
+      it('retrieves and transforms the members', async () => {
+        expect(await mxApi.ListConnections('testId')).toEqual([
+          {
+            id: firstMember.guid,
+            cur_job_id: firstMember.guid,
+            institution_code: firstMember.institution_code,
+            is_being_aggregated: firstMember.is_being_aggregated,
+            is_oauth: firstMember.is_oauth,
+            oauth_window_uri: firstMember.oauth_window_uri,
+            provider: 'mx'
+          },
+          {
+            id: secondMember.guid,
+            cur_job_id: secondMember.guid,
+            institution_code: secondMember.institution_code,
+            is_being_aggregated: secondMember.is_being_aggregated,
+            is_oauth: secondMember.is_oauth,
+            oauth_window_uri: secondMember.oauth_window_uri,
+            provider: 'mx'
+          }
+        ])
       })
     })
   })
