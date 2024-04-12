@@ -1,6 +1,6 @@
 import '@testing-library/cypress/add-commands'
 
-import crypto from 'crypto'
+import * as crypto from 'crypto'
 import providerCredentials from './providerCredentials'
 
 const encrypt = (text: string, keyHex: string, ivHex: string) => {

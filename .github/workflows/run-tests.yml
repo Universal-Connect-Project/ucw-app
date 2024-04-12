@@ -1,6 +1,6 @@
 
 # Name of this action
-name: Jest Automatic Testing
+name: Unit/Integration tests
 
 # Event triggers on pull request event
 # For more detail visit https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#on
@@ -19,7 +19,6 @@ jobs:
 
     # Steps this job must take to complete
     steps:
-      # Reference the main branch. For more information visit https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstepsuses
       - name: Checkout under $GITHUB_WORKSPACE
         uses: actions/checkout@main
 
@@ -33,6 +32,25 @@ jobs:
       - name: Install all dependencies
         run: |
           npm ci
+
+      - name: 'Create env file'
+        run: |
+          touch .env
+          echo DEFAULTPROVIDER=${{ vars.DEFAULTPROVIDER }} >> .env
+          echo DEMO=${{ vars.DEMO }} >> .env
+          echo ENV=${{ vars.ENV }} >> .env
+          echo HOSTURL=${{ vars.HOSTURL }} >> .env
+          echo WEBHOOKHOSTURL=${{ vars.WEBHOOKHOSTURL }} >> .env
+          echo LOGLEVEL=${{ vars.LOGLEVEL }} >> .env
+          echo PORT=${{ vars.PORT }} >> .env
+          echo RESOURCEPREFIX=${{ vars.RESOURCEPREFIX }} >> .env
+          echo RESOURCEVERSION="" >> .env
+          echo CRYPTOIV=${{ secrets.CRYPTOIV }} >> .env
+          echo CRYPTOKEY=${{ secrets.CRYPTOKEY }} >> .env
+          echo UCPAUTHCLIENTID=${{ secrets.UCP_CLIENT_ID }} >> .env
+          echo UCPAUTHCLIENTSECRET=${{ secrets.UCP_CLIENT_SECRET }} >> .env
+          echo UCPAUTHENCRYPTIONKEY=${{ secrets.UCP_ENCRYPTION_KEY }} >> .env
+          cat .env
 
       - name: Run Jest Tests
         run: |
