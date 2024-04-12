@@ -1,6 +1,6 @@
 
 # Name of this action
-name: Jest Automatic Testing
+name: Unit/Integration tests
 
 # Event triggers on pull request event
 # For more detail visit https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#on
@@ -22,6 +22,9 @@ jobs:
       # Reference the main branch. For more information visit https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstepsuses
       - name: Checkout under $GITHUB_WORKSPACE
         uses: actions/checkout@main
+
+      - uses: ./.github/workflows/create-env-file.yml
+      secrets: inherit
 
       # Specify which version of Node this project is using. For more information visit.
       # https://docs.github.com/en/actions/guides/building-and-testing-nodejs#specifying-the-nodejs-version
