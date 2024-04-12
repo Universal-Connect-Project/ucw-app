@@ -19,7 +19,6 @@ jobs:
 
     # Steps this job must take to complete
     steps:
-      # Reference the main branch. For more information visit https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstepsuses
       - name: Checkout under $GITHUB_WORKSPACE
         uses: actions/checkout@main
 
