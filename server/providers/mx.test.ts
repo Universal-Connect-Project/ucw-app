@@ -112,5 +112,23 @@ describe('mx provider', () => {
         ])
       })
     })
+
+    describe('ListConnectionCredentials', () => {
+      const [firstCredential, secondCredential] = institutionCredentialsData.credentials
+
+      it('retreieves and transforms member credentials', async () => {
+        expect(await mxApi.ListConnectionCredentials('testMemberId', 'testUserId')).toEqual([{
+          id: firstCredential.guid,
+          field_name: firstCredential.field_name,
+          field_type: firstCredential.field_type,
+          label: firstCredential.field_name
+        }, {
+          id: secondCredential.guid,
+          field_name: secondCredential.field_name,
+          field_type: secondCredential.field_type,
+          label: secondCredential.field_name
+        }])
+      })
+    })
   })
 })
