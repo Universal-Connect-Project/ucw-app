@@ -22,9 +22,6 @@ jobs:
       - name: Checkout under $GITHUB_WORKSPACE
         uses: actions/checkout@main
 
-      - uses: ./.github/workflows/create-env-file.yml
-      secrets: inherit
-
       # Specify which version of Node this project is using. For more information visit.
       # https://docs.github.com/en/actions/guides/building-and-testing-nodejs#specifying-the-nodejs-version
       - name: Set up NodeJS
