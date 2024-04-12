@@ -37,6 +37,25 @@ jobs:
         run: |
           npm ci
 
+      - name: 'Create env file'
+        run: |
+          touch .env
+          echo DEFAULTPROVIDER=${{ vars.DEFAULTPROVIDER }} >> .env
+          echo DEMO=${{ vars.DEMO }} >> .env
+          echo ENV=${{ vars.ENV }} >> .env
+          echo HOSTURL=${{ vars.HOSTURL }} >> .env
+          echo WEBHOOKHOSTURL=${{ vars.WEBHOOKHOSTURL }} >> .env
+          echo LOGLEVEL=${{ vars.LOGLEVEL }} >> .env
+          echo PORT=${{ vars.PORT }} >> .env
+          echo RESOURCEPREFIX=${{ vars.RESOURCEPREFIX }} >> .env
+          echo RESOURCEVERSION="" >> .env
+          echo CRYPTOIV=${{ secrets.CRYPTOIV }} >> .env
+          echo CRYPTOKEY=${{ secrets.CRYPTOKEY }} >> .env
+          echo UCPAUTHCLIENTID=${{ secrets.UCP_CLIENT_ID }} >> .env
+          echo UCPAUTHCLIENTSECRET=${{ secrets.UCP_CLIENT_SECRET }} >> .env
+          echo UCPAUTHENCRYPTIONKEY=${{ secrets.UCP_ENCRYPTION_KEY }} >> .env
+          cat .env
+
       - name: Run Jest Tests
         run: |
           npx jest --all --ci
