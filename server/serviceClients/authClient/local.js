@@ -4,8 +4,8 @@
 // simply return the provider credentials, coppied from : 
 // const providerConfig = require('../../../../example/application/configuration')
 
-const {decrypt} = require('../../utils');
-const config = require('../../config');
+import { decrypt } from '../../utils'
+import config from '../../config'
 
 export class AuthClient {
   token;
