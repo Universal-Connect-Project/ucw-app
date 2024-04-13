@@ -1,4 +1,4 @@
-{
+module.exports = {
   "sourceType": "unambiguous",
   "presets": [
     "@babel/preset-react"

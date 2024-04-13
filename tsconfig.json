@@ -8,16 +8,16 @@
     "noImplicitAny": true,
     "outDir": "dist",
     "esModuleInterop": true,
-    "types": ["node", "cypress", "@testing-library/cypress"],
+    "types": ["node", "jest"],
     "allowJs": true,
     "strictNullChecks": false // TODO: change this to true and fix all errors
   },
   "include": [
+    "__mocks__/**/*",
     "server/**/*",
-    "cypress.config.ts",
+    "test/**/*",
     "jest.config.js",
     "shared/connect/fireflyApiBridge/index.js",
-    "cypress"
   ],
-  "exclude": ["dist", "node_modules", "./ui/dist", "./ui/node_modules"],
+  "exclude": ["dist", "node_modules", "./ui/dist", "./ui/node_modules", "cypress.config.ts",],
 }
