@@ -1,12 +1,10 @@
 # Universal Connect Widget (Application)
 
-This repo is a full stack application which anyone can clone and self-host as a way to serve the connect widget via a url which can then be loaded into an iframe.
+This repo is a full-stack application which anyone can clone and self-host as a way to serve the connect widget via a url which can then be loaded into an iframe.
 
 ## Getting Started (in production)
 
-This repo is a full stack application which anyone can clone and self-host as a way to serve the connect widget.
-
-To get started, clone the repo, follow the steps in `Initial Setup`, below to set up your .env file, and then run the following command, from the root of the project:
+To get started, clone the repo, follow the steps in `Initial Setup` (below) to set up your `.env` file, and then run the following command, from the root of the project:
 
 *This assumes you have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) already installed.*
 ```
@@ -48,12 +46,19 @@ USE `.env` FILE
 
 ## Publish to Docker
 
-To publish to DockerHub, first run `docker compose up`, 
-then run 
-    `docker push universalconnectfoundation/ucw-app:v<version>`
-and 
-    `docker push universalconnectfoundation/ucw-ui:v<version>`
+__Publishing to DockerHub is automatic, and will happen when code is merged to `main`.__
 
-You must be logged in to DockerHub, and a member of the UCP organization.
+If you need to publish manually, you can do so with the following steps.
+
+First run `docker compose up --pull never`, to build the new images.
+
+Then run
+
+    docker push universalconnectfoundation/ucw-app:v<version>
+and then
+
+    docker push universalconnectfoundation/ucw-ui:v<version>
 
 `<version>` must mach the respective version listed in the `docker-compose.yaml` file.
+
+_NOTE: You must be logged in to DockerHub, and a member of the UCP organization._

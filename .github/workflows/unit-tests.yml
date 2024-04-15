@@ -1,0 +1,25 @@
+
+name: Jest Automatic Testing
+on: pull_request
+
+jobs:
+  run-jest-tests:
+    name: Jest Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout under $GITHUB_WORKSPACE
+        uses: actions/checkout@main
+
+      - name: Set up NodeJS
+        uses: actions/setup-node@v1
+        with:
+          node-version: 20
+
+      - name: Install all dependencies
+        run: |
+          npm ci
+
+      - name: Run Jest Tests
+        run: |
+          npx jest --all --ci

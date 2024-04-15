@@ -3,7 +3,12 @@ version: '3.8'
 services:
 
   server:
-    depends_on: [cache, ui]
+    depends_on:
+      cache:
+        condition: service_healthy
+      ui:
+        condition: service_healthy
+
     container_name: ucw-app-server
     restart: on-failure
     healthcheck:

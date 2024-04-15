@@ -22,3 +22,7 @@ The `./server/config.js` is already setup to use the exposed service (http://loc
 
 The above commands will allow this UI to be used with the server project, which is also in this repo.
 Follow the steps in the [README.md](../README.md) to run the `server` locally.
+
+If you need to update the UCW NPM package to a newly published version, simply run 
+
+`npm i -S @ucp-npm/components@<version>`

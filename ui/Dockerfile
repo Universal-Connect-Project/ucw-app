@@ -2,6 +2,7 @@
 # Please run `docker compose up` from the root of the project to run the docker environment for this project.
 
 FROM node:20 as builder
+ENV NODE_VERSION 20.12.2
 
 WORKDIR /app
 
@@ -14,7 +15,7 @@ COPY ./ ./
 RUN npm run build
 
 FROM alpine:3.19.1 as web
-ENV NODE_VERSION 20.11.1
+ENV NODE_VERSION 20.12.2
 
 RUN apk --update --no-cache add nodejs npm
 
