@@ -18,11 +18,10 @@ const keysToPullFromEnv = [
   "CryptoKey",
   "CryptoIv",
 
-  "AuthProvider", //supported: ucp, local, sophtron
-  // fill the corresponding credentials below if the auth provider is to be used
+  "AuthProvider", 
 
-  "LocalAuthEncryptionKey", // shared encryption key with caller to encrypt the auth phraze
-  "LocalAuthPhrase", // a static auth phraze to be encrypted by the key above at caller side. 
+  "LocalAuthEncryptionKey", 
+  "LocalAuthPhrase",
   
   "SophtronClientId",
   "SophtronClientSecret",
