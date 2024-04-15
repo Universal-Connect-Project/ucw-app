@@ -21,7 +21,9 @@ module.exports = {
   },
   ignorePatterns: [
     '.eslintrc.js',
-    'jest.config.js'
+    'jest.config.js',
+    'jestSetup.ts',
+    'babel.config.js'
   ],
   rules: {
     '@typescript-eslint/no-namespace': 'off', // TODO: remove and fix later
