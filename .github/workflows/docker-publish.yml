@@ -2,11 +2,10 @@ name: Publish Docker image
 # TODO: add step to populate .env file
 
 on:
-  pull_request:
+  push:
+    # only trigger on branches, not on tags
     branches:
-      - tyson/gh-actions
-#  push:
-#    branches:
+      - '**'
 #      - main
 #  release:
 #    branches: [tyson/gh-actions]
