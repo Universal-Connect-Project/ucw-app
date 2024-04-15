@@ -50,8 +50,8 @@ const providerCredentials = {
   sophtron: {
     clientId: Cypress.env('sophtron_api_user_id'),
     secret: Cypress.env('sophtron_api_user_secret'),
-    endpoint: Cypress.env('sophtron_api_service_endpoint'),
-    vcEndpoint: Cypress.env('sophtron_vc_service_endpoint'),
+    endpoint: 'https://api.sophtron.com/api',
+    vcEndpoint: 'https://vc.sophtron.com/api/',
     provider: 'sophtron',
     available: true
   }

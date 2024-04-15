@@ -9,11 +9,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      
       - uses: actions/setup-node@v3
         with:
           node-version: "lts/*"
       - run: npm ci
-      - run: cd ./ui && npm ci
+
       - name: 'Create env file'
         run: |
           touch .env
@@ -32,6 +33,8 @@ jobs:
           echo UCPAUTHCLIENTSECRET=${{ secrets.UCP_CLIENT_SECRET }} >> .env
           echo UCPAUTHENCRYPTIONKEY=${{ secrets.UCP_ENCRYPTION_KEY }} >> .env
           cat .env
+
+      - run: cd ./ui && npm ci
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:

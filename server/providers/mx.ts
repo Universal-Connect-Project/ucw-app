@@ -28,7 +28,7 @@ import { StorageClient } from '../serviceClients/storageClient'
 
 const EXTENDED_HISTORY_NOT_SUPPORTED_MSG = "Member's institution does not support extended transaction history."
 
-function fromMxInstitution (ins: InstitutionResponse, provider: string): Institution {
+export function fromMxInstitution (ins: InstitutionResponse, provider: string): Institution {
   return {
     id: ins.code,
     logo_url: ins.medium_logo_url ?? ins.small_logo_url,
@@ -78,6 +78,7 @@ export class MxApi implements ProviderApiClient {
     this.db = storageClient
     this.provider = int ? 'mx_int' : 'mx'
     this.mxConfig = int ? mxInt : mxProd
+
     this.apiClient = MxPlatformApiFactory(new Configuration({
       ...this.mxConfig,
       baseOptions: {
@@ -97,14 +98,13 @@ export class MxApi implements ProviderApiClient {
   async ListInstitutionCredentials (
     institutionId: string
   ): Promise<Credential[]> {
-    // console.log(this.mxConfig)
     const res = await this.apiClient.listInstitutionCredentials(institutionId)
     return mapCredentials(res.data)
   }
 
   async ListConnections (userId: string): Promise<Connection[]> {
     const res = await this.apiClient.listMembers(userId)
-    // return res.data.members?.map((member) => fromMxInstitution(member, this.provider))
+
     return res.data.members?.map((member) => fromMxMember(member, this.provider)) ?? []
   }
 
