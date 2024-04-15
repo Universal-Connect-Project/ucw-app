@@ -2,9 +2,15 @@ name: Publish Docker image
 # TODO: add step to populate .env file
 
 on:
-  release:
-    branches: [tyson/gh-actions]
-    types: [published]
+  pull_request:
+    branches:
+      - tyson/gh-actions
+#  push:
+#    branches:
+#      - main
+#  release:
+#    branches: [tyson/gh-actions]
+#    types: [published]
 
 jobs:
   setup-env:
