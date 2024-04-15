@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw'
 import { server } from '../../test/testServer'
 import { institutionData } from '../../test/testData/institution'
 import { MxApi } from './mx'
-import { INSTITUTION_BY_ID_PATH } from '../../test/handlers'
+import { CONNECTIONS_BY_ID_PATH, DELETE_MEMBER_PATH, INSTITUTION_BY_ID_PATH } from '../../test/handlers'
 import { institutionCredentialsData } from '../../test/testData/institutionCredentials'
 import { membersData } from '../../test/testData/members'
 
@@ -128,6 +128,83 @@ describe('mx provider', () => {
           field_type: secondCredential.field_type,
           label: secondCredential.field_name
         }])
+      })
+    })
+
+    describe('CreateConnection', () => {
+      const baseConnectionRequest = {
+        id: 'testId',
+        initial_job_type: 'auth',
+        background_aggregation_is_disabled: false,
+        credentials: [{
+          id: 'testCredentialId',
+          label: 'testCredentialLabel',
+          value: 'testCredentialValue',
+          field_type: 'testCredentialFieldType',
+          field_name: 'testCredentialFieldName'
+        }],
+        institution_id: 'testInstitutionId',
+        is_oauth: false,
+        skip_aggregation: false,
+        metadata: 'testMetadata'
+      }
+
+      it('deletes the existing member if one is found', async () => {
+        server.use(http.get(CONNECTIONS_BY_ID_PATH, () => HttpResponse.json(membersData)))
+
+        let memberDeletionAttempted = false
+
+        server.use(http.delete(DELETE_MEMBER_PATH, () => {
+          memberDeletionAttempted = true
+
+          return new HttpResponse(null, {
+            status: 200
+          })
+        }))
+
+        await mxApi.CreateConnection({
+          ...baseConnectionRequest,
+          institution_id: membersData.members[0].institution_code,
+          is_oauth: true
+        }, 'testUserId')
+
+        expect(memberDeletionAttempted).toBe(true)
+      })
+
+      it('creates member with a client_redirect_url if is_oauth', () => {
+
+      })
+
+      it('creates member without a client_redirect_url if !is_oauth', () => {
+
+      })
+
+      it('creates a member with skip_aggregation if requested', () => {
+
+      })
+
+      it('creates a member with skip_aggregation if jobType is aggregate', () => {
+
+      })
+
+      it('creates a member with !skip_aggregation if jobType is not aggregate', () => {
+
+      })
+
+      it('creates a member with correctly mapped request options and returns the member from that response when is_oauth', () => {
+
+      })
+
+      it('returns the member from verifyMember if job type is verification or aggregate_identity_verification', () => {
+
+      })
+
+      it('returns the member from identifyMember if job type is aggregate_identity', () => {
+
+      })
+
+      it('returns the member from extendHistory if job type is aggregate_extendedhistory', () => {
+
       })
     })
   })
