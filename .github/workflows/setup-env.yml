@@ -17,12 +17,12 @@ jobs:
         id: environment
         shell: bash
         env:
-          ENV_VARS: ${{ toJSON(secrets) }}
+          ENV: ${{ toJSON(secrets) }}
         run: |
-          ## Iterate over the input variables
-          ## output them in a format so we can run and update the env variables
-          ## making use of $GITHUB_ENV
-          echo "$ENV_VARS" | jq -r 'keys[] as $k | "echo \"\($k)=\(.[$k] )\" >> $GITHUB_ENV"' > ./update_env.sh
+          echo "-------"
+          echo "$ENV"
+          echo "-------"
+          echo "$ENV" | jq -r 'keys[] as $k | "echo \"\($k)=\(.[$k] )\" >> $GITHUB_ENV"' > ./update_env.sh
           chmod +x ./update_env.sh
           ./update_env.sh
 
@@ -30,4 +30,4 @@ jobs:
         id: output
         shell: bash
         run: |
-          echo $DOCKER_USERNAME
+          echo ${{ env.DOCKER_USERNAME }}
