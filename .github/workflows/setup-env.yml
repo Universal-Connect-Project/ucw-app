@@ -34,9 +34,3 @@ jobs:
           chmod +x ./update_vars.sh
           ./update_secrets.sh
           ./update_vars.sh
-
-      - name: Output testing
-        id: output
-        shell: bash
-        run: |
-          echo ${{ vars.DEFAULTPROVIDER }}
