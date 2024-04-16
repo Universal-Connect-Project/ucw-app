@@ -1,6 +1,12 @@
 #echo "$SECRETS" | jq -r 'keys[] as $k | "echo \"\($k)=\(.[$k] )\" >> $GITHUB_OUTPUT"' > ./update_secrets.sh
 #echo "$VARS" | jq -r 'keys[] as $k | "echo \"\($k)=\(.[$k] )\" >> $GITHUB_OUTPUT"' > ./update_vars.sh
 
+#          chmod +x ./update_secrets.sh
+#          chmod +x ./update_vars.sh
+#
+#          ./update_secrets.sh
+#          ./update_vars.sh
+
 name: Setup env file
 
 on:
@@ -31,17 +37,16 @@ jobs:
           VARS: ${{ toJSON(vars) }}
         run: |
           
-          echo "$SECRETS" | jq -r 'keys[] as $k | "\"\($k)=\(.[$k] )\""' > ./update_secrets.sh
-          echo "$VARS" | jq -r 'keys[] as $k | "\"\($k)=\(.[$k] )\""' > ./update_vars.sh
+          echo "$SECRETS" | jq -r 'keys[] as $k | "\($k)=\(.[$k] )"' > ./update_secrets.txt
+          echo "$VARS" | jq -r 'keys[] as $k | "\($k)=\(.[$k] )"' > ./update_vars.txt
                
           echo "-------------------------"
-          echo "$(/bin/cat ./update_secrets.sh)"
+          echo "$(/bin/cat ./update_secrets.txt)"
           echo "-------------------------"
-          echo "$(/bin/cat ./update_vars.sh)"
+          echo "$(/bin/cat ./update_vars.txt)"
           echo "-------------------------"
 
-          chmod +x ./update_secrets.sh
-          chmod +x ./update_vars.sh
-
-          ./update_secrets.sh
-          ./update_vars.sh
+          secrets_=$(/bin/cat ./update_secrets.txt)
+          vars_=$(/bin/cat ./update_vars.txt)
+          echo "secrets=<<EOF"$'\n'"$secrets_"$'\n'EOF >> $GITHUB_OUTPUT
+          echo "vars=<<EOF"$'\n'"$vars_"$'\n'EOF >> $GITHUB_OUTPUT
