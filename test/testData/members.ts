@@ -32,6 +32,14 @@ export const extendHistoryMemberData = {
   }
 }
 
+export const aggregateMemberMemberData = {
+  ...memberData,
+  member: {
+    ...memberData.member,
+    guid: 'aggregateMemberMemberGuid'
+  }
+}
+
 export const membersData = {
   members: [memberData.member, {
     guid: 'testGuid2',

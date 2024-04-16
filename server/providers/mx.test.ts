@@ -1,11 +1,12 @@
 import { http, HttpResponse } from 'msw'
 import { server } from '../../test/testServer'
 import { institutionData } from '../../test/testData/institution'
-import { MxApi } from './mx'
-import { CREATE_MEMBER_PATH, DELETE_CONNECTION_PATH, DELETE_MEMBER_PATH, INSTITUTION_BY_ID_PATH } from '../../test/handlers'
+import { EXTENDED_HISTORY_NOT_SUPPORTED_MSG, MxApi } from './mx'
+import { AGGREGATE_MEMBER_PATH, CREATE_MEMBER_PATH, DELETE_CONNECTION_PATH, DELETE_MEMBER_PATH, EXTEND_HISTORY_PATH, INSTITUTION_BY_ID_PATH, VERIFY_MEMBER_PATH } from '../../test/handlers'
 import { institutionCredentialsData } from '../../test/testData/institutionCredentials'
-import { extendHistoryMemberData, identifyMemberData, memberData, membersData, verifyMemberData } from '../../test/testData/members'
+import { aggregateMemberMemberData, extendHistoryMemberData, identifyMemberData, memberData, membersData, verifyMemberData } from '../../test/testData/members'
 import config from '../config'
+import { ChallengeType } from '../../shared/contract'
 
 const token = 'testToken'
 
@@ -28,6 +29,14 @@ const mxApi = new MxApi({
 const institutionResponse = institutionData.institution
 
 const clientRedirectUrl = `${config.HostUrl}/oauth/mx/redirect_from?token=${token}`
+
+const testCredential = {
+  id: 'testCredentialId',
+  label: 'testCredentialLabel',
+  value: 'testCredentialValue',
+  field_type: 'testCredentialFieldType',
+  field_name: 'testCredentialFieldName'
+}
 
 describe('mx provider', () => {
   describe('MxApi', () => {
@@ -143,13 +152,7 @@ describe('mx provider', () => {
         id: 'testId',
         initial_job_type: 'auth',
         background_aggregation_is_disabled: false,
-        credentials: [{
-          id: 'testCredentialId',
-          label: 'testCredentialLabel',
-          value: 'testCredentialValue',
-          field_type: 'testCredentialFieldType',
-          field_name: 'testCredentialFieldName'
-        }],
+        credentials: [testCredential],
         institution_id: 'testInstitutionId',
         is_oauth: false,
         skip_aggregation: false,
@@ -306,6 +309,120 @@ describe('mx provider', () => {
         await mxApi.DeleteConnection('testId', 'testUserId')
 
         expect(connectionDeletionAttempted).toBe(true)
+      })
+    })
+
+    describe('UpdateConnection', () => {
+      const baseUpdateConnectionRequest = {
+        id: 'testUpdateConnectionId',
+        job_type: 'auth',
+        credentials: [testCredential],
+        challenges: [{
+          id: 'testChallengeId',
+          external_id: 'testExternalId',
+          question: 'testQuestion',
+          data: 'testData',
+          type: ChallengeType.QUESTION,
+          response: 'testResponse'
+        }
+        ]
+      }
+
+      it('returns the member from verifyMember if jobType is verification', async () => {
+        const member = await mxApi.UpdateConnection({
+          ...baseUpdateConnectionRequest,
+          job_type: 'verification'
+        }, 'testUserId')
+
+        expect(member.id).toEqual(verifyMemberData.member.guid)
+      })
+
+      it('returns the member from identifyMember if jobType is aggregate_identity', async () => {
+        const member = await mxApi.UpdateConnection({
+          ...baseUpdateConnectionRequest,
+          job_type: 'aggregate_identity'
+        }, 'testUserId')
+
+        expect(member.id).toEqual(identifyMemberData.member.guid)
+      })
+
+      it('returns the member from extendHistory if jobType is aggregate_extendedhistory', async () => {
+        const member = await mxApi.UpdateConnection({
+          ...baseUpdateConnectionRequest,
+          job_type: 'aggregate_extendedhistory'
+        }, 'testUserId')
+
+        expect(member.id).toEqual(extendHistoryMemberData.member.guid)
+      })
+
+      it('returns the member from aggregateMember if jobType is agg', async () => {
+        const member = await mxApi.UpdateConnection({
+          ...baseUpdateConnectionRequest,
+          job_type: 'agg'
+        }, 'testUserId')
+
+        expect(member.id).toEqual(aggregateMemberMemberData.member.guid)
+      })
+
+      it('returns the member from aggregateMember if extended history is not supported', async () => {
+        server.use(http.post(EXTEND_HISTORY_PATH, () => HttpResponse.json({
+          error: {
+            message: EXTENDED_HISTORY_NOT_SUPPORTED_MSG
+          }
+        })))
+
+        const member = await mxApi.UpdateConnection({
+          ...baseUpdateConnectionRequest,
+          job_type: 'aggregate_extendedhistory'
+        }, 'testUserId')
+
+        expect(member.id).toEqual(aggregateMemberMemberData.member.guid)
+      })
+
+      it('returns an error message if a request fails', async () => {
+        const errorMessage = 'testError'
+
+        server.use(http.post(VERIFY_MEMBER_PATH, () => HttpResponse.json({
+          error: {
+            message: errorMessage
+          }
+        })))
+
+        const error = await mxApi.UpdateConnection({
+          ...baseUpdateConnectionRequest,
+          job_type: 'verification'
+        }, 'testUserId')
+
+        expect(error).toEqual({
+          error_message: errorMessage,
+          id: baseUpdateConnectionRequest.id
+        })
+      })
+
+      it('returns an error message if the aggregate member request fails after extended history is not supported', async () => {
+        server.use(http.post(EXTEND_HISTORY_PATH, () => HttpResponse.json({
+          error: {
+            message: EXTENDED_HISTORY_NOT_SUPPORTED_MSG
+          }
+        })))
+
+        const errorMessage = 'testError'
+
+        server.use(http.post(AGGREGATE_MEMBER_PATH, () => HttpResponse.json({
+          error: {
+            message: errorMessage
+          }
+        })))
+
+        const error = await mxApi.UpdateConnection({
+          ...baseUpdateConnectionRequest,
+          job_type: 'aggregate_extendedhistory'
+        }, 'testUserId')
+
+        expect(error).toEqual({
+          error_message: errorMessage,
+          id: baseUpdateConnectionRequest.id
+        })
       })
     })
   })

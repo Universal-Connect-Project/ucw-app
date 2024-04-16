@@ -26,7 +26,7 @@ import { mapJobType } from '../../server/utils'
 import config from '../config'
 import { StorageClient } from '../serviceClients/storageClient'
 
-const EXTENDED_HISTORY_NOT_SUPPORTED_MSG = "Member's institution does not support extended transaction history."
+export const EXTENDED_HISTORY_NOT_SUPPORTED_MSG = "Member's institution does not support extended transaction history."
 
 export function fromMxInstitution (ins: InstitutionResponse, provider: string): Institution {
   return {
@@ -184,12 +184,12 @@ export class MxApi implements ProviderApiClient {
       ret = await this.apiClient.aggregateMember(request.id, userId)
     }
 
+    if (ret?.data?.error?.message === EXTENDED_HISTORY_NOT_SUPPORTED_MSG) {
+      ret = await this.apiClient.aggregateMember(request.id, userId)
+    }
+
     if (ret.data?.error) {
-      if (ret.data.error.message === EXTENDED_HISTORY_NOT_SUPPORTED_MSG) {
-        ret = await this.apiClient.aggregateMember(request.id, userId)
-      } else {
-        return { id: request.id, error_message: ret.data.error.message }
-      }
+      return { id: request.id, error_message: ret.data.error.message }
     }
 
     return fromMxMember(ret.data.member, this.provider)
