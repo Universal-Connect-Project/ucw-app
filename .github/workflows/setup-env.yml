@@ -34,14 +34,14 @@ jobs:
           vars=$(/bin/cat ./vars.txt)
           
           {
-            echo 'SECRETS<<EOF'
-            echo "$secrets"
+            echo 'VARS<<EOF'
+            echo "$vars"
             echo 'EOF'
           } >> $GITHUB_OUTPUT
           
           {
-            echo 'VARS<<EOF'
-            echo "$vars"
+            echo 'SECRETS<<EOF'
+            echo "$secrets"
             echo 'EOF'
           } >> $GITHUB_OUTPUT
           
