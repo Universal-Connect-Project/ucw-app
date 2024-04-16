@@ -13,6 +13,7 @@ on:
 
 jobs:
   setup-env:
+    name: 'Load ENV Vars'
     uses: ./.github/workflows/setup-env.yml
 
   push_to_registry:
