@@ -15,9 +15,14 @@ jobs:
   env-file:
     name: 'Workflow: Load ENV Vars'
     runs-on: ubuntu-latest
+
+    outputs:
+      vars: ${{ steps.env-setup.outputs.VARS }}
+      secrets: ${{ steps.env-setup.outputs.SECRETS }}
+
     steps:
       - name: Loading repository variables to real env vars
-        id: environment
+        id: env-setup
         shell: bash
         env:
           SECRETS: ${{ toJSON(secrets) }}

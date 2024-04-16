@@ -18,9 +18,9 @@ jobs:
     secrets: inherit
 
   push_to_registry:
-    needs: [setup-env]
     name: 'Push Docker image to Docker Hub'
     runs-on: ubuntu-latest
+    needs: [setup-env]
 
     steps:
       - name: Check out the repo
