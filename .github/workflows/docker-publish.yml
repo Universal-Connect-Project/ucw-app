@@ -25,7 +25,7 @@ jobs:
     steps:
       - name: Test setup-env
         run: |
-          echo ${{ fromJson(needs.setup-env.outputs.env_vars)[DEFAULTPROVIDER] }}
+          echo ${{ fromJson(needs.setup-env.outputs.env_vars) }}
 
 #      - name: Check out the repo
 #        uses: actions/checkout@v4

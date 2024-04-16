@@ -48,9 +48,12 @@ jobs:
 
           secrets=$(/bin/cat ./update_secrets.txt)
           vars=$(/bin/cat ./update_vars.txt)
-          echo 'secrets<<EOF' >> $GITHUB_OUTPUT
-          echo "$secrets" >> $GITHUB_OUTPUT
-          echo 'EOF' >> $GITHUB_OUTPUT
-          echo 'vars<<EOF' >> $GITHUB_OUTPUT
-          echo "$vars" >> $GITHUB_OUTPUT
-          echo 'EOF' >> $GITHUB_OUTPUT
+          
+          {
+            echo 'SECRETS<<EOF'
+            echo "$secrets"
+            echo 'EOF'
+            echo 'VARS<<EOF'
+            echo "$vars"
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
