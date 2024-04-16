@@ -28,15 +28,10 @@ jobs:
           env_vars: ${{ needs.setup-env.outputs.env_vars }}
           env_secrets: ${{ needs.setup-env.outputs.env_secrets }}
         run: |
-          echo "-----"
-          echo ${{ env.env_vars }}
-          echo ${{ env.env_secrets }}
-          echo "-----"
-          
           touch .env
           echo -e ${{ env.env_vars }} >> .env
-          echo -e ${{ env.env_secrets }} >> .env               
-          echo $(/bin/cat ./.env)
+          echo -e ${{ env.env_secrets }} >> .env
+          cat .env  
 
 #      - name: Check out the repo
 #        uses: actions/checkout@v4
