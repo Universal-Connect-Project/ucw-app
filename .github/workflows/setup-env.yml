@@ -35,17 +35,10 @@ jobs:
         env:
           SECRETS: ${{ toJSON(secrets) }}
           VARS: ${{ toJSON(vars) }}
-        run: |
-          
+        run: |          
           echo "$SECRETS" | jq -r 'keys[] as $k | "\($k)=\(.[$k] )"' > ./update_secrets.txt
           echo "$VARS" | jq -r 'keys[] as $k | "\($k)=\(.[$k] )"' > ./update_vars.txt
                
-          echo "-------------------------"
-          echo "$(/bin/cat ./update_secrets.txt)"
-          echo "-------------------------"
-          echo "$(/bin/cat ./update_vars.txt)"
-          echo "-------------------------"
-
           secrets=$(/bin/cat ./update_secrets.txt)
           vars=$(/bin/cat ./update_vars.txt)
           

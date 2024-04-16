@@ -26,9 +26,9 @@ jobs:
       - name: 'Create env file'
         run: |
           touch .env
-          echo ${{ needs.setup-env.outputs.env_vars }} >> .env
-          echo ${{ needs.setup-env.outputs.env_secrets }} >> .env               
-          cat .env
+          echo -e ${{ needs.setup-env.outputs.env_vars }} >> .env
+          echo -e ${{ needs.setup-env.outputs.env_secrets }} >> .env               
+          echo $(/bin/cat ./.env)
 
 #      - name: Check out the repo
 #        uses: actions/checkout@v4
