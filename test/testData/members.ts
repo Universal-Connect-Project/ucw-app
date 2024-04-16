@@ -40,6 +40,14 @@ export const aggregateMemberMemberData = {
   }
 }
 
+export const connectionByIdMemberData = {
+  ...memberData,
+  member: {
+    ...memberData.member,
+    guid: 'connectionByIdMemberGuid'
+  }
+}
+
 export const membersData = {
   members: [memberData.member, {
     guid: 'testGuid2',

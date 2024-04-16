@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw'
 import { BASE_PATH as MX_BASE_PATH } from '../server/serviceClients/mxClient/base'
 import { institutionData } from './testData/institution'
 import { institutionCredentialsData } from './testData/institutionCredentials'
-import { aggregateMemberMemberData, extendHistoryMemberData, identifyMemberData, memberData, membersData, verifyMemberData } from './testData/members'
+import { aggregateMemberMemberData, connectionByIdMemberData, extendHistoryMemberData, identifyMemberData, memberData, membersData, verifyMemberData } from './testData/members'
 
 export const INSTITUTION_BY_ID_PATH = `${MX_BASE_PATH}/institutions/:institutionId`
 export const INSTITUTION_CREDENTIALS_BY_ID_PATH = `${MX_BASE_PATH}/institutions/:institutionId/credentials`
@@ -16,6 +16,7 @@ export const EXTEND_HISTORY_PATH = `${MX_BASE_PATH}/users/:userId/members/:guid/
 export const DELETE_CONNECTION_PATH = `${MX_BASE_PATH}/users/:userId/managed_members/:id`
 export const AGGREGATE_MEMBER_PATH = `${MX_BASE_PATH}/users/:userId/members/:id/aggregate`
 export const UPDATE_CONNECTION_PATH = `${MX_BASE_PATH}/users/:userId/members/:id`
+export const CONNECTION_BY_ID_PATH = `${MX_BASE_PATH}/users/:userId/members/:id`
 
 const handlers = [
   http.get(INSTITUTION_BY_ID_PATH, () => HttpResponse.json(institutionData)),
@@ -29,7 +30,8 @@ const handlers = [
   http.post(EXTEND_HISTORY_PATH, () => HttpResponse.json(extendHistoryMemberData)),
   http.post(AGGREGATE_MEMBER_PATH, () => HttpResponse.json(aggregateMemberMemberData)),
   http.delete(DELETE_CONNECTION_PATH, () => new HttpResponse(null, { status: 200 })),
-  http.put(UPDATE_CONNECTION_PATH, () => HttpResponse.json(memberData))
+  http.put(UPDATE_CONNECTION_PATH, () => HttpResponse.json(memberData)),
+  http.get(CONNECTION_BY_ID_PATH, () => HttpResponse.json(connectionByIdMemberData))
 ]
 
 export default handlers

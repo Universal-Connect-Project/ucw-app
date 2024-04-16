@@ -4,7 +4,7 @@ import { institutionData } from '../../test/testData/institution'
 import { EXTENDED_HISTORY_NOT_SUPPORTED_MSG, MxApi } from './mx'
 import { AGGREGATE_MEMBER_PATH, CREATE_MEMBER_PATH, DELETE_CONNECTION_PATH, DELETE_MEMBER_PATH, EXTEND_HISTORY_PATH, INSTITUTION_BY_ID_PATH, UPDATE_CONNECTION_PATH, VERIFY_MEMBER_PATH } from '../../test/handlers'
 import { institutionCredentialsData } from '../../test/testData/institutionCredentials'
-import { aggregateMemberMemberData, extendHistoryMemberData, identifyMemberData, memberData, membersData, verifyMemberData } from '../../test/testData/members'
+import { aggregateMemberMemberData, connectionByIdMemberData, extendHistoryMemberData, identifyMemberData, memberData, membersData, verifyMemberData } from '../../test/testData/members'
 import config from '../config'
 import { ChallengeType } from '../../shared/contract'
 
@@ -464,6 +464,25 @@ describe('mx provider', () => {
           is_oauth: testMember.is_oauth,
           oauth_window_uri: testMember.oauth_window_uri,
           provider: 'mx'
+        })
+      })
+    })
+
+    describe('GetConnectionById', () => {
+      it('returns the member from readMember', async () => {
+        const testUserId = 'userId'
+        const member = await mxApi.GetConnectionById('connectionId', testUserId)
+
+        const testMember = connectionByIdMemberData.member
+
+        expect(member).toEqual({
+          id: testMember.guid,
+          institution_code: testMember.institution_code,
+          is_being_aggregated: testMember.is_being_aggregated,
+          is_oauth: testMember.is_oauth,
+          oauth_window_uri: testMember.oauth_window_uri,
+          provider: 'mx',
+          user_id: testUserId
         })
       })
     })
