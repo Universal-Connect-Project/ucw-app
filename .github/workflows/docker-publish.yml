@@ -23,9 +23,12 @@ jobs:
     needs: [setup-env]
 
     steps:
-      - name: Test setup-env
+      - name: 'Create env file'
         run: |
-          echo ${{ needs.setup-env.outputs.env_vars }}
+          touch .env
+          echo ${{ needs.setup-env.outputs.env_vars }} >> .env
+          echo ${{ needs.setup-env.outputs.env_secrets }} >> .env               
+          cat .env
 
 #      - name: Check out the repo
 #        uses: actions/checkout@v4
