@@ -23,12 +23,13 @@ jobs:
     needs: [setup-env]
 
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v4
-
       - name: Test setup-env
         run: |
-          echo ${{ needs.setup-env.outputs.vars }}
+          echo ${{ needs.setup-env.outputs.env_vars }}
+
+#      - name: Check out the repo
+#        uses: actions/checkout@v4
+
 #          echo ${{ fromJson(needs.setup-env.outputs.secrets) }}
 
 #      - name: Log in to Docker Hub
