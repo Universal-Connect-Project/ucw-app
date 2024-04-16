@@ -22,7 +22,7 @@ jobs:
         env:
           VARS: ${{ toJSON(vars) }}
         run: |          
-          echo "$VARS" | jq -r 'keys[] as $k | "\($k)=\(.[$k])"$('\n')' > ./vars.txt
+          echo "$VARS" | jq -r 'keys[] as $k | "\($k)=\(.[$k])$('\\n')"' > ./vars.txt
                
           echo -e $(/bin/cat ./vars.txt)
           vars=$(/bin/cat ./vars.txt)
