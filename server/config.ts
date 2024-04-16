@@ -15,35 +15,35 @@ const nonSensitiveSharedConfig = {
 }
 
 const keysToPullFromEnv = [
-  "CryptoKey",
-  "CryptoIv",
+  'CryptoKey',
+  'CryptoIv',
 
-  "AuthProvider", 
+  'AuthProvider', 
 
-  "LocalAuthEncryptionKey", 
-  "LocalAuthPhrase",
+  'LocalAuthEncryptionKey', 
+  'LocalAuthPhrase',
   
-  "SophtronClientId",
-  "SophtronClientSecret",
+  'SophtronClientId',
+  'SophtronClientSecret',
 
-  "UcpAuthClientId",
-  "UcpAuthClientSecret",
-  "UcpAuthEncryptionKey",
+  'UcpAuthClientId',
+  'UcpAuthClientSecret',
+  'UcpAuthEncryptionKey',
 
-  "Demo",
-  "DefaultProvider",
-  "Port",
+  'Demo',
+  'DefaultProvider',
+  'Port',
 
-  "HostUrl",
-  "WebhookHostUrl",
-  "LogLevel",
+  'HostUrl',
+  'WebhookHostUrl',
+  'LogLevel',
   
-  "Env",
+  'Env',
 
-  "RedisServer",
-  "RedisCacheTimeSeconds",
-  "ResourcePrefix",
-  "ResourceVersion",
+  'RedisServer',
+  'RedisCacheTimeSeconds',
+  'ResourcePrefix',
+  'ResourceVersion',
 ]
 
 const config: Record<string, any> = keysToPullFromEnv.reduce((acc, envKey) => {
