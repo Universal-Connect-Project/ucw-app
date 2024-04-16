@@ -24,13 +24,13 @@ jobs:
         run: |          
           echo "$VARS" | jq -r 'keys[] as $k | "\($k)=\(.[$k])'\\n'"' > ./vars.txt
                
-          echo -e $(/bin/cat ./vars.txt)
+          echo $(/bin/cat ./vars.txt)
           vars=$(/bin/cat ./vars.txt)
-          echo -e $vars
+          echo $vars
           
           {
             echo 'VARS<<EOF'
-            echo -e "$vars"
+            echo "$vars"
             echo 'EOF'
           } >> $GITHUB_OUTPUT
           
