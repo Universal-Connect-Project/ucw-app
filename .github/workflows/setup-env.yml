@@ -28,9 +28,6 @@ jobs:
           SECRETS: ${{ toJSON(secrets) }}
           VARS: ${{ toJSON(vars) }}
         run: |
-#          echo "$SECRETS" | jq -r 'keys[] as $k | \"($k)=\(.[$k] )\"' > ./update_secrets.sh
-#          echo "$VARS" | jq -r 'keys[] as $k | \"($k)=\(.[$k] )\"' > ./update_vars.sh
-          
           echo "$SECRETS" | jq -r 'keys[] as $k | "echo \"\($k)=\(.[$k] )\" >> $GITHUB_OUTPUT"' > ./update_secrets.sh
           echo "$VARS" | jq -r 'keys[] as $k | "echo \"\($k)=\(.[$k] )\" >> $GITHUB_OUTPUT"' > ./update_vars.sh
 
