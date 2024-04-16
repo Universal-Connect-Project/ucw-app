@@ -1,4 +1,4 @@
-name: Publish Docker image
+name: 'Publish Docker image'
 # TODO: add step to populate .env file
 
 on:
@@ -17,7 +17,7 @@ jobs:
 
   push_to_registry:
     needs: [setup-env]
-    name: Push Docker image to Docker Hub
+    name: 'Push Docker image to Docker Hub'
     runs-on: ubuntu-latest
 
     steps:

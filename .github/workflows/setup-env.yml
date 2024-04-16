@@ -14,6 +14,9 @@ jobs:
     steps:
       - name: Loading repository variables to real env vars
         id: environment
+        shell: bash
+        env:
+          ENV_VARS: ${{ toJSON(vars) }}
         run: |
           ## Iterate over the input variables
           ## output them in a format so we can run and update the env variables
@@ -21,32 +24,9 @@ jobs:
           echo "$ENV_VARS" | jq -r 'keys[] as $k | "echo \"\($k)=\(.[$k] )\" >> $GITHUB_ENV"' > ./update_env.sh
           chmod +x ./update_env.sh
           ./update_env.sh
-        shell: bash
-        env:
-          ENV_VARS: ${{ toJSON(vars) }}
 
       - name: Output testing
         id: output
+        shell: bash
         run: |
-          echo "Dynamic Var ${{ env.VAR1 }}"
-          echo "Dynamic Var ${ VAR1 }"
           echo "ENV=${{ env }}" >> $GITHUB_OUTPUT
-
-      - name: 'Create env file'
-        run: |
-          touch .env
-          echo DEFAULTPROVIDER=${{ vars.DEFAULTPROVIDER }} >> .env
-          echo DEMO=${{ vars.DEMO }} >> .env
-          echo ENV=${{ vars.ENV }} >> .env
-          echo HOSTURL=${{ vars.HOSTURL }} >> .env
-          echo WEBHOOKHOSTURL=${{ vars.WEBHOOKHOSTURL }} >> .env
-          echo LOGLEVEL=${{ vars.LOGLEVEL }} >> .env
-          echo PORT=${{ vars.PORT }} >> .env
-          echo RESOURCEPREFIX=${{ vars.RESOURCEPREFIX }} >> .env
-          echo RESOURCEVERSION="" >> .env
-          echo CRYPTOIV=${{ secrets.CRYPTOIV }} >> .env
-          echo CRYPTOKEY=${{ secrets.CRYPTOKEY }} >> .env
-          echo UCPAUTHCLIENTID=${{ secrets.UCP_CLIENT_ID }} >> .env
-          echo UCPAUTHCLIENTSECRET=${{ secrets.UCP_CLIENT_SECRET }} >> .env
-          echo UCPAUTHENCRYPTIONKEY=${{ secrets.UCP_ENCRYPTION_KEY }} >> .env
-          echo "ENV=$(/bin/cat .env)" >> $GITHUB_OUTPUT
