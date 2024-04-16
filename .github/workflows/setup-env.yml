@@ -49,5 +49,4 @@ jobs:
           echo UCPAUTHCLIENTID=${{ secrets.UCP_CLIENT_ID }} >> .env
           echo UCPAUTHCLIENTSECRET=${{ secrets.UCP_CLIENT_SECRET }} >> .env
           echo UCPAUTHENCRYPTIONKEY=${{ secrets.UCP_ENCRYPTION_KEY }} >> .env
-          cat .env 
           echo "ENV=${{ cat .env }}" >> $GITHUB_OUTPUT
