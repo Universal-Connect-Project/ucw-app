@@ -28,8 +28,9 @@ jobs:
           
           {
             echo 'VARS<<EOF'
-            echo "$vars"
+            echo -e "$vars"
             echo 'EOF'
           } >> $GITHUB_OUTPUT
           
+          echo $(/bin/cat ./vars.txt)
           rm ./vars.txt
