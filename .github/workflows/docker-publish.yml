@@ -26,6 +26,10 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
+      - name: Test setup-env
+        run: |
+          echo ${{ fromJson(needs.setup-env.outputs.ENV_VARS) }}
+
 #      - name: Log in to Docker Hub
 #        uses: docker/login-action@v3
 #        with:
