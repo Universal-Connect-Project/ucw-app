@@ -34,4 +34,4 @@ jobs:
         id: output
         shell: bash
         run: |
-          echo ${{ ENV_VARS.DEFAULTPROVIDER }}
+          echo ${{ env.DEFAULTPROVIDER }}
