@@ -4,9 +4,12 @@ name: Setup env file
 on:
   workflow_call:
     outputs:
-      ENV:
-        description: 'Env file'
-        value: ${{ jobs.env-file.outputs.ENV }}
+      ENV_SECRETS:
+        description: 'Secrets file'
+        value: ${{ jobs.env-file.outputs.vars }}
+      ENV_VARS:
+        description: 'Vars file'
+        value: ${{ jobs.env-file.outputs.secrets }}
 
 jobs:
   env-file:
@@ -17,17 +20,18 @@ jobs:
         id: environment
         shell: bash
         env:
-          ENV_INPUT: ${{ toJSON(secrets) }}
+          SECRETS: ${{ toJSON(secrets) }}
+          VARS: ${{ toJSON(vars) }}
         run: |
-          echo "-------"
-          echo "$ENV_INPUT"
-          echo "-------"
-          echo "$ENV_INPUT" | jq -r 'keys[] as $k | "echo \"\($k)=\(.[$k] )\" >> $GITHUB_ENV"' > ./update_env.sh
-          chmod +x ./update_env.sh
-          ./update_env.sh
+          echo "$SECRETS" | jq -r 'keys[] as $k | "echo \"\($k)=\(.[$k] )\" >> $GITHUB_OUTPUT"' > ./update_secrets.sh
+          echo "$VARS" | jq -r 'keys[] as $k | "echo \"\($k)=\(.[$k] )\" >> $GITHUB_OUTPUT"' > ./update_vars.sh
+          chmod +x ./update_secrets.sh
+          chmod +x ./update_vars.sh
+          ./update_secrets.sh
+          ./update_vars.sh
 
       - name: Output testing
         id: output
         shell: bash
         run: |
-          echo ${{ env.DOCKER_USERNAME }}
+          echo ${{ ENV_VARS.DEFAULTPROVIDER }}
