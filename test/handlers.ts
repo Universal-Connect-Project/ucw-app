@@ -13,6 +13,7 @@ export const CREATE_MEMBER_PATH = `${MX_BASE_PATH}/users/:userId/members`
 export const VERIFY_MEMBER_PATH = `${MX_BASE_PATH}/users/:userId/members/:guid/verify`
 export const IDENTIFY_MEMBER_PATH = `${MX_BASE_PATH}/users/:userId/members/:guid/identify`
 export const EXTEND_HISTORY_PATH = `${MX_BASE_PATH}/users/:userId/members/:guid/extend_history`
+export const DELETE_CONNECTION_PATH = `${MX_BASE_PATH}/users/:userId/managed_members/:id`
 
 const handlers = [
   http.get(INSTITUTION_BY_ID_PATH, () => HttpResponse.json(institutionData)),
@@ -23,7 +24,8 @@ const handlers = [
   http.post(CREATE_MEMBER_PATH, () => HttpResponse.json(memberData)),
   http.post(VERIFY_MEMBER_PATH, () => HttpResponse.json(verifyMemberData)),
   http.post(IDENTIFY_MEMBER_PATH, () => HttpResponse.json(identifyMemberData)),
-  http.post(EXTEND_HISTORY_PATH, () => HttpResponse.json(extendHistoryMemberData))
+  http.post(EXTEND_HISTORY_PATH, () => HttpResponse.json(extendHistoryMemberData)),
+  http.delete(DELETE_CONNECTION_PATH, () => new HttpResponse(null, { status: 200 }))
 ]
 
 export default handlers

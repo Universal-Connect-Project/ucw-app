@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw'
 import { server } from '../../test/testServer'
 import { institutionData } from '../../test/testData/institution'
 import { MxApi } from './mx'
-import { CREATE_MEMBER_PATH, DELETE_MEMBER_PATH, INSTITUTION_BY_ID_PATH } from '../../test/handlers'
+import { CREATE_MEMBER_PATH, DELETE_CONNECTION_PATH, DELETE_MEMBER_PATH, INSTITUTION_BY_ID_PATH } from '../../test/handlers'
 import { institutionCredentialsData } from '../../test/testData/institutionCredentials'
 import { extendHistoryMemberData, identifyMemberData, memberData, membersData, verifyMemberData } from '../../test/testData/members'
 import config from '../config'
@@ -288,6 +288,24 @@ describe('mx provider', () => {
         }, 'testUserId')
 
         expect(member.id).toEqual(extendHistoryMemberData.member.guid)
+      })
+    })
+
+    describe('DeleteConnection', () => {
+      it('deletes the connection', async () => {
+        let connectionDeletionAttempted = false
+
+        server.use(http.delete(DELETE_CONNECTION_PATH, () => {
+          connectionDeletionAttempted = true
+
+          return new HttpResponse(null, {
+            status: 200
+          })
+        }))
+
+        await mxApi.DeleteConnection('testId', 'testUserId')
+
+        expect(connectionDeletionAttempted).toBe(true)
       })
     })
   })
