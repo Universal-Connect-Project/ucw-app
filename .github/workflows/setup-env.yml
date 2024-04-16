@@ -46,7 +46,7 @@ jobs:
           echo "$(/bin/cat ./update_vars.txt)"
           echo "-------------------------"
 
-          secrets_=$(/bin/cat ./update_secrets.txt)
-          vars_=$(/bin/cat ./update_vars.txt)
-          echo "secrets=<<EOF"$'\n'"$secrets_"$'\n'EOF >> $GITHUB_OUTPUT
-          echo "vars=<<EOF"$'\n'"$vars_"$'\n'EOF >> $GITHUB_OUTPUT
+          secrets=$(/bin/cat ./update_secrets.txt)
+          vars=$(/bin/cat ./update_vars.txt)
+          echo "secrets=<<EOF\n"$secrets_"\nEOF >> $GITHUB_OUTPUT
+          echo "vars=<<EOF\n$vars_\nEOF >> $GITHUB_OUTPUT
