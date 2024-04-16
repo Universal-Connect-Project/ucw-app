@@ -15,6 +15,7 @@ export const IDENTIFY_MEMBER_PATH = `${MX_BASE_PATH}/users/:userId/members/:guid
 export const EXTEND_HISTORY_PATH = `${MX_BASE_PATH}/users/:userId/members/:guid/extend_history`
 export const DELETE_CONNECTION_PATH = `${MX_BASE_PATH}/users/:userId/managed_members/:id`
 export const AGGREGATE_MEMBER_PATH = `${MX_BASE_PATH}/users/:userId/members/:id/aggregate`
+export const UPDATE_CONNECTION_PATH = `${MX_BASE_PATH}/users/:userId/members/:id`
 
 const handlers = [
   http.get(INSTITUTION_BY_ID_PATH, () => HttpResponse.json(institutionData)),
@@ -27,7 +28,8 @@ const handlers = [
   http.post(IDENTIFY_MEMBER_PATH, () => HttpResponse.json(identifyMemberData)),
   http.post(EXTEND_HISTORY_PATH, () => HttpResponse.json(extendHistoryMemberData)),
   http.post(AGGREGATE_MEMBER_PATH, () => HttpResponse.json(aggregateMemberMemberData)),
-  http.delete(DELETE_CONNECTION_PATH, () => new HttpResponse(null, { status: 200 }))
+  http.delete(DELETE_CONNECTION_PATH, () => new HttpResponse(null, { status: 200 })),
+  http.put(UPDATE_CONNECTION_PATH, () => HttpResponse.json(memberData))
 ]
 
 export default handlers

@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw'
 import { server } from '../../test/testServer'
 import { institutionData } from '../../test/testData/institution'
 import { EXTENDED_HISTORY_NOT_SUPPORTED_MSG, MxApi } from './mx'
-import { AGGREGATE_MEMBER_PATH, CREATE_MEMBER_PATH, DELETE_CONNECTION_PATH, DELETE_MEMBER_PATH, EXTEND_HISTORY_PATH, INSTITUTION_BY_ID_PATH, VERIFY_MEMBER_PATH } from '../../test/handlers'
+import { AGGREGATE_MEMBER_PATH, CREATE_MEMBER_PATH, DELETE_CONNECTION_PATH, DELETE_MEMBER_PATH, EXTEND_HISTORY_PATH, INSTITUTION_BY_ID_PATH, UPDATE_CONNECTION_PATH, VERIFY_MEMBER_PATH } from '../../test/handlers'
 import { institutionCredentialsData } from '../../test/testData/institutionCredentials'
 import { aggregateMemberMemberData, extendHistoryMemberData, identifyMemberData, memberData, membersData, verifyMemberData } from '../../test/testData/members'
 import config from '../config'
@@ -36,6 +36,15 @@ const testCredential = {
   value: 'testCredentialValue',
   field_type: 'testCredentialFieldType',
   field_name: 'testCredentialFieldName'
+}
+
+const testChallenge = {
+  id: 'testChallengeId',
+  external_id: 'testExternalId',
+  question: 'testQuestion',
+  data: 'testData',
+  type: ChallengeType.QUESTION,
+  response: 'testResponse'
 }
 
 describe('mx provider', () => {
@@ -317,14 +326,7 @@ describe('mx provider', () => {
         id: 'testUpdateConnectionId',
         job_type: 'auth',
         credentials: [testCredential],
-        challenges: [{
-          id: 'testChallengeId',
-          external_id: 'testExternalId',
-          question: 'testQuestion',
-          data: 'testData',
-          type: ChallengeType.QUESTION,
-          response: 'testResponse'
-        }
+        challenges: [testChallenge
         ]
       }
 
@@ -422,6 +424,46 @@ describe('mx provider', () => {
         expect(error).toEqual({
           error_message: errorMessage,
           id: baseUpdateConnectionRequest.id
+        })
+      })
+    })
+
+    describe('UpdateConnectionInternal', () => {
+      it('it calls updateMember with the correct request body and returns the member', async () => {
+        let updateConnectionPaylod
+
+        server.use(http.put(UPDATE_CONNECTION_PATH, async ({ request }) => {
+          updateConnectionPaylod = await request.json()
+
+          return HttpResponse.json(memberData)
+        }))
+
+        const member = await mxApi.UpdateConnectionInternal({
+          id: 'updateConnectionId',
+          job_type: 'testJobType',
+          credentials: [testCredential],
+          challenges: [testChallenge]
+        }, 'testUserId')
+
+        expect(updateConnectionPaylod).toEqual({
+          member: {
+            credentials: [{
+              guid: testCredential.id,
+              value: testCredential.value
+            }]
+          }
+        })
+
+        const testMember = memberData.member
+
+        expect(member).toEqual({
+          cur_job_id: testMember.guid,
+          id: testMember.guid,
+          institution_code: testMember.institution_code,
+          is_being_aggregated: testMember.is_being_aggregated,
+          is_oauth: testMember.is_oauth,
+          oauth_window_uri: testMember.oauth_window_uri,
+          provider: 'mx'
         })
       })
     })
