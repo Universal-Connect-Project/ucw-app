@@ -26,7 +26,6 @@ jobs:
       - name: 'Create env file'
         env:
           env_vars: ${{ needs.setup-env.outputs.env_vars }}
-          env_secrets: ${{ needs.setup-env.outputs.env_secrets }}
         run: |
           touch .env
           # Vars

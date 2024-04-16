@@ -3,9 +3,6 @@ name: Setup env file contents
 on:
   workflow_call:
     outputs:
-      env_secrets:
-        description: 'Secrets'
-        value: ${{ jobs.env-file.outputs.secrets }}
       env_vars:
         description: 'Vars'
         value: ${{ jobs.env-file.outputs.vars }}
@@ -16,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      secrets: ${{ steps.env-setup.outputs.SECRETS }}
       vars: ${{ steps.env-setup.outputs.VARS }}
 
     steps:
@@ -24,20 +20,11 @@ jobs:
         id: env-setup
         shell: bash
         env:
-          SECRETS: ${{ toJSON(secrets) }}
           VARS: ${{ toJSON(vars) }}
         run: |          
-          echo "$SECRETS" | jq -r 'keys[] as $k | "\($k)=\(.[$k] )"' > ./secrets.txt
           echo "$VARS" | jq -r 'keys[] as $k | "\($k)=\(.[$k] )"' > ./vars.txt
                
-          secrets=$(/bin/cat ./secrets.txt)
           vars=$(/bin/cat ./vars.txt)
-          
-          {
-            echo 'SECRETS<<EOF'
-            echo "$secrets"
-            echo 'EOF'
-          } >> $GITHUB_OUTPUT
           
           {
             echo 'VARS<<EOF'
@@ -45,5 +32,4 @@ jobs:
             echo 'EOF'
           } >> $GITHUB_OUTPUT
           
-          rm ./secrets.txt
           rm ./vars.txt

@@ -19,7 +19,7 @@ jobs:
       
       - uses: actions/setup-node@v3
         with:
-          node-version: "lts/*"
+          node-version: '20'
       - run: npm ci
 
       - name: 'Create env file'
@@ -27,7 +27,7 @@ jobs:
           touch .env
           
           # Vars
-          echo ${{ needs.setup-env.outputs.env_vars }} >> .env
+          echo -e ${{ needs.setup-env.outputs.env_vars }} >> .env
           echo RESOURCEVERSION="" >> .env
 
           # Secrets (can't load these from another job, due to GH security features)
