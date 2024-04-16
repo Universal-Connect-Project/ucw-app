@@ -4,10 +4,10 @@ name: Setup env file
 on:
   workflow_call:
     outputs:
-      ENV_SECRETS:
+      env_secrets:
         description: 'Secrets file'
         value: ${{ jobs.env-file.outputs.vars }}
-      ENV_VARS:
+      env_vars:
         description: 'Vars file'
         value: ${{ jobs.env-file.outputs.secrets }}
 
@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      vars: ${{ steps.env-setup.outputs.VARS }}
       secrets: ${{ steps.env-setup.outputs.SECRETS }}
+      vars: ${{ steps.env-setup.outputs.VARS }}
 
     steps:
       - name: Loading repository variables to real env vars
