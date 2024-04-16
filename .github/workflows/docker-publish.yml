@@ -15,8 +15,7 @@ jobs:
   setup-env:
     name: 'Load ENV Vars'
     uses: ./.github/workflows/setup-env.yml
-    with:
-      secrets: ${{ toJSON(secrets) }}
+    secrets: inherit
 
   push_to_registry:
     needs: [setup-env]

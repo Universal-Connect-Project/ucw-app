@@ -17,12 +17,12 @@ jobs:
         id: environment
         shell: bash
         env:
-          ENV: ${{ toJSON(secrets) }}
+          ENV_INPUT: ${{ toJSON(secrets) }}
         run: |
           echo "-------"
-          echo "$ENV"
+          echo "$ENV_INPUT"
           echo "-------"
-          echo "$ENV" | jq -r 'keys[] as $k | "echo \"\($k)=\(.[$k] )\" >> $GITHUB_ENV"' > ./update_env.sh
+          echo "$ENV_INPUT" | jq -r 'keys[] as $k | "echo \"\($k)=\(.[$k] )\" >> $GITHUB_ENV"' > ./update_env.sh
           chmod +x ./update_env.sh
           ./update_env.sh
 
