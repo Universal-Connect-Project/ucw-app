@@ -14,10 +14,10 @@ on:
     outputs:
       env_secrets:
         description: 'Secrets file'
-        value: ${{ jobs.env-file.outputs.vars }}
+        value: ${{ jobs.env-file.outputs.secrets }}
       env_vars:
         description: 'Vars file'
-        value: ${{ jobs.env-file.outputs.secrets }}
+        value: ${{ jobs.env-file.outputs.vars }}
 
 jobs:
   env-file:
