@@ -8,6 +8,30 @@ export const memberData = {
   }
 }
 
+export const verifyMemberData = {
+  ...memberData,
+  member: {
+    ...memberData.member,
+    guid: 'verifyMemberGuid'
+  }
+}
+
+export const identifyMemberData = {
+  ...memberData,
+  member: {
+    ...memberData.member,
+    guid: 'identifyMemberGuid'
+  }
+}
+
+export const extendHistoryMemberData = {
+  ...memberData,
+  member: {
+    ...memberData.member,
+    guid: 'extendHistoryMemberGuid'
+  }
+}
+
 export const membersData = {
   members: [memberData.member, {
     guid: 'testGuid2',

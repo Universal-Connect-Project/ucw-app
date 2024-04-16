@@ -2,25 +2,32 @@ import { http, HttpResponse } from 'msw'
 import { server } from '../../test/testServer'
 import { institutionData } from '../../test/testData/institution'
 import { MxApi } from './mx'
-import { CONNECTIONS_BY_ID_PATH, DELETE_MEMBER_PATH, INSTITUTION_BY_ID_PATH } from '../../test/handlers'
+import { CREATE_MEMBER_PATH, DELETE_MEMBER_PATH, INSTITUTION_BY_ID_PATH } from '../../test/handlers'
 import { institutionCredentialsData } from '../../test/testData/institutionCredentials'
-import { membersData } from '../../test/testData/members'
+import { extendHistoryMemberData, identifyMemberData, memberData, membersData, verifyMemberData } from '../../test/testData/members'
+import config from '../config'
+
+const token = 'testToken'
 
 const mxApiInt = new MxApi({
   mxInt: {
     username: 'testUsername',
     password: 'testPassword'
-  }
+  },
+  token
 }, true)
 
 const mxApi = new MxApi({
   mxProd: {
     username: 'testUsername',
     password: 'testPassword'
-  }
+  },
+  token
 }, false)
 
 const institutionResponse = institutionData.institution
+
+const clientRedirectUrl = `${config.HostUrl}/oauth/mx/redirect_from?token=${token}`
 
 describe('mx provider', () => {
   describe('MxApi', () => {
@@ -150,8 +157,6 @@ describe('mx provider', () => {
       }
 
       it('deletes the existing member if one is found', async () => {
-        server.use(http.get(CONNECTIONS_BY_ID_PATH, () => HttpResponse.json(membersData)))
-
         let memberDeletionAttempted = false
 
         server.use(http.delete(DELETE_MEMBER_PATH, () => {
@@ -171,40 +176,118 @@ describe('mx provider', () => {
         expect(memberDeletionAttempted).toBe(true)
       })
 
-      it('creates member with a client_redirect_url if is_oauth', () => {
+      describe('createMemberPayload spy tests', () => {
+        let createMemberPayload: any
 
+        beforeEach(() => {
+          createMemberPayload = null
+
+          server.use(http.post(CREATE_MEMBER_PATH, async ({ request }) => {
+            createMemberPayload = await request.json()
+
+            return HttpResponse.json(memberData)
+          }))
+        })
+
+        it('creates member with a client_redirect_url if is_oauth', async () => {
+          await mxApi.CreateConnection({
+            ...baseConnectionRequest,
+            is_oauth: true
+          }, 'testUserId')
+
+          expect(createMemberPayload.client_redirect_url).toEqual(clientRedirectUrl)
+        })
+
+        it('creates member without a client_redirect_url if !is_oauth', async () => {
+          await mxApi.CreateConnection({
+            ...baseConnectionRequest,
+            is_oauth: false
+          }, 'testUserId')
+
+          expect(createMemberPayload.client_redirect_url).toEqual(null)
+        })
+
+        it('creates a member with skip_aggregation if requested', async () => {
+          await mxApi.CreateConnection({
+            ...baseConnectionRequest,
+            skip_aggregation: true
+          }, 'testUserId')
+
+          expect(createMemberPayload.member.skip_aggregation).toEqual(true)
+        })
+
+        it('creates a member with skip_aggregation if jobType is not aggregate', async () => {
+          await mxApi.CreateConnection({
+            ...baseConnectionRequest,
+            initial_job_type: 'auth'
+          }, 'testUserId')
+
+          expect(createMemberPayload.member.skip_aggregation).toEqual(true)
+        })
+
+        it('creates a member with !skip_aggregation if jobType is aggregate', async () => {
+          await mxApi.CreateConnection({
+            ...baseConnectionRequest,
+            initial_job_type: 'aggregate'
+          }, 'testUserId')
+
+          expect(createMemberPayload.member.skip_aggregation).toEqual(false)
+        })
+
+        it('creates a member with correctly mapped request options and returns the member from that response when is_oauth', async () => {
+          await mxApi.CreateConnection({
+            ...baseConnectionRequest,
+            is_oauth: true
+          }, 'testUserId')
+
+          expect(createMemberPayload).toEqual({
+            client_redirect_url: clientRedirectUrl,
+            member: {
+              credentials: [{
+                guid: baseConnectionRequest.credentials[0].id,
+                value: baseConnectionRequest.credentials[0].value
+              }],
+              institution_code: baseConnectionRequest.institution_id,
+              is_oauth: true,
+              skip_aggregation: true
+            },
+            referral_source: 'APP'
+          })
+        })
       })
 
-      it('creates member without a client_redirect_url if !is_oauth', () => {
+      it('returns the member from verifyMember if job type is verification or aggregate_identity_verification', async () => {
+        const verificationMember = await mxApi.CreateConnection({
+          ...baseConnectionRequest,
+          initial_job_type: 'verification'
+        }, 'testUserId')
 
+        expect(verificationMember.id).toEqual(verifyMemberData.member.guid)
+
+        const aggregateMember = await mxApi.CreateConnection({
+          ...baseConnectionRequest,
+          initial_job_type: 'all'
+        }, 'testUserId')
+
+        expect(aggregateMember.id).toEqual(verifyMemberData.member.guid)
       })
 
-      it('creates a member with skip_aggregation if requested', () => {
+      it('returns the member from identifyMember if job type is aggregate_identity', async () => {
+        const member = await mxApi.CreateConnection({
+          ...baseConnectionRequest,
+          initial_job_type: 'vc_identity'
+        }, 'testUserId')
 
+        expect(member.id).toEqual(identifyMemberData.member.guid)
       })
 
-      it('creates a member with skip_aggregation if jobType is aggregate', () => {
+      it('returns the member from extendHistory if job type is aggregate_extendedhistory', async () => {
+        const member = await mxApi.CreateConnection({
+          ...baseConnectionRequest,
+          initial_job_type: 'aggregate_extendedhistory'
+        }, 'testUserId')
 
-      })
-
-      it('creates a member with !skip_aggregation if jobType is not aggregate', () => {
-
-      })
-
-      it('creates a member with correctly mapped request options and returns the member from that response when is_oauth', () => {
-
-      })
-
-      it('returns the member from verifyMember if job type is verification or aggregate_identity_verification', () => {
-
-      })
-
-      it('returns the member from identifyMember if job type is aggregate_identity', () => {
-
-      })
-
-      it('returns the member from extendHistory if job type is aggregate_extendedhistory', () => {
-
+        expect(member.id).toEqual(extendHistoryMemberData.member.guid)
       })
     })
   })
