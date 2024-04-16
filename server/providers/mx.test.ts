@@ -2,11 +2,12 @@ import { http, HttpResponse } from 'msw'
 import { server } from '../../test/testServer'
 import { institutionData } from '../../test/testData/institution'
 import { EXTENDED_HISTORY_NOT_SUPPORTED_MSG, MxApi } from './mx'
-import { AGGREGATE_MEMBER_PATH, CREATE_MEMBER_PATH, DELETE_CONNECTION_PATH, DELETE_MEMBER_PATH, EXTEND_HISTORY_PATH, INSTITUTION_BY_ID_PATH, UPDATE_CONNECTION_PATH, VERIFY_MEMBER_PATH } from '../../test/handlers'
+import { AGGREGATE_MEMBER_PATH, CREATE_MEMBER_PATH, DELETE_CONNECTION_PATH, DELETE_MEMBER_PATH, EXTEND_HISTORY_PATH, INSTITUTION_BY_ID_PATH, READ_MEMBER_STATUS_PATH, UPDATE_CONNECTION_PATH, VERIFY_MEMBER_PATH } from '../../test/handlers'
 import { institutionCredentialsData } from '../../test/testData/institutionCredentials'
-import { aggregateMemberMemberData, connectionByIdMemberData, extendHistoryMemberData, identifyMemberData, memberData, membersData, verifyMemberData } from '../../test/testData/members'
+import { aggregateMemberMemberData, connectionByIdMemberData, extendHistoryMemberData, identifyMemberData, memberData, membersData, memberStatusData, verifyMemberData } from '../../test/testData/members'
 import config from '../config'
-import { ChallengeType } from '../../shared/contract'
+import { ChallengeType, ConnectionStatus } from '../../shared/contract'
+import { clearRedisMock, createClient } from '../../__mocks__/redis'
 
 const token = 'testToken'
 
@@ -18,11 +19,14 @@ const mxApiInt = new MxApi({
   token
 }, true)
 
+const redisMock = createClient()
+
 const mxApi = new MxApi({
   mxProd: {
     username: 'testUsername',
     password: 'testPassword'
   },
+  storageClient: redisMock,
   token
 }, false)
 
@@ -483,6 +487,111 @@ describe('mx provider', () => {
           oauth_window_uri: testMember.oauth_window_uri,
           provider: 'mx',
           user_id: testUserId
+        })
+      })
+    })
+
+    describe('GetConnectionStatus', () => {
+      afterEach(() => {
+        clearRedisMock()
+      })
+
+      it("returns a rejected connection status if there's an error with oauthStatus", async () => {
+        redisMock.set(memberStatusData.member.guid, { error: true })
+
+        const connectionStatus = await mxApi.GetConnectionStatus('testMemberId', 'testJobId', false, 'testUserId')
+
+        expect(connectionStatus.status).toEqual(ConnectionStatus.REJECTED)
+      })
+
+      it('returns a properly mapped response with TEXT, OPTIONS< TOKEN< IMAGE_DATA, and IMAGE_OPTIONS challenges', async () => {
+        const challenges = [{
+          guid: 'challengeGuid1',
+          label: 'challengeLabel1',
+          type: 'TEXT'
+        }, {
+          guid: 'challengeGuid2',
+          label: 'challengeLabel2',
+          options: [{
+            label: 'optionLabel1',
+            value: 'optionValue1'
+          }],
+          type: 'OPTIONS'
+        }, {
+          guid: 'challengeGuid3',
+          label: 'challengeLabel3',
+          type: 'TOKEN'
+        }, {
+          guid: 'challengeGuid4',
+          label: 'challengeLabel4',
+          image_data: 'imageData',
+          type: 'IMAGE_DATA'
+        }, {
+          guid: 'challengeGuid5',
+          image_options: [{
+            label: 'optionLabel1',
+            value: 'optionValue1'
+          }],
+          label: 'challengeLabel5',
+          type: 'IMAGE_OPTIONS'
+        }]
+
+        const [textChallenge, optionsChallenge, tokenChallenge, imageChallenge, imageOptionsChallenge] = challenges
+
+        server.use(http.get(READ_MEMBER_STATUS_PATH, () => HttpResponse.json({
+          ...memberStatusData,
+          member: {
+            ...memberStatusData.member,
+            challenges
+          }
+        })))
+
+        const testMember = memberStatusData.member
+        const userId = 'testUserId'
+
+        expect(await mxApi.GetConnectionStatus('testMemberId', 'testJobId', false, userId)).toEqual({
+          cur_job_id: testMember.guid,
+          provider: 'mx',
+          id: testMember.guid,
+          user_id: userId,
+          status: ConnectionStatus[testMember.connection_status],
+          challenges: [{
+            data: [
+              {
+                key: '0',
+                value: textChallenge.label
+              }
+            ],
+            id: textChallenge.guid,
+            type: ChallengeType.QUESTION,
+            question: textChallenge.label
+          }, {
+            data: [{
+              key: optionsChallenge.options[0].label,
+              value: optionsChallenge.options[0].value
+            }],
+            id: optionsChallenge.guid,
+            question: optionsChallenge.label,
+            type: ChallengeType.OPTIONS
+          }, {
+            id: tokenChallenge.guid,
+            data: tokenChallenge.label,
+            question: tokenChallenge.label,
+            type: ChallengeType.TOKEN
+          }, {
+            data: imageChallenge.image_data,
+            id: imageChallenge.guid,
+            question: imageChallenge.label,
+            type: ChallengeType.IMAGE
+          }, {
+            data: [{
+              key: imageOptionsChallenge.image_options[0].label,
+              value: imageOptionsChallenge.image_options[0].value
+            }],
+            id: imageOptionsChallenge.guid,
+            question: imageOptionsChallenge.label,
+            type: ChallengeType.IMAGE_OPTIONS
+          }]
         })
       })
     })

@@ -1,3 +1,5 @@
+import { ConnectionStatus } from '../../shared/contract'
+
 export const memberData = {
   member: {
     guid: 'testGuid1',
@@ -56,4 +58,12 @@ export const membersData = {
     is_oauth: false,
     oauth_window_uri: 'oauthWindowUri2'
   }]
+}
+
+export const memberStatusData = {
+  member: {
+    // challenges: undefined,
+    connection_status: ConnectionStatus.CREATED,
+    guid: 'memberStatusGuid'
+  }
 }
