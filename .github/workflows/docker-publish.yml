@@ -42,7 +42,7 @@ jobs:
           # Vars
           echo -e "${{ env.env_vars }}" >> .env
           echo RESOURCEVERSION="" >> .env
-          echo DOCKERPUBLISHVERSIONAPP="v$(npm pkg get version | xargs)" >> .env
+          echo DOCKER_PUBLISH_VERSION_APP="$(npm pkg get version | xargs)" >> .env
             
           # Secrets (can't load these from another job, due to GH security features)
           echo DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} >> .env
@@ -52,7 +52,7 @@ jobs:
       - name: 'Get UI version'
         working-directory: ./ui
         run: |
-          echo DOCKERPUBLISHVERSIONUI="v$(npm pkg get version | xargs)" >> ../.env
+          echo DOCKER_PUBLISH_VERSION_UI="$(npm pkg get version | xargs)" >> ../.env
           cat ../.env
 
       - name: 'Log in to Docker Hub'
@@ -61,7 +61,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: 'Build Docker images'
+      - name: 'Build and Push Docker images'
         run: |
           docker compose build --quiet --push
 

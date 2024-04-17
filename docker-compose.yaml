@@ -18,7 +18,7 @@ services:
       timeout: 5s
       retries: 3
     build: .
-    image: universalconnectfoundation/ucw-app:v${DOCKERPUBLISHVERSIONAPP}
+    image: universalconnectfoundation/ucw-app:v${DOCKER_PUBLISH_VERSION_APP}
     networks:
       - ucw
     ports:
@@ -26,26 +26,26 @@ services:
     env_file:
       - ./.env
     environment:
-      RedisServer: "redis://cache:${REDISPORT}"
-      ResourcePrefix: "http://ui:${RESOURCEPORT}"
+      RedisServer: "redis://cache:${REDIS_PORT}"
+      ResourcePrefix: "http://ui:${RESOURCE_PORT}"
 
   ui:
     container_name: ucw-app-ui
     restart: on-failure
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://ui:${RESOURCEPORT}"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://ui:${RESOURCE_PORT}"]
       start_period: 5s
       interval: 20s
       timeout: 5s
       retries: 3
     build: ./ui
-    image: universalconnectfoundation/ucw-ui:v${DOCKERPUBLISHVERSIONUI}
+    image: universalconnectfoundation/ucw-ui:v${DOCKER_PUBLISH_VERSION_UI}
     networks:
       - ucw
     ports:
-      - "${RESOURCEPORT}:${RESOURCEPORT}"
+      - "${RESOURCE_PORT}:${RESOURCE_PORT}"
     environment:
-      ResourcePort: "${RESOURCEPORT}"
+      RESOURCE_PORT: "${RESOURCE_PORT}"
 
   cache:
     container_name: ucw-app-cache
@@ -60,7 +60,7 @@ services:
     networks:
       - ucw
     ports:
-      - "${REDISPORT}:${REDISPORT}"
+      - "${REDIS_PORT}:${REDIS_PORT}"
     command: redis-server --save 20 1 --loglevel warning
     volumes:
       - cache:/data

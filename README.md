@@ -6,7 +6,8 @@ This repo is a full-stack application which anyone can clone and self-host as a 
 
 To get started, clone the repo, follow the steps in `Initial Setup` (below) to set up your `.env` file, and then run the following command, from the root of the project:
 
-*This assumes you have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) already installed.*
+*This assumes you have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) already installed, and that you have a valid docker login.*
+
 ```
 docker compose up
 ```
@@ -14,6 +15,9 @@ docker compose up
 That's it! If you have questions, please reach out to us.
 
 The images for this repo are available on [DockerHub](https://hub.docker.com/repositories/universalconnectfoundation)
+
+_Note, if you get an error stating anything like `failed to authorize`, or `failed to fetch oauth token`, or a `401 Unauthorized`, you will need to run `docker login` 
+from your terminal, prior to running `docker compose up`_
 
 ## Getting Started (in development)
 1. clone the repo

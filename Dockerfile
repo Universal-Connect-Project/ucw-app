@@ -17,6 +17,6 @@ COPY ./shared ./shared
 
 ENV Env prod
 
-EXPOSE ${Port}
+EXPOSE ${PORT}
 
 CMD ["ts-node", "server/server.js"]

@@ -92,8 +92,8 @@ if (config.ResourcePrefix !== 'local') {
   app.get('*', _static(join(__dirname, '../ui/dist')))
 }
 
-app.listen(config.Port, () => {
-  const message = `Server is running on port ${config.Port}, Env: ${config.Env}`
+app.listen(config.PORT, () => {
+  const message = `Server is running on port ${config.PORT}, Env: ${config.Env}`
   console.log(message)
   info(message)
 })

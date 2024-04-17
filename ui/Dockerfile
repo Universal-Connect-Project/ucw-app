@@ -27,6 +27,6 @@ RUN npm ci --omit=dev &&  \
 
 COPY --from=builder /app/dist /app/dist
 
-EXPOSE ${ResourcePort}
+EXPOSE ${RESOURCE_PORT}
 
-CMD ["sh", "-c", "serve -p ${ResourcePort} /app/dist"]
+CMD ["sh", "-c", "serve -p ${RESOURCE_PORT} /app/dist"]
