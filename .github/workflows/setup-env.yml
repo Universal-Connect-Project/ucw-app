@@ -30,6 +30,7 @@ jobs:
           chmod +x ./create_vars.sh
           ./create_vars.sh
           
+          echo "vars.txt file"
           /bin/cat ./vars.txt
           echo "--------------------"
           echo -e "$(/bin/cat ./vars.txt)"
