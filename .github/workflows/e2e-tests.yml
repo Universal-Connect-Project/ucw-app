@@ -27,7 +27,7 @@ jobs:
           touch .env
           
           # Vars
-          echo -e ${{ needs.setup-env.outputs.env_vars }} >> .env
+          echo -e "${{ needs.setup-env.outputs.env_vars }}" >> .env
           echo RESOURCEVERSION="" >> .env
 
           # Secrets (can't load these from another job, due to GH security features)

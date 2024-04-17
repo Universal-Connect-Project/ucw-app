@@ -22,13 +22,13 @@ jobs:
         env:
           VARS: ${{ toJSON(vars) }}
         run: |          
-          #echo "$VARS" | jq -r 'keys[] as $k | "\($k)=\(.[$k])"' > ./vars.txt
-          echo "$VARS" | jq -r 'keys[] as $k | "echo -e \"\($k)=\(.[$k])\" >> ./vars.txt"' > ./create_vars.sh
+          echo "$VARS" | jq -r 'keys[] as $k | "\($k)=\(.[$k])"' > ./vars.txt
+          #echo "$VARS" | jq -r 'keys[] as $k | "echo -e \"\($k)=\(.[$k])\" >> ./vars.txt"' > ./create_vars.sh
   
-          /bin/cat ./create_vars.sh
+          #/bin/cat ./create_vars.sh
           
-          chmod +x ./create_vars.sh
-          ./create_vars.sh
+          #chmod +x ./create_vars.sh
+          #./create_vars.sh
           
           echo "vars.txt file"
           /bin/cat ./vars.txt
