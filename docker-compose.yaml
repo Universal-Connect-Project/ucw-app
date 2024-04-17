@@ -18,7 +18,7 @@ services:
       timeout: 5s
       retries: 3
     build: .
-    image: universalconnectfoundation/ucw-app:v0.0.7-beta
+    image: universalconnectfoundation/ucw-app:v${DockerPublishVersionApp}
     networks:
       - ucw
     ports:
@@ -39,7 +39,7 @@ services:
       timeout: 5s
       retries: 3
     build: ./ui
-    image: universalconnectfoundation/ucw-ui:v0.0.7-beta
+    image: universalconnectfoundation/ucw-ui:v${DockerPublishVersionUi}
     networks:
       - ucw
     ports:

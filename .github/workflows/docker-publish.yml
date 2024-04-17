@@ -22,28 +22,32 @@ jobs:
     needs: [setup-env]
 
     steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+
       - name: 'Create env file'
         env:
           env_vars: ${{ needs.setup-env.outputs.env_vars }}
         run: |
           echo "REF=${{ github.event.pull_request && github.head_ref || github.ref_name }}" >> $GITHUB_ENV
           
-          echo "DOCKER_IMAGE=universalconnectfoundation/ucw-app:${REF}" >> $GITHUB_ENV
           echo "REF: $REF"
           touch .env
           
           # Vars
           echo -e "${{ env.env_vars }}" >> .env
           echo RESOURCEVERSION="" >> .env
-
+          echo DOCKERPUBLISHVERSIONAPP="$(npm pkg get version)" >> .env
+          echo DOCKERPUBLISHVERSIONUI="$(npm pkg get version)" >> .env
+  
           # Secrets (can't load these from another job, due to GH security features)
           echo DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} >> .env
           echo DOCKER_TOKEN=${{ secrets.DOCKER_TOKEN }} >> .env
-          cat .env  
+          cat .env
 
-#      - name: Check out the repo
-#        uses: actions/checkout@v4
-#
 #      - name: Log in to Docker Hub
 #        uses: docker/login-action@v3
 #        with:
