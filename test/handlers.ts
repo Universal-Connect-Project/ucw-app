@@ -3,6 +3,7 @@ import { BASE_PATH as MX_BASE_PATH } from '../server/serviceClients/mxClient/bas
 import { institutionData } from './testData/institution'
 import { institutionCredentialsData } from './testData/institutionCredentials'
 import { aggregateMemberMemberData, connectionByIdMemberData, extendHistoryMemberData, identifyMemberData, memberData, membersData, memberStatusData, verifyMemberData } from './testData/members'
+import { createUserData, listUsersData } from './testData/users'
 
 export const INSTITUTION_BY_ID_PATH = `${MX_BASE_PATH}/institutions/:institutionId`
 export const INSTITUTION_CREDENTIALS_BY_ID_PATH = `${MX_BASE_PATH}/institutions/:institutionId/credentials`
@@ -19,6 +20,8 @@ export const UPDATE_CONNECTION_PATH = `${MX_BASE_PATH}/users/:userId/members/:id
 export const CONNECTION_BY_ID_PATH = `${MX_BASE_PATH}/users/:userId/members/:id`
 export const READ_MEMBER_STATUS_PATH = `${MX_BASE_PATH}/users/:userId/members/:id/status`
 export const ANSWER_CHALLENGE_PATH = `${MX_BASE_PATH}/users/:userId/members/:id/resume`
+export const USERS_PATH = `${MX_BASE_PATH}/users`
+export const CREATE_USER_PATH = `${MX_BASE_PATH}/users`
 
 const handlers = [
   http.get(INSTITUTION_BY_ID_PATH, () => HttpResponse.json(institutionData)),
@@ -35,7 +38,9 @@ const handlers = [
   http.put(UPDATE_CONNECTION_PATH, () => HttpResponse.json(memberData)),
   http.get(CONNECTION_BY_ID_PATH, () => HttpResponse.json(connectionByIdMemberData)),
   http.get(READ_MEMBER_STATUS_PATH, () => HttpResponse.json(memberStatusData)),
-  http.put(ANSWER_CHALLENGE_PATH, () => new HttpResponse(null, { status: 200 }))
+  http.put(ANSWER_CHALLENGE_PATH, () => new HttpResponse(null, { status: 200 })),
+  http.get(USERS_PATH, () => HttpResponse.json(listUsersData)),
+  http.post(CREATE_USER_PATH, () => HttpResponse.json(createUserData))
 ]
 
 export default handlers

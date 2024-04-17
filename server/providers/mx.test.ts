@@ -2,12 +2,13 @@ import { http, HttpResponse } from 'msw'
 import { server } from '../../test/testServer'
 import { institutionData } from '../../test/testData/institution'
 import { EXTENDED_HISTORY_NOT_SUPPORTED_MSG, MxApi } from './mx'
-import { AGGREGATE_MEMBER_PATH, ANSWER_CHALLENGE_PATH, CREATE_MEMBER_PATH, DELETE_CONNECTION_PATH, DELETE_MEMBER_PATH, EXTEND_HISTORY_PATH, INSTITUTION_BY_ID_PATH, READ_MEMBER_STATUS_PATH, UPDATE_CONNECTION_PATH, VERIFY_MEMBER_PATH } from '../../test/handlers'
+import { AGGREGATE_MEMBER_PATH, ANSWER_CHALLENGE_PATH, CREATE_MEMBER_PATH, CREATE_USER_PATH, DELETE_CONNECTION_PATH, DELETE_MEMBER_PATH, EXTEND_HISTORY_PATH, INSTITUTION_BY_ID_PATH, READ_MEMBER_STATUS_PATH, UPDATE_CONNECTION_PATH, VERIFY_MEMBER_PATH } from '../../test/handlers'
 import { institutionCredentialsData } from '../../test/testData/institutionCredentials'
 import { aggregateMemberMemberData, connectionByIdMemberData, extendHistoryMemberData, identifyMemberData, memberData, membersData, memberStatusData, verifyMemberData } from '../../test/testData/members'
 import config from '../config'
 import { ChallengeType, ConnectionStatus } from '../../shared/contract'
 import { clearRedisMock, createClient } from '../../__mocks__/redis'
+import { createUserData, listUsersData } from '../../test/testData/users'
 
 const token = 'testToken'
 
@@ -627,6 +628,32 @@ describe('mx provider', () => {
             ]
           }
         })
+      })
+    })
+
+    describe('ResolveUserId', () => {
+      it("returns the mx user from listUsers if it's available", async () => {
+        const user = listUsersData.users[0]
+
+        const returnedUserId = await mxApi.ResolveUserId(user.id)
+
+        expect(returnedUserId).toEqual(user.guid)
+      })
+
+      it("creates the user if the user isn't in the list and returns it from there", async () => {
+        const returnedUserId = await mxApi.ResolveUserId('fdadfsafd')
+
+        expect(returnedUserId).toEqual(createUserData.user.guid)
+      })
+
+      it('returns the provided userId if creating a user fails', async () => {
+        server.use(http.post(CREATE_USER_PATH, () => new HttpResponse(null, { status: 400 })))
+
+        const userId = 'fdasfdasfds'
+
+        const returnedUserId = await mxApi.ResolveUserId(userId)
+
+        expect(returnedUserId).toEqual(userId)
       })
     })
   })
