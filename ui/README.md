@@ -1,7 +1,7 @@
 # Universal Connect Widget embedded project
 
 ## Docker
-This project is hosted on Dockerhub. It is mean to be run via docker-compose. Please follow the steps in the 
+This project is hosted on Dockerhub. It is meant to be run via docker-compose. Please follow the steps in the 
 [README.md](../README.md) for more information.
 
 ## Local Development

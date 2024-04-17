@@ -41,7 +41,6 @@ jobs:
           
           # Vars
           echo -e "${{ env.env_vars }}" >> .env
-          echo RESOURCEVERSION="" >> .env
           echo DOCKER_PUBLISH_VERSION_APP="$(npm pkg get version | xargs)" >> .env
             
           # Secrets (can't load these from another job, due to GH security features)
