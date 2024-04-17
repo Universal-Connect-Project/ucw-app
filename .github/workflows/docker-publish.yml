@@ -65,7 +65,7 @@ jobs:
         working-directory: ./
         run: |
           ls -la
-          docker compose build
+          docker compose --env-file .env build
 #          docker compose build --quiet --push --env-file .env
 
 #      - name: 'Push Docker image'

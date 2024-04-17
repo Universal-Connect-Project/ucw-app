@@ -24,7 +24,7 @@ services:
     ports:
       - "${Port}:${Port}"
     env_file:
-      - .env
+      - ./.env
     environment:
       RedisServer: "redis://cache:${RedisPort}"
       ResourcePrefix: "http://ui:${ResourcePort}"
