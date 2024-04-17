@@ -133,6 +133,7 @@ export class ProviderApiBase {
     return []
   }
 
+  // This is not getting the logo url for any Finicity banks, needs to be fixed on search client probably. Mapping is wrong.
   async resolveInstitution (id: string): Promise<Institution> {
     this.context.updated = true
     const ret = {

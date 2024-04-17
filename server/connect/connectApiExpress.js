@@ -174,6 +174,7 @@ export default function (app) {
     })
   })
 
+  // This doesn't get hit by MX OAuth at all. So it only seems to be used for Finicity or nothing
   app.all('/webhook/:provider/*', async function (req, res) {
     const { provider } = req.params
     info(`received web hook at: ${req.path}`, req.query)

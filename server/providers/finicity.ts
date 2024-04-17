@@ -1,21 +1,17 @@
-import {
-  Challenge,
-  ChallengeType,
-  type Connection,
-  ConnectionStatus,
-  type CreateConnectionRequest,
-  type Credential,
-  type Institution,
-  Institutions,
-  type ProviderApiClient,
-  type UpdateConnectionRequest,
-  VcType
+import type {
+  Connection,
+  CreateConnectionRequest,
+  Credential,
+  Institution,
+  ProviderApiClient,
+  UpdateConnectionRequest
 } from '@/../../shared/contract'
+import { ConnectionStatus } from '@/../../shared/contract'
 import * as logger from '../infra/logger'
 import FinicityClient from '../serviceClients/finicityClient'
 import { StorageClient } from '../serviceClients/storageClient'
 
-const { v4: uuidv4 } = require('uuid')
+import { v4 as uuidv4 } from 'uuid'
 
 export class FinicityApi implements ProviderApiClient {
   sandbox: boolean
@@ -31,12 +27,12 @@ export class FinicityApi implements ProviderApiClient {
   }
 
   async GetInstitutionById (id: string): Promise<Institution> {
-    const ins = this.apiClient.getInstitution(id)
+    const institution = await this.apiClient.getInstitution(id)
     return {
       id,
-      name: ins?.name,
-      logo_url: ins?.urlLogonApp,
-      url: ins?.urlHomeApp,
+      name: institution?.name,
+      logo_url: institution?.branding?.icon, // this doesn't seem to be used anywhere
+      url: institution?.urlHomeApp,
       oauth: true,
       provider: this.apiClient.apiConfig.provider
     }
@@ -56,30 +52,31 @@ export class FinicityApi implements ProviderApiClient {
 
   async CreateConnection (
     request: CreateConnectionRequest,
-    user_id: string
+    userId: string
   ): Promise<Connection | undefined> {
-    const request_id = `${this.token};${uuidv4()}`
+    const requestId = `${this.token};${uuidv4()}`
+    const connectUrl = await this.apiClient.generateConnectLiteUrl(request.institution_id, userId, requestId)
     const obj = {
-      id: request_id,
-      is_oauth: true,
-      user_id,
+      id: requestId,
+      is_oauth: true, // true because like oauth, you are taken to another window to enter username/password
+      user_id: userId,
       credentials: [] as any[],
       institution_code: request.institution_id,
-      oauth_window_uri: await this.apiClient.generateConnectLiteUrl(request.institution_id, user_id, request_id),
+      oauth_window_uri: connectUrl,
       provider: this.apiClient.apiConfig.provider,
       status: ConnectionStatus.PENDING
     }
-    await this.db.set(request_id, obj)
+    await this.db.set(requestId, obj)
     return obj
   }
 
-  async DeleteConnection (id: string): Promise<void> {
+  async DeleteConnection (id: string, userId: string): Promise<void> {
     return await this.db.set(id, null)
   }
 
   async UpdateConnection (
     request: UpdateConnectionRequest,
-    user_id: string
+    userId: string
   ): Promise<Connection> {
     return null
   }
@@ -96,20 +93,20 @@ export class FinicityApi implements ProviderApiClient {
     return true
   }
 
-  async ResolveUserId (user_id: string) {
-    logger.debug('Resolving UserId: ' + user_id)
-    const finicityUser = await this.apiClient.getCustomer(user_id)
+  async ResolveUserId (userId: string) {
+    logger.debug('Resolving UserId: ' + userId)
+    const finicityUser = await this.apiClient.getCustomer(userId)
     if (finicityUser) {
       logger.trace(`Found existing finicity customer ${finicityUser.id}`)
       return finicityUser.id
     }
-    logger.trace(`Creating finicity user ${user_id}`)
-    const ret = await this.apiClient.createCustomer(user_id)
+    logger.trace(`Creating finicity user ${userId}`)
+    const ret = await this.apiClient.createCustomer(userId)
     if (ret) {
       return ret.id
     }
-    logger.trace(`Failed creating finicity user, using user_id: ${user_id}`)
-    return user_id
+    logger.trace(`Failed creating finicity user, using userId: ${userId}`)
+    return userId
   }
 
   static async HandleOauthResponse (request: any): Promise<Connection> {
