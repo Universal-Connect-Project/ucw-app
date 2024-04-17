@@ -24,9 +24,10 @@ jobs:
         run: |          
           echo "$VARS" | jq -r 'keys[] as $k | "\($k)=\(.[$k])"' > ./vars.txt
                
+          /bin/cat ./vars.txt
           echo $(/bin/cat ./vars.txt)
           vars=$(/bin/cat ./vars.txt)
-          echo $vars
+          echo -e $vars
           
           {
             echo 'VARS<<EOF'
