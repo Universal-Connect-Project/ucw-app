@@ -1,7 +1,7 @@
 {
   "name": "ucw-widget",
   "private": true,
-  "version": "ui-0.0.8-test",
+  "version": "0.0.8-uitest",
   "type": "module",
   "scripts": {
     "dev": "npx cross-env BROWSER=none && vite",

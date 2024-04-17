@@ -1,6 +1,6 @@
 {
   "name": "ucw-app",
-  "version": "app-0.0.8-test",
+  "version": "0.0.8-apptest",
   "scripts": {
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
