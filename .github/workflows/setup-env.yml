@@ -34,15 +34,15 @@ jobs:
           /bin/cat ./vars.txt
           echo "--------------------"
           echo -e "$(/bin/cat ./vars.txt)"
-          vars=$(/bin/cat ./vars.txt)
+          vars="$(/bin/cat ./vars.txt)"
           echo "--------------------"
-          echo -e $vars
+          echo -e "$vars"
           echo "--------------------"
           
           {
             echo 'VARS<<EOF'
-            echo -e "$vars"
+            echo -e "$(/bin/cat ./vars.txt)"
             echo 'EOF'
           } >> $GITHUB_OUTPUT
           
-          rm ./vars.txt
+          #rm ./vars.txt
