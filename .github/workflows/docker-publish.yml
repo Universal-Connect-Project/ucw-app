@@ -2,13 +2,8 @@ name: 'Publish Docker image'
 
 on:
   push:
-    # only trigger on branches, not on tags
     branches:
-      - '**'
-#      - main
-#  release:
-#    branches: [tyson/gh-actions]
-#    types: [published]
+      - main
 
 jobs:
   setup-env:
