@@ -32,9 +32,9 @@ jobs:
           
           /bin/cat ./vars.txt
           echo "--------------------"
-          echo $(/bin/cat ./vars.txt)
-          echo "--------------------"
+          echo -e "$(/bin/cat ./vars.txt)"
           vars=$(/bin/cat ./vars.txt)
+          echo "--------------------"
           echo -e $vars
           echo "--------------------"
           
