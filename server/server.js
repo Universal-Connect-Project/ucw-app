@@ -13,6 +13,7 @@ import useConnect from './connect/connectApiExpress'
 import { readFile } from './utils/fs'
 import RateLimit from 'express-rate-limit'
 import 'express-async-errors'
+import ngrok from '@ngrok/ngrok'
 // import asyncify from 'express-asyncify'
 
 process.on('unhandledRejection', (error) => {
@@ -97,3 +98,11 @@ app.listen(config.PORT, () => {
   console.log(message)
   info(message)
 })
+
+// Ngrok is required for Finicity webhooks local and github testing
+if (['dev', 'test'].includes(config.Env)) {
+  ngrok.listen(app).then(() => {
+    config.WebhookHostUrl = app.listener.url()
+    console.log('established listener at: ' + app.listener.url())
+  })
+}
