@@ -1,3 +1,5 @@
+import type { StorageClient } from 'server/serviceClients/storageClient'
+
 export interface AuthRequest {
   provider: string
   token: string
@@ -132,6 +134,7 @@ export interface Connection {
   vc?: string | null
   oauth_window_uri?: string | null
   error_message?: string | null
+  storageClient?: StorageClient
 }
 export interface UpdateConnectionRequest {
   id: string | undefined
