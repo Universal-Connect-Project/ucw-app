@@ -62,11 +62,8 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
 
       - name: 'Build Docker images'
-        working-directory: ./
         run: |
-          ls -la
-          docker compose build
-#          docker compose build --quiet --push --env-file .env
+          docker compose build --quiet --push
 
 #      - name: 'Push Docker image'
 #        run: |
