@@ -18,6 +18,7 @@ export const AGGREGATE_MEMBER_PATH = `${MX_BASE_PATH}/users/:userId/members/:id/
 export const UPDATE_CONNECTION_PATH = `${MX_BASE_PATH}/users/:userId/members/:id`
 export const CONNECTION_BY_ID_PATH = `${MX_BASE_PATH}/users/:userId/members/:id`
 export const READ_MEMBER_STATUS_PATH = `${MX_BASE_PATH}/users/:userId/members/:id/status`
+export const ANSWER_CHALLENGE_PATH = `${MX_BASE_PATH}/users/:userId/members/:id/resume`
 
 const handlers = [
   http.get(INSTITUTION_BY_ID_PATH, () => HttpResponse.json(institutionData)),
@@ -33,7 +34,8 @@ const handlers = [
   http.delete(DELETE_CONNECTION_PATH, () => new HttpResponse(null, { status: 200 })),
   http.put(UPDATE_CONNECTION_PATH, () => HttpResponse.json(memberData)),
   http.get(CONNECTION_BY_ID_PATH, () => HttpResponse.json(connectionByIdMemberData)),
-  http.get(READ_MEMBER_STATUS_PATH, () => HttpResponse.json(memberStatusData))
+  http.get(READ_MEMBER_STATUS_PATH, () => HttpResponse.json(memberStatusData)),
+  http.put(ANSWER_CHALLENGE_PATH, () => new HttpResponse(null, { status: 200 }))
 ]
 
 export default handlers

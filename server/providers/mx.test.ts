@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw'
 import { server } from '../../test/testServer'
 import { institutionData } from '../../test/testData/institution'
 import { EXTENDED_HISTORY_NOT_SUPPORTED_MSG, MxApi } from './mx'
-import { AGGREGATE_MEMBER_PATH, CREATE_MEMBER_PATH, DELETE_CONNECTION_PATH, DELETE_MEMBER_PATH, EXTEND_HISTORY_PATH, INSTITUTION_BY_ID_PATH, READ_MEMBER_STATUS_PATH, UPDATE_CONNECTION_PATH, VERIFY_MEMBER_PATH } from '../../test/handlers'
+import { AGGREGATE_MEMBER_PATH, ANSWER_CHALLENGE_PATH, CREATE_MEMBER_PATH, DELETE_CONNECTION_PATH, DELETE_MEMBER_PATH, EXTEND_HISTORY_PATH, INSTITUTION_BY_ID_PATH, READ_MEMBER_STATUS_PATH, UPDATE_CONNECTION_PATH, VERIFY_MEMBER_PATH } from '../../test/handlers'
 import { institutionCredentialsData } from '../../test/testData/institutionCredentials'
 import { aggregateMemberMemberData, connectionByIdMemberData, extendHistoryMemberData, identifyMemberData, memberData, membersData, memberStatusData, verifyMemberData } from '../../test/testData/members'
 import config from '../config'
@@ -592,6 +592,40 @@ describe('mx provider', () => {
             question: imageOptionsChallenge.label,
             type: ChallengeType.IMAGE_OPTIONS
           }]
+        })
+      })
+    })
+
+    describe('AnswerChallenge', () => {
+      it('calls the resumeAggregation endpoint with the correct payload and returns true', async () => {
+        let answerChallengePayload
+
+        server.use(http.put(ANSWER_CHALLENGE_PATH, async ({ request }) => {
+          answerChallengePayload = await request.json()
+
+          return new HttpResponse(null, { status: 200 })
+        }))
+
+        const challenge = {
+          id: 'challengeId',
+          response: 'challengeResponse'
+        }
+
+        expect(await mxApi.AnswerChallenge({
+          id: 'requestId',
+          job_type: 'auth',
+          credentials: [],
+          challenges: [challenge]
+        }, 'jobId', 'userId'))
+
+        expect(answerChallengePayload).toEqual({
+          member: {
+            challenges: [{
+              guid: challenge.id,
+              value: challenge.response
+            }
+            ]
+          }
         })
       })
     })

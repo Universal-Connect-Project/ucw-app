@@ -305,7 +305,6 @@ export class MxApi implements ProviderApiClient {
     jobId: string,
     userId: string
   ): Promise<boolean> {
-    console.log(request)
     await this.apiClient.resumeAggregation(request.id, userId, {
       member: {
         challenges: request.challenges.map((item, idx) => ({
