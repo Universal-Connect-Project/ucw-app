@@ -52,7 +52,11 @@ USE `.env` FILE
 
 __Publishing to DockerHub is automatic, and will happen when code is merged to `main`.__
 
-If you need to publish manually, you can do so with the following steps.
+__IMPORTANT__: Prior to merging your PR to main, make sure the versions of `ui` and `ucw-app` are up-to-date. The `version` property in 
+their respective `package.json` files should be up-to-date. This is where the versions for the docker images is pulled from.
+
+### Publishing manually
+It is strongly discouraged to publish to DockerHub manually, however, if you need to publish manually, you can do so with the following steps.
 
 First run `docker compose up --pull never`, to build the new images.
 
