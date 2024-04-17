@@ -656,5 +656,49 @@ describe('mx provider', () => {
         expect(returnedUserId).toEqual(userId)
       })
     })
+
+    describe('HandleOauthResponse', () => {
+      const errorReason = 'errorReason'
+      const memberGuid = 'memberGuid'
+
+      it('sets an error in redis if status is error', async () => {
+        const response = await MxApi.HandleOauthResponse({
+          member_guid: memberGuid,
+          status: 'error',
+          error_reason: errorReason,
+          token: 'token'
+        })
+
+        expect(response).toMatchObject({
+          id: memberGuid,
+          error: errorReason,
+          status: ConnectionStatus.REJECTED
+        })
+
+        expect(response.storageClient).toBeTruthy()
+      })
+
+      it('returns with connected status if success', async () => {
+        const response = await MxApi.HandleOauthResponse({
+          member_guid: memberGuid,
+          status: 'success',
+          error_reason: errorReason,
+          token: 'token'
+        })
+
+        expect(response.status).toEqual(ConnectionStatus.CONNECTED)
+      })
+
+      it('returns with pending status if not success', async () => {
+        const response = await MxApi.HandleOauthResponse({
+          member_guid: memberGuid,
+          status: 'fdsafds',
+          error_reason: errorReason,
+          token: 'token'
+        })
+
+        expect(response.status).toEqual(ConnectionStatus.PENDING)
+      })
+    })
   })
 })
