@@ -42,8 +42,13 @@ jobs:
           # Vars
           echo -e "${{ env.env_vars }}" >> .env
           echo RESOURCEVERSION="" >> .env
-          echo DOCKERPUBLISHVERSIONAPP="$(npm pkg get version)" >> .env
-          echo DOCKERPUBLISHVERSIONUI="$(npm pkg get version)" >> .env
+          echo DOCKERPUBLISHVERSIONAPP="v$(npm pkg get version)" >> .env
+          
+          cd ./ui
+          
+          echo DOCKERPUBLISHVERSIONUI="v$(npm pkg get version)" >> .env
+          
+          cd ../
   
           # Secrets (can't load these from another job, due to GH security features)
           echo DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} >> .env
