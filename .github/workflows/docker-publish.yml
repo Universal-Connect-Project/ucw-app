@@ -22,10 +22,10 @@ jobs:
     needs: [setup-env]
 
     steps:
-      - name: Check out the repo
+      - name: 'Check out the repo'
         uses: actions/checkout@v4
 
-      - name: Set up Node
+      - name: 'Set up Node'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -43,23 +43,23 @@ jobs:
           echo -e "${{ env.env_vars }}" >> .env
           echo RESOURCEVERSION="" >> .env
           echo DOCKERPUBLISHVERSIONAPP="v$(npm pkg get version)" >> .env
-          
-          cd ./ui
-          
-          echo DOCKERPUBLISHVERSIONUI="v$(npm pkg get version)" >> .env
-          
-          cd ../
-  
+            
           # Secrets (can't load these from another job, due to GH security features)
           echo DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} >> .env
           echo DOCKER_TOKEN=${{ secrets.DOCKER_TOKEN }} >> .env
           cat .env
 
-#      - name: Log in to Docker Hub
+      - name: 'Get UI version'
+        working-directory: ./ui
+        run: |
+          echo DOCKERPUBLISHVERSIONUI="v$(npm pkg get version)" >> .env
+          cat .env
+
+#      - name: 'Log in to Docker Hub'
 #        uses: docker/login-action@v3
 #        with:
 #          username: ${{ secrets.DOCKER_USERNAME }}
 #          password: ${{ secrets.DOCKER_TOKEN }}
 #
-#      - name: Build and push Docker image
+#      - name: 'Build and push Docker image'
 #        run: docker compose push
