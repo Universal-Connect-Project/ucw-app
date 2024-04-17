@@ -7,7 +7,7 @@ import { institutionCredentialsData } from '../../test/testData/institutionCrede
 import { aggregateMemberMemberData, connectionByIdMemberData, extendHistoryMemberData, identifyMemberData, memberData, membersData, memberStatusData, verifyMemberData } from '../../test/testData/members'
 import config from '../config'
 import { ChallengeType, ConnectionStatus } from '../../shared/contract'
-import { clearRedisMock, createClient } from '../../__mocks__/redis'
+import { clearRedisMock, createClient, getRedisStorageObject } from '../../__mocks__/redis'
 import { createUserData, listUsersData } from '../../test/testData/users'
 
 const token = 'testToken'
@@ -669,6 +669,11 @@ describe('mx provider', () => {
           token: 'token'
         })
 
+        expect(getRedisStorageObject().memberGuid).toEqual(JSON.stringify({
+          error: true,
+          error_reason: errorReason
+        }))
+
         expect(response).toMatchObject({
           id: memberGuid,
           error: errorReason,
@@ -676,6 +681,8 @@ describe('mx provider', () => {
         })
 
         expect(response.storageClient).toBeTruthy()
+
+        clearRedisMock()
       })
 
       it('returns with connected status if success', async () => {
