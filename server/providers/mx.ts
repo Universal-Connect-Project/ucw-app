@@ -26,7 +26,14 @@ import { mapJobType } from '../../server/utils'
 import config from '../config'
 import { StorageClient } from '../serviceClients/storageClient'
 
-const EXTENDED_HISTORY_NOT_SUPPORTED_MSG = "Member's institution does not support extended transaction history."
+export const EXTENDED_HISTORY_NOT_SUPPORTED_MSG = "Member's institution does not support extended transaction history."
+
+interface HandleOauthReponseRequest {
+  member_guid: string
+  status: string
+  error_reason: string
+  token: string
+}
 
 export function fromMxInstitution (ins: InstitutionResponse, provider: string): Institution {
   return {
@@ -184,12 +191,12 @@ export class MxApi implements ProviderApiClient {
       ret = await this.apiClient.aggregateMember(request.id, userId)
     }
 
+    if (ret?.data?.error?.message === EXTENDED_HISTORY_NOT_SUPPORTED_MSG) {
+      ret = await this.apiClient.aggregateMember(request.id, userId)
+    }
+
     if (ret.data?.error) {
-      if (ret.data.error.message === EXTENDED_HISTORY_NOT_SUPPORTED_MSG) {
-        ret = await this.apiClient.aggregateMember(request.id, userId)
-      } else {
-        return { id: request.id, error_message: ret.data.error.message }
-      }
+      return { id: request.id, error_message: ret.data.error.message }
     }
 
     return fromMxMember(ret.data.member, this.provider)
@@ -305,7 +312,6 @@ export class MxApi implements ProviderApiClient {
     jobId: string,
     userId: string
   ): Promise<boolean> {
-    console.log(request)
     await this.apiClient.resumeAggregation(request.id, userId, {
       member: {
         challenges: request.challenges.map((item, idx) => ({
@@ -336,7 +342,7 @@ export class MxApi implements ProviderApiClient {
     return userId
   }
 
-  static async HandleOauthResponse (request: any): Promise<Connection> {
+  static async HandleOauthResponse (request: HandleOauthReponseRequest): Promise<Connection> {
     const { member_guid, status, error_reason, token } = request
     const db = new StorageClient(token)
     if (status === 'error') {
@@ -347,7 +353,7 @@ export class MxApi implements ProviderApiClient {
     }
     const ret = {
       id: member_guid,
-      StorageClient: db,
+      storageClient: db,
       error: error_reason,
       status: status === 'error' ? ConnectionStatus.REJECTED : status === 'success' ? ConnectionStatus.CONNECTED : ConnectionStatus.PENDING
     }
