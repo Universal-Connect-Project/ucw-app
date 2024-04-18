@@ -29,9 +29,6 @@ jobs:
         env:
           env_vars: ${{ needs.setup-env.outputs.env_vars }}
         run: |
-          echo "REF=${{ github.event.pull_request && github.head_ref || github.ref_name }}" >> $GITHUB_ENV
-          
-          echo "REF: $REF"
           touch .env
           
           # Vars
