@@ -22,6 +22,8 @@ jobs:
         with:
           node-version: 'lts/*'
           check-latest: true
+
+      - name: Install all dependencies
         run: |
           npm ci
 
