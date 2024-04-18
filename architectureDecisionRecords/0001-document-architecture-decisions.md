@@ -12,7 +12,7 @@ We will document our decisions in our repository as architecture decision record
 
 Decisions will be made by consensus. If an ADR is agreed upon by at least 2/3 of the engineers on the team, then it can be added to the repository.
 
-Pull Requests with new code that doesn't adhere to the ADRs will not be approved. High priority urgent production bugs are an exception to this rule. This exception should be immediately followed up with a PR to fix the code, so that it conforms with the ADRs.
+Pull Requests with new code that doesn't adhere to the ADRs will not be approved. High-priority urgent production bugs are an exception to this rule. This exception should be immediately followed up with a PR to fix the code, so that it conforms with the ADRs.
 
 When making changes to code that doesn't conform to the ADRs the following steps should be taken:
 1. If feasible update the code to conform to the ADRs
