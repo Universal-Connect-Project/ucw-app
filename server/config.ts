@@ -27,7 +27,7 @@ const keysToPullFromEnv = [
 
   'Demo',
   'DefaultProvider',
-  'Port',
+  'PORT',
 
   'HostUrl',
   'WebhookHostUrl',
