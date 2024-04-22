@@ -1,14 +1,13 @@
 # Universal Connect Widget (Application)
 
-This repo is a full stack application which anyone can clone and self-host as a way to serve the connect widget via a url which can then be loaded into an iframe.
+This repo is a full-stack application which anyone can clone and self-host as a way to serve the connect widget via a url which can then be loaded into an iframe.
 
 ## Getting Started (in production)
 
-This repo is a full stack application which anyone can clone and self-host as a way to serve the connect widget.
+To get started, clone the repo, follow the steps in `Initial Setup` (below) to set up your `.env` file, and then run the following command, from the root of the project:
 
-To get started, clone the repo, follow the steps in `Initial Setup`, below to set up your .env file, and then run the following command, from the root of the project:
+*This assumes you have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) already installed, and that you have a valid docker login.*
 
-*This assumes you have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) already installed.*
 ```
 docker compose up
 ```
@@ -16,6 +15,9 @@ docker compose up
 That's it! If you have questions, please reach out to us.
 
 The images for this repo are available on [DockerHub](https://hub.docker.com/repositories/universalconnectfoundation)
+
+_Note, if you get an error stating anything like `failed to authorize`, or `failed to fetch oauth token`, or a `401 Unauthorized`, you will need to run `docker login` 
+from your terminal, prior to running `docker compose up`_
 
 ## Getting Started (in development)
 1. clone the repo
@@ -48,15 +50,27 @@ USE `.env` FILE
 
 ## Publish to Docker
 
-To publish to DockerHub, first run `docker compose up`, 
-then run 
-    `docker push universalconnectfoundation/ucw-app:v<version>`
-and 
-    `docker push universalconnectfoundation/ucw-ui:v<version>`
+__Publishing to DockerHub is automatic, and will happen when code is merged to `main`.__
 
-You must be logged in to DockerHub, and a member of the UCP organization.
+__IMPORTANT__: Prior to merging your PR to main, make sure the versions of `ui` and `ucw-app` are up-to-date. The `version` property in 
+their respective `package.json` files should be up-to-date. This is where the versions for the docker images is pulled from.
+
+### Publishing manually
+It is strongly discouraged to publish to DockerHub manually, however, if you need to publish manually, you can do so with the following steps.
+
+First run `docker compose up --pull never`, to build the new images.
+
+Then run
+
+    docker push universalconnectfoundation/ucw-app:v<version>
+and then
+
+    docker push universalconnectfoundation/ucw-ui:v<version>
 
 `<version>` must mach the respective version listed in the `docker-compose.yaml` file.
 
+_NOTE: You must be logged in to DockerHub, and a member of the UCP organization._
+
 ## Architecture decision records
 We use [architecture decision records](https://adr.github.io/) to make, document, and enforce our decisions. They live in the [architectureDecisionRecords](https://github.com/Universal-Connect-Project/ucw-app/tree/main/architectureDecisionRecords) folder.
+

@@ -1,0 +1,50 @@
+name: Unit/Integration tests
+
+on: pull_request
+
+jobs:
+  setup-env:
+    name: 'Load ENV Vars'
+    uses: ./.github/workflows/setup-env.yml
+    secrets: inherit
+
+  run-jest-tests:
+    name: Jest Tests
+    runs-on: ubuntu-latest
+    needs: [setup-env]
+
+    steps:
+      - name: Checkout under $GITHUB_WORKSPACE
+        uses: actions/checkout@v4
+
+      - name: Set up NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          check-latest: true
+
+      - name: Install all dependencies
+        run: |
+          npm ci
+
+      - name: 'Create env file'
+        env:
+          env_vars: ${{ needs.setup-env.outputs.env_vars }}
+        run: |
+          touch .env
+          
+          # Vars
+          echo -e "${{ env.env_vars }}" >> .env
+          echo RESOURCEVERSION="" >> .env
+
+          # Secrets (can't load these from another job, due to GH security features)          
+          echo CRYPTOIV=${{ secrets.CRYPTOIV }} >> .env
+          echo CRYPTOKEY=${{ secrets.CRYPTOKEY }} >> .env
+          echo UCPAUTHCLIENTID=${{ secrets.UCP_CLIENT_ID }} >> .env
+          echo UCPAUTHCLIENTSECRET=${{ secrets.UCP_CLIENT_SECRET }} >> .env
+          echo UCPAUTHENCRYPTIONKEY=${{ secrets.UCP_ENCRYPTION_KEY }} >> .env
+          cat .env
+
+      - name: Run Jest Tests
+        run: |
+          npx jest --all --ci
