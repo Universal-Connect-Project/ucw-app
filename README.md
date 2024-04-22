@@ -70,3 +70,7 @@ and then
 `<version>` must mach the respective version listed in the `docker-compose.yaml` file.
 
 _NOTE: You must be logged in to DockerHub, and a member of the UCP organization._
+
+## Architecture decision records
+We use [architecture decision records](https://adr.github.io/) to make, document, and enforce our decisions. They live in the [architectureDecisionRecords](https://github.com/Universal-Connect-Project/ucw-app/tree/main/architectureDecisionRecords) folder.
+
