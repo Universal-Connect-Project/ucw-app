@@ -3,44 +3,49 @@ version: '3.8'
 services:
 
   server:
-    depends_on: [cache, ui]
+    depends_on:
+      cache:
+        condition: service_healthy
+      ui:
+        condition: service_healthy
+
     container_name: ucw-app-server
     restart: on-failure
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://server:${Port}/ping"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://server:${PORT}/ping"]
       start_period: 5s
       interval: 20s
       timeout: 5s
       retries: 3
     build: .
-    image: universalconnectfoundation/ucw-app:v0.0.7-beta
+    image: universalconnectfoundation/ucw-app:v${DOCKER_PUBLISH_VERSION_APP}
     networks:
       - ucw
     ports:
-      - "${Port}:${Port}"
+      - "${PORT}:${PORT}"
     env_file:
-      - .env
+      - ./.env
     environment:
-      RedisServer: "redis://cache:${RedisPort}"
-      ResourcePrefix: "http://ui:${ResourcePort}"
+      RedisServer: "redis://cache:${REDIS_PORT}"
+      ResourcePrefix: "http://ui:${RESOURCE_PORT}"
 
   ui:
     container_name: ucw-app-ui
     restart: on-failure
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://ui:${ResourcePort}"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://ui:${RESOURCE_PORT}"]
       start_period: 5s
       interval: 20s
       timeout: 5s
       retries: 3
     build: ./ui
-    image: universalconnectfoundation/ucw-ui:v0.0.7-beta
+    image: universalconnectfoundation/ucw-ui:v${DOCKER_PUBLISH_VERSION_UI}
     networks:
       - ucw
     ports:
-      - "${ResourcePort}:${ResourcePort}"
+      - "${RESOURCE_PORT}:${RESOURCE_PORT}"
     environment:
-      ResourcePort: "${ResourcePort}"
+      RESOURCE_PORT: "${RESOURCE_PORT}"
 
   cache:
     container_name: ucw-app-cache
@@ -55,7 +60,7 @@ services:
     networks:
       - ucw
     ports:
-      - "${RedisPort}:${RedisPort}"
+      - "${REDIS_PORT}:${REDIS_PORT}"
     command: redis-server --save 20 1 --loglevel warning
     volumes:
       - cache:/data

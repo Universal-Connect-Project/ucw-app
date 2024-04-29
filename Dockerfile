@@ -2,7 +2,7 @@
 # Please run `docker compose up` from the root of the project to run the docker environment for this project.
 
 FROM alpine:3.19.1
-ENV NODE_VERSION 20.11.1
+ENV NODE_VERSION 20.12.2
 
 RUN apk --update --no-cache add nodejs npm
 
@@ -17,6 +17,6 @@ COPY ./shared ./shared
 
 ENV Env prod
 
-EXPOSE ${Port}
+EXPOSE ${PORT}
 
 CMD ["ts-node", "server/server.js"]

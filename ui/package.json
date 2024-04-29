@@ -1,7 +1,7 @@
 {
   "name": "ucw-widget",
   "private": true,
-  "version": "0.0.7-beta",
+  "version": "0.0.8-beta",
   "type": "module",
   "scripts": {
     "dev": "npx cross-env BROWSER=none && vite",
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@types/node": "^20.11.16",
-    "@ucp-npm/components": "^0.0.7-beta",
+    "@ucp-npm/components": "^0.0.8-beta",
     "@vitejs/plugin-react": "^4.2.1",
     "@vitejs/plugin-react-swc": "^3.6.0",
     "react": "^16.13.1",
