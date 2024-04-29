@@ -49,3 +49,10 @@ jobs:
         with:
           start: npm run ucw-app
           wait-on: "http://localhost:8080"
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
