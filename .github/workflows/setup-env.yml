@@ -1,0 +1,33 @@
+name: Setup env file contents
+
+on:
+  workflow_call:
+    outputs:
+      env_vars:
+        description: 'Vars'
+        value: ${{ jobs.env-file.outputs.vars }}
+
+jobs:
+  env-file:
+    name: 'Workflow: Load ENV Vars'
+    runs-on: ubuntu-latest
+
+    outputs:
+      vars: ${{ steps.env-setup.outputs.VARS }}
+
+    steps:
+      - name: Loading repository variables to real env vars
+        id: env-setup
+        shell: bash
+        env:
+          VARS: ${{ toJSON(vars) }}
+        run: |          
+          echo "$VARS" | jq -r 'keys[] as $k | "\($k)=\(.[$k])"' > ./vars.txt
+          
+          {
+            echo 'VARS<<EOF'
+            echo -e "$(/bin/cat ./vars.txt)"
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+          
+          rm ./vars.txt
