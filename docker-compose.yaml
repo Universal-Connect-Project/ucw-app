@@ -17,14 +17,14 @@ services:
       interval: 20s
       timeout: 5s
       retries: 3
-    build: .
+    build: ./server
     image: universalconnectfoundation/ucw-app:v${DOCKER_PUBLISH_VERSION_APP}
     networks:
       - ucw
     ports:
       - "${PORT}:${PORT}"
     env_file:
-      - ./.env
+      - ./server/.env
     environment:
       RedisServer: "redis://cache:${REDIS_PORT}"
       ResourcePrefix: "http://ui:${RESOURCE_PORT}"

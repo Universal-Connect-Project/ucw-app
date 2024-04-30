@@ -1,3 +1,5 @@
+# monorepo
+.turbo
 
 test.js
 test.ts
@@ -21,6 +23,7 @@ coverage/
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+.lh/*
 .idea/*
 *.suo
 *.ntvs*
@@ -30,7 +33,8 @@ coverage/
 
 # OS files
 .DS_Store
-.Thumbs.db
+Thumbs.db
 
 cypress.env.json
 cypress/screenshots/
+cypress/videos/

@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.paths.json",
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "declaration": true,
+    "target": "esnext",
+    "module": "commonjs",
+    "noImplicitAny": true,
+    "outDir": "dist",
+    "esModuleInterop": true,
+    "types": ["node", "jest"],
+    "allowJs": true,
+    "strictNullChecks": false // TODO: change this to true and fix all errors
+  },
+  "include": [
+    "src/**/*",
+    "jest.config.js",
+  ],
+  "exclude": ["dist", "node_modules", "./ui/dist", "./ui/node_modules", "cypress.config.ts",],
+}
