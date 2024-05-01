@@ -1,11 +1,12 @@
 {
   "name": "ucw-app",
-  "version": "0.0.8-beta",
+  "version": "0.0.10-beta",
   "scripts": {
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "server": "ts-node src/server.js",
-    "server:debug": "node --inspect -r ts-node/register ./src/server.js",
+    "dev": "ts-node src/server.js",
+    "dev:debug": "node --inspect -r ts-node/register ./src/server.js",
+    "server": "npm run dev",
     "lint:fix": "eslint . --fix --ext .js,.ts",
     "coverage": "npm test -- --verbose --coverage --watchAll",
     "test": "jest --no-coverage",

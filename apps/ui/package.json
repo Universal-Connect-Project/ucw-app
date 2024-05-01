@@ -1,11 +1,12 @@
 {
   "name": "ucw-widget",
+  "version": "0.0.10-beta",
   "private": true,
-  "version": "0.0.8-beta",
   "type": "module",
   "scripts": {
     "dev": "npx cross-env BROWSER=none && vite",
     "build": "tsc && vite build",
+    "types-check": "tsc",
     "lint": "eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
