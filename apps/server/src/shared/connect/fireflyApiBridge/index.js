@@ -9,6 +9,7 @@ const api = new ConnectApi({ context })
 
 async function sendStubData (fileName) {
   return await new Promise((resolve, reject) => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const data = require(`services/stubs/${fileName}`)
     resolve(data)
   })
@@ -44,6 +45,7 @@ module.exports = new Proxy(bridge, {
   get (target, prop) {
     if (stub[prop]) {
       return async function () {
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         console.log(`Calling stub method: ${prop}`)
         const ret = await stub[prop].apply(null, arguments)
         console.log(JSON.stringify(ret))
@@ -52,6 +54,7 @@ module.exports = new Proxy(bridge, {
     }
     if (api[prop]) {
       return async function () {
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         console.log(`Calling api method: ${prop}`)
         try {
           const ret = await api[prop].apply(api, arguments)
@@ -92,9 +95,11 @@ module.exports = new Proxy(bridge, {
       }
     }
     if (prop !== '$$typeof') {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       console.log(`Unstubbed method retrieved ${prop}`)
     }
     return async function () {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       console.log(`Unstubbed method called ${prop}`)
       return await Promise.resolve('')
     }

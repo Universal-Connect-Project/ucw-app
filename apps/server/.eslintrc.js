@@ -23,7 +23,9 @@ module.exports = {
     '.eslintrc.js',
     'jest.config.js',
     'jestSetup.ts',
-    'babel.config.js'
+    'babel.config.js',
+    'cypress.config.ts',
+    'cypress/**/*'
   ],
   rules: {
     '@typescript-eslint/no-namespace': 'off', // TODO: remove and fix later

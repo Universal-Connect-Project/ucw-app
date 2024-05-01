@@ -57,10 +57,12 @@ function mapConnection (connection: Connection): Member {
             break
           case ChallengeType.TOKEN:
             ret.type = 2 // ?
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
             ret.label = `${c.question}: ${c.data}`
             break
           case ChallengeType.IMAGE:
             ret.type = 13
+            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
             ret.meta_data = (c.data as string).startsWith('data:image') ? c.data : ('data:image/png;base64, ' + c.data)
             break
           case ChallengeType.OPTIONS:
@@ -90,6 +92,7 @@ function mapConnection (connection: Connection): Member {
 }
 
 export class ConnectApi extends ProviderApiBase {
+  // eslint-disable-next-line @typescript-eslint/no-useless-constructor
   constructor (req: any) {
     super(req)
   }
@@ -131,7 +134,7 @@ export class ConnectApi extends ProviderApiBase {
               if (c.value) {
                 ret.response = challenge?.options.find((o: any) => o.guid === c.value)?.value
                 if (!ret.response) {
-                  logger.error('Unexpected challege option: ${c.value}', challenge)
+                  logger.error(`Unexpected challege option: ${c.value}: `, challenge)
                 }
               }
               break

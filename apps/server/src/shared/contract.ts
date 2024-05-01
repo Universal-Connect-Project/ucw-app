@@ -94,6 +94,7 @@ export interface Institution {
   code?: string | null
   instructional_text?: string | null
   small_logo_url?: string | null
+  // eslint-disable-next-line @typescript-eslint/ban-types
   providers?: Object | {}
 }
 

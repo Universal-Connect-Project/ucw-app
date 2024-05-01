@@ -18,7 +18,7 @@ import { debug, trace, error as _error } from '../infra/logger'
 import SophtronClient from '../serviceClients/sophtronClient/v2'
 import SophtronClientV1 from '../serviceClients/sophtronClient'
 
-const uuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
+// const uuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
 function fromSophtronInstitution (ins: any): Institution | undefined {
   if (!ins) {

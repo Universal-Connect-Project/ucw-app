@@ -1,12 +1,12 @@
 import {
   type Institution
 } from '../shared/contract'
-import * as config from '../config'
 import * as logger from '../infra/logger'
 
 import { ProviderApiBase } from '../providers'
 
 export class VcsService extends ProviderApiBase {
+  // eslint-disable-next-line @typescript-eslint/no-useless-constructor
   constructor (req: any) {
     super(req)
   }
@@ -30,7 +30,9 @@ export class VcsService extends ProviderApiBase {
   }
 
   async login (
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     institution_id: string,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     connection_id: string | null,
     credentials: Credential[]
   ) {
