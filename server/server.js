@@ -113,6 +113,5 @@ process.on('SIGINT', async () => {
     console.log('Closing Ngrok tunnel')
     await ngrok.kill()
   }
-  // some other closing procedures go here
   process.exit(0)
 })

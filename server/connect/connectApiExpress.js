@@ -16,12 +16,10 @@ export default function (app) {
   stubs(app)
   app.use(contextHandler)
   app.use(async (req, res, next) => {
-    console.log('\n\nin initializer?\n\n')
     if (req.path === '/' || req.path.startsWith('/example') === true || req.path.startsWith('/static') === true) return next()
     req.connectService = new ConnectApi(req)
     if (await req.connectService.init() != null) {
       if (req.context.resolved_user_id == null || req.context.resolved_user_id === '') {
-        console.log('resolve user id from init')
         req.context.resolved_user_id = await req.connectService.ResolveUserId(req.context.user_id)
       }
     }
@@ -29,9 +27,7 @@ export default function (app) {
   })
 
   app.post('/analytics*', async (req, res) => {
-    console.log('analytics stuff', req.path)
     if (config.Env !== 'test' && config.AnalyticsServiceEndpoint !== '' && config.AnalyticsServiceEndpoint != null) {
-      console.log('analytics stuff part 2')
       const ret = await req.connectService.analytics(req.path, req.body)
       res.send(ret)
     } else {
@@ -178,7 +174,6 @@ export default function (app) {
     })
   })
 
-  // This doesn't get hit by MX OAuth at all. So it only seems to be used for Finicity or nothing
   app.all('/webhook/:provider/*', async function (req, res) {
     const { provider } = req.params
     info(`received web hook at: ${req.path}`, req.query)
