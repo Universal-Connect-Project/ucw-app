@@ -106,3 +106,13 @@ if (['dev', 'test'].includes(config.Env)) {
     console.log('established listener at: ' + app.listener.url())
   })
 }
+
+process.on('SIGINT', async () => {
+  console.log('\nGracefully shutting down from SIGINT (Ctrl-C)')
+  if (['dev', 'test'].includes(config.Env)) {
+    console.log('Closing Ngrok tunnel')
+    await ngrok.kill()
+  }
+  // some other closing procedures go here
+  process.exit(0)
+})
