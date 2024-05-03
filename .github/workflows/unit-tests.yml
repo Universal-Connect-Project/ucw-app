@@ -34,16 +34,16 @@ jobs:
           touch ./apps/server/.env
           
           # Vars
-          echo -e "${{ env.env_vars }}" >> .env
-          echo RESOURCEVERSION="" >> .env
+          echo -e "${{ env.env_vars }}" >> ./apps/server/.env
+          echo RESOURCEVERSION="" >> ./apps/server/.env
 
           # Secrets (can't load these from another job, due to GH security features)          
-          echo CRYPTOIV=${{ secrets.CRYPTOIV }} >> .env
-          echo CRYPTOKEY=${{ secrets.CRYPTOKEY }} >> .env
+          echo CRYPTOIV=${{ secrets.CRYPTOIV }} >> ./apps/server/.env
+          echo CRYPTOKEY=${{ secrets.CRYPTOKEY }} >> ./apps/server/.env
           echo UCPAUTHCLIENTID=${{ secrets.UCP_CLIENT_ID }} >> .env
-          echo UCPAUTHCLIENTSECRET=${{ secrets.UCP_CLIENT_SECRET }} >> .env
-          echo UCPAUTHENCRYPTIONKEY=${{ secrets.UCP_ENCRYPTION_KEY }} >> .env
-          cat .env
+          echo UCPAUTHCLIENTSECRET=${{ secrets.UCP_CLIENT_SECRET }} >> ./apps/server/.env
+          echo UCPAUTHENCRYPTIONKEY=${{ secrets.UCP_ENCRYPTION_KEY }} >> ./apps/server/.env
+          cat ./apps/server/.env
 
       - name: Run Jest Tests
         run: |
