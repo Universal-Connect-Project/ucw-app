@@ -52,7 +52,7 @@ jobs:
           CYPRESS_mx_api_secret: ${{ secrets.MX_API_SECRET }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          config-file: /apps/server/cypress.config.js
+          config-file: /apps/server/cypress.config.ts
           start: npm run dev
           wait-on: "http://localhost:8080"
 
