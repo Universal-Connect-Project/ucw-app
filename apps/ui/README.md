@@ -17,6 +17,6 @@ turbo run dev --filter=ui
 
 The `./apps/server/.env` file is used to configure the port that the widget ui will be served on. The default is http://localhost:5173. If you need to change this, you can do so in the `./apps/server/.env` file.
 
-If you need to update the UCW NPM package to a newly published version, simply run: 
+If you need to update the UCW NPM package to a newly published version, simply run in `./apps/ui`: 
 
 `npm i -S @ucp-npm/components@<version>`
