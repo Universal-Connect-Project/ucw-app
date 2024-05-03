@@ -21,12 +21,13 @@ jobs:
         shell: bash
         env:
           VARS: ${{ toJSON(vars) }}
-        run: |          
+        run: |
           echo "$VARS" | jq -r 'keys[] as $k | "\($k)=\(.[$k])"' > ./vars.txt
           
           {
             echo 'VARS<<EOF'
             echo -e "$(/bin/cat ./vars.txt)"
+            echo TURBO_TELEMETRY_DISABLED=1
             echo 'EOF'
           } >> $GITHUB_OUTPUT
           
