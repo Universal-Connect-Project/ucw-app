@@ -48,4 +48,4 @@ RUN npm i -g serve@14.2.3
 
 EXPOSE ${UI_PORT}
 
-CMD ["sh", "-c", "serve -p ${UI_PORT} ${WRKDR}/dist"]
+CMD ["sh", "-c", "serve -n -p ${UI_PORT} ."]
