@@ -1,105 +1,76 @@
-# Turborepo starter
+# Universal Connect Widget (Application)
 
-This is an official starter Turborepo.
+This repo is a full-stack application which anyone can clone and self-host as a way to serve the connect widget via a url which can then be loaded into an iframe.
 
-## Using this example
+## Getting Started (in production)
 
-Run the following command:
+To get started, clone the repo, follow the steps in `Initial Setup` (below) to set up your `.env` file, and then run the following command, from the root of the project:
 
-```sh
-npx create-turbo@latest
-```
-
-## What's inside?
-
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
+*This assumes you have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) already installed, and that you have a valid docker login.*
 
 ```
-cd my-turborepo
-pnpm build
+docker compose up
 ```
 
-### Develop
+That's it! If you have questions, please reach out to us.
 
-To develop all apps and packages, run the following command:
+The images for this repo are available on [DockerHub](https://hub.docker.com/repositories/universalconnectfoundation)
 
-```
-cd my-turborepo
-pnpm dev
-```
+_Note, if you get an error stating anything like `failed to authorize`, or `failed to fetch oauth token`, or a `401 Unauthorized`, you will need to run `docker login`
+from your terminal, prior to running `docker compose up`_
 
-### Remote Caching
+## Getting Started (in development)
+1. clone the repo
+2. Run `npm ci`
+3. Go into the `ui` directory: `cd ./ui`
+4. Run `npm ci` in the `ui` directory
+5. Go back to the root directory: `cd ..`
+6. Copy `.env.example`: `cp ./.env.example ./.env`
+7. Follow "Initial setup" (below) for setting-up some required environment variables
+8. Finally, run: `npm run ucw-app`
 
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+## Initial setup
+1. Run `npm run keys` to generate a new set of `key` and `IV` values.
+2. Fill in the `CryptoKey` and `CryptoIv` in your newly created `.env` file with the generated `key` and `IV`.
+3. Sign up for a UCP client account: [here](https://login.universalconnectproject.org/) (the `Click here to login` link navigates to the aws hosted login page where sign up option is available).
+4. Generate and view your client secrets once registered and logged in
+5. Fill in the `UcpAuthClientId`, `UcpAuthClientSecret` and `UcpAuthEncryptionKey` in the `.env` file with the values provided by login page.
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
+*Please remember that secrets are passed through environment variables instead of hardcoded in the js file.*
+DO NOT put any credentials in any of the js files. If you do so, it could accidentally get committed and leaked to the public.
+USE `.env` FILE
 
-```
-cd my-turborepo
-npx turbo login
-```
+*UCP credentials are required for authentication and secret exchange, storage (redis-like session cache) and analytics services.*
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+*The `CryptoKey` and `CryptoIv` values are for encrypting the session token in order to not rely on cookies. They must be shared across server instances if there are multiple instances.*
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+* You might see an error about failure to connect redis, the widget doesn't rely on redis to start, but some providers logic require an redis intance, to fix this error you can either:
+- start a local redis instance, this way it will be avaliable at localhost:6379 and the widget will use it
+- Or set in `.env` Env=dev, this way the redis client will use local in-mem object to handle the cache and remove the error, however, this is just for some testing, the cached values won't expire and also will be cleared on server restart.
 
-```
-npx turbo link
-```
+## Publish to Docker
 
-## Useful Links
+__Publishing to DockerHub is automatic, and will happen when code is merged to `main`.__
 
-Learn more about the power of Turborepo:
+__IMPORTANT__: Prior to merging your PR to main, make sure the versions of `ui` and `ucw-app` are up-to-date. The `version` property in
+their respective `package.json` files should be up-to-date. This is where the versions for the docker images is pulled from.
 
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+### Publishing manually
+It is strongly discouraged to publish to DockerHub manually, however, if you need to publish manually, you can do so with the following steps.
 
-## Docker commands for testing
+First run `docker compose up --pull never`, to build the new images.
 
-### server
-```shell
-docker build -f ./docker-server.Dockerfile -t ucp-app-server-cli --build-arg APP=server .
-docker run --name ucp-app-server-cli -p 8080:8080 --env-file ./apps/server/.env -t ucp-app-server-cli
-```
+Then run
 
-### ui
-```shell
-docker build -f ./docker-ui.Dockerfile -t ucp-app-ui-cli --build-arg APP=ui .
-docker run --name ucp-app-ui-cli -p 5137:5137 -e UI_PORT=5137 -t ucp-app-ui-cli
-```
+    docker push universalconnectfoundation/ucw-app:v<version>
+and then
 
-To run any of these containers interactively, use the `-i` flag.
+    docker push universalconnectfoundation/ucw-ui:v<version>
 
-```shell
-docker run --name ucp-app-ui-cli -p 5137:5137 -e UI_PORT=5137 -it ucp-app-server-cli sh
-```
-### compose
-```shell
-docker compose up --pull never
-```
+`<version>` must mach the respective version listed in the `docker-compose.yaml` file.
+
+_NOTE: You must be logged in to DockerHub, and a member of the UCP organization._
+
+## Architecture decision records
+We use [architecture decision records](https://adr.github.io/) to make, document, and enforce our decisions. They live in the [architectureDecisionRecords](https://github.com/Universal-Connect-Project/ucw-app/tree/main/architectureDecisionRecords) folder.
+
