@@ -31,7 +31,7 @@ jobs:
         env:
           env_vars: ${{ needs.setup-env.outputs.env_vars }}
         run: |
-          touch .env
+          touch ./apps/server/.env
           
           # Vars
           echo -e "${{ env.env_vars }}" >> .env
