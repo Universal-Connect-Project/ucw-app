@@ -40,7 +40,6 @@ jobs:
 
           cat .env
 
-      - run: cd ./ui && npm ci
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
@@ -53,7 +52,7 @@ jobs:
           CYPRESS_mx_api_secret: ${{ secrets.MX_API_SECRET }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          start: npm run ucw-app
+          start: npm run dev
           wait-on: "http://localhost:8080"
 
       - name: Upload screenshots
