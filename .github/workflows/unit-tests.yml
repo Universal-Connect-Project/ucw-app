@@ -47,4 +47,4 @@ jobs:
 
       - name: Run Jest Tests
         run: |
-          npx jest --all --ci
+          npm run test
