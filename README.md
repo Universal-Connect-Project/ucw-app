@@ -79,3 +79,22 @@ Learn more about the power of Turborepo:
 - [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
 - [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
 - [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+
+## Docker commands for testing
+
+### server
+```shell
+docker build . -f ./docker-server.Dockerfile -t ucp-app-server-turbo
+docker run --name ucp-app-server-turbo -p 8080:8080 --env-file ./apps/server/.env ucp-app-server-turbo
+```
+
+### ui
+```shell
+docker build -f ./docker-ui.Dockerfile -t ucp-app-ui-turbo --build-arg APP=ui .
+docker run --name ucp-app-ui-turbo -p 5137:5137 -it ucp-app-ui-turbo sh
+```
+
+### compose
+```shell
+docker compose up --pull never
+```

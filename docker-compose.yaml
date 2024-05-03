@@ -12,40 +12,49 @@ services:
     container_name: ucw-app-server
     restart: on-failure
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://server:${PORT}/ping"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://server:${SERVER_PORT}/ping"]
       start_period: 5s
       interval: 20s
       timeout: 5s
       retries: 3
-    build: ./server
+    build:
+      context: .
+      dockerfile: ./docker-server.Dockerfile
+      args:
+        APP: server
     image: universalconnectfoundation/ucw-app:v${DOCKER_PUBLISH_VERSION_APP}
     networks:
       - ucw
     ports:
-      - "${PORT}:${PORT}"
+      - "${SERVER_PORT}:${SERVER_PORT}"
     env_file:
-      - ./server/.env
+      - ./apps/server/.env
     environment:
       RedisServer: "redis://cache:${REDIS_PORT}"
-      ResourcePrefix: "http://ui:${RESOURCE_PORT}"
+      ResourcePrefix: "http://ui:${UI_PORT}"
 
   ui:
     container_name: ucw-app-ui
     restart: on-failure
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://ui:${RESOURCE_PORT}"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://ui:${UI_PORT}"]
       start_period: 5s
       interval: 20s
       timeout: 5s
       retries: 3
-    build: ./ui
+    build:
+      context: .
+      dockerfile: ./docker-ui.Dockerfile
+      args:
+        APP: ui
     image: universalconnectfoundation/ucw-ui:v${DOCKER_PUBLISH_VERSION_UI}
     networks:
       - ucw
     ports:
-      - "${RESOURCE_PORT}:${RESOURCE_PORT}"
+      - "${UI_PORT}:${UI_PORT}"
     environment:
-      RESOURCE_PORT: "${RESOURCE_PORT}"
+      APP: "ui"
+      RESOURCE_PORT: "${UI_PORT}"
 
   cache:
     container_name: ucw-app-cache
