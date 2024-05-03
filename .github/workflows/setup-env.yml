@@ -27,7 +27,6 @@ jobs:
           {
             echo 'VARS<<EOF'
             echo -e "$(/bin/cat ./vars.txt)"
-            echo TURBO_TELEMETRY_DISABLED=1
             echo 'EOF'
           } >> $GITHUB_OUTPUT
           
