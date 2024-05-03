@@ -36,15 +36,19 @@ COPY --from=pruner ${WRKDR}/out/full/ .
 RUN turbo run build --filter=${APP}
 
 FROM base as runner
+RUN npm i -g serve@14.2.3
 ARG APP
 ARG WRKDR
 
 WORKDIR ${WRKDR}
 
-COPY --from=builder ${WRKDR}/apps/${APP}/vite.config.ts .
-COPY --from=builder ${WRKDR}/apps/${APP}/dist .
-COPY --from=builder ${WRKDR}/package.json .
-RUN npm i -g serve@14.2.3
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nodejs
+USER nodejs
+
+COPY --from=builder --chown=nodejs:nodejs ${WRKDR}/apps/${APP}/vite.config.ts .
+COPY --from=builder --chown=nodejs:nodejs ${WRKDR}/apps/${APP}/dist .
+COPY --from=builder --chown=nodejs:nodejs ${WRKDR}/package.json .
 
 EXPOSE ${UI_PORT}
 

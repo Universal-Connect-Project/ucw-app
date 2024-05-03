@@ -22,7 +22,7 @@ services:
       dockerfile: ./docker-server.Dockerfile
       args:
         APP: server
-    image: universalconnectfoundation/ucw-app:v${DOCKER_PUBLISH_VERSION_APP}
+    image: universalconnectfoundation/ucw-app:v${DOCKER_IMAGE_SERVER}
     networks:
       - ucw
     ports:
@@ -47,7 +47,7 @@ services:
       dockerfile: ./docker-ui.Dockerfile
       args:
         APP: ui
-    image: universalconnectfoundation/ucw-ui:v${DOCKER_PUBLISH_VERSION_UI}
+    image: universalconnectfoundation/ucw-ui:v${DOCKER_IMAGE_UI}
     networks:
       - ucw
     ports:

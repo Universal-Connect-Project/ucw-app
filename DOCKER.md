@@ -4,24 +4,28 @@ This repo uses [Docker](https://www.docker.com/) as a containerization tool.
 
 ## Docker commands for testing
 
-### server
+You can use the following commands to test the docker images. _They are not normally
+run separately, and instead they are run together, using the `docker compose up` command._ 
+However, there are times when you may want to test the individual docker images, to make sure 
+they are working as expected, or to debug issues. This allows you to do so.
+
+### Server
 ```shell
-docker build -f ./docker-server.Dockerfile -t ucp-app-server-cli --build-arg APP=server .
-docker run --name ucp-app-server-cli -p 8080:8080 --env-file ./apps/server/.env -t ucp-app-server-cli
+docker build -f ./docker-server.Dockerfile -t ucw-app-server-cli --build-arg APP=server .
+docker run --name ucw-app-server-cli -p 8080:8080 --env-file ./apps/server/.env -t ucw-app-server-cli
 ```
 
-### ui
+### UI
 ```shell
-docker build -f ./docker-ui.Dockerfile -t ucp-app-ui-cli --build-arg APP=ui .
-docker run --name ucp-app-ui-cli -p 5137:5137 -e UI_PORT=5137 -t ucp-app-ui-cli
+docker build -f ./docker-ui.Dockerfile -t ucw-app-ui-cli --build-arg APP=ui .
+docker run --name ucw-app-ui-cli -p 5137:5137 -e UI_PORT=5137 -t ucw-app-ui-cli
 ```
 
-To run any of these containers interactively, use the `-i` flag.
+### Docker Compose
 
-```shell
-docker run --name ucp-app-ui-cli -p 5137:5137 -e UI_PORT=5137 -it ucp-app-server-cli sh
-```
-### compose
+Using `--pull never` will ensure that the docker images used are always local, and not from dockerhub. 
+This ensures that our local changes can be tested.
+
 ```shell
 docker compose up --pull never
 ```
