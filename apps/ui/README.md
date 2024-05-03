@@ -1,28 +1,22 @@
 # Universal Connect Widget embedded project
 
 ## Docker
-This project is hosted on Dockerhub. It is meant to be run via docker-compose. Please follow the steps in the 
-[README.md](../README.md) for more information.
+The image for this project is hosted on Dockerhub. It is meant to be run via docker-compose. Please follow the steps in the 
+[README.md](../../README.md) for more information.
 
 ## Local Development
-This is where the UCW NPM Module is used in order to expose the Connect Widget via the ucw-app project
+The [UCW NPM Module](https://www.npmjs.com/package/@ucp-npm/components?activeTab=readme) is used here, and is rendered in a small Vite/React wrapper app, and served-up from the `server` project.
+
+Please follow the steps in the [README.md](../../README.md) in order to get started, before you start local development.
 
 In order to do local development, run the following commands from the root of the project:
+
 ```
-cd ./ui
-```
-```
-npm ci
-```
-```
-npm run dev
+turbo run dev --filter=ui
 ```
 
-The `./server/config.js` is already setup to use the exposed service (http://localhost:5173).
+The `./apps/server/.env` file is used to configure the port that the widget ui will be served on. The default is http://localhost:5173. If you need to change this, you can do so in the `./apps/server/.env` file.
 
-The above commands will allow this UI to be used with the server project, which is also in this repo.
-Follow the steps in the [README.md](../README.md) to run the `server` locally.
-
-If you need to update the UCW NPM package to a newly published version, simply run 
+If you need to update the UCW NPM package to a newly published version, simply run: 
 
 `npm i -S @ucp-npm/components@<version>`
