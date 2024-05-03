@@ -4,7 +4,7 @@ This repo is a full-stack application which anyone can clone and self-host as a 
 
 ## Getting Started (in production)
 
-To get started, clone the repo, follow the steps in [Initial Setup](#initial-setup) (below) to set up your `.env` files, and then run the following command, from the root of the project:
+To get started, clone the repo, follow the steps in [Getting Started](#getting-started-in-development) and  [Initial Setup](#initial-setup) (below) to set up your `.env` files, and then run the following command, from the root of the project:
 
 *This assumes you have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) already installed.*
 
