@@ -16,7 +16,8 @@ docker compose up
 That's it! If you have questions, please reach out to us.
 
 ### Docker images
-The images for this repo are available on [DockerHub](https://hub.docker.com/repositories/universalconnectfoundation). You can change the version of the images that you pull by setting the `DOCKER_IMAGE_SERVER` and `DOCKER_IMAGE_UI` values found in the `.env` file found in the project root.
+The images for this repo are available on [DockerHub](https://hub.docker.com/repositories/universalconnectfoundation). You can change the version of the images that you pull by setting 
+the `DOCKER_IMAGE_SERVER` and `DOCKER_IMAGE_UI` values in the `.env` file found in the project root.
 
 ### A note about `docker login`
 
@@ -35,11 +36,10 @@ resulting in the error. To fix this, you will need to run `docker logout` from y
 1. Finally, run: `npm run dev`
 
 ## Initial setup
-1. Run `cd ./apps/server`
-1. Run `npm run keys`, which will generate a new set of `key` and `IV` values.
+1. Run `npm run keys --prefix ./apps/server`, which will generate a new set of `key` and `IV` values.
 1. Fill in the `CryptoKey` and `CryptoIv` in your `./apps/server/.env` file with the generated `key` and `IV`.
 1. Sign up for a UCP client account: [here](https://login.universalconnectproject.org/) (the `Click here to login` link navigates to the aws hosted login page where sign up option is available).
-1. Generate and view your client secrets once registered and logged in
+1. Once you are registered and logged in, generate and view your client secrets
 1. Fill in the `UcpAuthClientId`, `UcpAuthClientSecret` and `UcpAuthEncryptionKey` in the `./apps/server/.env` file with the values provided by login page.
 
 Please remember that secrets are passed through environment variables instead of hardcoded in the js file. 
@@ -50,7 +50,7 @@ __Use the provided `.env` files.__
 
 *The `CryptoKey` and `CryptoIv` values are for encrypting the session token in order to not rely on cookies. They must be shared across server instances if there are multiple instances.*
 
-- You might see an error about failure to connect redis, the widget doesn't rely on redis to start, but some providers logic require an redis instance, to fix this error you can either:
+- You might see an error about failure to connect redis, the widget doesn't rely on redis to start, but some providers logic require a redis instance, to fix this error you can either:
 - Start a local redis instance, this way it will be avaliable at localhost:6379 and the widget will use it
 - Or in `./apps/server/.env`, set `Env=dev`. When this is done, the redis client will use local in-mem object to handle the cache and remove the error. However, this should only be used for testing. 
 The cached values won't expire and also will be cleared on server restart.
