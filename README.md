@@ -22,13 +22,13 @@ the `DOCKER_IMAGE_SERVER` and `DOCKER_IMAGE_UI` values in the `.env` file found 
 ### A note about `docker login`
 
 If you get an error stating anything like `failed to authorize`, or `failed to fetch oauth token`, or a `401 Unauthorized`, 
-you may have logged-in previously with a docker login, and your auth has expired. 
+you may have logged-in previously with a docker login (via cli), and your auth has expired. 
 
 You do not need a docker login to pull the UCW docker images, but if you have stale tokens, docker will try to use them, thus 
 resulting in the error. To fix this, you will need to run `docker logout` from your terminal, prior to running `docker compose up`
 
 ## Getting Started (in development)
-1. Clone the repo
+1. Clone the `ucw-app` repo
 1. Run `npm ci` from the root directory
 1. Run `cp ./.env.example ./.env`
 1. Run `cp ./apps/server/.env.example ./apps/server/.env`
@@ -38,21 +38,22 @@ resulting in the error. To fix this, you will need to run `docker logout` from y
 ## Initial setup
 1. Run `npm run keys --prefix ./apps/server`, which will generate a new set of `key` and `IV` values.
 1. Fill in the `CryptoKey` and `CryptoIv` in your `./apps/server/.env` file with the generated `key` and `IV`.
-1. Sign up for a UCP client account: [here](https://login.universalconnectproject.org/) (the `Click here to login` link navigates to the aws hosted login page where sign up option is available).
+1. Sign up for a UCP client account: [here](https://login.universalconnectproject.org/) (the `Click here to login` link navigates to the aws hosted login page where a sign-up option is available).
 1. Once you are registered and logged in, generate and view your client secrets
 1. Fill in the `UcpAuthClientId`, `UcpAuthClientSecret` and `UcpAuthEncryptionKey` in the `./apps/server/.env` file with the values provided by login page.
 
-Please remember that secrets are passed through environment variables instead of hardcoded in the js file. 
-__DO NO__ put any credentials in any of the js files. If you do so, it could accidentally get committed and leaked to the public.
+Please remember that secrets are passed through environment variables instead of hardcoded in the code files. 
+__DO NO__ put any credentials in any of the code files. If you do so, it could accidentally get committed and leaked to the public.
 __Use the provided `.env` files.__
 
 *UCP credentials are required for authentication and secret exchange, storage (redis-like session cache) and analytics services.*
 
 *The `CryptoKey` and `CryptoIv` values are for encrypting the session token in order to not rely on cookies. They must be shared across server instances if there are multiple instances.*
 
-- You might see an error about failure to connect redis, the widget doesn't rely on redis to start, but some providers logic require a redis instance, to fix this error you can either:
-- Start a local redis instance, this way it will be avaliable at localhost:6379 and the widget will use it
-- Or in `./apps/server/.env`, set `Env=dev`. When this is done, the redis client will use local in-mem object to handle the cache and remove the error. However, this should only be used for testing. 
+## Redis
+You might see an error about failure to connect redis. The widget doesn't rely on redis to start, but some providers logic require a redis instance. To fix this error you can either:
+- Start a local redis instance. This way it will be available at localhost:6379 and the widget will be able to use it
+- Or in `./apps/server/.env`, set `Env=dev`. When this is done, the redis client will use a local in-memory object to handle the cache, and avoid the error. However, this should only be used for testing. 
 The cached values won't expire and also will be cleared on server restart.
 
 ## Publish to Docker
@@ -76,7 +77,7 @@ and then
 
 `<version>` must mach the respective version listed in the `docker-compose.yaml` file.
 
-_NOTE: You must be logged in to DockerHub, and a member of the UCP organization._
+_NOTE: You must be logged in to DockerHub, and be a member of the UCP organization._
 
 ## Architecture decision records
 We use [architecture decision records](https://adr.github.io/) to make, document, and enforce our decisions. They live in the [architectureDecisionRecords](https://github.com/Universal-Connect-Project/ucw-app/tree/main/architectureDecisionRecords) folder.
