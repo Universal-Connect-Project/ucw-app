@@ -58,26 +58,32 @@ The cached values won't expire and also will be cleared on server restart.
 
 ## Publish to Docker
 
-__Publishing to DockerHub is automatic, and will happen when code is merged to `main`.__
+__Publishing to Docker Hub is automatic, and will happen when code is merged to `main`.__
 
 __IMPORTANT__: Prior to merging your PR to main, make sure the versions of `ui` and `ucw-app` are up-to-date. The `version` property in
 their respective `package.json` files should be up-to-date. This is where the versions for the docker images is pulled from.
 
 ### Publishing manually
-It is strongly discouraged to publish to DockerHub manually, however, if you need to publish manually, you can do so with the following steps.
+It is strongly discouraged to publish to Docker Hub manually, however, if you need to publish manually, you can do so with the following steps.
 
-First run `docker compose up --pull never`, to build the new images.
+From the root of the project:
 
-Then run
+Login to docker hub:
+    
+    docker login
 
-    docker push universalconnectfoundation/ucw-app:v<version>
-and then
+_NOTE: You must be a member of the UCP organization._
 
-    docker push universalconnectfoundation/ucw-ui:v<version>
+Then run the following, which will build the new images:
 
-`<version>` must mach the respective version listed in the `docker-compose.yaml` file.
+    docker compose up --pull never
 
-_NOTE: You must be logged in to DockerHub, and be a member of the UCP organization._
+Then run:
+
+    docker compose push
+    
+`<version>` must mach the respective versions in `./.env`, `DOCKER_IMAGE_{UI|SERVER}`. These env variables are used in the `./docker-compose.yml` file when building the images.
+
 
 ## Architecture decision records
 We use [architecture decision records](https://adr.github.io/) to make, document, and enforce our decisions. They live in the [architectureDecisionRecords](https://github.com/Universal-Connect-Project/ucw-app/tree/main/architectureDecisionRecords) folder.
