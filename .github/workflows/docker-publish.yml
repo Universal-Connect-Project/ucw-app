@@ -3,6 +3,7 @@ name: 'Publish Docker image'
 on:
   push:
     branches:
+      - '**'
       - main
 
 jobs:
@@ -26,26 +27,47 @@ jobs:
           node-version: 'lts/*'
           check-latest: true
 
-      - name: 'Create env file'
+      - name: 'Create Server env file'
         env:
           env_vars: ${{ needs.setup-env.outputs.env_vars }}
         run: |
-          touch .env
+          ENV_FILE_PATH=./apps/server/.env
+          touch ${ENV_FILE_PATH}
           
           # Vars
-          echo -e "${{ env.env_vars }}" >> .env
-          echo DOCKER_IMAGE_SERVER="$(npm pkg get version | xargs)" >> .env
+          echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
             
           # Secrets (can't load these from another job, due to GH security features)
-          echo DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} >> .env
-          echo DOCKER_TOKEN=${{ secrets.DOCKER_TOKEN }} >> .env
+          echo DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} >> ${ENV_FILE_PATH}
+          echo DOCKER_TOKEN=${{ secrets.DOCKER_TOKEN }} >> ${ENV_FILE_PATH}
+          cat ${ENV_FILE_PATH}
+
+      - name: 'Create Root env file'
+        env:
+          env_vars: ${{ needs.setup-env.outputs.env_vars }}
+        run: |
+          ENV_FILE_PATH=.env
+          touch ${ENV_FILE_PATH}
+          
+          # Vars
+          echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
+            
+          # Secrets (can't load these from another job, due to GH security features)
+          echo DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} >> ${ENV_FILE_PATH}
+          echo DOCKER_TOKEN=${{ secrets.DOCKER_TOKEN }} >> ${ENV_FILE_PATH}
+          cat ${ENV_FILE_PATH}
+
+      - name: 'Get Server version'
+        working-directory: ./apps/server
+        run: |
+          echo DOCKER_IMAGE_SERVER="$(npm pkg get version | xargs)" >> .env
           cat .env
 
       - name: 'Get UI version'
-        working-directory: ./ui
+        working-directory: ./apps/ui
         run: |
-          echo DOCKER_IMAGE_UI="$(npm pkg get version | xargs)" >> ../.env
-          cat ../.env
+          echo DOCKER_IMAGE_UI="$(npm pkg get version | xargs)" >> ../../.env
+          cat ../../.env
 
       - name: 'Log in to Docker Hub'
         uses: docker/login-action@v3
@@ -55,8 +77,4 @@ jobs:
 
       - name: 'Build and Push Docker images'
         run: |
-          docker compose build --quiet --push
-
-#      - name: 'Push Docker image'
-#        run: |
-#          docker compose push
+          docker compose build --quiet --push --dry-run
