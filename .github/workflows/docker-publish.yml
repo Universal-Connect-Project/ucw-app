@@ -58,13 +58,13 @@ jobs:
       - name: 'Get Server version'
         run: |
           echo DOCKER_IMAGE_SERVER="$(npm pkg get version --prefix ./apps/server | xargs)" >> ./.env
-          echo ${DOCKER_IMAGE_SERVER} >> GITHUB_ENV
+          echo "DOCKER_IMAGE_SERVER=${DOCKER_IMAGE_SERVER}" >> GITHUB_ENV
           cat ./.env
 
       - name: 'Get UI version'
         run: |
           echo DOCKER_IMAGE_UI="$(npm pkg get version --prefix ./apps/ui | xargs)" >> ./.env
-          echo ${DOCKER_IMAGE_UI} >> GITHUB_ENV
+          echo "DOCKER_IMAGE_UI=${DOCKER_IMAGE_UI}" >> GITHUB_ENV
           cat ./.env
 
       - name: 'Check if version exists on Docker Hub'
