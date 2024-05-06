@@ -57,22 +57,20 @@ jobs:
 
       - name: 'Get Server version'
         run: |
-          echo DOCKER_IMAGE_SERVER="$(npm pkg get version --prefix ./apps/server | xargs)" >> ./.env
+          DOCKER_IMAGE_SERVER=$(npm pkg get version --prefix ./apps/server | xargs)
+          echo DOCKER_IMAGE_SERVER="${DOCKER_IMAGE_SERVER}" >> ./.env
           echo "DOCKER_IMAGE_SERVER=${DOCKER_IMAGE_SERVER}" >> GITHUB_ENV
           cat ./.env
 
       - name: 'Get UI version'
         run: |
-          echo DOCKER_IMAGE_UI="$(npm pkg get version --prefix ./apps/ui | xargs)" >> ./.env
+          DOCKER_IMAGE_UI=$(npm pkg get version --prefix ./apps/ui | xargs)
+          echo DOCKER_IMAGE_UI="${DOCKER_IMAGE_UI}" >> ./.env
           echo "DOCKER_IMAGE_UI=${DOCKER_IMAGE_UI}" >> GITHUB_ENV
           cat ./.env
 
       - name: 'Check if version exists on Docker Hub'
-        env:
-          VERSION_UI: ${{ env.DOCKER_IMAGE_UI }}
-          VERSION_SERVER: ${{ env.DOCKER_IMAGE_SERVER }}
         run: |
-          echo "${VERSION_UI}"
           UI_VERSION=$(`docker buildx imagetools inspect universalconnectfoundation/ucw-ui:v${{ env.DOCKER_IMAGE_UI }} --format "{{json .Manifest}}" | jq -r .digest`)
           SERVER_VERSION=$(`docker buildx imagetools inspect universalconnectfoundation/ucw-app:v${{ env.DOCKER_IMAGE_SERVER }} --format "{{json .Manifest}}" | jq -r .digest`)
           
