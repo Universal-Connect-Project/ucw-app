@@ -58,14 +58,14 @@ jobs:
       - name: 'Get Server version'
         run: |
           DOCKER_IMAGE_SERVER=$(npm pkg get version --prefix ./apps/server | xargs)
-          echo DOCKER_IMAGE_SERVER="${DOCKER_IMAGE_SERVER}" >> ./.env
+          echo "DOCKER_IMAGE_SERVER=${DOCKER_IMAGE_SERVER}" >> ./.env
           echo "DOCKER_IMAGE_SERVER=${DOCKER_IMAGE_SERVER}" >> GITHUB_ENV
           cat ./.env
 
       - name: 'Get UI version'
         run: |
           DOCKER_IMAGE_UI=$(npm pkg get version --prefix ./apps/ui | xargs)
-          echo DOCKER_IMAGE_UI="${DOCKER_IMAGE_UI}" >> ./.env
+          echo "DOCKER_IMAGE_UI=${DOCKER_IMAGE_UI}" >> ./.env
           echo "DOCKER_IMAGE_UI=${DOCKER_IMAGE_UI}" >> GITHUB_ENV
           cat ./.env
 
