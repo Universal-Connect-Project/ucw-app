@@ -36,10 +36,6 @@ jobs:
           
           # Vars
           echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
-            
-          # Secrets (can't load these from another job, due to GH security features)
-          echo DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} >> ${ENV_FILE_PATH}
-          echo DOCKER_TOKEN=${{ secrets.DOCKER_TOKEN }} >> ${ENV_FILE_PATH}
           cat ${ENV_FILE_PATH}
 
       - name: 'Create Root env file'
@@ -51,6 +47,8 @@ jobs:
           
           # Vars
           echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
+          echo SERVER_PORT=${{ vars.PORT }} >> ${ENV_FILE_PATH}
+          echo UI_PORT=${{ vars.RESOURCE_PORT }} >> ${ENV_FILE_PATH}
             
           # Secrets (can't load these from another job, due to GH security features)
           echo DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} >> ${ENV_FILE_PATH}
@@ -60,8 +58,8 @@ jobs:
       - name: 'Get Server version'
         working-directory: ./apps/server
         run: |
-          echo DOCKER_IMAGE_SERVER="$(npm pkg get version | xargs)" >> .env
-          cat .env
+          echo DOCKER_IMAGE_SERVER="$(npm pkg get version | xargs)" >> ../../.env
+          cat ../../.env
 
       - name: 'Get UI version'
         working-directory: ./apps/ui
@@ -76,5 +74,6 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
 
       - name: 'Build and Push Docker images'
+        working-directory: ./
         run: |
-          docker compose build --quiet --push --dry-run
+          docker compose build --quiet --push
