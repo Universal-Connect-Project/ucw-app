@@ -69,11 +69,12 @@ jobs:
 
       - name: 'Check if version exists on Docker Hub'
         env:
-          DOCKER_IMAGE_SERVER: ${{ env.DOCKER_IMAGE_SERVER }}
-          DOCKER_IMAGE_UI: ${{ env.DOCKER_IMAGE_UI }}
+          VERSION_UI: ${{ env.DOCKER_IMAGE_UI }}
+          VERSION_SERVER: ${{ env.DOCKER_IMAGE_SERVER }}
         run: |
-          UI_VERSION=$(`docker buildx imagetools inspect universalconnectfoundation/ucw-ui:v${{ env.DOCKER_IMAGE_UI }} --format "{{json .Manifest}}" | jq -r .digest`)
-          SERVER_VERSION=$(`docker buildx imagetools inspect universalconnectfoundation/ucw-ui:v${{ env.DOCKER_IMAGE_SERVER }} --format "{{json .Manifest}}" | jq -r .digest`)
+          echo "${VERSION_UI}"
+          UI_VERSION=$(`docker buildx imagetools inspect universalconnectfoundation/ucw-ui:v${VERSION_UI} --format "{{json .Manifest}}" | jq -r .digest`)
+          SERVER_VERSION=$(`docker buildx imagetools inspect universalconnectfoundation/ucw-ui:v${VERSION_SERVER} --format "{{json .Manifest}}" | jq -r .digest`)
           
           if [ "${UI_VERSION}" == "" ]; then
             echo "UI_VERSION_EXISTS=false" >> GITHUB_ENV
