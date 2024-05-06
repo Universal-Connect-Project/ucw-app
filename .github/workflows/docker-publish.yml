@@ -100,7 +100,7 @@ jobs:
           {
             echo "### UI Version Check Results"
             echo "Version $VERSION of the UI already exists on Docker Hub. 😬🫠"
-            echo "Please update the 'version' property in UI 'package.json' and try again."
+            echo "Please update the 'version' property in the ./apps/ui 'package.json' and try again."
           } >> $GITHUB_STEP_SUMMARY
 
       - name: 'Show warning if SERVER version exists on Docker Hub'
@@ -109,7 +109,7 @@ jobs:
           {
             echo "### Server Version Check Results"
             echo "Version $VERSION of the Server already exists on Docker Hub. 😬🫠"
-            echo "Please update the 'version' property in Server 'package.json' and try again."
+            echo "Please update the 'version' property in the ./apps/server 'package.json' and try again."
           } >> $GITHUB_STEP_SUMMARY
 
       - name: 'Log in to Docker Hub'
