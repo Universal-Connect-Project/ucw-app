@@ -59,14 +59,14 @@ jobs:
         run: |
           DOCKER_IMAGE_SERVER=$(npm pkg get version --prefix ./apps/server | xargs)
           echo DOCKER_IMAGE_SERVER="${DOCKER_IMAGE_SERVER}" >> ./.env
-          echo "DOCKER_IMAGE_SERVER=${DOCKER_IMAGE_SERVER}" >> GITHUB_ENV
+          echo DOCKER_IMAGE_SERVER="${DOCKER_IMAGE_SERVER}" >> $GITHUB_ENV
           cat ./.env
 
       - name: 'Get UI version'
         run: |
           DOCKER_IMAGE_UI=$(npm pkg get version --prefix ./apps/ui | xargs)
           echo DOCKER_IMAGE_UI="${DOCKER_IMAGE_UI}" >> ./.env
-          echo "DOCKER_IMAGE_UI=${DOCKER_IMAGE_UI}" >> GITHUB_ENV
+          echo DOCKER_IMAGE_UI="${DOCKER_IMAGE_UI}" >> $GITHUB_ENV
           cat ./.env
 
       - name: 'Check if version exists on Docker Hub'
@@ -83,15 +83,15 @@ jobs:
           SERVER_DIGEST=$(`docker buildx imagetools inspect universalconnectfoundation/ucw-app:v${{ env.SERVER_VERSION }} --format "{{json .Manifest}}" | jq -r .digest`)
           
           if [ "${UI_DIGEST}" == "" ]; then
-            echo "UI_VERSION_EXISTS=false" >> GITHUB_ENV
+            echo "UI_VERSION_EXISTS=false" >> $GITHUB_ENV
           else
-            echo "UI_VERSION_EXISTS=true" >> GITHUB_ENV
+            echo "UI_VERSION_EXISTS=true" >> $GITHUB_ENV
           fi
 
           if [ "${SERVER_DIGEST}" == "" ]; then
-            echo "SERVER_VERSION_EXISTS=false" >> GITHUB_ENV
+            echo "SERVER_VERSION_EXISTS=false" >> $GITHUB_ENV
           else
-            echo "SERVER_VERSION_EXISTS=true" >> GITHUB_ENV
+            echo "SERVER_VERSION_EXISTS=true" >> $GITHUB_ENV
           fi
 
       - name: 'Show warning if UI version exists on Docker Hub'
