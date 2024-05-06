@@ -73,7 +73,7 @@ jobs:
           DOCKER_IMAGE_UI: ${{ env.DOCKER_IMAGE_UI }}
         run: |
           UI_VERSION=$(docker buildx imagetools inspect universalconnectfoundation/ucw-ui:v${{ env.DOCKER_IMAGE_UI }} --format "{{json .Manifest}}" | jq -r .digest)
-          SERVER_VERSION=$(docker buildx imagetools inspect universalconnectfoundation/ucw-ui:v${{ DOCKER_IMAGE_SERVER }} --format "{{json .Manifest}}" | jq -r .digest)
+          SERVER_VERSION=$(docker buildx imagetools inspect universalconnectfoundation/ucw-ui:v${{ env.DOCKER_IMAGE_SERVER }} --format "{{json .Manifest}}" | jq -r .digest)
           
           if [ "${UI_VERSION}" == "" ]; then
             echo "UI_VERSION_EXISTS=false" >> GITHUB_ENV
