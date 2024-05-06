@@ -74,6 +74,11 @@ jobs:
           UI_VERSION: ${{ env.DOCKER_IMAGE_SERVER }}
           SERVER_VERSION: ${{ env.DOCKER_IMAGE_UI }}
         run: |
+          echo "-----------------"
+          echo "${env.UI_VERSION}"
+          echo "${env.SERVER_VERSION}"
+          echo "-----------------"
+          
           UI_DIGEST=$(`docker buildx imagetools inspect universalconnectfoundation/ucw-ui:v${{ env.UI_VERSION }} --format "{{json .Manifest}}" | jq -r .digest`)
           SERVER_DIGEST=$(`docker buildx imagetools inspect universalconnectfoundation/ucw-app:v${{ env.SERVER_VERSION }} --format "{{json .Manifest}}" | jq -r .digest`)
           
