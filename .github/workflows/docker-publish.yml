@@ -56,16 +56,14 @@ jobs:
           cat ${ENV_FILE_PATH}
 
       - name: 'Get Server version'
-        working-directory: ./apps/server
         run: |
-          echo DOCKER_IMAGE_SERVER="$(npm pkg get version | xargs)" >> ../../.env
-          cat ../../.env
+          echo DOCKER_IMAGE_SERVER="$(npm pkg get version --prefix ./apps/server | xargs)" >> ./.env
+          cat ./.env
 
       - name: 'Get UI version'
-        working-directory: ./apps/ui
         run: |
-          echo DOCKER_IMAGE_UI="$(npm pkg get version | xargs)" >> ../../.env
-          cat ../../.env
+          echo DOCKER_IMAGE_UI="$(npm pkg get version --prefix ./apps/ui | xargs)" >> ./.env
+          cat ./.env
 
       - name: 'Log in to Docker Hub'
         uses: docker/login-action@v3
