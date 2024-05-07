@@ -10,11 +10,6 @@ ENV NODE_VERSION 20.12.2
 RUN apk --update --no-cache --virtual add nodejs npm \
     && rm -rf /var/cache/apk/*
 
-# OLD
-#RUN apk --update --no-cache --virtual add nodejs npm \
-#    && rm -rf /var/cache/apk/* \
-#    && npm i -g turbo ts-node
-
 FROM base as pruner
 RUN npm i -g turbo
 ARG APP
@@ -38,14 +33,14 @@ COPY --from=pruner ${WRKDR}/out/package-lock.json .
 RUN npm ci --omit=dev
 
 FROM base as runner
-RUN npm i -g ts-node
 ARG APP
 ARG WRKDR
 
 WORKDIR ${WRKDR}
 
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nodejs
+RUN npm i -g ts-node  \
+    && addgroup --system --gid 1001 nodejs \
+    && adduser --system --uid 1001 nodejs
 USER nodejs
 
 COPY --from=pruner --chown=nodejs:nodejs ${WRKDR}/out/full/apps/${APP}/ .

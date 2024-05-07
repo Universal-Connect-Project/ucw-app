@@ -1,6 +1,8 @@
 # Universal Connect Widget (Application)
 
-This repo is a full-stack application which anyone can clone and self-host as a way to serve the connect widget via a url, which can then be loaded into an iframe.
+This repo is a monorepo, which contains the pieces that make up the Universal Connect Application. It is a full-stack 
+application which anyone can clone and self-host as a way to serve the connect widget via a url, which can then be loaded 
+into an iframe.
 
 ## Getting Started (in production)
 
@@ -85,6 +87,13 @@ Then run:
 `<version>` must mach the respective versions in `./.env`, `DOCKER_IMAGE_{UI|SERVER}`. These env variables are used in the `./docker-compose.yml` file when building the images.
 
 
-## Architecture decision records
+## Additional Information
+
+### Architecture decision records
 We use [architecture decision records](https://adr.github.io/) to make, document, and enforce our decisions. They live in the [architectureDecisionRecords](https://github.com/Universal-Connect-Project/ucw-app/tree/main/architectureDecisionRecords) folder.
 
+### Monorepo
+Please refer to the Monorepo [README](./MONOREPO.md) for more information.
+
+### Testing Docker
+Please refer to the Docker [README](./DOCKER.md) for more information.

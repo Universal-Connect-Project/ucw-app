@@ -21,7 +21,6 @@ COPY . ${WRKDR}
 RUN turbo prune --scope=${APP} --docker
 
 FROM base as builder
-RUN npm i -g turbo
 ARG APP
 ARG WRKDR
 
@@ -30,20 +29,21 @@ WORKDIR ${WRKDR}
 COPY --from=pruner ${WRKDR}/out/json/apps/${APP}/package.json .
 COPY --from=pruner ${WRKDR}/out/package-lock.json .
 
-RUN npm ci --omit=dev
+RUN npm i -g turbo  \
+    && npm ci --omit=dev
 
 COPY --from=pruner ${WRKDR}/out/full/ .
 RUN turbo run build --filter=${APP}
 
 FROM base as runner
-RUN npm i -g serve@14.2.3
 ARG APP
 ARG WRKDR
 
 WORKDIR ${WRKDR}
 
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nodejs
+RUN npm i -g serve@14.2.3  \
+    && addgroup --system --gid 1001 nodejs \
+    && adduser --system --uid 1001 nodejs
 USER nodejs
 
 COPY --from=builder --chown=nodejs:nodejs ${WRKDR}/apps/${APP}/vite.config.ts .
