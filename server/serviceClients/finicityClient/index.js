@@ -35,7 +35,8 @@ export default class FinicityClient {
   }
 
   async getInstitution (institutionId) {
-    return await this.get(`institution/v2/institutions/${institutionId}`)
+    const response = await this.get(`institution/v2/institutions/${institutionId}`)
+    return response.institution
   }
 
   async getCustomers () {
@@ -45,6 +46,10 @@ export default class FinicityClient {
   async getCustomer (uniqueName) {
     return await this.get(`aggregation/v1/customers?username=${uniqueName}`)
       .then(ret => ret.customers?.[0])
+  }
+
+  async deleteCustomer (id) {
+    return await this.del(`aggregation/v1/customers/${id}`)
   }
 
   async getCustomerAccounts (customerId) {
@@ -80,17 +85,21 @@ export default class FinicityClient {
   }
 
   async generateConnectLiteUrl (institutionId, customerId, requestId) {
-    return await this.post('connect/v2/generate/lite', {
-      language: 'en-US',
+    const requestBody = {
       partnerId: this.apiConfig.partnerId,
       customerId,
       institutionId,
       redirectUri: `${config.HostUrl}/oauth/${this.apiConfig.provider}/redirect_from?connection_id=${requestId}`,
       webhook: `${config.WebhookHostUrl}/webhook/${this.apiConfig.provider}/?connection_id=${requestId}`,
-      webhookContentType: 'application/json'
+      webhookContentType: 'application/json',
+      isWebView: true
       // 'singleUseUrl': true,
-      // 'experience': 'default',
-    }).then(ret => ret.link)
+    }
+
+    return await this.post('connect/v2/generate/lite', requestBody).then(ret => ret.link).catch(err => {
+      const newErr = new Error('Error getting Finicity Connect Lite Url', err)
+      throw newErr
+    })
   }
 
   async generateConnectFixUrl (institutionLoginId, customerId, requestId) {

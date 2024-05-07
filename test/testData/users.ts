@@ -10,3 +10,15 @@ export const createUserData = {
     guid: 'createdUserGuid'
   }
 }
+
+export const finicityReadCustomerData = {
+  customers: [
+    {
+      id: 'finicityTestUser'
+    }
+  ]
+}
+
+export const createCustomerData = {
+  id: 'createdFinicityUserId'
+}

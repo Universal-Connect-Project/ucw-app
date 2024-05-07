@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw'
 import { server } from '../../test/testServer'
 import { institutionData } from '../../test/testData/institution'
 import { EXTENDED_HISTORY_NOT_SUPPORTED_MSG, MxApi } from './mx'
-import { AGGREGATE_MEMBER_PATH, ANSWER_CHALLENGE_PATH, CREATE_MEMBER_PATH, CREATE_USER_PATH, DELETE_CONNECTION_PATH, DELETE_MEMBER_PATH, EXTEND_HISTORY_PATH, INSTITUTION_BY_ID_PATH, READ_MEMBER_STATUS_PATH, UPDATE_CONNECTION_PATH, VERIFY_MEMBER_PATH } from '../../test/handlers'
+import { AGGREGATE_MEMBER_PATH, ANSWER_CHALLENGE_PATH, CREATE_MEMBER_PATH, CREATE_USER_PATH, DELETE_CONNECTION_PATH, DELETE_MEMBER_PATH, EXTEND_HISTORY_PATH, MX_INSTITUTION_BY_ID_PATH, READ_MEMBER_STATUS_PATH, UPDATE_CONNECTION_PATH, VERIFY_MEMBER_PATH } from '../../test/handlers'
 import { institutionCredentialsData } from '../../test/testData/institutionCredentials'
 import { aggregateMemberMemberData, connectionByIdMemberData, extendHistoryMemberData, identifyMemberData, memberData, membersData, memberStatusData, verifyMemberData } from '../../test/testData/members'
 import config from '../config'
@@ -78,7 +78,7 @@ describe('mx provider', () => {
       })
 
       it('uses the small logo if no medium logo', async () => {
-        server.use(http.get(INSTITUTION_BY_ID_PATH, () => HttpResponse.json({
+        server.use(http.get(MX_INSTITUTION_BY_ID_PATH, () => HttpResponse.json({
           ...institutionData,
           institution: {
             ...institutionData.institution,

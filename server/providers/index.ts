@@ -15,7 +15,7 @@ import type {
   CreateConnectionRequest,
   UpdateConnectionRequest
 } from '../../shared/contract'
-import { ConnectionStatus } from '../../shared/contract'
+import { ConnectionStatus, OAuthStatus } from '../../shared/contract'
 import { AnalyticsClient } from '../serviceClients/analyticsClient'
 import { SearchClient } from '../serviceClients/searchClient'
 import { AuthClient } from '../serviceClients/authClient'
@@ -133,6 +133,7 @@ export class ProviderApiBase {
     return []
   }
 
+  // This is not getting the logo url for any Finicity banks, needs to be fixed on search client probably. Mapping is wrong.
   async resolveInstitution (id: string): Promise<Institution> {
     this.context.updated = true
     const ret = {
@@ -238,9 +239,9 @@ export class ProviderApiBase {
       guid: connection_id,
       inbound_member_guid: connection_id,
       outbound_member_guid: connection_id,
-      auth_status: connection.status === ConnectionStatus.PENDING ? 1 : ConnectionStatus.CONNECTED ? 2 : 3
+      auth_status: connection.status === ConnectionStatus.PENDING ? OAuthStatus.PENDING : ConnectionStatus.CONNECTED ? OAuthStatus.COMPLETE : OAuthStatus.ERROR
     } as any
-    if (ret.auth_status === 3) {
+    if (ret.auth_status === OAuthStatus.ERROR) {
       ret.error_reason = connection.status
     }
     return { oauth_state: ret }

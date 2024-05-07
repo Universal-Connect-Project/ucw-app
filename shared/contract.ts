@@ -61,6 +61,13 @@ export enum ConnectionStatus {
   IMPAIRED,
   PENDING,
 }
+
+export enum OAuthStatus {
+  PENDING,
+  COMPLETE,
+  ERROR
+}
+
 export enum ChallengeType {
   QUESTION,
   OPTIONS,
