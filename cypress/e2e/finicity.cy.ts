@@ -8,7 +8,7 @@ describe('Should connect to an Institution through happy path', () => {
 
     cy.visit(`http://localhost:8080/?job_type=agg&auth=${authCode}`)
     cy.findByPlaceholderText('Search').type('finbank profiles')
-    cy.findByLabelText('Add account with finbank profiles - a').first().click()
+    cy.findByLabelText('Add account with finbank profiles - a').click()
 
     cy.findByRole('link', { name: 'Continue' }).should('exist')
   })
