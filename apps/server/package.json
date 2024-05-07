@@ -14,9 +14,7 @@
     "test": "jest --no-coverage",
     "test:watch": "jest --no-coverage --watch",
     "test-clear": "npm test -- --clearCache",
-    "keys": "node -e 'console.log(`key: ${crypto.randomBytes(32).toString(\"hex\")}\n IV: ${crypto.randomBytes(16).toString(\"hex\")}`)'",
-    "precommit": "lint-staged",
-    "prepare": "husky"
+    "keys": "node -e 'console.log(`key: ${crypto.randomBytes(32).toString(\"hex\")}\n IV: ${crypto.randomBytes(16).toString(\"hex\")}`)'"
   },
   "dependencies": {
     "@babel/eslint-parser": "^7.18.2",
@@ -31,7 +29,6 @@
     "express": "^4.19.2",
     "express-async-errors": "^3.1.1",
     "express-rate-limit": "^7.0.2",
-    "husky": "^9.0.11",
     "js-logger": "^1.6.1",
     "redis": "^4.6.12",
     "stream-browserify": "^3.0.0",
@@ -75,24 +72,9 @@
     "eslint-plugin-jest": "^27.6.3",
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-promise": "^6.1.1",
-    "lint-staged": "^15.2.2",
     "msw": "^2.2.13",
-    "prettier": "^3.2.5",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
-  },
-  "lint-staged": {
-    "{.eslintrc.js,.prettierrc.js}": [
-      "prettier --write"
-    ],
-    "*.{js[x],ts[x]}": [
-      "npm run lint -- --cache --fix"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "prettier --write . && lint-staged && npm run test && git add -A ."
-    }
   }
 }

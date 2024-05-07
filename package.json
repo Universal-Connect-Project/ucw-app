@@ -7,13 +7,19 @@
     "lint": "turbo lint",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "precommit": "lint-staged",
+    "prepare": "husky install",
+    "clean": "npx rimraf {apps,packages}/**/{node_modules,dist,.turbo} -g && npx rimraf node_modules"
   },
   "devDependencies": {
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
-    "turbo": "^1.13.3"
+    "turbo": "^1.13.3",
+    "typescript": "^5.4.5"
   },
   "engines": {
     "node": ">=20"
@@ -22,5 +28,18 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "prettier --write . && lint-staged && npm run test && git add -A ."
+    }
+  },
+  "lint-staged": {
+    "{.eslintrc.js,.prettierrc.js}": [
+      "prettier --write"
+    ],
+    "*.{js[x],ts[x]}": [
+      "npm run lint -- --cache --fix"
+    ]
+  }
 }

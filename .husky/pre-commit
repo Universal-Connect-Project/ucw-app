@@ -1,1 +1,3 @@
-# npm run lint:fix TODO: uncomment this when ts errors are all fixed
+
+npm run precommit
+npm run test
