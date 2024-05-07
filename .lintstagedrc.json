@@ -1,0 +1,8 @@
+{
+  "{.eslintrc.js,*.md}": [
+    "prettier --write"
+  ],
+  "*.{js[x],ts[x]}": [
+    "npm run lint -- --cache --fix"
+  ]
+}

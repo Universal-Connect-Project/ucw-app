@@ -28,18 +28,5 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ],
-  "husky": {
-    "hooks": {
-      "pre-commit": "prettier --write . && lint-staged && npm run test && git add -A ."
-    }
-  },
-  "lint-staged": {
-    "{.eslintrc.js,.prettierrc.js}": [
-      "prettier --write"
-    ],
-    "*.{js[x],ts[x]}": [
-      "npm run lint -- --cache --fix"
-    ]
-  }
+  ]
 }
