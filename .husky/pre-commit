@@ -4,5 +4,5 @@ npm run test
 #git add -A .
 
 # Original
-#npm run precommit
+#npm run pre-commit
 #npm run test
