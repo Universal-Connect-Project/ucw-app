@@ -71,6 +71,7 @@ export class FinicityApi implements ProviderApiClient {
   }
 
   async DeleteConnection (id: string, userId: string): Promise<void> {
+    this.apiClient.deleteCustomer(userId)
     return await this.db.set(id, null)
   }
 

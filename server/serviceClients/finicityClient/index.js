@@ -48,6 +48,10 @@ export default class FinicityClient {
       .then(ret => ret.customers?.[0])
   }
 
+  async deleteCustomer (id) {
+    return await this.del(`aggregation/v1/customers/${id}`)
+  }
+
   async getCustomerAccounts (customerId) {
     return await this.get(`aggregation/v1/customers/${customerId}/accounts`)
   }
