@@ -1,6 +1,6 @@
-npm run format
-#npx lint-staged
-#npm run test
+#npm run format
+npx lint-staged
+npm run test
 #git add -A .
 
 # Original
