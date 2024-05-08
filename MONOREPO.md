@@ -46,13 +46,13 @@ To run linters for all apps and packages, run the following command from the roo
 npm run lint
 ```
 
-To only run one app, run the following command from the root of the project:
+To only run the task for one app/package, run the following command from the root of the project:
 
 ```
-npm run dev --workspace=<app>
+npm run dev --workspace=<workspace>
 ```
 
-_The same pattern (`--workspace=<app>`) can be used for `build`, `test`, and `lint`._ 
+_The same pattern (`--workspace=<workspace>`) can be used for `build`, `test`, and `lint`._ 
 
 ### Add/Update dependencies
 
