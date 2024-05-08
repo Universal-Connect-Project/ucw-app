@@ -7,6 +7,7 @@
     "lint": "turbo lint",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
+    "test:no-cache": "turbo run test --no-cache --force",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "pre-commit": "lint-staged",
     "prepare": "husky install",
