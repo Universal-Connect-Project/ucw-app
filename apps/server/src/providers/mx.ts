@@ -131,10 +131,6 @@ export class MxApi implements ProviderApiClient {
     if (existing != null) {
       logger.info(`Found existing member for institution ${entityId}, deleting`)
       await this.apiClient.deleteMember(existing.guid, userId)
-      // return this.UpdateConnectionInternal({
-      //   id: existing.guid,
-      //   ...request,
-      // }, userId)
     }
     // let res = await this.apiClient.listInstitutionCredentials(entityId)
     // console.log(request)

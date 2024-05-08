@@ -50,6 +50,9 @@ jobs:
           CYPRESS_sophtron_api_user_secret: ${{ secrets.SOPHTRON_API_USER_SECRET }}
           CYPRESS_mx_client_id: ${{ secrets.MX_CLIENT_ID }}
           CYPRESS_mx_api_secret: ${{ secrets.MX_API_SECRET }}
+          CYPRESS_finicity_partner_id: ${{ secrets.FINICITY_PARTNER_ID }}
+          CYPRESS_finicity_secret: ${{ secrets.FINICITY_SECRET }}
+          CYPRESS_finicity_app_key: ${{ secrets.FINICITY_APP_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           project: apps/server

@@ -14,8 +14,8 @@ import type {
   ProviderApiClient,
   CreateConnectionRequest,
   UpdateConnectionRequest
-} from '../shared/contract'
-import { ConnectionStatus } from '../shared/contract'
+} from '../../shared/contract'
+import { ConnectionStatus, OAuthStatus } from '../../shared/contract'
 import { AnalyticsClient } from '../serviceClients/analyticsClient'
 import { SearchClient } from '../serviceClients/searchClient'
 import { AuthClient } from '../serviceClients/authClient'
@@ -133,12 +133,13 @@ export class ProviderApiBase {
     return []
   }
 
+  // This is not getting the logo url for any Finicity banks, needs to be fixed on search client probably. Mapping is wrong.
   async resolveInstitution (id: string): Promise<Institution> {
     this.context.updated = true
     const ret = {
       id
     } as any
-    if (!this.context.provider || (this.context.institution_uid && this.context.institution_uid !== id && this.context.institution_id !== id)) {
+    if (!this.context.provider || (this.context.institution_uid && this.context.institution_uid != id && this.context.institution_id != id)) {
       const resolved = await this.searchApi.resolve(id)
       if (resolved != null) {
         logger.debug(`resolved institution ${id} to provider ${resolved.provider} ${resolved.target_id}`)
@@ -207,7 +208,7 @@ export class ProviderApiBase {
     if (ret?.id != null) {
       await this.storageClient.set(`context_${ret.id}`, {
         oauth_referral_source: this.context.oauth_referral_source,
-        scheme: this.context.scheme
+        scheme: this.context.scheme,
       })
     }
     return ret
@@ -238,9 +239,9 @@ export class ProviderApiBase {
       guid: connection_id,
       inbound_member_guid: connection_id,
       outbound_member_guid: connection_id,
-      auth_status: connection.status === ConnectionStatus.PENDING ? 1 : ConnectionStatus.CONNECTED ? 2 : 3
+      auth_status: connection.status === ConnectionStatus.PENDING ? OAuthStatus.PENDING : ConnectionStatus.CONNECTED ? OAuthStatus.COMPLETE : OAuthStatus.ERROR
     } as any
-    if (ret.auth_status === 3) {
+    if (ret.auth_status === OAuthStatus.ERROR) {
       ret.error_reason = connection.status
     }
     return { oauth_state: ret }

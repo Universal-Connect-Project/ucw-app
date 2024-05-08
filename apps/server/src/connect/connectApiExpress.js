@@ -177,7 +177,6 @@ export default function (app) {
   app.all('/webhook/:provider/*', async function (req, res) {
     const { provider } = req.params
     info(`received web hook at: ${req.path}`, req.query)
-    // console.log(req.body)
     const ret = await ConnectApi.handleOauthResponse(provider, req.params, req.query, req.body)
     res.send(ret)
   })
