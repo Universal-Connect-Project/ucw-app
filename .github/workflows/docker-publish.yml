@@ -35,7 +35,8 @@ jobs:
           
           # Vars
           echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
-          echo -e "ENV=prod" >> ${ENV_FILE_PATH}  # Override ENV to Env=prod
+          # Override ENV to Env=prod
+          echo ENV=prod >> ${ENV_FILE_PATH}
           cat ${ENV_FILE_PATH}
 
       - name: 'Create Root env file'
@@ -49,6 +50,8 @@ jobs:
           echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
           echo SERVER_PORT=${{ vars.PORT }} >> ${ENV_FILE_PATH}
           echo UI_PORT=${{ vars.RESOURCE_PORT }} >> ${ENV_FILE_PATH}
+          # Override ENV to Env=prod
+          echo ENV=prod >> ${ENV_FILE_PATH}
             
           # Secrets (can't load these from another job, due to GH security features)
           echo DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} >> ${ENV_FILE_PATH}
