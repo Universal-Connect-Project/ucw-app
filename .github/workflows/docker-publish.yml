@@ -3,7 +3,7 @@ name: 'Publish Docker image'
 on:
   push:
     branches:
-      - main
+      - '**'
 
 jobs:
   setup-env:
@@ -35,6 +35,7 @@ jobs:
           
           # Vars
           echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
+          echo -e "Env=prod" >> ${ENV_FILE_PATH}  # Override ENV to Env=prod
           cat ${ENV_FILE_PATH}
 
       - name: 'Create Root env file'
@@ -53,6 +54,8 @@ jobs:
           echo DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} >> ${ENV_FILE_PATH}
           echo DOCKER_TOKEN=${{ secrets.DOCKER_TOKEN }} >> ${ENV_FILE_PATH}
           cat ${ENV_FILE_PATH}
+          
+          ### TODO: Override ENV so Env=prod
 
       - name: 'Get Server version'
         run: |
