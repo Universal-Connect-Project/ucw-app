@@ -96,8 +96,8 @@ Then run:
 
     docker compose push
 
-`<version>` must mach the respective versions in `./.env`, `DOCKER_IMAGE_{UI|SERVER}`. These env variables are used in
-the `./docker-compose.yml` file when building the images.
+To update the versions that are pulled/published, update the `./.env` file. Look at the `DOCKER_IMAGE_{UI|SERVER}` values. 
+These variables are used in the `./docker-compose.yml` file when building/pulling/publishing the images.
 
 ## Additional Information
 
