@@ -5,8 +5,8 @@ import type {
   Institution,
   ProviderApiClient,
   UpdateConnectionRequest
-} from '@/../../shared/contract'
-import { ConnectionStatus } from '@/../../shared/contract'
+} from '../shared/contract'
+import { ConnectionStatus } from '../shared/contract'
 import * as logger from '../infra/logger'
 import FinicityClient from '../serviceClients/finicityClient'
 import { StorageClient } from '../serviceClients/storageClient'
@@ -82,10 +82,12 @@ export class FinicityApi implements ProviderApiClient {
     return null
   }
 
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   async GetConnectionById (connectionId: string, user_id: string): Promise<Connection> {
     return await this.getConnection(connectionId, user_id)
   }
 
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   async GetConnectionStatus (connectionId: string, jobId: string, single_account_select?: boolean, user_id?: string): Promise<Connection> {
     return await this.getConnection(connectionId, user_id)
   }
@@ -111,6 +113,7 @@ export class FinicityApi implements ProviderApiClient {
   }
 
   static async HandleOauthResponse (request: any): Promise<Connection> {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const { connection_id, eventType, reason, code } = request
     const db = new StorageClient(connection_id.split(';')[0])
     let institutionLoginId = false
@@ -145,10 +148,12 @@ export class FinicityApi implements ProviderApiClient {
     return connection
   }
 
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   async getConnection (id: string, user_id: string) {
     if (id.startsWith(this.token)) {
       return await this.db.get(id)
     } else {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       const request_id = `${this.token};${id}`
       const existing = await this.db.get(request_id)
       if (existing?.id) {

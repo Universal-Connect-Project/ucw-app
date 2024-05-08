@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "files": [
-    "library.js",
-    "react-internal.js"
+    "library.cjs",
+    "react-internal.cjs"
   ],
   "devDependencies": {
     "@vercel/style-guide": "^5.2.0",

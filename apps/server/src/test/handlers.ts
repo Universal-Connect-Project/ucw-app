@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import { BASE_PATH as MX_BASE_PATH } from '../server/serviceClients/mxClient/base'
+import { BASE_PATH as MX_BASE_PATH } from '../serviceClients/mxClient/base'
 import { institutionData, finicityInsitutionData } from './testData/institution'
 import { institutionCredentialsData } from './testData/institutionCredentials'
 import { aggregateMemberMemberData, connectionByIdMemberData, extendHistoryMemberData, identifyMemberData, memberData, membersData, memberStatusData, verifyMemberData } from './testData/members'

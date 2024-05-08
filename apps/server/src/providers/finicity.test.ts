@@ -1,11 +1,11 @@
 import { http, HttpResponse } from 'msw'
-import { server } from '../../test/testServer'
+import { server } from '../test/testServer'
 import { FinicityApi } from './finicity'
-import { finicityInsitutionData } from '../../test/testData/institution'
-import { FINICITY_CONNECT_LITE_URL, DELETE_CUSTOMER_PATH, READ_CUSTOMER_PATH } from '../../test/handlers'
-import { clearRedisMock, createClient, getRedisStorageObject } from '../../__mocks__/redis'
-import { ConnectionStatus } from '@/../../shared/contract'
-import { finicityReadCustomerData } from '../../test/testData/users'
+import { finicityInsitutionData } from '../test/testData/institution'
+import { FINICITY_CONNECT_LITE_URL, DELETE_CUSTOMER_PATH, READ_CUSTOMER_PATH } from '../test/handlers'
+import { clearRedisMock, createClient, getRedisStorageObject } from '../__mocks__/redis'
+import { ConnectionStatus } from '../shared/contract'
+import { finicityReadCustomerData } from '../test/testData/users'
 
 const token = 'testToken'
 
