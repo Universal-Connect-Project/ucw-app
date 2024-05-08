@@ -35,7 +35,7 @@ jobs:
           
           # Vars
           echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
-          echo -e "Env=prod" >> ${ENV_FILE_PATH}  # Override ENV to Env=prod
+          echo -e "ENV=prod" >> ${ENV_FILE_PATH}  # Override ENV to Env=prod
           cat ${ENV_FILE_PATH}
 
       - name: 'Create Root env file'
