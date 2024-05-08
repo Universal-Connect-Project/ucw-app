@@ -1,0 +1,6 @@
+{
+  "*.{js[x],ts[x]}": [
+    "prettier --write --parser=typescript --no-semi=true --single-quote=true --trailing-comma=none",
+    "npm run lint -- --cache --fix"
+  ]
+}

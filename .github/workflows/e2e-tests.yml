@@ -25,22 +25,21 @@ jobs:
 
       - name: 'Create env file'
         run: |
-          touch .env
+          ENV_FILE_PATH=./apps/server/.env
+          touch ${ENV_FILE_PATH}
           
           # Vars
-          echo -e "${{ needs.setup-env.outputs.env_vars }}" >> .env
-          echo RESOURCEVERSION="" >> .env
+          echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
+          echo RESOURCEVERSION="" >> ${ENV_FILE_PATH}
 
           # Secrets (can't load these from another job, due to GH security features)
-          echo CRYPTOIV=${{ secrets.CRYPTOIV }} >> .env
-          echo CRYPTOKEY=${{ secrets.CRYPTOKEY }} >> .env
-          echo UCPAUTHCLIENTID=${{ secrets.UCP_CLIENT_ID }} >> .env
-          echo UCPAUTHCLIENTSECRET=${{ secrets.UCP_CLIENT_SECRET }} >> .env
-          echo UCPAUTHENCRYPTIONKEY=${{ secrets.UCP_ENCRYPTION_KEY }} >> .env
+          echo CRYPTOIV=${{ secrets.CRYPTOIV }} >> ${ENV_FILE_PATH}
+          echo CRYPTOKEY=${{ secrets.CRYPTOKEY }} >> ${ENV_FILE_PATH}
+          echo UCPAUTHCLIENTID=${{ secrets.UCP_CLIENT_ID }} >> ${ENV_FILE_PATH}
+          echo UCPAUTHCLIENTSECRET=${{ secrets.UCP_CLIENT_SECRET }} >> ${ENV_FILE_PATH}
+          echo UCPAUTHENCRYPTIONKEY=${{ secrets.UCP_ENCRYPTION_KEY }} >> ${ENV_FILE_PATH}
+          cat ${ENV_FILE_PATH}
 
-          cat .env
-
-      - run: cd ./ui && npm ci
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
@@ -56,12 +55,13 @@ jobs:
           CYPRESS_finicity_app_key: ${{ secrets.FINICITY_APP_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          start: npm run ucw-app
+          project: apps/server
+          start: npm run dev
           wait-on: "http://localhost:8080"
 
       - name: Upload screenshots
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: cypress-screenshots
-          path: cypress/screenshots
+          path: ./apps/server/cypress/screenshots

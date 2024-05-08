@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+
+  server:
+    depends_on:
+      cache:
+        condition: service_healthy
+      ui:
+        condition: service_healthy
+
+    container_name: ucw-app-server
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://server:${SERVER_PORT}/ping"]
+      start_period: 5s
+      interval: 20s
+      timeout: 5s
+      retries: 3
+    build:
+      context: .
+      dockerfile: ./docker-server.Dockerfile
+      args:
+        APP: server
+    image: universalconnectfoundation/ucw-app:v${DOCKER_IMAGE_SERVER}
+    networks:
+      - ucw
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    env_file:
+      - ./apps/server/.env
+    environment:
+      RedisServer: "redis://cache:${REDIS_PORT}"
+      ResourcePrefix: "http://ui:${UI_PORT}"
+
+  ui:
+    container_name: ucw-app-ui
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://ui:${UI_PORT}"]
+      start_period: 5s
+      interval: 20s
+      timeout: 5s
+      retries: 3
+    build:
+      context: .
+      dockerfile: ./docker-ui.Dockerfile
+      args:
+        APP: ui
+    image: universalconnectfoundation/ucw-ui:v${DOCKER_IMAGE_UI}
+    networks:
+      - ucw
+    ports:
+      - "${UI_PORT}:${UI_PORT}"
+    env_file:
+      - ./.env
+    environment:
+      APP: "ui"
+      RESOURCE_PORT: "${UI_PORT}"
+
+  cache:
+    container_name: ucw-app-cache
+    image: redis:7.2-alpine
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      start_period: 5s
+      interval: 20s
+      timeout: 5s
+      retries: 3
+    networks:
+      - ucw
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - cache:/data
+
+volumes:
+  cache:
+    driver: local
+
+networks:
+  ucw:

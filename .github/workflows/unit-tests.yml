@@ -31,20 +31,21 @@ jobs:
         env:
           env_vars: ${{ needs.setup-env.outputs.env_vars }}
         run: |
-          touch .env
+          ENV_FILE_PATH=./apps/server/.env
+          touch ${ENV_FILE_PATH}
           
           # Vars
-          echo -e "${{ env.env_vars }}" >> .env
-          echo RESOURCEVERSION="" >> .env
+          echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
+          echo RESOURCEVERSION="" >> ${ENV_FILE_PATH}
 
           # Secrets (can't load these from another job, due to GH security features)          
-          echo CRYPTOIV=${{ secrets.CRYPTOIV }} >> .env
-          echo CRYPTOKEY=${{ secrets.CRYPTOKEY }} >> .env
-          echo UCPAUTHCLIENTID=${{ secrets.UCP_CLIENT_ID }} >> .env
-          echo UCPAUTHCLIENTSECRET=${{ secrets.UCP_CLIENT_SECRET }} >> .env
-          echo UCPAUTHENCRYPTIONKEY=${{ secrets.UCP_ENCRYPTION_KEY }} >> .env
-          cat .env
+          echo CRYPTOIV=${{ secrets.CRYPTOIV }} >> ${ENV_FILE_PATH}
+          echo CRYPTOKEY=${{ secrets.CRYPTOKEY }} >> ${ENV_FILE_PATH}
+          echo UCPAUTHCLIENTID=${{ secrets.UCP_CLIENT_ID }} >> ${ENV_FILE_PATH}
+          echo UCPAUTHCLIENTSECRET=${{ secrets.UCP_CLIENT_SECRET }} >> ${ENV_FILE_PATH}
+          echo UCPAUTHENCRYPTIONKEY=${{ secrets.UCP_ENCRYPTION_KEY }} >> ${ENV_FILE_PATH}
+          cat ${ENV_FILE_PATH}
 
       - name: Run Jest Tests
         run: |
-          npx jest --all --ci
+          npm run test

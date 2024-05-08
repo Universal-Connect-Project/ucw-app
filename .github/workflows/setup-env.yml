@@ -21,7 +21,7 @@ jobs:
         shell: bash
         env:
           VARS: ${{ toJSON(vars) }}
-        run: |          
+        run: |
           echo "$VARS" | jq -r 'keys[] as $k | "\($k)=\(.[$k])"' > ./vars.txt
           
           {
