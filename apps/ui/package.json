@@ -1,6 +1,6 @@
 {
   "name": "ui",
-  "version": "0.0.11-beta",
+  "version": "0.0.12-beta",
   "private": true,
   "type": "module",
   "packageManager": "npm@10.5.0",
@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@types/node": "^20.11.16",
-    "@ucp-npm/components": "^0.0.11-beta",
+    "@ucp-npm/components": "^0.0.12-beta",
     "@vitejs/plugin-react": "^4.2.1",
     "@vitejs/plugin-react-swc": "^3.6.0",
     "react": "^16.13.1",

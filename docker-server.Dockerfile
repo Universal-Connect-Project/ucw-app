@@ -21,7 +21,6 @@ COPY . ${WRKDR}
 RUN turbo prune --scope=${APP} --docker
 
 FROM base as builder
-RUN npm i -g turbo
 ARG APP
 ARG WRKDR
 
