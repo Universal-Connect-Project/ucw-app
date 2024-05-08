@@ -1,4 +1,4 @@
-# Universal Connect Widget embedded project
+# Universal Connect Widget UI
 
 ## Docker
 
@@ -7,7 +7,7 @@ The image for this project is hosted on Dockerhub. It is meant to be run via doc
 
 ## Local Development
 
-The [UCW NPM Module](https://www.npmjs.com/package/@ucp-npm/components?activeTab=readme) is used here, and is rendered in a small Vite/React wrapper app, and served-up from the `server` project.
+The [UCW NPM Module](https://www.npmjs.com/package/@ucp-npm/components?activeTab=readme) is used here, and is rendered in a small Vite/React wrapper app, and served-up from the `server` app.
 
 Please follow the steps in the [README.md](../../README.md) in order to get started, before you start local development.
 
