@@ -1,8 +1,2 @@
-#npm run format
 npx lint-staged
 npm run test
-#git add -A .
-
-# Original
-#npm run pre-commit
-#npm run test
