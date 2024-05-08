@@ -3,8 +3,10 @@
 See [Turborepo documentation](https://turbo.build/repo) for more details.
 
 For the most part, the way you interact with NPM and a monorepo is the same as with a normal repo. The following 
-commands remain the same, but will fire off the corresponding task for all monorepo apps/packages that have a task 
+commands remain the same, but will fire off the corresponding task for all monorepo apps/packages (workspace) that have a task 
 with the same name.
+
+Read more about workspaces [here](https://turbo.build/repo/docs/handbook/workspaces)
 
 ### Install
 
