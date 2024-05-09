@@ -17,6 +17,7 @@ jobs:
     needs: [setup-env]
     env:
       DOCKER_CLI_EXPERIMENTAL: enabled
+      DOCKER_HOST: tcp://docker:2375
 
     steps:
 

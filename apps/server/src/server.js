@@ -95,8 +95,11 @@ if (config.ResourcePrefix !== 'local') {
 
 app.listen(config.PORT, () => {
   const message = `Server is running on port ${config.PORT}, Env: ${config.Env}`
+  const uiMessage = `UI is running on port ${config.RESOURCE_PORT}`
   console.log(message)
+  console.log(uiMessage)
   info(message)
+  info(uiMessage)
 })
 
 // Ngrok is required for Finicity webhooks local and github testing
