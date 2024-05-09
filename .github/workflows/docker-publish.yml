@@ -15,8 +15,11 @@ jobs:
     name: 'Push Docker image to Docker Hub'
     runs-on: ubuntu-latest
     needs: [setup-env]
+    env:
+      DOCKER_CLI_EXPERIMENTAL: enabled
 
     steps:
+
       - name: 'Check out the repo'
         uses: actions/checkout@v4
 
@@ -25,6 +28,14 @@ jobs:
         with:
           node-version: 'lts/*'
           check-latest: true
+
+      - name: 'Set up Docker Buildx'
+        run: |
+          docker buildx create \ 
+            --use \
+            --platform=linux/arm64,linux/amd64 \
+            --name multi-platform-builder
+          docker buildx inspect --bootstrap
 
       - name: 'Create Server env file'
         env:
@@ -123,6 +134,4 @@ jobs:
       - name: 'Build and Push Docker images'
         if: env.UI_VERSION_EXISTS == 'false' && env.SERVER_VERSION_EXISTS == 'false'
         run: |
-          docker compose build \ 
-            --no-cache --push \
-            --platform linux/arm/v7,linux/arm64/v8,linux/amd64 .
+          docker buildx bake --file ./docker-compose.yml --push
