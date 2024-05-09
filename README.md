@@ -90,11 +90,11 @@ _NOTE: You must be a member of the UCP organization._
 
 Then run the following, which will build the new images:
 
-    docker compose up --pull never
-
-Then run:
-
-    docker compose push
+```shell
+docker compose build \
+    ---push --no-cache \
+    --platform linux/arm/v7,linux/arm64/v8,linux/amd64 .
+```
 
 To update the versions that are pulled/published, update the `./.env` file. Look at the `DOCKER_IMAGE_{UI|SERVER}` values. 
 These variables are used in the `./docker-compose.yml` file when building/pulling/publishing the images.

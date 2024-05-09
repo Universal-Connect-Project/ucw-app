@@ -122,6 +122,7 @@ jobs:
 
       - name: 'Build and Push Docker images'
         if: env.UI_VERSION_EXISTS == 'false' && env.SERVER_VERSION_EXISTS == 'false'
-        working-directory: ./
         run: |
-          docker compose build --push
+          docker compose build \ 
+            --no-cache --push \
+            --platform linux/arm/v7,linux/arm64/v8,linux/amd64 .
