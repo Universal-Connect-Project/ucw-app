@@ -124,4 +124,4 @@ jobs:
         if: env.UI_VERSION_EXISTS == 'false' && env.SERVER_VERSION_EXISTS == 'false'
         working-directory: ./
         run: |
-          docker compose build --quiet --push
+          docker compose build --push
