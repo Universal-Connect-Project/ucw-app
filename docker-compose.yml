@@ -33,6 +33,7 @@ services:
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
     env_file:
+      - ./.env
       - ./apps/server/.env
     environment:
       RedisServer: "redis://cache:${REDIS_PORT}"
@@ -81,7 +82,7 @@ services:
       - ./.env
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
-    command: sysctl vm.overcommit_memory=1 && redis-server --save 20 1 --loglevel warning
+    command: redis-server --save 20 1 --loglevel warning
     volumes:
       - cache:/data
 
