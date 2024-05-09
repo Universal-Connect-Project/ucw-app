@@ -38,7 +38,6 @@ services:
       RedisServer: "redis://cache:${REDIS_PORT}"
       ResourcePrefix: "http://ui:${UI_PORT}"
 
-
   ui:
     container_name: ucw-app-ui
     restart: on-failure
@@ -65,9 +64,6 @@ services:
       - "${UI_PORT}:${UI_PORT}"
     env_file:
       - ./.env
-    environment:
-      APP: "ui"
-      RESOURCE_PORT: "${UI_PORT}"
 
   cache:
     container_name: ucw-app-cache
@@ -81,9 +77,11 @@ services:
       retries: 3
     networks:
       - ucw
+    env_file:
+      - ./.env
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
-    command: redis-server --save 20 1 --loglevel warning
+    command: sysctl vm.overcommit_memory=1 && redis-server --save 20 1 --loglevel warning
     volumes:
       - cache:/data
 
@@ -93,3 +91,4 @@ volumes:
 
 networks:
   ucw:
+    driver: bridge
