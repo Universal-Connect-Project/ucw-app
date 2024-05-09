@@ -41,10 +41,10 @@ jobs:
       - name: 'Set up Docker Buildx'
         run: |
           echo $(docker --version)
-          #          docker buildx create \ 
-          #            --use \
-          #            --platform=linux/arm64,linux/amd64 \
-          #            --name multi-platform-builder
+          docker buildx create \ 
+            --use \
+            --platform=linux/arm64,linux/amd64 \
+            --name multi-platform-builder
           #          docker buildx inspect --bootstrap
 
       - name: 'Create Server env file'
@@ -121,7 +121,7 @@ jobs:
         run: |
           {
             echo "### UI Version Check Results"
-            echo "Version $VERSION of the UI already exists on Docker Hub. 😬🫠"
+            echo "Version $DOCKER_IMAGE_UI of the UI already exists on Docker Hub. 😬🫠"
             echo "Please update the 'version' property in the ./apps/ui 'package.json' and try again."
           } >> $GITHUB_STEP_SUMMARY
 
@@ -130,7 +130,7 @@ jobs:
         run: |
           {
             echo "### Server Version Check Results"
-            echo "Version $VERSION of the Server already exists on Docker Hub. 😬🫠"
+            echo "Version $DOCKER_IMAGE_SERVER of the Server already exists on Docker Hub. 😬🫠"
             echo "Please update the 'version' property in the ./apps/server 'package.json' and try again."
           } >> $GITHUB_STEP_SUMMARY
 
