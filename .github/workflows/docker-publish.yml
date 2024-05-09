@@ -44,15 +44,6 @@ jobs:
       - name: 'Set up Docker Buildx'
         uses: docker/setup-buildx-action@v3
 
-      - name: 'Set up Docker builder for multi-platform'
-        run: |
-          echo $(docker --version)
-          docker buildx create \ 
-            --use \
-            --platform=linux/arm64,linux/amd64 \
-            --name multi-platform-builder
-          docker buildx inspect --bootstrap
-
       - name: 'Create Server env file'
         env:
           env_vars: ${{ needs.setup-env.outputs.env_vars }}
