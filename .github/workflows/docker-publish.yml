@@ -40,7 +40,7 @@ jobs:
 
       - name: 'Set up Docker Buildx'
         run: |
-          echo docker --version
+          echo $(docker --version)
           #          docker buildx create \ 
           #            --use \
           #            --platform=linux/arm64,linux/amd64 \
