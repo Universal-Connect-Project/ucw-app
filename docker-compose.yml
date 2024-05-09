@@ -8,7 +8,6 @@ services:
         condition: service_healthy
       ui:
         condition: service_healthy
-
     container_name: ucw-app-server
     restart: on-failure
     healthcheck:
@@ -33,7 +32,6 @@ services:
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
     env_file:
-      - ./.env
       - ./apps/server/.env
     environment:
       RedisServer: "redis://cache:${REDIS_PORT}"
@@ -61,10 +59,11 @@ services:
     image: universalconnectfoundation/ucw-ui:v${DOCKER_IMAGE_UI}
     networks:
       - ucw
-    ports:
-      - "${UI_PORT}:${UI_PORT}"
-    env_file:
-      - ./.env
+# Uncomment to expose to host
+#    ports:
+#      - "${UI_PORT}:${UI_PORT}"
+    environment:
+      UI_PORT: ${UI_PORT}
 
   cache:
     container_name: ucw-app-cache
@@ -78,8 +77,6 @@ services:
       retries: 3
     networks:
       - ucw
-    env_file:
-      - ./.env
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
     command: redis-server --save 20 1 --loglevel warning
