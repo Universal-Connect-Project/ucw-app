@@ -68,13 +68,13 @@ function renderDefaultPage (req, res, html) {
 
 if (config.ResourcePrefix !== 'local') {
   app.get('/', async function (req, res) {
-    info(`serving resources from ${config.ResourcePrefix}`)
+    info(`Serving UI resources from ${config.ResourcePrefix}`)
     req.metricsPath = '/catchall'
     const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}${req.path}`
     await _wget(resourcePath).then(html => { renderDefaultPage(req, res, html) })
   })
   app.get('*', async function (req, res) {
-    info(`serving resources from ${config.ResourcePrefix}`)
+    info(`Serving UI resources from ${config.ResourcePrefix}`)
     req.metricsPath = '/catchall'
     const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}${req.path}`
     if (!req.path.includes('-hmr')) {
@@ -84,7 +84,7 @@ if (config.ResourcePrefix !== 'local') {
     }
   })
 } else {
-  info('using local resources from "../../ui/dist"')
+  info('Using local UI resources from "../../ui/dist"')
   app.get('/', async (req, res) => {
     const filePath = join(__dirname, '../../ui', 'dist', 'index.html')
     const html = await readFile(filePath)
@@ -103,7 +103,7 @@ app.listen(config.PORT, () => {
 if (['dev', 'test'].includes(config.Env)) {
   ngrok.listen(app).then(() => {
     config.WebhookHostUrl = app.listener.url()
-    console.log('established listener at: ' + app.listener.url())
+    console.log('Established listener at: ' + app.listener.url())
   })
 }
 
