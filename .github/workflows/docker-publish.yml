@@ -46,7 +46,6 @@ jobs:
 
       - name: 'Create Server env file'
         env:
-          UI_PORT: ${{ vars.RESOURCE_PORT }}
           env_vars: ${{ needs.setup-env.outputs.env_vars }}
         run: |
           ENV_FILE_PATH=./apps/server/.env
@@ -56,7 +55,6 @@ jobs:
           echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
           # Override ENV to Env=prod
           echo ENV=prod >> ${ENV_FILE_PATH}
-          echo ResourcePrefix="http://ui:${UI_PORT}" >> ${ENV_FILE_PATH}
           cat ${ENV_FILE_PATH}
 
       - name: 'Create Root env file'

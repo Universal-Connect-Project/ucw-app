@@ -35,7 +35,7 @@ services:
       - ./apps/server/.env
     environment:
       RedisServer: "redis://cache:${REDIS_PORT}"
-      ResourcePrefix: "http://ui:${UI_PORT}"
+      RESOURCEPREFIX: "http://ui:${UI_PORT}"
 
   ui:
     container_name: ucw-app-ui
