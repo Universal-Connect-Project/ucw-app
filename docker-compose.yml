@@ -26,7 +26,7 @@ services:
           platforms:
             - linux/arm64
             - linux/amd64
-    image: universalconnectfoundation/ucw-app:v${DOCKER_IMAGE_SERVER}
+    image: universalconnectfoundation/ucw-app-server:v${DOCKER_IMAGE_SERVER}
     networks:
       - ucw
     ports:
@@ -53,7 +53,7 @@ services:
           platforms:
             - linux/arm64
             - linux/amd64
-    image: universalconnectfoundation/ucw-ui:v${DOCKER_IMAGE_UI}
+    image: universalconnectfoundation/ucw-app-ui:v${DOCKER_IMAGE_UI}
     networks:
       - ucw
 # Uncomment to expose to host. Currently not needed
