@@ -94,7 +94,7 @@ if (config.ResourcePrefix !== 'local') {
 }
 
 app.listen(config.PORT, () => {
-  const message = `Server is running on port ${config.PORT}, Env: ${config.Env}`
+  const message = `Server is running on port ${config.PORT}, Env: ${config.Env}, LogLevel: ${config.LogLevel}`
   const uiMessage = `UI is running on ${config.ResourcePrefix}`
   console.log(message)
   console.log(uiMessage)

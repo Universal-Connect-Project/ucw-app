@@ -33,9 +33,6 @@ services:
       - "${SERVER_PORT}:${SERVER_PORT}"
     env_file:
       - ./apps/server/.env
-    environment:
-      RedisServer: "redis://cache:${REDIS_PORT}"
-      RESOURCEPREFIX: "http://ui:${UI_PORT}"
 
   ui:
     container_name: ucw-app-ui
@@ -59,11 +56,11 @@ services:
     image: universalconnectfoundation/ucw-ui:v${DOCKER_IMAGE_UI}
     networks:
       - ucw
-# Uncomment to expose to host
+# Uncomment to expose to host. Currently not needed
 #    ports:
 #      - "${UI_PORT}:${UI_PORT}"
-    environment:
-      UI_PORT: ${UI_PORT}
+    env_file:
+      - .env
 
   cache:
     container_name: ucw-app-cache
