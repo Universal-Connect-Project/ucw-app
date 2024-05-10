@@ -60,8 +60,6 @@ jobs:
           echo DOCKER_TOKEN=${{ secrets.DOCKER_TOKEN }} >> ${ENV_FILE_PATH}
           cat ${ENV_FILE_PATH}
           
-          ### TODO: Override ENV so Env=prod
-
       - name: 'Get Server version'
         run: |
           DOCKER_IMAGE_SERVER=$(npm pkg get version --prefix ./apps/server | xargs)
