@@ -8,7 +8,6 @@ services:
         condition: service_healthy
       ui:
         condition: service_healthy
-
     container_name: ucw-app-server
     restart: on-failure
     healthcheck:
@@ -22,16 +21,18 @@ services:
       dockerfile: ./docker-server.Dockerfile
       args:
         APP: server
-    image: universalconnectfoundation/ucw-app:v${DOCKER_IMAGE_SERVER}
+      <<:
+        x-bake:
+          platforms:
+            - linux/arm64
+            - linux/amd64
+    image: universalconnectfoundation/ucw-app-server:v${DOCKER_IMAGE_SERVER}
     networks:
       - ucw
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
     env_file:
       - ./apps/server/.env
-    environment:
-      RedisServer: "redis://cache:${REDIS_PORT}"
-      ResourcePrefix: "http://ui:${UI_PORT}"
 
   ui:
     container_name: ucw-app-ui
@@ -47,16 +48,19 @@ services:
       dockerfile: ./docker-ui.Dockerfile
       args:
         APP: ui
-    image: universalconnectfoundation/ucw-ui:v${DOCKER_IMAGE_UI}
+      <<:
+        x-bake:
+          platforms:
+            - linux/arm64
+            - linux/amd64
+    image: universalconnectfoundation/ucw-app-ui:v${DOCKER_IMAGE_UI}
     networks:
       - ucw
-    ports:
-      - "${UI_PORT}:${UI_PORT}"
+# Uncomment to expose to host. Currently not needed
+#    ports:
+#      - "${UI_PORT}:${UI_PORT}"
     env_file:
-      - ./.env
-    environment:
-      APP: "ui"
-      RESOURCE_PORT: "${UI_PORT}"
+      - .env
 
   cache:
     container_name: ucw-app-cache
@@ -82,3 +86,4 @@ volumes:
 
 networks:
   ucw:
+    driver: bridge

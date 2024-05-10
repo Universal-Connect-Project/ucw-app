@@ -73,7 +73,8 @@ require a redis instance. To fix this error you can either:
 **Publishing to Docker Hub is automatic, and will happen when code is merged to `main`.**
 
 **IMPORTANT**: Prior to merging your PR to main, make sure the versions of `ui` and `ucw-app` are up-to-date. The `version` property in
-their respective `package.json` files should be up-to-date. This is where the versions for the docker images is pulled from.
+their respective `package.json` files should be up-to-date. This is where the versions for the docker images is pulled from 
+for automated publishing.
 
 ### Publishing manually
 
@@ -88,15 +89,17 @@ Login to docker hub:
 
 _NOTE: You must be a member of the UCP organization._
 
-Then run the following, which will build the new images:
+Run the following, which will set up a new multi-arch builder:
 
-    docker compose up --pull never
+    docker buildx create --use --platform=linux/arm64,linux/amd64 --name multi-platform-builder
+    docker buildx inspect --bootstrap
 
-Then run:
+Run the following, which will build and publish the new images:
 
-    docker compose push
+    docker buildx bake --file ./docker-compose.yml --push
 
-To update the versions that are pulled/published, update the `./.env` file. Look at the `DOCKER_IMAGE_{UI|SERVER}` values. 
+Note: To update the versions that are pulled/published, update the `./.env` file at the root of the project. Look at 
+the `DOCKER_IMAGE_{UI|SERVER}` values. 
 These variables are used in the `./docker-compose.yml` file when building/pulling/publishing the images.
 
 ## Additional Information

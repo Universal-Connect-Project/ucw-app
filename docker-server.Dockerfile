@@ -45,7 +45,7 @@ USER nodejs
 COPY --from=pruner --chown=nodejs:nodejs ${WRKDR}/out/full/apps/${APP}/ .
 COPY --from=builder --chown=nodejs:nodejs ${WRKDR}/node_modules/ ./node_modules
 
-ENV Env prod
+ENV Env=prod
 
 EXPOSE ${PORT}
 

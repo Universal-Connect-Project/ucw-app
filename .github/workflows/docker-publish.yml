@@ -17,6 +17,7 @@ jobs:
     needs: [setup-env]
 
     steps:
+
       - name: 'Check out the repo'
         uses: actions/checkout@v4
 
@@ -26,8 +27,12 @@ jobs:
           node-version: 'lts/*'
           check-latest: true
 
+      - name: 'Set up Docker Buildx'
+        uses: docker/setup-buildx-action@v3
+
       - name: 'Create Server env file'
         env:
+          UI_PORT: ${{ vars.RESOURCE_PORT }}
           env_vars: ${{ needs.setup-env.outputs.env_vars }}
         run: |
           ENV_FILE_PATH=./apps/server/.env
@@ -35,17 +40,18 @@ jobs:
           
           # Vars
           echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
+          # Override ENV to Env=prod
+          echo ENV=prod >> ${ENV_FILE_PATH}
+          echo RESOURCEPREFIX="http://ui:${UI_PORT}" >> ${ENV_FILE_PATH}
           cat ${ENV_FILE_PATH}
 
       - name: 'Create Root env file'
-        env:
-          env_vars: ${{ needs.setup-env.outputs.env_vars }}
         run: |
           ENV_FILE_PATH=.env
           touch ${ENV_FILE_PATH}
           
           # Vars
-          echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
+          echo REDIS_PORT=${{ vars.REDIS_PORT }} >> ${ENV_FILE_PATH}
           echo SERVER_PORT=${{ vars.PORT }} >> ${ENV_FILE_PATH}
           echo UI_PORT=${{ vars.RESOURCE_PORT }} >> ${ENV_FILE_PATH}
             
@@ -53,7 +59,7 @@ jobs:
           echo DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} >> ${ENV_FILE_PATH}
           echo DOCKER_TOKEN=${{ secrets.DOCKER_TOKEN }} >> ${ENV_FILE_PATH}
           cat ${ENV_FILE_PATH}
-
+          
       - name: 'Get Server version'
         run: |
           DOCKER_IMAGE_SERVER=$(npm pkg get version --prefix ./apps/server | xargs)
@@ -98,7 +104,7 @@ jobs:
         run: |
           {
             echo "### UI Version Check Results"
-            echo "Version $VERSION of the UI already exists on Docker Hub. 😬🫠"
+            echo "Version $DOCKER_IMAGE_UI of the UI already exists on Docker Hub. 😬🫠"
             echo "Please update the 'version' property in the ./apps/ui 'package.json' and try again."
           } >> $GITHUB_STEP_SUMMARY
 
@@ -107,7 +113,7 @@ jobs:
         run: |
           {
             echo "### Server Version Check Results"
-            echo "Version $VERSION of the Server already exists on Docker Hub. 😬🫠"
+            echo "Version $DOCKER_IMAGE_SERVER of the Server already exists on Docker Hub. 😬🫠"
             echo "Please update the 'version' property in the ./apps/server 'package.json' and try again."
           } >> $GITHUB_STEP_SUMMARY
 
@@ -120,6 +126,5 @@ jobs:
 
       - name: 'Build and Push Docker images'
         if: env.UI_VERSION_EXISTS == 'false' && env.SERVER_VERSION_EXISTS == 'false'
-        working-directory: ./
         run: |
-          docker compose build --quiet --push
+          docker buildx bake --file ./docker-compose.yml --push
