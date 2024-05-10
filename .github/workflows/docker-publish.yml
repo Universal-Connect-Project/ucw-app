@@ -3,7 +3,7 @@ name: 'Publish Docker image'
 on:
   push:
     branches:
-      - main
+      - '**'
 
 jobs:
   setup-env:
@@ -26,20 +26,6 @@ jobs:
         with:
           node-version: 'lts/*'
           check-latest: true
-
-#      - name: Set up Docker
-#        uses: crazy-max/ghaction-setup-docker@v3
-#        with:
-#          daemon-config: |
-#            {
-#              "debug": true,
-#              "features": {
-#                "containerd-snapshotter": true
-#              }
-#            }
-
-      - name: 'Set up QEMU'
-        uses: docker/setup-qemu-action@v3
 
       - name: 'Set up Docker Buildx'
         uses: docker/setup-buildx-action@v3
