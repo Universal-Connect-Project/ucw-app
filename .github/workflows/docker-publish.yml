@@ -84,8 +84,8 @@ jobs:
           echo "${{ env.SERVER_VERSION }}"
           echo "-----------------"
           
-          UI_DIGEST=$(docker buildx imagetools inspect universalconnectfoundation/ucw-ui:v${{ env.UI_VERSION }} --format "{{json .Manifest}}" | jq -r .digest)
-          SERVER_DIGEST=$(docker buildx imagetools inspect universalconnectfoundation/ucw-app:v${{ env.SERVER_VERSION }} --format "{{json .Manifest}}" | jq -r .digest)
+          UI_DIGEST=$(docker buildx imagetools inspect universalconnectfoundation/ucw-app-ui:v${{ env.UI_VERSION }} --format "{{json .Manifest}}" | jq -r .digest)
+          SERVER_DIGEST=$(docker buildx imagetools inspect universalconnectfoundation/ucw-app-server:v${{ env.SERVER_VERSION }} --format "{{json .Manifest}}" | jq -r .digest)
           
           if [ "${UI_DIGEST}" == "" ]; then
             echo "UI_VERSION_EXISTS=false" >> $GITHUB_ENV
