@@ -69,7 +69,7 @@ Use the following commands to add/remove/update dependencies within each app/pac
 
 Example:
 
-    npm install react --workspace=ui
+    npm install react --workspace=apps/ui
 
 #### Remove a package from a workspace
 
@@ -77,7 +77,7 @@ Example:
 
 Example:
 
-    npm uninstall react --workspace=ui
+    npm uninstall react --workspace=apps/ui
 
 #### Upgrade a package in a workspace
 
@@ -85,4 +85,4 @@ Example:
 
 Example:
 
-    npm update react --workspace=ui
+    npm update react --workspace=apps/ui
