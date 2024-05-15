@@ -4,7 +4,7 @@ on: pull_request
 
 jobs:
   setup-env:
-    name: 'Load ENV Vars'
+    name: "Load ENV Vars"
     uses: ./.github/workflows/setup-env.yml
     secrets: inherit
 
@@ -20,20 +20,20 @@ jobs:
       - name: Set up NodeJS
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
+          node-version: "lts/*"
           check-latest: true
 
       - name: Install all dependencies
         run: |
           npm ci
 
-      - name: 'Create env file'
+      - name: "Create env file"
         env:
           env_vars: ${{ needs.setup-env.outputs.env_vars }}
         run: |
           ENV_FILE_PATH=./apps/server/.env
           touch ${ENV_FILE_PATH}
-          
+
           # Vars
           echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
           echo RESOURCEVERSION="" >> ${ENV_FILE_PATH}
@@ -41,9 +41,6 @@ jobs:
           # Secrets (can't load these from another job, due to GH security features)          
           echo CRYPTOIV=${{ secrets.CRYPTOIV }} >> ${ENV_FILE_PATH}
           echo CRYPTOKEY=${{ secrets.CRYPTOKEY }} >> ${ENV_FILE_PATH}
-          echo UCPAUTHCLIENTID=${{ secrets.UCP_CLIENT_ID }} >> ${ENV_FILE_PATH}
-          echo UCPAUTHCLIENTSECRET=${{ secrets.UCP_CLIENT_SECRET }} >> ${ENV_FILE_PATH}
-          echo UCPAUTHENCRYPTIONKEY=${{ secrets.UCP_ENCRYPTION_KEY }} >> ${ENV_FILE_PATH}
           cat ${ENV_FILE_PATH}
 
       - name: Run Jest Tests
