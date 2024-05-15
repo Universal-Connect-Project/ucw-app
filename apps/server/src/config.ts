@@ -13,6 +13,8 @@ const nonSensitiveSharedConfig = {
   Component: "UniversalWidget",
   ServiceName: "universal_widget",
   CryptoAlgorithm: "aes-256-cbc",
+  SophtronApiServiceEndpoint: "https://api.sophtron.com/api",
+  SophtronVCServiceEndpoint: "https://vc.sophtron.com/api/",
 }
 
 const keysToPullFromEnv = [
