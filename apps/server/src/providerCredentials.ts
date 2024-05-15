@@ -1,6 +1,6 @@
 import config from "./config"
 
-module.exports = {
+const providerCredentials = {
   mxInt: {
     username: config.MxClientId,
     password: config.MxApiSecret,
@@ -58,3 +58,5 @@ module.exports = {
     available: true,
   },
 }
+
+export default providerCredentials
