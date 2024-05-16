@@ -1,7 +1,7 @@
-import { http, HttpResponse } from "msw"
-import { server } from "../test/testServer"
-import { institutionData } from "../test/testData/institution"
-import { EXTENDED_HISTORY_NOT_SUPPORTED_MSG, MxApi } from "./mx"
+import { http, HttpResponse } from 'msw'
+import { server } from '../test/testServer'
+import { institutionData } from '../test/testData/institution'
+import { EXTENDED_HISTORY_NOT_SUPPORTED_MSG, MxApi } from './mx'
 import {
   AGGREGATE_MEMBER_PATH,
   ANSWER_CHALLENGE_PATH,
@@ -13,9 +13,9 @@ import {
   MX_INSTITUTION_BY_ID_PATH,
   READ_MEMBER_STATUS_PATH,
   UPDATE_CONNECTION_PATH,
-  VERIFY_MEMBER_PATH,
-} from "../test/handlers"
-import { institutionCredentialsData } from "../test/testData/institutionCredentials"
+  VERIFY_MEMBER_PATH
+} from '../test/handlers'
+import { institutionCredentialsData } from '../test/testData/institutionCredentials'
 import {
   aggregateMemberMemberData,
   connectionByIdMemberData,
@@ -24,23 +24,23 @@ import {
   memberData,
   membersData,
   memberStatusData,
-  verifyMemberData,
-} from "../test/testData/members"
-import config from "../config"
-import { ChallengeType, ConnectionStatus } from "../shared/contract"
+  verifyMemberData
+} from '../test/testData/members'
+import config from '../config'
+import { ChallengeType, ConnectionStatus } from '../shared/contract'
 import {
   clearRedisMock,
   createClient,
-  getRedisStorageObject,
-} from "../__mocks__/redis"
-import { createUserData, listUsersData } from "../test/testData/users"
+  getRedisStorageObject
+} from '../__mocks__/redis'
+import { createUserData, listUsersData } from '../test/testData/users'
 
 const mxApiInt = new MxApi(
   {
     mxInt: {
-      username: "testUsername",
-      password: "testPassword",
-    },
+      username: 'testUsername',
+      password: 'testPassword'
+    }
   },
   true
 )
@@ -50,10 +50,10 @@ const redisMock = createClient()
 const mxApi = new MxApi(
   {
     mxProd: {
-      username: "testUsername",
-      password: "testPassword",
+      username: 'testUsername',
+      password: 'testPassword'
     },
-    storageClient: redisMock,
+    storageClient: redisMock
   },
   false
 )
@@ -63,98 +63,98 @@ const institutionResponse = institutionData.institution
 const clientRedirectUrl = `${config.HostUrl}/oauth/mx/redirect_from`
 
 const testCredential = {
-  id: "testCredentialId",
-  label: "testCredentialLabel",
-  value: "testCredentialValue",
-  field_type: "testCredentialFieldType",
-  field_name: "testCredentialFieldName",
+  id: 'testCredentialId',
+  label: 'testCredentialLabel',
+  value: 'testCredentialValue',
+  field_type: 'testCredentialFieldType',
+  field_name: 'testCredentialFieldName'
 }
 
 const testChallenge = {
-  id: "testChallengeId",
-  external_id: "testExternalId",
-  question: "testQuestion",
-  data: "testData",
+  id: 'testChallengeId',
+  external_id: 'testExternalId',
+  question: 'testQuestion',
+  data: 'testData',
   type: ChallengeType.QUESTION,
-  response: "testResponse",
+  response: 'testResponse'
 }
 
-describe("mx provider", () => {
-  describe("MxApi", () => {
-    it("works with integration credentials", async () => {
-      expect(await mxApiInt.GetInstitutionById("testId")).toEqual({
+describe('mx provider', () => {
+  describe('MxApi', () => {
+    it('works with integration credentials', async () => {
+      expect(await mxApiInt.GetInstitutionById('testId')).toEqual({
         id: institutionResponse.code,
         logo_url: institutionResponse.medium_logo_url,
         name: institutionResponse.name,
         oauth: institutionResponse.supports_oauth,
         url: institutionResponse.url,
-        provider: "mx_int",
+        provider: 'mx_int'
       })
     })
 
-    describe("GetInsitutionById", () => {
-      it("uses the medium logo if available", async () => {
-        expect(await mxApi.GetInstitutionById("testId")).toEqual({
+    describe('GetInsitutionById', () => {
+      it('uses the medium logo if available', async () => {
+        expect(await mxApi.GetInstitutionById('testId')).toEqual({
           id: institutionResponse.code,
           logo_url: institutionResponse.medium_logo_url,
           name: institutionResponse.name,
           oauth: institutionResponse.supports_oauth,
           url: institutionResponse.url,
-          provider: "mx",
+          provider: 'mx'
         })
       })
 
-      it("uses the small logo if no medium logo", async () => {
+      it('uses the small logo if no medium logo', async () => {
         server.use(
           http.get(MX_INSTITUTION_BY_ID_PATH, () =>
             HttpResponse.json({
               ...institutionData,
               institution: {
                 ...institutionData.institution,
-                medium_logo_url: undefined,
-              },
+                medium_logo_url: undefined
+              }
             })
           )
         )
 
-        expect(await mxApi.GetInstitutionById("testId")).toEqual({
+        expect(await mxApi.GetInstitutionById('testId')).toEqual({
           id: institutionResponse.code,
           logo_url: institutionResponse.small_logo_url,
           name: institutionResponse.name,
           oauth: institutionResponse.supports_oauth,
           url: institutionResponse.url,
-          provider: "mx",
+          provider: 'mx'
         })
       })
     })
 
-    describe("ListInstitutionCredentials", () => {
+    describe('ListInstitutionCredentials', () => {
       const [firstCredential, secondCredential] =
         institutionCredentialsData.credentials
 
-      it("transforms the credentials into useable form", async () => {
-        expect(await mxApi.ListInstitutionCredentials("testId")).toEqual([
+      it('transforms the credentials into useable form', async () => {
+        expect(await mxApi.ListInstitutionCredentials('testId')).toEqual([
           {
             id: firstCredential.guid,
             field_name: firstCredential.field_name,
             field_type: firstCredential.field_type,
-            label: firstCredential.field_name,
+            label: firstCredential.field_name
           },
           {
             id: secondCredential.guid,
             field_name: secondCredential.field_name,
             field_type: secondCredential.field_type,
-            label: secondCredential.field_name,
-          },
+            label: secondCredential.field_name
+          }
         ])
       })
     })
 
-    describe("ListConnections", () => {
+    describe('ListConnections', () => {
       const [firstMember, secondMember] = membersData.members
 
-      it("retrieves and transforms the members", async () => {
-        expect(await mxApi.ListConnections("testId")).toEqual([
+      it('retrieves and transforms the members', async () => {
+        expect(await mxApi.ListConnections('testId')).toEqual([
           {
             id: firstMember.guid,
             cur_job_id: firstMember.guid,
@@ -162,7 +162,7 @@ describe("mx provider", () => {
             is_being_aggregated: firstMember.is_being_aggregated,
             is_oauth: firstMember.is_oauth,
             oauth_window_uri: firstMember.oauth_window_uri,
-            provider: "mx",
+            provider: 'mx'
           },
           {
             id: secondMember.guid,
@@ -171,49 +171,49 @@ describe("mx provider", () => {
             is_being_aggregated: secondMember.is_being_aggregated,
             is_oauth: secondMember.is_oauth,
             oauth_window_uri: secondMember.oauth_window_uri,
-            provider: "mx",
-          },
+            provider: 'mx'
+          }
         ])
       })
     })
 
-    describe("ListConnectionCredentials", () => {
+    describe('ListConnectionCredentials', () => {
       const [firstCredential, secondCredential] =
         institutionCredentialsData.credentials
 
-      it("retreieves and transforms member credentials", async () => {
+      it('retreieves and transforms member credentials', async () => {
         expect(
-          await mxApi.ListConnectionCredentials("testMemberId", "testUserId")
+          await mxApi.ListConnectionCredentials('testMemberId', 'testUserId')
         ).toEqual([
           {
             id: firstCredential.guid,
             field_name: firstCredential.field_name,
             field_type: firstCredential.field_type,
-            label: firstCredential.field_name,
+            label: firstCredential.field_name
           },
           {
             id: secondCredential.guid,
             field_name: secondCredential.field_name,
             field_type: secondCredential.field_type,
-            label: secondCredential.field_name,
-          },
+            label: secondCredential.field_name
+          }
         ])
       })
     })
 
-    describe("CreateConnection", () => {
+    describe('CreateConnection', () => {
       const baseConnectionRequest = {
-        id: "testId",
-        initial_job_type: "auth",
+        id: 'testId',
+        initial_job_type: 'auth',
         background_aggregation_is_disabled: false,
         credentials: [testCredential],
-        institution_id: "testInstitutionId",
+        institution_id: 'testInstitutionId',
         is_oauth: false,
         skip_aggregation: false,
-        metadata: "testMetadata",
+        metadata: 'testMetadata'
       }
 
-      it("deletes the existing member if one is found", async () => {
+      it('deletes the existing member if one is found', async () => {
         let memberDeletionAttempted = false
 
         server.use(
@@ -221,7 +221,7 @@ describe("mx provider", () => {
             memberDeletionAttempted = true
 
             return new HttpResponse(null, {
-              status: 200,
+              status: 200
             })
           })
         )
@@ -230,15 +230,15 @@ describe("mx provider", () => {
           {
             ...baseConnectionRequest,
             institution_id: membersData.members[0].institution_code,
-            is_oauth: true,
+            is_oauth: true
           },
-          "testUserId"
+          'testUserId'
         )
 
         expect(memberDeletionAttempted).toBe(true)
       })
 
-      describe("createMemberPayload spy tests", () => {
+      describe('createMemberPayload spy tests', () => {
         let createMemberPayload: any
 
         beforeEach(() => {
@@ -253,13 +253,13 @@ describe("mx provider", () => {
           )
         })
 
-        it("creates member with a client_redirect_url if is_oauth", async () => {
+        it('creates member with a client_redirect_url if is_oauth', async () => {
           await mxApi.CreateConnection(
             {
               ...baseConnectionRequest,
-              is_oauth: true,
+              is_oauth: true
             },
-            "testUserId"
+            'testUserId'
           )
 
           expect(createMemberPayload.client_redirect_url).toEqual(
@@ -267,61 +267,61 @@ describe("mx provider", () => {
           )
         })
 
-        it("creates member without a client_redirect_url if !is_oauth", async () => {
+        it('creates member without a client_redirect_url if !is_oauth', async () => {
           await mxApi.CreateConnection(
             {
               ...baseConnectionRequest,
-              is_oauth: false,
+              is_oauth: false
             },
-            "testUserId"
+            'testUserId'
           )
 
           expect(createMemberPayload.client_redirect_url).toEqual(null)
         })
 
-        it("creates a member with skip_aggregation if requested", async () => {
+        it('creates a member with skip_aggregation if requested', async () => {
           await mxApi.CreateConnection(
             {
               ...baseConnectionRequest,
-              skip_aggregation: true,
+              skip_aggregation: true
             },
-            "testUserId"
+            'testUserId'
           )
 
           expect(createMemberPayload.member.skip_aggregation).toEqual(true)
         })
 
-        it("creates a member with skip_aggregation if jobType is not aggregate", async () => {
+        it('creates a member with skip_aggregation if jobType is not aggregate', async () => {
           await mxApi.CreateConnection(
             {
               ...baseConnectionRequest,
-              initial_job_type: "auth",
+              initial_job_type: 'auth'
             },
-            "testUserId"
+            'testUserId'
           )
 
           expect(createMemberPayload.member.skip_aggregation).toEqual(true)
         })
 
-        it("creates a member with !skip_aggregation if jobType is aggregate", async () => {
+        it('creates a member with !skip_aggregation if jobType is aggregate', async () => {
           await mxApi.CreateConnection(
             {
               ...baseConnectionRequest,
-              initial_job_type: "aggregate",
+              initial_job_type: 'aggregate'
             },
-            "testUserId"
+            'testUserId'
           )
 
           expect(createMemberPayload.member.skip_aggregation).toEqual(false)
         })
 
-        it("creates a member with correctly mapped request options and returns the member from that response when is_oauth", async () => {
+        it('creates a member with correctly mapped request options and returns the member from that response when is_oauth', async () => {
           await mxApi.CreateConnection(
             {
               ...baseConnectionRequest,
-              is_oauth: true,
+              is_oauth: true
             },
-            "testUserId"
+            'testUserId'
           )
 
           expect(createMemberPayload).toEqual({
@@ -330,25 +330,25 @@ describe("mx provider", () => {
               credentials: [
                 {
                   guid: baseConnectionRequest.credentials[0].id,
-                  value: baseConnectionRequest.credentials[0].value,
-                },
+                  value: baseConnectionRequest.credentials[0].value
+                }
               ],
               institution_code: baseConnectionRequest.institution_id,
               is_oauth: true,
-              skip_aggregation: true,
+              skip_aggregation: true
             },
-            referral_source: "APP",
+            referral_source: 'APP'
           })
         })
       })
 
-      it("returns the member from verifyMember if job type is verification or aggregate_identity_verification", async () => {
+      it('returns the member from verifyMember if job type is verification or aggregate_identity_verification', async () => {
         const verificationMember = await mxApi.CreateConnection(
           {
             ...baseConnectionRequest,
-            initial_job_type: "verification",
+            initial_job_type: 'verification'
           },
-          "testUserId"
+          'testUserId'
         )
 
         expect(verificationMember.id).toEqual(verifyMemberData.member.guid)
@@ -356,41 +356,41 @@ describe("mx provider", () => {
         const aggregateMember = await mxApi.CreateConnection(
           {
             ...baseConnectionRequest,
-            initial_job_type: "all",
+            initial_job_type: 'all'
           },
-          "testUserId"
+          'testUserId'
         )
 
         expect(aggregateMember.id).toEqual(verifyMemberData.member.guid)
       })
 
-      it("returns the member from identifyMember if job type is aggregate_identity", async () => {
+      it('returns the member from identifyMember if job type is aggregate_identity', async () => {
         const member = await mxApi.CreateConnection(
           {
             ...baseConnectionRequest,
-            initial_job_type: "vc_identity",
+            initial_job_type: 'vc_identity'
           },
-          "testUserId"
+          'testUserId'
         )
 
         expect(member.id).toEqual(identifyMemberData.member.guid)
       })
 
-      it("returns the member from extendHistory if job type is aggregate_extendedhistory", async () => {
+      it('returns the member from extendHistory if job type is aggregate_extendedhistory', async () => {
         const member = await mxApi.CreateConnection(
           {
             ...baseConnectionRequest,
-            initial_job_type: "aggregate_extendedhistory",
+            initial_job_type: 'aggregate_extendedhistory'
           },
-          "testUserId"
+          'testUserId'
         )
 
         expect(member.id).toEqual(extendHistoryMemberData.member.guid)
       })
     })
 
-    describe("DeleteConnection", () => {
-      it("deletes the connection", async () => {
+    describe('DeleteConnection', () => {
+      it('deletes the connection', async () => {
         let connectionDeletionAttempted = false
 
         server.use(
@@ -398,80 +398,80 @@ describe("mx provider", () => {
             connectionDeletionAttempted = true
 
             return new HttpResponse(null, {
-              status: 200,
+              status: 200
             })
           })
         )
 
-        await mxApi.DeleteConnection("testId", "testUserId")
+        await mxApi.DeleteConnection('testId', 'testUserId')
 
         expect(connectionDeletionAttempted).toBe(true)
       })
     })
 
-    describe("UpdateConnection", () => {
+    describe('UpdateConnection', () => {
       const baseUpdateConnectionRequest = {
-        id: "testUpdateConnectionId",
-        job_type: "auth",
+        id: 'testUpdateConnectionId',
+        job_type: 'auth',
         credentials: [testCredential],
-        challenges: [testChallenge],
+        challenges: [testChallenge]
       }
 
-      it("returns the member from verifyMember if jobType is verification", async () => {
+      it('returns the member from verifyMember if jobType is verification', async () => {
         const member = await mxApi.UpdateConnection(
           {
             ...baseUpdateConnectionRequest,
-            job_type: "verification",
+            job_type: 'verification'
           },
-          "testUserId"
+          'testUserId'
         )
 
         expect(member.id).toEqual(verifyMemberData.member.guid)
       })
 
-      it("returns the member from identifyMember if jobType is aggregate_identity", async () => {
+      it('returns the member from identifyMember if jobType is aggregate_identity', async () => {
         const member = await mxApi.UpdateConnection(
           {
             ...baseUpdateConnectionRequest,
-            job_type: "aggregate_identity",
+            job_type: 'aggregate_identity'
           },
-          "testUserId"
+          'testUserId'
         )
 
         expect(member.id).toEqual(identifyMemberData.member.guid)
       })
 
-      it("returns the member from extendHistory if jobType is aggregate_extendedhistory", async () => {
+      it('returns the member from extendHistory if jobType is aggregate_extendedhistory', async () => {
         const member = await mxApi.UpdateConnection(
           {
             ...baseUpdateConnectionRequest,
-            job_type: "aggregate_extendedhistory",
+            job_type: 'aggregate_extendedhistory'
           },
-          "testUserId"
+          'testUserId'
         )
 
         expect(member.id).toEqual(extendHistoryMemberData.member.guid)
       })
 
-      it("returns the member from aggregateMember if jobType is agg", async () => {
+      it('returns the member from aggregateMember if jobType is agg', async () => {
         const member = await mxApi.UpdateConnection(
           {
             ...baseUpdateConnectionRequest,
-            job_type: "agg",
+            job_type: 'agg'
           },
-          "testUserId"
+          'testUserId'
         )
 
         expect(member.id).toEqual(aggregateMemberMemberData.member.guid)
       })
 
-      it("returns the member from aggregateMember if extended history is not supported", async () => {
+      it('returns the member from aggregateMember if extended history is not supported', async () => {
         server.use(
           http.post(EXTEND_HISTORY_PATH, () =>
             HttpResponse.json({
               error: {
-                message: EXTENDED_HISTORY_NOT_SUPPORTED_MSG,
-              },
+                message: EXTENDED_HISTORY_NOT_SUPPORTED_MSG
+              }
             })
           )
         )
@@ -479,23 +479,23 @@ describe("mx provider", () => {
         const member = await mxApi.UpdateConnection(
           {
             ...baseUpdateConnectionRequest,
-            job_type: "aggregate_extendedhistory",
+            job_type: 'aggregate_extendedhistory'
           },
-          "testUserId"
+          'testUserId'
         )
 
         expect(member.id).toEqual(aggregateMemberMemberData.member.guid)
       })
 
-      it("returns an error message if a request fails", async () => {
-        const errorMessage = "testError"
+      it('returns an error message if a request fails', async () => {
+        const errorMessage = 'testError'
 
         server.use(
           http.post(VERIFY_MEMBER_PATH, () =>
             HttpResponse.json({
               error: {
-                message: errorMessage,
-              },
+                message: errorMessage
+              }
             })
           )
         )
@@ -503,36 +503,36 @@ describe("mx provider", () => {
         const error = await mxApi.UpdateConnection(
           {
             ...baseUpdateConnectionRequest,
-            job_type: "verification",
+            job_type: 'verification'
           },
-          "testUserId"
+          'testUserId'
         )
 
         expect(error).toEqual({
           error_message: errorMessage,
-          id: baseUpdateConnectionRequest.id,
+          id: baseUpdateConnectionRequest.id
         })
       })
 
-      it("returns an error message if the aggregate member request fails after extended history is not supported", async () => {
+      it('returns an error message if the aggregate member request fails after extended history is not supported', async () => {
         server.use(
           http.post(EXTEND_HISTORY_PATH, () =>
             HttpResponse.json({
               error: {
-                message: EXTENDED_HISTORY_NOT_SUPPORTED_MSG,
-              },
+                message: EXTENDED_HISTORY_NOT_SUPPORTED_MSG
+              }
             })
           )
         )
 
-        const errorMessage = "testError"
+        const errorMessage = 'testError'
 
         server.use(
           http.post(AGGREGATE_MEMBER_PATH, () =>
             HttpResponse.json({
               error: {
-                message: errorMessage,
-              },
+                message: errorMessage
+              }
             })
           )
         )
@@ -540,20 +540,20 @@ describe("mx provider", () => {
         const error = await mxApi.UpdateConnection(
           {
             ...baseUpdateConnectionRequest,
-            job_type: "aggregate_extendedhistory",
+            job_type: 'aggregate_extendedhistory'
           },
-          "testUserId"
+          'testUserId'
         )
 
         expect(error).toEqual({
           error_message: errorMessage,
-          id: baseUpdateConnectionRequest.id,
+          id: baseUpdateConnectionRequest.id
         })
       })
     })
 
-    describe("UpdateConnectionInternal", () => {
-      it("it calls updateMember with the correct request body and returns the member", async () => {
+    describe('UpdateConnectionInternal', () => {
+      it('it calls updateMember with the correct request body and returns the member', async () => {
         let updateConnectionPaylod
 
         server.use(
@@ -566,12 +566,12 @@ describe("mx provider", () => {
 
         const member = await mxApi.UpdateConnectionInternal(
           {
-            id: "updateConnectionId",
-            job_type: "testJobType",
+            id: 'updateConnectionId',
+            job_type: 'testJobType',
             credentials: [testCredential],
-            challenges: [testChallenge],
+            challenges: [testChallenge]
           },
-          "testUserId"
+          'testUserId'
         )
 
         expect(updateConnectionPaylod).toEqual({
@@ -579,10 +579,10 @@ describe("mx provider", () => {
             credentials: [
               {
                 guid: testCredential.id,
-                value: testCredential.value,
-              },
-            ],
-          },
+                value: testCredential.value
+              }
+            ]
+          }
         })
 
         const testMember = memberData.member
@@ -594,15 +594,15 @@ describe("mx provider", () => {
           is_being_aggregated: testMember.is_being_aggregated,
           is_oauth: testMember.is_oauth,
           oauth_window_uri: testMember.oauth_window_uri,
-          provider: "mx",
+          provider: 'mx'
         })
       })
     })
 
-    describe("GetConnectionById", () => {
-      it("returns the member from readMember", async () => {
-        const testUserId = "userId"
-        const member = await mxApi.GetConnectionById("connectionId", testUserId)
+    describe('GetConnectionById', () => {
+      it('returns the member from readMember', async () => {
+        const testUserId = 'userId'
+        const member = await mxApi.GetConnectionById('connectionId', testUserId)
 
         const testMember = connectionByIdMemberData.member
 
@@ -612,13 +612,13 @@ describe("mx provider", () => {
           is_being_aggregated: testMember.is_being_aggregated,
           is_oauth: testMember.is_oauth,
           oauth_window_uri: testMember.oauth_window_uri,
-          provider: "mx",
-          user_id: testUserId,
+          provider: 'mx',
+          user_id: testUserId
         })
       })
     })
 
-    describe("GetConnectionStatus", () => {
+    describe('GetConnectionStatus', () => {
       afterEach(() => {
         clearRedisMock()
       })
@@ -627,55 +627,55 @@ describe("mx provider", () => {
         redisMock.set(memberStatusData.member.guid, { error: true })
 
         const connectionStatus = await mxApi.GetConnectionStatus(
-          "testMemberId",
-          "testJobId",
+          'testMemberId',
+          'testJobId',
           false,
-          "testUserId"
+          'testUserId'
         )
 
         expect(connectionStatus.status).toEqual(ConnectionStatus.REJECTED)
       })
 
-      it("returns a properly mapped response with TEXT, OPTIONS< TOKEN< IMAGE_DATA, and IMAGE_OPTIONS challenges", async () => {
+      it('returns a properly mapped response with TEXT, OPTIONS< TOKEN< IMAGE_DATA, and IMAGE_OPTIONS challenges', async () => {
         const challenges = [
           {
-            guid: "challengeGuid1",
-            label: "challengeLabel1",
-            type: "TEXT",
+            guid: 'challengeGuid1',
+            label: 'challengeLabel1',
+            type: 'TEXT'
           },
           {
-            guid: "challengeGuid2",
-            label: "challengeLabel2",
+            guid: 'challengeGuid2',
+            label: 'challengeLabel2',
             options: [
               {
-                label: "optionLabel1",
-                value: "optionValue1",
-              },
+                label: 'optionLabel1',
+                value: 'optionValue1'
+              }
             ],
-            type: "OPTIONS",
+            type: 'OPTIONS'
           },
           {
-            guid: "challengeGuid3",
-            label: "challengeLabel3",
-            type: "TOKEN",
+            guid: 'challengeGuid3',
+            label: 'challengeLabel3',
+            type: 'TOKEN'
           },
           {
-            guid: "challengeGuid4",
-            label: "challengeLabel4",
-            image_data: "imageData",
-            type: "IMAGE_DATA",
+            guid: 'challengeGuid4',
+            label: 'challengeLabel4',
+            image_data: 'imageData',
+            type: 'IMAGE_DATA'
           },
           {
-            guid: "challengeGuid5",
+            guid: 'challengeGuid5',
             image_options: [
               {
-                label: "optionLabel1",
-                value: "optionValue1",
-              },
+                label: 'optionLabel1',
+                value: 'optionValue1'
+              }
             ],
-            label: "challengeLabel5",
-            type: "IMAGE_OPTIONS",
-          },
+            label: 'challengeLabel5',
+            type: 'IMAGE_OPTIONS'
+          }
         ]
 
         const [
@@ -683,7 +683,7 @@ describe("mx provider", () => {
           optionsChallenge,
           tokenChallenge,
           imageChallenge,
-          imageOptionsChallenge,
+          imageOptionsChallenge
         ] = challenges
 
         server.use(
@@ -692,25 +692,25 @@ describe("mx provider", () => {
               ...memberStatusData,
               member: {
                 ...memberStatusData.member,
-                challenges,
-              },
+                challenges
+              }
             })
           )
         )
 
         const testMember = memberStatusData.member
-        const userId = "testUserId"
+        const userId = 'testUserId'
 
         expect(
           await mxApi.GetConnectionStatus(
-            "testMemberId",
-            "testJobId",
+            'testMemberId',
+            'testJobId',
             false,
             userId
           )
         ).toEqual({
           cur_job_id: testMember.guid,
-          provider: "mx",
+          provider: 'mx',
           id: testMember.guid,
           user_id: userId,
           status: ConnectionStatus[testMember.connection_status],
@@ -718,55 +718,55 @@ describe("mx provider", () => {
             {
               data: [
                 {
-                  key: "0",
-                  value: textChallenge.label,
-                },
+                  key: '0',
+                  value: textChallenge.label
+                }
               ],
               id: textChallenge.guid,
               type: ChallengeType.QUESTION,
-              question: textChallenge.label,
+              question: textChallenge.label
             },
             {
               data: [
                 {
                   key: optionsChallenge.options[0].label,
-                  value: optionsChallenge.options[0].value,
-                },
+                  value: optionsChallenge.options[0].value
+                }
               ],
               id: optionsChallenge.guid,
               question: optionsChallenge.label,
-              type: ChallengeType.OPTIONS,
+              type: ChallengeType.OPTIONS
             },
             {
               id: tokenChallenge.guid,
               data: tokenChallenge.label,
               question: tokenChallenge.label,
-              type: ChallengeType.TOKEN,
+              type: ChallengeType.TOKEN
             },
             {
               data: imageChallenge.image_data,
               id: imageChallenge.guid,
               question: imageChallenge.label,
-              type: ChallengeType.IMAGE,
+              type: ChallengeType.IMAGE
             },
             {
               data: [
                 {
                   key: imageOptionsChallenge.image_options[0].label,
-                  value: imageOptionsChallenge.image_options[0].value,
-                },
+                  value: imageOptionsChallenge.image_options[0].value
+                }
               ],
               id: imageOptionsChallenge.guid,
               question: imageOptionsChallenge.label,
-              type: ChallengeType.IMAGE_OPTIONS,
-            },
-          ],
+              type: ChallengeType.IMAGE_OPTIONS
+            }
+          ]
         })
       })
     })
 
-    describe("AnswerChallenge", () => {
-      it("calls the resumeAggregation endpoint with the correct payload and returns true", async () => {
+    describe('AnswerChallenge', () => {
+      it('calls the resumeAggregation endpoint with the correct payload and returns true', async () => {
         let answerChallengePayload
 
         server.use(
@@ -778,20 +778,20 @@ describe("mx provider", () => {
         )
 
         const challenge = {
-          id: "challengeId",
-          response: "challengeResponse",
+          id: 'challengeId',
+          response: 'challengeResponse'
         }
 
         expect(
           await mxApi.AnswerChallenge(
             {
-              id: "requestId",
-              job_type: "auth",
+              id: 'requestId',
+              job_type: 'auth',
               credentials: [],
-              challenges: [challenge],
+              challenges: [challenge]
             },
-            "jobId",
-            "userId"
+            'jobId',
+            'userId'
           )
         )
 
@@ -800,15 +800,15 @@ describe("mx provider", () => {
             challenges: [
               {
                 guid: challenge.id,
-                value: challenge.response,
-              },
-            ],
-          },
+                value: challenge.response
+              }
+            ]
+          }
         })
       })
     })
 
-    describe("ResolveUserId", () => {
+    describe('ResolveUserId', () => {
       it("returns the mx user from listUsers if it's available", async () => {
         const user = listUsersData.users[0]
 
@@ -818,12 +818,12 @@ describe("mx provider", () => {
       })
 
       it("creates the user if the user isn't in the list and returns it from there", async () => {
-        const returnedUserId = await mxApi.ResolveUserId("fdadfsafd")
+        const returnedUserId = await mxApi.ResolveUserId('fdadfsafd')
 
         expect(returnedUserId).toEqual(createUserData.user.guid)
       })
 
-      it("returns the provided userId if creating a user fails", async () => {
+      it('returns the provided userId if creating a user fails', async () => {
         server.use(
           http.post(
             CREATE_USER_PATH,
@@ -831,7 +831,7 @@ describe("mx provider", () => {
           )
         )
 
-        const userId = "fdasfdasfds"
+        const userId = 'fdasfdasfds'
 
         const returnedUserId = await mxApi.ResolveUserId(userId)
 
@@ -839,28 +839,28 @@ describe("mx provider", () => {
       })
     })
 
-    describe("HandleOauthResponse", () => {
-      const errorReason = "errorReason"
-      const memberGuid = "memberGuid"
+    describe('HandleOauthResponse', () => {
+      const errorReason = 'errorReason'
+      const memberGuid = 'memberGuid'
 
-      it("sets an error in redis if status is error", async () => {
+      it('sets an error in redis if status is error', async () => {
         const response = await MxApi.HandleOauthResponse({
           member_guid: memberGuid,
-          status: "error",
-          error_reason: errorReason,
+          status: 'error',
+          error_reason: errorReason
         })
 
         expect(getRedisStorageObject().memberGuid).toEqual(
           JSON.stringify({
             error: true,
-            error_reason: errorReason,
+            error_reason: errorReason
           })
         )
 
         expect(response).toMatchObject({
           id: memberGuid,
           error: errorReason,
-          status: ConnectionStatus.REJECTED,
+          status: ConnectionStatus.REJECTED
         })
 
         expect(response.storageClient).toBeTruthy()
@@ -868,21 +868,21 @@ describe("mx provider", () => {
         clearRedisMock()
       })
 
-      it("returns with connected status if success", async () => {
+      it('returns with connected status if success', async () => {
         const response = await MxApi.HandleOauthResponse({
           member_guid: memberGuid,
-          status: "success",
-          error_reason: errorReason,
+          status: 'success',
+          error_reason: errorReason
         })
 
         expect(response.status).toEqual(ConnectionStatus.CONNECTED)
       })
 
-      it("returns with pending status if not success", async () => {
+      it('returns with pending status if not success', async () => {
         const response = await MxApi.HandleOauthResponse({
           member_guid: memberGuid,
-          status: "fdsafds",
-          error_reason: errorReason,
+          status: 'fdsafds',
+          error_reason: errorReason
         })
 
         expect(response.status).toEqual(ConnectionStatus.PENDING)

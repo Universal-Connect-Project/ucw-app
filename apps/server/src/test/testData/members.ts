@@ -51,19 +51,22 @@ export const connectionByIdMemberData = {
 }
 
 export const membersData = {
-  members: [memberData.member, {
-    guid: 'testGuid2',
-    institution_code: 'insitutionCode2',
-    is_being_aggregated: false,
-    is_oauth: false,
-    oauth_window_uri: 'oauthWindowUri2'
-  }]
+  members: [
+    memberData.member,
+    {
+      guid: 'testGuid2',
+      institution_code: 'insitutionCode2',
+      is_being_aggregated: false,
+      is_oauth: false,
+      oauth_window_uri: 'oauthWindowUri2'
+    }
+  ]
 }
 
 export const memberStatusData = {
   member: {
     // challenges: undefined,
-    connection_status: ConnectionStatus.CREATED,
+    connection_status: 'CONNECTED',
     guid: 'memberStatusGuid'
   }
 }
