@@ -63,6 +63,7 @@ export enum ConnectionStatus {
 }
 
 export enum OAuthStatus {
+  _,
   PENDING,
   COMPLETE,
   ERROR
