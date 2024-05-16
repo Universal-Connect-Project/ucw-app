@@ -13,34 +13,18 @@ declare global {
   }
 }
 
-function get(req: Request) {
-  if (req.headers.meta?.length > 0) {
-    req.context = JSON.parse(req.headers.meta as string)
-    req.context.updated = false
-  } else {
-    req.context = {}
-  }
-  return req.context
-}
-
-function set(res: Response) {
-  if (res.context.updated) {
-    res.set("meta", JSON.stringify(res.context))
-  }
-}
-
 export function contextHandler(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
-  res.context = get(req)
-
-  const { send } = res
-  res.send = function (...args: any): any {
-    res.send = send
-    set(res)
-    send.apply(res, args)
+  let context = {}
+  if (req.headers.meta?.length > 0) {
+    context = JSON.parse(req.headers.meta as string)
   }
+
+  res.context = context
+  req.context = context
+
   next()
 }
