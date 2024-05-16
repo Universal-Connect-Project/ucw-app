@@ -21,9 +21,6 @@ const keysToPullFromEnv = [
   "SophtronClientId",
   "SophtronClientSecret",
 
-  "CryptoKey",
-  "CryptoIv",
-
   "Demo",
   "DefaultProvider",
   "PORT",

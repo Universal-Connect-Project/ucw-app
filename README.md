@@ -41,20 +41,9 @@ resulting in the error. To fix this, you will need to run `docker logout` from y
 
 ## Initial setup
 
-1. Run `npm run keys --prefix ./apps/server`, which will generate a new set of `key` and `IV` values.
-1. Fill in the `CryptoKey` and `CryptoIv` in your `./apps/server/.env` file with the generated `key` and `IV`.
-1. Sign up for a UCP client account: [here](https://login.universalconnectproject.org/) (the `Click here to login` link navigates to the aws hosted login page
-   where a sign-up option is available).
-1. Once you are registered and logged in, generate and view your client secrets
-
 Please remember that secrets are passed through environment variables instead of hardcoded in the code files.
 **DO NO** put any credentials in any of the code files. If you do so, it could accidentally get committed and leaked to the public.
 **Use the provided `.env` files.**
-
-_UCP credentials are required for authentication and secret exchange, storage (redis-like session cache) and analytics services._
-
-_The `CryptoKey` and `CryptoIv` values are for encrypting the session token in order to not rely on cookies. They must be
-shared across server instances if there are multiple instances._
 
 ## Redis
 

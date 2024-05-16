@@ -39,8 +39,6 @@ jobs:
           echo RESOURCEVERSION="" >> ${ENV_FILE_PATH}
 
           # Secrets (can't load these from another job, due to GH security features)          
-          echo CRYPTOIV=${{ secrets.CRYPTOIV }} >> ${ENV_FILE_PATH}
-          echo CRYPTOKEY=${{ secrets.CRYPTOKEY }} >> ${ENV_FILE_PATH}
           cat ${ENV_FILE_PATH}
 
       - name: Run Jest Tests

@@ -13,8 +13,7 @@
     "coverage": "npm test -- --verbose --coverage --watchAll",
     "test": "jest --no-coverage",
     "test:watch": "jest --no-coverage --watch",
-    "test-clear": "npm test -- --clearCache",
-    "keys": "node -e 'console.log(`key: ${crypto.randomBytes(32).toString(\"hex\")}\n IV: ${crypto.randomBytes(16).toString(\"hex\")}`)'"
+    "test-clear": "npm test -- --clearCache"
   },
   "dependencies": {
     "@babel/eslint-parser": "^7.18.2",
