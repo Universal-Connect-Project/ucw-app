@@ -27,7 +27,6 @@ interface HandleOauthReponseRequest {
   member_guid: string
   status: string
   error_reason: string
-  token: string
 }
 
 export function fromMxInstitution(
@@ -74,12 +73,10 @@ export class MxApi implements ProviderApiClient {
   apiClient: ReturnType<typeof MxPlatformApiFactory>
   mxConfig: any
   provider: string
-  token: string
   db: StorageClient
 
   constructor(config: any, int: boolean) {
-    const { mxInt, mxProd, token, storageClient } = config
-    this.token = token
+    const { mxInt, mxProd, storageClient } = config
     this.db = storageClient
     this.provider = int ? "mx_int" : "mx"
     this.mxConfig = int ? mxInt : mxProd
@@ -145,7 +142,7 @@ export class MxApi implements ProviderApiClient {
     const memberRes = await this.apiClient.createMember(userId, {
       referral_source: "APP", // request.is_oauth ? 'APP' : '',
       client_redirect_url: request.is_oauth
-        ? `${config.HostUrl}/oauth/${this.provider}/redirect_from?token=${this.token}`
+        ? `${config.HostUrl}/oauth/${this.provider}/redirect_from`
         : null,
       member: {
         skip_aggregation: request.skip_aggregation || jobType !== "aggregate",
@@ -363,7 +360,7 @@ export class MxApi implements ProviderApiClient {
     request: HandleOauthReponseRequest
   ): Promise<Connection> {
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { member_guid, status, error_reason, token } = request
+    const { member_guid, status, error_reason } = request
     const db = new StorageClient()
     if (status === "error") {
       await db.set(member_guid, {
