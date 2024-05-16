@@ -34,6 +34,84 @@ app.get("/ping", function (req, res) {
   res.send("ok")
 })
 
+// Elastic search setup
+const { Client } = require('@elastic/elasticsearch');
+const fs = require('fs');
+
+const client = new Client({ node: 'http://localhost:9200' });
+
+const items = [1, 2, 3, 4, 5];
+
+async function processItems() {
+  for (const item of items) {
+    await processItem(item);
+  }
+}
+
+async function processItem(item) {
+  // Simulate an asynchronous operation
+  return new Promise(resolve => {
+    setTimeout(() => {
+      console.log(`Processed item ${item}`);
+      resolve();
+    }, Math.random() * 1000);
+  });
+}
+
+processItems();
+
+
+async function indexDocuments() {
+  await client.indices.create({ index: 'institutions' })
+  console.log("indexing")
+  const dataFilePath = 'ucw_institution_mapping.json';
+  const rawData = fs.readFileSync(dataFilePath);
+  const jsonData = JSON.parse(rawData);
+
+  // const body = jsonData.flatMap(doc => [{ index: { _index: indexName } }, doc]);
+  for(const institution of jsonData) {
+    await client.index({
+      index: 'institutions',
+      id: institution.ucp_id,
+      document: institution,
+    })
+  }
+
+  console.log('done indexing')
+
+  // const { body: bulkResponse } = await client.bulk({ refresh: true, body });
+
+  // if (bulkResponse.errors) {
+  //   console.error('Failed to index documents:', bulkResponse.items);
+  // } else {
+  //   console.log('Successfully indexed documents:', bulkResponse.items);
+  // }
+}
+
+app.get('/es-index', async (req, res) => {
+  await indexDocuments();
+  res.send("Indexed institutions")
+})
+
+
+
+app.get('/pong/:search_term', async (req, res) => {
+  const stuff = await client.search({
+    index: 'institutions',
+    body: {
+      query: {
+        multi_match: {
+          query: req.params.search_term,
+          fields: ['name', 'keywords']
+        }
+      }
+    }
+  })
+  const institutionHits = stuff.hits.hits.map(esObject => esObject._source)
+  res.send(institutionHits)
+})
+
+
 useConnect(app)
 // useVcs(app);
 app.use(function (err, req, res, next) {

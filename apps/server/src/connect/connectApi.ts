@@ -4,11 +4,14 @@ import {
   type Connection,
   ConnectionStatus,
   type Institution,
+  type LocalInstitution,
+  type InstitutionResponse,
   type Challenge
 } from '../shared/contract'
 import * as logger from '../infra/logger'
 
 import { ProviderApiBase } from '../providers'
+import { Client } from '@elastic/elasticsearch'
 
 function mapInstitution (ins: Institution) {
   return ({
@@ -26,6 +29,24 @@ function mapInstitution (ins: Institution) {
     //   guid: c.id,
     //   ...c
     // }))
+  })
+}
+
+function mapInstitutionLocal (ins: LocalInstitution): InstitutionResponse {
+  const supportsOauth = ins.mx.supports_oauth || ins.sophtron.supports_oauth
+  // || ins.finicity.supports_oauth || ins.akoya.supports_oauth
+  return ({
+    id: ins.ucp_id,
+    guid: ins.ucp_id,
+    code: null,
+    name: ins.name,
+    url: ins.url,
+    logo_url: ins.logo,
+    instructional_data: null,
+    credentials: [] as any[],
+    supports_oauth: supportsOauth,
+    providers: null,
+    provider: null
   })
 }
 
@@ -92,9 +113,11 @@ function mapConnection (connection: Connection): Member {
 }
 
 export class ConnectApi extends ProviderApiBase {
+  client: any
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor
   constructor (req: any) {
     super(req)
+    this.client = new Client({ node: 'http://localhost:9200' });
   }
 
   async addMember (memberData: Member): Promise<MemberResponse> {
@@ -205,8 +228,21 @@ export class ConnectApi extends ProviderApiBase {
   }
 
   async loadInstitutions (query: string): Promise<any> {
-    const ret = await this.search(query)
-    return ret.map(mapInstitution)
+    // const ret = await this.search(query)
+    const stuff = await this.client.search({
+      index: 'institutions',
+      body: {
+        query: {
+          multi_match: {
+            query: query,
+            fields: ['name', 'keywords']
+          }
+        }
+      }
+    })
+    const institutionHits = stuff.hits.hits.map((esObject: { _source: any }) => esObject._source)
+    // return ret.map(mapInstitution)
+    return institutionHits.map(mapInstitutionLocal)
   }
 
   async loadInstitutionByGuid (guid: string): Promise<any> {

@@ -106,6 +106,45 @@ export interface Institution {
   providers?: Object | {}
 }
 
+export interface LocalInstitution {
+  name: string
+  keywords: string | null
+  logo: string
+  url: string
+  ucp_id: string
+  is_test_bank: boolean | false
+  mx: InstitutionProvider
+  sophtron: InstitutionProvider
+  finicity: InstitutionProvider
+  akoya: InstitutionProvider
+}
+
+interface InstitutionProvider {
+  id: string | null
+  supports_oauth: boolean | false
+  supports_identification: boolean | false
+  supports_verification: boolean | false
+  supports_account_statement: boolean | false
+  supports_history: boolean | false
+}
+
+export interface InstitutionResponse {
+  guid: string | null
+  id: string | null
+  name: string
+  url: string
+  logo_url: string | null
+  provider?: string | null
+  oauth?: boolean | false
+  code?: string | null
+  instructional_data?: string | null
+  credentials?: any
+  supports_oauth?: boolean | false
+  small_logo_url?: string | null
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  providers?: Object | {}
+}
+
 export interface Institutions {
   institutions: Institution[]
   pagination?: Pagination

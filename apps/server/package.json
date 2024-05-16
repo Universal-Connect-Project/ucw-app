@@ -5,7 +5,7 @@
   "scripts": {
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "dev": "ts-node src/server.js",
+    "dev": "nodemon src/server.js",
     "dev:debug": "node --inspect -r ts-node/register ./src/server.js",
     "server": "npm run dev",
     "lint": "eslint . --ext .js,.ts",
@@ -18,6 +18,7 @@
   "dependencies": {
     "@babel/eslint-parser": "^7.18.2",
     "@capacitor-community/http": "^1.4.1",
+    "@elastic/elasticsearch": "^8.13.1",
     "@ngrok/ngrok": "^1.2.0",
     "@types/express": "^4.17.21",
     "@types/uuid": "^9.0.8",
@@ -74,6 +75,7 @@
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-promise": "^6.1.1",
     "msw": "^2.2.13",
+    "nodemon": "^3.1.0",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
