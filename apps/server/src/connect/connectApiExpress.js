@@ -12,6 +12,8 @@ import { readFile } from "../utils/fs"
 
 const AGGREGATION_JOB_TYPE = 0
 
+const disableAnalytics = true
+
 export default function (app) {
   stubs(app)
   app.use(contextHandler)
@@ -37,6 +39,11 @@ export default function (app) {
   })
 
   app.post("/analytics*", async (req, res) => {
+    if (disableAnalytics) {
+      res.sendStatus(200)
+      return
+    }
+
     if (
       config.Env !== "test" &&
       config.AnalyticsServiceEndpoint !== "" &&
@@ -269,20 +276,9 @@ export default function (app) {
       )
     }
 
-    if (config.ResourcePrefix !== "local") {
-      const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}/oauth/success.html`
-      await wget(resourcePath).then((html) => {
-        mapOauthParams(queries, res, html)
-      })
-    } else {
-      const filePath = path.join(
-        __dirname,
-        "../",
-        "build",
-        "oauth/success.html"
-      )
-      const html = await readFile(filePath)
+    const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}/oauth/success.html`
+    await wget(resourcePath).then((html) => {
       mapOauthParams(queries, res, html)
-    }
+    })
   })
 }

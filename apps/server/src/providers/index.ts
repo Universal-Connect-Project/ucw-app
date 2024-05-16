@@ -161,7 +161,6 @@ export class ProviderApiBase {
   }
 
   async getInstitution(guid: string): Promise<any> {
-    console.log("here")
     const resolved = await this.resolveInstitution(guid)
     const inst = await this.serviceClient.GetInstitutionById(resolved.id)
     if (inst != null) {
