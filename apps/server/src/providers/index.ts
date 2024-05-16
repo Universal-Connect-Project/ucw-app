@@ -91,6 +91,7 @@ export class ProviderApiBase {
     this.analyticsClient = new AnalyticsClient(token)
     try {
       const conf = providerCredentials
+      // TODO Refactor: This naming is terribly misleading. "serviceClient" is something different, this is the ApiClient
       this.serviceClient = getApiClient(this.context?.provider, {
         ...conf,
         storageClient: this.storageClient

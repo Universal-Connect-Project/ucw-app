@@ -4,9 +4,21 @@ import { ProviderApiBase } from './index'
 import { createClient } from '../__mocks__/redis'
 import { ConnectionStatus, OAuthStatus } from '../../src/shared/contract'
 import { READ_MEMBER_STATUS_PATH } from '../test/handlers'
+import { MxApi } from './mx'
 
 const redisMock = createClient()
 const testConnectionId = 'test_connection_id'
+
+const mxApi = new MxApi(
+  {
+    mxProd: {
+      username: 'testUsername',
+      password: 'testPassword'
+    },
+    storageClient: redisMock
+  },
+  false
+)
 
 const providerApiBase = new ProviderApiBase({
   context: {
@@ -16,18 +28,14 @@ const providerApiBase = new ProviderApiBase({
       iv: 'test_iv'
     },
     resolved_user_id: 'test_user_id'
-  },
-  serviceClient: {},
-  analyticsClient: {},
-  storageClient: redisMock,
-  searchApi: {},
-  providers: []
+  }
 })
 
 describe('ProviderApiBase', () => {
   describe('getOauthState', () => {
     beforeAll(async () => {
       await providerApiBase.init()
+      providerApiBase.serviceClient = mxApi
     })
 
     describe('oauth status PENDING', () => {
