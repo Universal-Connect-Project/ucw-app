@@ -32,6 +32,9 @@ jobs:
           echo RESOURCEVERSION="" >> ${ENV_FILE_PATH}
 
           # Secrets (can't load these from another job, due to GH security features)
+          echo UCPAUTHCLIENTID=${{ secrets.UCP_CLIENT_ID }} >> ${ENV_FILE_PATH}
+          echo UCPAUTHCLIENTSECRET=${{ secrets.UCP_CLIENT_SECRET }} >> ${ENV_FILE_PATH}
+          echo UCPAUTHENCRYPTIONKEY=${{ secrets.UCP_ENCRYPTION_KEY }} >> ${ENV_FILE_PATH}
           cat ${ENV_FILE_PATH}
 
       - name: Cypress run
