@@ -713,7 +713,10 @@ describe('mx provider', () => {
           provider: 'mx',
           id: testMember.guid,
           user_id: userId,
-          status: ConnectionStatus[testMember.connection_status],
+          status:
+            ConnectionStatus[
+              testMember.connection_status as keyof typeof ConnectionStatus
+            ],
           challenges: [
             {
               data: [
