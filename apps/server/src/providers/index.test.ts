@@ -38,76 +38,70 @@ describe('ProviderApiBase', () => {
       providerApiBase.serviceClient = mxApi
     })
 
-    describe('oauth status PENDING', () => {
-      it('returns the expected state', async () => {
-        server.use(
-          http.get(READ_MEMBER_STATUS_PATH, () =>
-            HttpResponse.json({
-              member: {
-                connection_status: 'PENDING',
-                guid: 'memberStatusGuid'
-              }
-            })
-          )
+    it('returns a pending oauth state', async () => {
+      server.use(
+        http.get(READ_MEMBER_STATUS_PATH, () =>
+          HttpResponse.json({
+            member: {
+              connection_status: 'PENDING',
+              guid: 'memberStatusGuid'
+            }
+          })
         )
+      )
 
-        expect(await providerApiBase.getOauthState(testConnectionId)).toEqual({
-          oauth_state: {
-            guid: 'test_connection_id',
-            inbound_member_guid: 'test_connection_id',
-            outbound_member_guid: 'test_connection_id',
-            auth_status: OAuthStatus.PENDING
-          }
-        })
+      expect(await providerApiBase.getOauthState(testConnectionId)).toEqual({
+        oauth_state: {
+          guid: 'test_connection_id',
+          inbound_member_guid: 'test_connection_id',
+          outbound_member_guid: 'test_connection_id',
+          auth_status: OAuthStatus.PENDING
+        }
       })
     })
 
-    describe('oauth status COMPLETE', () => {
-      it('returns the expected state', async () => {
-        server.use(
-          http.get(READ_MEMBER_STATUS_PATH, () =>
-            HttpResponse.json({
-              member: {
-                connection_status: 'CONNECTED',
-                guid: 'memberStatusGuid'
-              }
-            })
-          )
+    it('returns a connected oauth state', async () => {
+      server.use(
+        http.get(READ_MEMBER_STATUS_PATH, () =>
+          HttpResponse.json({
+            member: {
+              connection_status: 'CONNECTED',
+              guid: 'memberStatusGuid'
+            }
+          })
         )
+      )
 
-        expect(await providerApiBase.getOauthState(testConnectionId)).toEqual({
-          oauth_state: {
-            guid: 'test_connection_id',
-            inbound_member_guid: 'test_connection_id',
-            outbound_member_guid: 'test_connection_id',
-            auth_status: OAuthStatus.COMPLETE
-          }
-        })
+      expect(await providerApiBase.getOauthState(testConnectionId)).toEqual({
+        oauth_state: {
+          guid: 'test_connection_id',
+          inbound_member_guid: 'test_connection_id',
+          outbound_member_guid: 'test_connection_id',
+          auth_status: OAuthStatus.COMPLETE
+        }
       })
     })
 
-    describe('oauth status ERRORED', () => {
-      it('returns the expected state', async () => {
-        server.use(
-          http.get(READ_MEMBER_STATUS_PATH, () =>
-            HttpResponse.json({
-              member: {
-                connection_status: 'DENIED',
-                guid: 'memberStatusGuid'
-              }
-            })
-          )
+    it('returns an errored oauth state', async () => {
+      server.use(
+        http.get(READ_MEMBER_STATUS_PATH, () =>
+          HttpResponse.json({
+            member: {
+              connection_status: 'DENIED',
+              guid: 'memberStatusGuid'
+            }
+          })
         )
+      )
 
-        expect(await providerApiBase.getOauthState(testConnectionId)).toEqual({
-          oauth_state: {
-            guid: 'test_connection_id',
-            inbound_member_guid: 'test_connection_id',
-            outbound_member_guid: 'test_connection_id',
-            auth_status: OAuthStatus.ERROR,
-            error_reason: ConnectionStatus.DENIED
-          }
-        })
+      expect(await providerApiBase.getOauthState(testConnectionId)).toEqual({
+        oauth_state: {
+          guid: 'test_connection_id',
+          inbound_member_guid: 'test_connection_id',
+          outbound_member_guid: 'test_connection_id',
+          auth_status: OAuthStatus.ERROR,
+          error_reason: ConnectionStatus.DENIED
+        }
       })
     })
   })
