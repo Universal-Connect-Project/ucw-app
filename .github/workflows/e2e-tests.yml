@@ -35,21 +35,22 @@ jobs:
           echo UCPAUTHCLIENTID=${{ secrets.UCP_CLIENT_ID }} >> ${ENV_FILE_PATH}
           echo UCPAUTHCLIENTSECRET=${{ secrets.UCP_CLIENT_SECRET }} >> ${ENV_FILE_PATH}
           echo UCPAUTHENCRYPTIONKEY=${{ secrets.UCP_ENCRYPTION_KEY }} >> ${ENV_FILE_PATH}
+
+          echo SOPHTRONCLIENTID=${{ secrets.SOPHTRON_API_USER_ID }} >> ${ENV_FILE_PATH}
+          echo SOPHTRONCLIENTSECRET=${{ secrets.SOPHTRON_API_USER_SECRET }} >> ${ENV_FILE_PATH}
+
+          echo MXCLIENTID=${{ secrets.MX_CLIENT_ID }} >> ${ENV_FILE_PATH}
+          echo MXAPISECRET=${{ secrets.MX_API_SECRET }} >> ${ENV_FILE_PATH}
+
+          echo FINICITYPARTNERID=${{ secrets.FINICITY_PARTNER_ID }} >> ${ENV_FILE_PATH}
+          echo FINICITYSECRET=${{ secrets.FINICITY_SECRET }} >> ${ENV_FILE_PATH}
+          echo FINICITYAPPKEY=${{ secrets.FINICITY_APP_KEY }} >> ${ENV_FILE_PATH}
+
           cat ${ENV_FILE_PATH}
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
-          CYPRESS_ucp_client_id: ${{ secrets.UCP_CLIENT_ID }}
-          CYPRESS_ucp_client_secret: ${{ secrets.UCP_CLIENT_SECRET }}
-          CYPRESS_ucp_encryption_key: ${{ secrets.UCP_ENCRYPTION_KEY }}
-          CYPRESS_sophtron_api_user_id: ${{ secrets.SOPHTRON_API_USER_ID }}
-          CYPRESS_sophtron_api_user_secret: ${{ secrets.SOPHTRON_API_USER_SECRET }}
-          CYPRESS_mx_client_id: ${{ secrets.MX_CLIENT_ID }}
-          CYPRESS_mx_api_secret: ${{ secrets.MX_API_SECRET }}
-          CYPRESS_finicity_partner_id: ${{ secrets.FINICITY_PARTNER_ID }}
-          CYPRESS_finicity_secret: ${{ secrets.FINICITY_SECRET }}
-          CYPRESS_finicity_app_key: ${{ secrets.FINICITY_APP_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           project: apps/server
