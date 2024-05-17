@@ -1,50 +1,43 @@
-import type { NextFunction, Request, Response } from 'express'
-import config from '../config'
-import { encrypt, decrypt } from '../utils'
+import type { NextFunction, Request, Response } from "express"
+import config from "../config"
+import { encrypt, decrypt } from "../utils"
+import { Context } from "../shared/contract"
 
 declare global {
   namespace Express {
     interface Request {
-      context?: import('../shared/contract').Context
+      context?: Context
     }
     interface Response {
-      context?: import('../shared/contract').Context
+      context?: Context
     }
   }
 }
 
-function get (req: Request) {
-  if (req.headers.meta?.length > 0) {
-    const decrypted = decrypt((req.headers.meta as string), config.CryptoKey, config.CryptoIv)
-    req.context = JSON.parse(decrypted)
-    req.context.updated = false
-  } else {
-    req.context = {}
-  }
-  return req.context
-}
-
-function set (res: Response) {
-  if (res.context.updated) {
-    res.set('meta', encrypt(JSON.stringify(res.context), config.CryptoKey, config.CryptoIv))
-  }
-}
-
-export function contextHandler (
+export function contextHandler(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
-  res.context = get(req)
-  // console.log('context res: ' + req.path)
-  // console.log(res.context)
+  let context = {} as Context
+  if (req.headers.meta?.length > 0) {
+    context = JSON.parse(req.headers.meta as string)
+    context.updated = false
+  }
+
+  res.context = context
+  req.context = context
+
   const { send } = res
   res.send = function (...args: any): any {
     res.send = send
-    set(res)
+
+    if (res.context.updated) {
+      res.set("meta", JSON.stringify(res.context))
+    }
+
     send.apply(res, args)
-    // console.log('context send: ' + req.path)
-    // console.log(res.context)
   }
+
   next()
 }

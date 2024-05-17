@@ -2,52 +2,71 @@ const processEnv = {}
 const envs = { ...process.env, ...(process as Record<string, any>).client_envs }
 
 Object.keys(envs).forEach((k) => {
-  (processEnv as Record<string, any>)[k.toUpperCase()] = envs[k]
+  ;(processEnv as Record<string, any>)[k.toUpperCase()] = envs[k]
 })
 
 const nonSensitiveSharedConfig = {
-  AuthServiceEndpoint: 'https://login.universalconnectproject.org/api',
-  SearchEndpoint: 'https://search.universalconnectproject.org/api/',
-  AnalyticsServiceEndpoint: 'https://analytics.universalconnectproject.org/api/',
-  Component: 'UniversalWidget',
-  ServiceName: 'universal_widget',
-  CryptoAlgorithm: 'aes-256-cbc'
+  AuthServiceEndpoint: "https://login.universalconnectproject.org/api",
+  SearchEndpoint: "https://search.universalconnectproject.org/api/",
+  AnalyticsServiceEndpoint:
+    "https://analytics.universalconnectproject.org/api/",
+  Component: "UniversalWidget",
+  ServiceName: "universal_widget",
+  CryptoAlgorithm: "aes-256-cbc",
+  SophtronApiServiceEndpoint: "https://api.sophtron.com/api",
+  SophtronVCServiceEndpoint: "https://vc.sophtron.com/api/",
 }
 
 const keysToPullFromEnv = [
-  'SophtronClientId',
-  'SophtronClientSecret',
+  "SophtronClientId",
+  "SophtronClientSecret",
 
-  'UcpAuthClientId',
-  'UcpAuthClientSecret',
-  'UcpAuthEncryptionKey',
+  "Demo",
+  "DefaultProvider",
+  "PORT",
 
-  'CryptoKey',
-  'CryptoIv',
+  "HostUrl",
+  "WebhookHostUrl",
+  "LogLevel",
 
-  'Demo',
-  'DefaultProvider',
-  'PORT',
+  "Env",
 
-  'HostUrl',
-  'WebhookHostUrl',
-  'LogLevel',
+  "RedisServer",
+  "RedisCacheTimeSeconds",
+  "ResourcePrefix",
+  "ResourceVersion",
 
-  'Env',
+  "SophtronApiUserId",
+  "SophtronApiUserSecret",
 
-  'RedisServer',
-  'RedisCacheTimeSeconds',
-  'ResourcePrefix',
-  'ResourceVersion'
+  "MxClientId",
+  "MxApiSecret",
+  "MxClientIdProd",
+  "MxApiSecretProd",
+
+  "AkoyaClientId",
+  "AkoyaApiSecret",
+  "AkoyaClientIdProd",
+  "AkoyaApiSecretProd",
+
+  "FinicityPartnerId",
+  "FinicityAppKey",
+  "FinicitySecret",
+  "FinicityPartnerIdProd",
+  "FinicityAppKeyProd",
+  "FinicitySecretProd",
 ]
 
-const config: Record<string, any> = keysToPullFromEnv.reduce((acc, envKey) => {
-  return {
-    ...acc,
-    [envKey]: (processEnv as Record<string, any>)[envKey.toUpperCase()]
+const config: Record<string, any> = keysToPullFromEnv.reduce(
+  (acc, envKey) => {
+    return {
+      ...acc,
+      [envKey]: (processEnv as Record<string, any>)[envKey.toUpperCase()],
+    }
+  },
+  {
+    ...nonSensitiveSharedConfig,
   }
-}, {
-  ...nonSensitiveSharedConfig
-})
+)
 
 export default config

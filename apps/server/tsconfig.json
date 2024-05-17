@@ -12,11 +12,8 @@
     "outDir": "dist",
     "strictNullChecks": false, // TODO: change this to true and fix all errors
     "target": "esnext",
-    "types": ["node", "jest"],
+    "types": ["node", "jest"]
   },
-  "include": [
-    "src/**/*",
-    "jest.config.js",
-  ],
-  "exclude": ["dist", "node_modules", "cypress.config.ts",],
+  "include": ["src/**/*", "jest.config.js"],
+  "exclude": ["dist", "node_modules", "cypress.config.ts"]
 }

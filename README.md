@@ -41,22 +41,9 @@ resulting in the error. To fix this, you will need to run `docker logout` from y
 
 ## Initial setup
 
-1. Run `npm run keys --prefix ./apps/server`, which will generate a new set of `key` and `IV` values.
-1. Fill in the `CryptoKey` and `CryptoIv` in your `./apps/server/.env` file with the generated `key` and `IV`.
-1. Sign up for a UCP client account: [here](https://login.universalconnectproject.org/) (the `Click here to login` link navigates to the aws hosted login page
-   where a sign-up option is available).
-1. Once you are registered and logged in, generate and view your client secrets
-1. Fill in the `UcpAuthClientId`, `UcpAuthClientSecret` and `UcpAuthEncryptionKey` in the `./apps/server/.env` file with
-   the values provided by login page.
-
 Please remember that secrets are passed through environment variables instead of hardcoded in the code files.
 **DO NO** put any credentials in any of the code files. If you do so, it could accidentally get committed and leaked to the public.
 **Use the provided `.env` files.**
-
-_UCP credentials are required for authentication and secret exchange, storage (redis-like session cache) and analytics services._
-
-_The `CryptoKey` and `CryptoIv` values are for encrypting the session token in order to not rely on cookies. They must be
-shared across server instances if there are multiple instances._
 
 ## Redis
 
@@ -73,7 +60,7 @@ require a redis instance. To fix this error you can either:
 **Publishing to Docker Hub is automatic, and will happen when code is merged to `main`.**
 
 **IMPORTANT**: Prior to merging your PR to main, make sure the versions of `ui` and `ucw-app` are up-to-date. The `version` property in
-their respective `package.json` files should be up-to-date. This is where the versions for the docker images is pulled from 
+their respective `package.json` files should be up-to-date. This is where the versions for the docker images is pulled from
 for automated publishing.
 
 ### Publishing manually
@@ -98,8 +85,8 @@ Run the following, which will build and publish the new images:
 
     docker buildx bake --file ./docker-compose.yml --push
 
-Note: To update the versions that are pulled/published, update the `./.env` file at the root of the project. Look at 
-the `DOCKER_IMAGE_{UI|SERVER}` values. 
+Note: To update the versions that are pulled/published, update the `./.env` file at the root of the project. Look at
+the `DOCKER_IMAGE_{UI|SERVER}` values.
 These variables are used in the `./docker-compose.yml` file when building/pulling/publishing the images.
 
 ## Additional Information
