@@ -1,14 +1,15 @@
 import type { NextFunction, Request, Response } from "express"
 import config from "../config"
 import { encrypt, decrypt } from "../utils"
+import { Context } from "../shared/contract"
 
 declare global {
   namespace Express {
     interface Request {
-      context?: import("../shared/contract").Context
+      context?: Context
     }
     interface Response {
-      context?: import("../shared/contract").Context
+      context?: Context
     }
   }
 }
@@ -18,13 +19,25 @@ export function contextHandler(
   res: Response,
   next: NextFunction
 ) {
-  let context = {}
+  let context = {} as Context
   if (req.headers.meta?.length > 0) {
     context = JSON.parse(req.headers.meta as string)
+    context.updated = false
   }
 
   res.context = context
   req.context = context
+
+  const { send } = res
+  res.send = function (...args: any): any {
+    res.send = send
+
+    if (res.context.updated) {
+      res.set("meta", JSON.stringify(res.context))
+    }
+
+    send.apply(res, args)
+  }
 
   next()
 }

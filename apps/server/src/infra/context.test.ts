@@ -28,8 +28,37 @@ describe("context", () => {
       const next = jest.fn()
       contextHandler(req, res, next)
 
-      expect(req.context).toEqual(testMetaObject)
-      expect(res.context).toEqual(testMetaObject)
+      const contextObject = {
+        ...testMetaObject,
+        updated: false,
+      }
+
+      expect(req.context).toEqual(contextObject)
+      expect(res.context).toEqual(contextObject)
+    })
+
+    it("sets the meta on send if context is updated and calls the original send function", () => {
+      const req = {
+        headers: {},
+      } as any
+
+      const res = {
+        send: jest.fn(),
+        set: jest.fn(),
+      } as any
+
+      const next = jest.fn()
+      contextHandler(req, res, next)
+
+      expect(res.context).toEqual({})
+
+      res.context.updated = true
+
+      res.send("1", "2")
+
+      expect(res.set).toHaveBeenCalledWith("meta", JSON.stringify(res.context))
+
+      expect(res.send).toHaveBeenCalledWith("1", "2")
     })
   })
 })
