@@ -36,8 +36,8 @@ jobs:
           echo UCPAUTHCLIENTSECRET=${{ secrets.UCP_CLIENT_SECRET }} >> ${ENV_FILE_PATH}
           echo UCPAUTHENCRYPTIONKEY=${{ secrets.UCP_ENCRYPTION_KEY }} >> ${ENV_FILE_PATH}
 
-          echo SOPHTRONCLIENTID=${{ secrets.SOPHTRON_API_USER_ID }} >> ${ENV_FILE_PATH}
-          echo SOPHTRONCLIENTSECRET=${{ secrets.SOPHTRON_API_USER_SECRET }} >> ${ENV_FILE_PATH}
+          echo SOPHTRONAPIUSERID=${{ secrets.SOPHTRON_API_USER_ID }} >> ${ENV_FILE_PATH}
+          echo SOPHTRONAPIUSERSECRET=${{ secrets.SOPHTRON_API_USER_SECRET }} >> ${ENV_FILE_PATH}
 
           echo MXCLIENTID=${{ secrets.MX_CLIENT_ID }} >> ${ENV_FILE_PATH}
           echo MXAPISECRET=${{ secrets.MX_API_SECRET }} >> ${ENV_FILE_PATH}
