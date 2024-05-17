@@ -5,20 +5,20 @@ import type {
   Credential,
   Institution,
   ProviderApiClient,
-  UpdateConnectionRequest,
-} from "../shared/contract"
-import { ChallengeType, ConnectionStatus } from "../shared/contract"
-import * as logger from "../infra/logger"
+  UpdateConnectionRequest
+} from '../shared/contract'
+import { ChallengeType, ConnectionStatus } from '../shared/contract'
+import * as logger from '../infra/logger'
 import type {
   InstitutionResponse,
   CredentialRequest,
   CredentialsResponseBody,
-  MemberResponse,
-} from "../serviceClients/mxClient"
-import { Configuration, MxPlatformApiFactory } from "../serviceClients/mxClient"
-import { mapJobType } from "../utils"
-import config from "../config"
-import { StorageClient } from "../serviceClients/storageClient"
+  MemberResponse
+} from '../serviceClients/mxClient'
+import { Configuration, MxPlatformApiFactory } from '../serviceClients/mxClient'
+import { mapJobType } from '../utils'
+import config from '../config'
+import { StorageClient } from '../serviceClients/storageClient'
 
 export const EXTENDED_HISTORY_NOT_SUPPORTED_MSG =
   "Member's institution does not support extended transaction history."
@@ -39,7 +39,7 @@ export function fromMxInstitution(
     name: ins.name,
     oauth: ins.supports_oauth,
     url: ins.url,
-    provider,
+    provider
   }
 }
 
@@ -49,7 +49,7 @@ function mapCredentials(mxCreds: CredentialsResponseBody): Credential[] {
       id: item.guid,
       label: item.field_name,
       field_type: item.field_type,
-      field_name: item.field_name,
+      field_name: item.field_name
     }))
   } else {
     return []
@@ -65,7 +65,7 @@ function fromMxMember(member: MemberResponse, provider: string): Connection {
     is_being_aggregated: member.is_being_aggregated,
     is_oauth: member.is_oauth,
     oauth_window_uri: member.oauth_window_uri,
-    provider,
+    provider
   }
 }
 
@@ -78,7 +78,7 @@ export class MxApi implements ProviderApiClient {
   constructor(config: any, int: boolean) {
     const { mxInt, mxProd, storageClient } = config
     this.db = storageClient
-    this.provider = int ? "mx_int" : "mx"
+    this.provider = int ? 'mx_int' : 'mx'
     this.mxConfig = int ? mxInt : mxProd
 
     this.apiClient = MxPlatformApiFactory(
@@ -86,9 +86,9 @@ export class MxApi implements ProviderApiClient {
         ...this.mxConfig,
         baseOptions: {
           headers: {
-            Accept: "application/vnd.mx.api.v1+json",
-          },
-        },
+            Accept: 'application/vnd.mx.api.v1+json'
+          }
+        }
       })
     )
   }
@@ -140,42 +140,42 @@ export class MxApi implements ProviderApiClient {
     // let res = await this.apiClient.listInstitutionCredentials(entityId)
     // console.log(request)
     const memberRes = await this.apiClient.createMember(userId, {
-      referral_source: "APP", // request.is_oauth ? 'APP' : '',
+      referral_source: 'APP', // request.is_oauth ? 'APP' : '',
       client_redirect_url: request.is_oauth
         ? `${config.HostUrl}/oauth/${this.provider}/redirect_from`
         : null,
       member: {
-        skip_aggregation: request.skip_aggregation || jobType !== "aggregate",
+        skip_aggregation: request.skip_aggregation || jobType !== 'aggregate',
         is_oauth: request.is_oauth,
         credentials: request.credentials?.map(
           (c) =>
             ({
               guid: c.id,
-              value: c.value,
+              value: c.value
             }) satisfies CredentialRequest
         ),
-        institution_code: entityId,
-      },
+        institution_code: entityId
+      }
     } as any)
     // console.log(memberRes)
     const member = memberRes.data.member
     // console.log(member)
     if (!request?.is_oauth) {
       if (
-        ["verification", "aggregate_identity_verification"].includes(jobType)
+        ['verification', 'aggregate_identity_verification'].includes(jobType)
       ) {
         const updatedMemberRes = await this.apiClient.verifyMember(
           member.guid,
           userId
         )
         return fromMxMember(updatedMemberRes.data.member, this.provider)
-      } else if (jobType === "aggregate_identity") {
+      } else if (jobType === 'aggregate_identity') {
         const updatedMemberRes = await this.apiClient.identifyMember(
           member.guid,
           userId
         )
         return fromMxMember(updatedMemberRes.data.member, this.provider)
-      } else if (jobType === "aggregate_extendedhistory") {
+      } else if (jobType === 'aggregate_extendedhistory') {
         const updatedMemberRes = await this.apiClient.extendHistory(
           member.guid,
           userId
@@ -196,13 +196,13 @@ export class MxApi implements ProviderApiClient {
     userId: string
   ): Promise<Connection> {
     let ret
-    if (request.job_type === "verification") {
+    if (request.job_type === 'verification') {
       ret = await this.apiClient.verifyMember(request.id, userId)
-    } else if (request.job_type === "aggregate_identity") {
+    } else if (request.job_type === 'aggregate_identity') {
       ret = await this.apiClient.identifyMember(request.id, userId, {
-        data: { member: { include_transactions: true } },
+        data: { member: { include_transactions: true } }
       })
-    } else if (request.job_type === "aggregate_extendedhistory") {
+    } else if (request.job_type === 'aggregate_extendedhistory') {
       ret = await this.apiClient.extendHistory(request.id, userId)
     } else {
       ret = await this.apiClient.aggregateMember(request.id, userId)
@@ -229,10 +229,10 @@ export class MxApi implements ProviderApiClient {
           (credential) =>
             ({
               guid: credential.id,
-              value: credential.value,
+              value: credential.value
             }) satisfies CredentialRequest
-        ),
-      },
+        )
+      }
     })
     const member = ret.data.member
     return fromMxMember(member, this.provider)
@@ -251,7 +251,7 @@ export class MxApi implements ProviderApiClient {
       is_being_aggregated: member.is_being_aggregated,
       oauth_window_uri: member.oauth_window_uri,
       provider: this.provider,
-      user_id: userId,
+      user_id: userId
     }
   }
 
@@ -282,42 +282,42 @@ export class MxApi implements ProviderApiClient {
         const challenge: Challenge = {
           id: item.guid ?? `${idx}`,
           type: ChallengeType.QUESTION,
-          question: item.label,
+          question: item.label
         }
         switch (item.type) {
-          case "TEXT":
+          case 'TEXT':
             challenge.type = ChallengeType.QUESTION
             challenge.data = [{ key: `${idx}`, value: item.label }]
             break
-          case "OPTIONS":
+          case 'OPTIONS':
             challenge.type = ChallengeType.OPTIONS
             challenge.question = item.label
             challenge.data = (item.options ?? []).map((o) => ({
               key: o.label ?? o.value,
-              value: o.value,
+              value: o.value
             }))
             break
-          case "TOKEN":
+          case 'TOKEN':
             challenge.type = ChallengeType.TOKEN
             challenge.data = item.label!
             break
-          case "IMAGE_DATA":
+          case 'IMAGE_DATA':
             challenge.type = ChallengeType.IMAGE
             challenge.data = item.image_data!
             break
-          case "IMAGE_OPTIONS":
+          case 'IMAGE_OPTIONS':
             // console.log(c)
             challenge.type = ChallengeType.IMAGE_OPTIONS
             challenge.data = (item.image_options ?? []).map((io) => ({
               key: io.label ?? io.value,
-              value: io.data_uri ?? io.value,
+              value: io.data_uri ?? io.value
             }))
             break
           default:
             break // todo?
         }
         return challenge
-      }),
+      })
     }
   }
 
@@ -330,15 +330,15 @@ export class MxApi implements ProviderApiClient {
       member: {
         challenges: request.challenges.map((item, idx) => ({
           guid: item.id ?? `${idx}`,
-          value: item.response as string,
-        })),
-      },
+          value: item.response as string
+        }))
+      }
     })
     return true
   }
 
   async ResolveUserId(userId: string): Promise<string> {
-    logger.debug("Resolving UserId: " + userId)
+    logger.debug('Resolving UserId: ' + userId)
     const res = await this.apiClient.listUsers(1, 10, userId)
     const mxUser = res.data?.users?.find((u) => u.id === userId)
     if (mxUser != null) {
@@ -347,7 +347,7 @@ export class MxApi implements ProviderApiClient {
     }
     logger.trace(`Creating mx user ${userId}`)
     const ret = await this.apiClient.createUser({
-      user: { id: userId },
+      user: { id: userId }
     })
     if (ret?.data?.user != null) {
       return ret.data.user.guid
@@ -362,10 +362,10 @@ export class MxApi implements ProviderApiClient {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const { member_guid, status, error_reason } = request
     const db = new StorageClient()
-    if (status === "error") {
+    if (status === 'error') {
       await db.set(member_guid, {
         error: true,
-        error_reason,
+        error_reason
       })
     }
     const ret = {
@@ -373,11 +373,11 @@ export class MxApi implements ProviderApiClient {
       storageClient: db,
       error: error_reason,
       status:
-        status === "error"
+        status === 'error'
           ? ConnectionStatus.REJECTED
-          : status === "success"
+          : status === 'success'
             ? ConnectionStatus.CONNECTED
-            : ConnectionStatus.PENDING,
+            : ConnectionStatus.PENDING
     }
     return ret
   }

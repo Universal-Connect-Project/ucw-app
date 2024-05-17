@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { MxApi } from "./mx"
-import { SophtronApi } from "./sophtron"
-import { AkoyaApi } from "./akoya"
-import { FinicityApi } from "./finicity"
-import config from "../config"
-import * as logger from "../infra/logger"
+import { MxApi } from './mx'
+import { SophtronApi } from './sophtron'
+import { AkoyaApi } from './akoya'
+import { FinicityApi } from './finicity'
+import config from '../config'
+import * as logger from '../infra/logger'
 import type {
   Challenge,
   Credential,
@@ -13,30 +13,30 @@ import type {
   Institution,
   ProviderApiClient,
   CreateConnectionRequest,
-  UpdateConnectionRequest,
-} from "../shared/contract"
-import { ConnectionStatus, OAuthStatus } from "../shared/contract"
-import { AnalyticsClient } from "../serviceClients/analyticsClient"
-import { SearchClient } from "../serviceClients/searchClient"
-import { StorageClient } from "../serviceClients/storageClient"
-import { decodeAuthToken } from "../utils"
-import providerCredentials from "../providerCredentials"
+  UpdateConnectionRequest
+} from '../shared/contract'
+import { ConnectionStatus, OAuthStatus } from '../shared/contract'
+import { AnalyticsClient } from '../serviceClients/analyticsClient'
+import { SearchClient } from '../serviceClients/searchClient'
+import { StorageClient } from '../serviceClients/storageClient'
+import { decodeAuthToken } from '../utils'
+import providerCredentials from '../providerCredentials'
 
 function getApiClient(provider: string, config: any): ProviderApiClient {
   switch (provider) {
-    case "mx":
+    case 'mx':
       return new MxApi(config, false)
-    case "mx_int":
+    case 'mx_int':
       return new MxApi(config, true)
-    case "sophtron":
+    case 'sophtron':
       return new SophtronApi(config)
-    case "akoya":
+    case 'akoya':
       return new AkoyaApi(config, false)
-    case "akoya_sandbox":
+    case 'akoya_sandbox':
       return new AkoyaApi(config, true)
-    case "finicity":
+    case 'finicity':
       return new FinicityApi(config, false)
-    case "finicity_sandbox":
+    case 'finicity_sandbox':
       return new FinicityApi(config, true)
     default:
       // throw new Error(`Unsupported provider ${provider}`);
@@ -47,12 +47,12 @@ function getApiClient(provider: string, config: any): ProviderApiClient {
 export async function instrumentation(context: Context, input: any) {
   const { user_id } = input
   context.user_id = user_id
-  if (!user_id || user_id === "undefined" || user_id === "test") {
+  if (!user_id || user_id === 'undefined' || user_id === 'test') {
     if (config.Demo) {
-      logger.info("Using demo userId")
-      context.user_id = "Universal_widget_demo_user"
+      logger.info('Using demo userId')
+      context.user_id = 'Universal_widget_demo_user'
     } else {
-      logger.info("Missing userId")
+      logger.info('Missing userId')
       return false
     }
   }
@@ -64,9 +64,9 @@ export async function instrumentation(context: Context, input: any) {
     context.auth = decodeAuthToken(input.auth)
   }
   context.partner = input.current_partner
-  context.job_type = input.job_type ?? "agg"
-  context.scheme = input.scheme ?? "vcs"
-  context.oauth_referral_source = input.oauth_referral_source ?? "BROWSER"
+  context.job_type = input.job_type ?? 'agg'
+  context.scheme = input.scheme ?? 'vcs'
+  context.oauth_referral_source = input.oauth_referral_source ?? 'BROWSER'
   context.single_account_select = input.single_account_select
   context.updated = true
   return true
@@ -85,22 +85,23 @@ export class ProviderApiBase {
 
   async init() {
     this.searchApi = new SearchClient(this.context.auth?.token)
-    const token = "fakeTokenThatWeNeedToRemove"
+    const token = 'fakeTokenThatWeNeedToRemove'
 
     this.storageClient = new StorageClient()
     this.analyticsClient = new AnalyticsClient(token)
     try {
       const conf = providerCredentials
+      // TODO Refactor: This naming is terribly misleading. "serviceClient" is something different, this is the ApiClient
       this.serviceClient = getApiClient(this.context?.provider, {
         ...conf,
-        storageClient: this.storageClient,
+        storageClient: this.storageClient
       })
       this.providers = Object.values(conf)
         .filter((v: any) => v.available)
         .map((v: any) => v.provider)
       return true
     } catch (err) {
-      logger.error("Error parsing auth token", err)
+      logger.error('Error parsing auth token', err)
     }
 
     return false
@@ -114,7 +115,7 @@ export class ProviderApiBase {
     this.context.updated = true
     this.context.provider = null
     const q = query as any
-    if (q.search_name != null && q.search_name !== "") {
+    if (q.search_name != null && q.search_name !== '') {
       query = q.search_name
     }
     if (query?.length >= 3) {
@@ -130,7 +131,7 @@ export class ProviderApiBase {
   async resolveInstitution(id: string): Promise<Institution> {
     this.context.updated = true
     const ret = {
-      id,
+      id
     } as any
     if (
       !this.context.provider ||
@@ -151,7 +152,7 @@ export class ProviderApiBase {
         ret.logo_url = resolved.logo_url
       }
     }
-    if (this.context.provider == null || this.context.provider === "") {
+    if (this.context.provider == null || this.context.provider === '') {
       this.context.provider = config.DefaultProvider
     }
     await this.init()
@@ -207,7 +208,7 @@ export class ProviderApiBase {
     if (ret?.id != null) {
       await this.storageClient.set(`context_${ret.id}`, {
         oauth_referral_source: this.context.oauth_referral_source,
-        scheme: this.context.scheme,
+        scheme: this.context.scheme
       })
     }
     return ret
@@ -225,7 +226,7 @@ export class ProviderApiBase {
     if (ret?.id != null) {
       await this.storageClient.set(`context_${ret.id}`, {
         oauth_referral_source: this.context.oauth_referral_source,
-        scheme: this.context.scheme,
+        scheme: this.context.scheme
       })
     }
     return ret
@@ -235,7 +236,7 @@ export class ProviderApiBase {
     return await this.serviceClient.AnswerChallenge(
       {
         id: connection_id ?? this.context.connection_id,
-        challenges,
+        challenges
       },
       this.context.current_job_id,
       this.getUserId()
@@ -259,9 +260,9 @@ export class ProviderApiBase {
       auth_status:
         connection.status === ConnectionStatus.PENDING
           ? OAuthStatus.PENDING
-          : ConnectionStatus.CONNECTED
+          : connection.status === ConnectionStatus.CONNECTED
             ? OAuthStatus.COMPLETE
-            : OAuthStatus.ERROR,
+            : OAuthStatus.ERROR
     } as any
     if (ret.auth_status === OAuthStatus.ERROR) {
       ret.error_reason = connection.status
@@ -272,7 +273,7 @@ export class ProviderApiBase {
   async getOauthStates(memberGuid: string) {
     const state = await this.getOauthState(memberGuid)
     return {
-      oauth_states: [state.oauth_state],
+      oauth_states: [state.oauth_state]
     }
   }
 
@@ -305,33 +306,33 @@ export class ProviderApiBase {
   ) {
     let res = {} as any
     switch (provider) {
-      case "akoya":
-      case "akoya_sandbox":
+      case 'akoya':
+      case 'akoya_sandbox':
         res = await AkoyaApi.HandleOauthResponse({
           ...rawQueries,
-          ...rawParams,
+          ...rawParams
         })
         break
-      case "finicity":
-      case "finicity_sandbox":
+      case 'finicity':
+      case 'finicity_sandbox':
         res = await FinicityApi.HandleOauthResponse({
           ...rawQueries,
           ...rawParams,
-          ...body,
+          ...body
         })
         break
-      case "mx":
-      case "mx_int":
+      case 'mx':
+      case 'mx_int':
         res = await MxApi.HandleOauthResponse({
           ...rawQueries,
           ...rawParams,
-          ...body,
+          ...body
         })
         break
     }
     const ret = {
       ...res,
-      provider,
+      provider
     }
     if (res?.storageClient != null && res?.id != null) {
       const context = await res.storageClient.get(
@@ -345,7 +346,7 @@ export class ProviderApiBase {
 
   async analytics(path: string, content: any) {
     return await this.analyticsClient?.analytics(
-      path.replaceAll("/", ""),
+      path.replaceAll('/', ''),
       content
     )
   }
