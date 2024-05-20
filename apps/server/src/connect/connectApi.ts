@@ -1,17 +1,17 @@
 import type { Member, MemberResponse } from 'interfaces/contract'
+import * as logger from '../infra/logger'
 import {
+  type Challenge,
   ChallengeType,
   type Connection,
   ConnectionStatus,
   type Institution,
-  type LocalInstitution,
   type InstitutionResponse,
-  type Challenge
+  type LocalInstitution
 } from '../shared/contract'
-import * as logger from '../infra/logger'
 
 import { ProviderApiBase } from '../providers'
-import { Client } from '@elastic/elasticsearch'
+import ElasticsearchClient from '../utils/ElasticSearchClient'
 
 function mapInstitution (ins: Institution) {
   return ({
@@ -113,11 +113,9 @@ function mapConnection (connection: Connection): Member {
 }
 
 export class ConnectApi extends ProviderApiBase {
-  client: any
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor
   constructor (req: any) {
     super(req)
-    this.client = new Client({ node: 'http://localhost:9200' });
   }
 
   async addMember (memberData: Member): Promise<MemberResponse> {
@@ -228,20 +226,7 @@ export class ConnectApi extends ProviderApiBase {
   }
 
   async loadInstitutions (query: string): Promise<any> {
-    // const ret = await this.search(query)
-    const stuff = await this.client.search({
-      index: 'institutions',
-      body: {
-        query: {
-          multi_match: {
-            query: query,
-            fields: ['name', 'keywords']
-          }
-        }
-      }
-    })
-    const institutionHits = stuff.hits.hits.map((esObject: { _source: any }) => esObject._source)
-    // return ret.map(mapInstitution)
+    const institutionHits = await ElasticsearchClient.search(query)
     return institutionHits.map(mapInstitutionLocal)
   }
 

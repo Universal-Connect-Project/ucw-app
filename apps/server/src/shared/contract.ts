@@ -106,6 +106,16 @@ export interface Institution {
   providers?: Object | {}
 }
 
+export interface ResolvedInstitution {
+  id: string
+  url: string
+  name: string
+  logo_url: string
+  provider: Provider
+}
+
+export type Provider = 'mx' | 'mx_int' | 'sophtron' | 'finicity' | 'akoya'
+
 export interface LocalInstitution {
   name: string
   keywords: string | null
@@ -119,7 +129,7 @@ export interface LocalInstitution {
   akoya: InstitutionProvider
 }
 
-interface InstitutionProvider {
+export interface InstitutionProvider {
   id: string | null
   supports_oauth: boolean | false
   supports_identification: boolean | false

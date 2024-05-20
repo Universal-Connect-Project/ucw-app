@@ -95,6 +95,7 @@ export class MxApi implements ProviderApiClient {
 
   async GetInstitutionById(id: string): Promise<Institution> {
     const res = await this.apiClient.readInstitution(id)
+    // if this is 401 we should throw an error
     const ins = res.data.institution
     return fromMxInstitution(ins, this.provider)
   }

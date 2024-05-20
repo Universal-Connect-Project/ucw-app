@@ -1,28 +1,29 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { MxApi } from './mx'
-import { SophtronApi } from './sophtron'
-import { AkoyaApi } from './akoya'
-import { FinicityApi } from './finicity'
 import config from '../config'
 import * as logger from '../infra/logger'
-import type {
-  Challenge,
-  Credential,
-  Connection,
-  Context,
-  Institution,
-  ProviderApiClient,
-  CreateConnectionRequest,
-  UpdateConnectionRequest
-} from '../shared/contract'
-import { ConnectionStatus, OAuthStatus } from '../shared/contract'
+import providerCredentials from '../providerCredentials'
 import { AnalyticsClient } from '../serviceClients/analyticsClient'
 import { SearchClient } from '../serviceClients/searchClient'
 import { StorageClient } from '../serviceClients/storageClient'
+import type {
+  Challenge,
+  Connection,
+  Context,
+  CreateConnectionRequest,
+  Credential,
+  Institution,
+  ProviderApiClient,
+  UpdateConnectionRequest
+} from '../shared/contract'
+import { ConnectionStatus, OAuthStatus } from '../shared/contract'
 import { decodeAuthToken } from '../utils'
-import providerCredentials from '../providerCredentials'
+import { resolveInstitutionProvider } from '../utils/InstitutionResolver'
+import { AkoyaApi } from './akoya'
+import { FinicityApi } from './finicity'
+import { MxApi } from './mx'
+import { SophtronApi } from './sophtron'
 
-function getApiClient(provider: string, config: any): ProviderApiClient {
+function getApiClient (provider: string, config: any): ProviderApiClient {
   switch (provider) {
     case 'mx':
       return new MxApi(config, false)
@@ -44,7 +45,7 @@ function getApiClient(provider: string, config: any): ProviderApiClient {
   }
 }
 
-export async function instrumentation(context: Context, input: any) {
+export async function instrumentation (context: Context, input: any) {
   const { user_id } = input
   context.user_id = user_id
   if (!user_id || user_id === 'undefined' || user_id === 'test') {
@@ -79,11 +80,11 @@ export class ProviderApiBase {
   storageClient: StorageClient
   searchApi: SearchClient
   providers: string[]
-  constructor(req: any) {
+  constructor (req: any) {
     this.context = req.context
   }
 
-  async init() {
+  async init () {
     this.searchApi = new SearchClient(this.context.auth?.token)
     const token = 'fakeTokenThatWeNeedToRemove'
 
@@ -107,61 +108,40 @@ export class ProviderApiBase {
     return false
   }
 
-  async institutions() {
+  async institutions () {
     return await this.searchApi.institutions()
   }
 
-  async search(query: string) {
-    this.context.updated = true
-    this.context.provider = null
-    const q = query as any
-    if (q.search_name != null && q.search_name !== '') {
-      query = q.search_name
-    }
-    if (query?.length >= 3) {
-      const list = await this.searchApi.institutions(query, this.providers)
-      return list?.institutions?.sort(
-        (a: any, b: any) => a.name.length - b.name.length
-      )
-    }
-    return []
-  }
+  // async search(query: string) {
+  //   this.context.updated = true
+  //   this.context.provider = null
+  //   const q = query as any
+  //   if (q.search_name != null && q.search_name !== '') {
+  //     query = q.search_name
+  //   }
+  //   if (query?.length >= 3) {
+  //     const list = await this.searchApi.institutions(query, this.providers)
+  //     return list?.institutions?.sort(
+  //       (a: any, b: any) => a.name.length - b.name.length
+  //     )
+  //   }
+  //   return []
+  // }
 
-  // This is not getting the logo url for any Finicity banks, needs to be fixed on search client probably. Mapping is wrong.
-  async resolveInstitution(id: string): Promise<Institution> {
+  async resolveInstitution (id: string): Promise<Institution> {
+    // const institution = await ElasticsearchClient.getInstitution(id)
+    // TODO: do some kind of resolve logic here to pick best provider
+    // For now just use MX.
+    const resolvedInstitution = await resolveInstitutionProvider(id)
+    this.context.provider = resolvedInstitution.provider
     this.context.updated = true
-    const ret = {
-      id
-    } as any
-    if (
-      !this.context.provider ||
-      (this.context.institution_uid &&
-        this.context.institution_uid !== id &&
-        this.context.institution_id !== id)
-    ) {
-      const resolved = await this.searchApi.resolve(id)
-      if (resolved != null) {
-        logger.debug(
-          `resolved institution ${id} to provider ${resolved.provider} ${resolved.target_id}`
-        )
-        this.context.provider = resolved.provider
-        this.context.institution_uid = id
-        ret.id = resolved.target_id
-        ret.url = resolved.url
-        ret.name = resolved.name
-        ret.logo_url = resolved.logo_url
-      }
-    }
-    if (this.context.provider == null || this.context.provider === '') {
-      this.context.provider = config.DefaultProvider
-    }
-    await this.init()
-    this.context.institution_id = ret.id
+    this.context.institution_id = resolvedInstitution.id
     this.context.resolved_user_id = null
-    return ret
+    await this.init()
+    return resolvedInstitution
   }
 
-  async getInstitution(guid: string): Promise<any> {
+  async getInstitution (guid: string): Promise<any> {
     const resolved = await this.resolveInstitution(guid)
     const inst = await this.serviceClient.GetInstitutionById(resolved.id)
     if (inst != null) {
@@ -172,21 +152,21 @@ export class ProviderApiBase {
     return inst
   }
 
-  async getInstitutionCredentials(guid: string): Promise<Credential[]> {
+  async getInstitutionCredentials (guid: string): Promise<Credential[]> {
     this.context.updated = true
     this.context.current_job_id = null
     // let id = await this.resolveInstitution(guid)
     return await this.serviceClient.ListInstitutionCredentials(guid)
   }
 
-  async getConnection(connection_id: string): Promise<Connection> {
+  async getConnection (connection_id: string): Promise<Connection> {
     return await this.serviceClient.GetConnectionById(
       connection_id,
       this.getUserId()
     )
   }
 
-  async getConnectionStatus(connection_id: string): Promise<Connection> {
+  async getConnectionStatus (connection_id: string): Promise<Connection> {
     return await this.serviceClient.GetConnectionStatus(
       connection_id,
       this.context.current_job_id,
@@ -195,7 +175,7 @@ export class ProviderApiBase {
     )
   }
 
-  async createConnection(
+  async createConnection (
     connection: CreateConnectionRequest
   ): Promise<Connection> {
     this.context.updated = true
@@ -214,7 +194,7 @@ export class ProviderApiBase {
     return ret
   }
 
-  async updateConnection(
+  async updateConnection (
     connection: UpdateConnectionRequest
   ): Promise<Connection> {
     const ret = await this.serviceClient.UpdateConnection(
@@ -232,7 +212,7 @@ export class ProviderApiBase {
     return ret
   }
 
-  async answerChallenge(connection_id: string, challenges: Challenge[]) {
+  async answerChallenge (connection_id: string, challenges: Challenge[]) {
     return await this.serviceClient.AnswerChallenge(
       {
         id: connection_id ?? this.context.connection_id,
@@ -243,12 +223,12 @@ export class ProviderApiBase {
     )
   }
 
-  async getOauthWindowUri(memberGuid: string) {
+  async getOauthWindowUri (memberGuid: string) {
     const ret = await this.getConnection(memberGuid)
     return ret?.oauth_window_uri
   }
 
-  async getOauthState(connection_id: string) {
+  async getOauthState (connection_id: string) {
     const connection = await this.getConnectionStatus(connection_id)
     if (connection == null) {
       return {}
@@ -270,18 +250,18 @@ export class ProviderApiBase {
     return { oauth_state: ret }
   }
 
-  async getOauthStates(memberGuid: string) {
+  async getOauthStates (memberGuid: string) {
     const state = await this.getOauthState(memberGuid)
     return {
       oauth_states: [state.oauth_state]
     }
   }
 
-  async deleteConnection(connection_id: string): Promise<void> {
+  async deleteConnection (connection_id: string): Promise<void> {
     await this.serviceClient.DeleteConnection(connection_id, this.getUserId())
   }
 
-  async getConnectionCredentials(memberGuid: string): Promise<Credential[]> {
+  async getConnectionCredentials (memberGuid: string): Promise<Credential[]> {
     this.context.updated = true
     this.context.current_job_id = null
     return await this.serviceClient.ListConnectionCredentials(
@@ -290,15 +270,15 @@ export class ProviderApiBase {
     )
   }
 
-  async ResolveUserId(id: string) {
+  async ResolveUserId (id: string) {
     return await this.serviceClient?.ResolveUserId(id)
   }
 
-  getUserId(): string {
+  getUserId (): string {
     return this.context.resolved_user_id
   }
 
-  static async handleOauthResponse(
+  static async handleOauthResponse (
     provider: string,
     rawParams: any,
     rawQueries: any,
@@ -344,7 +324,7 @@ export class ProviderApiBase {
     return ret
   }
 
-  async analytics(path: string, content: any) {
+  async analytics (path: string, content: any) {
     return await this.analyticsClient?.analytics(
       path.replaceAll('/', ''),
       content
