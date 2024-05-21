@@ -1,27 +1,24 @@
 import { http, HttpResponse } from 'msw'
-import { server } from '../test/testServer'
-import { FinicityApi } from './finicity'
-import { finicityInsitutionData } from '../test/testData/institution'
-import { FINICITY_CONNECT_LITE_URL, DELETE_CUSTOMER_PATH, READ_CUSTOMER_PATH } from '../test/handlers'
 import { clearRedisMock, createClient, getRedisStorageObject } from '../__mocks__/redis'
 import { ConnectionStatus } from '../shared/contract'
+import { DELETE_CUSTOMER_PATH, FINICITY_CONNECT_LITE_URL, READ_CUSTOMER_PATH } from '../test/handlers'
+import { finicityInsitutionData } from '../test/testData/institution'
 import { finicityReadCustomerData } from '../test/testData/users'
-
-const token = 'testToken'
+import { server } from '../test/testServer'
+import { FinicityApi } from './finicity'
 
 const redisMock = createClient()
 
 const finicityApi = new FinicityApi({
-  finicitySandbox: {
+  finicityProd: {
     partnerId: 'testPartnerId',
     appKey: 'testAppKey',
     secret: 'testSecret',
     basePath: 'https://api.finicity.com',
     provider: 'finicity_sandbox'
   },
-  storageClient: redisMock,
-  token
-}, true)
+  storageClient: redisMock
+})
 
 const institutionResponse = finicityInsitutionData.institution
 
