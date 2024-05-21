@@ -1,5 +1,5 @@
 import type { InstitutionProvider, LocalInstitution, Provider, ResolvedInstitution } from '../shared/contract'
-import ElasticsearchClient from './ElasticSearchClient'
+import ElasticsearchClient from './elasticSearchClient'
 
 export async function resolveInstitutionProvider (institutionId: string): Promise<ResolvedInstitution> {
   const institution = await ElasticsearchClient.getInstitution(institutionId)
@@ -32,7 +32,7 @@ export async function resolveInstitutionProvider (institutionId: string): Promis
   }
 }
 
-function availableProviders (institution: LocalInstitution): string[] {
+export function availableProviders (institution: LocalInstitution): string[] {
   const providers = []
   if (institution.mx.id != null) {
     providers.push('mx')

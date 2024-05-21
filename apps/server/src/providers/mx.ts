@@ -1,3 +1,13 @@
+import config from '../config'
+import * as logger from '../infra/logger'
+import type {
+  CredentialRequest,
+  CredentialsResponseBody,
+  InstitutionResponse,
+  MemberResponse
+} from '../serviceClients/mxClient'
+import { Configuration, MxPlatformApiFactory } from '../serviceClients/mxClient'
+import { StorageClient } from '../serviceClients/storageClient'
 import type {
   Challenge,
   Connection,
@@ -8,17 +18,7 @@ import type {
   UpdateConnectionRequest
 } from '../shared/contract'
 import { ChallengeType, ConnectionStatus } from '../shared/contract'
-import * as logger from '../infra/logger'
-import type {
-  InstitutionResponse,
-  CredentialRequest,
-  CredentialsResponseBody,
-  MemberResponse
-} from '../serviceClients/mxClient'
-import { Configuration, MxPlatformApiFactory } from '../serviceClients/mxClient'
 import { mapJobType } from '../utils'
-import config from '../config'
-import { StorageClient } from '../serviceClients/storageClient'
 
 export const EXTENDED_HISTORY_NOT_SUPPORTED_MSG =
   "Member's institution does not support extended transaction history."
@@ -29,7 +29,7 @@ interface HandleOauthReponseRequest {
   error_reason: string
 }
 
-export function fromMxInstitution(
+export function fromMxInstitution (
   ins: InstitutionResponse,
   provider: string
 ): Institution {
@@ -43,7 +43,7 @@ export function fromMxInstitution(
   }
 }
 
-function mapCredentials(mxCreds: CredentialsResponseBody): Credential[] {
+function mapCredentials (mxCreds: CredentialsResponseBody): Credential[] {
   if (mxCreds.credentials != null) {
     return mxCreds.credentials.map((item) => ({
       id: item.guid,
@@ -56,7 +56,7 @@ function mapCredentials(mxCreds: CredentialsResponseBody): Credential[] {
   }
 }
 
-function fromMxMember(member: MemberResponse, provider: string): Connection {
+function fromMxMember (member: MemberResponse, provider: string): Connection {
   return {
     id: member.guid,
     cur_job_id: member.guid,
@@ -75,7 +75,7 @@ export class MxApi implements ProviderApiClient {
   provider: string
   db: StorageClient
 
-  constructor(config: any, int: boolean) {
+  constructor (config: any, int: boolean) {
     const { mxInt, mxProd, storageClient } = config
     this.db = storageClient
     this.provider = int ? 'mx_int' : 'mx'
@@ -93,21 +93,21 @@ export class MxApi implements ProviderApiClient {
     )
   }
 
-  async GetInstitutionById(id: string): Promise<Institution> {
+  async GetInstitutionById (id: string): Promise<Institution> {
     const res = await this.apiClient.readInstitution(id)
-    // if this is 401 we should throw an error
+    // TODO: if this is 401 we should throw an error
     const ins = res.data.institution
     return fromMxInstitution(ins, this.provider)
   }
 
-  async ListInstitutionCredentials(
+  async ListInstitutionCredentials (
     institutionId: string
   ): Promise<Credential[]> {
     const res = await this.apiClient.listInstitutionCredentials(institutionId)
     return mapCredentials(res.data)
   }
 
-  async ListConnections(userId: string): Promise<Connection[]> {
+  async ListConnections (userId: string): Promise<Connection[]> {
     const res = await this.apiClient.listMembers(userId)
 
     return (
@@ -116,7 +116,7 @@ export class MxApi implements ProviderApiClient {
     )
   }
 
-  async ListConnectionCredentials(
+  async ListConnectionCredentials (
     memberId: string,
     userId: string
   ): Promise<Credential[]> {
@@ -124,7 +124,7 @@ export class MxApi implements ProviderApiClient {
     return mapCredentials(res.data)
   }
 
-  async CreateConnection(
+  async CreateConnection (
     request: CreateConnectionRequest,
     userId: string
   ): Promise<Connection> {
@@ -188,11 +188,11 @@ export class MxApi implements ProviderApiClient {
     return fromMxMember(member, this.provider)
   }
 
-  async DeleteConnection(id: string, userId: string): Promise<void> {
+  async DeleteConnection (id: string, userId: string): Promise<void> {
     await this.apiClient.deleteManagedMember(id, userId)
   }
 
-  async UpdateConnection(
+  async UpdateConnection (
     request: UpdateConnectionRequest,
     userId: string
   ): Promise<Connection> {
@@ -220,7 +220,7 @@ export class MxApi implements ProviderApiClient {
     return fromMxMember(ret.data.member, this.provider)
   }
 
-  async UpdateConnectionInternal(
+  async UpdateConnectionInternal (
     request: UpdateConnectionRequest,
     userId: string
   ): Promise<Connection> {
@@ -239,7 +239,7 @@ export class MxApi implements ProviderApiClient {
     return fromMxMember(member, this.provider)
   }
 
-  async GetConnectionById(
+  async GetConnectionById (
     connectionId: string,
     userId: string
   ): Promise<Connection> {
@@ -256,7 +256,7 @@ export class MxApi implements ProviderApiClient {
     }
   }
 
-  async GetConnectionStatus(
+  async GetConnectionStatus (
     memberId: string,
     jobId: string,
     singleAccountSelect: boolean,
@@ -322,7 +322,7 @@ export class MxApi implements ProviderApiClient {
     }
   }
 
-  async AnswerChallenge(
+  async AnswerChallenge (
     request: UpdateConnectionRequest,
     jobId: string,
     userId: string
@@ -338,7 +338,7 @@ export class MxApi implements ProviderApiClient {
     return true
   }
 
-  async ResolveUserId(userId: string): Promise<string> {
+  async ResolveUserId (userId: string): Promise<string> {
     logger.debug('Resolving UserId: ' + userId)
     const res = await this.apiClient.listUsers(1, 10, userId)
     const mxUser = res.data?.users?.find((u) => u.id === userId)
@@ -357,7 +357,7 @@ export class MxApi implements ProviderApiClient {
     return userId
   }
 
-  static async HandleOauthResponse(
+  static async HandleOauthResponse (
     request: HandleOauthReponseRequest
   ): Promise<Connection> {
     // eslint-disable-next-line @typescript-eslint/naming-convention

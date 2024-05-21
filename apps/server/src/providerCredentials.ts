@@ -33,19 +33,11 @@ const providerCredentials = {
     provider: 'akoya',
     available: true
   },
-  finicitySandbox: {
+  finicityProd: {
     basePath: 'https://api.finicity.com',
     partnerId: config.FinicityPartnerId,
     appKey: config.FinicityAppKey,
     secret: config.FinicitySecret,
-    provider: 'finicity_sandbox',
-    available: true
-  },
-  finicityProd: {
-    basePath: 'https://api.finicity.com',
-    partnerId: config.FinicityPartnerIdProd,
-    appKey: config.FinicityAppKeyProd,
-    secret: config.FinicitySecretProd,
     provider: 'finicity',
     available: true
   },

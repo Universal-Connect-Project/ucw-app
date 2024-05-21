@@ -151,8 +151,7 @@ export interface InstitutionResponse {
   credentials?: any
   supports_oauth?: boolean | false
   small_logo_url?: string | null
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  providers?: Object | {}
+  providers?: Provider[]
 }
 
 export interface Institutions {

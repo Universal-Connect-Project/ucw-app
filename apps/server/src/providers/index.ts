@@ -17,7 +17,7 @@ import type {
 } from '../shared/contract'
 import { ConnectionStatus, OAuthStatus } from '../shared/contract'
 import { decodeAuthToken } from '../utils'
-import { resolveInstitutionProvider } from '../utils/InstitutionResolver'
+import { resolveInstitutionProvider } from '../utils/institutionResolver'
 import { AkoyaApi } from './akoya'
 import { FinicityApi } from './finicity'
 import { MxApi } from './mx'
@@ -36,9 +36,8 @@ function getApiClient (provider: string, config: any): ProviderApiClient {
     case 'akoya_sandbox':
       return new AkoyaApi(config, true)
     case 'finicity':
-      return new FinicityApi(config, false)
     case 'finicity_sandbox':
-      return new FinicityApi(config, true)
+      return new FinicityApi(config)
     default:
       // throw new Error(`Unsupported provider ${provider}`);
       return null
@@ -129,9 +128,6 @@ export class ProviderApiBase {
   // }
 
   async resolveInstitution (id: string): Promise<Institution> {
-    // const institution = await ElasticsearchClient.getInstitution(id)
-    // TODO: do some kind of resolve logic here to pick best provider
-    // For now just use MX.
     const resolvedInstitution = await resolveInstitutionProvider(id)
     this.context.provider = resolvedInstitution.provider
     this.context.updated = true

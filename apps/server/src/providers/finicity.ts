@@ -1,34 +1,31 @@
+import * as logger from '../infra/logger'
+import FinicityClient from '../serviceClients/finicityClient'
+import { StorageClient } from '../serviceClients/storageClient'
 import type {
   Connection,
   CreateConnectionRequest,
   Credential,
   Institution,
   ProviderApiClient,
-  UpdateConnectionRequest,
-} from "../shared/contract"
-import { ConnectionStatus } from "../shared/contract"
-import * as logger from "../infra/logger"
-import FinicityClient from "../serviceClients/finicityClient"
-import { StorageClient } from "../serviceClients/storageClient"
+  UpdateConnectionRequest
+} from '../shared/contract'
+import { ConnectionStatus } from '../shared/contract'
 
-import { v4 as uuidv4 } from "uuid"
+import { v4 as uuidv4 } from 'uuid'
 
 export class FinicityApi implements ProviderApiClient {
   sandbox: boolean
   apiClient: any
   db: StorageClient
-  token: string
-  constructor(config: any, sandbox: boolean) {
-    const { finicityProd, finicitySandbox, token, storageClient } = config
-    this.token = token
+
+  constructor (config: any) {
+    const { finicityProd, storageClient } = config
     this.db = storageClient
-    this.sandbox = sandbox
-    this.apiClient = new FinicityClient(
-      sandbox ? finicitySandbox : finicityProd
-    )
+    this.sandbox = false
+    this.apiClient = new FinicityClient(finicityProd)
   }
 
-  async GetInstitutionById(id: string): Promise<Institution> {
+  async GetInstitutionById (id: string): Promise<Institution> {
     const institution = await this.apiClient.getInstitution(id)
     return {
       id,
@@ -36,30 +33,30 @@ export class FinicityApi implements ProviderApiClient {
       logo_url: institution?.branding?.icon, // this doesn't seem to be used anywhere
       url: institution?.urlHomeApp,
       oauth: true,
-      provider: this.apiClient.apiConfig.provider,
+      provider: this.apiClient.apiConfig.provider
     }
   }
 
-  async ListInstitutionCredentials(id: string): Promise<Credential[]> {
+  async ListInstitutionCredentials (id: string): Promise<Credential[]> {
     return await Promise.resolve([])
   }
 
-  async ListConnectionCredentials(
+  async ListConnectionCredentials (
     connectionId: string,
     userId: string
   ): Promise<Credential[]> {
     return await Promise.resolve([])
   }
 
-  async ListConnections(userId: string): Promise<Connection[]> {
+  async ListConnections (userId: string): Promise<Connection[]> {
     return await Promise.resolve([])
   }
 
-  async CreateConnection(
+  async CreateConnection (
     request: CreateConnectionRequest,
     userId: string
   ): Promise<Connection | undefined> {
-    const requestId = `${this.token};${uuidv4()}`
+    const requestId = `${userId};${uuidv4()}`
     const connectUrl = await this.apiClient.generateConnectLiteUrl(
       request.institution_id,
       userId,
@@ -73,18 +70,18 @@ export class FinicityApi implements ProviderApiClient {
       institution_code: request.institution_id,
       oauth_window_uri: connectUrl,
       provider: this.apiClient.apiConfig.provider,
-      status: ConnectionStatus.PENDING,
+      status: ConnectionStatus.PENDING
     }
     await this.db.set(requestId, obj)
     return obj
   }
 
-  async DeleteConnection(id: string, userId: string): Promise<void> {
+  async DeleteConnection (id: string, userId: string): Promise<void> {
     this.apiClient.deleteCustomer(userId)
     return await this.db.set(id, null)
   }
 
-  async UpdateConnection(
+  async UpdateConnection (
     request: UpdateConnectionRequest,
     userId: string
   ): Promise<Connection> {
@@ -92,32 +89,32 @@ export class FinicityApi implements ProviderApiClient {
   }
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  async GetConnectionById(
+  async GetConnectionById (
     connectionId: string,
-    user_id: string
+    userId: string
   ): Promise<Connection> {
-    return await this.getConnection(connectionId, user_id)
+    return await this.getConnection(connectionId, userId)
   }
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  async GetConnectionStatus(
+  async GetConnectionStatus (
     connectionId: string,
     jobId: string,
     single_account_select?: boolean,
-    user_id?: string
+    userId?: string
   ): Promise<Connection> {
-    return await this.getConnection(connectionId, user_id)
+    return await this.getConnection(connectionId, userId)
   }
 
-  async AnswerChallenge(
+  async AnswerChallenge (
     request: UpdateConnectionRequest,
     jobId: string
   ): Promise<boolean> {
     return true
   }
 
-  async ResolveUserId(userId: string) {
-    logger.debug("Resolving UserId: " + userId)
+  async ResolveUserId (userId: string) {
+    logger.debug('Resolving UserId: ' + userId)
     const finicityUser = await this.apiClient.getCustomer(userId)
     if (finicityUser) {
       logger.trace(`Found existing finicity customer ${finicityUser.id}`)
@@ -132,21 +129,21 @@ export class FinicityApi implements ProviderApiClient {
     return userId
   }
 
-  static async HandleOauthResponse(request: any): Promise<Connection> {
+  static async HandleOauthResponse (request: any): Promise<Connection> {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const { connection_id, eventType, reason, code } = request
     const db = new StorageClient()
     let institutionLoginId = false
     switch (eventType) {
-      case "added":
+      case 'added':
         institutionLoginId = request.payload.accounts?.[0]?.institutionLoginId
         break
       default:
         switch (reason) {
-          case "error":
-            if (code === "201") {
+          case 'error':
+            if (code === '201') {
               // refresh but unnecessary
-              institutionLoginId = connection_id.split(";")[1]
+              institutionLoginId = connection_id.split(';')[1]
             }
             break
         }
@@ -162,19 +159,19 @@ export class FinicityApi implements ProviderApiClient {
       connection.id = `${institutionLoginId}`
     }
     connection.request_id = connection_id
-    connection.error = JSON.stringify(reason || "")
+    connection.error = JSON.stringify(reason || '')
     await db.set(connection_id, connection)
     connection.storageClient = db
     return connection
   }
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  async getConnection(id: string, user_id: string) {
-    if (id.startsWith(this.token)) {
+  async getConnection (id: string, user_id: string) {
+    if (id.startsWith(user_id)) {
       return await this.db.get(id)
     } else {
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      const request_id = `${this.token};${id}`
+      const request_id = `${user_id};${id}`
       const existing = await this.db.get(request_id)
       if (existing?.id) {
         return existing
@@ -190,7 +187,7 @@ export class FinicityApi implements ProviderApiClient {
           request_id
         ),
         provider: this.apiClient.apiConfig.provider,
-        status: ConnectionStatus.PENDING,
+        status: ConnectionStatus.PENDING
       }
       await this.db.set(request_id, obj)
       return obj
