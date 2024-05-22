@@ -243,8 +243,8 @@ export class ConnectApi extends ProviderApiBase {
   async loadPopularInstitutions (query: string) {
     this.context.updated = true
     this.context.provider = null
-    const ret = await this.institutions()
-    return ret.institutions.map(mapInstitution)
+    const favoriteInstitutions = await ElasticsearchClient.getFavoriteInstitutions()
+    return favoriteInstitutions.map(mapInstitutionLocal)
   }
 
   async loadDiscoveredInstitutions (): Promise<Institution[]> {

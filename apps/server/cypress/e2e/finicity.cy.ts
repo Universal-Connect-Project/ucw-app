@@ -4,7 +4,7 @@ describe('Should connect to an Institution through happy path', () => {
 
     cy.visitAgg()
     cy.findByPlaceholderText('Search').type('finbank profiles')
-    cy.findByLabelText('Add account with finbank profiles - a').click()
+    cy.findByLabelText('Add account with FinBank Profiles - A').click()
 
     cy.findByRole('link', { name: 'Continue' }).should('exist')
   })

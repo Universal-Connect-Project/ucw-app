@@ -80,6 +80,26 @@ export default class ElasticsearchClient {
     return institutionResponse._source as LocalInstitution
   }
 
+  static async getFavoriteInstitutions (): Promise<LocalInstitution[]> {
+    const client = this.getInstance().client
+
+    // Eventually the favorites list will be in the config or something, this is just a placeholder until then
+    // to remove the dependency on the institution service hosted by UCP
+    const favorites = ['UCP-b087caf69b372c9', 'UCP-60155b7292895ed', 'UCP-ce8334bbb890163', 'UCP-ebca9a2b2ae2cca', 'UCP-b0a4307160ecb4c', 'UCP-8c4ca4c32dbd8de', 'UCP-412ded54698c47f']
+    const esSearch = favorites.map(favorite => {
+      return {
+        _index: 'institutions',
+        _id: favorite
+      }
+    })
+
+    const favoriteInstitutionsResponse: estypes.MgetRequest = await client.mget({
+      docs: esSearch
+    })
+    const institutions = favoriteInstitutionsResponse.docs.map(favoriteInstitution => favoriteInstitution._source as LocalInstitution)
+    return institutions
+  }
+
   static async deleteIndex () {
     const client = this.getInstance().client
 
