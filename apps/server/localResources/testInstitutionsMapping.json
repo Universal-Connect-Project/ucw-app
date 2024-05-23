@@ -1,0 +1,45 @@
+[{
+  "name": "MX Bank (Oauth)",
+  "keywords": "Gringotts, MX Bank, oauth",
+  "logo": "https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png",
+  "url": "https://mx.com",
+  "ucp_id": "UCP-da107e6d0da7779",
+  "is_test_bank": true,
+  "mx": {
+    "id": "INS-68e96dd6-eabd-42d3-9f05-416897f0746c",
+    "supports_oauth": true,
+    "supports_identification": true,
+    "supports_verification": true,
+    "supports_account_statement": false,
+    "supports_history": false
+  },
+  "sophtron": {
+    "id": null,
+    "supports_oauth": null,
+    "supports_identification": null,
+    "supports_verification": null,
+    "supports_account_statement": null,
+    "supports_history": null
+  },
+  "finicity": {
+    "id": null,
+    "supports_oauth": null,
+    "supports_identification": null,
+    "supports_verification": null,
+    "supports_account_statement": null,
+    "supports_history": null
+  },
+  "akoya": {
+    "id": null,
+    "supports_oauth": null,
+    "supports_identification": null,
+    "supports_verification": null,
+    "supports_account_statement": null,
+    "supports_history": null
+  }
+},
+{"name":"MX Bank","keywords":"Gringotts, MX Bank","logo":"https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png","url":"https://mx.com","ucp_id":"UCP-bb5296bd5aae5d9","is_test_bank":true,"mx":{"id":"mxbank","supports_oauth":false,"supports_identification":true,"supports_verification":true,"supports_account_statement":false,"supports_history":true},"sophtron":{"id":null,"supports_oauth":null,"supports_identification":null,"supports_verification":null,"supports_account_statement":null,"supports_history":null},"finicity":{"id":null,"supports_oauth":null,"supports_identification":null,"supports_verification":null,"supports_account_statement":null,"supports_history":null},"akoya":{"id":null,"supports_oauth":null,"supports_identification":null,"supports_verification":null,"supports_account_statement":null,"supports_history":null}},
+{"name":"Sophtron Bank NoMFA","keywords":null,"logo":"https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/default_100x100.png","url":"https://sophtron.com","ucp_id":"UCP-8f44f07ab52c40d","is_test_bank":false,"mx":{"id":null,"supports_oauth":false,"supports_identification":false,"supports_verification":false,"supports_account_statement":false,"supports_history":false},"sophtron":{"id":"926623ca-5952-4921-8f77-2023f1cdde8e","supports_oauth":null,"supports_identification":false,"supports_verification":false,"supports_account_statement":false,"supports_history":false},"finicity":{"id":null,"supports_oauth":null,"supports_identification":null,"supports_verification":null,"supports_account_statement":null,"supports_history":null},"akoya":{"id":null,"supports_oauth":null,"supports_identification":null,"supports_verification":null,"supports_account_statement":null,"supports_history":null}},
+{"name":"Sophtron Bank","keywords":null,"logo":"https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/default_100x100.png","url":"https://sophtron.com","ucp_id":"UCP-e13d0b85e40f6d0","is_test_bank":false,"mx":{"id":null,"supports_oauth":false,"supports_identification":false,"supports_verification":false,"supports_account_statement":false,"supports_history":false},"sophtron":{"id":"8d0d9991-5e35-4b82-afa4-e93695e5ca7d","supports_oauth":null,"supports_identification":false,"supports_verification":false,"supports_account_statement":false,"supports_history":false},"finicity":{"id":null,"supports_oauth":null,"supports_identification":null,"supports_verification":null,"supports_account_statement":null,"supports_history":null},"akoya":{"id":null,"supports_oauth":null,"supports_identification":null,"supports_verification":null,"supports_account_statement":null,"supports_history":null}},
+{"name":"FinBank Profiles - A","keywords":"finbank, finicity","logo":"https://prod-carpintero-branding.s3.us-west-2.amazonaws.com/102105/icon.svg","url":"http://www.finbank.com","ucp_id":"UCP-finbank-profile-a","is_test_bank":false,"mx":{"id":null,"supports_oauth":true,"supports_identification":true,"supports_verification":true,"supports_account_statement":false,"supports_history":false},"sophtron":{"id":null,"supports_oauth":null,"supports_identification":null,"supports_verification":null,"supports_account_statement":null,"supports_history":null},"finicity":{"id":"102105","supports_oauth":null,"supports_identification":true,"supports_verification":true,"supports_account_statement":true,"supports_history":null},"akoya":{"id":null,"supports_oauth":null,"supports_identification":null,"supports_verification":null,"supports_account_statement":null,"supports_history":null}}
+]

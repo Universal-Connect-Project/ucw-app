@@ -1,8 +1,20 @@
 import type { estypes } from '@elastic/elasticsearch'
 import { Client } from '@elastic/elasticsearch'
 import { readFileSync } from 'fs'
-import type { LocalInstitution } from 'src/shared/contract'
+import { resolve } from 'path'
 import config from '../config'
+
+import type { LocalInstitution } from 'src/shared/contract'
+
+function getInstitutionFilePath () {
+  if (config.Env === 'test') {
+    console.log('loading test institutions')
+    return resolve(__dirname, '../../localResources/testInstitutionsMapping.json')
+  } else {
+    console.log('loading all institutions into elasticSearch')
+    return resolve(__dirname, '../../localResources/ucwInstitutionsMapping.json')
+  }
+}
 
 export default class ElasticsearchClient {
   private readonly client: Client
@@ -24,6 +36,8 @@ export default class ElasticsearchClient {
     const elasticSearchLoaded = await client.indices.exists({ index: 'institutions' })
     if (!elasticSearchLoaded) {
       await this.reIndexElasticSearch()
+    } else {
+      console.log('ElasticSearch already indexed')
     }
   }
 
@@ -45,11 +59,13 @@ export default class ElasticsearchClient {
     } catch {
       console.log('Elasticsearch "institutions" index did not exist')
     }
-    await client.indices.create({ index: 'institutions' })
     console.log('Elasticsearch indexing institutions')
-    const dataFilePath = 'ucw_institution_mapping.json'
+    const dataFilePath = getInstitutionFilePath()
+    console.log('file path', dataFilePath)
     const rawData = readFileSync(dataFilePath)
     const jsonData = JSON.parse(rawData.toString())
+
+    await client.indices.create({ index: 'institutions' })
 
     for (const institution of jsonData) {
       await client.index({
