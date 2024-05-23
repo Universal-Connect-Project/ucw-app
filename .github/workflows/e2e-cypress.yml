@@ -12,6 +12,16 @@ jobs:
     runs-on: ubuntu-latest
     needs: [setup-env]
 
+    services:
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+        options: --health-cmd="curl --silent --fail localhost:9200/_cluster/health || exit 1" --health-interval=10s --health-timeout=5s --health-retries=5
+        ports:
+          - 9200:9200
+        env:
+          discovery.type: single-node
+          ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,12 +33,12 @@ jobs:
           sudo sysctl -w fs.file-max=262144
           sudo sysctl -w vm.max_map_count=262144
 
-      - name: Runs ElasticSearch
-        uses: getong/elasticsearch-action@v1.3
-        with:
-          elasticsearch version: 8.13.4
-          host port: 9200
-          container port: 9200
+      # - name: Runs ElasticSearch
+      #   uses: getong/elasticsearch-action@v1.3
+      #   with:
+      #     elasticsearch version: 8.13.4
+      #     host port: 9200
+      #     container port: 9200
 
       - uses: actions/setup-node@v4
         with:
@@ -61,6 +71,11 @@ jobs:
           echo FINICITYAPPKEY=${{ secrets.FINICITY_APP_KEY }} >> ${ENV_FILE_PATH}
 
           cat ${ENV_FILE_PATH}
+
+      - name: Wait for Elasticsearch to be ready
+        run: |
+          echo "Waiting for Elasticsearch to be ready..."
+          timeout 120s bash -c 'until curl -s http://localhost:9200/_cluster/health | grep -q green; do echo "Waiting for ES..."; sleep 5; done'
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
