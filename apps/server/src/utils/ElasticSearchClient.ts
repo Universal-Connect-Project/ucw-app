@@ -2,13 +2,20 @@ import type { estypes } from '@elastic/elasticsearch'
 import { Client } from '@elastic/elasticsearch'
 import { readFileSync } from 'fs'
 import type { LocalInstitution } from 'src/shared/contract'
+import config from '../config'
 
 export default class ElasticsearchClient {
   private readonly client: Client
   private static _instance: ElasticsearchClient
 
   private constructor () {
-    this.client = new Client({ node: 'http://localhost:9200' })
+    this.client = new Client({
+      node: 'http://localhost:9200',
+      auth: {
+        username: 'elastic',
+        password: config.ElasticSearchPassword
+      }
+    })
   }
 
   static async initialize () {

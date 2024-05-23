@@ -54,7 +54,9 @@ const keysToPullFromEnv = [
   'FinicitySecret',
   'FinicityPartnerIdProd',
   'FinicityAppKeyProd',
-  'FinicitySecretProd'
+  'FinicitySecretProd',
+
+  'ElasticSearchPassword'
 ]
 
 const config: Record<string, any> = keysToPullFromEnv.reduce(
