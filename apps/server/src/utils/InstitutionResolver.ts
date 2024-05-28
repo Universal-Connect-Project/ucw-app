@@ -5,6 +5,7 @@ export async function resolveInstitutionProvider (institutionId: string): Promis
   const institution = await ElasticsearchClient.getInstitution(institutionId)
   const providers = availableProviders(institution)
 
+  // TODO: change this to simply use the first provider and switch to mx_int if provider is mx and is test
   if (providers.length === 1) {
     let provider = providers[0]
     const institutionProvider = institution[provider as keyof LocalInstitution] as InstitutionProvider

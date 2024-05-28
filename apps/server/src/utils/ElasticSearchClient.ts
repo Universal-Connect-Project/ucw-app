@@ -9,10 +9,10 @@ import type { LocalInstitution } from 'src/shared/contract'
 function getInstitutionFilePath () {
   if (config.Env === 'test') {
     console.log('loading test institutions')
-    return resolve(__dirname, '../../localResources/testInstitutionsMapping.json')
+    return resolve(__dirname, '../../cachedDefaults/testInstitutionsMapping.json')
   } else {
     console.log('loading all institutions into elasticSearch')
-    return resolve(__dirname, '../../localResources/ucwInstitutionsMapping.json')
+    return resolve(__dirname, '../../cachedDefaults/ucwInstitutionsMapping.json')
   }
 }
 
@@ -22,11 +22,7 @@ export default class ElasticsearchClient {
 
   private constructor () {
     this.client = new Client({
-      node: 'http://localhost:9200',
-      auth: {
-        username: 'elastic',
-        password: config.ElasticSearchPassword
-      }
+      node: process.env.ELASTIC_SEARCH_URL
     })
   }
 
