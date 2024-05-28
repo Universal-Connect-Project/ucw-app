@@ -1,0 +1,23 @@
+{
+  "defaultProvider": "provider1",
+
+  "defaultProviderVolume": {
+    "provider1": 70,
+    "provider2": 30
+  },
+
+  "institutionProviderVolumeMap": {
+    "institutionId1": {
+      "provider1": 33.33,
+      "provider2": 33.33,
+      "provider3": 33.34
+    },
+    "institutionId2": {
+      "provider1": 100
+    }
+  },
+
+  "hiddenInstitutions": ["bankId"],
+
+  "recommendedInstitutions": ["bankId1", "bankId2"]
+}
