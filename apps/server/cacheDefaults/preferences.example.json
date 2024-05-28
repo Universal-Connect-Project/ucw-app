@@ -17,7 +17,7 @@
     }
   },
 
-  "hiddenInstitutions": ["bankId"],
+  "hiddenInstitutions": ["institutionId"],
 
-  "recommendedInstitutions": ["bankId1", "bankId2"]
+  "recommendedInstitutions": ["institutionId1", "institutionId2"]
 }
