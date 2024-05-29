@@ -7,13 +7,13 @@ import config from '../config'
 import type { LocalInstitution } from 'src/shared/contract'
 
 function getInstitutionFilePath () {
-  if (config.Env === 'test') {
-    console.log('loading test institutions')
-    return resolve(__dirname, '../../cachedDefaults/testInstitutionsMapping.json')
-  } else {
-    console.log('loading all institutions into elasticSearch')
-    return resolve(__dirname, '../../cachedDefaults/ucwInstitutionsMapping.json')
-  }
+  // if (config.Env === 'test') {
+  //   console.log('loading test institutions')
+  //   return resolve(__dirname, '../../cachedDefaults/testInstitutionsMapping.json')
+  // } else {
+  //   console.log('loading all institutions into elasticSearch')
+  // }
+  return resolve(__dirname, '../../cachedDefaults/ucwInstitutionsMapping.json')
 }
 
 export default class ElasticsearchClient {
