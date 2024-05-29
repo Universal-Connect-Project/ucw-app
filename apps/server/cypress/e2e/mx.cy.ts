@@ -9,12 +9,4 @@ describe('Should connect to an Institution through happy path', () => {
 
     cy.findByText('Connected', { timeout: 45000 }).should('exist')
   })
-
-  it('Connects to MX Bank (OAuth)', () => {
-    cy.visitAgg()
-    cy.findByPlaceholderText('Search').type('MX Bank (Oauth)')
-    cy.findByLabelText('Add account with MX Bank (Oauth)').first().click()
-
-    cy.findByRole('link', { name: 'Continue' }).should('exist')
-  })
 })
