@@ -1,4 +1,4 @@
-import type { InstitutionProvider, LocalInstitution, Provider, ResolvedInstitution } from '../shared/contract'
+import type { CachedInstitution, InstitutionProvider, Provider, ResolvedInstitution } from '../shared/contract'
 import ElasticsearchClient from './ElasticSearchClient'
 
 export async function resolveInstitutionProvider (institutionId: string): Promise<ResolvedInstitution> {
@@ -6,7 +6,7 @@ export async function resolveInstitutionProvider (institutionId: string): Promis
   const providers = getAvailableProviders(institution)
 
   let provider = providers[0]
-  const institutionProvider = institution[provider as keyof LocalInstitution] as InstitutionProvider
+  const institutionProvider = institution[provider as keyof CachedInstitution] as InstitutionProvider
   if (provider === 'mx') {
     if (institution.is_test_bank) {
       provider = 'mx_int'
@@ -21,7 +21,7 @@ export async function resolveInstitutionProvider (institutionId: string): Promis
   }
 }
 
-export function getAvailableProviders (institution: LocalInstitution): string[] {
+export function getAvailableProviders (institution: CachedInstitution): string[] {
   const providers = []
   if (institution.mx.id != null) {
     providers.push('mx')

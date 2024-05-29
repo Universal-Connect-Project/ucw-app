@@ -120,7 +120,7 @@ export class ProviderApiBase {
     return resolvedInstitution
   }
 
-  async getProviderInstitution (ucpId: string): Promise<any> {
+  async getProviderInstitution (ucpId: string): Promise<Institution> {
     const resolved = await this.resolveInstitution(ucpId)
     const inst = await this.providerApiClient.GetInstitutionById(resolved.id)
     if (inst != null) {

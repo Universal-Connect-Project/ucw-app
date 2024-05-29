@@ -4,16 +4,16 @@ import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import config from '../config'
 
-import type { LocalInstitution } from 'src/shared/contract'
+import type { CachedInstitution } from 'src/shared/contract'
 
 function getInstitutionFilePath () {
-  // if (config.Env === 'test') {
-  //   console.log('loading test institutions')
-  //   return resolve(__dirname, '../../cachedDefaults/testInstitutionsMapping.json')
-  // } else {
-  //   console.log('loading all institutions into elasticSearch')
-  // }
-  return resolve(__dirname, '../../cachedDefaults/ucwInstitutionsMapping.json')
+  if (config.Env === 'test') {
+    console.log('loading test institutions')
+    return resolve(__dirname, '../../cachedDefaults/testInstitutionsMapping.json')
+  } else {
+    console.log('loading all institutions into elasticSearch')
+    return resolve(__dirname, '../../cachedDefaults/ucwInstitutionsMapping.json')
+  }
 }
 
 export default class ElasticsearchClient {
@@ -57,7 +57,6 @@ export default class ElasticsearchClient {
     }
     console.log('Elasticsearch indexing institutions')
     const dataFilePath = getInstitutionFilePath()
-    console.log('file path', dataFilePath)
     const rawData = readFileSync(dataFilePath)
     const jsonData = JSON.parse(rawData.toString())
 
@@ -88,7 +87,7 @@ export default class ElasticsearchClient {
     return searchResults.hits.hits.map((esObject: estypes.SearchHit) => esObject._source)
   }
 
-  static async getInstitution (id: string): Promise<LocalInstitution> {
+  static async getInstitution (id: string): Promise<CachedInstitution> {
     const client = this.getInstance().client
 
     const institutionResponse = await client.get({
@@ -96,10 +95,10 @@ export default class ElasticsearchClient {
       index: 'institutions'
     })
 
-    return institutionResponse._source as LocalInstitution
+    return institutionResponse._source as CachedInstitution
   }
 
-  static async getFavoriteInstitutions (): Promise<LocalInstitution[]> {
+  static async getFavoriteInstitutions (): Promise<CachedInstitution[]> {
     const client = this.getInstance().client
 
     // Eventually the favorites list will be in the config or something, this is just a placeholder until then
@@ -115,7 +114,7 @@ export default class ElasticsearchClient {
     const favoriteInstitutionsResponse: estypes.MgetRequest = await client.mget({
       docs: esSearch
     })
-    const institutions = favoriteInstitutionsResponse.docs.map(favoriteInstitution => favoriteInstitution._source as LocalInstitution)
+    const institutions = favoriteInstitutionsResponse.docs.map(favoriteInstitution => favoriteInstitution._source as CachedInstitution)
     return institutions
   }
 

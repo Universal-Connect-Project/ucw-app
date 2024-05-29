@@ -1,19 +1,19 @@
 import type { Member, MemberResponse } from 'interfaces/contract'
 import * as logger from '../infra/logger'
 import {
+  type CachedInstitution,
   type Challenge,
   ChallengeType,
   type Connection,
   ConnectionStatus,
   type Institution,
-  type InstitutionResponse,
-  type LocalInstitution
+  type InstitutionSearchResponseItem
 } from '../shared/contract'
 
 import { ProviderApiBase } from '../providers'
 import ElasticsearchClient from '../utils/ElasticSearchClient'
 
-function mapInstitution (ins: Institution) {
+function mapResolvedInstitution (ins: Institution) {
   return ({
     guid: ins.id,
     code: ins.id,
@@ -32,21 +32,15 @@ function mapInstitution (ins: Institution) {
   })
 }
 
-function mapInstitutionLocal (ins: LocalInstitution): InstitutionResponse {
+function mapCachedInstitution (ins: CachedInstitution): InstitutionSearchResponseItem {
   const supportsOauth = ins.mx.supports_oauth || ins.sophtron.supports_oauth
   // || ins.finicity.supports_oauth || ins.akoya.supports_oauth
   return ({
-    id: ins.ucp_id,
     guid: ins.ucp_id,
-    code: null,
     name: ins.name,
     url: ins.url,
     logo_url: ins.logo,
-    instructional_data: null,
-    credentials: [] as any[],
-    supports_oauth: supportsOauth,
-    providers: null,
-    provider: null
+    supports_oauth: supportsOauth
   })
 }
 
@@ -225,20 +219,20 @@ export class ConnectApi extends ProviderApiBase {
     }
   }
 
-  async loadInstitutions (query: string): Promise<any> {
+  async loadInstitutions (query: string): Promise<InstitutionSearchResponseItem[]> {
     const institutionHits = await ElasticsearchClient.search(query)
-    return institutionHits.map(mapInstitutionLocal)
+    return institutionHits.map(mapCachedInstitution)
   }
 
   async loadInstitutionByUcpId (ucpId: string): Promise<any> {
     const inst = await this.getProviderInstitution(ucpId)
-    return { institution: mapInstitution(inst) }
+    return { institution: mapResolvedInstitution(inst) }
   }
 
   async loadPopularInstitutions (query: string) {
     this.context.updated = true
     this.context.provider = null
     const favoriteInstitutions = await ElasticsearchClient.getFavoriteInstitutions()
-    return favoriteInstitutions.filter(ins => ins != null).map(mapInstitutionLocal)
+    return favoriteInstitutions.filter(ins => ins != null).map(mapCachedInstitution)
   }
 }

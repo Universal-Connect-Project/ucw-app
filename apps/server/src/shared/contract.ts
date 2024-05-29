@@ -112,11 +112,12 @@ export interface ResolvedInstitution {
   name: string
   logo_url: string
   provider: Provider
+  oauth?: boolean
 }
 
 export type Provider = 'mx' | 'mx_int' | 'sophtron' | 'finicity' | 'akoya'
 
-export interface LocalInstitution {
+export interface CachedInstitution {
   name: string
   keywords: string | null
   logo: string
@@ -138,20 +139,12 @@ export interface InstitutionProvider {
   supports_history: boolean | false
 }
 
-export interface InstitutionResponse {
+export interface InstitutionSearchResponseItem {
   guid: string | null
-  id: string | null
   name: string
   url: string
   logo_url: string | null
-  provider?: string | null
-  oauth?: boolean | false
-  code?: string | null
-  instructional_data?: string | null
-  credentials?: any
   supports_oauth?: boolean | false
-  small_logo_url?: string | null
-  providers?: Provider[]
 }
 
 export interface Institutions {

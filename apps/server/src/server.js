@@ -44,13 +44,6 @@ app.get('/ping', function (req, res) {
   res.send('ok')
 })
 
-app.get('/es-index', async (req, res) => {
-  await ElasticsearchClient.deleteIndex()
-  res.send('deleted index')
-  // await ElasticsearchClient.reIndexElasticSearch()
-  // res.send('Indexed institutions')
-})
-
 app.get('/pong/:search_term', async (req, res) => {
   const institutionHits = await ElasticsearchClient.search(req.params.search_term)
   res.send(institutionHits)

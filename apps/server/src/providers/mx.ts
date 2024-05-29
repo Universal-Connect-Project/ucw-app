@@ -3,7 +3,6 @@ import * as logger from '../infra/logger'
 import type {
   CredentialRequest,
   CredentialsResponseBody,
-  InstitutionResponse,
   MemberResponse
 } from '../serviceClients/mxClient'
 import { Configuration, MxPlatformApiFactory } from '../serviceClients/mxClient'
@@ -27,20 +26,6 @@ interface HandleOauthReponseRequest {
   member_guid: string
   status: string
   error_reason: string
-}
-
-export function fromMxInstitution (
-  ins: InstitutionResponse,
-  provider: string
-): Institution {
-  return {
-    id: ins.code,
-    logo_url: ins.medium_logo_url ?? ins.small_logo_url,
-    name: ins.name,
-    oauth: ins.supports_oauth,
-    url: ins.url,
-    provider
-  }
 }
 
 function mapCredentials (mxCreds: CredentialsResponseBody): Credential[] {
@@ -96,8 +81,15 @@ export class MxApi implements ProviderApiClient {
   async GetInstitutionById (id: string): Promise<Institution> {
     const res = await this.apiClient.readInstitution(id)
     // TODO: if this is 401 we should throw an error
-    const ins = res.data.institution
-    return fromMxInstitution(ins, this.provider)
+    const institution = res.data.institution
+    return {
+      id: institution.code,
+      logo_url: institution.medium_logo_url ?? institution.small_logo_url,
+      name: institution.name,
+      oauth: institution.supports_oauth,
+      url: institution.url,
+      provider: this.provider
+    }
   }
 
   async ListInstitutionCredentials (
