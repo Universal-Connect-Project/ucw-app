@@ -74,7 +74,7 @@ export async function instrumentation (context: Context, input: any) {
 
 export class ProviderApiBase {
   context: Context
-  serviceClient: ProviderApiClient
+  providerApiClient: ProviderApiClient
   analyticsClient: AnalyticsClient
   storageClient: StorageClient
   searchApi: SearchClient
@@ -91,8 +91,7 @@ export class ProviderApiBase {
     this.analyticsClient = new AnalyticsClient(token)
     try {
       const conf = providerCredentials
-      // TODO Refactor: This naming is terribly misleading. "serviceClient" is something different, this is the ApiClient
-      this.serviceClient = getApiClient(this.context?.provider, {
+      this.providerApiClient = getApiClient(this.context?.provider, {
         ...conf,
         storageClient: this.storageClient
       })
@@ -111,22 +110,6 @@ export class ProviderApiBase {
     return await this.searchApi.institutions()
   }
 
-  // async search(query: string) {
-  //   this.context.updated = true
-  //   this.context.provider = null
-  //   const q = query as any
-  //   if (q.search_name != null && q.search_name !== '') {
-  //     query = q.search_name
-  //   }
-  //   if (query?.length >= 3) {
-  //     const list = await this.searchApi.institutions(query, this.providers)
-  //     return list?.institutions?.sort(
-  //       (a: any, b: any) => a.name.length - b.name.length
-  //     )
-  //   }
-  //   return []
-  // }
-
   async resolveInstitution (id: string): Promise<Institution> {
     const resolvedInstitution = await resolveInstitutionProvider(id)
     this.context.provider = resolvedInstitution.provider
@@ -137,9 +120,9 @@ export class ProviderApiBase {
     return resolvedInstitution
   }
 
-  async getInstitution (guid: string): Promise<any> {
-    const resolved = await this.resolveInstitution(guid)
-    const inst = await this.serviceClient.GetInstitutionById(resolved.id)
+  async getProviderInstitution (ucpId: string): Promise<any> {
+    const resolved = await this.resolveInstitution(ucpId)
+    const inst = await this.providerApiClient.GetInstitutionById(resolved.id)
     if (inst != null) {
       inst.name = resolved.name ?? inst.name
       inst.url = resolved?.url ?? inst.url?.trim()
@@ -152,18 +135,18 @@ export class ProviderApiBase {
     this.context.updated = true
     this.context.current_job_id = null
     // let id = await this.resolveInstitution(guid)
-    return await this.serviceClient.ListInstitutionCredentials(guid)
+    return await this.providerApiClient.ListInstitutionCredentials(guid)
   }
 
   async getConnection (connection_id: string): Promise<Connection> {
-    return await this.serviceClient.GetConnectionById(
+    return await this.providerApiClient.GetConnectionById(
       connection_id,
       this.getUserId()
     )
   }
 
   async getConnectionStatus (connection_id: string): Promise<Connection> {
-    return await this.serviceClient.GetConnectionStatus(
+    return await this.providerApiClient.GetConnectionStatus(
       connection_id,
       this.context.current_job_id,
       this.context.single_account_select,
@@ -176,7 +159,7 @@ export class ProviderApiBase {
   ): Promise<Connection> {
     this.context.updated = true
     this.context.current_job_id = null
-    const ret = await this.serviceClient.CreateConnection(
+    const ret = await this.providerApiClient.CreateConnection(
       connection,
       this.getUserId()
     )
@@ -193,7 +176,7 @@ export class ProviderApiBase {
   async updateConnection (
     connection: UpdateConnectionRequest
   ): Promise<Connection> {
-    const ret = await this.serviceClient.UpdateConnection(
+    const ret = await this.providerApiClient.UpdateConnection(
       connection,
       this.getUserId()
     )
@@ -209,7 +192,7 @@ export class ProviderApiBase {
   }
 
   async answerChallenge (connection_id: string, challenges: Challenge[]) {
-    return await this.serviceClient.AnswerChallenge(
+    return await this.providerApiClient.AnswerChallenge(
       {
         id: connection_id ?? this.context.connection_id,
         challenges
@@ -254,20 +237,20 @@ export class ProviderApiBase {
   }
 
   async deleteConnection (connection_id: string): Promise<void> {
-    await this.serviceClient.DeleteConnection(connection_id, this.getUserId())
+    await this.providerApiClient.DeleteConnection(connection_id, this.getUserId())
   }
 
   async getConnectionCredentials (memberGuid: string): Promise<Credential[]> {
     this.context.updated = true
     this.context.current_job_id = null
-    return await this.serviceClient.ListConnectionCredentials(
+    return await this.providerApiClient.ListConnectionCredentials(
       memberGuid,
       this.getUserId()
     )
   }
 
   async ResolveUserId (id: string) {
-    return await this.serviceClient?.ResolveUserId(id)
+    return await this.providerApiClient?.ResolveUserId(id)
   }
 
   getUserId (): string {

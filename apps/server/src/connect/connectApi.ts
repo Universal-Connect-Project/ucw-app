@@ -230,24 +230,15 @@ export class ConnectApi extends ProviderApiBase {
     return institutionHits.map(mapInstitutionLocal)
   }
 
-  async loadInstitutionByGuid (guid: string): Promise<any> {
-    const inst = await this.getInstitution(guid)
+  async loadInstitutionByUcpId (ucpId: string): Promise<any> {
+    const inst = await this.getProviderInstitution(ucpId)
     return { institution: mapInstitution(inst) }
   }
-
-  // loadInstitutionByCode(code: string): Promise<Institution> {
-  //   let client = getApiClient({provider: config.DefaultProvider});
-  //   throw new Error('Method not implemented.');
-  // }
 
   async loadPopularInstitutions (query: string) {
     this.context.updated = true
     this.context.provider = null
     const favoriteInstitutions = await ElasticsearchClient.getFavoriteInstitutions()
     return favoriteInstitutions.filter(ins => ins != null).map(mapInstitutionLocal)
-  }
-
-  async loadDiscoveredInstitutions (): Promise<Institution[]> {
-    return []
   }
 }

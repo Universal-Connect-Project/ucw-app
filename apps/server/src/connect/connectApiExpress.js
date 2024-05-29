@@ -124,7 +124,7 @@ export default function (app) {
   app.get(
     `${ApiEndpoints.INSTITUTIONS}/:institution_guid`,
     async (req, res) => {
-      const ret = await req.connectService.loadInstitutionByGuid(
+      const ret = await req.connectService.loadInstitutionByUcpId(
         req.params.institution_guid
       )
       res.send(ret)
