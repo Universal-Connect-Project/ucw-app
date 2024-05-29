@@ -12,7 +12,7 @@ import { error as _error, info } from './infra/logger'
 import ngrok from '@ngrok/ngrok'
 import 'express-async-errors'
 import RateLimit from 'express-rate-limit'
-import ElasticsearchClient from './utils/elasticSearchClient'
+import ElasticsearchClient from './utils/ElasticSearchClient'
 
 // import asyncify from 'express-asyncify'
 

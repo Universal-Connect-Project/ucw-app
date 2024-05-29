@@ -4,8 +4,8 @@ services:
 
   server:
     depends_on:
-      # elasticsearch:
-      #   condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
       cache:
         condition: service_healthy
       ui:
@@ -36,7 +36,9 @@ services:
     env_file:
       - ./apps/server/.env
     environment:
-       - ELASTIC_SEARCH_URL=http://ucw-app-elasticsearch:9200
+      - ELASTIC_SEARCH_URL=http://ucw-app-elasticsearch:9200
+      - ResourcePrefix=http://ui:5173
+      - RedisServer=redis://cache:6379
 
   ui:
     container_name: ucw-app-ui
@@ -84,24 +86,24 @@ services:
     volumes:
       - cache:/data
 
-  # elasticsearch:
-  #   container_name: ucw-app-elasticsearch
-  #   image: elasticsearch:8.13.4
-  #   restart: on-failure
-  #   networks:
-  #     - ucw
-  #   healthcheck:
-  #     test: curl -s http://ucw-app-elasticsearch:9200 >/dev/null || exit 1
-  #     start_period: 10s
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 5
-  #   ports:
-  #     - 9200:9200
-  #     - 9300:9300
-  #   environment:
-  #     - discovery.type=single-node
-  #     - xpack.security.enabled=false
+  elasticsearch:
+    container_name: ucw-app-elasticsearch
+    image: elasticsearch:8.13.4
+    restart: on-failure
+    networks:
+      - ucw
+    healthcheck:
+      test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://ucw-app-elasticsearch:9200/
+      start_period: 10s
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
 
 volumes:
   cache:

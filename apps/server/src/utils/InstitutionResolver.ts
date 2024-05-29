@@ -1,5 +1,5 @@
 import type { InstitutionProvider, LocalInstitution, Provider, ResolvedInstitution } from '../shared/contract'
-import ElasticsearchClient from './elasticSearchClient'
+import ElasticsearchClient from './ElasticSearchClient'
 
 export async function resolveInstitutionProvider (institutionId: string): Promise<ResolvedInstitution> {
   const institution = await ElasticsearchClient.getInstitution(institutionId)

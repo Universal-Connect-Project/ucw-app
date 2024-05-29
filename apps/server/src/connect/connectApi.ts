@@ -11,7 +11,7 @@ import {
 } from '../shared/contract'
 
 import { ProviderApiBase } from '../providers'
-import ElasticsearchClient from '../utils/elasticSearchClient'
+import ElasticsearchClient from '../utils/ElasticSearchClient'
 
 function mapInstitution (ins: Institution) {
   return ({
