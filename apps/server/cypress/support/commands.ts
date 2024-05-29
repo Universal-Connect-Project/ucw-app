@@ -1,4 +1,4 @@
-import "@testing-library/cypress/add-commands"
+import '@testing-library/cypress/add-commands'
 
 // ***********************************************
 // This example commands.ts shows you how to
@@ -28,12 +28,17 @@ import "@testing-library/cypress/add-commands"
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 //
 
+Cypress.Commands.add('visitAgg', () => {
+  cy.visit('http://localhost:8080/?job_type=agg')
+})
+
 export {}
 
 declare global {
   namespace Cypress {
     interface Chainable {
       setAuthCode: () => Chainable<void>
+      visitAgg: () => Chainable<void>
     }
   }
 }
