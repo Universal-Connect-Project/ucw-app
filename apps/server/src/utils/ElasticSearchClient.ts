@@ -21,9 +21,8 @@ export default class ElasticsearchClient {
   private static _instance: ElasticsearchClient
 
   private constructor () {
-    console.log(`es at ${config.ELASTIC_SEARCH_URL}`)
     this.client = new Client({
-      node: config.ELASTIC_SEARCH_URL
+      node: config.ELASTIC_SEARCH_URL ?? 'http://localhost:9200'
     })
   }
 
