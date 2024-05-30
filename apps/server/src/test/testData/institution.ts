@@ -1,3 +1,5 @@
+import type { CachedInstitution } from '../../shared/contract'
+
 export const institutionData = {
   institution: {
     code: 'testCode',
@@ -59,5 +61,46 @@ export const finicityInsitutionData = {
       ach: 'online',
       aha: 'online'
     }
+  }
+}
+
+export const elasticSearchInstitutionData: CachedInstitution = {
+  name: 'MX Bank (Oauth)',
+  keywords: 'Gringotts, MX Bank, oauth',
+  logo: 'https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
+  url: 'https://mx.com',
+  ucp_id: 'UCP-da107e6d0da7779',
+  is_test_bank: true,
+  mx: {
+    id: 'INS-68e96dd6-eabd-42d3-9f05-416897f0746c',
+    supports_oauth: true,
+    supports_identification: true,
+    supports_verification: true,
+    supports_account_statement: false,
+    supports_history: false
+  },
+  sophtron: {
+    id: null,
+    supports_oauth: false,
+    supports_identification: false,
+    supports_verification: false,
+    supports_account_statement: false,
+    supports_history: false
+  },
+  finicity: {
+    id: null,
+    supports_oauth: false,
+    supports_identification: false,
+    supports_verification: false,
+    supports_account_statement: false,
+    supports_history: false
+  },
+  akoya: {
+    id: null,
+    supports_oauth: false,
+    supports_identification: false,
+    supports_verification: false,
+    supports_account_statement: false,
+    supports_history: false
   }
 }

@@ -20,10 +20,16 @@ export default class ElasticsearchClient {
   private readonly client: Client
   private static _instance: ElasticsearchClient
 
-  private constructor () {
-    this.client = new Client({
-      node: config.ELASTIC_SEARCH_URL ?? 'http://localhost:9200'
-    })
+  private constructor (client: Client = null) {
+    if (client) {
+      console.log('client passed in')
+      this.client = client
+    } else {
+      console.log('make new client')
+      this.client = new Client({
+        node: config.ELASTIC_SEARCH_URL ?? 'http://localhost:9200'
+      })
+    }
   }
 
   static async initialize () {
@@ -37,12 +43,12 @@ export default class ElasticsearchClient {
     }
   }
 
-  static getInstance () {
+  static getInstance (client: Client = null) {
     if (this._instance) {
       return this._instance
     }
 
-    this._instance = new ElasticsearchClient()
+    this._instance = new ElasticsearchClient(client)
     return this._instance
   }
 
@@ -116,17 +122,5 @@ export default class ElasticsearchClient {
     })
     const institutions = favoriteInstitutionsResponse.docs.map(favoriteInstitution => favoriteInstitution._source as CachedInstitution)
     return institutions
-  }
-
-  static async deleteIndex () {
-    const client = this.getInstance().client
-
-    try {
-      await client.indices.delete({
-        index: 'institutions'
-      })
-    } catch {
-      console.log('Elasticsearch "institutions" index did not exist')
-    }
   }
 }
