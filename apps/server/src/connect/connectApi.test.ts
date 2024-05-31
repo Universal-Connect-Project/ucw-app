@@ -1,17 +1,11 @@
 import { elasticSearchInstitutionData } from '../test/testData/institution'
-import ElasticsearchClient from '../utils/ElasticSearchClient'
 import { ConnectApi } from './connectApi'
 
-import { Client } from '@elastic/elasticsearch'
-import Mock from '@elastic/elasticsearch-mock'
 import { createClient } from '../__mocks__/redis'
 import { MxApi } from '../providers/mx'
+import { ElasticSearchMock } from '../utils/ElasticSearchClient'
 
-const mock = new Mock()
-const client = new Client({
-  node: 'http://localhost:9200',
-  Connection: mock.getConnection()
-})
+const mock = ElasticSearchMock
 
 const connectApi = new ConnectApi({
   context: {
@@ -36,7 +30,6 @@ const mxApiClient = new MxApi(
 )
 
 connectApi.providerApiClient = mxApiClient
-ElasticsearchClient.getInstance(client)
 
 describe('loadInstitutions', () => {
   beforeAll(() => {
@@ -130,6 +123,7 @@ describe('loadInstitutionByUcpId', () => {
 
 describe('loadPopularInstitutions', () => {
   beforeAll(() => {
+    connectApi.providerApiClient = mxApiClient
     mock.clearAll()
 
     mock.add({

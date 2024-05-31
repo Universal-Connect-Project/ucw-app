@@ -2,15 +2,13 @@ import { Client } from '@elastic/elasticsearch'
 import Mock from '@elastic/elasticsearch-mock'
 
 import { elasticSearchInstitutionData } from '../test/testData/institution'
-import ElasticsearchClient from '../utils/ElasticSearchClient'
+import { getFavoriteInstitutions, getInstitution, initialize, reIndexElasticSearch, search } from '../utils/ElasticSearchClient'
 
 const mock = new Mock()
 const client = new Client({
   node: 'http://localhost:9200',
   Connection: mock.getConnection()
 })
-
-ElasticsearchClient.getInstance(client)
 
 describe('initialize', () => {
   describe('elastic search already indexed', () => {
@@ -24,7 +22,7 @@ describe('initialize', () => {
     })
 
     it('does not reindex institutions', async () => {
-      await ElasticsearchClient.initialize()
+      await initialize(client)
       // this test would fail if it tried to reindex institutions without mocking those methods
     })
   })
@@ -38,7 +36,7 @@ describe('initialize', () => {
       // The reindex method triggers 'Mock not found' so we know it's getting to that method, we will test that method
       // separatly from 'initialize'.
       await expect(async () => {
-        await ElasticsearchClient.initialize()
+        await initialize(client)
       }).rejects.toThrow('Mock not found')
     })
   })
@@ -71,7 +69,7 @@ describe('reIndexElasticSearch', () => {
   })
 
   it('creates a new index and indexes institutions', async () => {
-    await ElasticsearchClient.reIndexElasticSearch()
+    await reIndexElasticSearch(client)
     expect(indexCreated).toBeTruthy()
     expect(institutionsIndexedCount).toBeGreaterThan(4)
   })
@@ -121,13 +119,13 @@ describe('search', () => {
   })
 
   it('makes the expected elasticsearch call and maps the data', async () => {
-    const results = await ElasticsearchClient.search('MX Bank')
+    const results = await search(client, 'MX Bank')
 
     expect(results).toEqual([elasticSearchInstitutionData])
   })
 
   it('calls elasticsearch and doesnt find any institutions', async () => {
-    const results = await ElasticsearchClient.search('nothing')
+    const results = await search(client, 'nothing')
 
     expect(results).toEqual([])
   })
@@ -148,7 +146,7 @@ describe('getInstitution', () => {
   })
 
   it('gets the expected institution response', async () => {
-    const institutionResponse = await ElasticsearchClient.getInstitution('UCP-1234')
+    const institutionResponse = await getInstitution(client, 'UCP-1234')
     expect(institutionResponse).toEqual(elasticSearchInstitutionData)
   })
 })
@@ -181,7 +179,7 @@ describe('getFavoriteInstitutions', () => {
   })
 
   it('gets a list of favorite institutions', async () => {
-    const favoriteInsitutions = await ElasticsearchClient.getFavoriteInstitutions()
+    const favoriteInsitutions = await getFavoriteInstitutions(client)
 
     expect(favoriteInsitutions).toEqual([elasticSearchInstitutionData])
   })

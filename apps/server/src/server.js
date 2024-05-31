@@ -12,7 +12,7 @@ import { error as _error, info } from './infra/logger'
 import ngrok from '@ngrok/ngrok'
 import 'express-async-errors'
 import RateLimit from 'express-rate-limit'
-import ElasticsearchClient from './utils/ElasticSearchClient'
+import { ElasticsearchClient, initialize as initializeElastic } from './utils/ElasticSearchClient'
 
 // import asyncify from 'express-asyncify'
 
@@ -30,11 +30,7 @@ const limiter = RateLimit({
 })
 app.use(limiter)
 
-async function initialize () {
-  await ElasticsearchClient.initialize()
-}
-
-initialize().then(_ => {
+initializeElastic(ElasticsearchClient).then(_ => {
   info('App initialized successfully')
 }).catch(error => {
   _error(`Failed to initialized: ${error}`)
@@ -42,11 +38,6 @@ initialize().then(_ => {
 
 app.get('/ping', function (req, res) {
   res.send('ok')
-})
-
-app.get('/pong/:search_term', async (req, res) => {
-  const institutionHits = await ElasticsearchClient.search(req.params.search_term)
-  res.send(institutionHits)
 })
 
 useConnect(app)

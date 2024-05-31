@@ -4,12 +4,12 @@ import type {
   Provider,
   ResolvedInstitution
 } from '../shared/contract'
-import ElasticsearchClient from './ElasticSearchClient'
+import { ElasticsearchClient, getInstitution } from './ElasticSearchClient'
 
 export async function resolveInstitutionProvider (
   institutionId: string
 ): Promise<ResolvedInstitution> {
-  const institution = await ElasticsearchClient.getInstitution(institutionId)
+  const institution = await getInstitution(ElasticsearchClient, institutionId)
   const providers = getAvailableProviders(institution)
 
   let provider = providers[0]
