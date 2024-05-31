@@ -4,6 +4,8 @@ import { ConnectApi } from './connectApi'
 
 import { Client } from '@elastic/elasticsearch'
 import Mock from '@elastic/elasticsearch-mock'
+import { createClient } from '../__mocks__/redis'
+import { MxApi } from '../providers/mx'
 
 const mock = new Mock()
 const client = new Client({
@@ -20,10 +22,24 @@ const connectApi = new ConnectApi({
   }
 })
 
+const redisMock = createClient()
+
+const mxApiClient = new MxApi(
+  {
+    mxProd: {
+      username: 'testUsername',
+      password: 'testPassword'
+    },
+    storageClient: redisMock
+  },
+  false
+)
+
+connectApi.providerApiClient = mxApiClient
+ElasticsearchClient.getInstance(client)
+
 describe('loadInstitutions', () => {
   beforeAll(() => {
-    ElasticsearchClient.getInstance(client)
-
     mock.add({
       method: ['GET', 'POST'],
       path: ['/_search', '/institutions/_search'],
