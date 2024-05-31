@@ -6,7 +6,7 @@ import type {
 } from '../shared/contract'
 import ElasticsearchClient from './ElasticSearchClient'
 
-export async function resolveInstitutionProvider(
+export async function resolveInstitutionProvider (
   institutionId: string
 ): Promise<ResolvedInstitution> {
   const institution = await ElasticsearchClient.getInstitution(institutionId)
@@ -30,7 +30,7 @@ export async function resolveInstitutionProvider(
   }
 }
 
-export function getAvailableProviders(
+export function getAvailableProviders (
   institution: CachedInstitution
 ): string[] {
   const providers = []

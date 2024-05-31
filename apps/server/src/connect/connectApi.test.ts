@@ -13,7 +13,7 @@ const client = new Client({
 
 const connectApi = new ConnectApi({
   context: {
-    provider: 'none',
+    provider: 'mx_int',
     updated: false,
     institution_id: 'xxx',
     resolved_user_id: null
