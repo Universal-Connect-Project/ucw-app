@@ -66,19 +66,14 @@ jobs:
 
           cat ${ENV_FILE_PATH}
 
-      - name: Wait for Elasticsearch to be ready
-        run: |
-          echo "Waiting for Elasticsearch to be ready..."
-          timeout 120s bash -c 'until curl -s http://localhost:9200/_cluster/health | grep -q green; do echo "Waiting for ES..."; sleep 5; done'
-
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           project: apps/server
-          start: npm run dev
-          wait-on: 'http://localhost:8080'
+          start: npm run dev:elasticsearchless
+          wait-on: 'http://localhost:8080, http://localhost:9200'
 
       - name: Upload screenshots
         uses: actions/upload-artifact@v4
