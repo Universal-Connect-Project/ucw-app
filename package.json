@@ -4,6 +4,7 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
+    "dev:cypress": "turbo dev:cypress",
     "lint": "turbo lint",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
