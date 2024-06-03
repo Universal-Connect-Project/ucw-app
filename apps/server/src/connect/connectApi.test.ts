@@ -1,11 +1,7 @@
-import { elasticSearchInstitutionData } from '../test/testData/institution'
 import { ConnectApi } from './connectApi'
 
 import { createClient } from '../__mocks__/redis'
 import { MxApi } from '../providers/mx'
-import { ElasticSearchMock } from '../utils/ElasticSearchClient'
-
-const mock = ElasticSearchMock
 
 const connectApi = new ConnectApi({
   context: {
@@ -32,34 +28,6 @@ const mxApiClient = new MxApi(
 connectApi.providerApiClient = mxApiClient
 
 describe('loadInstitutions', () => {
-  beforeAll(() => {
-    mock.add({
-      method: ['GET', 'POST'],
-      path: ['/_search', '/institutions/_search'],
-      body: {
-        query: {
-          multi_match: {
-            query: 'MX',
-            fields: ['name', 'keywords']
-          }
-        }
-      }
-    }, () => {
-      return {
-        hits: {
-          hits: [
-            {
-              _source: elasticSearchInstitutionData
-            },
-            {
-              _source: elasticSearchInstitutionData
-            }
-          ]
-        }
-      }
-    })
-  })
-
   const expectedInstitutionList = [
     {
       guid: 'UCP-da107e6d0da7779',
@@ -85,19 +53,6 @@ describe('loadInstitutions', () => {
 })
 
 describe('loadInstitutionByUcpId', () => {
-  beforeAll(() => {
-    mock.clearAll()
-
-    mock.add({
-      method: 'GET',
-      path: '/institutions/_doc/UCP-1234'
-    }, () => {
-      return {
-        _source: elasticSearchInstitutionData
-      }
-    })
-  })
-
   const expectedInstitutionResponse = {
     institution: {
       guid: 'testCode',
@@ -124,29 +79,6 @@ describe('loadInstitutionByUcpId', () => {
 describe('loadPopularInstitutions', () => {
   beforeAll(() => {
     connectApi.providerApiClient = mxApiClient
-    mock.clearAll()
-
-    mock.add({
-      method: 'POST',
-      path: '/_mget',
-      body: {
-        docs: [
-          { _index: 'institutions', _id: 'UCP-b087caf69b372c9' },
-          { _index: 'institutions', _id: 'UCP-60155b7292895ed' },
-          { _index: 'institutions', _id: 'UCP-ce8334bbb890163' },
-          { _index: 'institutions', _id: 'UCP-ebca9a2b2ae2cca' },
-          { _index: 'institutions', _id: 'UCP-b0a4307160ecb4c' },
-          { _index: 'institutions', _id: 'UCP-8c4ca4c32dbd8de' },
-          { _index: 'institutions', _id: 'UCP-412ded54698c47f' }
-        ]
-      }
-    }, (params) => {
-      return {
-        docs: [
-          { _source: elasticSearchInstitutionData }
-        ]
-      }
-    })
   })
 
   const expectedPopularInstitutionResponse = [{

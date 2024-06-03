@@ -1,19 +1,10 @@
-import { Client } from '@elastic/elasticsearch'
-import Mock from '@elastic/elasticsearch-mock'
-
 import { elasticSearchInstitutionData } from '../test/testData/institution'
-import { getFavoriteInstitutions, getInstitution, initialize, reIndexElasticSearch, search } from '../utils/ElasticSearchClient'
-
-const mock = new Mock()
-const client = new Client({
-  node: 'http://localhost:9200',
-  Connection: mock.getConnection()
-})
+import { ElasticSearchMock, getFavoriteInstitutions, getInstitution, initialize, reIndexElasticSearch, search } from '../utils/ElasticSearchClient'
 
 describe('initialize', () => {
   describe('elastic search already indexed', () => {
     beforeAll(() => {
-      mock.add({
+      ElasticSearchMock.add({
         method: 'HEAD',
         path: '/institutions'
       }, () => {
@@ -22,21 +13,21 @@ describe('initialize', () => {
     })
 
     it('does not reindex institutions', async () => {
-      await initialize(client)
+      await initialize()
       // this test would fail if it tried to reindex institutions without mocking those methods
     })
   })
 
   describe('elastic search not indexed', () => {
     beforeAll(() => {
-      mock.clearAll()
+      ElasticSearchMock.clearAll()
     })
 
     it('triggers the reIndexElasticSearch method', async () => {
       // The reindex method triggers 'Mock not found' so we know it's getting to that method, we will test that method
       // separatly from 'initialize'.
       await expect(async () => {
-        await initialize(client)
+        await initialize()
       }).rejects.toThrow('Mock not found')
     })
   })
@@ -47,11 +38,11 @@ describe('reIndexElasticSearch', () => {
   let institutionsIndexedCount: number
 
   beforeAll(() => {
-    mock.clearAll()
+    ElasticSearchMock.clearAll()
     indexCreated = false
     institutionsIndexedCount = 0
 
-    mock.add({
+    ElasticSearchMock.add({
       method: 'PUT',
       path: '/institutions'
     }, () => {
@@ -59,7 +50,7 @@ describe('reIndexElasticSearch', () => {
       return ''
     })
 
-    mock.add({
+    ElasticSearchMock.add({
       method: 'PUT',
       path: '/institutions/_doc/*'
     }, () => {
@@ -69,15 +60,16 @@ describe('reIndexElasticSearch', () => {
   })
 
   it('creates a new index and indexes institutions', async () => {
-    await reIndexElasticSearch(client)
+    await reIndexElasticSearch()
     expect(indexCreated).toBeTruthy()
     expect(institutionsIndexedCount).toBeGreaterThan(4)
   })
 })
 
 describe('search', () => {
-  beforeAll(() => {
-    mock.add({
+  beforeEach(() => {
+    ElasticSearchMock.clearAll()
+    ElasticSearchMock.add({
       method: ['GET', 'POST'],
       path: ['/_search', '/institutions/_search'],
       body: {
@@ -94,7 +86,7 @@ describe('search', () => {
       }
     })
 
-    mock.add({
+    ElasticSearchMock.add({
       method: ['GET', 'POST'],
       path: ['/_search', '/institutions/_search'],
       body: {
@@ -119,23 +111,23 @@ describe('search', () => {
   })
 
   it('makes the expected elasticsearch call and maps the data', async () => {
-    const results = await search(client, 'MX Bank')
+    const results = await search('MX Bank')
 
     expect(results).toEqual([elasticSearchInstitutionData])
   })
 
   it('calls elasticsearch and doesnt find any institutions', async () => {
-    const results = await search(client, 'nothing')
+    const results = await search('nothing')
 
     expect(results).toEqual([])
   })
 })
 
 describe('getInstitution', () => {
-  beforeAll(() => {
-    mock.clearAll()
+  beforeEach(() => {
+    ElasticSearchMock.clearAll()
 
-    mock.add({
+    ElasticSearchMock.add({
       method: 'GET',
       path: '/institutions/_doc/UCP-1234'
     }, (params) => {
@@ -146,16 +138,16 @@ describe('getInstitution', () => {
   })
 
   it('gets the expected institution response', async () => {
-    const institutionResponse = await getInstitution(client, 'UCP-1234')
+    const institutionResponse = await getInstitution('UCP-1234')
     expect(institutionResponse).toEqual(elasticSearchInstitutionData)
   })
 })
 
 describe('getFavoriteInstitutions', () => {
   beforeAll(() => {
-    mock.clearAll()
+    ElasticSearchMock.clearAll()
 
-    mock.add({
+    ElasticSearchMock.add({
       method: 'POST',
       path: '/_mget',
       body: {
@@ -179,7 +171,7 @@ describe('getFavoriteInstitutions', () => {
   })
 
   it('gets a list of favorite institutions', async () => {
-    const favoriteInsitutions = await getFavoriteInstitutions(client)
+    const favoriteInsitutions = await getFavoriteInstitutions()
 
     expect(favoriteInsitutions).toEqual([elasticSearchInstitutionData])
   })

@@ -12,7 +12,7 @@ import { error as _error, info } from './infra/logger'
 import ngrok from '@ngrok/ngrok'
 import 'express-async-errors'
 import RateLimit from 'express-rate-limit'
-import { ElasticsearchClient, initialize as initializeElastic } from './utils/ElasticSearchClient'
+import { initialize as initializeElastic } from './utils/ElasticSearchClient'
 
 // import asyncify from 'express-asyncify'
 
@@ -30,7 +30,7 @@ const limiter = RateLimit({
 })
 app.use(limiter)
 
-initializeElastic(ElasticsearchClient).then(_ => {
+initializeElastic().then(_ => {
   info('App initialized successfully')
 }).catch(error => {
   _error(`Failed to initialized: ${error}`)
