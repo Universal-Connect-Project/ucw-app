@@ -11,10 +11,14 @@ import {
 } from '../shared/contract'
 
 import { ProviderApiBase } from '../providers'
-import { ElasticsearchClient, getFavoriteInstitutions, search } from '../utils/ElasticSearchClient'
+import {
+  ElasticsearchClient,
+  getRecommendedInstitutions,
+  search
+} from '../utils/ElasticSearchClient'
 
-function mapResolvedInstitution (ins: Institution) {
-  return ({
+function mapResolvedInstitution(ins: Institution) {
+  return {
     guid: ins.id,
     code: ins.id,
     name: ins.name,
@@ -29,35 +33,40 @@ function mapResolvedInstitution (ins: Institution) {
     //   guid: c.id,
     //   ...c
     // }))
-  })
+  }
 }
 
-function mapCachedInstitution (ins: CachedInstitution): InstitutionSearchResponseItem {
+function mapCachedInstitution(
+  ins: CachedInstitution
+): InstitutionSearchResponseItem {
   const supportsOauth = ins.mx.supports_oauth || ins.sophtron.supports_oauth
   // || ins.finicity.supports_oauth || ins.akoya.supports_oauth
-  return ({
+  return {
     guid: ins.ucp_id,
     name: ins.name,
     url: ins.url,
     logo_url: ins.logo,
     supports_oauth: supportsOauth
-  })
+  }
 }
 
-function mapConnection (connection: Connection): Member {
+function mapConnection(connection: Connection): Member {
   return {
     // ...connection,
     institution_guid: connection.institution_code,
     guid: connection.id,
     connection_status: connection.status ?? ConnectionStatus.CREATED, // ?
-    most_recent_job_guid: connection.status === ConnectionStatus.CONNECTED ? null : connection.cur_job_id,
+    most_recent_job_guid:
+      connection.status === ConnectionStatus.CONNECTED
+        ? null
+        : connection.cur_job_id,
     is_oauth: connection.is_oauth,
     oauth_window_uri: connection.oauth_window_uri,
     provider: connection.provider,
     is_being_aggregated: connection.is_being_aggregated,
     user_guid: connection.user_id,
     mfa: {
-      credentials: connection.challenges?.map(c => {
+      credentials: connection.challenges?.map((c) => {
         const ret = {
           guid: c.id,
           credential_guid: c.id,
@@ -78,11 +87,13 @@ function mapConnection (connection: Connection): Member {
           case ChallengeType.IMAGE:
             ret.type = 13
             // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-            ret.meta_data = (c.data as string).startsWith('data:image') ? c.data : ('data:image/png;base64, ' + c.data)
+            ret.meta_data = (c.data as string).startsWith('data:image')
+              ? c.data
+              : 'data:image/png;base64, ' + c.data
             break
           case ChallengeType.OPTIONS:
             ret.type = 2
-            ret.options = (c.data as any[]).map(d => ({
+            ret.options = (c.data as any[]).map((d) => ({
               guid: d.key,
               label: d.key,
               value: d.value,
@@ -91,7 +102,7 @@ function mapConnection (connection: Connection): Member {
             break
           case ChallengeType.IMAGE_OPTIONS:
             ret.type = 14
-            ret.options = (c.data as any[]).map(d => ({
+            ret.options = (c.data as any[]).map((d) => ({
               guid: d.key,
               label: d.key,
               data_uri: d.value,
@@ -100,43 +111,47 @@ function mapConnection (connection: Connection): Member {
             break
         }
         return ret
-      }
-      )
+      })
     }
   } as any
 }
 
 export class ConnectApi extends ProviderApiBase {
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor
-  constructor (req: any) {
+  constructor(req: any) {
     super(req)
   }
 
-  async addMember (memberData: Member): Promise<MemberResponse> {
+  async addMember(memberData: Member): Promise<MemberResponse> {
     const connection = await this.createConnection({
       institution_id: memberData.institution_guid,
-      is_oauth: (memberData.is_oauth ?? false),
-      skip_aggregation: (memberData.skip_aggregation ?? false) && (memberData.is_oauth ?? false),
+      is_oauth: memberData.is_oauth ?? false,
+      skip_aggregation:
+        (memberData.skip_aggregation ?? false) &&
+        (memberData.is_oauth ?? false),
       initial_job_type: this.context.job_type ?? 'agg',
-      credentials: memberData.credentials?.map(c => ({
-        id: c.guid,
-        value: c.value
-      })) ?? []
+      credentials:
+        memberData.credentials?.map((c) => ({
+          id: c.guid,
+          value: c.value
+        })) ?? []
     })
     return { member: mapConnection(connection) }
   }
 
-  async updateMember (member: Member): Promise<MemberResponse> {
+  async updateMember(member: Member): Promise<MemberResponse> {
     if (this.context.current_job_id && member.credentials !== undefined) {
       await this.answerChallenge(
         member.guid,
-        member.credentials.map(c => {
+        member.credentials.map((c) => {
           const ret: Challenge = {
             id: c.guid,
             type: c.field_type,
             response: c.value
           }
-          const challenge = member.mfa?.credentials.find(m => m.guid === c.guid) // widget posts everything back
+          const challenge = member.mfa?.credentials.find(
+            (m) => m.guid === c.guid
+          ) // widget posts everything back
           switch (challenge?.type) {
             case 0:
               ret.type = ChallengeType.QUESTION
@@ -147,9 +162,14 @@ export class ConnectApi extends ProviderApiBase {
             case 2:
               ret.type = c.value ? ChallengeType.OPTIONS : ChallengeType.TOKEN
               if (c.value) {
-                ret.response = challenge?.options.find((o: any) => o.guid === c.value)?.value
+                ret.response = challenge?.options.find(
+                  (o: any) => o.guid === c.value
+                )?.value
                 if (!ret.response) {
-                  logger.error(`Unexpected challege option: ${c.value}: `, challenge)
+                  logger.error(
+                    `Unexpected challege option: ${c.value}: `,
+                    challenge
+                  )
                 }
               }
               break
@@ -162,7 +182,7 @@ export class ConnectApi extends ProviderApiBase {
       const connection = await this.updateConnection({
         job_type: this.context.job_type,
         id: member.guid,
-        credentials: member.credentials?.map(c => ({
+        credentials: member.credentials?.map((c) => ({
           id: c.guid,
           value: c.value
         }))
@@ -171,15 +191,18 @@ export class ConnectApi extends ProviderApiBase {
     }
   }
 
-  async loadMembers (): Promise<Member[]> {
-    if (this.context.connection_id != null && this.context.connection_id !== '') {
+  async loadMembers(): Promise<Member[]> {
+    if (
+      this.context.connection_id != null &&
+      this.context.connection_id !== ''
+    ) {
       const focusedMember = await this.getConnection(this.context.connection_id)
       return [mapConnection(focusedMember)]
     }
     return []
   }
 
-  async loadMemberByGuid (memberGuid: string): Promise<MemberResponse> {
+  async loadMemberByGuid(memberGuid: string): Promise<MemberResponse> {
     const mfa = await this.getConnectionStatus(memberGuid)
     if (mfa?.institution_code == null) {
       const connection = await this.getConnection(memberGuid)
@@ -188,19 +211,19 @@ export class ConnectApi extends ProviderApiBase {
     return { member: mapConnection({ ...mfa }) }
   }
 
-  async getOauthWindowUri (memberGuid: string) {
+  async getOauthWindowUri(memberGuid: string) {
     const ret = await this.loadMemberByGuid(memberGuid)
     return ret?.member?.oauth_window_uri
   }
 
-  async deleteMember (member: Member): Promise<void> {
+  async deleteMember(member: Member): Promise<void> {
     await this.deleteConnection(member.guid)
   }
 
-  async getMemberCredentials (memberGuid: string): Promise<any> {
+  async getMemberCredentials(memberGuid: string): Promise<any> {
     const crs = await this.getConnectionCredentials(memberGuid)
     return {
-      credentials: crs.map(c => ({
+      credentials: crs.map((c) => ({
         ...c,
         guid: c.id,
         field_type: c.field_type === 'PASSWORD' ? 1 : 3
@@ -208,10 +231,10 @@ export class ConnectApi extends ProviderApiBase {
     }
   }
 
-  async getInstitutionCredentials (guid: string): Promise<any> {
+  async getInstitutionCredentials(guid: string): Promise<any> {
     const crs = await super.getInstitutionCredentials(guid)
     return {
-      credentials: crs.map(c => ({
+      credentials: crs.map((c) => ({
         ...c,
         guid: c.id,
         field_type: c.field_type === 'PASSWORD' ? 1 : 3
@@ -219,20 +242,25 @@ export class ConnectApi extends ProviderApiBase {
     }
   }
 
-  async loadInstitutions (query: string): Promise<InstitutionSearchResponseItem[]> {
+  async loadInstitutions(
+    query: string
+  ): Promise<InstitutionSearchResponseItem[]> {
     const institutionHits = await search(ElasticsearchClient, query)
     return institutionHits.map(mapCachedInstitution)
   }
 
-  async loadInstitutionByUcpId (ucpId: string): Promise<any> {
+  async loadInstitutionByUcpId(ucpId: string): Promise<any> {
     const inst = await this.getProviderInstitution(ucpId)
     return { institution: mapResolvedInstitution(inst) }
   }
 
-  async loadPopularInstitutions () {
+  async loadPopularInstitutions() {
     this.context.updated = true
     this.context.provider = null
-    const favoriteInstitutions = await getFavoriteInstitutions(ElasticsearchClient)
-    return favoriteInstitutions.filter(ins => ins != null).map(mapCachedInstitution)
+    const favoriteInstitutions =
+      await getRecommendedInstitutions(ElasticsearchClient)
+    return favoriteInstitutions
+      .filter((ins) => ins != null)
+      .map(mapCachedInstitution)
   }
 }
