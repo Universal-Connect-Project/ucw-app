@@ -28,12 +28,16 @@ const GET_FAVORITE_INSTITUTIONS_RESPONSE = () => {
   return { docs: [{ _source: elasticSearchInstitutionData }] }
 }
 
-export default function initializeDefaultElasticSearchHandlers () {
-  ElasticSearchMock.clearAll()
+export function initializeDefaultElasticSearchHandlers () {
   ElasticSearchMock.add(GET_INSTITUTION, GET_INSTITUTION_RESPONSE)
   ElasticSearchMock.add(GET_INSTITUTIONS, GET_INSTITUTIONS_RESPONSE)
   ElasticSearchMock.add(
     GET_FAVORITE_INSTITUTIONS,
     GET_FAVORITE_INSTITUTIONS_RESPONSE
   )
+}
+
+export function resetDefaultElasticSearchHandlers () {
+  ElasticSearchMock.clearAll()
+  initializeDefaultElasticSearchHandlers()
 }

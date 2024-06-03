@@ -3,32 +3,56 @@ import { ElasticSearchMock, getFavoriteInstitutions, getInstitution, initialize,
 
 describe('initialize', () => {
   describe('elastic search already indexed', () => {
+    let indexCreated: boolean = false
+
     beforeAll(() => {
+      ElasticSearchMock.clearAll()
       ElasticSearchMock.add({
         method: 'HEAD',
         path: '/institutions'
       }, () => {
         return ''
       })
+
+      ElasticSearchMock.add({
+        method: 'PUT',
+        path: '/institutions'
+      }, () => {
+        indexCreated = true
+        return ''
+      })
     })
 
     it('does not reindex institutions', async () => {
       await initialize()
-      // this test would fail if it tried to reindex institutions without mocking those methods
+      expect(indexCreated).toBeFalsy()
     })
   })
 
   describe('elastic search not indexed', () => {
+    let indexCreated: boolean
+
     beforeAll(() => {
       ElasticSearchMock.clearAll()
+      ElasticSearchMock.add({
+        method: 'PUT',
+        path: '/institutions'
+      }, () => {
+        indexCreated = true
+        return ''
+      })
+
+      ElasticSearchMock.add({
+        method: 'PUT',
+        path: '/institutions/_doc/*'
+      }, () => {
+        return ''
+      })
     })
 
-    it('triggers the reIndexElasticSearch method', async () => {
-      // The reindex method triggers 'Mock not found' so we know it's getting to that method, we will test that method
-      // separatly from 'initialize'.
-      await expect(async () => {
-        await initialize()
-      }).rejects.toThrow('Mock not found')
+    it('triggers the reIndexElasticSearch method which makes call ES create index endpoint', async () => {
+      await initialize()
+      expect(indexCreated).toBeTruthy()
     })
   })
 })
@@ -59,7 +83,7 @@ describe('reIndexElasticSearch', () => {
     })
   })
 
-  it('creates a new index and indexes institutions', async () => {
+  it('makes call to create index and makes call to index more than 4 institutions', async () => {
     await reIndexElasticSearch()
     expect(indexCreated).toBeTruthy()
     expect(institutionsIndexedCount).toBeGreaterThan(4)
@@ -110,13 +134,13 @@ describe('search', () => {
     })
   })
 
-  it('makes the expected elasticsearch call and maps the data', async () => {
+  it('makes the expected ES call and maps the data', async () => {
     const results = await search('MX Bank')
 
     expect(results).toEqual([elasticSearchInstitutionData])
   })
 
-  it('calls elasticsearch and doesnt find any institutions', async () => {
+  it('makes the expected ES call and returns an empty array', async () => {
     const results = await search('nothing')
 
     expect(results).toEqual([])
@@ -137,7 +161,7 @@ describe('getInstitution', () => {
     })
   })
 
-  it('gets the expected institution response', async () => {
+  it('makes the expected ES call and gets the expected institution response', async () => {
     const institutionResponse = await getInstitution('UCP-1234')
     expect(institutionResponse).toEqual(elasticSearchInstitutionData)
   })
@@ -170,7 +194,7 @@ describe('getFavoriteInstitutions', () => {
     })
   })
 
-  it('gets a list of favorite institutions', async () => {
+  it('makes expected call to ES and gets a list of favorite institutions', async () => {
     const favoriteInsitutions = await getFavoriteInstitutions()
 
     expect(favoriteInsitutions).toEqual([elasticSearchInstitutionData])

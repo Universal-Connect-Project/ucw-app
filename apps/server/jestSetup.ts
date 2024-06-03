@@ -1,4 +1,4 @@
-import initializeDefaultElasticSearchHandlers from './src/test/elasticSearchHandlers'
+import { initializeDefaultElasticSearchHandlers, resetDefaultElasticSearchHandlers } from './src/test/elasticSearchHandlers'
 import { server } from './src/test/testServer'
  
 beforeAll(() => {
@@ -8,7 +8,7 @@ beforeAll(() => {
 
 afterEach(() => {
   server.resetHandlers()
-  initializeDefaultElasticSearchHandlers()
+  resetDefaultElasticSearchHandlers()
 })
 
 afterAll(() => server.close())
