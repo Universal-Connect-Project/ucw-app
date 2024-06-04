@@ -12,7 +12,7 @@ function getInstitutionFilePath() {
   if (config.Env === 'test') {
     return resolve(
       __dirname,
-      '../../cachedDefaults/testInstitutionsMapping.json'
+      '../../cachedDefaults/testData/testInstitutionsMapping.json'
     )
   } else {
     return resolve(
