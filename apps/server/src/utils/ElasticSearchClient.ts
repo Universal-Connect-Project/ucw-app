@@ -9,13 +9,7 @@ import { info } from '../infra/logger'
 import type { CachedInstitution } from 'src/shared/contract'
 
 function getInstitutionFilePath () {
-  // if (config.Env === 'test') {
-  //   info('loading test institutions')
-  //   return resolve(__dirname, '../../cachedDefaults/testInstitutionsMapping.json')
-  // } else {
-  info('loading all institutions into elasticSearch')
   return resolve(__dirname, '../../cachedDefaults/ucwInstitutionsMapping.json')
-  // }
 }
 
 export const ElasticSearchMock = new Mock()

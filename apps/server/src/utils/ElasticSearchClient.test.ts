@@ -90,14 +90,6 @@ describe('search', () => {
   })
 
   it('makes the expected ES call and maps the data', async () => {
-    // ElasticSearchMock.add({
-    //   method: ['POST', 'PUT', 'GET', 'HEAD'],
-    //   path: '*'
-    // }, (params) => {
-    //   // can put a brakepoint here
-    //   return ''
-    // })
-
     ElasticSearchMock.add({
       method: ['GET', 'POST'],
       path: ['/_search', '/institutions/_search'],
