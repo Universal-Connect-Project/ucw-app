@@ -12,7 +12,6 @@ import {
 
 import { ProviderApiBase } from '../providers'
 import {
-  ElasticsearchClient,
   getRecommendedInstitutions,
   search
 } from '../utils/ElasticSearchClient'
@@ -245,7 +244,7 @@ export class ConnectApi extends ProviderApiBase {
   async loadInstitutions(
     query: string
   ): Promise<InstitutionSearchResponseItem[]> {
-    const institutionHits = await search(ElasticsearchClient, query)
+    const institutionHits = await search(query)
     return institutionHits.map(mapCachedInstitution)
   }
 
@@ -257,9 +256,9 @@ export class ConnectApi extends ProviderApiBase {
   async loadPopularInstitutions() {
     this.context.updated = true
     this.context.provider = null
-    const favoriteInstitutions =
-      await getRecommendedInstitutions(ElasticsearchClient)
-    return favoriteInstitutions
+
+    const recommendedInstitutions = await getRecommendedInstitutions()
+    return recommendedInstitutions
       .filter((ins) => ins != null)
       .map(mapCachedInstitution)
   }

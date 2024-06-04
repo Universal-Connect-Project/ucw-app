@@ -4,17 +4,20 @@ import Mock from '@elastic/elasticsearch-mock'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import config from '../config'
+import { info } from '../infra/logger'
 
 import type { CachedInstitution } from 'src/shared/contract'
 import { getPreferences } from '../shared/preferences'
 
 function getInstitutionFilePath() {
   if (config.Env === 'test') {
+    info('loading test institutions')
     return resolve(
       __dirname,
       '../../cachedDefaults/testData/testInstitutionsMapping.json'
     )
   } else {
+    info('loading all institutions into elasticSearch')
     return resolve(
       __dirname,
       '../../cachedDefaults/ucwInstitutionsMapping.json'
@@ -31,29 +34,34 @@ export const ElasticsearchClient = new Client({
   })
 })
 
-export async function initialize(client: Client) {
-  const elasticSearchLoaded = await client.indices.exists({
+export async function initialize() {
+  const elasticSearchLoaded = await ElasticsearchClient.indices.exists({
     index: 'institutions'
   })
   if (!elasticSearchLoaded) {
-    await reIndexElasticSearch(client)
+    await reIndexElasticSearch()
+  } else {
+    info('ElasticSearch already indexed')
   }
 }
 
-export async function reIndexElasticSearch(client: Client) {
+export async function reIndexElasticSearch() {
   try {
-    await client.indices.delete({
+    await ElasticsearchClient.indices.delete({
       index: 'institutions'
     })
-  } catch {}
+  } catch {
+    info('Elasticsearch "institutions" index did not exist')
+  }
+  info('Elasticsearch indexing institutions')
   const dataFilePath = getInstitutionFilePath()
   const rawData = readFileSync(dataFilePath)
   const jsonData = JSON.parse(rawData.toString())
 
-  await client.indices.create({ index: 'institutions' })
+  await ElasticsearchClient.indices.create({ index: 'institutions' })
 
   for (const institution of jsonData) {
-    await client.index({
+    await ElasticsearchClient.index({
       index: 'institutions',
       id: institution.ucp_id,
       document: institution
@@ -61,32 +69,30 @@ export async function reIndexElasticSearch(client: Client) {
   }
 }
 
-export async function search(
-  client: Client,
-  searchTerm: string
-): Promise<any[]> {
+export async function search(searchTerm: string): Promise<any[]> {
   const hiddenInstitutions = (await getPreferences())?.hiddenInstitutions || []
 
-  const searchResults: estypes.SearchResponseBody = await client.search({
-    index: 'institutions',
-    body: {
-      query: {
-        bool: {
-          must_not: {
-            terms: {
-              'ucp_id.keyword': hiddenInstitutions
-            }
-          },
-          should: {
-            multi_match: {
-              query: searchTerm,
-              fields: ['name', 'keywords']
+  const searchResults: estypes.SearchResponseBody =
+    await ElasticsearchClient.search({
+      index: 'institutions',
+      body: {
+        query: {
+          bool: {
+            must_not: {
+              terms: {
+                'ucp_id.keyword': hiddenInstitutions
+              }
+            },
+            should: {
+              multi_match: {
+                query: searchTerm,
+                fields: ['name', 'keywords']
+              }
             }
           }
         }
       }
-    }
-  })
+    })
 
   const mappedResults = searchResults.hits.hits.map(
     (esObject: estypes.SearchHit) => esObject._source
@@ -95,11 +101,8 @@ export async function search(
   return mappedResults
 }
 
-export async function getInstitution(
-  client: Client,
-  id: string
-): Promise<CachedInstitution> {
-  const institutionResponse = await client.get({
+export async function getInstitution(id: string): Promise<CachedInstitution> {
+  const institutionResponse = await ElasticsearchClient.get({
     id,
     index: 'institutions'
   })
@@ -107,9 +110,9 @@ export async function getInstitution(
   return institutionResponse._source as CachedInstitution
 }
 
-export async function getRecommendedInstitutions(
-  client: Client
-): Promise<CachedInstitution[]> {
+export async function getRecommendedInstitutions(): Promise<
+  CachedInstitution[]
+> {
   const recommendedInstitutions = (await getPreferences())
     ?.recommendedInstitutions
 
@@ -125,12 +128,12 @@ export async function getRecommendedInstitutions(
   })
 
   const recommendedInstitutionsResponse: estypes.MgetRequest =
-    await client.mget({
+    await ElasticsearchClient.mget({
       docs: esSearch
     })
   const institutions = recommendedInstitutionsResponse.docs.map(
-    (recommendedInstitution) =>
-      recommendedInstitution._source as CachedInstitution
+    (favoriteInstitution) => favoriteInstitution._source as CachedInstitution
   )
+
   return institutions
 }

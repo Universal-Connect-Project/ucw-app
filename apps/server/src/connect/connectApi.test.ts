@@ -1,12 +1,7 @@
-import { elasticSearchInstitutionData } from '../test/testData/institution'
 import { ConnectApi } from './connectApi'
 
 import { createClient } from '../__mocks__/redis'
 import { MxApi } from '../providers/mx'
-import { ElasticSearchMock } from '../utils/ElasticSearchClient'
-import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
-
-const mock = ElasticSearchMock
 
 const connectApi = new ConnectApi({
   context: {
@@ -33,46 +28,6 @@ const mxApiClient = new MxApi(
 connectApi.providerApiClient = mxApiClient
 
 describe('loadInstitutions', () => {
-  beforeAll(() => {
-    mock.add(
-      {
-        method: ['GET', 'POST'],
-        path: ['/_search', '/institutions/_search'],
-        body: {
-          query: {
-            bool: {
-              must_not: {
-                terms: {
-                  'ucp_id.keyword': testPreferences.hiddenInstitutions
-                }
-              },
-              should: {
-                multi_match: {
-                  query: 'MX',
-                  fields: ['name', 'keywords']
-                }
-              }
-            }
-          }
-        }
-      },
-      () => {
-        return {
-          hits: {
-            hits: [
-              {
-                _source: elasticSearchInstitutionData
-              },
-              {
-                _source: elasticSearchInstitutionData
-              }
-            ]
-          }
-        }
-      }
-    )
-  })
-
   const expectedInstitutionList = [
     {
       guid: 'UCP-da107e6d0da7779',
@@ -100,22 +55,6 @@ describe('loadInstitutions', () => {
 })
 
 describe('loadInstitutionByUcpId', () => {
-  beforeAll(() => {
-    mock.clearAll()
-
-    mock.add(
-      {
-        method: 'GET',
-        path: '/institutions/_doc/UCP-1234'
-      },
-      () => {
-        return {
-          _source: elasticSearchInstitutionData
-        }
-      }
-    )
-  })
-
   const expectedInstitutionResponse = {
     institution: {
       guid: 'testCode',
@@ -139,31 +78,6 @@ describe('loadInstitutionByUcpId', () => {
 })
 
 describe('loadPopularInstitutions', () => {
-  beforeAll(() => {
-    connectApi.providerApiClient = mxApiClient
-    mock.clearAll()
-
-    mock.add(
-      {
-        method: 'POST',
-        path: '/_mget',
-        body: {
-          docs: testPreferences.recommendedInstitutions.map(
-            (institutionId: string) => ({
-              _index: 'institutions',
-              _id: institutionId
-            })
-          )
-        }
-      },
-      (params) => {
-        return {
-          docs: [{ _source: elasticSearchInstitutionData }]
-        }
-      }
-    )
-  })
-
   const expectedPopularInstitutionResponse = [
     {
       guid: 'UCP-da107e6d0da7779',
@@ -176,6 +90,8 @@ describe('loadPopularInstitutions', () => {
   ]
 
   it('gets the popular institution list', async () => {
+    connectApi.providerApiClient = mxApiClient
+
     const popularInstitutionList = await connectApi.loadPopularInstitutions()
 
     expect(popularInstitutionList).toEqual(expectedPopularInstitutionResponse)

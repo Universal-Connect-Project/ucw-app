@@ -6,7 +6,7 @@ import type {
   Provider,
   ResolvedInstitution
 } from '../shared/contract'
-import { ElasticsearchClient, getInstitution } from './ElasticSearchClient'
+import { getInstitution } from './ElasticSearchClient'
 
 const getProviderByVolume = (volumeMap: Record<string, number>): Provider => {
   if (!volumeMap) {
@@ -33,7 +33,7 @@ const getProviderByVolume = (volumeMap: Record<string, number>): Provider => {
 export async function resolveInstitutionProvider(
   institutionId: string
 ): Promise<ResolvedInstitution> {
-  const institution = await getInstitution(ElasticsearchClient, institutionId)
+  const institution = await getInstitution(institutionId)
   const providers: Provider[] = getAvailableProviders(institution)
 
   let provider: Provider
