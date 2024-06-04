@@ -1,9 +1,9 @@
 import { http, HttpResponse } from 'msw'
+import { ConnectionStatus, OAuthStatus } from '../../src/shared/contract'
+import { createClient } from '../__mocks__/redis'
+import { READ_MEMBER_STATUS_PATH } from '../test/handlers'
 import { server } from '../test/testServer'
 import { ProviderApiBase } from './index'
-import { createClient } from '../__mocks__/redis'
-import { ConnectionStatus, OAuthStatus } from '../../src/shared/contract'
-import { READ_MEMBER_STATUS_PATH } from '../test/handlers'
 import { MxApi } from './mx'
 
 const redisMock = createClient()
@@ -35,7 +35,7 @@ describe('ProviderApiBase', () => {
   describe('getOauthState', () => {
     beforeAll(async () => {
       await providerApiBase.init()
-      providerApiBase.serviceClient = mxApi
+      providerApiBase.providerApiClient = mxApi
     })
 
     it('returns a pending oauth state', async () => {

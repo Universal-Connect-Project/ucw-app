@@ -2,5 +2,5 @@
   "watch": ["."],
   "ext": "js,ts,json,env",
   "ignore": [],
-  "exec": "ts-node server/server.js"  
+  "exec": "ts-node src/server.js"  
 }

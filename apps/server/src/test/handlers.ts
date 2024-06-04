@@ -1,13 +1,15 @@
 import { http, HttpResponse } from 'msw'
 import { BASE_PATH as MX_BASE_PATH } from '../serviceClients/mxClient/base'
-import { institutionData, finicityInsitutionData } from './testData/institution'
+import { finicityInsitutionData, institutionData } from './testData/institution'
 import { institutionCredentialsData } from './testData/institutionCredentials'
 import { aggregateMemberMemberData, connectionByIdMemberData, extendHistoryMemberData, identifyMemberData, memberData, membersData, memberStatusData, verifyMemberData } from './testData/members'
-import { createUserData, listUsersData, createCustomerData } from './testData/users'
+import { createCustomerData, createUserData, listUsersData } from './testData/users'
 
 const FINICITY_BASE_PATH = 'https://api.finicity.com'
+const MX_INTEGRATION_PATH = 'https://int-api.mx.com'
 
 export const MX_INSTITUTION_BY_ID_PATH = `${MX_BASE_PATH}/institutions/:institutionId`
+export const MX_TEST_INSTITUTION_BY_ID_PATH = `${MX_INTEGRATION_PATH}/institutions/:institutionId`
 export const FINICITY_INSTITUTION_BY_ID_PATH = `${FINICITY_BASE_PATH}/institution/v2/institutions/:institutionId`
 export const INSTITUTION_CREDENTIALS_BY_ID_PATH = `${MX_BASE_PATH}/institutions/:institutionId/credentials`
 export const CONNECTIONS_BY_ID_PATH = `${MX_BASE_PATH}/users/:userId/members`
@@ -34,6 +36,7 @@ export const CREATE_CUSTOMER_PATH = `${FINICITY_BASE_PATH}/aggregation/v2/custom
 
 const handlers = [
   http.get(MX_INSTITUTION_BY_ID_PATH, () => HttpResponse.json(institutionData)),
+  http.get(MX_TEST_INSTITUTION_BY_ID_PATH, () => HttpResponse.json(institutionData)),
   http.get(INSTITUTION_CREDENTIALS_BY_ID_PATH, () => HttpResponse.json(institutionCredentialsData)),
   http.get(CONNECTIONS_BY_ID_PATH, () => HttpResponse.json(membersData)),
   http.get(CONNECTION_CREDENTIALS_PATH, () => HttpResponse.json(institutionCredentialsData)),

@@ -78,7 +78,7 @@ module.exports = new Proxy(bridge, {
                 accounts: ret.accounts,
                 members: ret.members
               }
-            case 'loadInstitutionByGuid':
+            case 'loadInstitutionByUcpId':
             case 'loadInstitutionByCode':
               return {
                 ...ret.institution,

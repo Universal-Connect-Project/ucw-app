@@ -106,6 +106,47 @@ export interface Institution {
   providers?: Object | {}
 }
 
+export interface ResolvedInstitution {
+  id: string
+  url: string
+  name: string
+  logo_url: string
+  provider: Provider
+  oauth?: boolean
+}
+
+export type Provider = 'mx' | 'mx_int' | 'sophtron' | 'finicity' | 'akoya'
+
+export interface CachedInstitution {
+  name: string
+  keywords: string | null
+  logo: string
+  url: string
+  ucp_id: string
+  is_test_bank: boolean | false
+  mx: InstitutionProvider
+  sophtron: InstitutionProvider
+  finicity: InstitutionProvider
+  akoya: InstitutionProvider
+}
+
+export interface InstitutionProvider {
+  id: string | null
+  supports_oauth: boolean | false
+  supports_identification: boolean | false
+  supports_verification: boolean | false
+  supports_account_statement: boolean | false
+  supports_history: boolean | false
+}
+
+export interface InstitutionSearchResponseItem {
+  guid: string | null
+  name: string
+  url: string
+  logo_url: string | null
+  supports_oauth?: boolean | false
+}
+
 export interface Institutions {
   institutions: Institution[]
   pagination?: Pagination

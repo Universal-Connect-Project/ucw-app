@@ -1,10 +1,10 @@
-import { contextHandler } from "./context"
+import { contextHandler } from './context'
 
-describe("context", () => {
-  describe("contextHandler", () => {
-    it("sets the request context and response context to an empty object if there are no meta headers", () => {
+describe('context', () => {
+  describe('contextHandler', () => {
+    it('sets the request context and response context to an empty object if there are no meta headers', () => {
       const req = {
-        headers: {},
+        headers: {}
       } as any
       const res = {} as any
       const next = jest.fn()
@@ -16,13 +16,13 @@ describe("context", () => {
 
     it("sets the req and res context to the meta headers, sets updated to false, and doesn't set the res meta if there are headers", () => {
       const testMetaObject = {
-        test: "test",
+        test: 'test'
       }
 
       const req = {
         headers: {
-          meta: JSON.stringify(testMetaObject),
-        },
+          meta: JSON.stringify(testMetaObject)
+        }
       } as any
       const res = {} as any
       const next = jest.fn()
@@ -30,21 +30,21 @@ describe("context", () => {
 
       const contextObject = {
         ...testMetaObject,
-        updated: false,
+        updated: false
       }
 
       expect(req.context).toEqual(contextObject)
       expect(res.context).toEqual(contextObject)
     })
 
-    it("sets the meta on send if context is updated and calls the original send function", () => {
+    it('sets the meta on send if context is updated and calls the original send function', () => {
       const req = {
-        headers: {},
+        headers: {}
       } as any
 
       const res = {
         send: jest.fn(),
-        set: jest.fn(),
+        set: jest.fn()
       } as any
 
       const next = jest.fn()
@@ -54,11 +54,11 @@ describe("context", () => {
 
       res.context.updated = true
 
-      res.send("1", "2")
+      res.send('1', '2')
 
-      expect(res.set).toHaveBeenCalledWith("meta", JSON.stringify(res.context))
+      expect(res.set).toHaveBeenCalledWith('meta', JSON.stringify(res.context))
 
-      expect(res.send).toHaveBeenCalledWith("1", "2")
+      expect(res.send).toHaveBeenCalledWith('1', '2')
     })
   })
 })

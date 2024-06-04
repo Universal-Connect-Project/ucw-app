@@ -12,9 +12,9 @@
  */
 import * as logger from "../../infra/logger"
 
-import { Configuration } from "./configuration"
-import { RequiredError, RequestArgs } from "./base"
 import { AxiosInstance, AxiosResponse } from "axios"
+import { RequestArgs, RequiredError } from "./base"
+import { Configuration } from "./configuration"
 
 /**
  *
@@ -179,7 +179,7 @@ export const createRequestFunction = function (
       url: (configuration?.basePath || basePath) + axiosArgs.url,
     }
     const encodedWord = CryptoJS.enc.Utf8.parse(
-      axiosRequestArgs.auth.username + ":" + axiosRequestArgs.auth.password
+      axiosRequestArgs?.auth?.username + ":" + axiosRequestArgs?.auth?.password
     )
     let authHeader = "Basic " + CryptoJS.enc.Base64.stringify(encodedWord)
     let options = {

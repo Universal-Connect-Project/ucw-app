@@ -1,16 +1,19 @@
 import type { Member, MemberResponse } from 'interfaces/contract'
+import * as logger from '../infra/logger'
 import {
+  type CachedInstitution,
+  type Challenge,
   ChallengeType,
   type Connection,
   ConnectionStatus,
   type Institution,
-  type Challenge
+  type InstitutionSearchResponseItem
 } from '../shared/contract'
-import * as logger from '../infra/logger'
 
 import { ProviderApiBase } from '../providers'
+import { getFavoriteInstitutions, search } from '../utils/ElasticSearchClient'
 
-function mapInstitution (ins: Institution) {
+function mapResolvedInstitution (ins: Institution) {
   return ({
     guid: ins.id,
     code: ins.id,
@@ -26,6 +29,18 @@ function mapInstitution (ins: Institution) {
     //   guid: c.id,
     //   ...c
     // }))
+  })
+}
+
+function mapCachedInstitution (ins: CachedInstitution): InstitutionSearchResponseItem {
+  const supportsOauth = ins.mx.supports_oauth || ins.sophtron.supports_oauth
+  // || ins.finicity.supports_oauth || ins.akoya.supports_oauth
+  return ({
+    guid: ins.ucp_id,
+    name: ins.name,
+    url: ins.url,
+    logo_url: ins.logo,
+    supports_oauth: supportsOauth
   })
 }
 
@@ -204,29 +219,20 @@ export class ConnectApi extends ProviderApiBase {
     }
   }
 
-  async loadInstitutions (query: string): Promise<any> {
-    const ret = await this.search(query)
-    return ret.map(mapInstitution)
+  async loadInstitutions (query: string): Promise<InstitutionSearchResponseItem[]> {
+    const institutionHits = await search(query)
+    return institutionHits.map(mapCachedInstitution)
   }
 
-  async loadInstitutionByGuid (guid: string): Promise<any> {
-    const inst = await this.getInstitution(guid)
-    return { institution: mapInstitution(inst) }
+  async loadInstitutionByUcpId (ucpId: string): Promise<any> {
+    const inst = await this.getProviderInstitution(ucpId)
+    return { institution: mapResolvedInstitution(inst) }
   }
 
-  // loadInstitutionByCode(code: string): Promise<Institution> {
-  //   let client = getApiClient({provider: config.DefaultProvider});
-  //   throw new Error('Method not implemented.');
-  // }
-
-  async loadPopularInstitutions (query: string) {
+  async loadPopularInstitutions () {
     this.context.updated = true
     this.context.provider = null
-    const ret = await this.institutions()
-    return ret.institutions.map(mapInstitution)
-  }
-
-  async loadDiscoveredInstitutions (): Promise<Institution[]> {
-    return []
+    const favoriteInstitutions = await getFavoriteInstitutions()
+    return favoriteInstitutions.filter(ins => ins != null).map(mapCachedInstitution)
   }
 }

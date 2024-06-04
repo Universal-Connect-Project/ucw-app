@@ -4,6 +4,7 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
+    "dev:cypress": "turbo dev:cypress",
     "lint": "turbo lint",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
@@ -18,11 +19,13 @@
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
     "@types/node": "^20.12.12",
+    "concurrently": "^8.2.2",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
     "turbo": "^1.13.3",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "wait-on": "^7.2.0"
   },
   "engines": {
     "node": ">=20"
