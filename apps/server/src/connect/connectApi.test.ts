@@ -40,9 +40,18 @@ describe('loadInstitutions', () => {
         path: ['/_search', '/institutions/_search'],
         body: {
           query: {
-            multi_match: {
-              query: 'MX',
-              fields: ['name', 'keywords']
+            bool: {
+              must_not: {
+                terms: {
+                  'ucp_id.keyword': testPreferences.hiddenInstitutions
+                }
+              },
+              should: {
+                multi_match: {
+                  query: 'MX',
+                  fields: ['name', 'keywords']
+                }
+              }
             }
           }
         }

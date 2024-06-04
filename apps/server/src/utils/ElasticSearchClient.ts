@@ -65,26 +65,34 @@ export async function search(
   client: Client,
   searchTerm: string
 ): Promise<any[]> {
+  const hiddenInstitutions = (await getPreferences())?.hiddenInstitutions || []
+
   const searchResults: estypes.SearchResponseBody = await client.search({
     index: 'institutions',
     body: {
       query: {
-        multi_match: {
-          query: searchTerm,
-          fields: ['name', 'keywords']
+        bool: {
+          must_not: {
+            terms: {
+              'ucp_id.keyword': hiddenInstitutions
+            }
+          },
+          should: {
+            multi_match: {
+              query: searchTerm,
+              fields: ['name', 'keywords']
+            }
+          }
         }
       }
     }
   })
+
   const mappedResults = searchResults.hits.hits.map(
     (esObject: estypes.SearchHit) => esObject._source
   )
 
-  const hiddenInstitutions = (await getPreferences())?.hiddenInstitutions || []
-
-  return mappedResults.filter(
-    (result: CachedInstitution) => !hiddenInstitutions.includes(result.ucp_id)
-  )
+  return mappedResults
 }
 
 export async function getInstitution(
@@ -102,9 +110,6 @@ export async function getInstitution(
 export async function getRecommendedInstitutions(
   client: Client
 ): Promise<CachedInstitution[]> {
-  // Eventually the favorites list will be in the config or something, this is just a placeholder until then
-  // to remove the dependency on the institution service hosted by UCP
-
   const recommendedInstitutions = (await getPreferences())
     ?.recommendedInstitutions
 

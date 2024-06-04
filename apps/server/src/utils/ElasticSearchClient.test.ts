@@ -93,36 +93,25 @@ describe('reIndexElasticSearch', () => {
 })
 
 describe('search', () => {
-  beforeAll(() => {
+  it('makes the expected elasticsearch call and maps the data', async () => {
     mock.add(
       {
         method: ['GET', 'POST'],
         path: ['/_search', '/institutions/_search'],
         body: {
           query: {
-            multi_match: {
-              query: 'nothing',
-              fields: ['name', 'keywords']
-            }
-          }
-        }
-      },
-      () => {
-        return {
-          hits: { hits: [] }
-        }
-      }
-    )
-
-    mock.add(
-      {
-        method: ['GET', 'POST'],
-        path: ['/_search', '/institutions/_search'],
-        body: {
-          query: {
-            multi_match: {
-              query: 'MX Bank',
-              fields: ['name', 'keywords']
+            bool: {
+              must_not: {
+                terms: {
+                  'ucp_id.keyword': testPreferences.hiddenInstitutions
+                }
+              },
+              should: {
+                multi_match: {
+                  query: 'MX Bank',
+                  fields: ['name', 'keywords']
+                }
+              }
             }
           }
         }
@@ -139,15 +128,42 @@ describe('search', () => {
         }
       }
     )
-  })
 
-  it('makes the expected elasticsearch call and maps the data', async () => {
     const results = await search(client, 'MX Bank')
 
     expect(results).toEqual([elasticSearchInstitutionData])
   })
 
   it('calls elasticsearch and doesnt find any institutions', async () => {
+    mock.add(
+      {
+        method: ['GET', 'POST'],
+        path: ['/_search', '/institutions/_search'],
+        body: {
+          query: {
+            bool: {
+              must_not: {
+                terms: {
+                  'ucp_id.keyword': testPreferences.hiddenInstitutions
+                }
+              },
+              should: {
+                multi_match: {
+                  query: 'nothing',
+                  fields: ['name', 'keywords']
+                }
+              }
+            }
+          }
+        }
+      },
+      () => {
+        return {
+          hits: { hits: [] }
+        }
+      }
+    )
+
     const results = await search(client, 'nothing')
 
     expect(results).toEqual([])
@@ -202,9 +218,9 @@ describe('getRecommendedInstitutions', () => {
     )
   })
 
-  it('gets a list of favorite institutions', async () => {
-    const favoriteInsitutions = await getRecommendedInstitutions(client)
+  it('gets a list of recommended institutions', async () => {
+    const recommendedInstitutions = await getRecommendedInstitutions(client)
 
-    expect(favoriteInsitutions).toEqual([elasticSearchInstitutionData])
+    expect(recommendedInstitutions).toEqual([elasticSearchInstitutionData])
   })
 })
