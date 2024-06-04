@@ -1,3 +1,5 @@
+import { getPreferences } from '../shared/preferences'
+import { debug } from '../infra/logger'
 import type {
   CachedInstitution,
   InstitutionProvider,
@@ -6,13 +8,60 @@ import type {
 } from '../shared/contract'
 import { ElasticsearchClient, getInstitution } from './ElasticSearchClient'
 
-export async function resolveInstitutionProvider (
+const getProviderByVolume = (volumeMap: Record<string, number>): Provider => {
+  if (!volumeMap) {
+    return undefined
+  }
+
+  const randomNumber = Math.random() * 100
+  let randomNumberCutoffTotal = 0
+
+  return Object.entries(volumeMap).find(([, volume]) => {
+    if (
+      randomNumber > randomNumberCutoffTotal &&
+      randomNumber <= randomNumberCutoffTotal + volume
+    ) {
+      return true
+    }
+
+    randomNumberCutoffTotal += volume
+
+    return false
+  })?.[0] as Provider
+}
+
+export async function resolveInstitutionProvider(
   institutionId: string
 ): Promise<ResolvedInstitution> {
   const institution = await getInstitution(ElasticsearchClient, institutionId)
-  const providers = getAvailableProviders(institution)
+  const providers: Provider[] = getAvailableProviders(institution)
 
-  let provider = providers[0]
+  let provider: Provider
+
+  const preferences = await getPreferences()
+
+  const potentialResolvers = [
+    () =>
+      getProviderByVolume(
+        preferences?.institutionProviderVolumeMap?.[institutionId]
+      ),
+    () => getProviderByVolume(preferences?.defaultProviderVolume),
+    () => preferences?.defaultProvider
+  ]
+
+  for (const resolver of potentialResolvers) {
+    const possibleProvider = resolver()
+
+    if (providers.includes(possibleProvider)) {
+      provider = possibleProvider
+      break
+    }
+  }
+
+  if (!provider) {
+    provider = providers[Math.floor(Math.random() * providers.length)]
+  }
+
   const institutionProvider = institution[
     provider as keyof CachedInstitution
   ] as InstitutionProvider
@@ -21,6 +70,9 @@ export async function resolveInstitutionProvider (
       provider = 'mx_int'
     }
   }
+
+  debug(`Resolving institution: ${institutionId} to provider: ${provider}`)
+
   return {
     id: institutionProvider.id,
     url: institution.url,
@@ -30,9 +82,9 @@ export async function resolveInstitutionProvider (
   }
 }
 
-export function getAvailableProviders (
+export function getAvailableProviders(
   institution: CachedInstitution
-): string[] {
+): Provider[] {
   const providers = []
   if (institution.mx.id != null) {
     providers.push('mx')
@@ -41,5 +93,5 @@ export function getAvailableProviders (
     providers.push('sophtron')
   }
 
-  return providers
+  return providers as Provider[]
 }
