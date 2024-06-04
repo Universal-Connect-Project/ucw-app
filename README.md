@@ -37,7 +37,6 @@ resulting in the error. To fix this, you will need to run `docker logout` from y
 1. Run `cp ./.env.example ./.env`
 1. Run `cp ./apps/server/.env.example ./apps/server/.env`
 1. Follow [Initial Setup](#initial-setup) (below) for setting-up some required environment variables
-1. Install [ElasticSearch] via docker (https://www.elastic.co/guide/en/elasticsearch/reference/current/install-elasticsearch.html) `docker pull elasticsearch:8.13.4`
 1. Finally, run: `npm run dev`
 
 ## Initial setup

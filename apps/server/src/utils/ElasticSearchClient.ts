@@ -4,15 +4,16 @@ import Mock from '@elastic/elasticsearch-mock'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import config from '../config'
+import { info } from '../infra/logger'
 
 import type { CachedInstitution } from 'src/shared/contract'
 
 function getInstitutionFilePath () {
   if (config.Env === 'test') {
-    console.log('loading test institutions')
+    info('loading test institutions')
     return resolve(__dirname, '../../cachedDefaults/testInstitutionsMapping.json')
   } else {
-    console.log('loading all institutions into elasticSearch')
+    info('loading all institutions into elasticSearch')
     return resolve(__dirname, '../../cachedDefaults/ucwInstitutionsMapping.json')
   }
 }
@@ -29,7 +30,7 @@ export async function initialize () {
   if (!elasticSearchLoaded) {
     await reIndexElasticSearch()
   } else {
-    console.log('ElasticSearch already indexed')
+    info('ElasticSearch already indexed')
   }
 }
 
@@ -39,9 +40,9 @@ export async function reIndexElasticSearch () {
       index: 'institutions'
     })
   } catch {
-    console.log('Elasticsearch "institutions" index did not exist')
+    info('Elasticsearch "institutions" index did not exist')
   }
-  console.log('Elasticsearch indexing institutions')
+  info('Elasticsearch indexing institutions')
   const dataFilePath = getInstitutionFilePath()
   const rawData = readFileSync(dataFilePath)
   const jsonData = JSON.parse(rawData.toString())

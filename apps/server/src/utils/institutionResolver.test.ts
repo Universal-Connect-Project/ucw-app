@@ -60,7 +60,7 @@ describe('resolveInstitutionProvider', () => {
   })
 
   describe('when MX Test bank', () => {
-    beforeEach(() => {
+    it('resolves to "mx_int"', async () => {
       ElasticSearchMock.add({
         method: 'GET',
         path: '/institutions/_doc/test'
@@ -69,16 +69,14 @@ describe('resolveInstitutionProvider', () => {
           _source: elasticSearchInstitutionData
         }
       })
-    })
 
-    it('resolves to "mx_int"', async () => {
       const institution = await resolveInstitutionProvider('test')
       expect(institution.provider).toEqual('mx_int')
     })
   })
 
   describe('when MX prod bank', () => {
-    beforeEach(() => {
+    it('resolves to "mx"', async () => {
       ElasticSearchMock.add({
         method: 'GET',
         path: '/institutions/_doc/test'
@@ -90,16 +88,14 @@ describe('resolveInstitutionProvider', () => {
           }
         }
       })
-    })
 
-    it('resolves to "mx"', async () => {
       const institution = await resolveInstitutionProvider('test')
       expect(institution.provider).toEqual('mx')
     })
   })
 
   describe('when Sophtron bank', () => {
-    beforeEach(() => {
+    it('resolves to "sophtron"', async () => {
       ElasticSearchMock.add({
         method: 'GET',
         path: '/institutions/_doc/test'
@@ -116,9 +112,7 @@ describe('resolveInstitutionProvider', () => {
           }
         }
       })
-    })
 
-    it('resolves to "sophtron"', async () => {
       const institution = await resolveInstitutionProvider('test')
       expect(institution.provider).toEqual('sophtron')
     })

@@ -77,10 +77,6 @@ describe('loadInstitutionByUcpId', () => {
 })
 
 describe('loadPopularInstitutions', () => {
-  beforeAll(() => {
-    connectApi.providerApiClient = mxApiClient
-  })
-
   const expectedPopularInstitutionResponse = [{
     guid: 'UCP-da107e6d0da7779',
     name: 'MX Bank (Oauth)',
@@ -90,6 +86,8 @@ describe('loadPopularInstitutions', () => {
   }]
 
   it('gets the popular institution list', async () => {
+    connectApi.providerApiClient = mxApiClient
+
     const popularInstitutionList = await connectApi.loadPopularInstitutions()
 
     expect(popularInstitutionList).toEqual(expectedPopularInstitutionResponse)
