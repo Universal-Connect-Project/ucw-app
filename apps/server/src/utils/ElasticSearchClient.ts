@@ -9,13 +9,7 @@ import { info } from '../infra/logger'
 import type { CachedInstitution } from 'src/shared/contract'
 
 function getInstitutionFilePath () {
-  if (config.Env === 'test') {
-    info('loading test institutions')
-    return resolve(__dirname, '../../cachedDefaults/testInstitutionsMapping.json')
-  } else {
-    info('loading all institutions into elasticSearch')
-    return resolve(__dirname, '../../cachedDefaults/ucwInstitutionsMapping.json')
-  }
+  return resolve(__dirname, '../../cachedDefaults/ucwInstitutionsMapping.json')
 }
 
 export const ElasticSearchMock = new Mock()
@@ -49,13 +43,15 @@ export async function reIndexElasticSearch () {
 
   await ElasticsearchClient.indices.create({ index: 'institutions' })
 
-  for (const institution of jsonData) {
-    await ElasticsearchClient.index({
+  const indexPromises = jsonData.map(async (institution: { ucp_id: any }) => {
+    return await ElasticsearchClient.index({
       index: 'institutions',
       id: institution.ucp_id,
       document: institution
     })
-  }
+  })
+
+  await Promise.all(indexPromises)
 }
 
 export async function search (searchTerm: string): Promise<any[]> {
@@ -63,11 +59,31 @@ export async function search (searchTerm: string): Promise<any[]> {
     index: 'institutions',
     body: {
       query: {
-        multi_match: {
-          query: searchTerm,
-          fields: ['name', 'keywords']
+        bool: {
+          should: [
+            {
+              multi_match: {
+                query: searchTerm,
+                type: 'best_fields',
+                fields: ['name', 'keywords'],
+                fuzziness: 'AUTO',
+                prefix_length: 0,
+                max_expansions: 50,
+                fuzzy_transpositions: true
+              }
+            },
+            {
+              match: {
+                'keywords.keyword': {
+                  query: searchTerm
+                }
+              }
+            }
+          ],
+          minimum_should_match: 1
         }
-      }
+      },
+      size: 20
     }
   })
   return searchResults.hits.hits.map((esObject: estypes.SearchHit) => esObject._source)

@@ -95,11 +95,34 @@ describe('search', () => {
       path: ['/_search', '/institutions/_search'],
       body: {
         query: {
-          multi_match: {
-            query: 'MX Bank',
-            fields: ['name', 'keywords']
+          bool: {
+            should: [
+              {
+                multi_match: {
+                  query: 'MX Bank',
+                  type: 'best_fields',
+                  fields: [
+                    'name',
+                    'keywords'
+                  ],
+                  fuzziness: 'AUTO',
+                  prefix_length: 0,
+                  max_expansions: 50,
+                  fuzzy_transpositions: true
+                }
+              },
+              {
+                match: {
+                  'keywords.keyword': {
+                    query: 'MX Bank'
+                  }
+                }
+              }
+            ],
+            minimum_should_match: 1
           }
-        }
+        },
+        size: 20
       }
     }, () => {
       return {
@@ -118,18 +141,10 @@ describe('search', () => {
     expect(results).toEqual([elasticSearchInstitutionData])
   })
 
-  it('makes the expected ES call and returns an empty array', async () => {
+  it('does not break when ES returns an empty array', async () => {
     ElasticSearchMock.add({
       method: ['GET', 'POST'],
-      path: ['/_search', '/institutions/_search'],
-      body: {
-        query: {
-          multi_match: {
-            query: 'nothing',
-            fields: ['name', 'keywords']
-          }
-        }
-      }
+      path: ['/_search', '/institutions/_search']
     }, () => {
       return {
         hits: { hits: [] }
