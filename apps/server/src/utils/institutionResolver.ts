@@ -60,13 +60,6 @@ export async function resolveInstitutionProvider(
 
   if (!provider) {
     provider = providers[Math.floor(Math.random() * providers.length)]
-
-    console.log(
-      'choosing a random provider',
-      providers,
-      provider,
-      institutionId
-    )
   }
 
   const institutionProvider = institution[

@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
-import { StorageClient } from '..//serviceClients/storageClient'
+import { StorageClient } from '../serviceClients/storageClient'
 
 const redis = new StorageClient()
 
