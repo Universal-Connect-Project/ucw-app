@@ -10,19 +10,7 @@ import type { CachedInstitution } from 'src/shared/contract'
 import { getPreferences } from '../shared/preferences'
 
 function getInstitutionFilePath() {
-  if (config.Env === 'test') {
-    info('loading test institutions')
-    return resolve(
-      __dirname,
-      '../../cachedDefaults/testData/testInstitutionsMapping.json'
-    )
-  } else {
-    info('loading all institutions into elasticSearch')
-    return resolve(
-      __dirname,
-      '../../cachedDefaults/ucwInstitutionsMapping.json'
-    )
-  }
+  return resolve(__dirname, '../../cachedDefaults/ucwInstitutionsMapping.json')
 }
 
 export const ElasticSearchMock = new Mock()
@@ -60,13 +48,15 @@ export async function reIndexElasticSearch() {
 
   await ElasticsearchClient.indices.create({ index: 'institutions' })
 
-  for (const institution of jsonData) {
-    await ElasticsearchClient.index({
+  const indexPromises = jsonData.map(async (institution: { ucp_id: any }) => {
+    return await ElasticsearchClient.index({
       index: 'institutions',
       id: institution.ucp_id,
       document: institution
     })
-  }
+  })
+
+  await Promise.all(indexPromises)
 }
 
 export async function search(searchTerm: string): Promise<any[]> {
@@ -83,22 +73,36 @@ export async function search(searchTerm: string): Promise<any[]> {
                 'ucp_id.keyword': hiddenInstitutions
               }
             },
-            should: {
-              multi_match: {
-                query: searchTerm,
-                fields: ['name', 'keywords']
+            should: [
+              {
+                multi_match: {
+                  query: searchTerm,
+                  type: 'best_fields',
+                  fields: ['name', 'keywords'],
+                  fuzziness: 'AUTO',
+                  prefix_length: 0,
+                  max_expansions: 50,
+                  fuzzy_transpositions: true
+                }
+              },
+              {
+                match: {
+                  'keywords.keyword': {
+                    query: searchTerm
+                  }
+                }
               }
-            }
+            ],
+            minimum_should_match: 1
           }
-        }
+        },
+        size: 20
       }
     })
 
-  const mappedResults = searchResults.hits.hits.map(
+  return searchResults.hits.hits.map(
     (esObject: estypes.SearchHit) => esObject._source
   )
-
-  return mappedResults
 }
 
 export async function getInstitution(id: string): Promise<CachedInstitution> {
