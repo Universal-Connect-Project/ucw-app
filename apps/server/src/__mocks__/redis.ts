@@ -4,8 +4,6 @@ export const clearRedisMock = () => {
   storageObject = {}
 }
 
-export const getRedisStorageObject = () => storageObject
-
 export const createClient = () => ({
   connect: async () => true,
   get: (key: string) => {

@@ -1,5 +1,3 @@
-import type { StorageClient } from '../serviceClients/storageClient'
-
 export interface AuthRequest {
   provider: string
   token: string
@@ -59,7 +57,7 @@ export enum ConnectionStatus {
   RESUMED,
   EXPIRED,
   IMPAIRED,
-  PENDING,
+  PENDING
 }
 
 export enum OAuthStatus {
@@ -74,13 +72,13 @@ export enum ChallengeType {
   OPTIONS,
   IMAGE,
   IMAGE_OPTIONS,
-  TOKEN,
+  TOKEN
 }
 
 export enum VcType {
   IDENTITY,
   ACCOUNTS,
-  TRANSACTIONS,
+  TRANSACTIONS
 }
 
 export interface Challenge {
@@ -184,7 +182,6 @@ export interface Connection {
   vc?: string | null
   oauth_window_uri?: string | null
   error_message?: string | null
-  storageClient?: StorageClient
 }
 export interface UpdateConnectionRequest {
   id: string | undefined
@@ -208,7 +205,10 @@ export interface ProviderApiClient {
   ResolveUserId: (id: string) => Promise<string>
   GetInstitutionById: (id: string) => Promise<Institution>
   ListInstitutionCredentials: (institutionId: string) => Promise<Credential[]>
-  ListConnectionCredentials: (connectionId: string, userId: string) => Promise<Credential[]>
+  ListConnectionCredentials: (
+    connectionId: string,
+    userId: string
+  ) => Promise<Credential[]>
   ListConnections: (userId: string) => Promise<Connection[]>
   CreateConnection: (
     connection: CreateConnectionRequest,

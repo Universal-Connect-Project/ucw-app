@@ -1,25 +1,5 @@
-import { readFileSync } from 'fs'
-import { resolve } from 'path'
-import { StorageClient } from '../serviceClients/storageClient'
-
-const redis = new StorageClient()
-
-const preferencesKey = 'preferences'
-
-const cacheLocalPreferences = async () => {
-  let preferencesToSet
-  try {
-    preferencesToSet = JSON.parse(
-      readFileSync(
-        resolve(__dirname, '../../cachedDefaults/preferences.json')
-      )?.toString()
-    )
-  } catch {}
-
-  await redis.set(preferencesKey, preferencesToSet || {})
-}
-
-void cacheLocalPreferences()
+import { PREFERENCES_REDIS_KEY } from '../serviceClients/storageClient/constants'
+import { get } from '../serviceClients/storageClient/redis'
 
 export interface Preferences {
   defaultProvider?: 'mx' | 'sophtron'
@@ -33,5 +13,8 @@ export interface Preferences {
   recommendedInstitutions: string[]
 }
 
-export const getPreferences = async (): Promise<Preferences> =>
-  await redis.get(preferencesKey)
+export const getPreferences = async (): Promise<Preferences> => {
+  const preferencesGotten = await get(PREFERENCES_REDIS_KEY)
+
+  return preferencesGotten
+}

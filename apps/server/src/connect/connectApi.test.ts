@@ -1,6 +1,4 @@
 import { ConnectApi } from './connectApi'
-
-import { createClient } from '../__mocks__/redis'
 import { MxApi } from '../providers/mx'
 
 const connectApi = new ConnectApi({
@@ -12,15 +10,12 @@ const connectApi = new ConnectApi({
   }
 })
 
-const redisMock = createClient()
-
 const mxApiClient = new MxApi(
   {
     mxProd: {
       username: 'testUsername',
       password: 'testPassword'
-    },
-    storageClient: redisMock
+    }
   },
   false
 )

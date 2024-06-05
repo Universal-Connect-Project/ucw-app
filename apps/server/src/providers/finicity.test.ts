@@ -1,13 +1,16 @@
 import { http, HttpResponse } from 'msw'
-import { clearRedisMock, createClient, getRedisStorageObject } from '../__mocks__/redis'
+import { clearRedisMock } from '../__mocks__/redis'
 import { ConnectionStatus } from '../shared/contract'
-import { DELETE_CUSTOMER_PATH, FINICITY_CONNECT_LITE_URL, READ_CUSTOMER_PATH } from '../test/handlers'
+import {
+  DELETE_CUSTOMER_PATH,
+  FINICITY_CONNECT_LITE_URL,
+  READ_CUSTOMER_PATH
+} from '../test/handlers'
 import { finicityInsitutionData } from '../test/testData/institution'
 import { finicityReadCustomerData } from '../test/testData/users'
 import { server } from '../test/testServer'
 import { FinicityApi } from './finicity'
-
-const redisMock = createClient()
+import { get, set } from '../serviceClients/storageClient/redis'
 
 const finicityApi = new FinicityApi({
   finicityProd: {
@@ -16,8 +19,7 @@ const finicityApi = new FinicityApi({
     secret: 'testSecret',
     basePath: 'https://api.finicity.com',
     provider: 'finicity_sandbox'
-  },
-  storageClient: redisMock
+  }
 })
 
 const institutionResponse = finicityInsitutionData.institution
@@ -43,10 +45,13 @@ describe('finicity provider', () => {
       })
 
       it('generates object with connect lite url', async () => {
-        const response = await finicityApi.CreateConnection({
-          institution_id: 'testInstitutionId',
-          credentials: []
-        }, 'testUserId')
+        const response = await finicityApi.CreateConnection(
+          {
+            institution_id: 'testInstitutionId',
+            credentials: []
+          },
+          'testUserId'
+        )
 
         const expectedResponse = {
           id: response.id,
@@ -59,7 +64,7 @@ describe('finicity provider', () => {
           status: ConnectionStatus.PENDING
         }
 
-        expect(getRedisStorageObject()[response.id]).toEqual(expectedResponse)
+        expect(await get(response.id)).toEqual(expectedResponse)
         expect(response).toEqual(expectedResponse)
       })
     })
@@ -67,39 +72,55 @@ describe('finicity provider', () => {
     describe('DeleteConnection', () => {
       it('deletes the connection', async () => {
         let connectionDeletionAttempted = false
-        redisMock.set('testId', 'something')
+        await set('testId', 'something')
 
-        server.use(http.delete(DELETE_CUSTOMER_PATH, () => {
-          connectionDeletionAttempted = true
+        server.use(
+          http.delete(DELETE_CUSTOMER_PATH, () => {
+            connectionDeletionAttempted = true
 
-          return new HttpResponse(null, {
-            status: 200
+            return new HttpResponse(null, {
+              status: 200
+            })
           })
-        }))
+        )
 
         await finicityApi.DeleteConnection('testId', 'testUserId')
 
         expect(connectionDeletionAttempted).toBe(true)
-        expect(getRedisStorageObject().testId).toBe(null)
+        expect(await get('testId')).toBe(null)
       })
     })
 
     describe('ResolveUserId', () => {
       describe('when a finicity customer already exists', () => {
         it('returns the user id of the existing customer', async () => {
-          server.use(http.get(READ_CUSTOMER_PATH, () => HttpResponse.json(finicityReadCustomerData)))
+          server.use(
+            http.get(READ_CUSTOMER_PATH, () =>
+              HttpResponse.json(finicityReadCustomerData)
+            )
+          )
 
-          expect(await finicityApi.ResolveUserId('testUserId')).toEqual('finicityTestUser')
+          expect(await finicityApi.ResolveUserId('testUserId')).toEqual(
+            'finicityTestUser'
+          )
         })
       })
 
       describe('when a finicity customer does NOT exist', () => {
         it('creates a new customer and returns the ID', async () => {
-          server.use(http.get(READ_CUSTOMER_PATH, () => new HttpResponse(null, {
-            status: 200
-          })))
+          server.use(
+            http.get(
+              READ_CUSTOMER_PATH,
+              () =>
+                new HttpResponse(null, {
+                  status: 200
+                })
+            )
+          )
 
-          expect(await finicityApi.ResolveUserId('testUserId')).toEqual('createdFinicityUserId')
+          expect(await finicityApi.ResolveUserId('testUserId')).toEqual(
+            'createdFinicityUserId'
+          )
         })
       })
     })

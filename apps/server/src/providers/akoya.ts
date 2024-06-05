@@ -5,24 +5,22 @@ import {
   type Credential,
   type Institution,
   type ProviderApiClient,
-  type UpdateConnectionRequest,
-} from "../shared/contract"
-import * as logger from "../infra/logger"
-import AkoyaClient from "../serviceClients/akoyaClient"
-import { StorageClient } from "../serviceClients/storageClient"
+  type UpdateConnectionRequest
+} from '../shared/contract'
+import * as logger from '../infra/logger'
+import AkoyaClient from '../serviceClients/akoyaClient'
+import { get, set } from '../serviceClients/storageClient/redis'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { v4: uuidv4 } = require("uuid")
+const { v4: uuidv4 } = require('uuid')
 
 export class AkoyaApi implements ProviderApiClient {
   sandbox: boolean
   apiClient: any
-  db: StorageClient
   token: string
   constructor(config: any, sandbox: boolean) {
-    const { akoyaProd, akoyaSandbox, token, storageClient } = config
+    const { akoyaProd, akoyaSandbox, token } = config
     this.token = token
-    this.db = storageClient
     this.sandbox = sandbox
     this.apiClient = new AkoyaClient(sandbox ? akoyaSandbox : akoyaProd)
   }
@@ -34,7 +32,7 @@ export class AkoyaApi implements ProviderApiClient {
       logo_url: null,
       url: null,
       oauth: true,
-      provider: this.apiClient.apiConfig.provider,
+      provider: this.apiClient.apiConfig.provider
     })
   }
 
@@ -57,7 +55,7 @@ export class AkoyaApi implements ProviderApiClient {
     request: CreateConnectionRequest
   ): Promise<Connection | undefined> {
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    const request_id = `${this.token}${uuidv4().replaceAll("-", "")}`
+    const request_id = `${this.token}${uuidv4().replaceAll('-', '')}`
     const obj = {
       id: request_id,
       is_oauth: true,
@@ -69,14 +67,16 @@ export class AkoyaApi implements ProviderApiClient {
         request_id
       ),
       provider: this.apiClient.apiConfig.provider,
-      status: ConnectionStatus.PENDING,
+      status: ConnectionStatus.PENDING
     }
-    await this.db.set(request_id, obj)
+    await set(request_id, obj)
     return obj
   }
 
   async DeleteConnection(id: string): Promise<void> {
-    return await this.db.set(id, null)
+    await set(id, null)
+
+    return undefined
   }
 
   async UpdateConnection(
@@ -86,7 +86,7 @@ export class AkoyaApi implements ProviderApiClient {
   }
 
   async GetConnectionById(connectionId: string): Promise<Connection> {
-    return await this.db.get(connectionId)
+    return await get(connectionId)
   }
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -96,7 +96,7 @@ export class AkoyaApi implements ProviderApiClient {
     single_account_select?: boolean,
     user_id?: string
   ): Promise<Connection> {
-    return await this.db.get(connectionId)
+    return await get(connectionId)
   }
 
   async AnswerChallenge(
@@ -115,8 +115,7 @@ export class AkoyaApi implements ProviderApiClient {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const { state: request_id, code } = request
     logger.info(`Received akoya oauth redirect response ${request_id}`)
-    const db = new StorageClient()
-    const connection = await db.get(request_id)
+    const connection = await get(request_id)
     if (!connection) {
       return null
     }
@@ -128,8 +127,8 @@ export class AkoyaApi implements ProviderApiClient {
       connection.request_id = request_id
     }
     // console.log(connection)
-    await db.set(request_id, connection)
-    connection.storageClient = db
+    await set(request_id, connection)
+
     return connection
   }
 }

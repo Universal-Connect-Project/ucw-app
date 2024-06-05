@@ -1,47 +1,58 @@
-import { createClient } from "redis"
-import config from "../../config"
+import { createClient } from 'redis'
+import config from '../../config'
+import { readFileSync } from 'fs'
+import { resolve } from 'path'
 
-import { info, debug, error } from "../../infra/logger"
+import { info, debug, error } from '../../infra/logger'
+import { PREFERENCES_REDIS_KEY } from './constants'
 
 const redisClient = createClient({
-  url: config.RedisServer,
+  url: config.RedisServer
 })
 
-const useRedis =
-  config.Env !== "dev" && config.Env !== "mocked" && config.Env !== "local"
-
-if (useRedis) {
-  redisClient
-    .connect()
-    .then(() => {
-      info("Redis connection established with server: " + config.RedisServer)
-    })
-    .catch((reason) => {
-      error("Failed to connect to redis server: " + reason)
-      info("No redis connection")
-    })
-}
-
-const localCache = {
-  // TODO: expiry?
-}
-export class StorageClient {
-  async get(key) {
-    debug(`Redis get: ${key}, ready: ${redisClient.isReady}`)
-    if (useRedis && redisClient.isReady) {
-      const ret = await redisClient.get(key)
-      return ret != null ? JSON.parse(ret) : null
-    }
-    return await Promise.resolve(localCache[key])
-  }
-
-  async set(key, obj) {
-    debug(`Redis set: ${key}, ready: ${redisClient.isReady}`)
-    if (useRedis && redisClient.isReady) {
-      return await redisClient.set(key, JSON.stringify(obj), {
-        EX: config.RedisCacheTimeSeconds,
-      })
-    }
-    return await Promise.resolve((localCache[key] = obj))
+export const get = async (key) => {
+  debug(`Redis get: ${key}, ready: ${redisClient.isReady}`)
+  if (redisClient.isReady) {
+    const ret = await redisClient.get(key)
+    return ret != null ? JSON.parse(ret) : null
   }
 }
+
+export const set = async (key, obj) => {
+  debug(`Redis set: ${key}, ready: ${redisClient.isReady}`)
+  if (redisClient.isReady) {
+    return await redisClient.set(key, JSON.stringify(obj), {
+      EX: config.RedisCacheTimeSeconds
+    })
+  }
+}
+
+export const setNoExpiration = async (key, obj) => {
+  debug(`Redis set: ${key}, ready: ${redisClient.isReady}`)
+  if (redisClient.isReady) {
+    return await redisClient.set(key, JSON.stringify(obj))
+  }
+}
+
+redisClient
+  .connect()
+  .then(async () => {
+    info('Redis connection established with server: ' + config.RedisServer)
+
+    let preferencesToSet
+    try {
+      preferencesToSet = JSON.parse(
+        readFileSync(
+          resolve(__dirname, '../../../cachedDefaults/preferences.json')
+        )?.toString()
+      )
+    } catch (error) {
+      console.log(error)
+    }
+
+    await setNoExpiration(PREFERENCES_REDIS_KEY, preferencesToSet || {})
+  })
+  .catch((reason) => {
+    error('Failed to connect to redis server: ' + reason)
+    info('No redis connection')
+  })

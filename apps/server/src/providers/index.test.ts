@@ -1,12 +1,10 @@
 import { http, HttpResponse } from 'msw'
 import { ConnectionStatus, OAuthStatus } from '../../src/shared/contract'
-import { createClient } from '../__mocks__/redis'
 import { READ_MEMBER_STATUS_PATH } from '../test/handlers'
 import { server } from '../test/testServer'
 import { ProviderApiBase } from './index'
 import { MxApi } from './mx'
 
-const redisMock = createClient()
 const testConnectionId = 'test_connection_id'
 
 const mxApi = new MxApi(
@@ -14,8 +12,7 @@ const mxApi = new MxApi(
     mxProd: {
       username: 'testUsername',
       password: 'testPassword'
-    },
-    storageClient: redisMock
+    }
   },
   false
 )
