@@ -8,7 +8,8 @@
 
   "institutionProviderVolumeMap": {
     "UCP-b087caf69b372c9": {
-      "mx": 100
+      "mx": 70,
+      "sophtron": 30
     },
     "UCP-ce8334bbb890163": {
       "sophtron": 100

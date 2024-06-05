@@ -1,9 +1,11 @@
+import { getPreferences } from '../shared/preferences'
 import { elasticSearchInstitutionData } from '../test/testData/institution'
 import { ElasticSearchMock } from '../utils/ElasticSearchClient'
 import {
   getAvailableProviders,
   resolveInstitutionProvider
 } from './institutionResolver'
+import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
 
 describe('institutionResolver', () => {
   describe('getAvailableProviders', () => {
@@ -125,7 +127,55 @@ describe('institutionResolver', () => {
       expect(institution.provider).toEqual('mx')
     })
 
-    it('routes using institution specific volume', () => {})
+    it('routes using institution specific volume', async () => {
+      const firstInstitutionWithVolumeControl = Object.entries(
+        testPreferences.institutionProviderVolumeMap
+      )[0]
+
+      const [institutionId, volumeMap] = firstInstitutionWithVolumeControl
+
+      expect(volumeMap).toEqual({
+        mx: 70,
+        sophtron: 30
+      })
+
+      ElasticSearchMock.add(
+        {
+          method: 'GET',
+          path: `/institutions/_doc/${institutionId}`
+        },
+        () => {
+          return {
+            _source: {
+              ...elasticSearchInstitutionData,
+              is_test_bank: false,
+              mx: {
+                id: 'mx_id'
+              },
+              sophtron: {
+                id: 'sophtron_bank'
+              }
+            }
+          }
+        }
+      )
+
+      jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.7)
+
+      expect(
+        (await resolveInstitutionProvider(institutionId)).provider
+      ).toEqual('mx')
+
+      jest.spyOn(global.Math, 'random').mockRestore()
+
+      jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.71)
+
+      expect(
+        (await resolveInstitutionProvider(institutionId)).provider
+      ).toEqual('sophtron')
+
+      jest.spyOn(global.Math, 'random').mockRestore()
+    })
 
     it('routes using default volume', () => {})
 
