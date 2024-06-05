@@ -36,6 +36,7 @@ resulting in the error. To fix this, you will need to run `docker logout` from y
 1. Run `npm ci` from the root directory
 1. Run `cp ./.env.example ./.env`
 1. Run `cp ./apps/server/.env.example ./apps/server/.env`
+1. Run `cp ./apps/server/cachedDefaults/preferences.example.json ./apps/server/cachedDefaults/preferences.json` and modify the preferences if you need them
 1. Follow [Initial Setup](#initial-setup) (below) for setting-up some required environment variables
 1. Install [Docker](#docker), a dependency for the institution search feature to work
 1. Finally, run: `npm run dev`
@@ -47,9 +48,11 @@ Please remember that secrets are passed through environment variables instead of
 **Use the provided `.env` files.**
 
 ## Docker
+
 Docker is required to be installed on your local development system.
 
 Compatible options are:
+
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [Rancher Desktop](https://rancherdesktop.io/)
 
