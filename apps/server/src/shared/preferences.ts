@@ -11,12 +11,7 @@ const cacheLocalPreferences = async () => {
   try {
     preferencesToSet = JSON.parse(
       readFileSync(
-        resolve(
-          __dirname,
-          process.env.NODE_ENV === 'test'
-            ? '../../cachedDefaults/testData/testPreferences.json'
-            : '../../cachedDefaults/preferences.json'
-        )
+        resolve(__dirname, '../../cachedDefaults/preferences.json')
       )?.toString()
     )
   } catch {}
@@ -26,14 +21,14 @@ const cacheLocalPreferences = async () => {
 
 void cacheLocalPreferences()
 
-interface Preferences {
-  defaultProvider: 'mx' | 'sophtron'
+export interface Preferences {
+  defaultProvider?: 'mx' | 'sophtron'
 
-  defaultProviderVolume: Record<string, number>
+  defaultProviderVolume?: Record<string, number>
 
-  institutionProviderVolumeMap: Record<string, Record<string, number>>
+  institutionProviderVolumeMap?: Record<string, Record<string, number>>
 
-  hiddenInstitutions: string[]
+  hiddenInstitutions?: string[]
 
   recommendedInstitutions: string[]
 }

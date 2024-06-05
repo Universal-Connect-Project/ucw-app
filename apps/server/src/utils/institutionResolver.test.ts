@@ -1,4 +1,4 @@
-import { getPreferences } from '../shared/preferences'
+import * as preferences from '../shared/preferences'
 import { elasticSearchInstitutionData } from '../test/testData/institution'
 import { ElasticSearchMock } from '../utils/ElasticSearchClient'
 import {
@@ -7,7 +7,59 @@ import {
 } from './institutionResolver'
 import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
 
+const mockInstitutionWithMxAndSophtron = (institutionId = 'test') => {
+  ElasticSearchMock.add(
+    {
+      method: 'GET',
+      path: `/institutions/_doc/${institutionId}`
+    },
+    () => {
+      return {
+        _source: {
+          ...elasticSearchInstitutionData,
+          is_test_bank: false,
+          mx: {
+            id: 'mx_id'
+          },
+          sophtron: {
+            id: 'sophtron_bank'
+          }
+        }
+      }
+    }
+  )
+}
+
+const mockInstitutionWithMx = (institutionId = 'test') => {
+  ElasticSearchMock.add(
+    {
+      method: 'GET',
+      path: `/institutions/_doc/${institutionId}`
+    },
+    () => {
+      return {
+        _source: {
+          ...elasticSearchInstitutionData,
+          is_test_bank: false,
+          mx: {
+            id: 'mx_id'
+          },
+          sophtron: {
+            id: null
+          }
+        }
+      }
+    }
+  )
+}
+
 describe('institutionResolver', () => {
+  beforeEach(() => {
+    jest
+      .spyOn(preferences, 'getPreferences')
+      .mockResolvedValue(testPreferences as preferences.Preferences)
+  })
+
   describe('getAvailableProviders', () => {
     it('gets mx and sophtron providers', () => {
       const expectedProviders = ['mx', 'sophtron']
@@ -139,26 +191,7 @@ describe('institutionResolver', () => {
         sophtron: 30
       })
 
-      ElasticSearchMock.add(
-        {
-          method: 'GET',
-          path: `/institutions/_doc/${institutionId}`
-        },
-        () => {
-          return {
-            _source: {
-              ...elasticSearchInstitutionData,
-              is_test_bank: false,
-              mx: {
-                id: 'mx_id'
-              },
-              sophtron: {
-                id: 'sophtron_bank'
-              }
-            }
-          }
-        }
-      )
+      mockInstitutionWithMxAndSophtron(institutionId)
 
       jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.7)
 
@@ -166,25 +199,113 @@ describe('institutionResolver', () => {
         (await resolveInstitutionProvider(institutionId)).provider
       ).toEqual('mx')
 
-      jest.spyOn(global.Math, 'random').mockRestore()
-
       jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.71)
 
       expect(
         (await resolveInstitutionProvider(institutionId)).provider
       ).toEqual('sophtron')
-
-      jest.spyOn(global.Math, 'random').mockRestore()
     })
 
-    it('routes using default volume', () => {})
+    it('routes using default volume', async () => {
+      mockInstitutionWithMxAndSophtron()
 
-    it('routes using default provider', () => {})
+      expect(testPreferences.defaultProviderVolume).toEqual({
+        mx: 50,
+        sophtron: 50
+      })
 
-    it('falls back to default volume if institution specific volume doesnt have an available provider', () => {})
+      jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.5)
 
-    it('falls back to default provider if institution specific and default volume dont have an available provider', () => {})
+      expect((await resolveInstitutionProvider('test')).provider).toEqual('mx')
 
-    it('chooses a random available provider if institution specific, default volume, and default provider dont have an available provider', () => {})
+      jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.51)
+
+      expect((await resolveInstitutionProvider('test')).provider).toEqual(
+        'sophtron'
+      )
+    })
+
+    it('routes using default provider', async () => {
+      mockInstitutionWithMxAndSophtron()
+
+      jest.spyOn(preferences, 'getPreferences').mockResolvedValue({
+        ...(testPreferences as preferences.Preferences),
+        institutionProviderVolumeMap: undefined,
+        defaultProviderVolume: undefined,
+        defaultProvider: 'mx'
+      })
+
+      expect((await resolveInstitutionProvider('test')).provider).toEqual('mx')
+
+      jest.spyOn(preferences, 'getPreferences').mockResolvedValue({
+        ...(testPreferences as preferences.Preferences),
+        institutionProviderVolumeMap: undefined,
+        defaultProviderVolume: undefined,
+        defaultProvider: 'sophtron'
+      })
+
+      expect((await resolveInstitutionProvider('test')).provider).toEqual(
+        'sophtron'
+      )
+    })
+
+    it('falls back to default volume if institution specific volume doesnt have an available provider', async () => {
+      jest.spyOn(preferences, 'getPreferences').mockResolvedValue({
+        ...(testPreferences as preferences.Preferences),
+        institutionProviderVolumeMap: {
+          test: {
+            sophtron: 100
+          }
+        },
+        defaultProviderVolume: {
+          mx: 100
+        },
+        defaultProvider: undefined
+      })
+
+      mockInstitutionWithMx()
+
+      expect((await resolveInstitutionProvider('test')).provider).toEqual('mx')
+    })
+
+    it('falls back to default provider if institution specific and default volume dont have an available provider', async () => {
+      jest.spyOn(preferences, 'getPreferences').mockResolvedValue({
+        ...(testPreferences as preferences.Preferences),
+        institutionProviderVolumeMap: {
+          test: {
+            sophtron: 100
+          }
+        },
+        defaultProviderVolume: {
+          sophtron: 100
+        },
+        defaultProvider: 'mx'
+      })
+
+      mockInstitutionWithMx()
+
+      expect((await resolveInstitutionProvider('test')).provider).toEqual('mx')
+    })
+
+    it('chooses a random available provider if institution specific, default volume, and default provider dont have an available provider', async () => {
+      jest.spyOn(preferences, 'getPreferences').mockResolvedValue({
+        ...(testPreferences as preferences.Preferences),
+        institutionProviderVolumeMap: undefined,
+        defaultProviderVolume: undefined,
+        defaultProvider: undefined
+      })
+
+      mockInstitutionWithMxAndSophtron()
+
+      jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.49)
+
+      expect((await resolveInstitutionProvider('test')).provider).toEqual('mx')
+
+      jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.5)
+
+      expect((await resolveInstitutionProvider('test')).provider).toEqual(
+        'sophtron'
+      )
+    })
   })
 })

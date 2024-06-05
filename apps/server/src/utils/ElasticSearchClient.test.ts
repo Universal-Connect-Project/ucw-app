@@ -1,4 +1,5 @@
 import { elasticSearchInstitutionData } from '../test/testData/institution'
+import * as preferences from '../shared/preferences'
 import {
   ElasticSearchMock,
   getRecommendedInstitutions,
@@ -8,6 +9,10 @@ import {
   search
 } from '../utils/ElasticSearchClient'
 import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
+
+jest
+  .spyOn(preferences, 'getPreferences')
+  .mockResolvedValue(testPreferences as preferences.Preferences)
 
 describe('initialize', () => {
   describe('elastic search already indexed', () => {
