@@ -84,7 +84,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           project: apps/server
-          start: npm run dev:cypress
+          start: npm run dev:e2e
           wait-on: 'http://localhost:8080, http://localhost:9200'
 
       - name: Upload screenshots

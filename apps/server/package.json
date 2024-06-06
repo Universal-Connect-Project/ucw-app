@@ -8,7 +8,7 @@
     "dev": "concurrently --kill-others \"npm run elasticsearch\" \"npm run server\" \"npm run redisserver\"",
     "elasticsearch": "docker run --rm --name elasticsearch_container -p 9200:9200 -p 9300:9300 -e \"discovery.type=single-node\" -e \"xpack.security.enabled=false\" elasticsearch:8.13.4",
     "dev:debug": "node --inspect -r ts-node/register ./src/server.js",
-    "dev:cypress": "nodemon src/server.js",
+    "dev:e2e": "nodemon src/server.js",
     "redisserver": "redis-server",
     "server": "wait-on http://localhost:9200 && nodemon src/server.js",
     "lint": "eslint . --ext .js,.ts",

@@ -17,7 +17,7 @@
       "cache": false,
       "persistent": true
     },
-    "dev:cypress": {
+    "dev:e2e": {
       "cache": false,
       "persistent": true
     }
