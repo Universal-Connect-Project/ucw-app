@@ -6,7 +6,7 @@
   "packageManager": "npm@10.5.0",
   "scripts": {
     "dev": "npx cross-env BROWSER=none && vite",
-    "dev:cypress": "npm run dev",
+    "dev:e2e": "npm run dev",
     "build": "tsc && vite build",
     "lint": "eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
