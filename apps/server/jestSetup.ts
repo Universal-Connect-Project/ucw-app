@@ -1,6 +1,10 @@
-import { initializeDefaultElasticSearchHandlers, resetDefaultElasticSearchHandlers } from './src/test/elasticSearchHandlers'
+import {
+  initializeDefaultElasticSearchHandlers,
+  resetDefaultElasticSearchHandlers
+} from './src/test/elasticSearchHandlers'
 import { server } from './src/test/testServer'
- 
+import { clearRedisMock } from './src/__mocks__/redis'
+
 beforeAll(() => {
   server.listen()
   initializeDefaultElasticSearchHandlers()
@@ -9,6 +13,7 @@ beforeAll(() => {
 afterEach(() => {
   server.resetHandlers()
   resetDefaultElasticSearchHandlers()
+  clearRedisMock()
 })
 
 afterAll(() => server.close())

@@ -1,5 +1,4 @@
 import { http, HttpResponse } from 'msw'
-import { clearRedisMock } from '../__mocks__/redis'
 import { ConnectionStatus } from '../shared/contract'
 import {
   DELETE_CUSTOMER_PATH,
@@ -40,10 +39,6 @@ describe('finicity provider', () => {
     })
 
     describe('CreateConnection', () => {
-      afterEach(() => {
-        clearRedisMock()
-      })
-
       it('generates object with connect lite url', async () => {
         const response = await finicityApi.CreateConnection(
           {

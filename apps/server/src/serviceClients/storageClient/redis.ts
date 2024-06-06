@@ -10,28 +10,31 @@ const redisClient = createClient({
   url: config.RedisServer
 })
 
-export const get = async (key) => {
+export const get = async (key: string) => {
   debug(`Redis get: ${key}, ready: ${redisClient.isReady}`)
-  if (redisClient.isReady) {
+
+  try {
     const ret = await redisClient.get(key)
-    return ret != null ? JSON.parse(ret) : null
-  }
+    return JSON.parse(ret)
+  } catch {}
 }
 
-export const set = async (key, obj) => {
-  debug(`Redis set: ${key}, ready: ${redisClient.isReady}`)
-  if (redisClient.isReady) {
-    return await redisClient.set(key, JSON.stringify(obj), {
-      EX: config.RedisCacheTimeSeconds
-    })
+export const set = async (
+  key: string,
+  value: any,
+  params: object = {
+    EX: config.RedisCacheTimeSeconds
   }
+) => {
+  debug(`Redis set: ${key}, ready: ${redisClient.isReady}`)
+
+  try {
+    await redisClient.set(key, JSON.stringify(value), params)
+  } catch {}
 }
 
-export const setNoExpiration = async (key, obj) => {
-  debug(`Redis set: ${key}, ready: ${redisClient.isReady}`)
-  if (redisClient.isReady) {
-    return await redisClient.set(key, JSON.stringify(obj))
-  }
+export const setNoExpiration = async (key: string, value: any) => {
+  await set(key, value, {})
 }
 
 redisClient
@@ -47,7 +50,7 @@ redisClient
         )?.toString()
       )
     } catch (error) {
-      console.log(error)
+      error(`Failed to resolve preferences: ${error}`)
     }
 
     await setNoExpiration(PREFERENCES_REDIS_KEY, preferencesToSet || {})

@@ -28,7 +28,6 @@ import {
 } from '../test/testData/members'
 import config from '../config'
 import { ChallengeType, ConnectionStatus } from '../shared/contract'
-import { clearRedisMock } from '../__mocks__/redis'
 import { createUserData, listUsersData } from '../test/testData/users'
 import { get, set } from '../serviceClients/storageClient/redis'
 
@@ -613,10 +612,6 @@ describe('mx provider', () => {
     })
 
     describe('GetConnectionStatus', () => {
-      afterEach(() => {
-        clearRedisMock()
-      })
-
       it("returns a rejected connection status if there's an error with oauthStatus", async () => {
         await set(memberStatusData.member.guid, { error: true })
 
@@ -857,8 +852,6 @@ describe('mx provider', () => {
           error: errorReason,
           status: ConnectionStatus.REJECTED
         })
-
-        clearRedisMock()
       })
 
       it('returns with connected status if success', async () => {

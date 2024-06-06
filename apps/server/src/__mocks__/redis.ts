@@ -1,16 +1,30 @@
+import { PREFERENCES_REDIS_KEY } from '../serviceClients/storageClient/constants'
+
 let storageObject: Record<string, any> = {}
 
 export const clearRedisMock = () => {
-  storageObject = {}
+  if (storageObject?.[PREFERENCES_REDIS_KEY]) {
+    storageObject = {
+      [PREFERENCES_REDIS_KEY]: storageObject[PREFERENCES_REDIS_KEY]
+    }
+  } else {
+    storageObject = {}
+  }
 }
 
+export const get = jest.fn((key: string) => {
+  return storageObject[key]
+})
+
+export const set = jest.fn((key: string, value: any) => {
+  storageObject[key] = value
+})
+
 export const createClient = () => ({
-  connect: async () => true,
-  get: (key: string) => {
-    return storageObject[key]
+  connect: async () => {
+    return true
   },
+  get,
   isReady: true,
-  set: (key: string, value: any) => {
-    storageObject[key] = value
-  }
+  set
 })
