@@ -12,6 +12,17 @@ jobs:
     runs-on: ubuntu-latest
     needs: [setup-env]
 
+    services:
+      redis:
+        image: redis:7.2-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval: 20s
+          --health-timeout: 5s
+          --health-retries: 3
+        ports:
+          - '${REDIS_PORT}:${REDIS_PORT}'
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
