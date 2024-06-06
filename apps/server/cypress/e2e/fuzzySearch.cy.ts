@@ -1,9 +1,7 @@
 describe('Should be able to find certain banks with keywords and misspellings', () => {
-  beforeEach(() => {
-    cy.visitAgg()
-  })
-
   it('Finds expected banks', () => {
+    cy.visitAgg()
+
     cy.findByPlaceholderText('Search').type('MACU')
     cy.findByText('Mountain America Credit Union', { timeout: 45000 }).should('exist')
 
@@ -18,6 +16,8 @@ describe('Should be able to find certain banks with keywords and misspellings', 
   })
 
   it('Ranks search results in the best way', () => {
+    cy.visitAgg()
+
     cy.findByPlaceholderText('Search').clear().type('chase')
     cy.get('[data-test="institution-tile"]').first().should('have.attr', 'aria-label', 'Add account with Chase (CA)')
     cy.get('[data-test="institution-tile"]').eq(1).should('have.attr', 'aria-label', 'Add account with Chase UCard')
