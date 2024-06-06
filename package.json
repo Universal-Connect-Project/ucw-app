@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
+    "copyTestPreferences": "cp ./apps/server/cachedDefaults/testData/testPreferences.json ./apps/server/cachedDefaults/preferences.json",
     "dev": "turbo dev",
     "dev:cypress": "turbo dev:cypress",
     "lint": "turbo lint",

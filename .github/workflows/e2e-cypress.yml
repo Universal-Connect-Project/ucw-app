@@ -40,6 +40,8 @@ jobs:
           check-latest: true
       - run: npm ci
 
+      - run: npm run copyTestPreferences
+
       - name: 'Create env file'
         run: |
           ENV_FILE_PATH=./apps/server/.env
