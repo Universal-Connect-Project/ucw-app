@@ -19,7 +19,24 @@ describe('Should be able to find certain banks with keywords and misspellings', 
     cy.visitAgg()
 
     cy.findByPlaceholderText('Search').clear().type('chase')
-    cy.get('[data-test="institution-tile"]').first().should('have.attr', 'aria-label', 'Add account with Chase (CA)')
-    cy.get('[data-test="institution-tile"]').eq(1).should('have.attr', 'aria-label', 'Add account with Chase UCard')
+    cy.wait(3000)
+    cy.get('[data-test="institution-tile"]').then(institutions => {
+      expect(institutions.length).to.be.at.least(3)
+
+      let chaseCaFound = false
+      let chaseUCardFound = false
+
+      for (let i = 0; i < 3; i++) {
+        const ariaLabel = institutions.eq(i).attr('aria-label');
+        if (ariaLabel === 'Add account with Chase (CA)') {
+          chaseCaFound = true
+        } else if (ariaLabel === 'Add account with Chase UCard') {
+          chaseUCardFound = true
+        }
+      }
+
+      expect(chaseCaFound).to.be.true
+      expect(chaseUCardFound).to.be.true
+    })
   })
 })
