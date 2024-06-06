@@ -68,32 +68,48 @@ export async function search(searchTerm: string): Promise<any[]> {
       body: {
         query: {
           bool: {
-            must_not: {
-              terms: {
-                'ucp_id.keyword': hiddenInstitutions
-              }
-            },
             should: [
               {
-                multi_match: {
-                  query: searchTerm,
-                  type: 'best_fields',
-                  fields: ['name', 'keywords'],
-                  fuzziness: 'AUTO',
-                  prefix_length: 0,
-                  max_expansions: 50,
-                  fuzzy_transpositions: true
+                match: {
+                  name: {
+                    query: searchTerm,
+                    boost: 1.5
+                  }
                 }
               },
               {
                 match: {
-                  'keywords.keyword': {
-                    query: searchTerm
+                  keywords: {
+                    query: searchTerm,
+                    boost: 1.4
+                  }
+                }
+              },
+              {
+                fuzzy: {
+                  name: {
+                    value: searchTerm.toLowerCase(),
+                    fuzziness: 'AUTO',
+                    boost: 1,
+                    max_expansions: 50
+                  }
+                }
+              },
+              {
+                wildcard: {
+                  name: {
+                    value: `${searchTerm}*`,
+                    boost: 0.8
                   }
                 }
               }
             ],
-            minimum_should_match: 1
+            minimum_should_match: 1,
+            must_not: {
+              terms: {
+                'ucp_id.keyword': hiddenInstitutions
+              }
+            }
           }
         },
         size: 20
@@ -115,7 +131,7 @@ export async function getInstitution(id: string): Promise<CachedInstitution> {
 }
 
 export async function getRecommendedInstitutions(): Promise<
-  CachedInstitution[]
+CachedInstitution[]
 > {
   const recommendedInstitutions = (await getPreferences())
     ?.recommendedInstitutions
