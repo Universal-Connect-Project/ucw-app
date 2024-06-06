@@ -1,5 +1,5 @@
 import { getPreferences } from './preferences'
-import { get } from '..//serviceClients/storageClient/redis'
+import { get } from '../serviceClients/storageClient/redis'
 import { PREFERENCES_REDIS_KEY } from '../serviceClients/storageClient/constants'
 
 describe('preferences', () => {
