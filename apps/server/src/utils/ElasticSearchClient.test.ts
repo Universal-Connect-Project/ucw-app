@@ -1,14 +1,14 @@
-import { elasticSearchInstitutionData } from '../test/testData/institution'
+import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
 import * as preferences from '../shared/preferences'
+import { elasticSearchInstitutionData } from '../test/testData/institution'
 import {
   ElasticSearchMock,
-  getRecommendedInstitutions,
   getInstitution,
+  getRecommendedInstitutions,
   initialize,
   reIndexElasticSearch,
   search
 } from '../utils/ElasticSearchClient'
-import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
 
 jest
   .spyOn(preferences, 'getPreferences')
@@ -128,32 +128,50 @@ describe('search', () => {
         body: {
           query: {
             bool: {
-              must_not: {
-                terms: {
-                  'ucp_id.keyword': testPreferences.hiddenInstitutions
-                }
-              },
               should: [
                 {
-                  multi_match: {
-                    query: 'MX Bank',
-                    type: 'best_fields',
-                    fields: ['name', 'keywords'],
-                    fuzziness: 'AUTO',
-                    prefix_length: 0,
-                    max_expansions: 50,
-                    fuzzy_transpositions: true
+                  match: {
+                    name: {
+                      query: 'MX Bank',
+                      boost: 1.5
+                    }
                   }
                 },
                 {
                   match: {
-                    'keywords.keyword': {
-                      query: 'MX Bank'
+                    keywords: {
+                      query: 'MX Bank',
+                      boost: 1.4
+                    }
+                  }
+                },
+                {
+                  fuzzy: {
+                    name: {
+                      value: 'mx bank',
+                      fuzziness: 'AUTO',
+                      boost: 1,
+                      max_expansions: 50
+                    }
+                  }
+                },
+                {
+                  wildcard: {
+                    name: {
+                      value: 'MX Bank*',
+                      boost: 0.8
                     }
                   }
                 }
               ],
-              minimum_should_match: 1
+              minimum_should_match: 1,
+              must_not: {
+                terms: {
+                  'ucp_id.keyword': [
+                    'UCP-60155b7292895ed'
+                  ]
+                }
+              }
             }
           },
           size: 20
