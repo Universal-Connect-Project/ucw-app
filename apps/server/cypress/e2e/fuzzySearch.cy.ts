@@ -19,7 +19,7 @@ describe('Should be able to find certain banks with keywords and misspellings', 
     cy.visitAgg()
 
     cy.findByPlaceholderText('Search').clear().type('chase')
-    cy.wait(3000)
+    cy.findByText('Chase (CA)')
     cy.get('[data-test="institution-tile"]').then(institutions => {
       expect(institutions.length).to.be.at.least(3)
 
