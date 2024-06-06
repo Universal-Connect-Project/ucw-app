@@ -24,7 +24,7 @@ jobs:
           xpack.security.enabled: false
 
       redis:
-        image: redis:7.2-alpine
+        image: redis
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval: 20s
