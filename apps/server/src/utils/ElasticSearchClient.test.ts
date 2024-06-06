@@ -1,5 +1,18 @@
+import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
+import * as preferences from '../shared/preferences'
 import { elasticSearchInstitutionData } from '../test/testData/institution'
-import { ElasticSearchMock, getFavoriteInstitutions, getInstitution, initialize, reIndexElasticSearch, search } from '../utils/ElasticSearchClient'
+import {
+  ElasticSearchMock,
+  getInstitution,
+  getRecommendedInstitutions,
+  initialize,
+  reIndexElasticSearch,
+  search
+} from '../utils/ElasticSearchClient'
+
+jest
+  .spyOn(preferences, 'getPreferences')
+  .mockResolvedValue(testPreferences as preferences.Preferences)
 
 describe('initialize', () => {
   describe('elastic search already indexed', () => {
@@ -7,20 +20,26 @@ describe('initialize', () => {
 
     it('does not reindex institutions', async () => {
       ElasticSearchMock.clearAll()
-      ElasticSearchMock.add({
-        method: 'HEAD',
-        path: '/institutions'
-      }, () => {
-        return ''
-      })
+      ElasticSearchMock.add(
+        {
+          method: 'HEAD',
+          path: '/institutions'
+        },
+        () => {
+          return ''
+        }
+      )
 
-      ElasticSearchMock.add({
-        method: 'PUT',
-        path: '/institutions'
-      }, () => {
-        indexCreated = true
-        return ''
-      })
+      ElasticSearchMock.add(
+        {
+          method: 'PUT',
+          path: '/institutions'
+        },
+        () => {
+          indexCreated = true
+          return ''
+        }
+      )
 
       await initialize()
       expect(indexCreated).toBeFalsy()
@@ -32,20 +51,26 @@ describe('initialize', () => {
 
     it('triggers the reIndexElasticSearch method which makes call ES create index endpoint', async () => {
       ElasticSearchMock.clearAll()
-      ElasticSearchMock.add({
-        method: 'PUT',
-        path: '/institutions'
-      }, () => {
-        indexCreated = true
-        return ''
-      })
+      ElasticSearchMock.add(
+        {
+          method: 'PUT',
+          path: '/institutions'
+        },
+        () => {
+          indexCreated = true
+          return ''
+        }
+      )
 
-      ElasticSearchMock.add({
-        method: 'PUT',
-        path: '/institutions/_doc/*'
-      }, () => {
-        return ''
-      })
+      ElasticSearchMock.add(
+        {
+          method: 'PUT',
+          path: '/institutions/_doc/*'
+        },
+        () => {
+          return ''
+        }
+      )
 
       await initialize()
       expect(indexCreated).toBeTruthy()
@@ -62,21 +87,27 @@ describe('reIndexElasticSearch', () => {
     indexCreated = false
     institutionsIndexedCount = 0
 
-    ElasticSearchMock.add({
-      method: 'PUT',
-      path: '/institutions'
-    }, () => {
-      indexCreated = true
-      return ''
-    })
+    ElasticSearchMock.add(
+      {
+        method: 'PUT',
+        path: '/institutions'
+      },
+      () => {
+        indexCreated = true
+        return ''
+      }
+    )
 
-    ElasticSearchMock.add({
-      method: 'PUT',
-      path: '/institutions/_doc/*'
-    }, () => {
-      institutionsIndexedCount += 1
-      return ''
-    })
+    ElasticSearchMock.add(
+      {
+        method: 'PUT',
+        path: '/institutions/_doc/*'
+      },
+      () => {
+        institutionsIndexedCount += 1
+        return ''
+      }
+    )
 
     await reIndexElasticSearch()
     expect(indexCreated).toBeTruthy()
@@ -90,51 +121,74 @@ describe('search', () => {
   })
 
   it('makes the expected ES call and maps the data', async () => {
-    ElasticSearchMock.add({
-      method: ['GET', 'POST'],
-      path: ['/_search', '/institutions/_search'],
-      body: {
-        query: {
-          bool: {
-            should: [
-              {
-                multi_match: {
-                  query: 'MX Bank',
-                  type: 'best_fields',
-                  fields: [
-                    'name',
-                    'keywords'
-                  ],
-                  fuzziness: 'AUTO',
-                  prefix_length: 0,
-                  max_expansions: 50,
-                  fuzzy_transpositions: true
-                }
-              },
-              {
-                match: {
-                  'keywords.keyword': {
-                    query: 'MX Bank'
+    ElasticSearchMock.add(
+      {
+        method: ['GET', 'POST'],
+        path: ['/_search', '/institutions/_search'],
+        body: {
+          query: {
+            bool: {
+              should: [
+                {
+                  match: {
+                    name: {
+                      query: 'MX Bank',
+                      boost: 1.5
+                    }
+                  }
+                },
+                {
+                  match: {
+                    keywords: {
+                      query: 'MX Bank',
+                      boost: 1.4
+                    }
+                  }
+                },
+                {
+                  fuzzy: {
+                    name: {
+                      value: 'mx bank',
+                      fuzziness: 'AUTO',
+                      boost: 1,
+                      max_expansions: 50
+                    }
+                  }
+                },
+                {
+                  wildcard: {
+                    name: {
+                      value: 'MX Bank*',
+                      boost: 0.8
+                    }
                   }
                 }
+              ],
+              minimum_should_match: 1,
+              must_not: {
+                terms: {
+                  'ucp_id.keyword': [
+                    'UCP-60155b7292895ed'
+                  ]
+                }
               }
-            ],
-            minimum_should_match: 1
-          }
-        },
-        size: 20
-      }
-    }, () => {
-      return {
-        hits: {
-          hits: [
-            {
-              _source: elasticSearchInstitutionData
             }
-          ]
+          },
+          size: 20
+        }
+      },
+      () => {
+        return {
+          hits: {
+            hits: [
+              {
+                _source: elasticSearchInstitutionData
+              }
+            ]
+          }
         }
       }
-    })
+    )
 
     const results = await search('MX Bank')
 
@@ -142,14 +196,17 @@ describe('search', () => {
   })
 
   it('does not break when ES returns an empty array', async () => {
-    ElasticSearchMock.add({
-      method: ['GET', 'POST'],
-      path: ['/_search', '/institutions/_search']
-    }, () => {
-      return {
-        hits: { hits: [] }
+    ElasticSearchMock.add(
+      {
+        method: ['GET', 'POST'],
+        path: ['/_search', '/institutions/_search']
+      },
+      () => {
+        return {
+          hits: { hits: [] }
+        }
       }
-    })
+    )
 
     const results = await search('nothing')
 
@@ -161,48 +218,49 @@ describe('getInstitution', () => {
   it('makes the expected ES call and gets the expected institution response', async () => {
     ElasticSearchMock.clearAll()
 
-    ElasticSearchMock.add({
-      method: 'GET',
-      path: '/institutions/_doc/UCP-1234'
-    }, (params) => {
-      return {
-        _source: elasticSearchInstitutionData
+    ElasticSearchMock.add(
+      {
+        method: 'GET',
+        path: '/institutions/_doc/UCP-1234'
+      },
+      (params) => {
+        return {
+          _source: elasticSearchInstitutionData
+        }
       }
-    })
+    )
 
     const institutionResponse = await getInstitution('UCP-1234')
     expect(institutionResponse).toEqual(elasticSearchInstitutionData)
   })
 })
 
-describe('getFavoriteInstitutions', () => {
+describe('getRecommendedInstitutions', () => {
   it('makes expected call to ES and gets a list of favorite institutions', async () => {
     ElasticSearchMock.clearAll()
 
-    ElasticSearchMock.add({
-      method: 'POST',
-      path: '/_mget',
-      body: {
-        docs: [
-          { _index: 'institutions', _id: 'UCP-b087caf69b372c9' },
-          { _index: 'institutions', _id: 'UCP-60155b7292895ed' },
-          { _index: 'institutions', _id: 'UCP-ce8334bbb890163' },
-          { _index: 'institutions', _id: 'UCP-ebca9a2b2ae2cca' },
-          { _index: 'institutions', _id: 'UCP-b0a4307160ecb4c' },
-          { _index: 'institutions', _id: 'UCP-8c4ca4c32dbd8de' },
-          { _index: 'institutions', _id: 'UCP-412ded54698c47f' }
-        ]
+    ElasticSearchMock.add(
+      {
+        method: 'POST',
+        path: '/_mget',
+        body: {
+          docs: testPreferences.recommendedInstitutions.map(
+            (institutionId: string) => ({
+              _index: 'institutions',
+              _id: institutionId
+            })
+          )
+        }
+      },
+      (params) => {
+        return {
+          docs: [{ _source: elasticSearchInstitutionData }]
+        }
       }
-    }, (params) => {
-      return {
-        docs: [
-          { _source: elasticSearchInstitutionData }
-        ]
-      }
-    })
+    )
 
-    const favoriteInsitutions = await getFavoriteInstitutions()
+    const recommendedInstitutions = await getRecommendedInstitutions()
 
-    expect(favoriteInsitutions).toEqual([elasticSearchInstitutionData])
+    expect(recommendedInstitutions).toEqual([elasticSearchInstitutionData])
   })
 })

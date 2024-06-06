@@ -8,7 +8,7 @@ const levels = {
   error: 3
 }
 
-function startDoc () {
+function startDoc() {
   return {
     Level: 'trace',
     Component: config.Component,
@@ -18,8 +18,11 @@ function startDoc () {
   }
 }
 
-function logDoc (doc) {
-  if (levels[config.LogLevel.toLowerCase()] > levels[doc.Level.toLowerCase()]) {
+function logDoc(doc) {
+  if (
+    levels[config.LogLevel.toLowerCase()] > levels[doc.Level.toLowerCase()] ||
+    process.env.NODE_ENV === 'test'
+  ) {
     return
   }
   if (
@@ -33,7 +36,7 @@ function logDoc (doc) {
   }
 }
 
-function logMessage (message, level, data, isError) {
+function logMessage(message, level, data, isError) {
   const doc = startDoc()
   doc.Level = level ?? doc.Level
   doc.Message = message
@@ -45,8 +48,18 @@ function logMessage (message, level, data, isError) {
   logDoc(doc)
 }
 
-export function error (message, error) { logMessage(message, 'error', error, true) }
-export function info (message, data) { logMessage(message, 'info', data) }
-export function warning (message, data) { logMessage(message, 'warning', data) }
-export function trace (message, data) { logMessage(message, 'trace', data) }
-export function debug (message, data) { logMessage(message, 'debug', data) }
+export function error(message, error) {
+  logMessage(message, 'error', error, true)
+}
+export function info(message, data) {
+  logMessage(message, 'info', data)
+}
+export function warning(message, data) {
+  logMessage(message, 'warning', data)
+}
+export function trace(message, data) {
+  logMessage(message, 'trace', data)
+}
+export function debug(message, data) {
+  logMessage(message, 'debug', data)
+}

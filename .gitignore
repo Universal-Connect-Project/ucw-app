@@ -44,3 +44,6 @@ apps/server/cypress/screenshots
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+apps/server/cachedDefaults/preferences.json
+apps/server/dump.rdb

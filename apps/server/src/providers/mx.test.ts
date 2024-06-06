@@ -28,12 +28,8 @@ import {
 } from '../test/testData/members'
 import config from '../config'
 import { ChallengeType, ConnectionStatus } from '../shared/contract'
-import {
-  clearRedisMock,
-  createClient,
-  getRedisStorageObject
-} from '../__mocks__/redis'
 import { createUserData, listUsersData } from '../test/testData/users'
+import { get, set } from '../serviceClients/storageClient/redis'
 
 const mxApiInt = new MxApi(
   {
@@ -45,15 +41,12 @@ const mxApiInt = new MxApi(
   true
 )
 
-const redisMock = createClient()
-
 const mxApi = new MxApi(
   {
     mxProd: {
       username: 'testUsername',
       password: 'testPassword'
-    },
-    storageClient: redisMock
+    }
   },
   false
 )
@@ -619,12 +612,8 @@ describe('mx provider', () => {
     })
 
     describe('GetConnectionStatus', () => {
-      afterEach(() => {
-        clearRedisMock()
-      })
-
       it("returns a rejected connection status if there's an error with oauthStatus", async () => {
-        redisMock.set(memberStatusData.member.guid, { error: true })
+        await set(memberStatusData.member.guid, { error: true })
 
         const connectionStatus = await mxApi.GetConnectionStatus(
           'testMemberId',
@@ -853,22 +842,16 @@ describe('mx provider', () => {
           error_reason: errorReason
         })
 
-        expect(getRedisStorageObject().memberGuid).toEqual(
-          JSON.stringify({
-            error: true,
-            error_reason: errorReason
-          })
-        )
+        expect(await get(memberGuid)).toEqual({
+          error: true,
+          error_reason: errorReason
+        })
 
         expect(response).toMatchObject({
           id: memberGuid,
           error: errorReason,
           status: ConnectionStatus.REJECTED
         })
-
-        expect(response.storageClient).toBeTruthy()
-
-        clearRedisMock()
       })
 
       it('returns with connected status if success', async () => {

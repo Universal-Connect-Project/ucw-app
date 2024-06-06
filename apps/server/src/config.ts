@@ -22,7 +22,6 @@ const keysToPullFromEnv = [
   'SophtronClientSecret',
 
   'Demo',
-  'DefaultProvider',
   'PORT',
 
   'HostUrl',

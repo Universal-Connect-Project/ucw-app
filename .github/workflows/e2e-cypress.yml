@@ -23,6 +23,16 @@ jobs:
           discovery.type: single-node
           xpack.security.enabled: false
 
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 20s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - '${{vars.REDIS_PORT}}:${{vars.REDIS_PORT}}'
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,6 +49,8 @@ jobs:
           node-version: 'lts/*'
           check-latest: true
       - run: npm ci
+
+      - run: npm run copyTestPreferences
 
       - name: 'Create env file'
         run: |
@@ -72,7 +84,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           project: apps/server
-          start: npm run dev:cypress
+          start: npm run dev:e2e
           wait-on: 'http://localhost:8080, http://localhost:9200'
 
       - name: Upload screenshots

@@ -6,7 +6,7 @@ import type {
   MemberResponse
 } from '../serviceClients/mxClient'
 import { Configuration, MxPlatformApiFactory } from '../serviceClients/mxClient'
-import { StorageClient } from '../serviceClients/storageClient'
+import { get, set } from '../serviceClients/storageClient/redis'
 import type {
   Challenge,
   Connection,
@@ -28,7 +28,7 @@ interface HandleOauthReponseRequest {
   error_reason: string
 }
 
-function mapCredentials (mxCreds: CredentialsResponseBody): Credential[] {
+function mapCredentials(mxCreds: CredentialsResponseBody): Credential[] {
   if (mxCreds.credentials != null) {
     return mxCreds.credentials.map((item) => ({
       id: item.guid,
@@ -41,7 +41,7 @@ function mapCredentials (mxCreds: CredentialsResponseBody): Credential[] {
   }
 }
 
-function fromMxMember (member: MemberResponse, provider: string): Connection {
+function fromMxMember(member: MemberResponse, provider: string): Connection {
   return {
     id: member.guid,
     cur_job_id: member.guid,
@@ -58,11 +58,9 @@ export class MxApi implements ProviderApiClient {
   apiClient: ReturnType<typeof MxPlatformApiFactory>
   mxConfig: any
   provider: string
-  db: StorageClient
 
-  constructor (config: any, int: boolean) {
-    const { mxInt, mxProd, storageClient } = config
-    this.db = storageClient
+  constructor(config: any, int: boolean) {
+    const { mxInt, mxProd } = config
     this.provider = int ? 'mx_int' : 'mx'
     this.mxConfig = int ? mxInt : mxProd
 
@@ -78,7 +76,7 @@ export class MxApi implements ProviderApiClient {
     )
   }
 
-  async GetInstitutionById (id: string): Promise<Institution> {
+  async GetInstitutionById(id: string): Promise<Institution> {
     const res = await this.apiClient.readInstitution(id)
     // TODO: if this is 401 we should throw an error
     const institution = res.data.institution
@@ -92,14 +90,14 @@ export class MxApi implements ProviderApiClient {
     }
   }
 
-  async ListInstitutionCredentials (
+  async ListInstitutionCredentials(
     institutionId: string
   ): Promise<Credential[]> {
     const res = await this.apiClient.listInstitutionCredentials(institutionId)
     return mapCredentials(res.data)
   }
 
-  async ListConnections (userId: string): Promise<Connection[]> {
+  async ListConnections(userId: string): Promise<Connection[]> {
     const res = await this.apiClient.listMembers(userId)
 
     return (
@@ -108,7 +106,7 @@ export class MxApi implements ProviderApiClient {
     )
   }
 
-  async ListConnectionCredentials (
+  async ListConnectionCredentials(
     memberId: string,
     userId: string
   ): Promise<Credential[]> {
@@ -116,7 +114,7 @@ export class MxApi implements ProviderApiClient {
     return mapCredentials(res.data)
   }
 
-  async CreateConnection (
+  async CreateConnection(
     request: CreateConnectionRequest,
     userId: string
   ): Promise<Connection> {
@@ -180,11 +178,11 @@ export class MxApi implements ProviderApiClient {
     return fromMxMember(member, this.provider)
   }
 
-  async DeleteConnection (id: string, userId: string): Promise<void> {
+  async DeleteConnection(id: string, userId: string): Promise<void> {
     await this.apiClient.deleteManagedMember(id, userId)
   }
 
-  async UpdateConnection (
+  async UpdateConnection(
     request: UpdateConnectionRequest,
     userId: string
   ): Promise<Connection> {
@@ -212,7 +210,7 @@ export class MxApi implements ProviderApiClient {
     return fromMxMember(ret.data.member, this.provider)
   }
 
-  async UpdateConnectionInternal (
+  async UpdateConnectionInternal(
     request: UpdateConnectionRequest,
     userId: string
   ): Promise<Connection> {
@@ -231,7 +229,7 @@ export class MxApi implements ProviderApiClient {
     return fromMxMember(member, this.provider)
   }
 
-  async GetConnectionById (
+  async GetConnectionById(
     connectionId: string,
     userId: string
   ): Promise<Connection> {
@@ -248,7 +246,7 @@ export class MxApi implements ProviderApiClient {
     }
   }
 
-  async GetConnectionStatus (
+  async GetConnectionStatus(
     memberId: string,
     jobId: string,
     singleAccountSelect: boolean,
@@ -257,7 +255,7 @@ export class MxApi implements ProviderApiClient {
     const res = await this.apiClient.readMemberStatus(memberId, userId)
     const member = res.data.member
     let status = member.connection_status
-    const oauthStatus = await this.db.get(member.guid)
+    const oauthStatus = await get(member.guid)
     if (oauthStatus?.error != null) {
       status = ConnectionStatus[ConnectionStatus.REJECTED]
     }
@@ -314,7 +312,7 @@ export class MxApi implements ProviderApiClient {
     }
   }
 
-  async AnswerChallenge (
+  async AnswerChallenge(
     request: UpdateConnectionRequest,
     jobId: string,
     userId: string
@@ -330,7 +328,7 @@ export class MxApi implements ProviderApiClient {
     return true
   }
 
-  async ResolveUserId (userId: string): Promise<string> {
+  async ResolveUserId(userId: string): Promise<string> {
     logger.debug('Resolving UserId: ' + userId)
     const res = await this.apiClient.listUsers(1, 10, userId)
     const mxUser = res.data?.users?.find((u) => u.id === userId)
@@ -349,21 +347,19 @@ export class MxApi implements ProviderApiClient {
     return userId
   }
 
-  static async HandleOauthResponse (
+  static async HandleOauthResponse(
     request: HandleOauthReponseRequest
   ): Promise<Connection> {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const { member_guid, status, error_reason } = request
-    const db = new StorageClient()
     if (status === 'error') {
-      await db.set(member_guid, {
+      await set(member_guid, {
         error: true,
         error_reason
       })
     }
     const ret = {
       id: member_guid,
-      storageClient: db,
       error: error_reason,
       status:
         status === 'error'

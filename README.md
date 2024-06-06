@@ -4,6 +4,17 @@ This repo is a monorepo, which contains the pieces that make up the Universal Co
 application which anyone can clone and self-host as a way to serve the connect widget via a url which can then be loaded
 into an iframe.
 
+## Cached data
+
+This widget runs off of cached data, so that it doesn't rely on any UCP hosted services to be able to function.
+
+In `./apps/server/cachedDefaults` you will find files that are loaded into a redis cache. In the future these files will be used as a backup in case UCP hosted services are down.
+
+The following files need to be there for the widget service to function
+
+1. Preferences
+1. Institutions
+
 ## Getting Started (in production)
 
 To get started: clone the repo, follow the steps in [Getting Started](#getting-started-in-development) and
@@ -36,6 +47,7 @@ resulting in the error. To fix this, you will need to run `docker logout` from y
 1. Run `npm ci` from the root directory
 1. Run `cp ./.env.example ./.env`
 1. Run `cp ./apps/server/.env.example ./apps/server/.env`
+1. Run `cp ./apps/server/cachedDefaults/preferences.example.json ./apps/server/cachedDefaults/preferences.json` and modify the preferences
 1. Follow [Initial Setup](#initial-setup) (below) for setting-up some required environment variables
 1. Install [Docker](#docker), a dependency for the institution search feature to work
 1. Finally, run: `npm run dev`
@@ -47,9 +59,11 @@ Please remember that secrets are passed through environment variables instead of
 **Use the provided `.env` files.**
 
 ## Docker
+
 Docker is required to be installed on your local development system.
 
 Compatible options are:
+
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [Rancher Desktop](https://rancherdesktop.io/)
 
