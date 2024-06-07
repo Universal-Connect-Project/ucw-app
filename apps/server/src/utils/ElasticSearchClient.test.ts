@@ -167,9 +167,7 @@ describe('search', () => {
               minimum_should_match: 1,
               must_not: {
                 terms: {
-                  'ucp_id.keyword': [
-                    'UCP-60155b7292895ed'
-                  ]
+                  'ucp_id.keyword': testPreferences.hiddenInstitutions
                 }
               }
             }
