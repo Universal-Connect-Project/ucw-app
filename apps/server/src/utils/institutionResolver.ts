@@ -71,7 +71,9 @@ export async function resolveInstitutionProvider(
     }
   }
 
-  debug(`Resolving institution: ${institutionId} to provider: ${provider}`)
+  debug(
+    `Resolving institution: ${institutionId} to provider: ${provider} available providers: ${JSON.stringify(providers)}`
+  )
 
   return {
     id: institutionProvider.id,

@@ -19,9 +19,9 @@ describe('preferences', () => {
 
   it('uses local preferences to hide institutions when searching', () => {
     cy.visitAgg()
-    cy.findByPlaceholderText('Search').type('Chase')
+    cy.findByPlaceholderText('Search').type('cando')
 
-    cy.findByText('Chase UCard').should('exist')
-    cy.findByText('Chase Bank').should('not.exist')
+    cy.findByText('First State Bank of Cando').should('exist')
+    cy.findByText('CanDo CU').should('not.exist')
   })
 })
