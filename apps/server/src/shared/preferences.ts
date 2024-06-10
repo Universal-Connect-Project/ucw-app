@@ -1,8 +1,12 @@
 import { PREFERENCES_REDIS_KEY } from '../serviceClients/storageClient/constants'
 import { get } from '../serviceClients/storageClient/redis'
 
+type Provider = 'mx' | 'sophtron'
+
 export interface Preferences {
-  defaultProvider?: 'mx' | 'sophtron'
+  defaultProvider?: Provider
+
+  supportedProviders?: Provider[]
 
   defaultProviderVolume?: Record<string, number>
 

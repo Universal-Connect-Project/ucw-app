@@ -1,6 +1,11 @@
 {
   "defaultProvider": "provider1",
 
+  "supportedProviders": [
+    "mx",
+    "sophtron"
+  ],
+
   "defaultProviderVolume": {
     "provider1": 70,
     "provider2": 30
