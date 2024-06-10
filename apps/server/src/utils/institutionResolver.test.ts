@@ -1,11 +1,8 @@
+import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
 import * as preferences from '../shared/preferences'
 import { elasticSearchInstitutionData } from '../test/testData/institution'
 import { ElasticSearchMock } from '../utils/ElasticSearchClient'
-import {
-  getAvailableProviders,
-  resolveInstitutionProvider
-} from './institutionResolver'
-import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
+import { resolveInstitutionProvider } from './institutionResolver'
 
 const mockInstitutionWithMxAndSophtron = (institutionId = 'test') => {
   ElasticSearchMock.add(
@@ -60,64 +57,12 @@ describe('institutionResolver', () => {
       .mockResolvedValue(testPreferences as preferences.Preferences)
   })
 
-  describe('getAvailableProviders', () => {
-    it('gets mx and sophtron providers', () => {
-      const expectedProviders = ['mx', 'sophtron']
-      const institution = {
-        ...elasticSearchInstitutionData,
-        mx: {
-          ...elasticSearchInstitutionData.mx,
-          id: 'mx_bank'
-        },
-        sophtron: {
-          ...elasticSearchInstitutionData.sophtron,
-          id: 'sophtron_bank'
-        }
-      }
-
-      expect(getAvailableProviders(institution)).toEqual(expectedProviders)
-    })
-
-    // This is temporary until we fully support finicity and akoya
-    it('only returns mx and sophtron even if finbank and akoya are configured', () => {
-      const institution = {
-        ...elasticSearchInstitutionData,
-        mx: {
-          ...elasticSearchInstitutionData.mx,
-          id: 'mx_bank'
-        },
-        sophtron: {
-          ...elasticSearchInstitutionData.sophtron,
-          id: 'sophtron_bank'
-        },
-        finicity: {
-          ...elasticSearchInstitutionData.finicity,
-          id: 'finicity_bank'
-        },
-        akoya: {
-          ...elasticSearchInstitutionData.akoya,
-          id: 'akoya_bank'
-        }
-      }
-      const expectedProviders = ['mx', 'sophtron']
-
-      expect(getAvailableProviders(institution)).toEqual(expectedProviders)
-    })
-
-    it('gets mx provider', () => {
-      const institution = elasticSearchInstitutionData
-      const expectedProviders = ['mx']
-
-      expect(getAvailableProviders(institution)).toEqual(expectedProviders)
-    })
-  })
-
   describe('resolveInstitutionProvider', () => {
     beforeEach(() => {
       ElasticSearchMock.clearAll()
     })
 
-    it("resolves to mx if it's the only option", async () => {
+    it('resolves to mx_int if its a test bank and mx is the provider', async () => {
       ElasticSearchMock.add(
         {
           method: 'GET',
@@ -159,21 +104,8 @@ describe('institutionResolver', () => {
       expect(institution.provider).toEqual('sophtron')
     })
 
-    it('resolves to mx_int if its a test bank and mx is the provider', async () => {
-      ElasticSearchMock.add(
-        {
-          method: 'GET',
-          path: '/institutions/_doc/test'
-        },
-        () => {
-          return {
-            _source: {
-              ...elasticSearchInstitutionData,
-              is_test_bank: false
-            }
-          }
-        }
-      )
+    it('resolves to mx if its the only option', async () => {
+      mockInstitutionWithMx('test')
 
       const institution = await resolveInstitutionProvider('test')
       expect(institution.provider).toEqual('mx')
@@ -306,6 +238,38 @@ describe('institutionResolver', () => {
       expect((await resolveInstitutionProvider('test')).provider).toEqual(
         'sophtron'
       )
+    })
+
+    it('returns undefined if mx is the only option but sophtron is the only supported provider', async () => {
+      jest.spyOn(preferences, 'getPreferences').mockResolvedValue({
+        ...(testPreferences as preferences.Preferences),
+        supportedProviders: ['sophtron']
+      })
+
+      mockInstitutionWithMx()
+
+      const institution = await resolveInstitutionProvider('test')
+      expect(institution.provider).toEqual(undefined)
+    })
+
+    it('returns a provider if that provider is the only supported provider', async () => {
+      jest.spyOn(preferences, 'getPreferences').mockResolvedValue({
+        ...(testPreferences as preferences.Preferences),
+        supportedProviders: ['mx']
+      })
+
+      mockInstitutionWithMxAndSophtron()
+
+      const institution = await resolveInstitutionProvider('test')
+      expect(institution.provider).toEqual('mx')
+
+      jest.spyOn(preferences, 'getPreferences').mockResolvedValue({
+        ...(testPreferences as preferences.Preferences),
+        supportedProviders: ['sophtron']
+      })
+
+      const institution2 = await resolveInstitutionProvider('test')
+      expect(institution2.provider).toEqual('sophtron')
     })
   })
 })

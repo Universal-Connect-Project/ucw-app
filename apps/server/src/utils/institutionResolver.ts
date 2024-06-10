@@ -1,4 +1,3 @@
-import { getPreferences } from '../shared/preferences'
 import { debug } from '../infra/logger'
 import type {
   CachedInstitution,
@@ -6,6 +5,7 @@ import type {
   Provider,
   ResolvedInstitution
 } from '../shared/contract'
+import { getPreferences } from '../shared/preferences'
 import { getInstitution } from './ElasticSearchClient'
 
 const getProviderByVolume = (volumeMap: Record<string, number>): Provider => {
@@ -34,11 +34,13 @@ export async function resolveInstitutionProvider(
   institutionId: string
 ): Promise<ResolvedInstitution> {
   const institution = await getInstitution(institutionId)
-  const providers: Provider[] = getAvailableProviders(institution)
+  const preferences = await getPreferences()
+  const providers: Provider[] = getAvailableProviders(
+    institution,
+    preferences.supportedProviders
+  )
 
   let provider: Provider
-
-  const preferences = await getPreferences()
 
   const potentialResolvers = [
     () =>
@@ -76,22 +78,26 @@ export async function resolveInstitutionProvider(
   )
 
   return {
-    id: institutionProvider.id,
-    url: institution.url,
-    name: institution.name,
-    logo_url: institution.logo,
+    id: institutionProvider?.id,
+    url: institution?.url,
+    name: institution?.name,
+    logo_url: institution?.logo,
     provider: provider as Provider
   }
 }
 
-export function getAvailableProviders(
-  institution: CachedInstitution
+function getAvailableProviders(
+  institution: CachedInstitution,
+  supportedProviders?: Provider[]
 ): Provider[] {
   const providers = []
-  if (institution.mx.id != null) {
+  if (supportedProviders.includes('mx') && institution.mx.id != null) {
     providers.push('mx')
   }
-  if (institution.sophtron.id != null) {
+  if (
+    supportedProviders.includes('sophtron') &&
+    institution.sophtron.id != null
+  ) {
     providers.push('sophtron')
   }
 
