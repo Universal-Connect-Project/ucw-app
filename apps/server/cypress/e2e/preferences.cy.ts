@@ -25,9 +25,12 @@ describe('preferences', () => {
     cy.findByText('CanDo CU').should('not.exist')
   })
 
-  it('doesnt show mx banks when mx is not a supported provider', async () => {
+  it('filters out institutions which are not supported by a provider in your list of supported providers.', async () => {
     cy.visitAgg()
 
+    // "Unsupported Provider" is a test institution included in the institution list solely for this test
+    // it will never show in search as long as the supportedProviders preference works because it doesn't
+    // have any providers configured.
     cy.findByPlaceholderText('Search').type('Unsupported Provider')
 
     cy.findByText('0 search results').should('exist')
