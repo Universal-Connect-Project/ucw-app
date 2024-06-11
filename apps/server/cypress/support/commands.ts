@@ -1,7 +1,4 @@
 import '@testing-library/cypress/add-commands'
-// import { PREFERENCES_REDIS_KEY } from '../../src/serviceClients/storageClient/constants'
-// import { Preferences } from '../../src/shared/preferences'
-// import redis = require('redis')
 
 // ***********************************************
 // This example commands.ts shows you how to
