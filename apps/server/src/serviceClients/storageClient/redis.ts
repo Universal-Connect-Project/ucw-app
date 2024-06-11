@@ -1,9 +1,9 @@
-import { createClient } from 'redis'
-import config from '../../config'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
+import { createClient } from 'redis'
+import config from '../../config'
 
-import { info, debug, error } from '../../infra/logger'
+import { debug, error, info } from '../../infra/logger'
 import { PREFERENCES_REDIS_KEY } from './constants'
 
 const redisClient = createClient({

@@ -64,7 +64,6 @@ export async function search(searchTerm: string): Promise<any[]> {
   const hiddenInstitutions = preferences?.hiddenInstitutions || []
   const supportedProviders = preferences?.supportedProviders || []
 
-  console.log('hidden', hiddenInstitutions, '\n\n')
   const searchResults: estypes.SearchResponseBody =
     await ElasticsearchClient.search({
       index: 'institutions',
