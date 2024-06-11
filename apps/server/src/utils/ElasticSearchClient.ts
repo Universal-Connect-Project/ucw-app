@@ -7,7 +7,7 @@ import config from '../config'
 import { info } from '../infra/logger'
 
 import type { CachedInstitution } from 'src/shared/contract'
-import { getPreferences } from '../shared/preferences'
+import { getPreferences, type Provider } from '../shared/preferences'
 
 function getInstitutionFilePath() {
   return resolve(__dirname, '../../cachedDefaults/ucwInstitutionsMapping.json')
@@ -60,7 +60,9 @@ export async function reIndexElasticSearch() {
 }
 
 export async function search(searchTerm: string): Promise<any[]> {
-  const hiddenInstitutions = (await getPreferences())?.hiddenInstitutions || []
+  const preferences = await getPreferences()
+  const hiddenInstitutions = preferences?.hiddenInstitutions || []
+  const supportedProviders = preferences?.supportedProviders || []
 
   const searchResults: estypes.SearchResponseBody =
     await ElasticsearchClient.search({
@@ -68,43 +70,9 @@ export async function search(searchTerm: string): Promise<any[]> {
       body: {
         query: {
           bool: {
-            should: [
-              {
-                match: {
-                  name: {
-                    query: searchTerm,
-                    boost: 1.5
-                  }
-                }
-              },
-              {
-                match: {
-                  keywords: {
-                    query: searchTerm,
-                    boost: 1.4
-                  }
-                }
-              },
-              {
-                fuzzy: {
-                  name: {
-                    value: searchTerm.toLowerCase(),
-                    fuzziness: 'AUTO',
-                    boost: 1,
-                    max_expansions: 50
-                  }
-                }
-              },
-              {
-                wildcard: {
-                  name: {
-                    value: `${searchTerm}*`,
-                    boost: 0.8
-                  }
-                }
-              }
-            ],
+            should: fuzzySearchTermQuery(searchTerm),
             minimum_should_match: 1,
+            must: mustBeSupportedProviderQuery(supportedProviders),
             must_not: {
               terms: {
                 'ucp_id.keyword': hiddenInstitutions
@@ -121,6 +89,62 @@ export async function search(searchTerm: string): Promise<any[]> {
   )
 }
 
+function fuzzySearchTermQuery(searchTerm: string) {
+  return [
+    {
+      match: {
+        name: {
+          query: searchTerm,
+          boost: 1.5
+        }
+      }
+    },
+    {
+      match: {
+        keywords: {
+          query: searchTerm,
+          boost: 1.4
+        }
+      }
+    },
+    {
+      fuzzy: {
+        name: {
+          value: searchTerm.toLowerCase(),
+          fuzziness: 'AUTO',
+          boost: 1,
+          max_expansions: 50
+        }
+      }
+    },
+    {
+      wildcard: {
+        name: {
+          value: `${searchTerm}*`,
+          boost: 0.8
+        }
+      }
+    }
+  ]
+}
+
+function mustBeSupportedProviderQuery(supportedProviders: Provider[]) {
+  const providerQueryTerms = supportedProviders.map((provider) => {
+    return {
+      exists: {
+        field: `${provider}.id`
+      }
+    }
+  })
+
+  return {
+    bool: {
+      should: providerQueryTerms,
+      minimum_should_match: 1
+    }
+  }
+}
+
 export async function getInstitution(id: string): Promise<CachedInstitution> {
   const institutionResponse = await ElasticsearchClient.get({
     id,
@@ -131,7 +155,7 @@ export async function getInstitution(id: string): Promise<CachedInstitution> {
 }
 
 export async function getRecommendedInstitutions(): Promise<
-CachedInstitution[]
+  CachedInstitution[]
 > {
   const recommendedInstitutions = (await getPreferences())
     ?.recommendedInstitutions

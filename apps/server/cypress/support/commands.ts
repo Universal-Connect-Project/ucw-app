@@ -37,7 +37,6 @@ export {}
 declare global {
   namespace Cypress {
     interface Chainable {
-      setAuthCode: () => Chainable<void>
       visitAgg: () => Chainable<void>
     }
   }

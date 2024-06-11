@@ -20,7 +20,7 @@ function startDoc() {
 
 function logDoc(doc) {
   if (
-    levels[config.LogLevel.toLowerCase()] > levels[doc.Level.toLowerCase()] ||
+    levels[config.LogLevel?.toLowerCase()] > levels[doc.Level.toLowerCase()] ||
     process.env.NODE_ENV === 'test'
   ) {
     return
