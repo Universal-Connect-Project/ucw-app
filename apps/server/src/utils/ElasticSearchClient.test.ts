@@ -165,9 +165,26 @@ describe('search', () => {
                 }
               ],
               minimum_should_match: 1,
+              must: {
+                bool: {
+                  should: [
+                    {
+                      exists: {
+                        field: 'mx.id'
+                      }
+                    },
+                    {
+                      exists: {
+                        field: 'sophtron.id'
+                      }
+                    }
+                  ],
+                  minimum_should_match: 1
+                }
+              },
               must_not: {
                 terms: {
-                  'ucp_id.keyword': testPreferences.hiddenInstitutions
+                  'ucp_id.keyword': ['UCP-2e2b825bd378172']
                 }
               }
             }
