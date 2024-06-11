@@ -1,7 +1,7 @@
 import { PREFERENCES_REDIS_KEY } from '../serviceClients/storageClient/constants'
 import { get } from '../serviceClients/storageClient/redis'
 
-type Provider = 'mx' | 'sophtron'
+export type Provider = 'mx' | 'sophtron'
 
 export interface Preferences {
   defaultProvider?: Provider
@@ -19,6 +19,7 @@ export interface Preferences {
 
 export const getPreferences = async (): Promise<Preferences> => {
   const preferencesGotten = await get(PREFERENCES_REDIS_KEY)
+  const test = await get('test')
 
   return preferencesGotten
 }

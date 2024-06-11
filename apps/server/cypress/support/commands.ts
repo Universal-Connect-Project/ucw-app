@@ -1,4 +1,7 @@
 import '@testing-library/cypress/add-commands'
+// import { PREFERENCES_REDIS_KEY } from '../../src/serviceClients/storageClient/constants'
+// import { setNoExpiration } from '../../src/serviceClients/storageClient/redis'
+// import { Preferences } from '../../src/shared/preferences'
 
 // ***********************************************
 // This example commands.ts shows you how to
@@ -32,13 +35,18 @@ Cypress.Commands.add('visitAgg', () => {
   cy.visit('http://localhost:8080/?job_type=agg')
 })
 
+Cypress.Commands.add('updatePreferences', (preferences) => {
+  // await setNoExpiration(PREFERENCES_REDIS_KEY, preferences.toString())
+  // await setNoExpiration('test', 'hi')
+})
+
 export {}
 
 declare global {
   namespace Cypress {
     interface Chainable {
-      setAuthCode: () => Chainable<void>
       visitAgg: () => Chainable<void>
+      updatePreferences: (preferences: Preferences) => Promise<Chainable<void>>
     }
   }
 }
