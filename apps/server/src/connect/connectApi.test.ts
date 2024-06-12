@@ -1,5 +1,5 @@
-import { ConnectApi } from './connectApi'
 import { MxApi } from '../providers/mx'
+import { ConnectApi } from './connectApi'
 
 const connectApi = new ConnectApi({
   context: {
@@ -29,7 +29,7 @@ describe('loadInstitutions', () => {
       name: 'MX Bank (Oauth)',
       url: 'https://mx.com',
       logo_url:
-        'https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
+        'https://s3.amazonaws.com/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
       supports_oauth: true
     },
     {
@@ -37,7 +37,7 @@ describe('loadInstitutions', () => {
       name: 'MX Bank (Oauth)',
       url: 'https://mx.com',
       logo_url:
-        'https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
+        'https://s3.amazonaws.com/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
       supports_oauth: true
     }
   ]
@@ -57,7 +57,7 @@ describe('loadInstitutionByUcpId', () => {
       name: 'MX Bank (Oauth)',
       url: 'https://mx.com',
       logo_url:
-        'https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
+        'https://s3.amazonaws.com/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
       instructional_data: {},
       credentials: [] as any[],
       supports_oauth: true,
@@ -79,7 +79,7 @@ describe('loadPopularInstitutions', () => {
       name: 'MX Bank (Oauth)',
       url: 'https://mx.com',
       logo_url:
-        'https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
+        'https://s3.amazonaws.com/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
       supports_oauth: true
     }
   ]

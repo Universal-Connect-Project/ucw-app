@@ -1,4 +1,5 @@
 import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
+import config from '../config'
 import * as preferences from '../shared/preferences'
 import { elasticSearchInstitutionData } from '../test/testData/institution'
 import {
@@ -182,11 +183,13 @@ describe('search', () => {
                   minimum_should_match: 1
                 }
               },
-              must_not: {
-                terms: {
-                  'ucp_id.keyword': testPreferences.hiddenInstitutions
+              must_not: [
+                {
+                  terms: {
+                    'ucp_id.keyword': testPreferences.hiddenInstitutions
+                  }
                 }
-              }
+              ]
             }
           },
           size: 20
@@ -208,6 +211,100 @@ describe('search', () => {
     const results = await search('MX Bank')
 
     expect(results).toEqual([elasticSearchInstitutionData])
+  })
+
+  it('excludes test banks in ES search when Env is prod', async () => {
+    config.Env = 'prod'
+    ElasticSearchMock.add({
+      method: ['GET', 'POST'],
+      path: ['/_search', '/institutions/_search'],
+      body: {
+        query: {
+          bool: {
+            should: [
+              {
+                match: {
+                  name: {
+                    query: 'MX Bank',
+                    boost: 1.5
+                  }
+                }
+              },
+              {
+                match: {
+                  keywords: {
+                    query: 'MX Bank',
+                    boost: 1.4
+                  }
+                }
+              },
+              {
+                fuzzy: {
+                  name: {
+                    value: 'mx bank',
+                    fuzziness: 'AUTO',
+                    boost: 1,
+                    max_expansions: 50
+                  }
+                }
+              },
+              {
+                wildcard: {
+                  name: {
+                    value: 'MX Bank*',
+                    boost: 0.8
+                  }
+                }
+              }
+            ],
+            minimum_should_match: 1,
+            must: {
+              bool: {
+                should: [
+                  {
+                    exists: {
+                      field: 'mx.id'
+                    }
+                  },
+                  {
+                    exists: {
+                      field: 'sophtron.id'
+                    }
+                  }
+                ],
+                minimum_should_match: 1
+              }
+            },
+            must_not: [
+              {
+                terms: {
+                  'ucp_id.keyword': testPreferences.hiddenInstitutions
+                }
+              },
+              {
+                term: {
+                  is_test_bank: true
+                }
+              }
+            ]
+          }
+        },
+        size: 20
+      }
+    }, (parms) => {
+      return {
+        hits: {
+          hits: [
+            {
+              _source: elasticSearchInstitutionData
+            }
+          ]
+        }
+      }
+    })
+
+    await search('MX Bank')
+    config.Env = 'test'
   })
 
   it('does not break when ES returns an empty array', async () => {

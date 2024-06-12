@@ -73,11 +73,7 @@ export async function search(searchTerm: string): Promise<any[]> {
             should: fuzzySearchTermQuery(searchTerm),
             minimum_should_match: 1,
             must: mustBeSupportedProviderQuery(supportedProviders),
-            must_not: {
-              terms: {
-                'ucp_id.keyword': hiddenInstitutions
-              }
-            }
+            must_not: buildMustNotQuery(hiddenInstitutions)
           }
         },
         size: 20
@@ -145,6 +141,26 @@ function mustBeSupportedProviderQuery(supportedProviders: Provider[]) {
   }
 }
 
+function buildMustNotQuery(hiddenInstitutions: string[]): any[] {
+  const mustNotClauses = []
+
+  mustNotClauses.push({
+    terms: {
+      'ucp_id.keyword': hiddenInstitutions
+    }
+  })
+
+  if (!['pre', 'test', 'dev', 'staging'].includes(config.Env)) {
+    mustNotClauses.push({
+      term: {
+        is_test_bank: true
+      }
+    })
+  }
+
+  return mustNotClauses
+}
+
 export async function getInstitution(id: string): Promise<CachedInstitution> {
   const institutionResponse = await ElasticsearchClient.get({
     id,
@@ -155,7 +171,7 @@ export async function getInstitution(id: string): Promise<CachedInstitution> {
 }
 
 export async function getRecommendedInstitutions(): Promise<
-  CachedInstitution[]
+CachedInstitution[]
 > {
   const recommendedInstitutions = (await getPreferences())
     ?.recommendedInstitutions
