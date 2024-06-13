@@ -133,7 +133,7 @@ export class MxApi implements ProviderApiClient {
     const memberRes = await this.apiClient.createMember(userId, {
       referral_source: 'APP', // request.is_oauth ? 'APP' : '',
       client_redirect_url: request.is_oauth
-        ? `${config.HostUrl}/oauth/${this.provider}/redirect_from`
+        ? `${config.HostUrl}/oauth_redirect`
         : null,
       member: {
         skip_aggregation: request.skip_aggregation || jobType !== 'aggregate',
