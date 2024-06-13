@@ -36,6 +36,10 @@ export default function (app) {
     next()
   })
 
+  app.get('/oauth_redirect', (req, res) => {
+    res.sendFile(path.join(__dirname, '../infra/http/oauth.html'))
+  })
+
   app.post('/analytics*', async (req, res) => {
     if (disableAnalytics) {
       res.sendStatus(200)

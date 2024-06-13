@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw'
-import { server } from '../test/testServer'
-import { institutionData } from '../test/testData/institution'
-import { EXTENDED_HISTORY_NOT_SUPPORTED_MSG, MxApi } from './mx'
+import config from '../config'
+import { get, set } from '../serviceClients/storageClient/redis'
+import { ChallengeType, ConnectionStatus } from '../shared/contract'
 import {
   AGGREGATE_MEMBER_PATH,
   ANSWER_CHALLENGE_PATH,
@@ -15,6 +15,7 @@ import {
   UPDATE_CONNECTION_PATH,
   VERIFY_MEMBER_PATH
 } from '../test/handlers'
+import { institutionData } from '../test/testData/institution'
 import { institutionCredentialsData } from '../test/testData/institutionCredentials'
 import {
   aggregateMemberMemberData,
@@ -26,10 +27,9 @@ import {
   memberStatusData,
   verifyMemberData
 } from '../test/testData/members'
-import config from '../config'
-import { ChallengeType, ConnectionStatus } from '../shared/contract'
 import { createUserData, listUsersData } from '../test/testData/users'
-import { get, set } from '../serviceClients/storageClient/redis'
+import { server } from '../test/testServer'
+import { EXTENDED_HISTORY_NOT_SUPPORTED_MSG, MxApi } from './mx'
 
 const mxApiInt = new MxApi(
   {
@@ -53,7 +53,7 @@ const mxApi = new MxApi(
 
 const institutionResponse = institutionData.institution
 
-const clientRedirectUrl = `${config.HostUrl}/oauth/mx/redirect_from`
+const clientRedirectUrl = `${config.HostUrl}/oauth_redirect`
 
 const testCredential = {
   id: 'testCredentialId',

@@ -67,6 +67,8 @@ jobs:
           echo FINICITYSECRET=${{ secrets.FINICITY_SECRET }} >> ${ENV_FILE_PATH}
           echo FINICITYAPPKEY=${{ secrets.FINICITY_APP_KEY }} >> ${ENV_FILE_PATH}
 
+          echo HostUrl=http://localhost:8080 >> ${ENV_FILE_PATH}
+
           cat ${ENV_FILE_PATH}
 
       - name: Install Playwright Browsers
