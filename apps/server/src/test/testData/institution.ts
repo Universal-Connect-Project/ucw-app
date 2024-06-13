@@ -67,7 +67,7 @@ export const finicityInsitutionData = {
 export const elasticSearchInstitutionData: CachedInstitution = {
   name: 'MX Bank (Oauth)',
   keywords: 'Gringotts, MX Bank, oauth',
-  logo: 'https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
+  logo: 'https://s3.amazonaws.com/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
   url: 'https://mx.com',
   ucp_id: 'UCP-da107e6d0da7779',
   is_test_bank: true,
