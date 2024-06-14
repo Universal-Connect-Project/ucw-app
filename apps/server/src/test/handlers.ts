@@ -31,7 +31,7 @@ export const FINICITY_AUTH_PATH = `${FINICITY_BASE_PATH}/aggregation/v2/partners
 export const FINICITY_CONNECT_PATH = `${FINICITY_BASE_PATH}/connect/v2/generate/lite`
 export const FINICITY_CONNECT_LITE_URL = 'https://testconnect.com'
 export const DELETE_CUSTOMER_PATH = `${FINICITY_BASE_PATH}/aggregation/v1/customers/:id`
-export const READ_CUSTOMER_PATH = `${FINICITY_BASE_PATH}/aggregation/v1/customers?username=:id`
+export const READ_CUSTOMER_PATH = `${FINICITY_BASE_PATH}/aggregation/v1/customers`
 export const CREATE_CUSTOMER_PATH = `${FINICITY_BASE_PATH}/aggregation/v2/customers/testing`
 
 const handlers = [

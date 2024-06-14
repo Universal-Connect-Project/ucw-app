@@ -1,4 +1,5 @@
 import { http, HttpResponse } from 'msw'
+import { get, set } from '../serviceClients/storageClient/redis'
 import { ConnectionStatus } from '../shared/contract'
 import {
   DELETE_CUSTOMER_PATH,
@@ -9,7 +10,6 @@ import { finicityInsitutionData } from '../test/testData/institution'
 import { finicityReadCustomerData } from '../test/testData/users'
 import { server } from '../test/testServer'
 import { FinicityApi } from './finicity'
-import { get, set } from '../serviceClients/storageClient/redis'
 
 const finicityApi = new FinicityApi({
   finicityProd: {
