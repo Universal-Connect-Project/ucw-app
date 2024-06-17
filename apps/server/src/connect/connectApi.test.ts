@@ -20,7 +20,7 @@ const mxApiClient = new MxAdapter(
   false
 )
 
-connectApi.providerApiClient = mxApiClient
+connectApi.providerAdapter = mxApiClient
 
 describe('loadInstitutions', () => {
   const expectedInstitutionList = [
@@ -85,7 +85,7 @@ describe('loadPopularInstitutions', () => {
   ]
 
   it('gets the popular institution list', async () => {
-    connectApi.providerApiClient = mxApiClient
+    connectApi.providerAdapter = mxApiClient
 
     const popularInstitutionList = await connectApi.loadPopularInstitutions()
 
