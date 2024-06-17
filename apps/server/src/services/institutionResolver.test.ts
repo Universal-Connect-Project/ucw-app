@@ -1,7 +1,7 @@
 import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
 import * as preferences from '../shared/preferences'
 import { elasticSearchInstitutionData } from '../test/testData/institution'
-import { ElasticSearchMock } from '../utils/ElasticSearchClient'
+import { ElasticSearchMock } from './ElasticSearchClient'
 import { resolveInstitutionProvider } from './institutionResolver'
 
 const mockInstitutionWithMxAndSophtron = (institutionId = 'test') => {

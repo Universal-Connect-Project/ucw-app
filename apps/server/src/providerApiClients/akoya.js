@@ -1,6 +1,6 @@
 import { enc } from 'crypto-js'
-import config from '../../config'
-import { get, post } from '../../infra/http'
+import config from '../config'
+import { get, post } from '../infra/http'
 
 const version = 'v2'
 

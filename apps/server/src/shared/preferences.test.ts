@@ -1,6 +1,6 @@
+import { PREFERENCES_REDIS_KEY } from '../services/storageClient/constants'
+import { get } from '../services/storageClient/redis'
 import { getPreferences } from './preferences'
-import { get } from '../serviceClients/storageClient/redis'
-import { PREFERENCES_REDIS_KEY } from '../serviceClients/storageClient/constants'
 
 describe('preferences', () => {
   it('returns cached local preferences when calling getPreferences', async () => {

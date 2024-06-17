@@ -1,7 +1,5 @@
 import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
 import config from '../config'
-import * as preferences from '../shared/preferences'
-import { elasticSearchInstitutionData } from '../test/testData/institution'
 import {
   ElasticSearchMock,
   getInstitution,
@@ -9,7 +7,9 @@ import {
   initialize,
   reIndexElasticSearch,
   search
-} from '../utils/ElasticSearchClient'
+} from '../services/ElasticSearchClient'
+import * as preferences from '../shared/preferences'
+import { elasticSearchInstitutionData } from '../test/testData/institution'
 
 jest
   .spyOn(preferences, 'getPreferences')

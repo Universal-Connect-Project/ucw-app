@@ -4,8 +4,8 @@ import type {
   CreateConnectionRequest,
   Credential,
   Institution,
-  ProviderApiClient,
-  UpdateConnectionRequest
+  UpdateConnectionRequest,
+  WidgetAdapter
 } from '../shared/contract'
 import {
   ChallengeType,
@@ -14,9 +14,9 @@ import {
 import { mapJobType } from '../utils'
 
 import config from '../config'
-import { debug, trace, error as _error } from '../infra/logger'
-import SophtronClient from '../serviceClients/sophtronClient/v2'
-import SophtronClientV1 from '../serviceClients/sophtronClient'
+import { error as _error, debug, trace } from '../infra/logger'
+import SophtronClientV1 from '../providerApiClients/sophtronClient'
+import SophtronClient from '../providerApiClients/sophtronClient/v2'
 
 // const uuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
@@ -33,7 +33,7 @@ function fromSophtronInstitution (ins: any): Institution | undefined {
   }
 }
 
-export class SophtronApi implements ProviderApiClient {
+export class SophtronAdapter implements WidgetAdapter {
   apiClient: any
   apiClientV1: any
 

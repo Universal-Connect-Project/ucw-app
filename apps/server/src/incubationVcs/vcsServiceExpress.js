@@ -1,6 +1,6 @@
-import { VcsService } from './vcsService'
-import { instrumentation } from '../providers'
+import { instrumentation } from '../adapters'
 import { contextHandler } from '../infra/context.ts'
+import { VcsService } from './vcsService'
 
 export default function (app) {
   app.use(contextHandler)

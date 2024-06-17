@@ -1,4 +1,4 @@
-import { MxApi } from '../providers/mx'
+import { MxAdapter } from '../adapters/mx'
 import { ConnectApi } from './connectApi'
 
 const connectApi = new ConnectApi({
@@ -10,7 +10,7 @@ const connectApi = new ConnectApi({
   }
 })
 
-const mxApiClient = new MxApi(
+const mxApiClient = new MxAdapter(
   {
     mxProd: {
       username: 'testUsername',

@@ -1,13 +1,13 @@
 import { http, HttpResponse } from 'msw'
-import { ConnectionStatus, OAuthStatus } from '../../src/shared/contract'
+import { ConnectionStatus, OAuthStatus } from '../shared/contract'
 import { READ_MEMBER_STATUS_PATH } from '../test/handlers'
 import { server } from '../test/testServer'
-import { ProviderApiBase } from './index'
-import { MxApi } from './mx'
+import { ProviderAdapterBase } from './index'
+import { MxAdapter } from './mx'
 
 const testConnectionId = 'test_connection_id'
 
-const mxApi = new MxApi(
+const mxApi = new MxAdapter(
   {
     mxProd: {
       username: 'testUsername',
@@ -17,7 +17,7 @@ const mxApi = new MxApi(
   false
 )
 
-const providerApiBase = new ProviderApiBase({
+const providerApiBase = new ProviderAdapterBase({
   context: {
     provider: 'mx',
     auth: {
@@ -28,7 +28,7 @@ const providerApiBase = new ProviderApiBase({
   }
 })
 
-describe('ProviderApiBase', () => {
+describe('ProviderAdapterBase', () => {
   describe('getOauthState', () => {
     beforeAll(async () => {
       await providerApiBase.init()

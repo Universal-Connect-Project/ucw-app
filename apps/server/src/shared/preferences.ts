@@ -1,5 +1,5 @@
-import { PREFERENCES_REDIS_KEY } from '../serviceClients/storageClient/constants'
-import { get } from '../serviceClients/storageClient/redis'
+import { PREFERENCES_REDIS_KEY } from '../services/storageClient/constants'
+import { get } from '../services/storageClient/redis'
 
 export type Provider = 'mx' | 'sophtron'
 

@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import { get, set } from '../serviceClients/storageClient/redis'
+import { get, set } from '../services/storageClient/redis'
 import { ConnectionStatus } from '../shared/contract'
 import {
   DELETE_CUSTOMER_PATH,
@@ -9,9 +9,9 @@ import {
 import { finicityInsitutionData } from '../test/testData/institution'
 import { finicityReadCustomerData } from '../test/testData/users'
 import { server } from '../test/testServer'
-import { FinicityApi } from './finicity'
+import { FinicityAdapter } from './finicity'
 
-const finicityApi = new FinicityApi({
+const finicityApi = new FinicityAdapter({
   finicityProd: {
     partnerId: 'testPartnerId',
     appKey: 'testAppKey',
@@ -24,7 +24,7 @@ const finicityApi = new FinicityApi({
 const institutionResponse = finicityInsitutionData.institution
 
 describe('finicity provider', () => {
-  describe('FinicityApi', () => {
+  describe('FinicityAdapter', () => {
     describe('GetInstitutionById', () => {
       it('gets institution data correctly', async () => {
         expect(await finicityApi.GetInstitutionById('testId')).toEqual({

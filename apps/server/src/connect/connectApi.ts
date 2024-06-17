@@ -10,11 +10,11 @@ import {
   type InstitutionSearchResponseItem
 } from '../shared/contract'
 
-import { ProviderApiBase } from '../providers'
+import { ProviderAdapterBase } from '../adapters'
 import {
   getRecommendedInstitutions,
   search
-} from '../utils/ElasticSearchClient'
+} from '../services/ElasticSearchClient'
 
 function mapResolvedInstitution(ins: Institution) {
   return {
@@ -115,7 +115,7 @@ function mapConnection(connection: Connection): Member {
   } as any
 }
 
-export class ConnectApi extends ProviderApiBase {
+export class ConnectApi extends ProviderAdapterBase {
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor
   constructor(req: any) {
     super(req)

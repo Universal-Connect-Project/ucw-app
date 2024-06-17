@@ -1,4 +1,4 @@
-import { PREFERENCES_REDIS_KEY } from '../serviceClients/storageClient/constants'
+import { PREFERENCES_REDIS_KEY } from '../services/storageClient/constants'
 
 let storageObject: Record<string, any> = {}
 
