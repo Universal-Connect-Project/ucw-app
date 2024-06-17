@@ -7,7 +7,7 @@ import { MxAdapter } from './mx'
 
 const testConnectionId = 'test_connection_id'
 
-const mxApi = new MxAdapter(
+const mxAdapter = new MxAdapter(
   {
     mxProd: {
       username: 'testUsername',
@@ -17,7 +17,7 @@ const mxApi = new MxAdapter(
   false
 )
 
-const providerApiBase = new ProviderAdapterBase({
+const providerAdapterBase = new ProviderAdapterBase({
   context: {
     provider: 'mx',
     auth: {
@@ -31,8 +31,8 @@ const providerApiBase = new ProviderAdapterBase({
 describe('ProviderAdapterBase', () => {
   describe('getOauthState', () => {
     beforeAll(async () => {
-      await providerApiBase.init()
-      providerApiBase.providerApiClient = mxApi
+      await providerAdapterBase.init()
+      providerAdapterBase.providerAdapter = mxAdapter
     })
 
     it('returns a pending oauth state', async () => {
@@ -47,7 +47,7 @@ describe('ProviderAdapterBase', () => {
         )
       )
 
-      expect(await providerApiBase.getOauthState(testConnectionId)).toEqual({
+      expect(await providerAdapterBase.getOauthState(testConnectionId)).toEqual({
         oauth_state: {
           guid: 'test_connection_id',
           inbound_member_guid: 'test_connection_id',
@@ -69,7 +69,7 @@ describe('ProviderAdapterBase', () => {
         )
       )
 
-      expect(await providerApiBase.getOauthState(testConnectionId)).toEqual({
+      expect(await providerAdapterBase.getOauthState(testConnectionId)).toEqual({
         oauth_state: {
           guid: 'test_connection_id',
           inbound_member_guid: 'test_connection_id',
@@ -91,7 +91,7 @@ describe('ProviderAdapterBase', () => {
         )
       )
 
-      expect(await providerApiBase.getOauthState(testConnectionId)).toEqual({
+      expect(await providerAdapterBase.getOauthState(testConnectionId)).toEqual({
         oauth_state: {
           guid: 'test_connection_id',
           inbound_member_guid: 'test_connection_id',
