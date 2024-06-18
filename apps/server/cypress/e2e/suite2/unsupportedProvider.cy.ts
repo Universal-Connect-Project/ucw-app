@@ -4,6 +4,7 @@ describe('unsupported provider', () => {
     cy.findByPlaceholderText('Search').type('MX Bank')
 
     cy.findByText('BBVA MX').should('exist')
-    cy.findByText('MX Bank').should('not.exist')
+    cy.findByText('https://www.anbbank.com/').should('exist')
+    cy.findByText('MX Bank (Oauth)').should('not.exist')
   })
 })

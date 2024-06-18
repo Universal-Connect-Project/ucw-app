@@ -83,7 +83,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          spec: apps/server/cypress/e2e/suite2/*.cy.ts
+          config-file: cypress.config.alternate.ts
           project: apps/server
           start: npm run dev:e2e
           wait-on: 'http://localhost:8080, http://localhost:9200'
