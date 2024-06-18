@@ -1,5 +1,5 @@
-import SophtronBaseClient from './base'
 import config from '../../config'
+import SophtronBaseClient from './base'
 
 export default class SophtronV2Client extends SophtronBaseClient {
   async getCustomer (customerId) {
@@ -48,5 +48,9 @@ export default class SophtronV2Client extends SophtronBaseClient {
 
   async getJobInfo (jobId) {
     return await this.get(`/v2/job/${jobId}`)
+  }
+
+  async answerJobMfa(jobId, mfaType, answer) {
+    return await this.put(`/v2/job/${jobId}/challenge/${mfaType}`, { AnswerText: answer })
   }
 }

@@ -14,7 +14,7 @@ import {
 import { mapJobType } from '../utils'
 
 import config from '../config'
-import { error as _error, debug, trace } from '../infra/logger'
+import { debug, error, trace } from '../infra/logger'
 import SophtronClientV1 from '../providerApiClients/sophtronClient'
 import SophtronClient from '../providerApiClients/sophtronClient/v2'
 
@@ -235,7 +235,7 @@ export class SophtronAdapter implements WidgetAdapter {
           challenge.id = 'TokenRead'
           challenge.type = ChallengeType.TOKEN
           challenge.question =
-            'Please approve from you secure device with following token'
+            `Please approve from you secure device with following token: ${job.TokenRead}`
           challenge.data = job.TokenRead
         } else if (job.CaptchaImage) {
           challenge.id = 'CaptchaImage'
@@ -262,37 +262,26 @@ export class SophtronAdapter implements WidgetAdapter {
 
   async AnswerChallenge (request: UpdateConnectionRequest, jobId: string): Promise<boolean> {
     const c = request.challenges[0]
-    switch (c.type) {
-      case ChallengeType.TOKEN:
-        await this.apiClientV1.jobTokenInput(jobId, null, null, true)
+    let answer
+    switch (c.id) {
+      case 'TokenRead':
+        answer = true
         break
-      case ChallengeType.IMAGE:
-      case ChallengeType.IMAGE_OPTIONS:
-        await this.apiClientV1.jobCaptchaInput(jobId, c.response)
+      case 'SecurityQuestion':
+        answer = JSON.stringify([c.response])
         break
-      case ChallengeType.QUESTION:
-        if (c.question === 'ota' || c.id === 'TokenSentFlag') {
-          await this.apiClientV1.jobTokenInput(
-            jobId,
-            null,
-            c.response,
-            null
-          )
-        } else {
-          await this.apiClientV1.jobSecurityAnswer(jobId, [c.response])
-        }
+      case 'TokenSentFlag':
+      case 'single_account_select':
+      case 'TokenMethod':
+      case 'CaptchaImage':
+        answer = c.response
         break
-      case ChallengeType.OPTIONS:
-        if (c.id === 'single_account_select') {
-          await this.apiClientV1.getFullAccountNumberWithinJob(c.response, jobId)
-        } else {
-          await this.apiClientV1.jobTokenInput(jobId, c.response, null, null)
-        }
-        break
-      default:
-        _error('Wrong challenge answer received', c)
-        return false
     }
+    if (!answer) {
+      error('Wrong challenge answer received', c)
+      return false
+    }
+    await this.apiClient.answerJobMfa(jobId, c.id, answer)
     return true
   }
 
