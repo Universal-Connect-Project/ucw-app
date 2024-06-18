@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import config from '../config'
-import { get, set } from '../serviceClients/storageClient/redis'
+import { get, set } from '../services/storageClient/redis'
 import { ChallengeType, ConnectionStatus } from '../shared/contract'
 import {
   AGGREGATE_MEMBER_PATH,
@@ -29,9 +29,9 @@ import {
 } from '../test/testData/members'
 import { createUserData, listUsersData } from '../test/testData/users'
 import { server } from '../test/testServer'
-import { EXTENDED_HISTORY_NOT_SUPPORTED_MSG, MxApi } from './mx'
+import { EXTENDED_HISTORY_NOT_SUPPORTED_MSG, MxAdapter } from './mx'
 
-const mxApiInt = new MxApi(
+const mxApiInt = new MxAdapter(
   {
     mxInt: {
       username: 'testUsername',
@@ -41,7 +41,7 @@ const mxApiInt = new MxApi(
   true
 )
 
-const mxApi = new MxApi(
+const mxApi = new MxAdapter(
   {
     mxProd: {
       username: 'testUsername',
@@ -73,7 +73,7 @@ const testChallenge = {
 }
 
 describe('mx provider', () => {
-  describe('MxApi', () => {
+  describe('MxAdapter', () => {
     it('works with integration credentials', async () => {
       expect(await mxApiInt.GetInstitutionById('testId')).toEqual({
         id: institutionResponse.code,
@@ -836,7 +836,7 @@ describe('mx provider', () => {
       const memberGuid = 'memberGuid'
 
       it('sets an error in redis if status is error', async () => {
-        const response = await MxApi.HandleOauthResponse({
+        const response = await MxAdapter.HandleOauthResponse({
           member_guid: memberGuid,
           status: 'error',
           error_reason: errorReason
@@ -855,7 +855,7 @@ describe('mx provider', () => {
       })
 
       it('returns with connected status if success', async () => {
-        const response = await MxApi.HandleOauthResponse({
+        const response = await MxAdapter.HandleOauthResponse({
           member_guid: memberGuid,
           status: 'success',
           error_reason: errorReason
@@ -865,7 +865,7 @@ describe('mx provider', () => {
       })
 
       it('returns with pending status if not success', async () => {
-        const response = await MxApi.HandleOauthResponse({
+        const response = await MxAdapter.HandleOauthResponse({
           member_guid: memberGuid,
           status: 'fdsafds',
           error_reason: errorReason

@@ -1,4 +1,5 @@
 import { debug } from '../infra/logger'
+import { getInstitution } from '../services/ElasticSearchClient'
 import type {
   CachedInstitution,
   InstitutionProvider,
@@ -6,7 +7,6 @@ import type {
   ResolvedInstitution
 } from '../shared/contract'
 import { getPreferences } from '../shared/preferences'
-import { getInstitution } from './ElasticSearchClient'
 
 const getProviderByVolume = (volumeMap: Record<string, number>): Provider => {
   if (!volumeMap) {

@@ -1,20 +1,20 @@
+import * as logger from '../infra/logger'
+import AkoyaClient from '../providerApiClients/akoya'
+import { get, set } from '../services/storageClient/redis'
 import {
   type Connection,
   ConnectionStatus,
   type CreateConnectionRequest,
   type Credential,
   type Institution,
-  type ProviderApiClient,
-  type UpdateConnectionRequest
+  type UpdateConnectionRequest,
+  type WidgetAdapter
 } from '../shared/contract'
-import * as logger from '../infra/logger'
-import AkoyaClient from '../serviceClients/akoyaClient'
-import { get, set } from '../serviceClients/storageClient/redis'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { v4: uuidv4 } = require('uuid')
 
-export class AkoyaApi implements ProviderApiClient {
+export class AkoyaAdapter implements WidgetAdapter {
   sandbox: boolean
   apiClient: any
   token: string

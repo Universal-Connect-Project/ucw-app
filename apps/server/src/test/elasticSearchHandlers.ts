@@ -1,5 +1,5 @@
+import { ElasticSearchMock } from '../services/ElasticSearchClient'
 import { elasticSearchInstitutionData } from '../test/testData/institution'
-import { ElasticSearchMock } from '../utils/ElasticSearchClient'
 
 const GET_INSTITUTION = { method: 'GET', path: '/institutions/_doc/*' }
 const GET_INSTITUTION_RESPONSE = () => {

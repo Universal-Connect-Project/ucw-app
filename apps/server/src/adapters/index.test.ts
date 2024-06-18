@@ -1,13 +1,13 @@
 import { http, HttpResponse } from 'msw'
-import { ConnectionStatus, OAuthStatus } from '../../src/shared/contract'
+import { ConnectionStatus, OAuthStatus } from '../shared/contract'
 import { READ_MEMBER_STATUS_PATH } from '../test/handlers'
 import { server } from '../test/testServer'
-import { ProviderApiBase } from './index'
-import { MxApi } from './mx'
+import { ProviderAdapterBase } from './index'
+import { MxAdapter } from './mx'
 
 const testConnectionId = 'test_connection_id'
 
-const mxApi = new MxApi(
+const mxAdapter = new MxAdapter(
   {
     mxProd: {
       username: 'testUsername',
@@ -17,7 +17,7 @@ const mxApi = new MxApi(
   false
 )
 
-const providerApiBase = new ProviderApiBase({
+const providerAdapterBase = new ProviderAdapterBase({
   context: {
     provider: 'mx',
     auth: {
@@ -28,11 +28,11 @@ const providerApiBase = new ProviderApiBase({
   }
 })
 
-describe('ProviderApiBase', () => {
+describe('ProviderAdapterBase', () => {
   describe('getOauthState', () => {
     beforeAll(async () => {
-      await providerApiBase.init()
-      providerApiBase.providerApiClient = mxApi
+      await providerAdapterBase.init()
+      providerAdapterBase.providerAdapter = mxAdapter
     })
 
     it('returns a pending oauth state', async () => {
@@ -47,7 +47,7 @@ describe('ProviderApiBase', () => {
         )
       )
 
-      expect(await providerApiBase.getOauthState(testConnectionId)).toEqual({
+      expect(await providerAdapterBase.getOauthState(testConnectionId)).toEqual({
         oauth_state: {
           guid: 'test_connection_id',
           inbound_member_guid: 'test_connection_id',
@@ -69,7 +69,7 @@ describe('ProviderApiBase', () => {
         )
       )
 
-      expect(await providerApiBase.getOauthState(testConnectionId)).toEqual({
+      expect(await providerAdapterBase.getOauthState(testConnectionId)).toEqual({
         oauth_state: {
           guid: 'test_connection_id',
           inbound_member_guid: 'test_connection_id',
@@ -91,7 +91,7 @@ describe('ProviderApiBase', () => {
         )
       )
 
-      expect(await providerApiBase.getOauthState(testConnectionId)).toEqual({
+      expect(await providerAdapterBase.getOauthState(testConnectionId)).toEqual({
         oauth_state: {
           guid: 'test_connection_id',
           inbound_member_guid: 'test_connection_id',

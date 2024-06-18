@@ -4,17 +4,17 @@ import type {
   CredentialRequest,
   CredentialsResponseBody,
   MemberResponse
-} from '../serviceClients/mxClient'
-import { Configuration, MxPlatformApiFactory } from '../serviceClients/mxClient'
-import { get, set } from '../serviceClients/storageClient/redis'
+} from '../providerApiClients/mx'
+import { Configuration, MxPlatformApiFactory } from '../providerApiClients/mx'
+import { get, set } from '../services/storageClient/redis'
 import type {
   Challenge,
   Connection,
   CreateConnectionRequest,
   Credential,
   Institution,
-  ProviderApiClient,
-  UpdateConnectionRequest
+  UpdateConnectionRequest,
+  WidgetAdapter
 } from '../shared/contract'
 import { ChallengeType, ConnectionStatus } from '../shared/contract'
 import { mapJobType } from '../utils'
@@ -54,7 +54,7 @@ function fromMxMember(member: MemberResponse, provider: string): Connection {
   }
 }
 
-export class MxApi implements ProviderApiClient {
+export class MxAdapter implements WidgetAdapter {
   apiClient: ReturnType<typeof MxPlatformApiFactory>
   mxConfig: any
   provider: string

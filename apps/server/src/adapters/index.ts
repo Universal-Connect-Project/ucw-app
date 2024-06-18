@@ -2,9 +2,9 @@
 import config from '../config'
 import * as logger from '../infra/logger'
 import providerCredentials from '../providerCredentials'
-import { AnalyticsClient } from '../serviceClients/analyticsClient'
-import { SearchClient } from '../serviceClients/searchClient'
-import { get, set } from '../serviceClients/storageClient/redis'
+import { AnalyticsClient } from '../services/analyticsClient'
+import { resolveInstitutionProvider } from '../services/institutionResolver'
+import { get, set } from '../services/storageClient/redis'
 import type {
   Challenge,
   Connection,
@@ -12,32 +12,31 @@ import type {
   CreateConnectionRequest,
   Credential,
   Institution,
-  ProviderApiClient,
-  UpdateConnectionRequest
+  UpdateConnectionRequest,
+  WidgetAdapter
 } from '../shared/contract'
 import { ConnectionStatus, OAuthStatus } from '../shared/contract'
 import { decodeAuthToken } from '../utils'
-import { resolveInstitutionProvider } from '../utils/institutionResolver'
-import { AkoyaApi } from './akoya'
-import { FinicityApi } from './finicity'
-import { MxApi } from './mx'
-import { SophtronApi } from './sophtron'
+import { AkoyaAdapter } from './akoya'
+import { FinicityAdapter } from './finicity'
+import { MxAdapter } from './mx'
+import { SophtronAdapter } from './sophtron'
 
-function getApiClient(provider: string, config: any): ProviderApiClient {
+function getProviderAdapter(provider: string, config: any): WidgetAdapter {
   switch (provider) {
     case 'mx':
-      return new MxApi(config, false)
+      return new MxAdapter(config, false)
     case 'mx_int':
-      return new MxApi(config, true)
+      return new MxAdapter(config, true)
     case 'sophtron':
-      return new SophtronApi(config)
+      return new SophtronAdapter(config)
     case 'akoya':
-      return new AkoyaApi(config, false)
+      return new AkoyaAdapter(config, false)
     case 'akoya_sandbox':
-      return new AkoyaApi(config, true)
+      return new AkoyaAdapter(config, true)
     case 'finicity':
     case 'finicity_sandbox':
-      return new FinicityApi(config)
+      return new FinicityAdapter(config)
     default:
       // throw new Error(`Unsupported provider ${provider}`);
       return null
@@ -72,24 +71,22 @@ export async function instrumentation(context: Context, input: any) {
   return true
 }
 
-export class ProviderApiBase {
+export class ProviderAdapterBase {
   context: Context
-  providerApiClient: ProviderApiClient
+  providerAdapter: WidgetAdapter
   analyticsClient: AnalyticsClient
-  searchApi: SearchClient
   providers: string[]
   constructor(req: any) {
     this.context = req.context
   }
 
   async init() {
-    this.searchApi = new SearchClient(this.context.auth?.token)
     const token = 'fakeTokenThatWeNeedToRemove'
 
     this.analyticsClient = new AnalyticsClient(token)
     try {
       const conf = providerCredentials
-      this.providerApiClient = getApiClient(this.context?.provider, conf)
+      this.providerAdapter = getProviderAdapter(this.context?.provider, conf)
       this.providers = Object.values(conf)
         .filter((v: any) => v.available)
         .map((v: any) => v.provider)
@@ -99,10 +96,6 @@ export class ProviderApiBase {
     }
 
     return false
-  }
-
-  async institutions() {
-    return await this.searchApi.institutions()
   }
 
   async resolveInstitution(id: string): Promise<Institution> {
@@ -117,7 +110,7 @@ export class ProviderApiBase {
 
   async getProviderInstitution(ucpId: string): Promise<Institution> {
     const resolved = await this.resolveInstitution(ucpId)
-    const inst = await this.providerApiClient.GetInstitutionById(resolved.id)
+    const inst = await this.providerAdapter.GetInstitutionById(resolved.id)
     if (inst != null) {
       inst.name = resolved.name ?? inst.name
       inst.url = resolved?.url ?? inst.url?.trim()
@@ -130,18 +123,18 @@ export class ProviderApiBase {
     this.context.updated = true
     this.context.current_job_id = null
     // let id = await this.resolveInstitution(guid)
-    return await this.providerApiClient.ListInstitutionCredentials(guid)
+    return await this.providerAdapter.ListInstitutionCredentials(guid)
   }
 
   async getConnection(connection_id: string): Promise<Connection> {
-    return await this.providerApiClient.GetConnectionById(
+    return await this.providerAdapter.GetConnectionById(
       connection_id,
       this.getUserId()
     )
   }
 
   async getConnectionStatus(connection_id: string): Promise<Connection> {
-    return await this.providerApiClient.GetConnectionStatus(
+    return await this.providerAdapter.GetConnectionStatus(
       connection_id,
       this.context.current_job_id,
       this.context.single_account_select,
@@ -154,7 +147,7 @@ export class ProviderApiBase {
   ): Promise<Connection> {
     this.context.updated = true
     this.context.current_job_id = null
-    const ret = await this.providerApiClient.CreateConnection(
+    const ret = await this.providerAdapter.CreateConnection(
       connection,
       this.getUserId()
     )
@@ -171,7 +164,7 @@ export class ProviderApiBase {
   async updateConnection(
     connection: UpdateConnectionRequest
   ): Promise<Connection> {
-    const ret = await this.providerApiClient.UpdateConnection(
+    const ret = await this.providerAdapter.UpdateConnection(
       connection,
       this.getUserId()
     )
@@ -187,7 +180,7 @@ export class ProviderApiBase {
   }
 
   async answerChallenge(connection_id: string, challenges: Challenge[]) {
-    return await this.providerApiClient.AnswerChallenge(
+    return await this.providerAdapter.AnswerChallenge(
       {
         id: connection_id ?? this.context.connection_id,
         challenges
@@ -232,7 +225,7 @@ export class ProviderApiBase {
   }
 
   async deleteConnection(connection_id: string): Promise<void> {
-    await this.providerApiClient.DeleteConnection(
+    await this.providerAdapter.DeleteConnection(
       connection_id,
       this.getUserId()
     )
@@ -241,14 +234,14 @@ export class ProviderApiBase {
   async getConnectionCredentials(memberGuid: string): Promise<Credential[]> {
     this.context.updated = true
     this.context.current_job_id = null
-    return await this.providerApiClient.ListConnectionCredentials(
+    return await this.providerAdapter.ListConnectionCredentials(
       memberGuid,
       this.getUserId()
     )
   }
 
   async ResolveUserId(id: string) {
-    return await this.providerApiClient?.ResolveUserId(id)
+    return await this.providerAdapter?.ResolveUserId(id)
   }
 
   getUserId(): string {
@@ -265,14 +258,14 @@ export class ProviderApiBase {
     switch (provider) {
       case 'akoya':
       case 'akoya_sandbox':
-        res = await AkoyaApi.HandleOauthResponse({
+        res = await AkoyaAdapter.HandleOauthResponse({
           ...rawQueries,
           ...rawParams
         })
         break
       case 'finicity':
       case 'finicity_sandbox':
-        res = await FinicityApi.HandleOauthResponse({
+        res = await FinicityAdapter.HandleOauthResponse({
           ...rawQueries,
           ...rawParams,
           ...body
@@ -280,7 +273,7 @@ export class ProviderApiBase {
         break
       case 'mx':
       case 'mx_int':
-        res = await MxApi.HandleOauthResponse({
+        res = await MxAdapter.HandleOauthResponse({
           ...rawQueries,
           ...rawParams,
           ...body

@@ -1,11 +1,11 @@
+import * as logger from '../infra/logger'
 import {
   type Institution
 } from '../shared/contract'
-import * as logger from '../infra/logger'
 
-import { ProviderApiBase } from '../providers'
+import { ProviderAdapterBase } from '../adapters'
 
-export class VcsService extends ProviderApiBase {
+export class VcsService extends ProviderAdapterBase {
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor
   constructor (req: any) {
     super(req)

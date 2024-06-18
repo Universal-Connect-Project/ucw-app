@@ -1,6 +1,6 @@
-import config from '../../config'
-import { error } from '../../infra/logger'
 import { create, post } from 'axios'
+import config from '../config'
+import { error } from '../infra/logger'
 
 function makeFinicityAuthHeaders (apiConfig, tokenRes) {
   return {

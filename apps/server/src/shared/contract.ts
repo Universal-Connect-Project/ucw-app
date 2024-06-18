@@ -201,7 +201,7 @@ export interface Pagination {
   total_pages?: number
 }
 
-export interface ProviderApiClient {
+export interface WidgetAdapter {
   ResolveUserId: (id: string) => Promise<string>
   GetInstitutionById: (id: string) => Promise<Institution>
   ListInstitutionCredentials: (institutionId: string) => Promise<Credential[]>

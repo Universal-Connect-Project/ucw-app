@@ -1,19 +1,19 @@
 import * as logger from '../infra/logger'
-import FinicityClient from '../serviceClients/finicityClient'
-import { get, set } from '../serviceClients/storageClient/redis'
+import FinicityClient from '../providerApiClients/finicity'
+import { get, set } from '../services/storageClient/redis'
 import type {
   Connection,
   CreateConnectionRequest,
   Credential,
   Institution,
-  ProviderApiClient,
-  UpdateConnectionRequest
+  UpdateConnectionRequest,
+  WidgetAdapter
 } from '../shared/contract'
 import { ConnectionStatus } from '../shared/contract'
 
 import { v4 as uuidv4 } from 'uuid'
 
-export class FinicityApi implements ProviderApiClient {
+export class FinicityAdapter implements WidgetAdapter {
   sandbox: boolean
   apiClient: any
 
