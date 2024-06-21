@@ -264,13 +264,25 @@ describe('search', () => {
           query: searchQuery(
             [
               {
-                term: {
-                  'mx.supports_identification': true
+                bool: {
+                  must: [
+                    {
+                      term: {
+                        'mx.supports_identification': true
+                      }
+                    }
+                  ]
                 }
               },
               {
-                term: {
-                  'sophtron.supports_identification': true
+                bool: {
+                  must: [
+                    {
+                      term: {
+                        'sophtron.supports_identification': true
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -292,6 +304,69 @@ describe('search', () => {
     )
 
     const results = await search('MX Bank', 'aggregate_identity')
+
+    expect(results).toEqual([elasticSearchInstitutionData])
+  })
+
+  it('includes identity and verification filter when job type is aggregate_identity_verification', async () => {
+    ElasticSearchMock.add(
+      {
+        method: ['GET', 'POST'],
+        path: ['/_search', '/institutions/_search'],
+        body: {
+          query: searchQuery(
+            [
+              {
+                bool: {
+                  must: [
+                    {
+                      term: {
+                        'mx.supports_verification': true
+                      }
+                    },
+                    {
+                      term: {
+                        'mx.supports_identification': true
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                bool: {
+                  must: [
+                    {
+                      term: {
+                        'sophtron.supports_verification': true
+                      }
+                    },
+                    {
+                      term: {
+                        'sophtron.supports_identification': true
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          ),
+          size: 20
+        }
+      },
+      (params) => {
+        return {
+          hits: {
+            hits: [
+              {
+                _source: elasticSearchInstitutionData
+              }
+            ]
+          }
+        }
+      }
+    )
+
+    const results = await search('MX Bank', 'aggregate_identity_verification')
 
     expect(results).toEqual([elasticSearchInstitutionData])
   })

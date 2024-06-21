@@ -10,11 +10,11 @@ import type { CachedInstitution, JobType } from 'src/shared/contract'
 import { getPreferences, type Provider } from '../shared/preferences'
 
 const JOB_ES_MAPPING = {
-  aggregate: null as string | null, // all institutions have aggregate
-  aggregate_identity_verification: null as string | null,
-  aggregate_extendedhistory: null as string | null, // same filter as aggregate
-  verification: 'supports_verification',
-  aggregate_identity: 'supports_identification'
+  aggregate: [] as string[], // all institutions have aggregate
+  aggregate_identity_verification: ['supports_verification', 'supports_identification'] as string[],
+  aggregate_extendedhistory: [] as string[], // same filter as aggregate
+  verification: ['supports_verification'],
+  aggregate_identity: ['supports_identification']
 }
 
 function getInstitutionFilePath() {
@@ -144,14 +144,20 @@ function mustQuery(supportedProviders: Provider[], jobType: JobType) {
   const institutionJobTypeFilter = JOB_ES_MAPPING[jobType]
 
   let jobTypeSupported = [] as any
-  if (institutionJobTypeFilter != null) {
+  if (institutionJobTypeFilter.length > 0) {
     jobTypeSupported = supportedProviders.map((provider) => {
       return {
-        term: {
-          [`${provider}.${institutionJobTypeFilter}`]: true
+        bool: {
+          must: institutionJobTypeFilter.map(jobTypeFilter => {
+            return {
+              term: {
+                [`${provider}.${jobTypeFilter}`]: true
+              }
+            }
+          })
         }
       }
-    })
+    }).flat()
   }
 
   return {
