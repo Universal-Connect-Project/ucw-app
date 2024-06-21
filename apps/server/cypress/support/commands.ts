@@ -32,12 +32,17 @@ Cypress.Commands.add('visitAgg', () => {
   cy.visit('http://localhost:8080/?job_type=agg')
 })
 
-export {}
+Cypress.Commands.add('visitIdentity', () => {
+  cy.visit('http://localhost:8080/?job_type=identify')
+})
+
+export { }
 
 declare global {
   namespace Cypress {
     interface Chainable {
       visitAgg: () => Chainable<void>
+      visitIdentity: () => Chainable<void>
     }
   }
 }

@@ -98,7 +98,7 @@ export class SophtronAdapter implements WidgetAdapter {
     request: CreateConnectionRequest,
     userId: string
   ): Promise<Connection | undefined> {
-    const jobType = mapJobType(request.initial_job_type?.toLowerCase())
+    const jobType = request.initial_job_type
     if (jobType == null) {
       return
     }

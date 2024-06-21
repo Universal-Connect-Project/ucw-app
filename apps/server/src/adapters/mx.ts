@@ -17,7 +17,6 @@ import type {
   WidgetAdapter
 } from '../shared/contract'
 import { ChallengeType, ConnectionStatus } from '../shared/contract'
-import { mapJobType } from '../utils'
 
 export const EXTENDED_HISTORY_NOT_SUPPORTED_MSG =
   "Member's institution does not support extended transaction history."
@@ -118,7 +117,7 @@ export class MxAdapter implements WidgetAdapter {
     request: CreateConnectionRequest,
     userId: string
   ): Promise<Connection> {
-    const jobType = mapJobType(request.initial_job_type?.toLowerCase())
+    const jobType = request.initial_job_type
     const entityId = request.institution_id
     const existings = await this.apiClient.listMembers(userId)
     const existing = existings.data.members.find(

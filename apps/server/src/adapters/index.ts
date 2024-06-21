@@ -16,7 +16,7 @@ import type {
   WidgetAdapter
 } from '../shared/contract'
 import { ConnectionStatus, OAuthStatus } from '../shared/contract'
-import { decodeAuthToken } from '../utils'
+import { decodeAuthToken, mapJobType } from '../utils'
 import { AkoyaAdapter } from './akoya'
 import { FinicityAdapter } from './finicity'
 import { MxAdapter } from './mx'
@@ -63,7 +63,7 @@ export async function instrumentation(context: Context, input: any) {
     context.auth = decodeAuthToken(input.auth)
   }
   context.partner = input.current_partner
-  context.job_type = input.job_type ?? 'agg'
+  context.job_type = mapJobType(input.job_type)
   context.scheme = input.scheme ?? 'vcs'
   context.oauth_referral_source = input.oauth_referral_source ?? 'BROWSER'
   context.single_account_select = input.single_account_select

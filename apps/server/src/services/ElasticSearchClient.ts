@@ -6,8 +6,16 @@ import { resolve } from 'path'
 import config from '../config'
 import { info } from '../infra/logger'
 
-import type { CachedInstitution } from 'src/shared/contract'
+import type { CachedInstitution, JobType } from 'src/shared/contract'
 import { getPreferences, type Provider } from '../shared/preferences'
+
+const JOB_ES_MAPPING = {
+  aggregate: null as string | null, // all institutions have aggregate
+  aggregate_identity_verification: null as string | null,
+  aggregate_extendedhistory: null as string | null, // same filter as aggregate
+  verification: 'supports_verification',
+  aggregate_identity: 'supports_identification'
+}
 
 function getInstitutionFilePath() {
   return resolve(__dirname, '../../cachedDefaults/ucwInstitutionsMapping.json')
@@ -59,7 +67,7 @@ export async function reIndexElasticSearch() {
   await Promise.all(indexPromises)
 }
 
-export async function search(searchTerm: string): Promise<any[]> {
+export async function search(searchTerm: string, jobType: JobType): Promise<any[]> {
   const preferences = await getPreferences()
   const hiddenInstitutions = preferences?.hiddenInstitutions || []
   const supportedProviders = preferences?.supportedProviders || []
@@ -72,7 +80,7 @@ export async function search(searchTerm: string): Promise<any[]> {
           bool: {
             should: fuzzySearchTermQuery(searchTerm),
             minimum_should_match: 1,
-            must: mustBeSupportedProviderQuery(supportedProviders),
+            must: mustQuery(supportedProviders, jobType),
             must_not: buildMustNotQuery(hiddenInstitutions)
           }
         },
@@ -124,7 +132,7 @@ function fuzzySearchTermQuery(searchTerm: string) {
   ]
 }
 
-function mustBeSupportedProviderQuery(supportedProviders: Provider[]) {
+function mustQuery(supportedProviders: Provider[], jobType: JobType) {
   const providerQueryTerms = supportedProviders.map((provider) => {
     return {
       exists: {
@@ -133,10 +141,29 @@ function mustBeSupportedProviderQuery(supportedProviders: Provider[]) {
     }
   })
 
+  const institutionJobTypeFilter = JOB_ES_MAPPING[jobType]
+
+  let jobTypeSupported = [] as any
+  if (institutionJobTypeFilter != null) {
+    jobTypeSupported = supportedProviders.map((provider) => {
+      return {
+        term: {
+          [`${provider}.${institutionJobTypeFilter}`]: true
+        }
+      }
+    })
+  }
+
   return {
     bool: {
       should: providerQueryTerms,
-      minimum_should_match: 1
+      minimum_should_match: 1,
+      must: {
+        bool: {
+          should: jobTypeSupported,
+          minimum_should_match: 1
+        }
+      }
     }
   }
 }
