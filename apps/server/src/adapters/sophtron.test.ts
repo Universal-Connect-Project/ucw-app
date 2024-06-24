@@ -3,6 +3,7 @@ import config from '../config'
 import { SophtronAdapter } from './sophtron'
 import { HttpResponse, http } from 'msw'
 import { SOPHTRON_DELETE_MEMBER_PATH } from '../test/handlers'
+import { sophtronInstitutionData } from '../test/testData/institution'
 
 const Adapter = new SophtronAdapter({
   sophtron: {
@@ -51,6 +52,20 @@ describe('sophtron adapter', () => {
       await Adapter.clearConnection({}, testId, testUserId)
 
       expect(memberDeletionAttempted).toBe(false)
+    })
+  })
+
+  describe('GetInstitutionById', () => {
+    it('returns a modified institution object', async () => {
+      const response = await Adapter.GetInstitutionById(testId)
+
+      expect(response).toEqual({
+        id: sophtronInstitutionData.InstitutionID,
+        logo_url: sophtronInstitutionData.Logo,
+        name: sophtronInstitutionData.InstitutionName,
+        provider: 'sophtron',
+        url: sophtronInstitutionData.URL
+      })
     })
   })
 })

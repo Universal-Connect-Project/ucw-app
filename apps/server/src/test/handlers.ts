@@ -1,6 +1,10 @@
 import { http, HttpResponse } from 'msw'
 import { BASE_PATH as MX_BASE_PATH } from '../providerApiClients/mx'
-import { finicityInsitutionData, institutionData } from './testData/institution'
+import {
+  finicityInsitutionData,
+  institutionData,
+  sophtronInstitutionData
+} from './testData/institution'
 import { institutionCredentialsData } from './testData/institutionCredentials'
 import {
   aggregateMemberMemberData,
@@ -48,11 +52,16 @@ export const FINICITY_AUTH_PATH = `${FINICITY_BASE_PATH}/aggregation/v2/partners
 export const FINICITY_CONNECT_PATH = `${FINICITY_BASE_PATH}/connect/v2/generate/lite`
 export const FINICITY_CONNECT_LITE_URL = 'https://testconnect.com'
 
-const SOPHTRON_BASE_PATH = 'https://api.sophtron.com/api/v2'
+const SOPHTRON_V2_BASE_PATH = 'https://api.sophtron.com/api/v2'
+const SOPHTRON_V1_BASE_PATH = 'https://api.sophtron.com/api'
 
-export const SOPHTRON_DELETE_MEMBER_PATH = `${SOPHTRON_BASE_PATH}/customers/:userId/members/:memberId`
+export const SOPHTRON_DELETE_MEMBER_PATH = `${SOPHTRON_V2_BASE_PATH}/customers/:userId/members/:memberId`
+export const SOPHTRON_INSTITUTION_BY_ID = `${SOPHTRON_V1_BASE_PATH}/Institution/GetInstitutionByID`
 
 const handlers = [
+  http.post(SOPHTRON_INSTITUTION_BY_ID, () =>
+    HttpResponse.json(sophtronInstitutionData)
+  ),
   http.delete(
     SOPHTRON_DELETE_MEMBER_PATH,
     () => new HttpResponse(null, { status: 200 })

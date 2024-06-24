@@ -11,6 +11,13 @@ export const institutionData = {
   }
 }
 
+export const sophtronInstitutionData = {
+  InstitutionID: 'institutionId',
+  Logo: 'Logo',
+  InstitutionName: 'institutionName',
+  URL: 'url'
+}
+
 export const finicityInsitutionData = {
   institution: {
     id: 'testId',
@@ -33,7 +40,8 @@ export const finicityInsitutionData = {
     urlForgotPassword: 'https://developer.mastercard.com/forgot-password',
     urlOnlineRegistration: 'https://www.finicity.com/signup/',
     class: 'testfi',
-    specialText: 'Please enter your FinBank Username and Password required for login.',
+    specialText:
+      'Please enter your FinBank Username and Password required for login.',
     address: {
       city: 'Utah',
       state: '',
@@ -47,7 +55,8 @@ export const finicityInsitutionData = {
     status: 'online',
     branding: {
       logo: 'https://prod-carpintero-branding.s3.us-west-2.amazonaws.com/101732/logo.svg',
-      alternateLogo: 'https://prod-carpintero-branding.s3.us-west-2.amazonaws.com/101732/alternateLogo.svg',
+      alternateLogo:
+        'https://prod-carpintero-branding.s3.us-west-2.amazonaws.com/101732/alternateLogo.svg',
       icon: 'https://prod-carpintero-branding.s3.us-west-2.amazonaws.com/101732/icon.svg',
       primaryColor: '#1B3E4A',
       tile: 'https://prod-carpintero-branding.s3.us-west-2.amazonaws.com/101732/tile.svg'
