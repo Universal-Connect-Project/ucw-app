@@ -30,11 +30,13 @@ const limiter = RateLimit({
 })
 app.use(limiter)
 
-initializeElastic().then(_ => {
-  info('App initialized successfully')
-}).catch(error => {
-  _error(`Failed to initialized: ${error}`)
-})
+initializeElastic()
+  .then((_) => {
+    info('App initialized successfully')
+  })
+  .catch((error) => {
+    _error(`Failed to initialized: ${error}`)
+  })
 
 app.get('/ping', function (req, res) {
   res.send('ok')
@@ -70,7 +72,7 @@ const pageQueries = new RegExp(
   'g'
 )
 
-function renderDefaultPage (req, res, html) {
+function renderDefaultPage(req, res, html) {
   if (
     req.query.connection_id != null &&
     (req.query.provider == null || req.query.provider === '')
@@ -106,8 +108,7 @@ app.get('*', async function (req, res) {
 app.listen(config.PORT, () => {
   const message = `Server is running on port ${config.PORT}, Env: ${config.Env}, LogLevel: ${config.LogLevel}`
   const uiMessage = `UI is running on ${config.ResourcePrefix}`
-  console.log(message)
-  console.log(uiMessage)
+
   info(message)
   info(uiMessage)
 })
@@ -116,14 +117,14 @@ app.listen(config.PORT, () => {
 if (['dev', 'test'].includes(config.Env)) {
   ngrok.listen(app).then(() => {
     config.WebhookHostUrl = app.listener.url()
-    console.log('Established listener at: ' + app.listener.url())
+    info('Established listener at: ' + app.listener.url())
   })
 }
 
 process.on('SIGINT', async () => {
-  console.log('\nGracefully shutting down from SIGINT (Ctrl-C)')
+  info('\nGracefully shutting down from SIGINT (Ctrl-C)')
   if (['dev', 'test'].includes(config.Env)) {
-    console.log('Closing Ngrok tunnel')
+    info('Closing Ngrok tunnel')
     await ngrok.kill()
   }
   process.exit(0)
