@@ -1,4 +1,4 @@
-describe('Should be able to find certain banks with keywords and misspellings', () => {
+describe('Fuzzy Search: Should be able to find certain banks with keywords and misspellings', () => {
   it('Finds expected banks', () => {
     cy.visitAgg()
 
@@ -38,5 +38,22 @@ describe('Should be able to find certain banks with keywords and misspellings', 
       expect(chaseCaFound).to.be.true
       expect(chaseUCardFound).to.be.true
     })
+  })
+})
+
+describe('Job type influences the returned institutions', () => {
+  it('shows "Liberty Federal Credit Union" for agg job type', () => {
+    cy.visitAgg()
+
+    cy.findByPlaceholderText('Search').type('Liberty Federal Credit Union')
+    cy.findByText('https://www.libertyfcu.org/', { timeout: 45000 }).should('exist')
+  })
+
+  it('does not show "Liberty Federal Credit Union" for identity job type because that job type is not supported', () => {
+    cy.visitIdentity()
+
+    cy.findByPlaceholderText('Search').type('Liberty Federal Credit Union')
+    cy.findByText('Purdue Federal Credit Union', { timeout: 45000 }).should('exist')
+    cy.findByText('https://www.libertyfcu.org/').should('not.exist')
   })
 })

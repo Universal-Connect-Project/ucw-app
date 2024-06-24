@@ -1,6 +1,6 @@
-import config from '../config'
-import { algo, enc } from 'crypto-js'
 import { createCipheriv, createDecipheriv } from 'crypto'
+import { algo, enc } from 'crypto-js'
+import config from '../config'
 
 export function hmac (text, key) {
   const hmac = algo.HMAC.create(algo.SHA256, enc.Base64.parse(key))
@@ -61,7 +61,8 @@ export function decodeAuthToken (input) {
 }
 
 export function mapJobType (input) {
-  switch (input) {
+  const inputLowerCase = input.toLowerCase()
+  switch (inputLowerCase) {
     case 'agg':
     case 'aggregation':
     case 'aggregate':
@@ -90,10 +91,12 @@ export function mapJobType (input) {
     case 'vc_accounts':
       return 'verification'
     case 'identify':
+    case 'identity':
+    case 'id':
     case 'vc_identity':
       return 'aggregate_identity'
     default:
       error('Invalid Job Type')
-      return null
+      return 'aggregate'
   }
 }
