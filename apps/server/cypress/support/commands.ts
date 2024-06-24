@@ -29,11 +29,11 @@ import '@testing-library/cypress/add-commands'
 //
 
 Cypress.Commands.add('visitAgg', () => {
-  cy.visit('http://localhost:8080/?job_type=agg')
+  cy.visit('/?job_type=agg')
 })
 
 Cypress.Commands.add('visitIdentity', () => {
-  cy.visit('http://localhost:8080/?job_type=identify')
+  cy.visit('/?job_type=identify')
 })
 
 export { }
