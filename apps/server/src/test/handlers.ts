@@ -56,10 +56,10 @@ const SOPHTRON_V2_BASE_PATH = 'https://api.sophtron.com/api/v2'
 const SOPHTRON_V1_BASE_PATH = 'https://api.sophtron.com/api'
 
 export const SOPHTRON_DELETE_MEMBER_PATH = `${SOPHTRON_V2_BASE_PATH}/customers/:userId/members/:memberId`
-export const SOPHTRON_INSTITUTION_BY_ID = `${SOPHTRON_V1_BASE_PATH}/Institution/GetInstitutionByID`
+export const SOPHTRON_INSTITUTION_BY_ID_PATH = `${SOPHTRON_V1_BASE_PATH}/Institution/GetInstitutionByID`
 
 const handlers = [
-  http.post(SOPHTRON_INSTITUTION_BY_ID, () =>
+  http.post(SOPHTRON_INSTITUTION_BY_ID_PATH, () =>
     HttpResponse.json(sophtronInstitutionData)
   ),
   http.delete(

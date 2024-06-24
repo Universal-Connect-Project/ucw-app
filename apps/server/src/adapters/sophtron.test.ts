@@ -2,7 +2,10 @@ import { server } from '../test/testServer'
 import config from '../config'
 import { SophtronAdapter } from './sophtron'
 import { HttpResponse, http } from 'msw'
-import { SOPHTRON_DELETE_MEMBER_PATH } from '../test/handlers'
+import {
+  SOPHTRON_DELETE_MEMBER_PATH,
+  SOPHTRON_INSTITUTION_BY_ID_PATH
+} from '../test/handlers'
 import { sophtronInstitutionData } from '../test/testData/institution'
 
 const Adapter = new SophtronAdapter({
@@ -66,6 +69,61 @@ describe('sophtron adapter', () => {
         provider: 'sophtron',
         url: sophtronInstitutionData.URL
       })
+    })
+  })
+
+  describe('ListInstitutionCredentials', () => {
+    it('uses custom login form user name and password if provided', async () => {
+      const customName = 'customName'
+      const customPassword = 'customPassword'
+
+      server.use(
+        http.post(SOPHTRON_INSTITUTION_BY_ID_PATH, () =>
+          HttpResponse.json({
+            ...sophtronInstitutionData,
+            InstitutionDetail: {
+              LoginFormUserName: customName,
+              LoginFormPassword: customPassword
+            }
+          })
+        )
+      )
+
+      const response = await Adapter.ListInstitutionCredentials(testId)
+
+      expect(response).toEqual([
+        {
+          field_name: 'LOGIN',
+          field_type: 'LOGIN',
+          id: 'username',
+          label: 'customName'
+        },
+        {
+          field_name: 'PASSWORD',
+          field_type: 'PASSWORD',
+          id: 'password',
+          label: 'customPassword'
+        }
+      ])
+    })
+
+    it('Uses standard User name and Password if nothing custom is provided', async () => {
+      const response = await Adapter.ListInstitutionCredentials(testId)
+
+      expect(response).toEqual([
+        {
+          field_name: 'LOGIN',
+          field_type: 'LOGIN',
+          id: 'username',
+          label: 'User name'
+        },
+        {
+          field_name: 'PASSWORD',
+          field_type: 'PASSWORD',
+          id: 'password',
+          label: 'Password'
+        }
+      ])
     })
   })
 })
