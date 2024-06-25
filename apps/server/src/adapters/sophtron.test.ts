@@ -489,7 +489,47 @@ describe('sophtron adapter', () => {
       })
     })
 
-    it('handles the job status SecurityQuestion case', () => {})
+    it('handles the job status SecurityQuestion case', async () => {
+      const securityQuestionString = 'securityQuestionString'
+
+      server.use(
+        http.get(SOPHTRON_GET_JOB_INFO_PATH, () =>
+          HttpResponse.json({
+            JobID: testJobId,
+            JobType: 'agg',
+            SecurityQuestion: JSON.stringify([securityQuestionString]),
+            UserInstitutionID: testUserInstitutionId
+          })
+        )
+      )
+
+      const response = await adapter.GetConnectionStatus(
+        testId,
+        testJobId,
+        false,
+        testUserId
+      )
+
+      expect(response).toEqual({
+        challenges: [
+          {
+            id: 'SecurityQuestion',
+            type: ChallengeType.QUESTION,
+            data: [
+              {
+                key: securityQuestionString,
+                value: securityQuestionString
+              }
+            ]
+          }
+        ],
+        id: testUserInstitutionId,
+        user_id: testUserId,
+        cur_job_id: testJobId,
+        status: ConnectionStatus.CHALLENGED,
+        provider: 'sophtron'
+      })
+    })
 
     it('handles the job status TokenMethod case', () => {})
 
