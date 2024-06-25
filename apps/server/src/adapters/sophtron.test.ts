@@ -24,44 +24,6 @@ const testId = 'testId'
 const testUserId = 'testUserId'
 
 describe('sophtron adapter', () => {
-  describe('clear connection', () => {
-    it('calls delete member if there is a vc issues', async () => {
-      let memberDeletionAttempted = false
-
-      server.use(
-        http.delete(SOPHTRON_DELETE_MEMBER_PATH, () => {
-          memberDeletionAttempted = true
-
-          return new HttpResponse(null, {
-            status: 200
-          })
-        })
-      )
-
-      await adapter.clearConnection({ issuer: true }, testId, testUserId)
-
-      expect(memberDeletionAttempted).toBe(true)
-    })
-
-    it('doesnt call delete member if there is not a vc issuer', async () => {
-      let memberDeletionAttempted = false
-
-      server.use(
-        http.delete(SOPHTRON_DELETE_MEMBER_PATH, () => {
-          memberDeletionAttempted = true
-
-          return new HttpResponse(null, {
-            status: 200
-          })
-        })
-      )
-
-      await adapter.clearConnection({}, testId, testUserId)
-
-      expect(memberDeletionAttempted).toBe(false)
-    })
-  })
-
   describe('GetInstitutionById', () => {
     it('returns a modified institution object', async () => {
       const response = await adapter.GetInstitutionById(testId)
@@ -269,6 +231,30 @@ describe('sophtron adapter', () => {
         InstitutionID: testId,
         Password: passwordValue,
         UserName: usernameValue
+      })
+    })
+  })
+
+  describe('DeleteConnection', () => {
+    it('calls the delete member endpoint', async () => {
+      let deleteMemberAttempted = false
+      let requestParams
+
+      server.use(
+        http.delete(SOPHTRON_DELETE_MEMBER_PATH, ({ params }) => {
+          deleteMemberAttempted = true
+          requestParams = params
+
+          return new HttpResponse(null, { status: 200 })
+        })
+      )
+
+      await adapter.DeleteConnection(testId, testUserId)
+
+      expect(deleteMemberAttempted).toBe(true)
+      expect(requestParams).toEqual({
+        memberId: testId,
+        userId: testUserId
       })
     })
   })
