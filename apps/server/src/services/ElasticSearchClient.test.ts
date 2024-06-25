@@ -15,6 +15,87 @@ jest
   .spyOn(preferences, 'getPreferences')
   .mockResolvedValue(testPreferences as preferences.Preferences)
 
+function searchQuery(jobTypeQuery = [] as any[], filterTestBanks = false) {
+  return {
+    bool: {
+      should: [
+        {
+          match: {
+            name: {
+              query: 'MX Bank',
+              boost: 1.5
+            }
+          }
+        },
+        {
+          match: {
+            keywords: {
+              query: 'MX Bank',
+              boost: 1.4
+            }
+          }
+        },
+        {
+          fuzzy: {
+            name: {
+              value: 'mx bank',
+              fuzziness: 'AUTO',
+              boost: 1,
+              max_expansions: 50
+            }
+          }
+        },
+        {
+          wildcard: {
+            name: {
+              value: 'MX Bank*',
+              boost: 0.8
+            }
+          }
+        }
+      ],
+      minimum_should_match: 1,
+      must: {
+        bool: {
+          should: [
+            {
+              exists: {
+                field: 'mx.id'
+              }
+            },
+            {
+              exists: {
+                field: 'sophtron.id'
+              }
+            }
+          ],
+          minimum_should_match: 1,
+          must: {
+            bool: {
+              should: jobTypeQuery,
+              minimum_should_match: 1
+            }
+          }
+        }
+      },
+      must_not: [
+        {
+          terms: {
+            'ucp_id.keyword': testPreferences.hiddenInstitutions
+          }
+        },
+        ...filterTestBanks
+          ? [{
+              term: {
+                is_test_bank: true
+              }
+            }]
+          : []
+      ]
+    }
+  }
+}
+
 describe('initialize', () => {
   describe('elastic search already indexed', () => {
     let indexCreated: boolean = false
@@ -127,71 +208,7 @@ describe('search', () => {
         method: ['GET', 'POST'],
         path: ['/_search', '/institutions/_search'],
         body: {
-          query: {
-            bool: {
-              should: [
-                {
-                  match: {
-                    name: {
-                      query: 'MX Bank',
-                      boost: 1.5
-                    }
-                  }
-                },
-                {
-                  match: {
-                    keywords: {
-                      query: 'MX Bank',
-                      boost: 1.4
-                    }
-                  }
-                },
-                {
-                  fuzzy: {
-                    name: {
-                      value: 'mx bank',
-                      fuzziness: 'AUTO',
-                      boost: 1,
-                      max_expansions: 50
-                    }
-                  }
-                },
-                {
-                  wildcard: {
-                    name: {
-                      value: 'MX Bank*',
-                      boost: 0.8
-                    }
-                  }
-                }
-              ],
-              minimum_should_match: 1,
-              must: {
-                bool: {
-                  should: [
-                    {
-                      exists: {
-                        field: 'mx.id'
-                      }
-                    },
-                    {
-                      exists: {
-                        field: 'sophtron.id'
-                      }
-                    }
-                  ],
-                  minimum_should_match: 1
-                }
-              },
-              must_not: [
-                {
-                  terms: {
-                    'ucp_id.keyword': testPreferences.hiddenInstitutions
-                  }
-                }
-              ]
-            }
-          },
+          query: searchQuery(),
           size: 20
         }
       },
@@ -208,7 +225,7 @@ describe('search', () => {
       }
     )
 
-    const results = await search('MX Bank')
+    const results = await search('MX Bank', 'aggregate')
 
     expect(results).toEqual([elasticSearchInstitutionData])
   })
@@ -219,76 +236,7 @@ describe('search', () => {
       method: ['GET', 'POST'],
       path: ['/_search', '/institutions/_search'],
       body: {
-        query: {
-          bool: {
-            should: [
-              {
-                match: {
-                  name: {
-                    query: 'MX Bank',
-                    boost: 1.5
-                  }
-                }
-              },
-              {
-                match: {
-                  keywords: {
-                    query: 'MX Bank',
-                    boost: 1.4
-                  }
-                }
-              },
-              {
-                fuzzy: {
-                  name: {
-                    value: 'mx bank',
-                    fuzziness: 'AUTO',
-                    boost: 1,
-                    max_expansions: 50
-                  }
-                }
-              },
-              {
-                wildcard: {
-                  name: {
-                    value: 'MX Bank*',
-                    boost: 0.8
-                  }
-                }
-              }
-            ],
-            minimum_should_match: 1,
-            must: {
-              bool: {
-                should: [
-                  {
-                    exists: {
-                      field: 'mx.id'
-                    }
-                  },
-                  {
-                    exists: {
-                      field: 'sophtron.id'
-                    }
-                  }
-                ],
-                minimum_should_match: 1
-              }
-            },
-            must_not: [
-              {
-                terms: {
-                  'ucp_id.keyword': testPreferences.hiddenInstitutions
-                }
-              },
-              {
-                term: {
-                  is_test_bank: true
-                }
-              }
-            ]
-          }
-        },
+        query: searchQuery([], true),
         size: 20
       }
     }, (parms) => {
@@ -303,8 +251,124 @@ describe('search', () => {
       }
     })
 
-    await search('MX Bank')
+    await search('MX Bank', 'aggregate')
     config.Env = 'test'
+  })
+
+  it('includes a filter when job type is identity', async () => {
+    ElasticSearchMock.add(
+      {
+        method: ['GET', 'POST'],
+        path: ['/_search', '/institutions/_search'],
+        body: {
+          query: searchQuery(
+            [
+              {
+                bool: {
+                  must: [
+                    {
+                      term: {
+                        'mx.supports_identification': true
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                bool: {
+                  must: [
+                    {
+                      term: {
+                        'sophtron.supports_identification': true
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          ),
+          size: 20
+        }
+      },
+      () => {
+        return {
+          hits: {
+            hits: [
+              {
+                _source: elasticSearchInstitutionData
+              }
+            ]
+          }
+        }
+      }
+    )
+
+    const results = await search('MX Bank', 'aggregate_identity')
+
+    expect(results).toEqual([elasticSearchInstitutionData])
+  })
+
+  it('includes identity and verification filter when job type is aggregate_identity_verification', async () => {
+    ElasticSearchMock.add(
+      {
+        method: ['GET', 'POST'],
+        path: ['/_search', '/institutions/_search'],
+        body: {
+          query: searchQuery(
+            [
+              {
+                bool: {
+                  must: [
+                    {
+                      term: {
+                        'mx.supports_verification': true
+                      }
+                    },
+                    {
+                      term: {
+                        'mx.supports_identification': true
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                bool: {
+                  must: [
+                    {
+                      term: {
+                        'sophtron.supports_verification': true
+                      }
+                    },
+                    {
+                      term: {
+                        'sophtron.supports_identification': true
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          ),
+          size: 20
+        }
+      },
+      (params) => {
+        return {
+          hits: {
+            hits: [
+              {
+                _source: elasticSearchInstitutionData
+              }
+            ]
+          }
+        }
+      }
+    )
+
+    const results = await search('MX Bank', 'aggregate_identity_verification')
+
+    expect(results).toEqual([elasticSearchInstitutionData])
   })
 
   it('does not break when ES returns an empty array', async () => {
@@ -320,7 +384,7 @@ describe('search', () => {
       }
     )
 
-    const results = await search('nothing')
+    const results = await search('nothing', 'aggregate')
 
     expect(results).toEqual([])
   })

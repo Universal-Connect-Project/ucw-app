@@ -31,7 +31,7 @@ import { createUserData, listUsersData } from '../test/testData/users'
 import { server } from '../test/testServer'
 import { EXTENDED_HISTORY_NOT_SUPPORTED_MSG, MxAdapter } from './mx'
 
-const mxApiInt = new MxAdapter(
+const mxAdapterInt = new MxAdapter(
   {
     mxInt: {
       username: 'testUsername',
@@ -41,7 +41,7 @@ const mxApiInt = new MxAdapter(
   true
 )
 
-const mxApi = new MxAdapter(
+const mxAdapter = new MxAdapter(
   {
     mxProd: {
       username: 'testUsername',
@@ -75,7 +75,7 @@ const testChallenge = {
 describe('mx provider', () => {
   describe('MxAdapter', () => {
     it('works with integration credentials', async () => {
-      expect(await mxApiInt.GetInstitutionById('testId')).toEqual({
+      expect(await mxAdapterInt.GetInstitutionById('testId')).toEqual({
         id: institutionResponse.code,
         logo_url: institutionResponse.medium_logo_url,
         name: institutionResponse.name,
@@ -87,7 +87,7 @@ describe('mx provider', () => {
 
     describe('GetInsitutionById', () => {
       it('uses the medium logo if available', async () => {
-        expect(await mxApi.GetInstitutionById('testId')).toEqual({
+        expect(await mxAdapter.GetInstitutionById('testId')).toEqual({
           id: institutionResponse.code,
           logo_url: institutionResponse.medium_logo_url,
           name: institutionResponse.name,
@@ -110,7 +110,7 @@ describe('mx provider', () => {
           )
         )
 
-        expect(await mxApi.GetInstitutionById('testId')).toEqual({
+        expect(await mxAdapter.GetInstitutionById('testId')).toEqual({
           id: institutionResponse.code,
           logo_url: institutionResponse.small_logo_url,
           name: institutionResponse.name,
@@ -126,7 +126,7 @@ describe('mx provider', () => {
         institutionCredentialsData.credentials
 
       it('transforms the credentials into useable form', async () => {
-        expect(await mxApi.ListInstitutionCredentials('testId')).toEqual([
+        expect(await mxAdapter.ListInstitutionCredentials('testId')).toEqual([
           {
             id: firstCredential.guid,
             field_name: firstCredential.field_name,
@@ -147,7 +147,7 @@ describe('mx provider', () => {
       const [firstMember, secondMember] = membersData.members
 
       it('retrieves and transforms the members', async () => {
-        expect(await mxApi.ListConnections('testId')).toEqual([
+        expect(await mxAdapter.ListConnections('testId')).toEqual([
           {
             id: firstMember.guid,
             cur_job_id: firstMember.guid,
@@ -176,7 +176,7 @@ describe('mx provider', () => {
 
       it('retreieves and transforms member credentials', async () => {
         expect(
-          await mxApi.ListConnectionCredentials('testMemberId', 'testUserId')
+          await mxAdapter.ListConnectionCredentials('testMemberId', 'testUserId')
         ).toEqual([
           {
             id: firstCredential.guid,
@@ -197,7 +197,7 @@ describe('mx provider', () => {
     describe('CreateConnection', () => {
       const baseConnectionRequest = {
         id: 'testId',
-        initial_job_type: 'auth',
+        initial_job_type: 'verification',
         background_aggregation_is_disabled: false,
         credentials: [testCredential],
         institution_id: 'testInstitutionId',
@@ -219,7 +219,7 @@ describe('mx provider', () => {
           })
         )
 
-        await mxApi.CreateConnection(
+        await mxAdapter.CreateConnection(
           {
             ...baseConnectionRequest,
             institution_id: membersData.members[0].institution_code,
@@ -247,7 +247,7 @@ describe('mx provider', () => {
         })
 
         it('creates member with a client_redirect_url if is_oauth', async () => {
-          await mxApi.CreateConnection(
+          await mxAdapter.CreateConnection(
             {
               ...baseConnectionRequest,
               is_oauth: true
@@ -261,7 +261,7 @@ describe('mx provider', () => {
         })
 
         it('creates member without a client_redirect_url if !is_oauth', async () => {
-          await mxApi.CreateConnection(
+          await mxAdapter.CreateConnection(
             {
               ...baseConnectionRequest,
               is_oauth: false
@@ -273,7 +273,7 @@ describe('mx provider', () => {
         })
 
         it('creates a member with skip_aggregation if requested', async () => {
-          await mxApi.CreateConnection(
+          await mxAdapter.CreateConnection(
             {
               ...baseConnectionRequest,
               skip_aggregation: true
@@ -285,7 +285,7 @@ describe('mx provider', () => {
         })
 
         it('creates a member with skip_aggregation if jobType is not aggregate', async () => {
-          await mxApi.CreateConnection(
+          await mxAdapter.CreateConnection(
             {
               ...baseConnectionRequest,
               initial_job_type: 'auth'
@@ -297,7 +297,7 @@ describe('mx provider', () => {
         })
 
         it('creates a member with !skip_aggregation if jobType is aggregate', async () => {
-          await mxApi.CreateConnection(
+          await mxAdapter.CreateConnection(
             {
               ...baseConnectionRequest,
               initial_job_type: 'aggregate'
@@ -309,7 +309,7 @@ describe('mx provider', () => {
         })
 
         it('creates a member with correctly mapped request options and returns the member from that response when is_oauth', async () => {
-          await mxApi.CreateConnection(
+          await mxAdapter.CreateConnection(
             {
               ...baseConnectionRequest,
               is_oauth: true
@@ -336,7 +336,7 @@ describe('mx provider', () => {
       })
 
       it('returns the member from verifyMember if job type is verification or aggregate_identity_verification', async () => {
-        const verificationMember = await mxApi.CreateConnection(
+        const verificationMember = await mxAdapter.CreateConnection(
           {
             ...baseConnectionRequest,
             initial_job_type: 'verification'
@@ -346,10 +346,10 @@ describe('mx provider', () => {
 
         expect(verificationMember.id).toEqual(verifyMemberData.member.guid)
 
-        const aggregateMember = await mxApi.CreateConnection(
+        const aggregateMember = await mxAdapter.CreateConnection(
           {
             ...baseConnectionRequest,
-            initial_job_type: 'all'
+            initial_job_type: 'aggregate_identity_verification'
           },
           'testUserId'
         )
@@ -358,10 +358,10 @@ describe('mx provider', () => {
       })
 
       it('returns the member from identifyMember if job type is aggregate_identity', async () => {
-        const member = await mxApi.CreateConnection(
+        const member = await mxAdapter.CreateConnection(
           {
             ...baseConnectionRequest,
-            initial_job_type: 'vc_identity'
+            initial_job_type: 'aggregate_identity'
           },
           'testUserId'
         )
@@ -370,7 +370,7 @@ describe('mx provider', () => {
       })
 
       it('returns the member from extendHistory if job type is aggregate_extendedhistory', async () => {
-        const member = await mxApi.CreateConnection(
+        const member = await mxAdapter.CreateConnection(
           {
             ...baseConnectionRequest,
             initial_job_type: 'aggregate_extendedhistory'
@@ -396,7 +396,7 @@ describe('mx provider', () => {
           })
         )
 
-        await mxApi.DeleteConnection('testId', 'testUserId')
+        await mxAdapter.DeleteConnection('testId', 'testUserId')
 
         expect(connectionDeletionAttempted).toBe(true)
       })
@@ -411,7 +411,7 @@ describe('mx provider', () => {
       }
 
       it('returns the member from verifyMember if jobType is verification', async () => {
-        const member = await mxApi.UpdateConnection(
+        const member = await mxAdapter.UpdateConnection(
           {
             ...baseUpdateConnectionRequest,
             job_type: 'verification'
@@ -423,7 +423,7 @@ describe('mx provider', () => {
       })
 
       it('returns the member from identifyMember if jobType is aggregate_identity', async () => {
-        const member = await mxApi.UpdateConnection(
+        const member = await mxAdapter.UpdateConnection(
           {
             ...baseUpdateConnectionRequest,
             job_type: 'aggregate_identity'
@@ -435,7 +435,7 @@ describe('mx provider', () => {
       })
 
       it('returns the member from extendHistory if jobType is aggregate_extendedhistory', async () => {
-        const member = await mxApi.UpdateConnection(
+        const member = await mxAdapter.UpdateConnection(
           {
             ...baseUpdateConnectionRequest,
             job_type: 'aggregate_extendedhistory'
@@ -447,7 +447,7 @@ describe('mx provider', () => {
       })
 
       it('returns the member from aggregateMember if jobType is agg', async () => {
-        const member = await mxApi.UpdateConnection(
+        const member = await mxAdapter.UpdateConnection(
           {
             ...baseUpdateConnectionRequest,
             job_type: 'agg'
@@ -469,7 +469,7 @@ describe('mx provider', () => {
           )
         )
 
-        const member = await mxApi.UpdateConnection(
+        const member = await mxAdapter.UpdateConnection(
           {
             ...baseUpdateConnectionRequest,
             job_type: 'aggregate_extendedhistory'
@@ -493,7 +493,7 @@ describe('mx provider', () => {
           )
         )
 
-        const error = await mxApi.UpdateConnection(
+        const error = await mxAdapter.UpdateConnection(
           {
             ...baseUpdateConnectionRequest,
             job_type: 'verification'
@@ -530,7 +530,7 @@ describe('mx provider', () => {
           )
         )
 
-        const error = await mxApi.UpdateConnection(
+        const error = await mxAdapter.UpdateConnection(
           {
             ...baseUpdateConnectionRequest,
             job_type: 'aggregate_extendedhistory'
@@ -557,7 +557,7 @@ describe('mx provider', () => {
           })
         )
 
-        const member = await mxApi.UpdateConnectionInternal(
+        const member = await mxAdapter.UpdateConnectionInternal(
           {
             id: 'updateConnectionId',
             job_type: 'testJobType',
@@ -595,7 +595,7 @@ describe('mx provider', () => {
     describe('GetConnectionById', () => {
       it('returns the member from readMember', async () => {
         const testUserId = 'userId'
-        const member = await mxApi.GetConnectionById('connectionId', testUserId)
+        const member = await mxAdapter.GetConnectionById('connectionId', testUserId)
 
         const testMember = connectionByIdMemberData.member
 
@@ -615,7 +615,7 @@ describe('mx provider', () => {
       it("returns a rejected connection status if there's an error with oauthStatus", async () => {
         await set(memberStatusData.member.guid, { error: true })
 
-        const connectionStatus = await mxApi.GetConnectionStatus(
+        const connectionStatus = await mxAdapter.GetConnectionStatus(
           'testMemberId',
           'testJobId',
           false,
@@ -691,7 +691,7 @@ describe('mx provider', () => {
         const userId = 'testUserId'
 
         expect(
-          await mxApi.GetConnectionStatus(
+          await mxAdapter.GetConnectionStatus(
             'testMemberId',
             'testJobId',
             false,
@@ -775,7 +775,7 @@ describe('mx provider', () => {
         }
 
         expect(
-          await mxApi.AnswerChallenge(
+          await mxAdapter.AnswerChallenge(
             {
               id: 'requestId',
               job_type: 'auth',
@@ -804,13 +804,13 @@ describe('mx provider', () => {
       it("returns the mx user from listUsers if it's available", async () => {
         const user = listUsersData.users[0]
 
-        const returnedUserId = await mxApi.ResolveUserId(user.id)
+        const returnedUserId = await mxAdapter.ResolveUserId(user.id)
 
         expect(returnedUserId).toEqual(user.guid)
       })
 
       it("creates the user if the user isn't in the list and returns it from there", async () => {
-        const returnedUserId = await mxApi.ResolveUserId('fdadfsafd')
+        const returnedUserId = await mxAdapter.ResolveUserId('fdadfsafd')
 
         expect(returnedUserId).toEqual(createUserData.user.guid)
       })
@@ -825,7 +825,7 @@ describe('mx provider', () => {
 
         const userId = 'fdasfdasfds'
 
-        const returnedUserId = await mxApi.ResolveUserId(userId)
+        const returnedUserId = await mxAdapter.ResolveUserId(userId)
 
         expect(returnedUserId).toEqual(userId)
       })

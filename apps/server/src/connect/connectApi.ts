@@ -7,7 +7,8 @@ import {
   type Connection,
   ConnectionStatus,
   type Institution,
-  type InstitutionSearchResponseItem
+  type InstitutionSearchResponseItem,
+  type JobType
 } from '../shared/contract'
 
 import { ProviderAdapterBase } from '../adapters'
@@ -128,7 +129,7 @@ export class ConnectApi extends ProviderAdapterBase {
       skip_aggregation:
         (memberData.skip_aggregation ?? false) &&
         (memberData.is_oauth ?? false),
-      initial_job_type: this.context.job_type ?? 'agg',
+      initial_job_type: this.context.job_type ?? 'aggregate',
       credentials:
         memberData.credentials?.map((c) => ({
           id: c.guid,
@@ -242,9 +243,10 @@ export class ConnectApi extends ProviderAdapterBase {
   }
 
   async loadInstitutions(
-    query: string
+    query: string,
+    jobType: JobType
   ): Promise<InstitutionSearchResponseItem[]> {
-    const institutionHits = await search(query)
+    const institutionHits = await search(query, jobType)
     return institutionHits.map(mapCachedInstitution)
   }
 

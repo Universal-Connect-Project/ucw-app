@@ -136,7 +136,8 @@ export default function (app) {
   )
   app.get(ApiEndpoints.INSTITUTIONS, async (req, res) => {
     const ret = await req.connectService.loadInstitutions(
-      req.query.search_name ?? req.query.routing_number
+      req.query.search_name ?? req.query.routing_number,
+      req.context.job_type
     )
     res.send(ret)
   })

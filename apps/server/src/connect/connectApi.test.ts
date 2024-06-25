@@ -43,7 +43,7 @@ describe('loadInstitutions', () => {
   ]
 
   it('loads formatted institutions', async () => {
-    const institutions = await connectApi.loadInstitutions('MX')
+    const institutions = await connectApi.loadInstitutions('MX', 'aggregate')
 
     expect(institutions).toEqual(expectedInstitutionList)
   })
