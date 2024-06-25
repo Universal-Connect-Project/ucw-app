@@ -6,11 +6,19 @@ import {
   SOPHTRON_CREATE_MEMBER_PATH,
   SOPHTRON_DELETE_MEMBER_PATH,
   SOPHTRON_INSTITUTION_BY_ID_PATH,
-  SOPHTRON_MEMBER_BY_ID_PATH
+  SOPHTRON_MEMBER_BY_ID_PATH,
+  SOPHTRON_UPDATE_MEMBER_PATH
 } from '../test/handlers'
 import { sophtronInstitutionData } from '../test/testData/institution'
-import { ConnectionStatus, CreateConnectionRequest } from '../shared/contract'
-import { createMemberData } from '../test/testData/sophtronMember'
+import {
+  ConnectionStatus,
+  CreateConnectionRequest,
+  UpdateConnectionRequest
+} from '../shared/contract'
+import {
+  createMemberData,
+  updateMemberData
+} from '../test/testData/sophtronMember'
 
 const adapter = new SophtronAdapter({
   sophtron: {
@@ -255,6 +263,52 @@ describe('sophtron adapter', () => {
       expect(requestParams).toEqual({
         memberId: testId,
         userId: testUserId
+      })
+    })
+  })
+
+  describe('UpdateConnection', () => {
+    it('calls the updateMember endpoint with the correct payload and returns a response', async () => {
+      const usernameValue = 'testUsernameValue'
+      const passwordValue = 'passwordValue'
+
+      let updateMemberPayload
+
+      server.use(
+        http.put(SOPHTRON_UPDATE_MEMBER_PATH, async ({ request }) => {
+          updateMemberPayload = await request.json()
+
+          return HttpResponse.json(updateMemberData)
+        })
+      )
+
+      const response = await adapter.UpdateConnection(
+        {
+          credentials: [
+            {
+              id: 'username',
+              value: usernameValue
+            },
+            {
+              id: 'password',
+              value: passwordValue
+            }
+          ],
+          id: testId
+        } as UpdateConnectionRequest,
+        testUserId
+      )
+
+      expect(updateMemberPayload).toEqual({
+        Password: passwordValue,
+        UserName: usernameValue
+      })
+
+      expect(response).toEqual({
+        cur_job_id: updateMemberData.JobID,
+        id: updateMemberData.MemberID,
+        institution_code: 'institution_code',
+        provider: 'sophtron'
       })
     })
   })

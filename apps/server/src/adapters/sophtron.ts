@@ -10,12 +10,9 @@ import type {
 import { ChallengeType, ConnectionStatus } from '../shared/contract'
 import { mapJobType } from '../utils'
 
-import config from '../config'
 import { debug, error, trace } from '../infra/logger'
 import SophtronClientV1 from '../providerApiClients/sophtronClient'
 import SophtronClient from '../providerApiClients/sophtronClient/v2'
-
-// const uuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
 function fromSophtronInstitution(ins: any): Institution | undefined {
   if (!ins) {
@@ -40,20 +37,7 @@ export class SophtronAdapter implements WidgetAdapter {
     this.apiClientV1 = new SophtronClientV1(sophtron)
   }
 
-  async clearConnection(vc: any, id: string, userID: string) {
-    if (config.Demo && vc.issuer) {
-      // a valid vc should have an issuer field. this means we have a successful response,
-      // once a VC is sccessfully returned to user, we clear the connection for data safty
-      this.apiClient.deleteMember(userID, id)
-    }
-  }
-
   async GetInstitutionById(id: string): Promise<Institution> {
-    // if (!uuid.test(id)) {
-    //   const name = id;
-    //   const res = await this.apiClient.getInstitutionsByName(name);
-    //   return fromSophtronInstitution(res?.[0]);
-    // }
     const ins = await this.apiClientV1.getInstitutionById(id)
     return fromSophtronInstitution(ins)
   }
@@ -139,9 +123,7 @@ export class SophtronAdapter implements WidgetAdapter {
   ): Promise<Connection> {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const job_type = mapJobType('agg')
-    if (!job_type) {
-      return
-    }
+
     const username = request.credentials.find(
       (item) => item.id === 'username'
     ).value
