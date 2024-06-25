@@ -9,7 +9,7 @@ import {
 } from '../test/handlers'
 import { sophtronInstitutionData } from '../test/testData/institution'
 
-const Adapter = new SophtronAdapter({
+const adapter = new SophtronAdapter({
   sophtron: {
     clientId: 'testClientId',
     endpoint: config.SophtronApiServiceEndpoint,
@@ -35,7 +35,7 @@ describe('sophtron adapter', () => {
         })
       )
 
-      await Adapter.clearConnection({ issuer: true }, testId, testUserId)
+      await adapter.clearConnection({ issuer: true }, testId, testUserId)
 
       expect(memberDeletionAttempted).toBe(true)
     })
@@ -53,7 +53,7 @@ describe('sophtron adapter', () => {
         })
       )
 
-      await Adapter.clearConnection({}, testId, testUserId)
+      await adapter.clearConnection({}, testId, testUserId)
 
       expect(memberDeletionAttempted).toBe(false)
     })
@@ -61,7 +61,7 @@ describe('sophtron adapter', () => {
 
   describe('GetInstitutionById', () => {
     it('returns a modified institution object', async () => {
-      const response = await Adapter.GetInstitutionById(testId)
+      const response = await adapter.GetInstitutionById(testId)
 
       expect(response).toEqual({
         id: sophtronInstitutionData.InstitutionID,
@@ -90,7 +90,7 @@ describe('sophtron adapter', () => {
         )
       )
 
-      const response = await Adapter.ListInstitutionCredentials(testId)
+      const response = await adapter.ListInstitutionCredentials(testId)
 
       expect(response).toEqual([
         {
@@ -109,7 +109,7 @@ describe('sophtron adapter', () => {
     })
 
     it('Uses standard User name and Password if nothing custom is provided', async () => {
-      const response = await Adapter.ListInstitutionCredentials(testId)
+      const response = await adapter.ListInstitutionCredentials(testId)
 
       expect(response).toEqual([
         {
@@ -140,7 +140,7 @@ describe('sophtron adapter', () => {
         })
       )
 
-      const response = await Adapter.ListConnectionCredentials(
+      const response = await adapter.ListConnectionCredentials(
         testId,
         testUserId
       )
@@ -168,12 +168,18 @@ describe('sophtron adapter', () => {
         http.get(SOPHTRON_MEMBER_BY_ID, () => HttpResponse.json(undefined))
       )
 
-      const response = await Adapter.ListConnectionCredentials(
+      const response = await adapter.ListConnectionCredentials(
         testId,
         testUserId
       )
 
       expect(response).toEqual([])
+    })
+  })
+
+  describe('ListConnections', () => {
+    it('returns an empty array', async () => {
+      expect(await adapter.ListConnections()).toEqual([])
     })
   })
 })

@@ -7,10 +7,7 @@ import type {
   UpdateConnectionRequest,
   WidgetAdapter
 } from '../shared/contract'
-import {
-  ChallengeType,
-  ConnectionStatus
-} from '../shared/contract'
+import { ChallengeType, ConnectionStatus } from '../shared/contract'
 import { mapJobType } from '../utils'
 
 import config from '../config'
@@ -20,7 +17,7 @@ import SophtronClient from '../providerApiClients/sophtronClient/v2'
 
 // const uuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
-function fromSophtronInstitution (ins: any): Institution | undefined {
+function fromSophtronInstitution(ins: any): Institution | undefined {
   if (!ins) {
     return undefined
   }
@@ -37,13 +34,13 @@ export class SophtronAdapter implements WidgetAdapter {
   apiClient: any
   apiClientV1: any
 
-  constructor (config: any) {
+  constructor(config: any) {
     const { sophtron } = config
     this.apiClient = new SophtronClient(sophtron)
     this.apiClientV1 = new SophtronClientV1(sophtron)
   }
 
-  async clearConnection (vc: any, id: string, userID: string) {
+  async clearConnection(vc: any, id: string, userID: string) {
     if (config.Demo && vc.issuer) {
       // a valid vc should have an issuer field. this means we have a successful response,
       // once a VC is sccessfully returned to user, we clear the connection for data safty
@@ -51,7 +48,7 @@ export class SophtronAdapter implements WidgetAdapter {
     }
   }
 
-  async GetInstitutionById (id: string): Promise<Institution> {
+  async GetInstitutionById(id: string): Promise<Institution> {
     // if (!uuid.test(id)) {
     //   const name = id;
     //   const res = await this.apiClient.getInstitutionsByName(name);
@@ -61,7 +58,7 @@ export class SophtronAdapter implements WidgetAdapter {
     return fromSophtronInstitution(ins)
   }
 
-  async ListInstitutionCredentials (id: string): Promise<Credential[]> {
+  async ListInstitutionCredentials(id: string): Promise<Credential[]> {
     const ins = await this.apiClientV1.getInstitutionById(id)
     const ret = [
       {
@@ -82,7 +79,10 @@ export class SophtronAdapter implements WidgetAdapter {
     return ret
   }
 
-  async ListConnectionCredentials (connectionId: string, userId: string): Promise<Credential[]> {
+  async ListConnectionCredentials(
+    connectionId: string,
+    userId: string
+  ): Promise<Credential[]> {
     const uins = await this.apiClient.getMember(userId, connectionId)
     if (uins) {
       return await this.ListInstitutionCredentials(uins.InstitutionID)
@@ -90,11 +90,11 @@ export class SophtronAdapter implements WidgetAdapter {
     return []
   }
 
-  async ListConnections (userId: string): Promise<Connection[]> {
-    return await Promise.resolve([])
+  async ListConnections(): Promise<Connection[]> {
+    return []
   }
 
-  async CreateConnection (
+  async CreateConnection(
     request: CreateConnectionRequest,
     userId: string
   ): Promise<Connection | undefined> {
@@ -110,7 +110,13 @@ export class SophtronAdapter implements WidgetAdapter {
     )
     // if password field wasn't available, it should be a 'none' type
     const password = passwordField ? passwordField.value : 'None'
-    const ret = await this.apiClient.createMember(userId, jobType, username, password, request.institution_id)
+    const ret = await this.apiClient.createMember(
+      userId,
+      jobType,
+      username,
+      password,
+      request.institution_id
+    )
     if (ret) {
       return {
         id: ret.MemberID,
@@ -123,11 +129,11 @@ export class SophtronAdapter implements WidgetAdapter {
     return undefined
   }
 
-  async DeleteConnection (id: string, userId: string): Promise<void> {
+  async DeleteConnection(id: string, userId: string): Promise<void> {
     return this.apiClient.deleteMember(userId, id)
   }
 
-  async UpdateConnection (
+  async UpdateConnection(
     request: UpdateConnectionRequest,
     userId: string
   ): Promise<Connection> {
@@ -142,7 +148,13 @@ export class SophtronAdapter implements WidgetAdapter {
     const password = request.credentials.find(
       (item) => item.id === 'password'
     ).value
-    const ret = await this.apiClient.updateMember(userId, request.id, job_type, username, password)
+    const ret = await this.apiClient.updateMember(
+      userId,
+      request.id,
+      job_type,
+      username,
+      password
+    )
     return {
       id: ret.MemberID,
       cur_job_id: ret.JobID,
@@ -151,7 +163,10 @@ export class SophtronAdapter implements WidgetAdapter {
     }
   }
 
-  async GetConnectionById (connectionId: string, userId: string): Promise<Connection> {
+  async GetConnectionById(
+    connectionId: string,
+    userId: string
+  ): Promise<Connection> {
     const m = await this.apiClient.getMember(userId, connectionId)
     return {
       id: m.MemberID,
@@ -162,7 +177,12 @@ export class SophtronAdapter implements WidgetAdapter {
   }
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  async GetConnectionStatus (memberId: string, jobId: string, single_account_select: boolean, userId: string): Promise<Connection> {
+  async GetConnectionStatus(
+    memberId: string,
+    jobId: string,
+    single_account_select: boolean,
+    userId: string
+  ): Promise<Connection> {
     if (!jobId) {
       const ret = await this.GetConnectionById(memberId, userId)
       return ret
@@ -189,18 +209,22 @@ export class SophtronAdapter implements WidgetAdapter {
         break
       case 'AccountsReady': {
         const jobType = job.JobType.toLowerCase()
-        if (single_account_select &&
-            (!job.AccountID || job.AccountID === '00000000-0000-0000-0000-000000000000') &&
-            (jobType === 'authallaccounts' || jobType === 'refreshauthall')
+        if (
+          single_account_select &&
+          (!job.AccountID ||
+            job.AccountID === '00000000-0000-0000-0000-000000000000') &&
+          (jobType === 'authallaccounts' || jobType === 'refreshauthall')
         ) {
-          const accounts = await this.apiClientV1.getUserInstitutionAccounts(memberId)
+          const accounts =
+            await this.apiClientV1.getUserInstitutionAccounts(memberId)
           challenge.id = 'single_account_select'
           challenge.external_id = 'single_account_select'
           challenge.type = ChallengeType.OPTIONS
           challenge.question = 'Please select an account to proceed:'
-          challenge.data = accounts.map(
-            (a: any) => ({ key: `${a.AccountName} ${a.AccountNumber}`, value: a.AccountID })
-          )
+          challenge.data = accounts.map((a: any) => ({
+            key: `${a.AccountName} ${a.AccountNumber}`,
+            value: a.AccountID
+          }))
         } else {
           status = ConnectionStatus.CREATED
         }
@@ -234,8 +258,7 @@ export class SophtronAdapter implements WidgetAdapter {
         } else if (job.TokenRead) {
           challenge.id = 'TokenRead'
           challenge.type = ChallengeType.TOKEN
-          challenge.question =
-            `Please approve from you secure device with following token: ${job.TokenRead}`
+          challenge.question = `Please approve from you secure device with following token: ${job.TokenRead}`
           challenge.data = job.TokenRead
         } else if (job.CaptchaImage) {
           challenge.id = 'CaptchaImage'
@@ -260,7 +283,10 @@ export class SophtronAdapter implements WidgetAdapter {
     }
   }
 
-  async AnswerChallenge (request: UpdateConnectionRequest, jobId: string): Promise<boolean> {
+  async AnswerChallenge(
+    request: UpdateConnectionRequest,
+    jobId: string
+  ): Promise<boolean> {
     const c = request.challenges[0]
     let answer
     switch (c.id) {
@@ -286,7 +312,7 @@ export class SophtronAdapter implements WidgetAdapter {
   }
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  async ResolveUserId (user_id: string) {
+  async ResolveUserId(user_id: string) {
     debug('Resolving UserId: ' + user_id)
     const sophtronUser = await this.apiClient.getCustomerByUniqueName(user_id)
     if (sophtronUser) {
