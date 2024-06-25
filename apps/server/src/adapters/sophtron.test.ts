@@ -17,6 +17,7 @@ import {
 } from '../shared/contract'
 import {
   createMemberData,
+  getMemberData,
   updateMemberData
 } from '../test/testData/sophtronMember'
 
@@ -309,6 +310,34 @@ describe('sophtron adapter', () => {
         id: updateMemberData.MemberID,
         institution_code: 'institution_code',
         provider: 'sophtron'
+      })
+    })
+  })
+
+  describe('GetConnectionById', () => {
+    it('calls the getMember endpoint with the correct parameters and returns the connection', async () => {
+      let getMemberParams
+
+      server.use(
+        http.get(SOPHTRON_MEMBER_BY_ID_PATH, ({ params }) => {
+          getMemberParams = params
+
+          return HttpResponse.json(getMemberData)
+        })
+      )
+
+      const response = await adapter.GetConnectionById(testId, testUserId)
+
+      expect(response).toEqual({
+        id: getMemberData.MemberID,
+        institution_code: getMemberData.InstitutionID,
+        provider: 'sophtron',
+        user_id: testUserId
+      })
+
+      expect(getMemberParams).toEqual({
+        memberId: testId,
+        userId: testUserId
       })
     })
   })

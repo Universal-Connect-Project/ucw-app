@@ -4,3 +4,8 @@ export const createMemberData = {
 }
 
 export const updateMemberData = createMemberData
+
+export const getMemberData = {
+  ...createMemberData,
+  InstitutionID: 'institutionId'
+}

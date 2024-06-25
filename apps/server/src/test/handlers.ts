@@ -21,7 +21,11 @@ import {
   createUserData,
   listUsersData
 } from './testData/users'
-import { createMemberData, updateMemberData } from './testData/sophtronMember'
+import {
+  createMemberData,
+  getMemberData,
+  updateMemberData
+} from './testData/sophtronMember'
 
 const MX_INTEGRATION_PATH = 'https://int-api.mx.com'
 
@@ -72,7 +76,7 @@ const handlers = [
   http.post(SOPHTRON_INSTITUTION_BY_ID_PATH, () =>
     HttpResponse.json(sophtronInstitutionData)
   ),
-  http.get(SOPHTRON_MEMBER_BY_ID_PATH, () => HttpResponse.json({})),
+  http.get(SOPHTRON_MEMBER_BY_ID_PATH, () => HttpResponse.json(getMemberData)),
   http.delete(
     SOPHTRON_DELETE_MEMBER_PATH,
     () => new HttpResponse(null, { status: 200 })
