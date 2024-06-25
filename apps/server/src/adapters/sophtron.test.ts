@@ -5,12 +5,17 @@ import { HttpResponse, http } from 'msw'
 import {
   SOPHTRON_CREATE_MEMBER_PATH,
   SOPHTRON_DELETE_MEMBER_PATH,
+  SOPHTRON_GET_JOB_INFO_PATH,
   SOPHTRON_INSTITUTION_BY_ID_PATH,
   SOPHTRON_MEMBER_BY_ID_PATH,
   SOPHTRON_UPDATE_MEMBER_PATH
 } from '../test/handlers'
-import { sophtronInstitutionData } from '../test/testData/institution'
 import {
+  sophtronInstitutionData,
+  sophtronUserInstitutionAccountsData
+} from '../test/testData/institution'
+import {
+  ChallengeType,
   ConnectionStatus,
   CreateConnectionRequest,
   UpdateConnectionRequest
@@ -31,6 +36,11 @@ const adapter = new SophtronAdapter({
 
 const testId = 'testId'
 const testUserId = 'testUserId'
+const testJobId = 'testJobId'
+const testUserInstitutionId = 'testUserInstitutionId'
+const usernameValue = 'testUsernameValue'
+const passwordValue = 'passwordValue'
+const accountsReadyStatus = 'AccountsReady'
 
 describe('sophtron adapter', () => {
   describe('GetInstitutionById', () => {
@@ -207,9 +217,6 @@ describe('sophtron adapter', () => {
         })
       )
 
-      const passwordValue = 'testPasswordValue'
-      const usernameValue = 'testUsernameValue'
-
       const response = await adapter.CreateConnection(
         {
           credentials: [
@@ -270,9 +277,6 @@ describe('sophtron adapter', () => {
 
   describe('UpdateConnection', () => {
     it('calls the updateMember endpoint with the correct payload and returns a response', async () => {
-      const usernameValue = 'testUsernameValue'
-      const passwordValue = 'passwordValue'
-
       let updateMemberPayload
 
       server.use(
@@ -340,5 +344,159 @@ describe('sophtron adapter', () => {
         userId: testUserId
       })
     })
+  })
+
+  describe('GetConnectionStatus', () => {
+    it('returns the connection using the memberId and userId if there is no jobId', async () => {
+      const response = await adapter.GetConnectionStatus(
+        testId,
+        undefined,
+        false,
+        testUserId
+      )
+
+      expect(response).toEqual({
+        id: getMemberData.MemberID,
+        institution_code: getMemberData.InstitutionID,
+        provider: 'sophtron',
+        user_id: testUserId
+      })
+    })
+
+    it('handles the job status success case', async () => {
+      server.use(
+        http.get(SOPHTRON_GET_JOB_INFO_PATH, () =>
+          HttpResponse.json({
+            JobID: testJobId,
+            SuccessFlag: true,
+            UserInstitutionID: testUserInstitutionId
+          })
+        )
+      )
+
+      const response = await adapter.GetConnectionStatus(
+        testId,
+        testJobId,
+        false,
+        testUserId
+      )
+
+      expect(response).toEqual({
+        id: testUserInstitutionId,
+        user_id: testUserId,
+        cur_job_id: testJobId,
+        status: ConnectionStatus.CONNECTED,
+        provider: 'sophtron'
+      })
+    })
+
+    it('handles the job status failure case', async () => {
+      server.use(
+        http.get(SOPHTRON_GET_JOB_INFO_PATH, () =>
+          HttpResponse.json({
+            JobID: testJobId,
+            SuccessFlag: false,
+            UserInstitutionID: testUserInstitutionId
+          })
+        )
+      )
+
+      const response = await adapter.GetConnectionStatus(
+        testId,
+        testJobId,
+        false,
+        testUserId
+      )
+
+      expect(response).toEqual({
+        id: testUserInstitutionId,
+        user_id: testUserId,
+        cur_job_id: testJobId,
+        status: ConnectionStatus.FAILED,
+        provider: 'sophtron'
+      })
+    })
+
+    it('handles the job status AccountsReady case', async () => {
+      server.use(
+        http.get(SOPHTRON_GET_JOB_INFO_PATH, () =>
+          HttpResponse.json({
+            JobID: testJobId,
+            JobType: 'agg',
+            LastStatus: accountsReadyStatus,
+            UserInstitutionID: testUserInstitutionId
+          })
+        )
+      )
+
+      const response = await adapter.GetConnectionStatus(
+        testId,
+        testJobId,
+        false,
+        testUserId
+      )
+
+      expect(response).toEqual({
+        id: testUserInstitutionId,
+        user_id: testUserId,
+        cur_job_id: testJobId,
+        status: ConnectionStatus.CREATED,
+        provider: 'sophtron'
+      })
+    })
+
+    it('handles the job status AccountsReady case with single account select', async () => {
+      server.use(
+        http.get(SOPHTRON_GET_JOB_INFO_PATH, () =>
+          HttpResponse.json({
+            JobID: testJobId,
+            JobType: 'refreshauthall',
+            LastStatus: accountsReadyStatus,
+            UserInstitutionID: testUserInstitutionId
+          })
+        )
+      )
+
+      const response = await adapter.GetConnectionStatus(
+        testId,
+        testJobId,
+        true,
+        testUserId
+      )
+
+      const [firstAccount] = sophtronUserInstitutionAccountsData
+
+      expect(response).toEqual({
+        challenges: [
+          {
+            id: 'single_account_select',
+            external_id: 'single_account_select',
+            type: ChallengeType.OPTIONS,
+            question: 'Please select an account to proceed:',
+            data: [
+              {
+                key: `${firstAccount.AccountName} ${firstAccount.AccountNumber}`,
+                value: firstAccount.AccountID
+              }
+            ]
+          }
+        ],
+        id: testUserInstitutionId,
+        user_id: testUserId,
+        cur_job_id: testJobId,
+        status: ConnectionStatus.CHALLENGED,
+        provider: 'sophtron'
+      })
+    })
+
+    it('handles the job status SecurityQuestion case', () => {})
+
+    it('handles the job status TokenMethod case', () => {})
+
+    it('handles the job status TokenSent case', () => {})
+
+    it('handles the job status TokenRead case', () => {})
+
+    it('handles the job status CaptchaImage case', () => {})
   })
 })

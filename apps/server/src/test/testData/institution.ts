@@ -18,6 +18,14 @@ export const sophtronInstitutionData = {
   URL: 'url'
 }
 
+export const sophtronUserInstitutionAccountsData = [
+  {
+    AccountName: 'AccountName',
+    AccountNumber: 'AccountNumber',
+    AccountID: 'AccountID'
+  }
+]
+
 export const finicityInsitutionData = {
   institution: {
     id: 'testId',

@@ -3,7 +3,8 @@ import { BASE_PATH as MX_BASE_PATH } from '../providerApiClients/mx'
 import {
   finicityInsitutionData,
   institutionData,
-  sophtronInstitutionData
+  sophtronInstitutionData,
+  sophtronUserInstitutionAccountsData
 } from './testData/institution'
 import { institutionCredentialsData } from './testData/institutionCredentials'
 import {
@@ -65,8 +66,14 @@ export const SOPHTRON_INSTITUTION_BY_ID_PATH = `${SOPHTRON_V1_BASE_PATH}/Institu
 export const SOPHTRON_MEMBER_BY_ID_PATH = `${SOPHTRON_V2_BASE_PATH}/customers/:userId/members/:memberId`
 export const SOPHTRON_CREATE_MEMBER_PATH = `${SOPHTRON_V2_BASE_PATH}/customers/:userId/members/:jobType`
 export const SOPHTRON_UPDATE_MEMBER_PATH = `${SOPHTRON_V2_BASE_PATH}/customers/:customerId/members/:memberId/:jobType`
+export const SOPHTRON_GET_JOB_INFO_PATH = `${SOPHTRON_V2_BASE_PATH}/job/:jobId`
+export const SOPHTRON_GET_USER_INSTITUTION_ACCOUNTS_PATH = `${SOPHTRON_V1_BASE_PATH}/UserInstitution/GetUserInstitutionAccounts`
 
 const handlers = [
+  http.post(SOPHTRON_GET_USER_INSTITUTION_ACCOUNTS_PATH, () =>
+    HttpResponse.json(sophtronUserInstitutionAccountsData)
+  ),
+  http.get(SOPHTRON_GET_JOB_INFO_PATH, () => HttpResponse.json({})),
   http.put(SOPHTRON_UPDATE_MEMBER_PATH, () =>
     HttpResponse.json(updateMemberData)
   ),
