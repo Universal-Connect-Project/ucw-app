@@ -1,14 +1,15 @@
 import config from '../config'
 import { algo, enc } from 'crypto-js'
 import { createCipheriv, createDecipheriv } from 'crypto'
+import { error } from '../infra/logger'
 
-export function hmac (text, key) {
+export function hmac(text, key) {
   const hmac = algo.HMAC.create(algo.SHA256, enc.Base64.parse(key))
   hmac.update(text)
   return enc.Base64.stringify(hmac.finalize())
 }
 
-export function buildSophtronAuthCode (httpMethod, url, apiUserID, secret) {
+export function buildSophtronAuthCode(httpMethod, url, apiUserID, secret) {
   const authPath = url.substring(url.lastIndexOf('/')).toLowerCase()
   const text = httpMethod.toUpperCase() + '\n' + authPath
   const b64Sig = hmac(text, secret)
@@ -18,7 +19,7 @@ export function buildSophtronAuthCode (httpMethod, url, apiUserID, secret) {
 
 const algorithm = config.CryptoAlgorithm
 
-export function encrypt (text, keyHex, ivHex) {
+export function encrypt(text, keyHex, ivHex) {
   if (text == null || text === '') {
     return ''
   }
@@ -30,7 +31,7 @@ export function encrypt (text, keyHex, ivHex) {
   return encrypted.toString('hex')
 }
 
-export function decrypt (text, keyHex, ivHex) {
+export function decrypt(text, keyHex, ivHex) {
   if (text == null || text === '') {
     return ''
   }
@@ -43,7 +44,7 @@ export function decrypt (text, keyHex, ivHex) {
   return decrypted.toString()
 }
 
-export function decodeAuthToken (input) {
+export function decodeAuthToken(input) {
   try {
     const str = Buffer.from(input, 'base64').toString('utf-8')
     const arr = str.split(';')
@@ -60,7 +61,7 @@ export function decodeAuthToken (input) {
   }
 }
 
-export function mapJobType (input) {
+export function mapJobType(input) {
   switch (input) {
     case 'agg':
     case 'aggregation':

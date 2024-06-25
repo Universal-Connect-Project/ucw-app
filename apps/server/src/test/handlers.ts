@@ -21,6 +21,7 @@ import {
   createUserData,
   listUsersData
 } from './testData/users'
+import { createMemberData } from './testData/sophtronMember'
 
 const MX_INTEGRATION_PATH = 'https://int-api.mx.com'
 
@@ -57,13 +58,17 @@ const SOPHTRON_V1_BASE_PATH = 'https://api.sophtron.com/api'
 
 export const SOPHTRON_DELETE_MEMBER_PATH = `${SOPHTRON_V2_BASE_PATH}/customers/:userId/members/:memberId`
 export const SOPHTRON_INSTITUTION_BY_ID_PATH = `${SOPHTRON_V1_BASE_PATH}/Institution/GetInstitutionByID`
-export const SOPHTRON_MEMBER_BY_ID = `${SOPHTRON_V2_BASE_PATH}/customers/:userId/members/:memberId`
+export const SOPHTRON_MEMBER_BY_ID_PATH = `${SOPHTRON_V2_BASE_PATH}/customers/:userId/members/:memberId`
+export const SOPHTRON_CREATE_MEMBER_PATH = `${SOPHTRON_V2_BASE_PATH}/customers/:userId/members/:jobType`
 
 const handlers = [
+  http.post(SOPHTRON_CREATE_MEMBER_PATH, () =>
+    HttpResponse.json(createMemberData)
+  ),
   http.post(SOPHTRON_INSTITUTION_BY_ID_PATH, () =>
     HttpResponse.json(sophtronInstitutionData)
   ),
-  http.get(SOPHTRON_MEMBER_BY_ID, () => HttpResponse.json({})),
+  http.get(SOPHTRON_MEMBER_BY_ID_PATH, () => HttpResponse.json({})),
   http.delete(
     SOPHTRON_DELETE_MEMBER_PATH,
     () => new HttpResponse(null, { status: 200 })

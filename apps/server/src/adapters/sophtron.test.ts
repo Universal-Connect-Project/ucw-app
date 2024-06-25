@@ -3,11 +3,14 @@ import config from '../config'
 import { SophtronAdapter } from './sophtron'
 import { HttpResponse, http } from 'msw'
 import {
+  SOPHTRON_CREATE_MEMBER_PATH,
   SOPHTRON_DELETE_MEMBER_PATH,
   SOPHTRON_INSTITUTION_BY_ID_PATH,
-  SOPHTRON_MEMBER_BY_ID
+  SOPHTRON_MEMBER_BY_ID_PATH
 } from '../test/handlers'
 import { sophtronInstitutionData } from '../test/testData/institution'
+import { ConnectionStatus, CreateConnectionRequest } from '../shared/contract'
+import { createMemberData } from '../test/testData/sophtronMember'
 
 const adapter = new SophtronAdapter({
   sophtron: {
@@ -133,7 +136,7 @@ describe('sophtron adapter', () => {
       let institutionId = null
 
       server.use(
-        http.get(SOPHTRON_MEMBER_BY_ID, ({ params }) => {
+        http.get(SOPHTRON_MEMBER_BY_ID_PATH, ({ params }) => {
           institutionId = params.memberId
 
           return HttpResponse.json({})
@@ -165,7 +168,7 @@ describe('sophtron adapter', () => {
 
     it('returns an empty array if there is no member', async () => {
       server.use(
-        http.get(SOPHTRON_MEMBER_BY_ID, () => HttpResponse.json(undefined))
+        http.get(SOPHTRON_MEMBER_BY_ID_PATH, () => HttpResponse.json(undefined))
       )
 
       const response = await adapter.ListConnectionCredentials(
@@ -180,6 +183,93 @@ describe('sophtron adapter', () => {
   describe('ListConnections', () => {
     it('returns an empty array', async () => {
       expect(await adapter.ListConnections()).toEqual([])
+    })
+  })
+
+  describe('CreateConnection', () => {
+    it('does nothing if there is no job type', async () => {
+      const response = await adapter.CreateConnection(
+        {
+          initial_job_type: undefined
+        } as CreateConnectionRequest,
+        testUserId
+      )
+
+      expect(response).toBeUndefined()
+    })
+
+    it('uses a None password if there is no password specified', async () => {
+      let createMemberPayload: any
+
+      server.use(
+        http.post(SOPHTRON_CREATE_MEMBER_PATH, async ({ request }) => {
+          createMemberPayload = await request.json()
+
+          return HttpResponse.json(createMemberData)
+        })
+      )
+
+      await adapter.CreateConnection(
+        {
+          credentials: [
+            {
+              id: 'username'
+            }
+          ],
+          initial_job_type: 'agg',
+          institution_id: testId
+        } as CreateConnectionRequest,
+        testUserId
+      )
+
+      expect(createMemberPayload.Password).toEqual('None')
+    })
+
+    it('calls the create member api with the correct payload and returns the new connection', async () => {
+      let createMemberPayload: any
+
+      server.use(
+        http.post(SOPHTRON_CREATE_MEMBER_PATH, async ({ request }) => {
+          createMemberPayload = await request.json()
+
+          return HttpResponse.json(createMemberData)
+        })
+      )
+
+      const passwordValue = 'testPasswordValue'
+      const usernameValue = 'testUsernameValue'
+
+      const response = await adapter.CreateConnection(
+        {
+          credentials: [
+            {
+              id: 'username',
+              value: usernameValue
+            },
+            {
+              id: 'password',
+              value: passwordValue
+            }
+          ],
+          initial_job_type: 'agg',
+          institution_id: testId
+        } as CreateConnectionRequest,
+        testUserId
+      )
+
+      expect(response).toEqual({
+        id: 'memberId',
+        cur_job_id: 'jobId',
+        institution_code: 'testId',
+        status: ConnectionStatus.CREATED,
+        provider: 'sophtron'
+      })
+
+      expect(createMemberPayload).toEqual({
+        InstitutionID: testId,
+        Password: passwordValue,
+        UserName: usernameValue
+      })
     })
   })
 })

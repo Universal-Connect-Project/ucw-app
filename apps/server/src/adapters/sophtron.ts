@@ -121,7 +121,7 @@ export class SophtronAdapter implements WidgetAdapter {
       return {
         id: ret.MemberID,
         cur_job_id: ret.JobID,
-        institution_code: request.institution_id, // TODO
+        institution_code: request.institution_id,
         status: ConnectionStatus.CREATED,
         provider: 'sophtron'
       }
@@ -138,7 +138,7 @@ export class SophtronAdapter implements WidgetAdapter {
     userId: string
   ): Promise<Connection> {
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    const job_type = mapJobType('agg') // TODO
+    const job_type = mapJobType('agg')
     if (!job_type) {
       return
     }
