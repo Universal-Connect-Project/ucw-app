@@ -574,7 +574,90 @@ describe('sophtron adapter', () => {
       })
     })
 
-    it('handles the job status TokenSent case', () => {})
+    it('handles the job status TokenSent case', async () => {
+      const testTokenInputName = 'testTokenInputName'
+
+      server.use(
+        http.get(SOPHTRON_GET_JOB_INFO_PATH, () =>
+          HttpResponse.json({
+            JobID: testJobId,
+            JobType: 'agg',
+            TokenInputName: testTokenInputName,
+            TokenSentFlag: true,
+            UserInstitutionID: testUserInstitutionId
+          })
+        )
+      )
+
+      const response = await adapter.GetConnectionStatus(
+        testId,
+        testJobId,
+        false,
+        testUserId
+      )
+
+      expect(response).toEqual({
+        challenges: [
+          {
+            id: 'TokenSentFlag',
+            type: ChallengeType.QUESTION,
+            data: [
+              {
+                key: 'ota',
+                value: `Please enter the ${testTokenInputName}`
+              }
+            ],
+            question: 'ota'
+          }
+        ],
+        id: testUserInstitutionId,
+        user_id: testUserId,
+        cur_job_id: testJobId,
+        status: ConnectionStatus.CHALLENGED,
+        provider: 'sophtron'
+      })
+    })
+
+    it('handles the job status TokenSent case without a tokenInputName', async () => {
+      server.use(
+        http.get(SOPHTRON_GET_JOB_INFO_PATH, () =>
+          HttpResponse.json({
+            JobID: testJobId,
+            JobType: 'agg',
+            TokenSentFlag: true,
+            UserInstitutionID: testUserInstitutionId
+          })
+        )
+      )
+
+      const response = await adapter.GetConnectionStatus(
+        testId,
+        testJobId,
+        false,
+        testUserId
+      )
+
+      expect(response).toEqual({
+        challenges: [
+          {
+            id: 'TokenSentFlag',
+            type: ChallengeType.QUESTION,
+            data: [
+              {
+                key: 'ota',
+                value: `Please enter the OTA code`
+              }
+            ],
+            question: 'ota'
+          }
+        ],
+        id: testUserInstitutionId,
+        user_id: testUserId,
+        cur_job_id: testJobId,
+        status: ConnectionStatus.CHALLENGED,
+        provider: 'sophtron'
+      })
+    })
 
     it('handles the job status TokenRead case', () => {})
 

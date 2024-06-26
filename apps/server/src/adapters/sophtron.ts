@@ -235,7 +235,7 @@ export class SophtronAdapter implements WidgetAdapter {
           challenge.data = [
             {
               key: 'ota',
-              value: `Please Enter the ${job.TokenInputName || 'OTA code'}`
+              value: `Please enter the ${job.TokenInputName || 'OTA code'}`
             }
           ]
         } else if (job.TokenRead) {
