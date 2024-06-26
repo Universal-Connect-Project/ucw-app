@@ -531,7 +531,48 @@ describe('sophtron adapter', () => {
       })
     })
 
-    it('handles the job status TokenMethod case', () => {})
+    it('handles the job status TokenMethod case', async () => {
+      const tokenMethodString = 'tokenMethodString'
+
+      server.use(
+        http.get(SOPHTRON_GET_JOB_INFO_PATH, () =>
+          HttpResponse.json({
+            JobID: testJobId,
+            JobType: 'agg',
+            TokenMethod: JSON.stringify([tokenMethodString]),
+            UserInstitutionID: testUserInstitutionId
+          })
+        )
+      )
+
+      const response = await adapter.GetConnectionStatus(
+        testId,
+        testJobId,
+        false,
+        testUserId
+      )
+
+      expect(response).toEqual({
+        challenges: [
+          {
+            id: 'TokenMethod',
+            type: ChallengeType.OPTIONS,
+            data: [
+              {
+                key: tokenMethodString,
+                value: tokenMethodString
+              }
+            ],
+            question: 'Please select a channel to receive your secure code'
+          }
+        ],
+        id: testUserInstitutionId,
+        user_id: testUserId,
+        cur_job_id: testJobId,
+        status: ConnectionStatus.CHALLENGED,
+        provider: 'sophtron'
+      })
+    })
 
     it('handles the job status TokenSent case', () => {})
 

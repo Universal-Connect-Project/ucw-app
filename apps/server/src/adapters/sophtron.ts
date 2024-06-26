@@ -217,16 +217,17 @@ export class SophtronAdapter implements WidgetAdapter {
           challenge.id = 'SecurityQuestion'
           challenge.type = ChallengeType.QUESTION
           challenge.data = JSON.parse(job.SecurityQuestion).map(
-            (q: string, i: number) => ({ key: q, value: q })
+            (q: string) => ({ key: q, value: q })
           )
         } else if (job.TokenMethod) {
           challenge.id = 'TokenMethod'
           challenge.type = ChallengeType.OPTIONS
           challenge.question =
-            'Please select a channal to receive your secure code'
-          challenge.data = JSON.parse(job.TokenMethod).map(
-            (q: string, i: number) => ({ key: q, value: q })
-          )
+            'Please select a channel to receive your secure code'
+          challenge.data = JSON.parse(job.TokenMethod).map((q: string) => ({
+            key: q,
+            value: q
+          }))
         } else if (job.TokenSentFlag === true) {
           challenge.id = 'TokenSentFlag'
           challenge.type = ChallengeType.QUESTION
