@@ -17,7 +17,7 @@
     "lint:fix": "eslint . --fix --ext .js,.ts",
     "coverage": "npm test -- --verbose --coverage --watchAll",
     "test": "jest --no-coverage",
-    "test:watch": "jest --no-coverage --watch",
+    "test:watch": "cross-env DEBUG_PRINT_LIMIT=50000 jest --no-coverage --watch",
     "test-clear": "npm test -- --clearCache"
   },
   "dependencies": {
@@ -71,6 +71,7 @@
     "@types/jest": "^29.5.12",
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "babel-plugin-js-logger": "^1.0.17",
+    "cross-env": "^7.0.3",
     "customize-cra": "^1.0.0",
     "cypress": "^13.7.1",
     "eslint": "^8.56.0",

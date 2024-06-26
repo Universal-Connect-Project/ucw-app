@@ -7,7 +7,7 @@ const context = {
 }
 const api = new ConnectApi({ context })
 
-async function sendStubData (fileName) {
+async function sendStubData(fileName) {
   return await new Promise((resolve, reject) => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const data = require(`services/stubs/${fileName}`)
@@ -20,10 +20,11 @@ const stub = {
   instrumentation: async () => await sendStubData('instrumentation'),
   loadUserFeatures: async () => await sendStubData('user_features'),
   createAnalyticsSession: async () => await sendStubData('analytics_sessions'),
-  loadJob: async (guid) => await Promise.resolve({
-    guid,
-    job_type: 0 // must
-  }),
+  loadJob: async (guid) =>
+    await Promise.resolve({
+      guid,
+      job_type: 0 // must
+    }),
   // loadPopularInstitutions: () => sendStubData('favorite'),
 
   extendSession: async () => await Promise.resolve(''),
@@ -42,20 +43,20 @@ for (const name of Object.getOwnPropertyNames(Object.getPrototypeOf(api))) {
   bridge[name] = () => api[name]
 }
 module.exports = new Proxy(bridge, {
-  get (target, prop) {
+  get(target, prop) {
     if (stub[prop]) {
       return async function () {
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        console.log(`Calling stub method: ${prop}`)
+        debug(`Calling stub method: ${prop}`)
         const ret = await stub[prop].apply(null, arguments)
-        console.log(JSON.stringify(ret))
+        debug(JSON.stringify(ret))
         return ret
       }
     }
     if (api[prop]) {
       return async function () {
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        console.log(`Calling api method: ${prop}`)
+        debug(`Calling api method: ${prop}`)
         try {
           const ret = await api[prop].apply(api, arguments)
           switch (prop) {
@@ -83,24 +84,26 @@ module.exports = new Proxy(bridge, {
               return {
                 ...ret.institution,
                 // Remove extra level of nesting
-                credentials: ret.institution.credentials.map(credential => credential.credential)
+                credentials: ret.institution.credentials.map(
+                  (credential) => credential.credential
+                )
               }
             case 'loadJob':
               return ret.job
           }
           return ret
         } catch (err) {
-          console.log(err.message || JSON.stringify(err))
+          debug(err.message || JSON.stringify(err))
         }
       }
     }
     if (prop !== '$$typeof') {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      console.log(`Unstubbed method retrieved ${prop}`)
+      debug(`Unstubbed method retrieved ${prop}`)
     }
     return async function () {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      console.log(`Unstubbed method called ${prop}`)
+      debug(`Unstubbed method called ${prop}`)
       return await Promise.resolve('')
     }
   }
