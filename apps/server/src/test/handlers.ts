@@ -68,8 +68,13 @@ export const SOPHTRON_CREATE_MEMBER_PATH = `${SOPHTRON_V2_BASE_PATH}/customers/:
 export const SOPHTRON_UPDATE_MEMBER_PATH = `${SOPHTRON_V2_BASE_PATH}/customers/:customerId/members/:memberId/:jobType`
 export const SOPHTRON_GET_JOB_INFO_PATH = `${SOPHTRON_V2_BASE_PATH}/job/:jobId`
 export const SOPHTRON_GET_USER_INSTITUTION_ACCOUNTS_PATH = `${SOPHTRON_V1_BASE_PATH}/UserInstitution/GetUserInstitutionAccounts`
+export const SOPHTRON_ANSWER_JOB_MFA_PATH = `${SOPHTRON_V2_BASE_PATH}/job/:jobId/challenge/:challengeId`
 
 const handlers = [
+  http.put(
+    SOPHTRON_ANSWER_JOB_MFA_PATH,
+    () => new HttpResponse(null, { status: 200 })
+  ),
   http.post(SOPHTRON_GET_USER_INSTITUTION_ACCOUNTS_PATH, () =>
     HttpResponse.json(sophtronUserInstitutionAccountsData)
   ),

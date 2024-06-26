@@ -3,6 +3,7 @@ import config from '../config'
 import { SophtronAdapter } from './sophtron'
 import { HttpResponse, http } from 'msw'
 import {
+  SOPHTRON_ANSWER_JOB_MFA_PATH,
   SOPHTRON_CREATE_MEMBER_PATH,
   SOPHTRON_DELETE_MEMBER_PATH,
   SOPHTRON_GET_JOB_INFO_PATH,
@@ -760,6 +761,134 @@ describe('sophtron adapter', () => {
       cur_job_id: testJobId,
       status: ConnectionStatus.CREATED,
       provider: 'sophtron'
+    })
+  })
+
+  describe('AnswerChallenge', () => {
+    it('calls the answerJobMfa api with true for TokenRead', async () => {
+      let requestParams
+      let requestBody
+
+      server.use(
+        http.put(SOPHTRON_ANSWER_JOB_MFA_PATH, async ({ params, request }) => {
+          requestParams = params
+          requestBody = await request.json()
+
+          return new HttpResponse(null, { status: 200 })
+        })
+      )
+
+      const response = await adapter.AnswerChallenge(
+        {
+          challenges: [
+            {
+              id: 'TokenRead'
+            }
+          ]
+        } as UpdateConnectionRequest,
+        testId
+      )
+
+      expect(requestBody).toEqual({
+        AnswerText: true
+      })
+      expect(requestParams).toEqual({
+        challengeId: 'TokenRead',
+        jobId: testId
+      })
+
+      expect(response).toBe(true)
+    })
+
+    it('calls the answerJobMfa api with a stringified response for SecurityQuestion', async () => {
+      let requestParams
+      let requestBody
+
+      server.use(
+        http.put(SOPHTRON_ANSWER_JOB_MFA_PATH, async ({ params, request }) => {
+          requestParams = params
+          requestBody = await request.json()
+
+          return new HttpResponse(null, { status: 200 })
+        })
+      )
+
+      const testQuestionResponse = 'testQuestionResponse'
+
+      const response = await adapter.AnswerChallenge(
+        {
+          challenges: [
+            {
+              id: 'SecurityQuestion',
+              response: testQuestionResponse
+            }
+          ]
+        } as UpdateConnectionRequest,
+        testId
+      )
+
+      expect(requestBody).toEqual({
+        AnswerText: JSON.stringify([testQuestionResponse])
+      })
+      expect(requestParams).toEqual({
+        challengeId: 'SecurityQuestion',
+        jobId: testId
+      })
+
+      expect(response).toBe(true)
+    })
+
+    it('calls the answerJobMfa api with the response for TokenSentFlag', async () => {
+      let requestParams
+      let requestBody
+
+      server.use(
+        http.put(SOPHTRON_ANSWER_JOB_MFA_PATH, async ({ params, request }) => {
+          requestParams = params
+          requestBody = await request.json()
+
+          return new HttpResponse(null, { status: 200 })
+        })
+      )
+
+      const testQuestionResponse = 'testQuestionResponse'
+
+      const response = await adapter.AnswerChallenge(
+        {
+          challenges: [
+            {
+              id: 'TokenSentFlag',
+              response: testQuestionResponse
+            }
+          ]
+        } as UpdateConnectionRequest,
+        testId
+      )
+
+      expect(requestBody).toEqual({
+        AnswerText: testQuestionResponse
+      })
+      expect(requestParams).toEqual({
+        challengeId: 'TokenSentFlag',
+        jobId: testId
+      })
+
+      expect(response).toBe(true)
+    })
+
+    it("returns false if the id doesn't match anything", async () => {
+      const response = await adapter.AnswerChallenge(
+        {
+          challenges: [
+            {
+              id: 'junk'
+            }
+          ]
+        } as UpdateConnectionRequest,
+        testId
+      )
+
+      expect(response).toBe(false)
     })
   })
 })
