@@ -697,6 +697,69 @@ describe('sophtron adapter', () => {
       })
     })
 
-    it('handles the job status CaptchaImage case', () => {})
+    it('handles the job status CaptchaImage case', async () => {
+      const testCaptchaImage = 'testCaptchaImage'
+
+      server.use(
+        http.get(SOPHTRON_GET_JOB_INFO_PATH, () =>
+          HttpResponse.json({
+            JobID: testJobId,
+            JobType: 'agg',
+            CaptchaImage: testCaptchaImage,
+            UserInstitutionID: testUserInstitutionId
+          })
+        )
+      )
+
+      const response = await adapter.GetConnectionStatus(
+        testId,
+        testJobId,
+        false,
+        testUserId
+      )
+
+      expect(response).toEqual({
+        challenges: [
+          {
+            id: 'CaptchaImage',
+            type: ChallengeType.IMAGE,
+            data: testCaptchaImage,
+            question: `Please enter the Captcha code`
+          }
+        ],
+        id: testUserInstitutionId,
+        user_id: testUserId,
+        cur_job_id: testJobId,
+        status: ConnectionStatus.CHALLENGED,
+        provider: 'sophtron'
+      })
+    })
+  })
+
+  it('defaults to connection status created', async () => {
+    server.use(
+      http.get(SOPHTRON_GET_JOB_INFO_PATH, () =>
+        HttpResponse.json({
+          JobID: testJobId,
+          JobType: 'agg',
+          UserInstitutionID: testUserInstitutionId
+        })
+      )
+    )
+
+    const response = await adapter.GetConnectionStatus(
+      testId,
+      testJobId,
+      false,
+      testUserId
+    )
+
+    expect(response).toEqual({
+      id: testUserInstitutionId,
+      user_id: testUserId,
+      cur_job_id: testJobId,
+      status: ConnectionStatus.CREATED,
+      provider: 'sophtron'
+    })
   })
 })
