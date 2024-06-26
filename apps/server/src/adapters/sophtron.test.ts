@@ -659,7 +659,43 @@ describe('sophtron adapter', () => {
       })
     })
 
-    it('handles the job status TokenRead case', () => {})
+    it('handles the job status TokenRead case', async () => {
+      const testTokenRead = 'testTokenRead'
+
+      server.use(
+        http.get(SOPHTRON_GET_JOB_INFO_PATH, () =>
+          HttpResponse.json({
+            JobID: testJobId,
+            JobType: 'agg',
+            TokenRead: testTokenRead,
+            UserInstitutionID: testUserInstitutionId
+          })
+        )
+      )
+
+      const response = await adapter.GetConnectionStatus(
+        testId,
+        testJobId,
+        false,
+        testUserId
+      )
+
+      expect(response).toEqual({
+        challenges: [
+          {
+            id: 'TokenRead',
+            type: ChallengeType.TOKEN,
+            data: testTokenRead,
+            question: `Please approve from your secure device with the following token: ${testTokenRead}`
+          }
+        ],
+        id: testUserInstitutionId,
+        user_id: testUserId,
+        cur_job_id: testJobId,
+        status: ConnectionStatus.CHALLENGED,
+        provider: 'sophtron'
+      })
+    })
 
     it('handles the job status CaptchaImage case', () => {})
   })

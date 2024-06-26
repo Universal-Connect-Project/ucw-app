@@ -241,7 +241,7 @@ export class SophtronAdapter implements WidgetAdapter {
         } else if (job.TokenRead) {
           challenge.id = 'TokenRead'
           challenge.type = ChallengeType.TOKEN
-          challenge.question = `Please approve from you secure device with following token: ${job.TokenRead}`
+          challenge.question = `Please approve from your secure device with the following token: ${job.TokenRead}`
           challenge.data = job.TokenRead
         } else if (job.CaptchaImage) {
           challenge.id = 'CaptchaImage'
