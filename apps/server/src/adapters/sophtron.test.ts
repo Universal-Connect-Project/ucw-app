@@ -4,7 +4,9 @@ import { SophtronAdapter } from './sophtron'
 import { HttpResponse, http } from 'msw'
 import {
   SOPHTRON_ANSWER_JOB_MFA_PATH,
+  SOPHTRON_CREATE_CUSTOMER_PATH,
   SOPHTRON_CREATE_MEMBER_PATH,
+  SOPHTRON_CUSTOMER_UNIQUE_ID_PATH,
   SOPHTRON_DELETE_MEMBER_PATH,
   SOPHTRON_GET_JOB_INFO_PATH,
   SOPHTRON_INSTITUTION_BY_ID_PATH,
@@ -26,6 +28,10 @@ import {
   getMemberData,
   updateMemberData
 } from '../test/testData/sophtronMember'
+import {
+  createCustomerData,
+  customerFromUniqueIdData
+} from '../test/testData/sophtronCustomer'
 
 const adapter = new SophtronAdapter({
   sophtron: {
@@ -889,6 +895,47 @@ describe('sophtron adapter', () => {
       )
 
       expect(response).toBe(false)
+    })
+  })
+
+  describe('ResolveUserId', () => {
+    it('returns the customerId from getCustomerByUniqueName endpoint if it exists', async () => {
+      const response = await adapter.ResolveUserId(testUserId)
+
+      expect(response).toEqual(customerFromUniqueIdData.CustomerID)
+    })
+
+    it("creates a new customer and returns its id if there isn't one already", async () => {
+      server.use(
+        http.get(
+          SOPHTRON_CUSTOMER_UNIQUE_ID_PATH,
+          () => new HttpResponse(null, { status: 200 })
+        )
+      )
+
+      const response = await adapter.ResolveUserId(testUserId)
+
+      expect(response).toEqual(createCustomerData.CustomerID)
+    })
+
+    it('returns the provided user_id if creation fails', async () => {
+      server.use(
+        http.get(
+          SOPHTRON_CUSTOMER_UNIQUE_ID_PATH,
+          () => new HttpResponse(null, { status: 200 })
+        )
+      )
+
+      server.use(
+        http.post(
+          SOPHTRON_CREATE_CUSTOMER_PATH,
+          () => new HttpResponse(null, { status: 200 })
+        )
+      )
+
+      const response = await adapter.ResolveUserId(testUserId)
+
+      expect(response).toEqual(testUserId)
     })
   })
 })

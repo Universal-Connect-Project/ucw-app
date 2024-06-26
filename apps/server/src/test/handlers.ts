@@ -27,6 +27,10 @@ import {
   getMemberData,
   updateMemberData
 } from './testData/sophtronMember'
+import {
+  createCustomerData as createSophtronCustomerData,
+  customerFromUniqueIdData
+} from './testData/sophtronCustomer'
 
 const MX_INTEGRATION_PATH = 'https://int-api.mx.com'
 
@@ -69,8 +73,16 @@ export const SOPHTRON_UPDATE_MEMBER_PATH = `${SOPHTRON_V2_BASE_PATH}/customers/:
 export const SOPHTRON_GET_JOB_INFO_PATH = `${SOPHTRON_V2_BASE_PATH}/job/:jobId`
 export const SOPHTRON_GET_USER_INSTITUTION_ACCOUNTS_PATH = `${SOPHTRON_V1_BASE_PATH}/UserInstitution/GetUserInstitutionAccounts`
 export const SOPHTRON_ANSWER_JOB_MFA_PATH = `${SOPHTRON_V2_BASE_PATH}/job/:jobId/challenge/:challengeId`
+export const SOPHTRON_CUSTOMER_UNIQUE_ID_PATH = `${SOPHTRON_V2_BASE_PATH}/customers`
+export const SOPHTRON_CREATE_CUSTOMER_PATH = `${SOPHTRON_V2_BASE_PATH}/customers`
 
 const handlers = [
+  http.post(SOPHTRON_CUSTOMER_UNIQUE_ID_PATH, () =>
+    HttpResponse.json(createSophtronCustomerData)
+  ),
+  http.get(SOPHTRON_CUSTOMER_UNIQUE_ID_PATH, () =>
+    HttpResponse.json([customerFromUniqueIdData])
+  ),
   http.put(
     SOPHTRON_ANSWER_JOB_MFA_PATH,
     () => new HttpResponse(null, { status: 200 })
