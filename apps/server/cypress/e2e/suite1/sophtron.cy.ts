@@ -33,7 +33,7 @@ describe('Should connect to an Institution through happy path', () => {
     cy.findByRole('button', { name: 'Continue' }).click()
 
     cy.findByRole('textbox', {
-      name: 'Please Enter the Token',
+      name: 'Please enter the Token',
       timeout: 45000
     }).type('asdf')
     cy.findByRole('button', { name: 'Continue' }).click()
