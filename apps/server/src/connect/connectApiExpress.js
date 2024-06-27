@@ -4,6 +4,7 @@ import config from '../config'
 import { contextHandler } from '../infra/context.ts'
 import { wget } from '../infra/http'
 import { info } from '../infra/logger'
+import getVC from '../services/vcProviders'
 import { ApiEndpoints } from '../shared/connect/ApiEndpoint'
 import { ConnectionStatus } from '../shared/contract.ts'
 import { ConnectApi } from './connectApi'
@@ -284,5 +285,42 @@ export default function (app) {
     await wget(resourcePath).then((html) => {
       mapOauthParams(queries, res, html)
     })
+  })
+
+  // VC Data Endpoints
+  app.get('/data/accounts', async (req, res) => {
+    const { provider, connectionId, userId, accountId } = req.query
+    try {
+      const vc = await getVC(provider, connectionId, 'accounts', userId, accountId)
+      res.send({
+        jwt: vc
+      })
+    } catch (error) {
+      res.send(error)
+    }
+  })
+
+  app.get('/data/identity', async (req, res) => {
+    const { provider, connectionId, userId, accountId } = req.query
+    try {
+      const vc = await getVC(provider, connectionId, 'identity', userId, accountId)
+      res.send({
+        jwt: vc
+      })
+    } catch (error) {
+      res.send(error)
+    }
+  })
+
+  app.get('/data/transactions', async (req, res) => {
+    const { provider, connectionId, userId, accountId, startTime, endTime } = req.query
+    try {
+      const vc = await getVC(provider, connectionId, 'transactions', userId, accountId, startTime, endTime)
+      res.send({
+        jwt: vc
+      })
+    } catch (error) {
+      res.send(error)
+    }
   })
 }
