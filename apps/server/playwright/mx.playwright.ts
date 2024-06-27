@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 test('connects to mx bank with oAuth', async ({ page }) => {
   test.setTimeout(60000)
 
-  await page.goto('http://localhost:8080/?job_type=agg')
+  await page.goto('http://localhost:8080/?job_type=aggregate')
 
   await page.getByPlaceholder('Search').fill('MX Bank (Oauth)')
 
@@ -15,7 +15,9 @@ test('connects to mx bank with oAuth', async ({ page }) => {
 
   const authorizeTab = await popupPromise
   await authorizeTab.getByRole('button', { name: 'Authorize' }).click()
-  await expect(authorizeTab.getByText('Thank you for completing OAuth.')).toBeVisible()
+  await expect(
+    authorizeTab.getByText('Thank you for completing OAuth.')
+  ).toBeVisible()
 
   await expect(page.getByRole('button', { name: 'Continue' })).toBeVisible({
     timeout: 60000
