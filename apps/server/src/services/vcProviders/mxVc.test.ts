@@ -5,6 +5,9 @@ describe('getVc', () => {
   const userId = 'userId'
   const accountId = 'accountId'
 
+  // TODO: just need to add handlers for all these
+  // and expect a jwt token
+
   it('gets identity VC from INT environment', () => {
     const isProd = false
 

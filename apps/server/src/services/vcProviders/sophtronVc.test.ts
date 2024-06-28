@@ -7,8 +7,18 @@ describe('getVc', () => {
   const startTime = '1/1/2024'
   const endTime = '6/1/2024'
 
+  // TODO: just need to add handlers for all these
+  // and expect a jwt token
+
   it('gets identity VC', () => {
-    const vc = getVC(connectionId, 'identity', userId, accountId, startTime, endTime)
+    const vc = getVC(
+      connectionId,
+      'identity',
+      userId,
+      accountId,
+      startTime,
+      endTime
+    )
     expect(vc).toEqual({})
   })
 

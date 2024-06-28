@@ -22,7 +22,9 @@ export default function (app) {
       req.path === '/' ||
       req.path.startsWith('/example') === true ||
       req.path.startsWith('/static') === true
-    ) { return next() }
+    ) {
+      return next()
+    }
     req.connectService = new ConnectApi(req)
     if ((await req.connectService.init()) != null) {
       if (
@@ -118,7 +120,8 @@ export default function (app) {
   )
 
   app.get(`${ApiEndpoints.INSTITUTIONS}/favorite`, async (req, res) => {
-    const popularInsitutions = await req.connectService.loadPopularInstitutions()
+    const popularInsitutions =
+      await req.connectService.loadPopularInstitutions()
     res.send(popularInsitutions)
   })
 
@@ -275,7 +278,7 @@ export default function (app) {
         .join('|'),
       'g'
     )
-    function mapOauthParams (queries, res, html) {
+    function mapOauthParams(queries, res, html) {
       res.send(
         html.replaceAll(oauthParams, (q) => queries[q.substring(1)] ?? '')
       )
@@ -290,8 +293,15 @@ export default function (app) {
   // VC Data Endpoints
   app.get('/data/accounts', async (req, res) => {
     const { provider, connectionId, userId, accountId } = req.query
+    // TODO: Failed requests are not throwing an error, throwing would be better I think
     try {
-      const vc = await getVC(provider, connectionId, 'accounts', userId, accountId)
+      const vc = await getVC(
+        provider,
+        connectionId,
+        'accounts',
+        userId,
+        accountId
+      )
       res.send({
         jwt: vc
       })
@@ -302,8 +312,15 @@ export default function (app) {
 
   app.get('/data/identity', async (req, res) => {
     const { provider, connectionId, userId, accountId } = req.query
+    // TODO: Failed requests are not throwing an error, make it throw
     try {
-      const vc = await getVC(provider, connectionId, 'identity', userId, accountId)
+      const vc = await getVC(
+        provider,
+        connectionId,
+        'identity',
+        userId,
+        accountId
+      )
       res.send({
         jwt: vc
       })
@@ -313,9 +330,19 @@ export default function (app) {
   })
 
   app.get('/data/transactions', async (req, res) => {
-    const { provider, connectionId, userId, accountId, startTime, endTime } = req.query
+    const { provider, connectionId, userId, accountId, startTime, endTime } =
+      req.query
+    // TODO: Failed requests are not throwing an error, make it throw
     try {
-      const vc = await getVC(provider, connectionId, 'transactions', userId, accountId, startTime, endTime)
+      const vc = await getVC(
+        provider,
+        connectionId,
+        'transactions',
+        userId,
+        accountId,
+        startTime,
+        endTime
+      )
       res.send({
         jwt: vc
       })
