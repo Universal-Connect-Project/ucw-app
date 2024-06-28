@@ -6,7 +6,7 @@ into an iframe.
 
 ## Authentication
 
-The express endpoints exposed in these repositories don't provide any authentication. You will need to fork the repo to add your own authentication.
+The express endpoints exposed in these repositories don't provide any authentication. You will need to fork the repo if you want to add your own authentication.
 
 ## Api documentation
 
