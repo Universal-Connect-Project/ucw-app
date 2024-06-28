@@ -17,7 +17,8 @@
         is_mobile_webview: '$is_mobile_webview',
         scheme: '$scheme',
         single_account_select: '$single_account_select',
-        include_identity: '$include_identity'
+        include_identity: '$include_identity',
+        institution_id: '$institution_id'
       }
 
       window.app = {
@@ -40,7 +41,7 @@
             auth: '$auth',
             mode: params.job_type || 'agg', // 'verify'
             job_type: params.job_type || 'agg', // 'verify'
-            current_institution_code: '$institution_id', // 'mxbank',
+            current_institution_code: params.institution_id,
             current_institution_guid: null,
             current_member_guid: '$connection_id',
             current_provider: '$provider',
@@ -48,7 +49,7 @@
             user_id: '$user_id',
             current_microdeposit_guid: null,
             disable_background_agg: null,
-            disable_institution_search: false,
+            disable_institution_search: !!params.institution_id,
             include_identity: params.include_identity === 'true',
             include_transactions: null, // true
             oauth_referral_source: params.oauth_referral_source || 'BROWSER',

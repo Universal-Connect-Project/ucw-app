@@ -32,7 +32,7 @@
             }
           },
           {
-            "description": "The UCP id of the institution. Providing this id will skip search and go directly to the authorization step for the institution.",
+            "description": "The UCP id of the institution. Providing this id will skip search, go directly to the authorization step for the institution, and hide the back button.",
             "name": "institution_id",
             "in": "query",
             "required": false,
