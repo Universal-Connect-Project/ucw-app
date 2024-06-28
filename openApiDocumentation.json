@@ -16,6 +16,7 @@
       "get": {
         "parameters": [
           {
+            "description": "The type of the job to be performed",
             "name": "job_type",
             "in": "query",
             "required": true,
@@ -28,6 +29,15 @@
                 "verification",
                 "identity"
               ]
+            }
+          },
+          {
+            "description": "The UCP id of the institution. Providing this id will skip search and go directly to the authorization step for the institution.",
+            "name": "institution_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
             }
           }
         ],
