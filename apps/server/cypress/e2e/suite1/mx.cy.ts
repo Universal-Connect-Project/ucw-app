@@ -77,7 +77,7 @@ const verifyTransactions = ({ accountId, memberGuid, provider, userGuid }) => {
   })
 }
 
-describe('Create a connection in agg mode and get vc data', () => {
+describe('mx provider', () => {
   jobTypes.map((jobType) =>
     it(`makes a connection with jobType: ${jobType}, gets the accounts, identity, and transaction data from the vc endpoints`, () => {
       let memberGuid: string
