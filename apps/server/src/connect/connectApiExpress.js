@@ -4,11 +4,15 @@ import config from '../config'
 import { contextHandler } from '../infra/context.ts'
 import { wget } from '../infra/http'
 import { info } from '../infra/logger'
-import getVC from '../services/vcProviders'
 import { ApiEndpoints } from '../shared/connect/ApiEndpoint'
 import { ConnectionStatus } from '../shared/contract.ts'
 import { ConnectApi } from './connectApi'
 import stubs from './instrumentations.js'
+import {
+  accountsDataHandler,
+  identityDataHandler,
+  transactionsDataHandler
+} from './dataEndpoints'
 
 const AGGREGATION_JOB_TYPE = 0
 
@@ -291,66 +295,7 @@ export default function (app) {
   })
 
   // VC Data Endpoints
-  app.get('/data/accounts', async (req, res) => {
-    const { provider, connectionId, userId, accountId } = req.query
-
-    try {
-      const vc = await getVC(
-        provider,
-        connectionId,
-        'accounts',
-        userId,
-        accountId
-      )
-      res.send({
-        jwt: vc
-      })
-    } catch (error) {
-      res.status(400)
-      res.send('Something went wrong')
-    }
-  })
-
-  app.get('/data/identity', async (req, res) => {
-    const { provider, connectionId, userId, accountId } = req.query
-
-    try {
-      const vc = await getVC(
-        provider,
-        connectionId,
-        'identity',
-        userId,
-        accountId
-      )
-      res.send({
-        jwt: vc
-      })
-    } catch (error) {
-      res.status(400)
-      res.send('Something went wrong')
-    }
-  })
-
-  app.get('/data/transactions', async (req, res) => {
-    const { provider, connectionId, userId, accountId, startTime, endTime } =
-      req.query
-
-    try {
-      const vc = await getVC(
-        provider,
-        connectionId,
-        'transactions',
-        userId,
-        accountId,
-        startTime,
-        endTime
-      )
-      res.send({
-        jwt: vc
-      })
-    } catch (error) {
-      res.status(400)
-      res.send('Something went wrong')
-    }
-  })
+  app.get('/data/accounts', accountsDataHandler)
+  app.get('/data/identity', identityDataHandler)
+  app.get('/data/transactions', transactionsDataHandler)
 }
