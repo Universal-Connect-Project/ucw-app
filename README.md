@@ -4,6 +4,10 @@ This repo is a monorepo, which contains the pieces that make up the Universal Co
 application which anyone can clone and self-host as a way to serve the connect widget via a url which can then be loaded
 into an iframe.
 
+## Documentation
+
+Please refer to the UCP documentation [here](https://docs.universalconnect.org) for additional information on how to use the widget.
+
 ## Cached data
 
 This widget runs off of cached data, which is included in this repo, so that it doesn't rely on any UCP-hosted services in order to be able to function.
