@@ -1,15 +1,19 @@
 import { createCipheriv, createDecipheriv } from 'crypto'
 import { algo, enc } from 'crypto-js'
 import config from '../config'
-import { error } from '../infra/logger'
 
-export function hmac(text, key) {
+export function hmac(text: string, key: string) {
   const hmac = algo.HMAC.create(algo.SHA256, enc.Base64.parse(key))
   hmac.update(text)
   return enc.Base64.stringify(hmac.finalize())
 }
 
-export function buildSophtronAuthCode(httpMethod, url, apiUserID, secret) {
+export function buildSophtronAuthCode(
+  httpMethod: string,
+  url: string,
+  apiUserID: string,
+  secret: string
+) {
   const authPath = url.substring(url.lastIndexOf('/')).toLowerCase()
   const text = httpMethod.toUpperCase() + '\n' + authPath
   const b64Sig = hmac(text, secret)
@@ -19,7 +23,7 @@ export function buildSophtronAuthCode(httpMethod, url, apiUserID, secret) {
 
 const algorithm = config.CryptoAlgorithm
 
-export function encrypt(text, keyHex, ivHex) {
+export function encrypt(text: string, keyHex: string, ivHex: string) {
   if (text == null || text === '') {
     return ''
   }
@@ -31,7 +35,7 @@ export function encrypt(text, keyHex, ivHex) {
   return encrypted.toString('hex')
 }
 
-export function decrypt(text, keyHex, ivHex) {
+export function decrypt(text: string, keyHex: string, ivHex: string) {
   if (text == null || text === '') {
     return ''
   }
@@ -44,7 +48,7 @@ export function decrypt(text, keyHex, ivHex) {
   return decrypted.toString()
 }
 
-export function decodeAuthToken(input) {
+export function decodeAuthToken(input: string) {
   try {
     const str = Buffer.from(input, 'base64').toString('utf-8')
     const arr = str.split(';')
@@ -61,43 +65,28 @@ export function decodeAuthToken(input) {
   }
 }
 
-export function mapJobType(input) {
+export enum JobTypes {
+  AGGREGATE = 'aggregate',
+  ALL = 'all',
+  FULLHISTORY = 'fullhistory',
+  VERIFICATION = 'verification',
+  IDENTITY = 'identity'
+}
+
+export function mapJobType(input: JobTypes) {
   const inputLowerCase = input.toLowerCase()
   switch (inputLowerCase) {
-    case 'agg':
-    case 'aggregation':
-    case 'aggregate':
-    case 'add':
-    case 'utils':
-    case 'util':
-    case 'demo':
-    case 'vc_transactions':
-    case 'vc_transaction':
+    case JobTypes.AGGREGATE:
       return 'aggregate'
-    case 'all':
-    case 'everything':
-    case 'aggregate_all':
-    case 'aggregate_everything':
-    case 'agg_all':
-    case 'agg_everything':
+    case JobTypes.ALL:
       return 'aggregate_identity_verification'
-    case 'fullhistory':
-    case 'aggregate_extendedhistory':
+    case JobTypes.FULLHISTORY:
       return 'aggregate_extendedhistory'
-    case 'auth':
-    case 'bankauth':
-    case 'verify':
-    case 'verification':
-    case 'vc_account':
-    case 'vc_accounts':
+    case JobTypes.VERIFICATION:
       return 'verification'
-    case 'identify':
-    case 'identity':
-    case 'id':
-    case 'vc_identity':
+    case JobTypes.IDENTITY:
       return 'aggregate_identity'
     default:
-      error('Invalid Job Type')
-      return 'aggregate'
+      throw new Error('Invalid job type')
   }
 }

@@ -1,0 +1,53 @@
+{
+  "info": {
+    "description": "Universal Connect Widget endpoints",
+    "title": "Universal Connect Widget",
+    "version": "1.0.0"
+  },
+  "openapi": "3.0.0",
+  "servers": [
+    {
+      "description": "Local development widget",
+      "url": "http://localhost:8080"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "parameters": [
+          {
+            "description": "The type of the job to be performed",
+            "name": "job_type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "aggregate",
+                "all",
+                "fullhistory",
+                "verification",
+                "identity"
+              ]
+            }
+          },
+          {
+            "description": "The UCP id of the institution. Providing this id will skip search, go directly to the authorization step for the institution, and hide the back button.",
+            "name": "institution_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "description": "Get the widget html to attach to a browser frame",
+        "responses": {
+          "200": {
+            "description": "The widget page"
+          }
+        }
+      }
+    }
+  }
+}
