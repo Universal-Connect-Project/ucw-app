@@ -16,6 +16,66 @@ const makeAConnection = async (jobType) => {
   cy.findByText('Connected', { timeout: 90000 }).should('exist')
 }
 
+const verifyAccountsAndReturnAccountId = ({
+  provider,
+  memberGuid,
+  userGuid
+}) => {
+  return cy
+    .request(
+      'GET',
+      `/data/accounts?provider=${provider}&connectionId=${memberGuid}&userId=${userGuid}`
+    )
+    .then((response) => {
+      expect(response.status).to.equal(200)
+      expect(response.body).to.haveOwnProperty('jwt')
+      expect(response.body.jwt).not.to.haveOwnProperty('error')
+      // We have to extract the AccountGuid from the base64 encoded jwt token
+      const jwt = response.body.jwt
+      const data = jwt.split('.')[1] // gets the middle part of the jwt
+      const decodedVcData = JSON.parse(atob(data))
+      // Verify the proper VC came back
+      expect(decodedVcData.vc.type).to.include('FinancialAccountCredential')
+      const account = decodedVcData.vc.credentialSubject.accounts.find(
+        (acc) => Object.keys(acc)[0] === 'depositAccount'
+      )
+
+      return account.depositAccount.accountId
+    })
+}
+
+const verifyIdentity = ({ accountId, provider, memberGuid, userGuid }) => {
+  cy.request(
+    'GET',
+    `/data/identity?provider=${provider}&connectionId=${memberGuid}&userId=${userGuid}&accountId=${accountId}`
+  ).should((response) => {
+    expect(response.status).to.equal(200)
+    expect(response.body).to.haveOwnProperty('jwt')
+    expect(response.body.jwt).not.to.haveOwnProperty('error')
+    const jwt = response.body.jwt
+    const data = jwt.split('.')[1] // gets the middle part of the jwt
+    const decodedVcData = JSON.parse(atob(data))
+    // Verify the proper VC came back
+    expect(decodedVcData.vc.type).to.include('FinancialIdentityCredential')
+  })
+}
+
+const verifyTransactions = ({ accountId, memberGuid, provider, userGuid }) => {
+  cy.request(
+    'GET',
+    `/data/transactions?provider=${provider}&connectionId=${memberGuid}&userId=${userGuid}&accountId=${accountId}`
+  ).should((response) => {
+    expect(response.status).to.equal(200)
+    expect(response.body).to.haveOwnProperty('jwt')
+    expect(response.body.jwt).not.to.haveOwnProperty('error')
+    const jwt = response.body.jwt
+    const data = jwt.split('.')[1] // gets the middle part of the jwt
+    const decodedVcData = JSON.parse(atob(data))
+    // Verify the proper VC came back
+    expect(decodedVcData.vc.type).to.include('FinancialTransactionCredential')
+  })
+}
+
 describe('Create a connection in agg mode and get vc data', () => {
   jobTypes.map((jobType) =>
     it(`makes a connection with jobType: ${jobType}, gets the accounts, identity, and transaction data from the vc endpoints`, () => {
@@ -42,60 +102,23 @@ describe('Create a connection in agg mode and get vc data', () => {
             provider = metadata.provider
             userGuid = metadata.user_guid
 
-            // Get accounts
-            cy.request(
-              'GET',
-              `/data/accounts?provider=${provider}&connectionId=${memberGuid}&userId=${userGuid}`
-            ).then((response) => {
-              expect(response.status).to.equal(200)
-              expect(response.body).to.haveOwnProperty('jwt')
-              expect(response.body.jwt).not.to.haveOwnProperty('error')
-              // We have to extract the AccountGuid from the base64 encoded jwt token
-              const jwt = response.body.jwt
-              const data = jwt.split('.')[1] // gets the middle part of the jwt
-              const decodedVcData = JSON.parse(atob(data))
-              // Verify the proper VC came back
-              expect(decodedVcData.vc.type).to.include(
-                'FinancialAccountCredential'
-              )
-              const account = decodedVcData.vc.credentialSubject.accounts.find(
-                (acc) => Object.keys(acc)[0] === 'depositAccount'
-              )
-
-              const accountId = account.depositAccount.accountId
-
-              // Get identity
-              cy.request(
-                'GET',
-                `/data/identity?provider=${provider}&connectionId=${memberGuid}&userId=${userGuid}&accountId=${accountId}`
-              ).should((response) => {
-                expect(response.status).to.equal(200)
-                expect(response.body).to.haveOwnProperty('jwt')
-                expect(response.body.jwt).not.to.haveOwnProperty('error')
-                const jwt = response.body.jwt
-                const data = jwt.split('.')[1] // gets the middle part of the jwt
-                const decodedVcData = JSON.parse(atob(data))
-                // Verify the proper VC came back
-                expect(decodedVcData.vc.type).to.include(
-                  'FinancialIdentityCredential'
-                )
+            verifyAccountsAndReturnAccountId({
+              memberGuid,
+              provider,
+              userGuid
+            }).then((accountId) => {
+              verifyIdentity({
+                accountId,
+                memberGuid,
+                provider,
+                userGuid
               })
 
-              // Get transactions
-              cy.request(
-                'GET',
-                `/data/transactions?provider=${provider}&connectionId=${memberGuid}&userId=${userGuid}&accountId=${accountId}`
-              ).should((response) => {
-                expect(response.status).to.equal(200)
-                expect(response.body).to.haveOwnProperty('jwt')
-                expect(response.body.jwt).not.to.haveOwnProperty('error')
-                const jwt = response.body.jwt
-                const data = jwt.split('.')[1] // gets the middle part of the jwt
-                const decodedVcData = JSON.parse(atob(data))
-                // Verify the proper VC came back
-                expect(decodedVcData.vc.type).to.include(
-                  'FinancialTransactionCredential'
-                )
+              verifyTransactions({
+                accountId,
+                memberGuid,
+                provider,
+                userGuid
               })
             })
           })
