@@ -2,6 +2,11 @@ import { JobTypes } from '../../../src/utils/index'
 
 const jobTypes = Object.values(JobTypes)
 
+const decodeVcDataFromResponse = (response) => {
+  const data = response.body.jwt.split('.')[1] // gets the middle part of the jwt
+  return JSON.parse(atob(data))
+}
+
 const makeAConnection = async (jobType) => {
   cy.findByPlaceholderText('Search').type('MX Bank')
   cy.findByLabelText('Add account with MX Bank').first().click()
@@ -30,10 +35,8 @@ const verifyAccountsAndReturnAccountId = ({
       expect(response.status).to.equal(200)
       expect(response.body).to.haveOwnProperty('jwt')
       expect(response.body.jwt).not.to.haveOwnProperty('error')
-      // We have to extract the AccountGuid from the base64 encoded jwt token
-      const jwt = response.body.jwt
-      const data = jwt.split('.')[1] // gets the middle part of the jwt
-      const decodedVcData = JSON.parse(atob(data))
+
+      const decodedVcData = decodeVcDataFromResponse(response)
       // Verify the proper VC came back
       expect(decodedVcData.vc.type).to.include('FinancialAccountCredential')
       const account = decodedVcData.vc.credentialSubject.accounts.find(
@@ -52,9 +55,8 @@ const verifyIdentity = ({ accountId, provider, memberGuid, userGuid }) => {
     expect(response.status).to.equal(200)
     expect(response.body).to.haveOwnProperty('jwt')
     expect(response.body.jwt).not.to.haveOwnProperty('error')
-    const jwt = response.body.jwt
-    const data = jwt.split('.')[1] // gets the middle part of the jwt
-    const decodedVcData = JSON.parse(atob(data))
+
+    const decodedVcData = decodeVcDataFromResponse(response)
     // Verify the proper VC came back
     expect(decodedVcData.vc.type).to.include('FinancialIdentityCredential')
   })
@@ -68,9 +70,8 @@ const verifyTransactions = ({ accountId, memberGuid, provider, userGuid }) => {
     expect(response.status).to.equal(200)
     expect(response.body).to.haveOwnProperty('jwt')
     expect(response.body.jwt).not.to.haveOwnProperty('error')
-    const jwt = response.body.jwt
-    const data = jwt.split('.')[1] // gets the middle part of the jwt
-    const decodedVcData = JSON.parse(atob(data))
+
+    const decodedVcData = decodeVcDataFromResponse(response)
     // Verify the proper VC came back
     expect(decodedVcData.vc.type).to.include('FinancialTransactionCredential')
   })
