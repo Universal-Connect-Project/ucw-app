@@ -4,6 +4,14 @@ This repo is a monorepo, which contains the pieces that make up the Universal Co
 application which anyone can clone and self-host as a way to serve the connect widget via a url which can then be loaded
 into an iframe.
 
+## Authentication
+
+The express endpoints exposed in these repositories don't provide any authentication. You will need to fork the repo if you want to add your own authentication.
+
+## Api documentation
+
+The api documentation for this service lives in openApiDocumentation.json and uses the (open api spec)[https://swagger.io/specification/]. You can open it in your preferred tool. You may copy the file into [swagger editor](https://editor.swagger.io/) and edit the local file with updates when complete.
+
 ## Cached data
 
 This widget runs off of cached data, so that it doesn't rely on any UCP hosted services to be able to function.

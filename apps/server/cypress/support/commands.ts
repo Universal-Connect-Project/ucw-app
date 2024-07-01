@@ -29,14 +29,14 @@ import '@testing-library/cypress/add-commands'
 //
 
 Cypress.Commands.add('visitAgg', () => {
-  cy.visit('/?job_type=agg')
+  cy.visit('/?job_type=aggregate')
 })
 
 Cypress.Commands.add('visitIdentity', () => {
-  cy.visit('/?job_type=identify')
+  cy.visit('/?job_type=identity')
 })
 
-export { }
+export {}
 
 declare global {
   namespace Cypress {

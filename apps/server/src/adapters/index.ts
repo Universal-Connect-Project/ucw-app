@@ -60,7 +60,7 @@ export async function instrumentation(context: Context, input: any) {
     context.connection_id = input.current_member_guid
   }
   if (input.auth != null) {
-    context.auth = decodeAuthToken(input.auth)
+    context.auth = decodeAuthToken(input.auth) as any
   }
   context.partner = input.current_partner
   context.job_type = mapJobType(input.job_type)
@@ -225,10 +225,7 @@ export class ProviderAdapterBase {
   }
 
   async deleteConnection(connection_id: string): Promise<void> {
-    await this.providerAdapter.DeleteConnection(
-      connection_id,
-      this.getUserId()
-    )
+    await this.providerAdapter.DeleteConnection(connection_id, this.getUserId())
   }
 
   async getConnectionCredentials(memberGuid: string): Promise<Credential[]> {
