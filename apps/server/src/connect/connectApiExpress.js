@@ -293,7 +293,7 @@ export default function (app) {
   // VC Data Endpoints
   app.get('/data/accounts', async (req, res) => {
     const { provider, connectionId, userId, accountId } = req.query
-    // TODO: Failed requests are not throwing an error, throwing would be better I think
+
     try {
       const vc = await getVC(
         provider,
@@ -313,7 +313,7 @@ export default function (app) {
 
   app.get('/data/identity', async (req, res) => {
     const { provider, connectionId, userId, accountId } = req.query
-    // TODO: Failed requests are not throwing an error, make it throw
+
     try {
       const vc = await getVC(
         provider,
@@ -334,7 +334,7 @@ export default function (app) {
   app.get('/data/transactions', async (req, res) => {
     const { provider, connectionId, userId, accountId, startTime, endTime } =
       req.query
-    // TODO: Failed requests are not throwing an error, make it throw
+
     try {
       const vc = await getVC(
         provider,

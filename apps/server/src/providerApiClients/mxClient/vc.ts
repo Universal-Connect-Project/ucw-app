@@ -2,8 +2,15 @@ import axios from 'axios'
 import { debug, error } from '../../infra/logger'
 import type { ConfigurationParameters } from './configuration'
 
-async function request(url: string, method: 'get' | 'post' | 'put' | 'delete', data: any, clientId: string, secret: string) {
-  const authHeader = 'Basic ' + Buffer.from(clientId + ':' + secret).toString('base64')
+async function request(
+  url: string,
+  method: 'get' | 'post' | 'put' | 'delete',
+  data: any,
+  clientId: string,
+  secret: string
+) {
+  const authHeader =
+    'Basic ' + Buffer.from(clientId + ':' + secret).toString('base64')
 
   return await axios({
     method,
@@ -14,13 +21,19 @@ async function request(url: string, method: 'get' | 'post' | 'put' | 'delete', d
       'content-type': 'application/json',
       Authorization: authHeader
     }
-  }).then(res => {
-    debug(`mx vc client http response status ${res.status} from ${url}`)
-    return res.data?.verifiableCredential || res.data
-  }).catch(err => {
-    error(`mx vc client http response status ${err.response?.status} from ${url}`, err.response?.data || err)
-    return err.response?.data
   })
+    .then((res) => {
+      debug(`mx vc client http response status ${res.status} from ${url}`)
+      return res.data?.verifiableCredential || res.data
+    })
+    .catch((err) => {
+      error(
+        `mx vc client http response status ${err.response?.status} from ${url}`,
+        err.response?.data || err
+      )
+
+      throw new Error('MX VC endpoint failure')
+    })
 }
 
 export class MxVcClient {
@@ -30,10 +43,16 @@ export class MxVcClient {
   }
 
   async getVC(path: string) {
-    return await this._get(`vc/${path}`).then(res => res)
+    return await this._get(`vc/${path}`).then((res) => res)
   }
 
   async _get(url: string) {
-    return await request(`${this.configuration.basePath}/${url}`, 'get', null, this.configuration.username, this.configuration.password)
+    return await request(
+      `${this.configuration.basePath}/${url}`,
+      'get',
+      null,
+      this.configuration.username,
+      this.configuration.password
+    )
   }
 }
