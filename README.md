@@ -10,7 +10,7 @@ Please refer to the [UCP documentation](https://docs.universalconnect.org) (Comi
 
 ## Cached data
 
-This widget runs off of cached data, which is included in this repo, so that it doesn't rely on any UCP-hosted services in order to be able to function.
+This widget runs off of cached data, which is included in this repo, so that it doesn't rely on any UCP-hosted services in order to function.
 
 In `./apps/server/cachedDefaults` you will find files that are loaded into a redis cache. In the future these files will be used as a backup in case UCP-hosted services are down.
 
