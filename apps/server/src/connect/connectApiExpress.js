@@ -306,7 +306,8 @@ export default function (app) {
         jwt: vc
       })
     } catch (error) {
-      res.send(error)
+      res.status(400)
+      res.send('Something went wrong')
     }
   })
 
@@ -325,7 +326,8 @@ export default function (app) {
         jwt: vc
       })
     } catch (error) {
-      res.send(error)
+      res.status(400)
+      res.send('Something went wrong')
     }
   })
 
@@ -347,7 +349,8 @@ export default function (app) {
         jwt: vc
       })
     } catch (error) {
-      res.send(error)
+      res.status(400)
+      res.send('Something went wrong')
     }
   })
 }
