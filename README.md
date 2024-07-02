@@ -33,10 +33,6 @@ docker compose up
 
 That's it! If you have questions, please reach out to us.
 
-### Cloud deployment
-
-We will be providing more information on basic deployment steps for Heroku in the future.
-
 ### Docker images
 
 The images for this repo are available on [DockerHub](https://hub.docker.com/repositories/universalconnectfoundation). You can change the version of the images that you pull by setting
