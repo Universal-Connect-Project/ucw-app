@@ -1,5 +1,8 @@
 import { sophtronVcAccountsData } from '../../test/testData/sophtronVcData'
-import { mxVcAccountsData } from '../../test/testData/mxVcData'
+import {
+  mxVcAccountsData,
+  mxVcIntegrationAccountsData
+} from '../../test/testData/mxVcData'
 import getVc from './index'
 
 const connectionId = 'testConectionId'
@@ -10,7 +13,7 @@ describe('vc providers index', () => {
   it('uses mx integration if the provider is mx_int', async () => {
     const response = await getVc('mx_int', connectionId, type, userId)
 
-    expect(response).toEqual(mxVcAccountsData)
+    expect(response).toEqual(mxVcIntegrationAccountsData)
   })
   it('uses mx prod if the provider is mx', async () => {
     const response = await getVc('mx', connectionId, type, userId)

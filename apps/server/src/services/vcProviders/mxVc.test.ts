@@ -1,6 +1,7 @@
 import {
   mxVcAccountsData,
   mxVcIdentityData,
+  mxVcIntegrationAccountsData,
   mxVcTranscationsData
 } from '../../test/testData/mxVcData'
 import getVC from './mxVc'
@@ -14,13 +15,13 @@ describe('getVc', () => {
     const isProd = false
 
     const vc = await getVC(isProd, connectionId, 'accounts', userId)
-    expect(vc).toEqual(mxVcAccountsData)
+    expect(vc).toEqual(mxVcIntegrationAccountsData)
   })
 
   it('gets identity VC from Prod environment', async () => {
     const isProd = true
 
-    const vc = await getVC(isProd, connectionId, 'identity', userId, accountId)
+    const vc = await getVC(isProd, connectionId, 'identity', userId)
     expect(vc).toEqual(mxVcIdentityData)
   })
 

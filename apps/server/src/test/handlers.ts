@@ -34,6 +34,7 @@ import {
 import {
   mxVcAccountsData,
   mxVcIdentityData,
+  mxVcIntegrationAccountsData,
   mxVcTranscationsData
 } from './testData/mxVcData'
 import {
@@ -115,7 +116,7 @@ const handlers = [
     HttpResponse.json({ verifiableCredential: mxVcTranscationsData })
   ),
   http.get(MX_INTEGRATION_VC_GET_ACCOUNTS_PATH, () =>
-    HttpResponse.json({ verifiableCredential: mxVcAccountsData })
+    HttpResponse.json({ verifiableCredential: mxVcIntegrationAccountsData })
   ),
   http.get(MX_VC_GET_ACCOUNTS_PATH, () =>
     HttpResponse.json({ verifiableCredential: mxVcAccountsData })
