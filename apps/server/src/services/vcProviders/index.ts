@@ -1,7 +1,4 @@
 import { info } from '../../infra/logger'
-
-import GetAkoyaVc from './akoyaVc'
-import GetFinicityVc from './finicityVc'
 import GetMxVc from './mxVc'
 import GetSophtronVc from './sophtronVc'
 
@@ -21,10 +18,6 @@ export default async function getVc(
     case 'mx-int':
     case 'mx_int':
       return await GetMxVc(false, connectionId, type, userId, accountId)
-    case 'akoya':
-      return await GetAkoyaVc(connectionId, type, userId)
-    case 'finicity':
-      return await GetFinicityVc(connectionId, type, userId)
     case 'sophtron':
       return await GetSophtronVc(
         connectionId,
