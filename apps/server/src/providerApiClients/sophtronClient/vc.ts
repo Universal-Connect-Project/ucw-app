@@ -1,7 +1,11 @@
-import * as http from '../../infra/http'
+import axios from 'axios'
 import { buildSophtronAuthCode } from '../../utils'
 import SophtronClient from './'
 import SophtronBaseClient from './base'
+
+interface VcResponse {
+  vc: string
+}
 
 export default class SophtronVcClient extends SophtronBaseClient {
   sophtronClient: SophtronClient
@@ -22,10 +26,13 @@ export default class SophtronVcClient extends SophtronBaseClient {
       )
     }
 
-    const ret = await http.get(
-      `${this.apiConfig.vcEndpoint}vc/${path}`,
-      headers
-    )
+    const ret: VcResponse = (
+      await axios({
+        url: `${this.apiConfig.vcEndpoint}vc/${path}`,
+        method: 'get',
+        headers
+      })
+    ).data
 
     return ret?.vc
   }
