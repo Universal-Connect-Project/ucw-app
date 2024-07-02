@@ -2,7 +2,6 @@ import { Request, Response } from 'express'
 import getVC from '../services/vcProviders'
 
 export interface AccountsDataQueryParameters {
-  accountId: string
   connectionId: string
   provider: string
   userId: string
@@ -23,15 +22,14 @@ export const accountsDataHandler = async (req: Request, res: Response) => {
   }
 }
 
-interface IdentityDataQueryParameters {
-  accountId: string
+export interface IdentityDataQueryParameters {
   connectionId: string
   provider: string
   userId: string
 }
 
 export const identityDataHandler = async (req: Request, res: Response) => {
-  const { provider, connectionId, userId, accountId } =
+  const { provider, connectionId, userId } =
     req.query as unknown as IdentityDataQueryParameters
 
   try {
@@ -45,9 +43,8 @@ export const identityDataHandler = async (req: Request, res: Response) => {
   }
 }
 
-interface TransactionsDataQueryParameters {
+export interface TransactionsDataQueryParameters {
   accountId: string
-  connectionId: string
   endTime: string
   provider: string
   startTime: string
@@ -55,13 +52,13 @@ interface TransactionsDataQueryParameters {
 }
 
 export const transactionsDataHandler = async (req: Request, res: Response) => {
-  const { provider, connectionId, userId, accountId, startTime, endTime } =
+  const { provider, userId, accountId, startTime, endTime } =
     req.query as unknown as TransactionsDataQueryParameters
 
   try {
     const vc = await getVC(
       provider,
-      connectionId,
+      undefined,
       'transactions',
       userId,
       accountId,

@@ -91,15 +91,6 @@
       "get": {
         "parameters": [
           {
-            "description": "The account id",
-            "name": "accountId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "description": "The connection id",
             "name": "connectionId",
             "in": "query",
@@ -140,15 +131,6 @@
           {
             "description": "The account id",
             "name": "accountId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "The connection id",
-            "name": "connectionId",
             "in": "query",
             "required": true,
             "schema": {
