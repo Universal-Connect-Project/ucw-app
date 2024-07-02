@@ -33,10 +33,10 @@ const verifyAccountsAndReturnAccountId = ({
     })
 }
 
-const verifyIdentity = ({ accountId, provider, memberGuid, userGuid }) => {
+const verifyIdentity = ({ provider, memberGuid, userGuid }) => {
   cy.request(
     'GET',
-    `/data/identity?provider=${provider}&connectionId=${memberGuid}&userId=${userGuid}&accountId=${accountId}`
+    `/data/identity?provider=${provider}&connectionId=${memberGuid}&userId=${userGuid}`
   ).should((response) => {
     expect(response.status).to.equal(200)
     expect(response.body).to.haveOwnProperty('jwt')
@@ -95,7 +95,6 @@ const generateVcDataTests = ({ makeAConnection }) =>
               userGuid
             }).then((accountId) => {
               verifyIdentity({
-                accountId,
                 memberGuid,
                 provider,
                 userGuid

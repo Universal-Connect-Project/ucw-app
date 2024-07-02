@@ -1,12 +1,16 @@
 import { Request, Response } from 'express'
 import {
   AccountsDataQueryParameters,
-  accountsDataHandler
+  accountsDataHandler,
+  identityDataHandler
 } from './dataEndpoints'
-import { mxVcAccountsData } from '../test/testData/mxVcData'
+import { mxVcAccountsData, mxVcIdentityData } from '../test/testData/mxVcData'
 import { server } from '../test/testServer'
 import { HttpResponse, http } from 'msw'
-import { MX_VC_GET_ACCOUNTS_PATH } from '../test/handlers'
+import {
+  MX_VC_GET_ACCOUNTS_PATH,
+  MX_VC_GET_IDENTITY_PATH
+} from '../test/handlers'
 
 describe('dataEndpoints', () => {
   describe('accountsDataHandler', () => {
@@ -52,6 +56,56 @@ describe('dataEndpoints', () => {
       } as unknown as Request
 
       await accountsDataHandler(req, res)
+
+      expect(res.send).toHaveBeenCalledWith('Something went wrong')
+      expect(res.status).toHaveBeenCalledWith(400)
+    })
+  })
+
+  describe('identityDataHandler', () => {
+    it('responds with the vc data in the jwt on success', async () => {
+      const res = {
+        send: jest.fn(),
+        status: jest.fn()
+      } as unknown as Response
+
+      const req = {
+        query: {
+          connectionId: 'testConnectionId',
+          provider: 'mx',
+          userId: 'testUserId'
+        } as AccountsDataQueryParameters
+      } as unknown as Request
+
+      await identityDataHandler(req, res)
+
+      expect(res.send).toHaveBeenCalledWith({
+        jwt: mxVcIdentityData
+      })
+    })
+
+    it('responds with a 400 on failure', async () => {
+      server.use(
+        http.get(
+          MX_VC_GET_IDENTITY_PATH,
+          () => new HttpResponse(null, { status: 400 })
+        )
+      )
+
+      const res = {
+        send: jest.fn(),
+        status: jest.fn()
+      } as unknown as Response
+
+      const req = {
+        query: {
+          connectionId: 'testConnectionId',
+          provider: 'mx',
+          userId: 'testUserId'
+        } as AccountsDataQueryParameters
+      } as unknown as Request
+
+      await identityDataHandler(req, res)
 
       expect(res.send).toHaveBeenCalledWith('Something went wrong')
       expect(res.status).toHaveBeenCalledWith(400)
