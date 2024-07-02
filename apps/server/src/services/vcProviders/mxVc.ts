@@ -1,3 +1,4 @@
+import { info } from '../../infra/logger'
 import { MxVcClient } from '../../providerApiClients/mxClient/vc'
 import providerCredentials from '../../providerCredentials'
 
@@ -26,7 +27,7 @@ export default async function getVC(
       break
   }
   if (path !== '') {
-    console.info(`Getting mx vc ${type}`, path)
+    info(`Getting mx vc ${type}`, path)
     const vcClient = isProd ? new MxVcClient(mxProd) : new MxVcClient(mxInt)
     return await vcClient.getVC(path)
   }

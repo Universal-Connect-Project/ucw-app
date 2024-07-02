@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import getVC from '../services/vcProviders'
 
-interface AccountsDataQueryParameters {
+export interface AccountsDataQueryParameters {
   accountId: string
   connectionId: string
   provider: string
@@ -9,17 +9,11 @@ interface AccountsDataQueryParameters {
 }
 
 export const accountsDataHandler = async (req: Request, res: Response) => {
-  const { provider, connectionId, userId, accountId } =
+  const { provider, connectionId, userId } =
     req.query as unknown as AccountsDataQueryParameters
 
   try {
-    const vc = await getVC(
-      provider,
-      connectionId,
-      'accounts',
-      userId,
-      accountId
-    )
+    const vc = await getVC(provider, connectionId, 'accounts', userId)
     res.send({
       jwt: vc
     })
@@ -41,13 +35,7 @@ export const identityDataHandler = async (req: Request, res: Response) => {
     req.query as unknown as IdentityDataQueryParameters
 
   try {
-    const vc = await getVC(
-      provider,
-      connectionId,
-      'identity',
-      userId,
-      accountId
-    )
+    const vc = await getVC(provider, connectionId, 'identity', userId)
     res.send({
       jwt: vc
     })

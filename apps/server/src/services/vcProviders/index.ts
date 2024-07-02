@@ -5,7 +5,15 @@ import GetFinicityVc from './finicityVc'
 import GetMxVc from './mxVc'
 import GetSophtronVc from './sophtronVc'
 
-export default async function getVc(provider: string, connectionId: string, type: string, userId: string, accountId: string, startTime?: string, endTime?: string) {
+export default async function getVc(
+  provider: string,
+  connectionId: string,
+  type: string,
+  userId: string,
+  accountId?: string,
+  startTime?: string,
+  endTime?: string
+) {
   info('Getting vc from provider', provider)
   switch (provider) {
     case 'mx':
@@ -18,6 +26,13 @@ export default async function getVc(provider: string, connectionId: string, type
     case 'finicity':
       return await GetFinicityVc(connectionId, type, userId)
     case 'sophtron':
-      return await GetSophtronVc(connectionId, type, userId, accountId, startTime, endTime)
+      return await GetSophtronVc(
+        connectionId,
+        type,
+        userId,
+        accountId,
+        startTime,
+        endTime
+      )
   }
 }

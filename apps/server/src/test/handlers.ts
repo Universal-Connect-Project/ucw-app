@@ -31,6 +31,7 @@ import {
   createCustomerData as createSophtronCustomerData,
   customerFromUniqueIdData
 } from './testData/sophtronCustomer'
+import { mxVcAccountsData } from './testData/mxVcData'
 
 const MX_INTEGRATION_PATH = 'https://int-api.mx.com'
 
@@ -52,6 +53,8 @@ export const READ_MEMBER_STATUS_PATH = `${MX_BASE_PATH}/users/:userId/members/:i
 export const ANSWER_CHALLENGE_PATH = `${MX_BASE_PATH}/users/:userId/members/:id/resume`
 export const USERS_PATH = `${MX_BASE_PATH}/users`
 export const CREATE_USER_PATH = `${MX_BASE_PATH}/users`
+
+export const MX_VC_GET_ACCOUNTS_PATH = `${MX_BASE_PATH}/vc/users/:userId/members/:connectionId/accounts`
 
 const FINICITY_BASE_PATH = 'https://api.finicity.com'
 export const FINICITY_INSTITUTION_BY_ID_PATH = `${FINICITY_BASE_PATH}/institution/v2/institutions/:institutionId`
@@ -77,6 +80,7 @@ export const SOPHTRON_CUSTOMER_UNIQUE_ID_PATH = `${SOPHTRON_V2_BASE_PATH}/custom
 export const SOPHTRON_CREATE_CUSTOMER_PATH = `${SOPHTRON_V2_BASE_PATH}/customers`
 
 const handlers = [
+  http.get(MX_VC_GET_ACCOUNTS_PATH, () => HttpResponse.json(mxVcAccountsData)),
   http.post(SOPHTRON_CUSTOMER_UNIQUE_ID_PATH, () =>
     HttpResponse.json(createSophtronCustomerData)
   ),

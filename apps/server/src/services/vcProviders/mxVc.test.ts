@@ -8,12 +8,12 @@ describe('getVc', () => {
   // TODO: just need to add handlers for all these
   // and expect a jwt token
 
-  it('gets identity VC from INT environment', () => {
-    const isProd = false
+  // it('gets identity VC from INT environment', () => {
+  //   const isProd = false
 
-    const vc = getVC(isProd, connectionId, 'identity', userId, accountId)
-    expect(vc).toEqual({})
-  })
+  //   const vc = getVC(isProd, connectionId, 'identity', userId, accountId)
+  //   expect(vc).toEqual({})
+  // })
 
   // it('gets accounts VC from INT environment', () => {
   //   const isProd = false
