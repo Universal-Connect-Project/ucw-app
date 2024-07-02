@@ -15,9 +15,19 @@ export default class SophtronVcClient extends SophtronBaseClient {
     const res = await this.sophtronClient.getUserIntegrationKey()
     const headers = {
       IntegrationKey: res.IntegrationKey,
-      Authorization: buildSophtronAuthCode('get', path, this.apiConfig.clientId, this.apiConfig.secret)
+      Authorization: buildSophtronAuthCode(
+        'get',
+        path,
+        this.apiConfig.clientId,
+        this.apiConfig.secret
+      )
     }
-    const ret = await http.get(`${this.apiConfig.vcEndpoint}vc/${path}`, headers)
-    return ret?.vc || ret
+
+    const ret = await http.get(
+      `${this.apiConfig.vcEndpoint}vc/${path}`,
+      headers
+    )
+
+    return ret?.vc
   }
-};
+}

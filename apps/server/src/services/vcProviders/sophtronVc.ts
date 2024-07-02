@@ -5,7 +5,7 @@ export default async function getVC(
   connectionId: string,
   type: string,
   userId: string,
-  accountId: string,
+  accountId?: string,
   startTime?: string,
   endTime?: string
 ) {
@@ -24,14 +24,8 @@ export default async function getVC(
     default:
       break
   }
-  if (path) {
-    const vcClient = new SophtronVcClient(providerCredentials.sophtron)
-    return await vcClient.getVC(path).then((vc) => {
-      // for data security purpose when doing demo, should remove the connection once vc is returned to client.
-      // clearConnection(vc, connectionId, userId);
-      // console.log(vc)
-      return vc
-    })
-  }
-  return null
+
+  const vcClient = new SophtronVcClient(providerCredentials.sophtron)
+
+  return await vcClient.getVC(path)
 }

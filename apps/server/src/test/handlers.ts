@@ -36,6 +36,11 @@ import {
   mxVcIdentityData,
   mxVcTranscationsData
 } from './testData/mxVcData'
+import {
+  sophtronVcAccountsData,
+  sophtronVcIdentityData,
+  sophtronVcTranscationsData
+} from './testData/sophtronVcData'
 
 const MX_INTEGRATION_PATH = 'https://int-api.mx.com'
 
@@ -85,8 +90,27 @@ export const SOPHTRON_GET_USER_INSTITUTION_ACCOUNTS_PATH = `${SOPHTRON_V1_BASE_P
 export const SOPHTRON_ANSWER_JOB_MFA_PATH = `${SOPHTRON_V2_BASE_PATH}/job/:jobId/challenge/:challengeId`
 export const SOPHTRON_CUSTOMER_UNIQUE_ID_PATH = `${SOPHTRON_V2_BASE_PATH}/customers`
 export const SOPHTRON_CREATE_CUSTOMER_PATH = `${SOPHTRON_V2_BASE_PATH}/customers`
+export const SOPHTRON_GET_USER_INTEGRATION_KEY_PATH = `${SOPHTRON_V1_BASE_PATH}/User/GetUserIntegrationKey`
+
+export const SOPHTRON_VC_BASE_PATH = 'https://vc.sophtron.com/api/vc'
+
+export const SOPHTRON_VC_GET_IDENTITY_PATH = `${SOPHTRON_VC_BASE_PATH}/customers/:userId/members/:connectionId/identity`
+export const SOPHTRON_VC_GET_ACCOUNTS_PATH = `${SOPHTRON_VC_BASE_PATH}/customers/:userId/members/:connectionId/accounts`
+export const SOPHTRON_VC_GET_TRANSACTIONS_PATH = `${SOPHTRON_VC_BASE_PATH}/customers/:userId/accounts/:accountId/transactions`
 
 const handlers = [
+  http.get(SOPHTRON_VC_GET_TRANSACTIONS_PATH, () =>
+    HttpResponse.json({ vc: sophtronVcTranscationsData })
+  ),
+  http.get(SOPHTRON_VC_GET_ACCOUNTS_PATH, () =>
+    HttpResponse.json({ vc: sophtronVcAccountsData })
+  ),
+  http.get(SOPHTRON_VC_GET_IDENTITY_PATH, () =>
+    HttpResponse.json({ vc: sophtronVcIdentityData })
+  ),
+  http.post(SOPHTRON_GET_USER_INTEGRATION_KEY_PATH, () =>
+    HttpResponse.json({ IntegrationKey: 'testIntegrationKey' })
+  ),
   http.get(MX_VC_GET_TRANSACTIONS_PATH, () =>
     HttpResponse.json({ verifiableCredential: mxVcTranscationsData })
   ),

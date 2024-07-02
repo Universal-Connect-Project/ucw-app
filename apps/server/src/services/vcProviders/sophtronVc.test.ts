@@ -1,3 +1,8 @@
+import {
+  sophtronVcAccountsData,
+  sophtronVcIdentityData,
+  sophtronVcTranscationsData
+} from '../../test/testData/sophtronVcData'
 import getVC from './sophtronVc'
 
 describe('getVc', () => {
@@ -7,28 +12,26 @@ describe('getVc', () => {
   const startTime = '1/1/2024'
   const endTime = '6/1/2024'
 
-  // TODO: just need to add handlers for all these
-  // and expect a jwt token
+  it('gets identity VC', async () => {
+    const vc = await getVC(connectionId, 'identity', userId)
 
-  it('gets identity VC', () => {
-    const vc = getVC(
+    expect(vc).toEqual(sophtronVcIdentityData)
+  })
+
+  it('gets accounts VC', async () => {
+    const vc = await getVC(connectionId, 'accounts', userId)
+    expect(vc).toEqual(sophtronVcAccountsData)
+  })
+
+  it('gets transactions VC', async () => {
+    const vc = await getVC(
       connectionId,
-      'identity',
+      'transactions',
       userId,
       accountId,
       startTime,
       endTime
     )
-    expect(vc).toEqual({})
+    expect(vc).toEqual(sophtronVcTranscationsData)
   })
-
-  // it('gets accounts VC', () => {
-  //   const vc = getVC(connectionId, 'accounts', userId, accountId, startTime, endTime)
-  //   expect(vc).toEqual({})
-  // })
-
-  // it('gets transactions VC', () => {
-  //   const vc = getVC(connectionId, 'transactions', userId, accountId, startTime, endTime)
-  //   expect(vc).toEqual({})
-  // })
 })
