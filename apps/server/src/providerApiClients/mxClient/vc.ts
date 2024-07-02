@@ -2,17 +2,21 @@ import axios from 'axios'
 import { debug, error } from '../../infra/logger'
 import providerCredentials from '../../providerCredentials'
 
-async function request(
-  url: string,
-  method: 'get' | 'post' | 'put' | 'delete',
-  clientId: string,
-  secret: string
-) {
+export const getVc = async (path: string, isProd: boolean) => {
+  const configuration = isProd
+    ? providerCredentials.mxProd
+    : providerCredentials.mxInt
+
   const authHeader =
-    'Basic ' + Buffer.from(clientId + ':' + secret).toString('base64')
+    'Basic ' +
+    Buffer.from(configuration.username + ':' + configuration.password).toString(
+      'base64'
+    )
+
+  const url = `${configuration.basePath}/vc/${path}`
 
   return await axios({
-    method,
+    method: 'get',
     url,
     headers: {
       Accept: 'application/vnd.mx.api.v1beta+json',
@@ -33,17 +37,4 @@ async function request(
 
       throw new Error('MX VC endpoint failure')
     })
-}
-
-export const getVc = (path: string, isProd: boolean) => {
-  const configuration = isProd
-    ? providerCredentials.mxProd
-    : providerCredentials.mxInt
-
-  return request(
-    `${configuration.basePath}/vc/${path}`,
-    'get',
-    configuration.username,
-    configuration.password
-  )
 }
