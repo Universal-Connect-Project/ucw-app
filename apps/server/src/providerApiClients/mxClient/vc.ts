@@ -5,7 +5,6 @@ import providerCredentials from '../../providerCredentials'
 async function request(
   url: string,
   method: 'get' | 'post' | 'put' | 'delete',
-  data: any,
   clientId: string,
   secret: string
 ) {
@@ -15,7 +14,6 @@ async function request(
   return await axios({
     method,
     url,
-    data,
     headers: {
       Accept: 'application/vnd.mx.api.v1beta+json',
       'content-type': 'application/json',
@@ -45,7 +43,6 @@ export const getVc = (path: string, isProd: boolean) => {
   return request(
     `${configuration.basePath}/vc/${path}`,
     'get',
-    null,
     configuration.username,
     configuration.password
   )
