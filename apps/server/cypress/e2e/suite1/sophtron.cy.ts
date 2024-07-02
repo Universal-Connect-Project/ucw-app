@@ -1,15 +1,21 @@
-describe('Should connect to an Institution through happy path', () => {
-  it('Connects to Sophtron No MFA', () => {
-    cy.visitAgg()
-    cy.findByPlaceholderText('Search').type('Sophtron Bank NoMFA')
-    cy.findByLabelText('Add account with Sophtron Bank NoMFA').first().click()
-    cy.findByLabelText('User ID').type('asdf')
-    cy.findByText('Password').type('asdf')
+import { JobTypes } from '../../../src/utils/index'
+import generateVcDataTests from '../../utils/generateVcDataTests'
+
+const makeAConnection = async (jobType) => {
+  cy.findByPlaceholderText('Search').type('Sophtron Bank NoMFA')
+  cy.findByLabelText('Add account with Sophtron Bank NoMFA').first().click()
+  cy.findByLabelText('User ID').type('asdf')
+  cy.findByText('Password').type('asdf')
+  cy.findByRole('button', { name: 'Continue' }).click()
+
+  if ([JobTypes.VERIFICATION].includes(jobType)) {
+    cy.findByText('Primary Checking 1234', { timeout: 45000 }).click()
     cy.findByRole('button', { name: 'Continue' }).click()
+  }
+  cy.findByText('Connected', { timeout: 90000 }).should('exist')
+}
 
-    cy.findByText('Connected', { timeout: 45000 }).should('exist')
-  })
-
+describe('Sophtron provider', () => {
   it('Connects to Sophtron Bank with all MFA options', () => {
     cy.visitAgg()
     cy.findByPlaceholderText('Search').type('Sophtron Bank')
@@ -40,4 +46,6 @@ describe('Should connect to an Institution through happy path', () => {
 
     cy.findByText('Connected', { timeout: 90000 }).should('exist')
   })
+
+  generateVcDataTests({ makeAConnection })
 })

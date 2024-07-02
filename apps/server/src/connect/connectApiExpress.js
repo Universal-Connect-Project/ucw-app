@@ -8,6 +8,11 @@ import { ApiEndpoints } from '../shared/connect/ApiEndpoint'
 import { ConnectionStatus } from '../shared/contract.ts'
 import { ConnectApi } from './connectApi'
 import stubs from './instrumentations.js'
+import {
+  accountsDataHandler,
+  identityDataHandler,
+  transactionsDataHandler
+} from './dataEndpoints'
 
 const AGGREGATION_JOB_TYPE = 0
 
@@ -21,7 +26,9 @@ export default function (app) {
       req.path === '/' ||
       req.path.startsWith('/example') === true ||
       req.path.startsWith('/static') === true
-    ) { return next() }
+    ) {
+      return next()
+    }
     req.connectService = new ConnectApi(req)
     if ((await req.connectService.init()) != null) {
       if (
@@ -117,7 +124,8 @@ export default function (app) {
   )
 
   app.get(`${ApiEndpoints.INSTITUTIONS}/favorite`, async (req, res) => {
-    const popularInsitutions = await req.connectService.loadPopularInstitutions()
+    const popularInsitutions =
+      await req.connectService.loadPopularInstitutions()
     res.send(popularInsitutions)
   })
 
@@ -274,7 +282,7 @@ export default function (app) {
         .join('|'),
       'g'
     )
-    function mapOauthParams (queries, res, html) {
+    function mapOauthParams(queries, res, html) {
       res.send(
         html.replaceAll(oauthParams, (q) => queries[q.substring(1)] ?? '')
       )
@@ -285,4 +293,9 @@ export default function (app) {
       mapOauthParams(queries, res, html)
     })
   })
+
+  // VC Data Endpoints
+  app.get('/data/accounts', accountsDataHandler)
+  app.get('/data/identity', identityDataHandler)
+  app.get('/data/transactions', transactionsDataHandler)
 }
