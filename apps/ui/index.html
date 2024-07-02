@@ -9,7 +9,7 @@
   <body>
     <div id="root"></div>
     <script type="text/javascript">
-      const exports = {};
+      const exports = {}
       const params = {
         job_type: '$job_type',
         oauth_referral_source: '$oauth_referral_source',
@@ -18,6 +18,7 @@
         scheme: '$scheme',
         single_account_select: '$single_account_select',
         include_identity: '$include_identity',
+        institution_id: '$institution_id'
       }
 
       window.app = {
@@ -25,9 +26,9 @@
           type: 'connect_widget',
           server: '$server',
           brokaw_websocket_url: '',
-          brokaw_auth:{
+          brokaw_auth: {
             url: ''
-          },
+          }
         },
         clientConfig: {
           is_mobile_webview: params.is_mobile_webview === 'true',
@@ -40,7 +41,7 @@
             auth: '$auth',
             mode: params.job_type || 'agg', // 'verify'
             job_type: params.job_type || 'agg', // 'verify'
-            current_institution_code: '$institution_id', // 'mxbank',
+            current_institution_code: params.institution_id,
             current_institution_guid: null,
             current_member_guid: '$connection_id',
             current_provider: '$provider',
@@ -48,7 +49,7 @@
             user_id: '$user_id',
             current_microdeposit_guid: null,
             disable_background_agg: null,
-            disable_institution_search: false,
+            disable_institution_search: !!params.institution_id,
             include_identity: params.include_identity === 'true',
             include_transactions: null, // true
             oauth_referral_source: params.oauth_referral_source || 'BROWSER',
@@ -56,7 +57,7 @@
             wait_for_full_aggregation: false,
             single_account_select: params.single_account_select !== 'false',
             scheme: params.scheme || 'vcs'
-          },
+          }
         },
         config: {
           client_guid: '$client_guid',
@@ -91,9 +92,9 @@
           enable_springboard_in_mini_net_worth: false,
           enable_springboard_in_mini_spending: false,
           enable_support_requests: true,
-          keepalive_url:null,
-          session_timeout:null,
-          session_timeout_url:null,
+          keepalive_url: null,
+          session_timeout: null,
+          session_timeout_url: null,
           show_accounts_widget_in_master: true,
           show_budgets_widget_in_master: true,
           show_cash_flow_widget_in_master: true,
@@ -117,7 +118,7 @@
             url: ''
           }
         }
-      };
+      }
     </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>

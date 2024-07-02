@@ -49,12 +49,11 @@ app.use(function (err, req, res, next) {
   res.status(500)
   res.send(err.message)
 })
-const pageQueries = new RegExp(
+const pageQueryParameters = new RegExp(
   [
     'institution_id',
     'job_type',
     'scheme',
-    'auth',
     'user_id',
     'client_guid',
     'connection_id',
@@ -80,7 +79,7 @@ function renderDefaultPage(req, res, html) {
     delete req.query.connection_id
   }
   res.send(
-    html.replaceAll(pageQueries, (q) =>
+    html.replaceAll(pageQueryParameters, (q) =>
       encodeURIComponent(req.query[q.substring(1)] ?? '')
     )
   )

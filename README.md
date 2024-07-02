@@ -8,6 +8,14 @@ into an iframe.
 
 Please refer to the [UCP documentation](https://docs.universalconnect.org) (Coming soon) for additional information on how to use the widget.
 
+## Authentication
+
+The express endpoints exposed in these repositories don't provide any authentication. You will need to fork the repo if you want to add your own authentication.
+
+## Api documentation
+
+The api documentation for this service lives in openApiDocumentation.json and uses the (open api spec)[https://swagger.io/specification/]. You can open it in your preferred tool. You may copy the file into [swagger editor](https://editor.swagger.io/) and edit the local file with updates when complete.
+
 ## Cached data
 
 This widget runs off of cached data, which is included in this repo, so that it doesn't rely on any UCP-hosted services in order to function.

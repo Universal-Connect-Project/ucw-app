@@ -8,7 +8,7 @@ import type {
   WidgetAdapter
 } from '../shared/contract'
 import { ChallengeType, ConnectionStatus } from '../shared/contract'
-import { mapJobType } from '../utils'
+import { JobTypes, mapJobType } from '../utils'
 
 import { debug, error, trace } from '../infra/logger'
 import SophtronClientV1 from '../providerApiClients/sophtronClient'
@@ -122,7 +122,7 @@ export class SophtronAdapter implements WidgetAdapter {
     userId: string
   ): Promise<Connection> {
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    const job_type = mapJobType('agg')
+    const job_type = mapJobType(JobTypes.AGGREGATE)
 
     const username = request.credentials.find(
       (item) => item.id === 'username'
