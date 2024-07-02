@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { debug, error } from '../../infra/logger'
-import type { ConfigurationParameters } from './configuration'
+import providerCredentials from '../../providerCredentials'
 
 async function request(
   url: string,
@@ -24,7 +24,8 @@ async function request(
   })
     .then((res) => {
       debug(`mx vc client http response status ${res.status} from ${url}`)
-      return res.data?.verifiableCredential || res.data
+
+      return res.data?.verifiableCredential
     })
     .catch((err) => {
       error(
@@ -36,23 +37,16 @@ async function request(
     })
 }
 
-export class MxVcClient {
-  configuration: ConfigurationParameters
-  constructor(conf: ConfigurationParameters) {
-    this.configuration = conf
-  }
+export const getVc = (path: string, isProd: boolean) => {
+  const configuration = isProd
+    ? providerCredentials.mxProd
+    : providerCredentials.mxInt
 
-  async getVC(path: string) {
-    return await this._get(`vc/${path}`).then((res) => res)
-  }
-
-  async _get(url: string) {
-    return await request(
-      `${this.configuration.basePath}/${url}`,
-      'get',
-      null,
-      this.configuration.username,
-      this.configuration.password
-    )
-  }
+  return request(
+    `${configuration.basePath}/vc/${path}`,
+    'get',
+    null,
+    configuration.username,
+    configuration.password
+  )
 }

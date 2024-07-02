@@ -58,6 +58,7 @@ export const ANSWER_CHALLENGE_PATH = `${MX_BASE_PATH}/users/:userId/members/:id/
 export const USERS_PATH = `${MX_BASE_PATH}/users`
 export const CREATE_USER_PATH = `${MX_BASE_PATH}/users`
 
+export const MX_INTEGRATION_VC_GET_ACCOUNTS_PATH = `${MX_INTEGRATION_PATH}/vc/users/:userId/members/:connectionId/accounts`
 export const MX_VC_GET_ACCOUNTS_PATH = `${MX_BASE_PATH}/vc/users/:userId/members/:connectionId/accounts`
 export const MX_VC_GET_IDENTITY_PATH = `${MX_BASE_PATH}/vc/users/:userId/members/:connectionId/customers`
 export const MX_VC_GET_TRANSACTIONS_PATH = `${MX_BASE_PATH}/vc/users/:userId/accounts/:accountId/transactions`
@@ -87,10 +88,17 @@ export const SOPHTRON_CREATE_CUSTOMER_PATH = `${SOPHTRON_V2_BASE_PATH}/customers
 
 const handlers = [
   http.get(MX_VC_GET_TRANSACTIONS_PATH, () =>
-    HttpResponse.json(mxVcTranscationsData)
+    HttpResponse.json({ verifiableCredential: mxVcTranscationsData })
   ),
-  http.get(MX_VC_GET_ACCOUNTS_PATH, () => HttpResponse.json(mxVcAccountsData)),
-  http.get(MX_VC_GET_IDENTITY_PATH, () => HttpResponse.json(mxVcIdentityData)),
+  http.get(MX_INTEGRATION_VC_GET_ACCOUNTS_PATH, () =>
+    HttpResponse.json({ verifiableCredential: mxVcAccountsData })
+  ),
+  http.get(MX_VC_GET_ACCOUNTS_PATH, () =>
+    HttpResponse.json({ verifiableCredential: mxVcAccountsData })
+  ),
+  http.get(MX_VC_GET_IDENTITY_PATH, () =>
+    HttpResponse.json({ verifiableCredential: mxVcIdentityData })
+  ),
   http.post(SOPHTRON_CUSTOMER_UNIQUE_ID_PATH, () =>
     HttpResponse.json(createSophtronCustomerData)
   ),
