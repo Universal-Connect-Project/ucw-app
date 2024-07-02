@@ -15,7 +15,6 @@ export default async function getVc(
   switch (provider) {
     case 'mx':
       return await GetMxVc(true, connectionId, type, userId, accountId)
-    case 'mx-int':
     case 'mx_int':
       return await GetMxVc(false, connectionId, type, userId, accountId)
     case 'sophtron':
