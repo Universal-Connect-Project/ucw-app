@@ -1,3 +1,8 @@
+import {
+  mxVcAccountsData,
+  mxVcIdentityData,
+  mxVcTranscationsData
+} from '../../test/testData/mxVcData'
 import getVC from './mxVc'
 
 describe('getVc', () => {
@@ -5,48 +10,37 @@ describe('getVc', () => {
   const userId = 'userId'
   const accountId = 'accountId'
 
-  // TODO: just need to add handlers for all these
-  // and expect a jwt token
+  it('gets accounts VC from INT environment', async () => {
+    const isProd = false
 
-  // it('gets identity VC from INT environment', () => {
-  //   const isProd = false
+    const vc = await getVC(isProd, connectionId, 'accounts', userId)
+    expect(vc).toEqual(mxVcAccountsData)
+  })
 
-  //   const vc = getVC(isProd, connectionId, 'identity', userId, accountId)
-  //   expect(vc).toEqual({})
-  // })
+  it('gets identity VC from Prod environment', async () => {
+    const isProd = true
 
-  // it('gets accounts VC from INT environment', () => {
-  //   const isProd = false
+    const vc = await getVC(isProd, connectionId, 'identity', userId, accountId)
+    expect(vc).toEqual(mxVcIdentityData)
+  })
 
-  //   const vc = getVC(isProd, connectionId, 'accounts', userId, accountId)
-  //   expect(vc).toEqual({})
-  // })
+  it('gets accounts VC from Prod environment', async () => {
+    const isProd = true
 
-  // it('gets transactions VC from INT environment', () => {
-  //   const isProd = false
+    const vc = await getVC(isProd, connectionId, 'accounts', userId)
+    expect(vc).toEqual(mxVcAccountsData)
+  })
 
-  //   const vc = getVC(isProd, connectionId, 'transactions', userId, accountId)
-  //   expect(vc).toEqual({})
-  // })
+  it('gets transactions VC from Prod environment', async () => {
+    const isProd = true
 
-  // it('gets identity VC from Prod environment', () => {
-  //   const isProd = false
-
-  //   const vc = getVC(isProd, connectionId, 'identity', userId, accountId)
-  //   expect(vc).toEqual({})
-  // })
-
-  // it('gets accounts VC from Prod environment', () => {
-  //   const isProd = false
-
-  //   const vc = getVC(isProd, connectionId, 'accounts', userId, accountId)
-  //   expect(vc).toEqual({})
-  // })
-
-  // it('gets transactions VC from Prod environment', () => {
-  //   const isProd = false
-
-  //   const vc = getVC(isProd, connectionId, 'transactions', userId, accountId)
-  //   expect(vc).toEqual({})
-  // })
+    const vc = await getVC(
+      isProd,
+      connectionId,
+      'transactions',
+      userId,
+      accountId
+    )
+    expect(vc).toEqual(mxVcTranscationsData)
+  })
 })

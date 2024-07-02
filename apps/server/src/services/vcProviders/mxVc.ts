@@ -26,10 +26,8 @@ export default async function getVC(
     default:
       break
   }
-  if (path !== '') {
-    info(`Getting mx vc ${type}`, path)
 
-    return await getMxVc(path, isProd)
-  }
-  return null
+  info(`Getting mx vc ${type}`, path)
+
+  return await getMxVc(path, isProd)
 }
