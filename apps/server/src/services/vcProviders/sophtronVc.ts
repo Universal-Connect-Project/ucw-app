@@ -1,5 +1,4 @@
-import SophtronVcClient from '../../providerApiClients/sophtronClient/vc'
-import providerCredentials from '../../providerCredentials'
+import { getVc as getSophtronVc } from '../../providerApiClients/sophtronClient/vc'
 
 export default async function getVC(
   connectionId: string,
@@ -25,7 +24,5 @@ export default async function getVC(
       break
   }
 
-  const vcClient = new SophtronVcClient(providerCredentials.sophtron)
-
-  return await vcClient.getVC(path)
+  return await getSophtronVc(path)
 }
