@@ -1,4 +1,3 @@
-// import { buildSophtronAuthCode } from '../..'
 import * as http from '../../infra/http'
 import { buildSophtronAuthCode } from '../../utils'
 import SophtronClient from './'
