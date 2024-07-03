@@ -64,8 +64,8 @@ resulting in the error. To fix this, you will need to run `docker logout` from y
 1. Follow [Initial Setup](#initial-setup) (below) for setting-up some required environment variables
 1. Install [Docker](#docker), a dependency for the institution search feature to work
 1. Finally, you can run the docker containers, or just run via node.
-  1. For docker: `docker compose up`
-  2. For node: `npm run dev`
+   1. For docker: `docker compose up`
+   1. For node: `npm run dev`
 
 ## Sensitive information
 
