@@ -40,6 +40,12 @@ jobs:
           echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
           echo RESOURCEVERSION="" >> ${ENV_FILE_PATH}
 
+          echo SOPHTRONAPIUSERID=testUserId >> ${ENV_FILE_PATH}
+          echo SOPHTRONAPIUSERSECRET=testUserSecret >> ${ENV_FILE_PATH}
+
+          echo MXCLIENTID=testClientId >> ${ENV_FILE_PATH}
+          echo MXAPISECRET=testClientSecret >> ${ENV_FILE_PATH}
+
           # Secrets (can't load these from another job, due to GH security features)          
           cat ${ENV_FILE_PATH}
 
