@@ -27,7 +27,6 @@
     "@ngrok/ngrok": "^1.2.0",
     "@types/express": "^4.17.21",
     "@types/uuid": "^9.0.8",
-    "@universe/address-parser": "^3.3.0",
     "assert-browserify": "^2.0.0",
     "axios": "^1.6.8",
     "buffer-browserify": "^0.2.5",
@@ -38,7 +37,6 @@
     "express-async-errors": "^3.1.1",
     "express-rate-limit": "^7.0.2",
     "js-logger": "^1.6.1",
-    "parse-full-name": "^1.2.6",
     "redis": "^4.6.12",
     "stream-browserify": "^3.0.0",
     "uuid": "^9.0.1"
@@ -71,7 +69,6 @@
     "@testing-library/cypress": "^10.0.1",
     "@types/crypto-js": "^4.2.2",
     "@types/jest": "^29.5.12",
-    "@types/parse-full-name": "^1.2.5",
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "babel-plugin-js-logger": "^1.0.17",
     "cross-env": "^7.0.3",
