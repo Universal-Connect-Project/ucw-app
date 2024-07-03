@@ -1,7 +1,7 @@
 # Universal Connect Widget (Application)
 
-This is a monorepo. It contains the pieces that make up the Universal Connect Widget Application. It is a full-stack
-application that anyone can clone and self-host, as a way to serve the connect widget via a URL, which can then be loaded
+This repo is a monorepo, which contains the pieces that make up the Universal Connect Application. It is a full-stack
+application which anyone can clone and self-host as a way to serve the connect widget via a url which can then be loaded
 into an iframe.
 
 ## Documentation
@@ -12,9 +12,9 @@ Please refer to the [UCP documentation](https://docs.universalconnect.org) (Comi
 
 The express endpoints exposed in these repositories don't provide any authentication. You will need to fork the repo if you want to add your own authentication.
 
-## API documentation
+## Api documentation
 
-The API documentation for this service lives in openApiDocumentation.json and uses the (OpenAPI spec)[https://swagger.io/specification/]. You can open it in your preferred tool. You may copy the file into [swagger editor](https://editor.swagger.io/) and edit the local file with updates when complete.
+The api documentation for this service lives in openApiDocumentation.json and uses the (open api spec)[https://swagger.io/specification/]. You can open it in your preferred tool. You may copy the file into [swagger editor](https://editor.swagger.io/) and edit the local file with updates when complete.
 
 ## Cached data
 
@@ -29,8 +29,8 @@ The following files need to be there for the widget service to function
 
 ## Getting Started (production)
 
-To get started: clone the repo, follow the steps in [Getting Started](#getting-started-development) and
-[Initial Setup](#initial-setup) to set up your `.env` files, and then run the following command from the root of the 
+To get started: clone the repo, follow the steps in [Getting Started](#getting-started-in-development) and
+[Initial Setup](#initial-setup) to set up your `.env` files, and then run the following command from the root of the
 project:
 
 _This assumes you have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) already installed._
@@ -60,15 +60,17 @@ resulting in the error. To fix this, you will need to run `docker logout` from y
 1. Run `npm ci` from the root directory
 1. Run `cp ./.env.example ./.env`
 1. Run `cp ./apps/server/.env.example ./apps/server/.env`
-1. Run `cp ./apps/server/cachedDefaults/preferences.example.json ./apps/server/cachedDefaults/preferences.json` and modify the preferences, if desired
+1. Run `cp ./apps/server/cachedDefaults/preferences.example.json ./apps/server/cachedDefaults/preferences.json` and modify the preferences
 1. Follow [Initial Setup](#initial-setup) (below) for setting-up some required environment variables
 1. Install [Docker](#docker), a dependency for the institution search feature to work
-1. Finally, run: `npm run dev`
+1. Finally, you can run the docker containers, or just run via node.
+  1. For docker: `docker compose up`
+  2. For node: `npm run dev`
 
-## Initial setup
+## Sensitive information
 
 Please remember that secrets are passed through environment variables instead of hardcoded in the code files.
-**DO NOT** put any credentials in any of the code files. If you do so, it could get committed and leaked to the public.
+Do not put any credentials in any of the code files. If you do so, it could get committed and leaked to the public.
 **Use the provided `.env` files.**
 
 ## Docker
@@ -80,7 +82,7 @@ Some compatible options are:
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [Rancher Desktop](https://rancherdesktop.io/)
 
-Please note, you do not need a "desktop" version of docker to run this project. Any docker-compatible container client is all 
+Please note, you do not need a "desktop" version of docker to run this project. Any docker-compatible container client is all
 that is required. However, not all clients have been tested with this project.
 
 ## Redis
