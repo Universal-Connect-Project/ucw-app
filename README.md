@@ -1,7 +1,7 @@
 # Universal Connect Widget (Application)
 
-This repo is a monorepo, which contains the pieces that make up the Universal Connect Application. It is a full-stack
-application which anyone can clone and self-host as a way to serve the connect widget via a url which can then be loaded
+This is a monorepo. It contains the pieces that make up the Universal Connect Widget Application. It is a full-stack
+application that anyone can clone and self-host, as a way to serve the connect widget via a URL, which can then be loaded
 into an iframe.
 
 ## Documentation
@@ -12,9 +12,9 @@ Please refer to the [UCP documentation](https://docs.universalconnect.org) (Comi
 
 The express endpoints exposed in these repositories don't provide any authentication. You will need to fork the repo if you want to add your own authentication.
 
-## Api documentation
+## API documentation
 
-The api documentation for this service lives in openApiDocumentation.json and uses the (open api spec)[https://swagger.io/specification/]. You can open it in your preferred tool. You may copy the file into [swagger editor](https://editor.swagger.io/) and edit the local file with updates when complete.
+The API documentation for this service lives in openApiDocumentation.json and uses the (OpenAPI spec)[https://swagger.io/specification/]. You can open it in your preferred tool. You may copy the file into [swagger editor](https://editor.swagger.io/) and edit the local file with updates when complete.
 
 ## Cached data
 
@@ -29,7 +29,7 @@ The following files need to be there for the widget service to function
 
 ## Getting Started (production)
 
-To get started: clone the repo, follow the steps in [Getting Started](#getting-started-in-development) and
+To get started: clone the repo, follow the steps in [Getting Started](#getting-started-development) and
 [Initial Setup](#initial-setup) to set up your `.env` files, and then run the following command from the root of the 
 project:
 
@@ -60,7 +60,7 @@ resulting in the error. To fix this, you will need to run `docker logout` from y
 1. Run `npm ci` from the root directory
 1. Run `cp ./.env.example ./.env`
 1. Run `cp ./apps/server/.env.example ./apps/server/.env`
-1. Run `cp ./apps/server/cachedDefaults/preferences.example.json ./apps/server/cachedDefaults/preferences.json` and modify the preferences
+1. Run `cp ./apps/server/cachedDefaults/preferences.example.json ./apps/server/cachedDefaults/preferences.json` and modify the preferences, if desired
 1. Follow [Initial Setup](#initial-setup) (below) for setting-up some required environment variables
 1. Install [Docker](#docker), a dependency for the institution search feature to work
 1. Finally, run: `npm run dev`
