@@ -31,6 +31,17 @@ import {
   createCustomerData as createSophtronCustomerData,
   customerFromUniqueIdData
 } from './testData/sophtronCustomer'
+import {
+  mxVcAccountsData,
+  mxVcIdentityData,
+  mxVcIntegrationAccountsData,
+  mxVcTranscationsData
+} from './testData/mxVcData'
+import {
+  sophtronVcAccountsData,
+  sophtronVcIdentityData,
+  sophtronVcTranscationsData
+} from './testData/sophtronVcData'
 
 const MX_INTEGRATION_PATH = 'https://int-api.mx.com'
 
@@ -52,6 +63,11 @@ export const READ_MEMBER_STATUS_PATH = `${MX_BASE_PATH}/users/:userId/members/:i
 export const ANSWER_CHALLENGE_PATH = `${MX_BASE_PATH}/users/:userId/members/:id/resume`
 export const USERS_PATH = `${MX_BASE_PATH}/users`
 export const CREATE_USER_PATH = `${MX_BASE_PATH}/users`
+
+export const MX_INTEGRATION_VC_GET_ACCOUNTS_PATH = `${MX_INTEGRATION_PATH}/vc/users/:userId/members/:connectionId/accounts`
+export const MX_VC_GET_ACCOUNTS_PATH = `${MX_BASE_PATH}/vc/users/:userId/members/:connectionId/accounts`
+export const MX_VC_GET_IDENTITY_PATH = `${MX_BASE_PATH}/vc/users/:userId/members/:connectionId/customers`
+export const MX_VC_GET_TRANSACTIONS_PATH = `${MX_BASE_PATH}/vc/users/:userId/accounts/:accountId/transactions`
 
 const FINICITY_BASE_PATH = 'https://api.finicity.com'
 export const FINICITY_INSTITUTION_BY_ID_PATH = `${FINICITY_BASE_PATH}/institution/v2/institutions/:institutionId`
@@ -75,8 +91,39 @@ export const SOPHTRON_GET_USER_INSTITUTION_ACCOUNTS_PATH = `${SOPHTRON_V1_BASE_P
 export const SOPHTRON_ANSWER_JOB_MFA_PATH = `${SOPHTRON_V2_BASE_PATH}/job/:jobId/challenge/:challengeId`
 export const SOPHTRON_CUSTOMER_UNIQUE_ID_PATH = `${SOPHTRON_V2_BASE_PATH}/customers`
 export const SOPHTRON_CREATE_CUSTOMER_PATH = `${SOPHTRON_V2_BASE_PATH}/customers`
+export const SOPHTRON_GET_USER_INTEGRATION_KEY_PATH = `${SOPHTRON_V1_BASE_PATH}/User/GetUserIntegrationKey`
+
+export const SOPHTRON_VC_BASE_PATH = 'https://vc.sophtron.com/api/vc'
+
+export const SOPHTRON_VC_GET_IDENTITY_PATH = `${SOPHTRON_VC_BASE_PATH}/customers/:userId/members/:connectionId/identity`
+export const SOPHTRON_VC_GET_ACCOUNTS_PATH = `${SOPHTRON_VC_BASE_PATH}/customers/:userId/members/:connectionId/accounts`
+export const SOPHTRON_VC_GET_TRANSACTIONS_PATH = `${SOPHTRON_VC_BASE_PATH}/customers/:userId/accounts/:accountId/transactions`
 
 const handlers = [
+  http.get(SOPHTRON_VC_GET_TRANSACTIONS_PATH, () =>
+    HttpResponse.json({ vc: sophtronVcTranscationsData })
+  ),
+  http.get(SOPHTRON_VC_GET_ACCOUNTS_PATH, () =>
+    HttpResponse.json({ vc: sophtronVcAccountsData })
+  ),
+  http.get(SOPHTRON_VC_GET_IDENTITY_PATH, () =>
+    HttpResponse.json({ vc: sophtronVcIdentityData })
+  ),
+  http.post(SOPHTRON_GET_USER_INTEGRATION_KEY_PATH, () =>
+    HttpResponse.json({ IntegrationKey: 'testIntegrationKey' })
+  ),
+  http.get(MX_VC_GET_TRANSACTIONS_PATH, () =>
+    HttpResponse.json({ verifiableCredential: mxVcTranscationsData })
+  ),
+  http.get(MX_INTEGRATION_VC_GET_ACCOUNTS_PATH, () =>
+    HttpResponse.json({ verifiableCredential: mxVcIntegrationAccountsData })
+  ),
+  http.get(MX_VC_GET_ACCOUNTS_PATH, () =>
+    HttpResponse.json({ verifiableCredential: mxVcAccountsData })
+  ),
+  http.get(MX_VC_GET_IDENTITY_PATH, () =>
+    HttpResponse.json({ verifiableCredential: mxVcIdentityData })
+  ),
   http.post(SOPHTRON_CUSTOMER_UNIQUE_ID_PATH, () =>
     HttpResponse.json(createSophtronCustomerData)
   ),
