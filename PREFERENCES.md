@@ -71,3 +71,10 @@ _The total for all providers need to add up to 100_
 ## Provider Credentials
 
 As mentioned above, it is important to understand, that for any providers listed in the section labeled `defaultProvider` or `supportedProviders`, you must provide your own credentials for each of these providers in the `./apps/servver/.env` file.
+
+Follow these links to sign-up for credentials for each provider:
+
+- MX - [Register for a developer account](https://dashboard.mx.com/sign_up)
+  - Once you have created an account, go to [https://dashboard.mx.com/home](https://dashboard.mx.com/home), and look for your `API Key` and `Client ID`, and put those values in `./apps/server/.env`
+- Sophtron - [Register for a developer account](https://sophtron.com/Account/Register)
+  - Once you have created an account, go to [https://sophtron.com/Manage](https://sophtron.com/Manage), and look for your `UserId` and `AccessKey`, and put those values in `./apps/server/.env`

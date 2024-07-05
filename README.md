@@ -33,6 +33,10 @@ Please refer to the [UCP documentation](https://docs.universalconnect.org) (Comi
     1. For docker: `docker compose up`
     1. For node: `npm run dev`
 
+## ENV credentials
+
+You will need to create an account for each 
+
 ## Authentication
 
 The express endpoints exposed in these repositories don't provide any authentication. You will need to fork the repo if you want to add your own authentication.
