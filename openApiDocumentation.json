@@ -39,6 +39,34 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "description": "The connection id of the connection to be refreshed. A user_id and provider are required when this is used. Providing these will skip search, go directly to the authorization step for the institution, and hide the back button.",
+            "name": "connection_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The user id of the connection to be refreshed. A connection_id and provider are required when this is used. Providing these will skip search, go directly to the authorization step for the institution, and hide the back button.",
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The provider of the connection to be refreshed. A connection_id and user_id are required when this is used. Providing these will skip search, go directly to the authorization step for the institution, and hide the back button.",
+            "name": "provider",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["mx", "mx_int", "sophtron"]
+            }
           }
         ],
         "description": "Get the widget html to attach to a browser frame",

@@ -136,6 +136,17 @@ export default function (app) {
   app.get(
     `${ApiEndpoints.INSTITUTIONS}/:institution_guid`,
     async (req, res) => {
+      if (req.context?.provider) {
+        const institution =
+          await req.connectService.loadInstitutionByProviderId(
+            req.params.institution_guid
+          )
+
+        res.send(institution)
+
+        return
+      }
+
       const ret = await req.connectService.loadInstitutionByUcpId(
         req.params.institution_guid
       )

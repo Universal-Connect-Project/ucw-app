@@ -56,9 +56,9 @@ export async function instrumentation(context: Context, input: any) {
     }
   }
 
-  // if (context.user_id) {
-  //   context.resolved_user_id = context.user_id
-  // }
+  if (context.user_id) {
+    context.resolved_user_id = context.user_id
+  }
 
   if (Boolean(input.current_member_guid) && Boolean(input.current_provider)) {
     context.provider = input.current_provider

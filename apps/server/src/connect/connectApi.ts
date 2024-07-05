@@ -255,6 +255,18 @@ export class ConnectApi extends ProviderAdapterBase {
     return { institution: mapResolvedInstitution(inst) }
   }
 
+  async loadInstitutionByProviderId(
+    providerInstitutionId: string
+  ): Promise<any> {
+    await this.init()
+
+    const institution = await this.providerAdapter.GetInstitutionById(
+      providerInstitutionId
+    )
+
+    return { institution: mapResolvedInstitution(institution) }
+  }
+
   async loadPopularInstitutions() {
     this.context.updated = true
     this.context.provider = null
