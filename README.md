@@ -11,11 +11,11 @@ into an iframe.
 - [Authentication](#authentication)
 
 ## Other Resources
-- [Preference Details](PREFERENCES.md)
 - [Additional Info](MISC)
 - [Contributing](CONTRIBUTING.md)
 - [Docker](DOCKER.md)
 - [Monorepo](MONOREPO.md)
+- [Preference Details](PREFERENCES.md)
 
 ## Documentation
 
