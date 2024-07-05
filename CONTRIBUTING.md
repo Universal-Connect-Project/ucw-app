@@ -1,5 +1,10 @@
 ## Contributing
 
+### Architecture decision records
+
+We use [architecture decision records](https://adr.github.io/) to make, document, and enforce our decisions. They live
+in the [architectureDecisionRecords](https://github.com/Universal-Connect-Project/ucw-app/tree/main/architectureDecisionRecords) folder.
+
 ### Publish to Docker
 
 **Publishing to Docker Hub is automatic, and will happen when code is merged to `main`.**

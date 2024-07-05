@@ -2,19 +2,11 @@
 
 ## Table of Contents
 
-- [Preferences and Aggregator Credentials](#preferences-and-aggregator-credentials)
 - [Sensitive information](#sensitive-information)
 - [Deploying a Production Instance](#deploying-a-production-instance)
-- [Authentication](#authentication)
 - [API Documentation](#api-documentation)
 - [Cached Data](#cached-data)
 - [Troubleshooting](#troubleshooting)
-- [Redis](#redis)
-- [Architecture Decision Records](#architecture-decision-records)
-
-## Preferences and Aggregator Credentials
-
-The preferences file (`./apps/server/cachedDefaults/preferences.json`) handles the institution search feature. For any providers listed in the section labeled `supportedProviders`, you must provide your own credentials for each of these providers in the `./.env` file.
 
 ## Sensitive Information
 
@@ -35,10 +27,6 @@ docker compose up
 ```
 
 That's it! If you have questions, please reach out to us.
-
-## Authentication
-
-The express endpoints exposed in these repositories don't provide any authentication. You will need to fork the repo if you want to add your own authentication.
 
 ## API Documentation
 
@@ -64,18 +52,3 @@ you may have logged-in previously with a docker login (via cli), and your auth h
 
 You do not need a docker login to pull the UCW docker images, but if you have stale tokens, docker will try to use them, thus
 resulting in the error. To fix this, you will need to run `docker logout` from your terminal, prior to running `docker compose up`
-
-## Redis
-
-You might see an error about failure to connect redis. The widget doesn't rely on redis to start, but some providers logic
-require a redis instance. To fix this error you can either:
-
-- Start a local redis instance. This way it will be available at localhost:6379 and the widget will be able to use it
-- Or in `./apps/server/.env`, set `Env=dev`. When this is done, the redis client will use a local in-memory object to handle
-  the cache, and avoid the error. However, this should only be used for testing. The cached values won't expire and also
-  will be cleared on server restart.
-
-## Architecture decision records
-
-We use [architecture decision records](https://adr.github.io/) to make, document, and enforce our decisions. They live
-in the [architectureDecisionRecords](https://github.com/Universal-Connect-Project/ucw-app/tree/main/architectureDecisionRecords) folder.
