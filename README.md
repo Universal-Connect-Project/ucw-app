@@ -12,7 +12,7 @@ into an iframe.
 
 ## Other Resources
 - [Preference Details](PREFERENCES.md)
-- [Additional Info](MORE-INFO.md)
+- [Additional Info](MISC)
 - [Contributing](CONTRIBUTING.md)
 - [Docker](DOCKER.md)
 - [Monorepo](MONOREPO.md)

@@ -1,4 +1,4 @@
-# Additional Info - Universal Connect Widget
+# Miscellaneous Info - Universal Connect Widget
 
 ## Table of Contents
 
