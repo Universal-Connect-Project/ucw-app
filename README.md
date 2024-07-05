@@ -69,7 +69,7 @@ resulting in the error. To fix this, you will need to run `docker logout` from y
 
 ## Preferences and Aggregator Credentials
 
-The preferences file (`./apps/server/cachedDefaults/preferences.json`) handles the institution search feature. For any providers listed in the section labeled `supportedProviders`, you must provide credentials for each of these providers in the `./.env` file.  
+The preferences file (`./apps/server/cachedDefaults/preferences.json`) handles the institution search feature. For any providers listed in the section labeled `supportedProviders`, you must provide credentials for each of these providers in the `./.env` file.
 
 ## Sensitive information
 
