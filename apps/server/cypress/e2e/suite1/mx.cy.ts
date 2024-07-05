@@ -1,12 +1,20 @@
-describe('Should connect to an Institution through happy path', () => {
-  it('Connects to MX Bank', () => {
-    cy.visitAgg()
-    cy.findByPlaceholderText('Search').type('MX Bank')
-    cy.findByLabelText('Add account with MX Bank').first().click()
-    cy.findByLabelText('LOGIN').type('mxuser')
-    cy.findByLabelText('PASSWORD').type('correct')
-    cy.findByRole('button', { name: 'Continue' }).click()
+import { JobTypes } from '../../../src/utils/index'
+import generateVcDataTests from '../../utils/generateVcDataTests'
 
-    cy.findByText('Connected', { timeout: 45000 }).should('exist')
-  })
+const makeAConnection = async (jobType) => {
+  cy.findByPlaceholderText('Search').type('MX Bank')
+  cy.findByLabelText('Add account with MX Bank').first().click()
+  cy.findByLabelText('LOGIN').type('mxuser')
+  cy.findByLabelText('PASSWORD').type('correct')
+  cy.findByRole('button', { name: 'Continue' }).click()
+
+  if ([JobTypes.ALL, JobTypes.VERIFICATION].includes(jobType)) {
+    cy.findByText('Checking').click()
+    cy.findByRole('button', { name: 'Continue' }).click()
+  }
+  cy.findByText('Connected', { timeout: 90000 }).should('exist')
+}
+
+describe('mx provider', () => {
+  generateVcDataTests({ makeAConnection })
 })
