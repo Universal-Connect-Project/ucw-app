@@ -11,6 +11,7 @@ into an iframe.
 - [Authentication](#authentication)
 
 ## Other Resources
+- [Preference Details](PREFERENCES.md)
 - [Additional Info](MORE-INFO.md)
 - [Contributing](CONTRIBUTING.md)
 - [Docker](DOCKER.md)
@@ -25,8 +26,8 @@ Please refer to the [UCP documentation](https://docs.universalconnect.org) (Comi
 1. Clone the `ucw-app` repo
 1. Run `npm ci` from the root directory
 1. Run `cp ./.env.example ./.env`
-1. Run `cp ./apps/server/.env.example ./apps/server/.env` (see [below](#preferences-and-aggregator-credentials) for details on necessary values that you must provide)
-1. Run `cp ./apps/server/cachedDefaults/preferences.example.json ./apps/server/cachedDefaults/preferences.json` and modify the preferences
+1. Run `cp ./apps/server/.env.example ./apps/server/.env` (see [PREFERENCES.md](PREFERENCES.md) for details on what values that you must provide in the `./apps/server/.env` file)
+1. Run `cp ./apps/server/cachedDefaults/preferences.example.json ./apps/server/cachedDefaults/preferences.json` and modify the preferences (see [PREFERENCES.md](PREFERENCES.md) for details on what the preferences)
 1. Install Docker, a dependency for the institution search feature to work (more info in [DOCKER.md](DOCKER.md))
 1. Finally, you can run the docker containers, or just run via node.
     1. For docker: `docker compose up`
