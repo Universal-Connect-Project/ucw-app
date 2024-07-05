@@ -4,6 +4,22 @@ The preferences file (`./apps/server/cachedDefaults/preferences.json`) handles t
 
 _See [testPreferences.json](./apps/server/cachedDefaults/testData/testPreferences.json) for an example with values filled in._
 
+## Table of Contents
+
+- [Provider Credentials](#provider-credentials)
+- [Preference Settings](#preference-settings)
+
+## Provider Credentials
+
+As mentioned above, it is important to understand, that for any providers listed in the section labeled `defaultProvider` or `supportedProviders`, you must provide your own credentials for each of these providers in the `./apps/server/.env` file.
+
+Follow these links to sign-up for credentials for each provider:
+
+- MX - [Register for a developer account](https://dashboard.mx.com/sign_up)
+  - Once you have created an account, go to [https://dashboard.mx.com/home](https://dashboard.mx.com/home), and look for your `API Key` and `Client ID`, and put those values in `./apps/server/.env`
+- Sophtron - [Register for a developer account](https://sophtron.com/Account/Register)
+  - Once you have created an account, go to [https://sophtron.com/Manage](https://sophtron.com/Manage), and look for your `UserId` and `AccessKey`, and put those values in `./apps/server/.env`
+
 ## Preference Settings
 
 Below we will explain what some of the settings mean.
@@ -67,14 +83,3 @@ _The total for all providers need to add up to 100_
   "UCP-412ded54698c47f"
 ]
 ```
-
-## Provider Credentials
-
-As mentioned above, it is important to understand, that for any providers listed in the section labeled `defaultProvider` or `supportedProviders`, you must provide your own credentials for each of these providers in the `./apps/servver/.env` file.
-
-Follow these links to sign-up for credentials for each provider:
-
-- MX - [Register for a developer account](https://dashboard.mx.com/sign_up)
-  - Once you have created an account, go to [https://dashboard.mx.com/home](https://dashboard.mx.com/home), and look for your `API Key` and `Client ID`, and put those values in `./apps/server/.env`
-- Sophtron - [Register for a developer account](https://sophtron.com/Account/Register)
-  - Once you have created an account, go to [https://sophtron.com/Manage](https://sophtron.com/Manage), and look for your `UserId` and `AccessKey`, and put those values in `./apps/server/.env`

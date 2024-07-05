@@ -33,9 +33,9 @@ Please refer to the [UCP documentation](https://docs.universalconnect.org) (Comi
     1. For docker: `docker compose up`
     1. For node: `npm run dev`
 
-## ENV credentials
+## Preferences and Aggregator Credentials
 
-You will need to create an account for each 
+You will need to create your own developer account, and then provide your credentials for each provider (aggregator) you want to use. See [PREFERENCES.md](PREFERENCES.md) for details.
 
 ## Authentication
 
