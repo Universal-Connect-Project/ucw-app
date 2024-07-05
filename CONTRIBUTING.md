@@ -2,8 +2,9 @@
 
 ### Architecture decision records
 
-We use [architecture decision records](https://adr.github.io/) to make, document, and enforce our decisions. They live
-in the [architectureDecisionRecords](https://github.com/Universal-Connect-Project/ucw-app/tree/main/architectureDecisionRecords) folder.
+We use [architecture decision records](https://adr.github.io/) to make, document, and enforce our decisions. This repository's ADRs live [here](./architectureDecisionRecords).
+
+We recommend that you read our ADRs before contributing. We maintain [Organization-leve ADRs](https://github.com/Universal-Connect-Project/ucw-app/tree/main/architectureDecisionRecords), and Repository-level ADRs, where necessary.
 
 ### Publish to Docker
 
@@ -24,7 +25,7 @@ Login to docker hub:
 
     docker login
 
-_NOTE: You must be a member of the UCP organization._
+_NOTE: You must be a member of the UCP organization on DockerHub._
 
 Run the following, which will set up a new multi-arch builder:
 
