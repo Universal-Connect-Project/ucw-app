@@ -32,10 +32,6 @@ Please refer to the [UCP documentation](https://docs.universalconnect.org) (Comi
     1. For docker: `docker compose up`
     1. For node: `npm run dev`
 
-## Preferences and Aggregator Credentials
-
-The preferences file (`./apps/server/cachedDefaults/preferences.json`) handles the institution search feature. For any providers listed in the section labeled `supportedProviders`, you must provide your own credentials for each of these providers in the `./.env` file.
-
 ## Authentication
 
 The express endpoints exposed in these repositories don't provide any authentication. You will need to fork the repo if you want to add your own authentication.
