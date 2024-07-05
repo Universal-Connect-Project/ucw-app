@@ -4,17 +4,63 @@ This repo is a monorepo, which contains the pieces that make up the Universal Co
 application which anyone can clone and self-host as a way to serve the connect widget via a url which can then be loaded
 into an iframe.
 
+## Index
+
+- [Getting Started](#getting-started)
+- [Preferences and Aggregator Credentials](#preferences-and-aggregator-credentials)
+- [Documentation](#documentation)
+- [Docker](#docker)
+- [Sensitive information](#sensitive-information)
+- [Architecture Decision Records](#architecture-decision-records)
+- [Monorepo](#monorepo)
+
 ## Documentation
 
 Please refer to the [UCP documentation](https://docs.universalconnect.org) (Coming soon) for additional information on how to use the widget.
+
+## Getting Started
+
+1. Clone the `ucw-app` repo
+1. Run `npm ci` from the root directory
+1. Run `cp ./.env.example ./.env`
+1. Run `cp ./apps/server/.env.example ./apps/server/.env`
+1. Run `cp ./apps/server/cachedDefaults/preferences.example.json ./apps/server/cachedDefaults/preferences.json` and modify the preferences
+1. Install [Docker](#docker), a dependency for the institution search feature to work
+1. Finally, you can run the docker containers, or just run via node.
+    1. For docker: `docker compose up`
+    1. For node: `npm run dev`
+
+## Preferences and Aggregator Credentials
+
+The preferences file (`./apps/server/cachedDefaults/preferences.json`) handles the institution search feature. For any providers listed in the section labeled `supportedProviders`, you must provide your own credentials for each of these providers in the `./.env` file.
+
+## Sensitive information
+
+Please remember that secrets are passed through environment variables instead of hardcoded in the code files.
+Do not put any credentials in any of the code files. If you do so, it could get committed and leaked to the public.
+**Use the provided `.env` files.**
+
+## Deploying a Production Instance
+
+For a production instance, it is easiest to use Docker. We provide docker files for both the server and the UI, along with a docker-compose file that runs all necessary containers, included Redis and ElasticSearch.
+
+The simplest way to deploy this widget is via docker-compose, as shown below, however you can also use the dockerfiles directly.
+
+Take a look at the [docker-compose.yml](./docker-compose.yml) file for more details on how it is set up.
+
+```
+docker compose up
+```
+
+That's it! If you have questions, please reach out to us.
 
 ## Authentication
 
 The express endpoints exposed in these repositories don't provide any authentication. You will need to fork the repo if you want to add your own authentication.
 
-## Api documentation
+## API documentation
 
-The api documentation for this service lives in openApiDocumentation.json and uses the (open api spec)[https://swagger.io/specification/]. You can open it in your preferred tool. You may copy the file into [swagger editor](https://editor.swagger.io/) and edit the local file with updates when complete.
+The API documentation for this service lives in openApiDocumentation.json and uses the (OpenAPI spec)[https://swagger.io/specification/]. You can open it in your preferred tool. You may copy the file into [swagger editor](https://editor.swagger.io/) and edit the local file with updates when complete.
 
 ## Cached data
 
@@ -26,20 +72,6 @@ The following files need to be there for the widget service to function
 
 1. Preferences
 1. Institutions
-
-## Getting Started (production)
-
-To get started: clone the repo, follow the steps in [Getting Started](#getting-started-in-development) and
-[Initial Setup](#initial-setup) to set up your `.env` files, and then run the following command from the root of the
-project:
-
-_This assumes you have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) already installed._
-
-```
-docker compose up
-```
-
-That's it! If you have questions, please reach out to us.
 
 ### Docker images
 
@@ -54,29 +86,6 @@ you may have logged-in previously with a docker login (via cli), and your auth h
 You do not need a docker login to pull the UCW docker images, but if you have stale tokens, docker will try to use them, thus
 resulting in the error. To fix this, you will need to run `docker logout` from your terminal, prior to running `docker compose up`
 
-## Getting Started (development)
-
-1. Clone the `ucw-app` repo
-1. Run `npm ci` from the root directory
-1. Run `cp ./.env.example ./.env`
-1. Run `cp ./apps/server/.env.example ./apps/server/.env`
-1. Run `cp ./apps/server/cachedDefaults/preferences.example.json ./apps/server/cachedDefaults/preferences.json` and modify the preferences
-1. Follow [Initial Setup](#initial-setup) (below) for setting-up some required environment variables
-1. Install [Docker](#docker), a dependency for the institution search feature to work
-1. Finally, you can run the docker containers, or just run via node.
-   1. For docker: `docker compose up`
-   1. For node: `npm run dev`
-
-## Preferences and Aggregator Credentials
-
-The preferences file (`./apps/server/cachedDefaults/preferences.json`) handles the institution search feature. For any providers listed in the section labeled `supportedProviders`, you must provide credentials for each of these providers in the `./.env` file.
-
-## Sensitive information
-
-Please remember that secrets are passed through environment variables instead of hardcoded in the code files.
-Do not put any credentials in any of the code files. If you do so, it could get committed and leaked to the public.
-**Use the provided `.env` files.**
-
 ## Docker
 
 If you want to run the provided docker containers, docker is required to be installed on your local development system.
@@ -88,6 +97,8 @@ Some compatible options are:
 
 Please note, you do not need a "desktop" version of docker to run this project. Any docker-compatible container client is all
 that is required. However, not all clients have been tested with this project.
+
+Please refer to the Docker [README](./DOCKER.md) for more information.
 
 ## Redis
 
@@ -145,7 +156,3 @@ in the [architectureDecisionRecords](https://github.com/Universal-Connect-Projec
 ### Monorepo
 
 Please refer to the Monorepo [README](./MONOREPO.md) for more information.
-
-### Testing Docker
-
-Please refer to the Docker [README](./DOCKER.md) for more information.
