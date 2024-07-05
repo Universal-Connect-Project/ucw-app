@@ -4,14 +4,11 @@ This repo is a monorepo, which contains the pieces that make up the Universal Co
 application which anyone can clone and self-host as a way to serve the connect widget via a url which can then be loaded
 into an iframe.
 
-## Table of Contents
-
-- [Getting Started](#getting-started)
-- [Documentation](#documentation)
-- [Docker](#docker)
-- [Sensitive information](#sensitive-information)
-- [Architecture Decision Records](#architecture-decision-records)
-- [Monorepo](#monorepo)
+## Other Resources
+- [Additional Info](MORE-INFO.md)
+- [Contributing](CONTRIBUTING.md)
+- [Docker](DOCKER.md)
+- [Monorepo](MONOREPO.md)
 
 ## Documentation
 

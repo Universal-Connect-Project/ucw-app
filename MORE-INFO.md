@@ -11,7 +11,6 @@
 - [Troubleshooting](#troubleshooting)
 - [Redis](#redis)
 - [Architecture Decision Records](#architecture-decision-records)
-- [Monorepo](#monorepo)
 
 ## Preferences and Aggregator Credentials
 
@@ -80,7 +79,3 @@ require a redis instance. To fix this error you can either:
 
 We use [architecture decision records](https://adr.github.io/) to make, document, and enforce our decisions. They live
 in the [architectureDecisionRecords](https://github.com/Universal-Connect-Project/ucw-app/tree/main/architectureDecisionRecords) folder.
-
-## Monorepo
-
-Please refer to the Monorepo [README](./MONOREPO.md) for more information.
