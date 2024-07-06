@@ -30,7 +30,7 @@ Please refer to the [UCP documentation](https://docs.universalconnect.org) (Comi
    1. `cp ./apps/server/.env.example ./apps/server/.env`
       1. See [PREFERENCES.md](PREFERENCES.md) for details on what values that you must provide in the `./apps/server/.env` file
    1. `cp ./apps/server/cachedDefaults/preferences.example.json ./apps/server/cachedDefaults/preferences.json`
-      1. Make sure you then set up your preferences (see [PREFERENCES.md](PREFERENCES.md) for details on what the preferences)
+      1. Make sure you then set up your preferences (see [PREFERENCES.md](PREFERENCES.md) for details)
 1. Make sure you have Docker installed (or another compatible container runtime), which is a required dependency for the institution search feature to function (more info in [DOCKER.md](DOCKER.md))
 1. Finally, you can run the docker containers, or just run via node.
     1. For docker: `docker compose up`
