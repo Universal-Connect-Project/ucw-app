@@ -22,7 +22,7 @@ Follow these links to sign-up for credentials for each provider:
 
 ## Preference Settings
 
-Below we will explain what some of the settings mean.
+Below are details regarding what each setting means.
 
 `defaultProvider` (`string`) - This allows you to set the default aggregator for all connections. 
 
@@ -41,7 +41,7 @@ Below we will explain what some of the settings mean.
 
 _Note: For all the providers that you list in `supportedProviders`, you need to provide your own API credentials for the provider in the `./apps/server/.env` file_
 
-`defaultProviderVolume` (`{ [key: string]: number }`) - This is an object of providers, with a number representing a percent of volume. 
+`defaultProviderVolume` (`{ [key: string]: number }`) - This is an object of providers, with a number representing a percent of volume. The combined volume across all providers must equal 100.
 
 ```
 "defaultProviderVolume": {
@@ -51,7 +51,7 @@ _Note: For all the providers that you list in `supportedProviders`, you need to 
 ```
 _The total for all providers need to add up to 100_
 
-`institutionProviderVolumeMap` (`{ [key: string]: { [key:string]: number } }`) - This is an object of institutions, with an object of providers, with a number representing a percent of volume.
+`institutionProviderVolumeMap` (`{ [key: string]: { [key:string]: number } }`) - This is an object of institutions, with a related object of providers. The number associated with each provider represents a percent of volume. The combined volume for each individual institution must equal 100.
 
 ```
 "institutionProviderVolumeMap": {
