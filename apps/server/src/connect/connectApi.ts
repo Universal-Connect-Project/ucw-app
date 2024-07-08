@@ -29,10 +29,6 @@ function mapResolvedInstitution(ins: Institution) {
     supports_oauth: ins.oauth ?? ins.name?.includes('Oauth'),
     providers: ins.providers,
     provider: ins.provider
-    // credentials: credentials?.map((c: any) => ({
-    //   guid: c.id,
-    //   ...c
-    // }))
   }
 }
 
