@@ -3,7 +3,9 @@ import { expect, test } from '@playwright/test'
 test('connects to mx bank with oAuth', async ({ page }) => {
   test.setTimeout(60000)
 
-  await page.goto('http://localhost:8080/?job_type=aggregate')
+  const userId = crypto.randomUUID()
+
+  await page.goto(`http://localhost:8080/?job_type=aggregate&user_id=${userId}`)
 
   await page.getByPlaceholder('Search').fill('MX Bank (Oauth)')
 

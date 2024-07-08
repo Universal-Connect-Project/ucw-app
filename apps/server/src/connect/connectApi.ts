@@ -29,10 +29,6 @@ function mapResolvedInstitution(ins: Institution) {
     supports_oauth: ins.oauth ?? ins.name?.includes('Oauth'),
     providers: ins.providers,
     provider: ins.provider
-    // credentials: credentials?.map((c: any) => ({
-    //   guid: c.id,
-    //   ...c
-    // }))
   }
 }
 
@@ -253,6 +249,18 @@ export class ConnectApi extends ProviderAdapterBase {
   async loadInstitutionByUcpId(ucpId: string): Promise<any> {
     const inst = await this.getProviderInstitution(ucpId)
     return { institution: mapResolvedInstitution(inst) }
+  }
+
+  async loadInstitutionByProviderId(
+    providerInstitutionId: string
+  ): Promise<any> {
+    await this.init()
+
+    const institution = await this.providerAdapter.GetInstitutionById(
+      providerInstitutionId
+    )
+
+    return { institution: mapResolvedInstitution(institution) }
   }
 
   async loadPopularInstitutions() {

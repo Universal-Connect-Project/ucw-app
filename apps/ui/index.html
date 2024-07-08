@@ -18,7 +18,10 @@
         scheme: '$scheme',
         single_account_select: '$single_account_select',
         include_identity: '$include_identity',
-        institution_id: '$institution_id'
+        institution_id: '$institution_id',
+        connection_id: '$connection_id',
+        user_id: '$user_id',
+        provider: '$provider'
       }
 
       window.app = {
@@ -43,13 +46,15 @@
             job_type: params.job_type || 'agg', // 'verify'
             current_institution_code: params.institution_id,
             current_institution_guid: null,
-            current_member_guid: '$connection_id',
-            current_provider: '$provider',
+            current_member_guid: params.connection_id,
+            current_provider: params.provider,
             current_partner: '$partner',
-            user_id: '$user_id',
+            user_id: params.user_id,
             current_microdeposit_guid: null,
             disable_background_agg: null,
-            disable_institution_search: !!params.institution_id,
+            disable_institution_search: !!(
+              params.institution_id || params.connection_id
+            ),
             include_identity: params.include_identity === 'true',
             include_transactions: null, // true
             oauth_referral_source: params.oauth_referral_source || 'BROWSER',

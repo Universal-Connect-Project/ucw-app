@@ -70,7 +70,7 @@ const generateVcDataTests = ({ makeAConnection }) =>
       let provider: string
       let userGuid: string
 
-      cy.visit(`/?job_type=${jobType}`, {
+      cy.visit(`/?job_type=${jobType}&user_id=Universal_widget_demo_user`, {
         onBeforeLoad(window) {
           cy.spy(window.parent, 'postMessage').as('postMessage')
         }

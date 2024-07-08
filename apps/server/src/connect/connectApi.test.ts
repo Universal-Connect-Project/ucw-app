@@ -1,3 +1,4 @@
+import { institutionData } from '../test/testData/institution'
 import { MxAdapter } from '../adapters/mx'
 import { ConnectApi } from './connectApi'
 
@@ -22,73 +23,98 @@ const mxApiClient = new MxAdapter(
 
 connectApi.providerAdapter = mxApiClient
 
-describe('loadInstitutions', () => {
-  const expectedInstitutionList = [
-    {
-      guid: 'UCP-da107e6d0da7779',
-      name: 'MX Bank (Oauth)',
-      url: 'https://mx.com',
-      logo_url:
-        'https://s3.amazonaws.com/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
-      supports_oauth: true
-    },
-    {
-      guid: 'UCP-da107e6d0da7779',
-      name: 'MX Bank (Oauth)',
-      url: 'https://mx.com',
-      logo_url:
-        'https://s3.amazonaws.com/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
-      supports_oauth: true
-    }
-  ]
+describe('connectApi', () => {
+  describe('loadInstitutionByProviderId', () => {
+    it('returns the institution', async () => {
+      const mxInstitution = institutionData.institution
 
-  it('loads formatted institutions', async () => {
-    const institutions = await connectApi.loadInstitutions('MX', 'aggregate')
+      const response = await connectApi.loadInstitutionByProviderId('testId')
 
-    expect(institutions).toEqual(expectedInstitutionList)
+      expect(response).toEqual({
+        institution: {
+          code: mxInstitution.code,
+          credentials: [],
+          guid: mxInstitution.code,
+          instructional_data: {},
+          logo_url: mxInstitution.medium_logo_url,
+          name: mxInstitution.name,
+          provider: 'mx',
+          providers: undefined,
+          supports_oauth: mxInstitution.supports_oauth,
+          url: mxInstitution.url
+        }
+      })
+    })
   })
-})
 
-describe('loadInstitutionByUcpId', () => {
-  const expectedInstitutionResponse = {
-    institution: {
-      guid: 'testCode',
-      code: 'testCode',
-      name: 'MX Bank (Oauth)',
-      url: 'https://mx.com',
-      logo_url:
-        'https://s3.amazonaws.com/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
-      instructional_data: {},
-      credentials: [] as any[],
-      supports_oauth: true,
-      providers: undefined as any,
-      provider: 'mx_int'
-    }
-  }
+  describe('loadInstitutions', () => {
+    const expectedInstitutionList = [
+      {
+        guid: 'UCP-da107e6d0da7779',
+        name: 'MX Bank (Oauth)',
+        url: 'https://mx.com',
+        logo_url:
+          'https://s3.amazonaws.com/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
+        supports_oauth: true
+      },
+      {
+        guid: 'UCP-da107e6d0da7779',
+        name: 'MX Bank (Oauth)',
+        url: 'https://mx.com',
+        logo_url:
+          'https://s3.amazonaws.com/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
+        supports_oauth: true
+      }
+    ]
 
-  it('finds the institution', async () => {
-    const institution = await connectApi.loadInstitutionByUcpId('UCP-1234')
-    expect(institution).toEqual(expectedInstitutionResponse)
+    it('loads formatted institutions', async () => {
+      const institutions = await connectApi.loadInstitutions('MX', 'aggregate')
+
+      expect(institutions).toEqual(expectedInstitutionList)
+    })
   })
-})
 
-describe('loadPopularInstitutions', () => {
-  const expectedPopularInstitutionResponse = [
-    {
-      guid: 'UCP-da107e6d0da7779',
-      name: 'MX Bank (Oauth)',
-      url: 'https://mx.com',
-      logo_url:
-        'https://s3.amazonaws.com/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
-      supports_oauth: true
+  describe('loadInstitutionByUcpId', () => {
+    const expectedInstitutionResponse = {
+      institution: {
+        guid: 'testCode',
+        code: 'testCode',
+        name: 'MX Bank (Oauth)',
+        url: 'https://mx.com',
+        logo_url:
+          'https://s3.amazonaws.com/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
+        instructional_data: {},
+        credentials: [] as any[],
+        supports_oauth: true,
+        providers: undefined as any,
+        provider: 'mx_int'
+      }
     }
-  ]
 
-  it('gets the popular institution list', async () => {
-    connectApi.providerAdapter = mxApiClient
+    it('finds the institution', async () => {
+      const institution = await connectApi.loadInstitutionByUcpId('UCP-1234')
+      expect(institution).toEqual(expectedInstitutionResponse)
+    })
+  })
 
-    const popularInstitutionList = await connectApi.loadPopularInstitutions()
+  describe('loadPopularInstitutions', () => {
+    const expectedPopularInstitutionResponse = [
+      {
+        guid: 'UCP-da107e6d0da7779',
+        name: 'MX Bank (Oauth)',
+        url: 'https://mx.com',
+        logo_url:
+          'https://s3.amazonaws.com/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
+        supports_oauth: true
+      }
+    ]
 
-    expect(popularInstitutionList).toEqual(expectedPopularInstitutionResponse)
+    it('gets the popular institution list', async () => {
+      connectApi.providerAdapter = mxApiClient
+
+      const popularInstitutionList = await connectApi.loadPopularInstitutions()
+
+      expect(popularInstitutionList).toEqual(expectedPopularInstitutionResponse)
+    })
   })
 })

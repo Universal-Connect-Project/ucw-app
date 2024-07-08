@@ -29,11 +29,19 @@ import '@testing-library/cypress/add-commands'
 //
 
 Cypress.Commands.add('visitAgg', () => {
-  cy.visit('/?job_type=aggregate')
+  const userId = crypto.randomUUID()
+
+  cy.visit(`/?job_type=aggregate&user_id=${userId}`)
+
+  return cy.wrap(userId)
 })
 
 Cypress.Commands.add('visitIdentity', () => {
-  cy.visit('/?job_type=identity')
+  const userId = crypto.randomUUID()
+
+  cy.visit(`/?job_type=identity&user_id=${userId}`)
+
+  return cy.wrap(userId)
 })
 
 export {}
@@ -41,8 +49,8 @@ export {}
 declare global {
   namespace Cypress {
     interface Chainable {
-      visitAgg: () => Chainable<void>
-      visitIdentity: () => Chainable<void>
+      visitAgg: () => Chainable<string>
+      visitIdentity: () => Chainable<string>
     }
   }
 }
