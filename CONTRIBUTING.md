@@ -1,12 +1,12 @@
-## Contributing
+# Contributing
 
-### Architecture decision records
+## Architecture decision records
 
 We use [architecture decision records](https://adr.github.io/) to make, document, and enforce our decisions. This repository's ADRs live [here](./architectureDecisionRecords).
 
 We recommend that you read our ADRs before contributing. We maintain [Organization-leve ADRs](https://github.com/Universal-Connect-Project/ucw-app/tree/main/architectureDecisionRecords), and Repository-level ADRs, where necessary.
 
-### Publish to Docker
+## Publish to Docker
 
 **Publishing to Docker Hub is automatic, and will happen when code is merged to `main`.**
 
@@ -14,7 +14,7 @@ We recommend that you read our ADRs before contributing. We maintain [Organizati
 their respective `package.json` files should be up-to-date. This is where the versions for the docker images is pulled from
 for automated publishing.
 
-### Publishing manually
+## Publishing manually
 
 It is strongly discouraged to publish to Docker Hub manually, however, if you need to publish manually, you can do so with
 the following steps.
