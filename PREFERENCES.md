@@ -47,7 +47,6 @@ Here are details for what each setting means.
   "sophtron": 50
 }
 ```
-_The total for all providers need to add up to 100_
 
 `institutionProviderVolumeMap` (`{ [key: string]: { [key:string]: number } }`) - An object of institutions, with a related object of providers. The number associated with each provider represents a percent of volume. The combined volume for each individual institution must equal 100.
 

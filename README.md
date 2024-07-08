@@ -2,7 +2,7 @@
 
 This repository is a monorepo, which contains the pieces that make up the Universal Connect Application. It is a full-stack
 application, which anyone can clone and self-host as a way to serve the connect widget via a URL, which can then be loaded
-into an iframe. Due to the nature of the architecture, it is language-agnostic.
+into an iframe.
 
 ## Table of Contents
 - [Documentation](#documentation)
