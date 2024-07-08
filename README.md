@@ -19,7 +19,7 @@ into an iframe.
 
 ## Documentation
 
-Please refer to the [UCP documentation](https://docs.universalconnect.org) (Coming soon) for additional information on how to use the widget.
+Please refer to the [UCP documentation](https://docs.universalconnectproject.org) (Coming soon) for additional information on how to use the widget.
 
 ## Getting Started
 
