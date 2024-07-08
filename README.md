@@ -31,8 +31,8 @@ Please refer to the [UCP documentation](https://docs.universalconnectproject.org
       1. See [PREFERENCES.md](PREFERENCES.md) for details on what values you must provide in the `./apps/server/.env` file
    1. `cp ./apps/server/cachedDefaults/preferences.example.json ./apps/server/cachedDefaults/preferences.json`
       1. Make sure you then set up your preferences (see [PREFERENCES.md](PREFERENCES.md) for details)
-1. Make sure you have Docker installed (or another compatible container runtime), which is a required dependency for the institution search feature to function (more info in [DOCKER.md](DOCKER.md))
-1. Finally, you can run the docker containers, or just run via node.
+1. Make sure you have Docker installed (or another compatible container runtime), which is a required dependency for the institution search feature to function, even when running via Node.js (more info in [DOCKER.md](DOCKER.md))
+1. Finally, you can run the docker containers, or simply run from the cli, via node.
     1. For docker: `docker compose up`
     1. For node: `npm run dev`
 
