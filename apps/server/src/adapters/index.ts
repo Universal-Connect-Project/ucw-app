@@ -46,18 +46,9 @@ function getProviderAdapter(provider: string, config: any): WidgetAdapter {
 export async function instrumentation(context: Context, input: any) {
   const { user_id } = input
   context.user_id = user_id
-  if (!user_id || user_id === 'undefined' || user_id === 'test') {
-    if (config.Demo) {
-      logger.info('Using demo userId')
-      context.user_id = 'Universal_widget_demo_user'
-    } else {
-      logger.info('Missing userId')
-      return false
-    }
-  }
 
-  if (context.user_id) {
-    context.resolved_user_id = context.user_id
+  if (!user_id) {
+    return false
   }
 
   if (Boolean(input.current_member_guid) && Boolean(input.current_provider)) {

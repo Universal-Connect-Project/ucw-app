@@ -13,6 +13,12 @@ import {
   identityDataHandler,
   transactionsDataHandler
 } from './dataEndpoints'
+import {
+  favoriteInstitutionsHandler,
+  getInstitutionCredentialsHandler,
+  getInstitutionHandler,
+  getInstitutionsHandler
+} from './institutionEndpoints'
 
 const AGGREGATION_JOB_TYPE = 0
 
@@ -31,10 +37,7 @@ export default function (app) {
     }
     req.connectService = new ConnectApi(req)
     if ((await req.connectService.init()) != null) {
-      if (
-        req.context.resolved_user_id == null ||
-        req.context.resolved_user_id === ''
-      ) {
+      if (!req.context.resolved_user_id) {
         req.context.resolved_user_id = await req.connectService.ResolveUserId(
           req.context.user_id
         )
@@ -115,51 +118,16 @@ export default function (app) {
   })
   app.get(
     `${ApiEndpoints.INSTITUTIONS}/:institution_guid/credentials`,
-    async (req, res) => {
-      const credentials = await req.connectService.getInstitutionCredentials(
-        req.params.institution_guid
-      )
-      res.send(credentials)
-    }
+    getInstitutionCredentialsHandler
   )
 
-  app.get(`${ApiEndpoints.INSTITUTIONS}/favorite`, async (req, res) => {
-    const popularInsitutions =
-      await req.connectService.loadPopularInstitutions()
-    res.send(popularInsitutions)
-  })
+  app.get(`${ApiEndpoints.INSTITUTIONS}/favorite`, favoriteInstitutionsHandler)
 
-  app.get(`${ApiEndpoints.INSTITUTIONS}/discovered`, async (req, res) => {
-    const ret = await req.connectService.loadDiscoveredInstitutions()
-    res.send(ret)
-  })
   app.get(
     `${ApiEndpoints.INSTITUTIONS}/:institution_guid`,
-    async (req, res) => {
-      if (req.context?.provider) {
-        const institution =
-          await req.connectService.loadInstitutionByProviderId(
-            req.params.institution_guid
-          )
-
-        res.send(institution)
-
-        return
-      }
-
-      const ret = await req.connectService.loadInstitutionByUcpId(
-        req.params.institution_guid
-      )
-      res.send(ret)
-    }
+    getInstitutionHandler
   )
-  app.get(ApiEndpoints.INSTITUTIONS, async (req, res) => {
-    const ret = await req.connectService.loadInstitutions(
-      req.query.search_name ?? req.query.routing_number,
-      req.context.job_type
-    )
-    res.send(ret)
-  })
+  app.get(ApiEndpoints.INSTITUTIONS, getInstitutionsHandler)
   app.get('/jobs/:member_guid', async (req, res) => {
     if (['mx_int', 'mx'].includes(req.context.provider)) {
       if (req.params.member_guid === 'null') {

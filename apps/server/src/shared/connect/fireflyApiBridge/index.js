@@ -1,10 +1,6 @@
-import config from '../../../server/config'
-
 import ConnectApi from '../../../server/connect/connectApi'
 
-const context = {
-  user_id: config.MxDemoUserId
-}
+const context = {}
 const api = new ConnectApi({ context })
 
 async function sendStubData(fileName) {
