@@ -1,145 +1,47 @@
-# Universal Connect Widget (Application)
+# Universal Connect Widget
 
-This repo is a monorepo, which contains the pieces that make up the Universal Connect Application. It is a full-stack
-application which anyone can clone and self-host as a way to serve the connect widget via a url which can then be loaded
+This repository is a monorepo, which contains the pieces that make up the Universal Connect Application. It is a full-stack
+application, which anyone can clone and self-host as a way to serve the connect widget via a URL, which can then be loaded
 into an iframe.
+
+## Table of Contents
+- [Documentation](#documentation)
+- [Getting Started](#getting-started)
+- [Preferences and Aggregator Credentials](#preferences-and-aggregator-credentials)
+- [Authentication](#authentication)
+
+## Other Resources
+- [Additional Info](MISC.md)
+- [Contributing](CONTRIBUTING.md)
+- [Docker](DOCKER.md)
+- [Monorepo](MONOREPO.md)
+- [Preference Details](PREFERENCES.md)
 
 ## Documentation
 
 Please refer to the [UCP documentation](https://docs.universalconnect.org) (Coming soon) for additional information on how to use the widget.
 
-## Authentication
-
-The express endpoints exposed in these repositories don't provide any authentication. You will need to fork the repo if you want to add your own authentication.
-
-## Api documentation
-
-The api documentation for this service lives in openApiDocumentation.json and uses the (open api spec)[https://swagger.io/specification/]. You can open it in your preferred tool. You may copy the file into [swagger editor](https://editor.swagger.io/) and edit the local file with updates when complete.
-
-## Cached data
-
-This widget runs off of cached data, which is included in this repo, so that it doesn't rely on any UCP-hosted services in order to function.
-
-In `./apps/server/cachedDefaults` you will find files that are loaded into a redis cache. In the future these files will be used as a backup in case UCP-hosted services are down.
-
-The following files need to be there for the widget service to function
-
-1. Preferences
-1. Institutions
-
-## Getting Started (production)
-
-To get started: clone the repo, follow the steps in [Getting Started](#getting-started-in-development) and
-[Initial Setup](#initial-setup) to set up your `.env` files, and then run the following command from the root of the 
-project:
-
-_This assumes you have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) already installed._
-
-```
-docker compose up
-```
-
-That's it! If you have questions, please reach out to us.
-
-### Docker images
-
-The images for this repo are available on [DockerHub](https://hub.docker.com/repositories/universalconnectfoundation). You can change the version of the images that you pull by setting
-the `DOCKER_IMAGE_SERVER` and `DOCKER_IMAGE_UI` values in the `.env` file found in the project root.
-
-### A note about `docker login`
-
-If you get an error stating anything like `failed to authorize`, or `failed to fetch oauth token`, or a `401 Unauthorized`,
-you may have logged-in previously with a docker login (via cli), and your auth has expired.
-
-You do not need a docker login to pull the UCW docker images, but if you have stale tokens, docker will try to use them, thus
-resulting in the error. To fix this, you will need to run `docker logout` from your terminal, prior to running `docker compose up`
-
-## Getting Started (development)
+## Getting Started
 
 1. Clone the `ucw-app` repo
-1. Run `npm ci` from the root directory
-1. Run `cp ./.env.example ./.env`
-1. Run `cp ./apps/server/.env.example ./apps/server/.env`
-1. Run `cp ./apps/server/cachedDefaults/preferences.example.json ./apps/server/cachedDefaults/preferences.json` and modify the preferences
-1. Follow [Initial Setup](#initial-setup) (below) for setting-up some required environment variables
-1. Install [Docker](#docker), a dependency for the institution search feature to work
-1. Finally, run: `npm run dev`
+1. From the root directory, run:
+   1. `npm ci`
+   1. `cp ./.env.example ./.env`
+   1. `cp ./apps/server/.env.example ./apps/server/.env`
+      1. See [PREFERENCES.md](PREFERENCES.md) for details on what values that you must provide in the `./apps/server/.env` file
+   1. `cp ./apps/server/cachedDefaults/preferences.example.json ./apps/server/cachedDefaults/preferences.json`
+      1. Make sure you then set up your preferences (see [PREFERENCES.md](PREFERENCES.md) for details)
+1. Make sure you have Docker installed (or another compatible container runtime), which is a required dependency for the institution search feature to function (more info in [DOCKER.md](DOCKER.md))
+1. Finally, you can run the docker containers, or just run via node.
+    1. For docker: `docker compose up`
+    1. For node: `npm run dev`
 
-## Initial setup
+## Preferences and Aggregator Credentials
 
-Please remember that secrets are passed through environment variables instead of hardcoded in the code files.
-**DO NOT** put any credentials in any of the code files. If you do so, it could get committed and leaked to the public.
-**Use the provided `.env` files.**
+For any aggregator/provider you are planning on using, you will need to create your own developer account, and then provide your credentials.
 
-## Docker
+See [PREFERENCES.md](PREFERENCES.md) for details.
 
-If you want to run the provided docker containers, docker is required to be installed on your local development system.
+## Authentication
 
-Some compatible options are:
-
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [Rancher Desktop](https://rancherdesktop.io/)
-
-Please note, you do not need a "desktop" version of docker to run this project. Any docker-compatible container client is all 
-that is required. However, not all clients have been tested with this project.
-
-## Redis
-
-You might see an error about failure to connect redis. The widget doesn't rely on redis to start, but some providers logic
-require a redis instance. To fix this error you can either:
-
-- Start a local redis instance. This way it will be available at localhost:6379 and the widget will be able to use it
-- Or in `./apps/server/.env`, set `Env=dev`. When this is done, the redis client will use a local in-memory object to handle
-  the cache, and avoid the error. However, this should only be used for testing. The cached values won't expire and also
-  will be cleared on server restart.
-
-## Contributing
-
-### Publish to Docker
-
-**Publishing to Docker Hub is automatic, and will happen when code is merged to `main`.**
-
-**IMPORTANT**: Prior to merging your PR to main, make sure the versions of `ui` and `ucw-app` are up-to-date. The `version` property in
-their respective `package.json` files should be up-to-date. This is where the versions for the docker images is pulled from
-for automated publishing.
-
-### Publishing manually
-
-It is strongly discouraged to publish to Docker Hub manually, however, if you need to publish manually, you can do so with
-the following steps.
-
-From the root of the project:
-
-Login to docker hub:
-
-    docker login
-
-_NOTE: You must be a member of the UCP organization._
-
-Run the following, which will set up a new multi-arch builder:
-
-    docker buildx create --use --platform=linux/arm64,linux/amd64 --name multi-platform-builder
-    docker buildx inspect --bootstrap
-
-Run the following command, which will build and publish the new images:
-
-    docker buildx bake --file ./docker-compose.yml --push
-
-Note: To update the versions that are pulled/published, update the `./.env` file at the root of the project. Look at
-the `DOCKER_IMAGE_{UI|SERVER}` values.
-These variables are used in the `./docker-compose.yml` file when building/pulling/publishing the images.
-
-## Additional Information
-
-### Architecture decision records
-
-We use [architecture decision records](https://adr.github.io/) to make, document, and enforce our decisions. They live
-in the [architectureDecisionRecords](https://github.com/Universal-Connect-Project/ucw-app/tree/main/architectureDecisionRecords) folder.
-
-### Monorepo
-
-Please refer to the Monorepo [README](./MONOREPO.md) for more information.
-
-### Testing Docker
-
-Please refer to the Docker [README](./DOCKER.md) for more information.
+The expressjs endpoints that are exposed in these repositories do not provide any authentication. You will need to fork the repo if you want to add your own authentication.
