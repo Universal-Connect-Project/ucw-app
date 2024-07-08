@@ -1,7 +1,9 @@
 const MX_BANK_INSTITUTION_ID = 'UCP-bb5296bd5aae5d9'
 
 const refreshAConnection = ({ enterCredentials, selectInstitution }) => {
-  cy.visit(`/?job_type=aggregate`, {
+  const userId = crypto.randomUUID()
+
+  cy.visit(`/?job_type=aggregate&user_id=${userId}`, {
     onBeforeLoad(window) {
       cy.spy(window.parent, 'postMessage').as('postMessage')
     }
@@ -23,11 +25,10 @@ const refreshAConnection = ({ enterCredentials, selectInstitution }) => {
       const { metadata } = connection?.args[0]
       const memberGuid = metadata.member_guid
       const provider = metadata.provider
-      const userGuid = metadata.user_guid
 
       //Refresh the connection
       cy.visit(
-        `/?job_type=aggregate&connection_id=${memberGuid}&provider=${provider}&user_id=${userGuid}`
+        `/?job_type=aggregate&connection_id=${memberGuid}&provider=${provider}&user_id=${userId}`
       )
 
       enterCredentials()
@@ -43,7 +44,11 @@ const refreshAConnection = ({ enterCredentials, selectInstitution }) => {
 
 describe('query parameters', () => {
   it('skips straight to the institution if an institution_id is provided in the query parameters, hides the back button, and completes the connection', () => {
-    cy.visit(`/?job_type=aggregate&institution_id=${MX_BANK_INSTITUTION_ID}`)
+    const userId = crypto.randomUUID()
+
+    cy.visit(
+      `/?job_type=aggregate&institution_id=${MX_BANK_INSTITUTION_ID}&user_id=${userId}`
+    )
 
     cy.findByLabelText('LOGIN').type('mxuser')
     cy.findByLabelText('PASSWORD').type('correct')
