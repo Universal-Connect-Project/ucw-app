@@ -10,8 +10,8 @@ const nonSensitiveSharedConfig = {
   SearchEndpoint: 'https://search.universalconnectproject.org/api/',
   AnalyticsServiceEndpoint:
     'https://analytics.universalconnectproject.org/api/',
-  Component: 'UniversalWidget',
-  ServiceName: 'universal_widget',
+  Component: 'UniversalConnectWidgetApp',
+  ServiceName: 'universal_connect_widget_app',
   CryptoAlgorithm: 'aes-256-cbc',
   SophtronApiServiceEndpoint: 'https://api.sophtron.com/api',
   SophtronVCServiceEndpoint: 'https://vc.sophtron.com/api/'
@@ -54,6 +54,7 @@ const keysToPullFromEnv = [
   'FinicityAppKeyProd',
   'FinicitySecretProd',
 
+  'NGROK_AUTHTOKEN',
   'ELASTIC_SEARCH_URL'
 ]
 

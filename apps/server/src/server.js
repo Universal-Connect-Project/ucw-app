@@ -11,7 +11,11 @@ import 'express-async-errors'
 import RateLimit from 'express-rate-limit'
 import { initialize as initializeElastic } from './services/ElasticSearchClient'
 
-// import asyncify from 'express-asyncify'
+const useNgrok = ['dev', 'test'].includes(config.Env) &&
+  Object.prototype.hasOwnProperty.call(config, 'NGROK_AUTHTOKEN') &&
+  config.NGROK_AUTHTOKEN !== ''
+
+info(`Use ngrok: ${useNgrok}`)
 
 process.on('unhandledRejection', (error) => {
   _error(`unhandledRejection: ${error.message}`, error)
@@ -108,17 +112,17 @@ app.listen(config.PORT, () => {
 })
 
 // Ngrok is required for Finicity webhooks local and github testing
-if (['dev', 'test'].includes(config.Env)) {
+if (useNgrok) {
   ngrok.listen(app).then(() => {
     config.WebhookHostUrl = app.listener.url()
-    info('Established listener at: ' + app.listener.url())
+    info('[NGROK] Established listener at: ' + app.listener.url())
   })
 }
 
 process.on('SIGINT', async () => {
   info('\nGracefully shutting down from SIGINT (Ctrl-C)')
-  if (['dev', 'test'].includes(config.Env)) {
-    info('Closing Ngrok tunnel')
+  if (useNgrok) {
+    info('[NGROK] Closing tunnel')
     await ngrok.kill()
   }
   process.exit(0)
