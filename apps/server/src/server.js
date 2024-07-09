@@ -1,5 +1,4 @@
 import 'dotenv/config'
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import { json, urlencoded } from 'body-parser'
 import express from 'express'
 import config from './config'
@@ -11,16 +10,11 @@ import 'express-async-errors'
 import RateLimit from 'express-rate-limit'
 import { initialize as initializeElastic } from './services/ElasticSearchClient'
 
-const useNgrok = ['dev', 'test'].includes(config.Env) &&
-  Object.prototype.hasOwnProperty.call(config, 'NGROK_AUTHTOKEN') &&
-  config.NGROK_AUTHTOKEN !== ''
-
-info(`Use ngrok: ${useNgrok}`)
-
 process.on('unhandledRejection', (error) => {
   _error(`unhandledRejection: ${error.message}`, error)
 })
 process.removeAllListeners('warning') // remove the noise caused by capacitor-community/http fetch plugin
+
 const app = express()
 app.use(json())
 app.use(urlencoded({ extended: true }))
@@ -44,12 +38,13 @@ app.get('/ping', function (req, res) {
 })
 
 useConnect(app)
-// useVcs(app);
+
 app.use(function (err, req, res, next) {
   _error(`Unhandled error on ${req.method} ${req.path}: `, err)
   res.status(500)
   res.send(err.message)
 })
+
 const pageQueryParameters = new RegExp(
   [
     'institution_id',
@@ -86,18 +81,19 @@ function renderDefaultPage(req, res, html) {
   )
 }
 
-app.get('/', async function (req, res) {
+app.get('/', (req, res) => {
   req.metricsPath = '/catchall'
   const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}${req.path}`
-  await _wget(resourcePath).then((html) => {
+  void _wget(resourcePath).then((html) => {
     renderDefaultPage(req, res, html)
   })
 })
-app.get('*', async function (req, res) {
+
+app.get('*', (req, res) => {
   req.metricsPath = '/catchall'
   const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}${req.path}`
   if (!req.path.includes('-hmr')) {
-    await stream(resourcePath, null, res)
+    void stream(resourcePath, null, res)
   } else {
     res.sendStatus(404)
   }
@@ -112,18 +108,18 @@ app.listen(config.PORT, () => {
 })
 
 // Ngrok is required for Finicity webhooks local and github testing
-if (useNgrok) {
+if (['dev', 'test'].includes(config.Env)) {
   ngrok.listen(app).then(() => {
     config.WebhookHostUrl = app.listener.url()
-    info('[NGROK] Established listener at: ' + app.listener.url())
+    info('Established listener at: ' + app.listener.url())
   })
 }
 
-process.on('SIGINT', async () => {
+process.on('SIGINT', () => {
   info('\nGracefully shutting down from SIGINT (Ctrl-C)')
-  if (useNgrok) {
-    info('[NGROK] Closing tunnel')
-    await ngrok.kill()
+  if (['dev', 'test'].includes(config.Env)) {
+    info('Closing Ngrok tunnel')
+    void ngrok.kill()
   }
   process.exit(0)
 })
