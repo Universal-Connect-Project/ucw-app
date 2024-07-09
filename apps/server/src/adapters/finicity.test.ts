@@ -11,7 +11,8 @@ import { finicityReadCustomerData } from '../test/testData/users'
 import { server } from '../test/testServer'
 import { FinicityAdapter } from './finicity'
 
-const finicityApi = new FinicityAdapter()
+const isSandbox = true
+const finicityApi = new FinicityAdapter(isSandbox)
 
 const institutionResponse = finicityInsitutionData.institution
 

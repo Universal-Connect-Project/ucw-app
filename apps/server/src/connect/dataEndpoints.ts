@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import type { Request, Response } from 'express'
+import type { Response } from 'express'
 import { getProviderAdapter } from '../adapters'
 import getVC from '../services/vcProviders'
 
@@ -9,9 +9,23 @@ export interface AccountsDataQueryParameters {
   user_id: string
 }
 
-export const accountsDataHandler = async (req: Request, res: Response) => {
-  const { provider, connection_id, user_id } =
-    req.query as unknown as AccountsDataQueryParameters
+export interface AccountsRequest {
+  query: AccountsDataQueryParameters
+}
+
+export interface IdentityRequest {
+  query: IdentityDataQueryParameters
+}
+
+export interface TransactionsRequest {
+  query: TransactionsDataQueryParameters
+}
+
+export const accountsDataHandler = async (
+  req: AccountsRequest,
+  res: Response
+) => {
+  const { provider, connection_id, user_id } = req.query
 
   const providerAdapter = getProviderAdapter(provider)
   const providerUserId = await providerAdapter.ResolveUserId(user_id)
@@ -33,7 +47,10 @@ export interface IdentityDataQueryParameters {
   user_id: string
 }
 
-export const identityDataHandler = async (req: Request, res: Response) => {
+export const identityDataHandler = async (
+  req: IdentityRequest,
+  res: Response
+) => {
   const { provider, connection_id, user_id } =
     req.query as unknown as IdentityDataQueryParameters
 
@@ -53,14 +70,17 @@ export const identityDataHandler = async (req: Request, res: Response) => {
 
 export interface TransactionsDataQueryParameters {
   account_id: string
-  endTime: string
+  end_time: string
   provider: string
-  startTime: string
+  start_time: string
   user_id: string
 }
 
-export const transactionsDataHandler = async (req: Request, res: Response) => {
-  const { provider, user_id, account_id, startTime, endTime } =
+export const transactionsDataHandler = async (
+  req: TransactionsRequest,
+  res: Response
+) => {
+  const { provider, user_id, account_id, start_time, end_time } =
     req.query as unknown as TransactionsDataQueryParameters
 
   const providerAdapter = getProviderAdapter(provider)
@@ -73,8 +93,8 @@ export const transactionsDataHandler = async (req: Request, res: Response) => {
       'transactions',
       providerUserId,
       account_id,
-      startTime,
-      endTime
+      start_time,
+      end_time
     )
     res.send({
       jwt: vc

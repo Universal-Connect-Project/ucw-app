@@ -18,7 +18,7 @@ export default async function getVC(
       path = `customers/${userId}/members/${connectionId}/accounts`
       break
     case 'transactions':
-      path = `customers/${userId}/accounts/${accountId}/transactions?startTime=${startTime}&endTime=${endTime}`
+      path = `customers/${userId}/accounts/${accountId}/transactions?start_time=${startTime}&end_time=${endTime}`
       break
     default:
       break
