@@ -7,15 +7,11 @@ const decodeVcDataFromResponse = (response) => {
   return JSON.parse(atob(data))
 }
 
-const verifyAccountsAndReturnAccountId = ({
-  provider,
-  memberGuid,
-  userGuid
-}) => {
+const verifyAccountsAndReturnAccountId = ({ provider, memberGuid, userId }) => {
   return cy
     .request(
       'GET',
-      `/data/accounts?provider=${provider}&connectionId=${memberGuid}&userId=${userGuid}`
+      `/data/accounts?provider=${provider}&connection_id=${memberGuid}&user_id=${userId}`
     )
     .then((response) => {
       expect(response.status).to.equal(200)
@@ -33,10 +29,10 @@ const verifyAccountsAndReturnAccountId = ({
     })
 }
 
-const verifyIdentity = ({ provider, memberGuid, userGuid }) => {
+const verifyIdentity = ({ provider, memberGuid, userId }) => {
   cy.request(
     'GET',
-    `/data/identity?provider=${provider}&connectionId=${memberGuid}&userId=${userGuid}`
+    `/data/identity?provider=${provider}&connection_id=${memberGuid}&user_id=${userId}`
   ).should((response) => {
     expect(response.status).to.equal(200)
     expect(response.body).to.haveOwnProperty('jwt')
@@ -48,10 +44,10 @@ const verifyIdentity = ({ provider, memberGuid, userGuid }) => {
   })
 }
 
-const verifyTransactions = ({ accountId, provider, userGuid }) => {
+const verifyTransactions = ({ accountId, provider, userId }) => {
   cy.request(
     'GET',
-    `/data/transactions?provider=${provider}&userId=${userGuid}&accountId=${accountId}${provider === 'sophtron' ? '&startTime=1/1/2024&endTime=1/2/2024' : ''}`
+    `/data/transactions?provider=${provider}&user_id=${userId}&account_id=${accountId}${provider === 'sophtron' ? '&startTime=1/1/2024&endTime=1/2/2024' : ''}`
   ).should((response) => {
     expect(response.status).to.equal(200)
     expect(response.body).to.haveOwnProperty('jwt')
@@ -68,9 +64,9 @@ const generateVcDataTests = ({ makeAConnection }) =>
     it(`makes a connection with jobType: ${jobType}, gets the accounts, identity, and transaction data from the vc endpoints`, () => {
       let memberGuid: string
       let provider: string
-      let userGuid: string
+      const userId = crypto.randomUUID()
 
-      cy.visit(`/?job_type=${jobType}&user_id=Universal_widget_demo_user`, {
+      cy.visit(`/?job_type=${jobType}&user_id=${userId}`, {
         onBeforeLoad(window) {
           cy.spy(window.parent, 'postMessage').as('postMessage')
         }
@@ -87,23 +83,22 @@ const generateVcDataTests = ({ makeAConnection }) =>
             const { metadata } = connection?.args[0]
             memberGuid = metadata.member_guid
             provider = metadata.provider
-            userGuid = metadata.user_guid
 
             verifyAccountsAndReturnAccountId({
               memberGuid,
               provider,
-              userGuid
+              userId
             }).then((accountId) => {
               verifyIdentity({
                 memberGuid,
                 provider,
-                userGuid
+                userId
               })
 
               verifyTransactions({
                 accountId,
                 provider,
-                userGuid
+                userId
               })
             })
           })

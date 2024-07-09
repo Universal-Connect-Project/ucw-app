@@ -1,8 +1,5 @@
 import { info } from '../../infra/logger'
 import { getVc as getMxVc } from '../../providerApiClients/mxClient/vc'
-import providerCredentials from '../../providerCredentials'
-
-const { mxInt, mxProd } = providerCredentials
 
 export default async function getVC(
   isProd: boolean,

@@ -1,5 +1,4 @@
 import { server } from '../test/testServer'
-import config from '../config'
 import { SophtronAdapter } from './sophtron'
 import { HttpResponse, http } from 'msw'
 import {
@@ -33,13 +32,7 @@ import {
   customerFromUniqueIdData
 } from '../test/testData/sophtronCustomer'
 
-const adapter = new SophtronAdapter({
-  sophtron: {
-    clientId: 'testClientId',
-    endpoint: config.SophtronApiServiceEndpoint,
-    secret: 'testSecret'
-  }
-})
+const adapter = new SophtronAdapter()
 
 const testId = 'testId'
 const testUserId = 'testUserId'

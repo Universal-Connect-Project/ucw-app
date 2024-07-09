@@ -7,15 +7,8 @@ import { MxAdapter } from './mx'
 
 const testConnectionId = 'test_connection_id'
 
-const mxAdapter = new MxAdapter(
-  {
-    mxProd: {
-      username: 'testUsername',
-      password: 'testPassword'
-    }
-  },
-  false
-)
+const isIntEnv = false
+const mxAdapter = new MxAdapter(isIntEnv)
 
 const providerAdapterBase = new ProviderAdapterBase({
   context: {
@@ -47,14 +40,16 @@ describe('ProviderAdapterBase', () => {
         )
       )
 
-      expect(await providerAdapterBase.getOauthState(testConnectionId)).toEqual({
-        oauth_state: {
-          guid: 'test_connection_id',
-          inbound_member_guid: 'test_connection_id',
-          outbound_member_guid: 'test_connection_id',
-          auth_status: OAuthStatus.PENDING
+      expect(await providerAdapterBase.getOauthState(testConnectionId)).toEqual(
+        {
+          oauth_state: {
+            guid: 'test_connection_id',
+            inbound_member_guid: 'test_connection_id',
+            outbound_member_guid: 'test_connection_id',
+            auth_status: OAuthStatus.PENDING
+          }
         }
-      })
+      )
     })
 
     it('returns a connected oauth state', async () => {
@@ -69,14 +64,16 @@ describe('ProviderAdapterBase', () => {
         )
       )
 
-      expect(await providerAdapterBase.getOauthState(testConnectionId)).toEqual({
-        oauth_state: {
-          guid: 'test_connection_id',
-          inbound_member_guid: 'test_connection_id',
-          outbound_member_guid: 'test_connection_id',
-          auth_status: OAuthStatus.COMPLETE
+      expect(await providerAdapterBase.getOauthState(testConnectionId)).toEqual(
+        {
+          oauth_state: {
+            guid: 'test_connection_id',
+            inbound_member_guid: 'test_connection_id',
+            outbound_member_guid: 'test_connection_id',
+            auth_status: OAuthStatus.COMPLETE
+          }
         }
-      })
+      )
     })
 
     it('returns an errored oauth state', async () => {
@@ -91,15 +88,17 @@ describe('ProviderAdapterBase', () => {
         )
       )
 
-      expect(await providerAdapterBase.getOauthState(testConnectionId)).toEqual({
-        oauth_state: {
-          guid: 'test_connection_id',
-          inbound_member_guid: 'test_connection_id',
-          outbound_member_guid: 'test_connection_id',
-          auth_status: OAuthStatus.ERROR,
-          error_reason: ConnectionStatus.DENIED
+      expect(await providerAdapterBase.getOauthState(testConnectionId)).toEqual(
+        {
+          oauth_state: {
+            guid: 'test_connection_id',
+            inbound_member_guid: 'test_connection_id',
+            outbound_member_guid: 'test_connection_id',
+            auth_status: OAuthStatus.ERROR,
+            error_reason: ConnectionStatus.DENIED
+          }
         }
-      })
+      )
     })
   })
 })

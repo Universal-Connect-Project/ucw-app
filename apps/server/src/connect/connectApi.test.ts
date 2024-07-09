@@ -1,5 +1,5 @@
-import { institutionData } from '../test/testData/institution'
 import { MxAdapter } from '../adapters/mx'
+import { institutionData } from '../test/testData/institution'
 import { ConnectApi } from './connectApi'
 
 const connectApi = new ConnectApi({
@@ -11,15 +11,8 @@ const connectApi = new ConnectApi({
   }
 })
 
-const mxApiClient = new MxAdapter(
-  {
-    mxProd: {
-      username: 'testUsername',
-      password: 'testPassword'
-    }
-  },
-  false
-)
+const isIntEnv = false
+const mxApiClient = new MxAdapter(isIntEnv)
 
 connectApi.providerAdapter = mxApiClient
 

@@ -1,18 +1,23 @@
-import { Request, Response } from 'express'
+/* eslint-disable @typescript-eslint/naming-convention */
+import type { Request, Response } from 'express'
+import { getProviderAdapter } from '../adapters'
 import getVC from '../services/vcProviders'
 
 export interface AccountsDataQueryParameters {
-  connectionId: string
+  connection_id: string
   provider: string
-  userId: string
+  user_id: string
 }
 
 export const accountsDataHandler = async (req: Request, res: Response) => {
-  const { provider, connectionId, userId } =
+  const { provider, connection_id, user_id } =
     req.query as unknown as AccountsDataQueryParameters
 
+  const providerAdapter = getProviderAdapter(provider)
+  const providerUserId = await providerAdapter.ResolveUserId(user_id)
+
   try {
-    const vc = await getVC(provider, connectionId, 'accounts', userId)
+    const vc = await getVC(provider, connection_id, 'accounts', providerUserId)
     res.send({
       jwt: vc
     })
@@ -23,17 +28,20 @@ export const accountsDataHandler = async (req: Request, res: Response) => {
 }
 
 export interface IdentityDataQueryParameters {
-  connectionId: string
+  connection_id: string
   provider: string
-  userId: string
+  user_id: string
 }
 
 export const identityDataHandler = async (req: Request, res: Response) => {
-  const { provider, connectionId, userId } =
+  const { provider, connection_id, user_id } =
     req.query as unknown as IdentityDataQueryParameters
 
+  const providerAdapter = getProviderAdapter(provider)
+  const providerUserId = await providerAdapter.ResolveUserId(user_id)
+
   try {
-    const vc = await getVC(provider, connectionId, 'identity', userId)
+    const vc = await getVC(provider, connection_id, 'identity', providerUserId)
     res.send({
       jwt: vc
     })
@@ -44,24 +52,27 @@ export const identityDataHandler = async (req: Request, res: Response) => {
 }
 
 export interface TransactionsDataQueryParameters {
-  accountId: string
+  account_id: string
   endTime: string
   provider: string
   startTime: string
-  userId: string
+  user_id: string
 }
 
 export const transactionsDataHandler = async (req: Request, res: Response) => {
-  const { provider, userId, accountId, startTime, endTime } =
+  const { provider, user_id, account_id, startTime, endTime } =
     req.query as unknown as TransactionsDataQueryParameters
+
+  const providerAdapter = getProviderAdapter(provider)
+  const providerUserId = await providerAdapter.ResolveUserId(user_id)
 
   try {
     const vc = await getVC(
       provider,
       undefined,
       'transactions',
-      userId,
-      accountId,
+      providerUserId,
+      account_id,
       startTime,
       endTime
     )
