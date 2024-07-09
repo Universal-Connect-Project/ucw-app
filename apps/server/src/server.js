@@ -1,5 +1,4 @@
 import 'dotenv/config'
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import { json, urlencoded } from 'body-parser'
 import express from 'express'
 import config from './config'
@@ -11,12 +10,11 @@ import 'express-async-errors'
 import RateLimit from 'express-rate-limit'
 import { initialize as initializeElastic } from './services/ElasticSearchClient'
 
-// import asyncify from 'express-asyncify'
-
 process.on('unhandledRejection', (error) => {
   _error(`unhandledRejection: ${error.message}`, error)
 })
 process.removeAllListeners('warning') // remove the noise caused by capacitor-community/http fetch plugin
+
 const app = express()
 app.use(json())
 app.use(urlencoded({ extended: true }))
@@ -40,12 +38,13 @@ app.get('/ping', function (req, res) {
 })
 
 useConnect(app)
-// useVcs(app);
+
 app.use(function (err, req, res, next) {
   _error(`Unhandled error on ${req.method} ${req.path}: `, err)
   res.status(500)
   res.send(err.message)
 })
+
 const pageQueryParameters = new RegExp(
   [
     'institution_id',
@@ -82,18 +81,19 @@ function renderDefaultPage(req, res, html) {
   )
 }
 
-app.get('/', async function (req, res) {
+app.get('/', (req, res) => {
   req.metricsPath = '/catchall'
   const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}${req.path}`
-  await _wget(resourcePath).then((html) => {
+  void _wget(resourcePath).then((html) => {
     renderDefaultPage(req, res, html)
   })
 })
-app.get('*', async function (req, res) {
+
+app.get('*', (req, res) => {
   req.metricsPath = '/catchall'
   const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}${req.path}`
   if (!req.path.includes('-hmr')) {
-    await stream(resourcePath, null, res)
+    void stream(resourcePath, null, res)
   } else {
     res.sendStatus(404)
   }
@@ -115,11 +115,11 @@ if (['dev', 'test'].includes(config.Env)) {
   })
 }
 
-process.on('SIGINT', async () => {
+process.on('SIGINT', () => {
   info('\nGracefully shutting down from SIGINT (Ctrl-C)')
   if (['dev', 'test'].includes(config.Env)) {
     info('Closing Ngrok tunnel')
-    await ngrok.kill()
+    void ngrok.kill()
   }
   process.exit(0)
 })
