@@ -54,7 +54,6 @@ const keysToPullFromEnv = [
   'FinicityAppKeyProd',
   'FinicitySecretProd',
 
-  'NGROK_AUTHTOKEN',
   'ELASTIC_SEARCH_URL'
 ]
 
