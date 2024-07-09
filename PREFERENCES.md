@@ -17,8 +17,11 @@ Follow these links to sign-up for credentials for each provider that the UCW cur
 
 - MX - [Register for a developer account](https://dashboard.mx.com/sign_up)
   - Once you have created an account, go to [https://dashboard.mx.com/home](https://dashboard.mx.com/home), and look for your `API Key` and `Client ID`. Put those values in `./apps/server/.env`
+  - Note that MX requires that your IP address(es) be approved and added to their allow-list, prior to being able to connect. This can be done in their dashboard.
 - Sophtron - [Register for a developer account](https://sophtron.com/Account/Register)
   - Once you have created an account, go to [https://sophtron.com/Manage](https://sophtron.com/Manage), and look for your `UserId` and `AccessKey`. Put those values in `./apps/server/.env`
+
+_Note: Providers require a contract to access their production APIs._
 
 ## Preference Settings
 

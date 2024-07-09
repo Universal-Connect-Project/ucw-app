@@ -83,7 +83,6 @@ function renderDefaultPage(req, res, html) {
 }
 
 app.get('/', async function (req, res) {
-  info(`Serving UI resources from ${config.ResourcePrefix}`)
   req.metricsPath = '/catchall'
   const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}${req.path}`
   await _wget(resourcePath).then((html) => {
@@ -91,7 +90,6 @@ app.get('/', async function (req, res) {
   })
 })
 app.get('*', async function (req, res) {
-  info(`Serving UI resources from ${config.ResourcePrefix}`)
   req.metricsPath = '/catchall'
   const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}${req.path}`
   if (!req.path.includes('-hmr')) {
