@@ -32,12 +32,40 @@
             }
           },
           {
+            "description": "The user id to make or refresh a connection with.",
+            "name": "user_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "description": "The UCP id of the institution. Providing this id will skip search, go directly to the authorization step for the institution, and hide the back button.",
             "name": "institution_id",
             "in": "query",
             "required": false,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "description": "The connection id of the connection to be refreshed. A provider is required when this is used. Providing these will skip search, go directly to the authorization step for the institution, and hide the back button.",
+            "name": "connection_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The provider of the connection to be refreshed. A connection_id is required when this is used. Providing these will skip search, go directly to the authorization step for the institution, and hide the back button.",
+            "name": "provider",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["mx", "mx_int", "sophtron"]
             }
           }
         ],
