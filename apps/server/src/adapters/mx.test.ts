@@ -31,25 +31,9 @@ import { createUserData, listUsersData } from '../test/testData/users'
 import { server } from '../test/testServer'
 import { EXTENDED_HISTORY_NOT_SUPPORTED_MSG, MxAdapter } from './mx'
 
-const mxAdapterInt = new MxAdapter(
-  {
-    mxInt: {
-      username: 'testUsername',
-      password: 'testPassword'
-    }
-  },
-  true
-)
+const mxAdapterInt = new MxAdapter(true)
 
-const mxAdapter = new MxAdapter(
-  {
-    mxProd: {
-      username: 'testUsername',
-      password: 'testPassword'
-    }
-  },
-  false
-)
+const mxAdapter = new MxAdapter(false)
 
 const institutionResponse = institutionData.institution
 
@@ -176,7 +160,10 @@ describe('mx provider', () => {
 
       it('retreieves and transforms member credentials', async () => {
         expect(
-          await mxAdapter.ListConnectionCredentials('testMemberId', 'testUserId')
+          await mxAdapter.ListConnectionCredentials(
+            'testMemberId',
+            'testUserId'
+          )
         ).toEqual([
           {
             id: firstCredential.guid,
@@ -595,7 +582,10 @@ describe('mx provider', () => {
     describe('GetConnectionById', () => {
       it('returns the member from readMember', async () => {
         const testUserId = 'userId'
-        const member = await mxAdapter.GetConnectionById('connectionId', testUserId)
+        const member = await mxAdapter.GetConnectionById(
+          'connectionId',
+          testUserId
+        )
 
         const testMember = connectionByIdMemberData.member
 

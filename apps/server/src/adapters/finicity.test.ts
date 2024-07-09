@@ -11,15 +11,8 @@ import { finicityReadCustomerData } from '../test/testData/users'
 import { server } from '../test/testServer'
 import { FinicityAdapter } from './finicity'
 
-const finicityApi = new FinicityAdapter({
-  finicityProd: {
-    partnerId: 'testPartnerId',
-    appKey: 'testAppKey',
-    secret: 'testSecret',
-    basePath: 'https://api.finicity.com',
-    provider: 'finicity_sandbox'
-  }
-})
+const isSandbox = true
+const finicityApi = new FinicityAdapter(isSandbox)
 
 const institutionResponse = finicityInsitutionData.institution
 
@@ -33,7 +26,7 @@ describe('finicity provider', () => {
           name: institutionResponse.name,
           oauth: true, // this is hardcoded true because finicity has an external widget we use
           url: institutionResponse.urlHomeApp,
-          provider: 'finicity_sandbox'
+          provider: 'finicity'
         })
       })
     })
@@ -55,7 +48,7 @@ describe('finicity provider', () => {
           credentials: [] as any,
           institution_code: 'testInstitutionId',
           oauth_window_uri: FINICITY_CONNECT_LITE_URL,
-          provider: 'finicity_sandbox',
+          provider: 'finicity',
           status: ConnectionStatus.PENDING
         }
 

@@ -7,7 +7,6 @@ import { info } from '../infra/logger'
 import { ApiEndpoints } from '../shared/connect/ApiEndpoint'
 import { ConnectionStatus } from '../shared/contract.ts'
 import { ConnectApi } from './connectApi'
-import stubs from './instrumentations.js'
 import {
   accountsDataHandler,
   identityDataHandler,
@@ -19,6 +18,7 @@ import {
   getInstitutionHandler,
   getInstitutionsHandler
 } from './institutionEndpoints'
+import stubs from './instrumentations.js'
 
 const AGGREGATION_JOB_TYPE = 0
 

@@ -1,24 +1,26 @@
-import { Request, Response } from 'express'
-import {
-  AccountsDataQueryParameters,
-  IdentityDataQueryParameters,
-  TransactionsDataQueryParameters,
-  accountsDataHandler,
-  identityDataHandler,
-  transactionsDataHandler
-} from './dataEndpoints'
-import {
-  mxVcAccountsData,
-  mxVcIdentityData,
-  mxVcTranscationsData
-} from '../test/testData/mxVcData'
-import { server } from '../test/testServer'
+import type { Response } from 'express'
 import { HttpResponse, http } from 'msw'
 import {
   MX_VC_GET_ACCOUNTS_PATH,
   MX_VC_GET_IDENTITY_PATH,
   MX_VC_GET_TRANSACTIONS_PATH
 } from '../test/handlers'
+import {
+  mxVcAccountsData,
+  mxVcIdentityData,
+  mxVcTranscationsData
+} from '../test/testData/mxVcData'
+import { server } from '../test/testServer'
+import type {
+  AccountsRequest,
+  IdentityRequest,
+  TransactionsRequest
+} from './dataEndpoints'
+import {
+  accountsDataHandler,
+  identityDataHandler,
+  transactionsDataHandler
+} from './dataEndpoints'
 
 describe('dataEndpoints', () => {
   describe('accountsDataHandler', () => {
@@ -27,13 +29,13 @@ describe('dataEndpoints', () => {
         send: jest.fn()
       } as unknown as Response
 
-      const req = {
+      const req: AccountsRequest = {
         query: {
-          connectionId: 'testConnectionId',
+          connection_id: 'testConnectionId',
           provider: 'mx',
-          userId: 'testUserId'
-        } as AccountsDataQueryParameters
-      } as unknown as Request
+          user_id: 'testUserId'
+        }
+      }
 
       await accountsDataHandler(req, res)
 
@@ -55,17 +57,18 @@ describe('dataEndpoints', () => {
         status: jest.fn()
       } as unknown as Response
 
-      const req = {
+      const req: AccountsRequest = {
         query: {
-          connectionId: 'testConnectionId',
+          connection_id: 'testConnectionId',
           provider: 'mx',
-          userId: 'testUserId'
-        } as AccountsDataQueryParameters
-      } as unknown as Request
+          user_id: 'testUserId'
+        }
+      }
 
       await accountsDataHandler(req, res)
 
       expect(res.send).toHaveBeenCalledWith('Something went wrong')
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(res.status).toHaveBeenCalledWith(400)
     })
   })
@@ -77,13 +80,13 @@ describe('dataEndpoints', () => {
         status: jest.fn()
       } as unknown as Response
 
-      const req = {
+      const req: IdentityRequest = {
         query: {
-          connectionId: 'testConnectionId',
+          connection_id: 'testConnectionId',
           provider: 'mx',
-          userId: 'testUserId'
-        } as IdentityDataQueryParameters
-      } as unknown as Request
+          user_id: 'testUserId'
+        }
+      }
 
       await identityDataHandler(req, res)
 
@@ -105,17 +108,18 @@ describe('dataEndpoints', () => {
         status: jest.fn()
       } as unknown as Response
 
-      const req = {
+      const req: IdentityRequest = {
         query: {
-          connectionId: 'testConnectionId',
+          connection_id: 'testConnectionId',
           provider: 'mx',
-          userId: 'testUserId'
-        } as IdentityDataQueryParameters
-      } as unknown as Request
+          user_id: 'testUserId'
+        }
+      }
 
       await identityDataHandler(req, res)
 
       expect(res.send).toHaveBeenCalledWith('Something went wrong')
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(res.status).toHaveBeenCalledWith(400)
     })
   })
@@ -127,13 +131,15 @@ describe('dataEndpoints', () => {
         status: jest.fn()
       } as unknown as Response
 
-      const req = {
+      const req: TransactionsRequest = {
         query: {
-          accountId: 'testAccountId',
+          account_id: 'testAccountId',
           provider: 'mx',
-          userId: 'testUserId'
-        } as TransactionsDataQueryParameters
-      } as unknown as Request
+          user_id: 'testUserId',
+          start_time: undefined,
+          end_time: undefined
+        }
+      }
 
       await transactionsDataHandler(req, res)
 
@@ -155,17 +161,20 @@ describe('dataEndpoints', () => {
         status: jest.fn()
       } as unknown as Response
 
-      const req = {
+      const req: TransactionsRequest = {
         query: {
-          accountId: 'testAccountId',
+          account_id: 'testAccountId',
           provider: 'mx',
-          userId: 'testUserId'
-        } as TransactionsDataQueryParameters
-      } as unknown as Request
+          user_id: 'testUserId',
+          start_time: undefined,
+          end_time: undefined
+        }
+      }
 
       await transactionsDataHandler(req, res)
 
       expect(res.send).toHaveBeenCalledWith('Something went wrong')
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(res.status).toHaveBeenCalledWith(400)
     })
   })
