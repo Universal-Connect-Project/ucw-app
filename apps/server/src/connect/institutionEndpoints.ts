@@ -1,7 +1,6 @@
 import type { Request, Response } from 'express'
 import type { JobType } from 'src/shared/contract'
 import type { ConnectApi } from './connectApi'
-
 export interface InstitutionRequest extends Request {
   connectService: ConnectApi
 }
