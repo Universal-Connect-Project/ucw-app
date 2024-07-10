@@ -1,6 +1,6 @@
-import { Request, Response } from 'express'
-import { ConnectApi } from './connectApi'
-import { JobType } from 'src/shared/contract'
+import type { Request, Response } from 'express'
+import type { JobType } from 'src/shared/contract'
+import type { ConnectApi } from './connectApi'
 
 export interface InstitutionRequest extends Request {
   connectService: ConnectApi
