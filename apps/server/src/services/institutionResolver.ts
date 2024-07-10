@@ -134,7 +134,7 @@ function providerSupportsJobType(
       // In the future maybe we could add some kind of check to see
       // if one of the available providers does support extended
       // history then resolve to that one, but if none support
-      // it than any institution can run the aggregate job.
+      // it then any institution can run the aggregate job.
       return true
     case 'aggregate_identity':
       return !!institutionAttributes.supports_identification
