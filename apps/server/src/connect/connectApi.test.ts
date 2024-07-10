@@ -7,7 +7,8 @@ const connectApi = new ConnectApi({
     provider: 'mx',
     updated: false,
     institution_id: 'xxx',
-    resolved_user_id: null
+    resolved_user_id: null,
+    job_type: 'aggregate'
   }
 })
 
