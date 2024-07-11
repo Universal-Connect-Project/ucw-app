@@ -9,9 +9,16 @@ import { info } from '../infra/logger'
 import type { CachedInstitution, JobType } from 'src/shared/contract'
 import { getPreferences, type Provider } from '../shared/preferences'
 
-const JOB_ES_MAPPING = {
+type JobMappingType = {
+  [key in JobType]: string[]
+}
+
+export const JOB_ES_MAPPING: JobMappingType = {
   aggregate: [] as string[], // all institutions have aggregate
-  aggregate_identity_verification: ['supports_verification', 'supports_identification'] as string[],
+  aggregate_identity_verification: [
+    'supports_verification',
+    'supports_identification'
+  ] as string[],
   aggregate_extendedhistory: [] as string[], // same filter as aggregate
   verification: ['supports_verification'],
   aggregate_identity: ['supports_identification']
@@ -67,7 +74,10 @@ export async function reIndexElasticSearch() {
   await Promise.all(indexPromises)
 }
 
-export async function search(searchTerm: string, jobType: JobType): Promise<any[]> {
+export async function search(
+  searchTerm: string,
+  jobType: JobType
+): Promise<any[]> {
   const preferences = await getPreferences()
   const hiddenInstitutions = preferences?.hiddenInstitutions || []
   const supportedProviders = preferences?.supportedProviders || []
@@ -145,19 +155,21 @@ function mustQuery(supportedProviders: Provider[], jobType: JobType) {
 
   let jobTypeSupported = [] as any
   if (institutionJobTypeFilter.length > 0) {
-    jobTypeSupported = supportedProviders.map((provider) => {
-      return {
-        bool: {
-          must: institutionJobTypeFilter.map(jobTypeFilter => {
-            return {
-              term: {
-                [`${provider}.${jobTypeFilter}`]: true
+    jobTypeSupported = supportedProviders
+      .map((provider) => {
+        return {
+          bool: {
+            must: institutionJobTypeFilter.map((jobTypeFilter) => {
+              return {
+                term: {
+                  [`${provider}.${jobTypeFilter}`]: true
+                }
               }
-            }
-          })
+            })
+          }
         }
-      }
-    }).flat()
+      })
+      .flat()
   }
 
   return {

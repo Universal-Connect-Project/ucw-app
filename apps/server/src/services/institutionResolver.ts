@@ -1,5 +1,5 @@
 import { debug } from '../infra/logger'
-import { getInstitution } from '../services/ElasticSearchClient'
+import { getInstitution, JOB_ES_MAPPING } from '../services/ElasticSearchClient'
 import type {
   CachedInstitution,
   InstitutionProvider,
@@ -117,35 +117,11 @@ function providerSupportsJobType(
   institutionAttributes: InstitutionProvider | undefined,
   jobType: JobType
 ): boolean {
-  if (institutionAttributes == null) {
-    return false
-  }
-  switch (jobType) {
-    case 'aggregate':
-      return true
-    case 'aggregate_extendedhistory':
-      // The resolver doesn't check if extended history works
-      // because that's how search works currently.
-      // Even though we have the data to know if an institution
-      // supports extended history we're not using it and the widget
-      // will automatically fall back to the aggregate job if the
-      // institution doesn't support extended history.
-
-      // In the future maybe we could add some kind of check to see
-      // if one of the available providers does support extended
-      // history then resolve to that one, but if none support
-      // it then any institution can run the aggregate job.
-      return true
-    case 'aggregate_identity':
-      return !!institutionAttributes.supports_identification
-    case 'verification':
-      return !!institutionAttributes.supports_verification
-    case 'aggregate_identity_verification':
-      return (
-        institutionAttributes.supports_identification &&
-        institutionAttributes.supports_verification
-      )
-    default:
-      return false
-  }
+  return JOB_ES_MAPPING[jobType].reduce((acc, supportsProp) => {
+    return (
+      acc &&
+      institutionAttributes?.[supportsProp as keyof InstitutionProvider] ===
+        true
+    )
+  }, true)
 }
