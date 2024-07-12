@@ -1,3 +1,4 @@
+import type { InstitutionProvider } from 'src/shared/contract'
 import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
 import * as preferences from '../shared/preferences'
 import { elasticSearchInstitutionData } from '../test/testData/institution'
@@ -50,6 +51,29 @@ const mockInstitutionWithMx = (institutionId = 'test') => {
   )
 }
 
+const mockInstitutionForJobTypes = (
+  institutionId = 'test',
+  mxAttrs: InstitutionProvider,
+  sophtronAttrs: InstitutionProvider
+) => {
+  ElasticSearchMock.add(
+    {
+      method: 'GET',
+      path: `/institutions/_doc/${institutionId}`
+    },
+    () => {
+      return {
+        _source: {
+          ...elasticSearchInstitutionData,
+          is_test_bank: false,
+          mx: mxAttrs,
+          sophtron: sophtronAttrs
+        }
+      }
+    }
+  )
+}
+
 describe('institutionResolver', () => {
   beforeEach(() => {
     jest
@@ -75,7 +99,7 @@ describe('institutionResolver', () => {
         }
       )
 
-      const institution = await resolveInstitutionProvider('test')
+      const institution = await resolveInstitutionProvider('test', 'aggregate')
       expect(institution.provider).toEqual('mx_int')
     })
 
@@ -100,14 +124,14 @@ describe('institutionResolver', () => {
         }
       )
 
-      const institution = await resolveInstitutionProvider('test')
+      const institution = await resolveInstitutionProvider('test', 'aggregate')
       expect(institution.provider).toEqual('sophtron')
     })
 
     it('resolves to mx if its the only option', async () => {
       mockInstitutionWithMx('test')
 
-      const institution = await resolveInstitutionProvider('test')
+      const institution = await resolveInstitutionProvider('test', 'aggregate')
       expect(institution.provider).toEqual('mx')
     })
 
@@ -128,13 +152,13 @@ describe('institutionResolver', () => {
       jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.7)
 
       expect(
-        (await resolveInstitutionProvider(institutionId)).provider
+        (await resolveInstitutionProvider(institutionId, 'aggregate')).provider
       ).toEqual('mx')
 
       jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.71)
 
       expect(
-        (await resolveInstitutionProvider(institutionId)).provider
+        (await resolveInstitutionProvider(institutionId, 'aggregate')).provider
       ).toEqual('sophtron')
     })
 
@@ -148,13 +172,15 @@ describe('institutionResolver', () => {
 
       jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.5)
 
-      expect((await resolveInstitutionProvider('test')).provider).toEqual('mx')
+      expect(
+        (await resolveInstitutionProvider('test', 'aggregate')).provider
+      ).toEqual('mx')
 
       jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.51)
 
-      expect((await resolveInstitutionProvider('test')).provider).toEqual(
-        'sophtron'
-      )
+      expect(
+        (await resolveInstitutionProvider('test', 'aggregate')).provider
+      ).toEqual('sophtron')
     })
 
     it('routes using default provider', async () => {
@@ -167,7 +193,9 @@ describe('institutionResolver', () => {
         defaultProvider: 'mx'
       })
 
-      expect((await resolveInstitutionProvider('test')).provider).toEqual('mx')
+      expect(
+        (await resolveInstitutionProvider('test', 'aggregate')).provider
+      ).toEqual('mx')
 
       jest.spyOn(preferences, 'getPreferences').mockResolvedValue({
         ...(testPreferences as preferences.Preferences),
@@ -176,9 +204,9 @@ describe('institutionResolver', () => {
         defaultProvider: 'sophtron'
       })
 
-      expect((await resolveInstitutionProvider('test')).provider).toEqual(
-        'sophtron'
-      )
+      expect(
+        (await resolveInstitutionProvider('test', 'aggregate')).provider
+      ).toEqual('sophtron')
     })
 
     it('falls back to default volume if institution specific volume doesnt have an available provider', async () => {
@@ -197,7 +225,9 @@ describe('institutionResolver', () => {
 
       mockInstitutionWithMx()
 
-      expect((await resolveInstitutionProvider('test')).provider).toEqual('mx')
+      expect(
+        (await resolveInstitutionProvider('test', 'aggregate')).provider
+      ).toEqual('mx')
     })
 
     it('falls back to default provider if institution specific and default volume dont have an available provider', async () => {
@@ -216,7 +246,9 @@ describe('institutionResolver', () => {
 
       mockInstitutionWithMx()
 
-      expect((await resolveInstitutionProvider('test')).provider).toEqual('mx')
+      expect(
+        (await resolveInstitutionProvider('test', 'aggregate')).provider
+      ).toEqual('mx')
     })
 
     it('chooses a random available provider if institution specific, default volume, and default provider dont have an available provider', async () => {
@@ -231,13 +263,15 @@ describe('institutionResolver', () => {
 
       jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.49)
 
-      expect((await resolveInstitutionProvider('test')).provider).toEqual('mx')
+      expect(
+        (await resolveInstitutionProvider('test', 'aggregate')).provider
+      ).toEqual('mx')
 
       jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.5)
 
-      expect((await resolveInstitutionProvider('test')).provider).toEqual(
-        'sophtron'
-      )
+      expect(
+        (await resolveInstitutionProvider('test', 'aggregate')).provider
+      ).toEqual('sophtron')
     })
 
     it('returns undefined if mx is the only option but sophtron is the only supported provider', async () => {
@@ -248,7 +282,7 @@ describe('institutionResolver', () => {
 
       mockInstitutionWithMx()
 
-      const institution = await resolveInstitutionProvider('test')
+      const institution = await resolveInstitutionProvider('test', 'aggregate')
       expect(institution.provider).toEqual(undefined)
     })
 
@@ -260,7 +294,7 @@ describe('institutionResolver', () => {
 
       mockInstitutionWithMxAndSophtron()
 
-      const institution = await resolveInstitutionProvider('test')
+      const institution = await resolveInstitutionProvider('test', 'aggregate')
       expect(institution.provider).toEqual('mx')
 
       jest.spyOn(preferences, 'getPreferences').mockResolvedValue({
@@ -268,8 +302,88 @@ describe('institutionResolver', () => {
         supportedProviders: ['sophtron']
       })
 
-      const institution2 = await resolveInstitutionProvider('test')
+      const institution2 = await resolveInstitutionProvider('test', 'aggregate')
       expect(institution2.provider).toEqual('sophtron')
+    })
+
+    it('returns "mx" for job types where sophtron doesnt support the job type', async () => {
+      mockInstitutionForJobTypes(
+        'test',
+        {
+          id: 'mx_bank',
+          supports_oauth: true,
+          supports_identification: true,
+          supports_verification: true,
+          supports_account_statement: true,
+          supports_history: true
+        },
+        {
+          id: 'sophtron_bank',
+          supports_oauth: false,
+          supports_identification: false,
+          supports_verification: false,
+          supports_account_statement: false,
+          supports_history: false
+        }
+      )
+
+      const institution = await resolveInstitutionProvider(
+        'test',
+        'aggregate_identity'
+      )
+      expect(institution.provider).toEqual('mx')
+
+      const institution2 = await resolveInstitutionProvider(
+        'test',
+        'verification'
+      )
+      expect(institution2.provider).toEqual('mx')
+
+      const institution3 = await resolveInstitutionProvider(
+        'test',
+        'aggregate_identity_verification'
+      )
+      expect(institution3.provider).toEqual('mx')
+    })
+
+    it('returns "sophtron" for job types where mx doesnt support the job type', async () => {
+      mockInstitutionForJobTypes(
+        'test',
+        {
+          id: 'mx_bank',
+          supports_oauth: false,
+          supports_identification: false,
+          supports_verification: false,
+          supports_account_statement: false,
+          supports_history: false
+        },
+        {
+          id: 'sophtron_bank',
+          supports_oauth: true,
+          supports_identification: true,
+          supports_verification: true,
+          supports_account_statement: true,
+          supports_history: true
+        }
+      )
+
+      const institution = await resolveInstitutionProvider(
+        'test',
+        'aggregate_identity'
+      )
+      expect(institution.provider).toEqual('sophtron')
+
+      const institution2 = await resolveInstitutionProvider(
+        'test',
+        'verification'
+      )
+      expect(institution2.provider).toEqual('sophtron')
+
+      const institution3 = await resolveInstitutionProvider(
+        'test',
+        'aggregate_identity_verification'
+      )
+      expect(institution3.provider).toEqual('sophtron')
     })
   })
 })

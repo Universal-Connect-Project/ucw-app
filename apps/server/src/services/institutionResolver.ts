@@ -1,8 +1,9 @@
 import { debug } from '../infra/logger'
-import { getInstitution } from '../services/ElasticSearchClient'
+import { getInstitution, JOB_ES_MAPPING } from '../services/ElasticSearchClient'
 import type {
   CachedInstitution,
   InstitutionProvider,
+  JobType,
   Provider,
   ResolvedInstitution
 } from '../shared/contract'
@@ -31,12 +32,14 @@ const getProviderByVolume = (volumeMap: Record<string, number>): Provider => {
 }
 
 export async function resolveInstitutionProvider(
-  institutionId: string
+  institutionId: string,
+  jobType: JobType
 ): Promise<ResolvedInstitution> {
   const institution = await getInstitution(institutionId)
   const preferences = await getPreferences()
   const providers: Provider[] = getAvailableProviders(
     institution,
+    jobType,
     preferences.supportedProviders
   )
 
@@ -88,18 +91,37 @@ export async function resolveInstitutionProvider(
 
 function getAvailableProviders(
   institution: CachedInstitution,
+  jobType: JobType,
   supportedProviders?: Provider[]
 ): Provider[] {
   const providers = []
-  if (supportedProviders.includes('mx') && institution.mx.id != null) {
+  if (
+    supportedProviders.includes('mx') &&
+    institution.mx.id != null &&
+    providerSupportsJobType(institution.mx, jobType)
+  ) {
     providers.push('mx')
   }
   if (
     supportedProviders.includes('sophtron') &&
-    institution.sophtron.id != null
+    institution.sophtron.id != null &&
+    providerSupportsJobType(institution.sophtron, jobType)
   ) {
     providers.push('sophtron')
   }
 
   return providers as Provider[]
+}
+
+function providerSupportsJobType(
+  institutionAttributes: InstitutionProvider | undefined,
+  jobType: JobType
+): boolean {
+  return JOB_ES_MAPPING[jobType].reduce((acc, supportsProp) => {
+    return (
+      acc &&
+      institutionAttributes?.[supportsProp as keyof InstitutionProvider] ===
+        true
+    )
+  }, true)
 }
