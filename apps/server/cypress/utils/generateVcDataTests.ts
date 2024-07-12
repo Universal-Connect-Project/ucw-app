@@ -1,4 +1,4 @@
-import { JobTypes } from '../../src/utils/index'
+import { JobTypes } from '../../src/shared/contract'
 
 const jobTypes = Object.values(JobTypes)
 
