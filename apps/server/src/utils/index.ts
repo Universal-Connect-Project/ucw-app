@@ -73,19 +73,27 @@ export enum JobTypes {
   IDENTITY = 'identity'
 }
 
+export enum MappedJobTypes {
+  AGGREGATE = 'aggregate',
+  ALL = 'aggregate_identity_verification',
+  FULLHISTORY = 'aggregate_extendedhistory',
+  VERIFICATION = 'verification',
+  IDENTITY = 'aggregate_identity'
+}
+
 export function mapJobType(input: JobTypes) {
   const inputLowerCase = input.toLowerCase()
   switch (inputLowerCase) {
     case JobTypes.AGGREGATE:
-      return 'aggregate'
+      return MappedJobTypes.AGGREGATE
     case JobTypes.ALL:
-      return 'aggregate_identity_verification'
+      return MappedJobTypes.ALL
     case JobTypes.FULLHISTORY:
-      return 'aggregate_extendedhistory'
+      return MappedJobTypes.FULLHISTORY
     case JobTypes.VERIFICATION:
-      return 'verification'
+      return MappedJobTypes.VERIFICATION
     case JobTypes.IDENTITY:
-      return 'aggregate_identity'
+      return MappedJobTypes.IDENTITY
     default:
       throw new Error('Invalid job type')
   }
