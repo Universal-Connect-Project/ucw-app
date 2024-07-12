@@ -1,6 +1,7 @@
 import { createCipheriv, createDecipheriv } from 'crypto'
 import { algo, enc } from 'crypto-js'
 import config from '../config'
+import { JobTypes, MappedJobTypes } from '../shared/contract'
 
 export function hmac(text: string, key: string) {
   const hmac = algo.HMAC.create(algo.SHA256, enc.Base64.parse(key))
@@ -63,22 +64,6 @@ export function decodeAuthToken(input: string) {
   } catch (err) {
     return input
   }
-}
-
-export enum JobTypes {
-  AGGREGATE = 'aggregate',
-  ALL = 'all',
-  FULLHISTORY = 'fullhistory',
-  VERIFICATION = 'verification',
-  IDENTITY = 'identity'
-}
-
-export enum MappedJobTypes {
-  AGGREGATE = 'aggregate',
-  ALL = 'aggregate_identity_verification',
-  FULLHISTORY = 'aggregate_extendedhistory',
-  VERIFICATION = 'verification',
-  IDENTITY = 'aggregate_identity'
 }
 
 export function mapJobType(input: JobTypes) {

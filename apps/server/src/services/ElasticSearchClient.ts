@@ -6,22 +6,22 @@ import { resolve } from 'path'
 import config from '../config'
 import { info } from '../infra/logger'
 
-import type { CachedInstitution, JobType } from 'src/shared/contract'
+import { MappedJobTypes, type CachedInstitution } from '../shared/contract'
 import { getPreferences, type Provider } from '../shared/preferences'
 
 type JobMappingType = {
-  [key in JobType]: string[]
+  [key in MappedJobTypes]: string[]
 }
 
 export const JOB_ES_MAPPING: JobMappingType = {
-  aggregate: [] as string[], // all institutions have aggregate
-  aggregate_identity_verification: [
+  [MappedJobTypes.AGGREGATE]: [] as string[], // all institutions have aggregate
+  [MappedJobTypes.ALL]: [
     'supports_verification',
     'supports_identification'
   ] as string[],
-  aggregate_extendedhistory: [] as string[], // same filter as aggregate
-  verification: ['supports_verification'],
-  aggregate_identity: ['supports_identification']
+  [MappedJobTypes.FULLHISTORY]: [] as string[], // same filter as aggregate
+  [MappedJobTypes.VERIFICATION]: ['supports_verification'],
+  [MappedJobTypes.IDENTITY]: ['supports_identification']
 }
 
 function getInstitutionFilePath() {
@@ -76,7 +76,7 @@ export async function reIndexElasticSearch() {
 
 export async function search(
   searchTerm: string,
-  jobType: JobType
+  jobType: MappedJobTypes
 ): Promise<any[]> {
   const preferences = await getPreferences()
   const hiddenInstitutions = preferences?.hiddenInstitutions || []
@@ -142,7 +142,7 @@ function fuzzySearchTermQuery(searchTerm: string) {
   ]
 }
 
-function mustQuery(supportedProviders: Provider[], jobType: JobType) {
+function mustQuery(supportedProviders: Provider[], jobType: MappedJobTypes) {
   const providerQueryTerms = supportedProviders.map((provider) => {
     return {
       exists: {
@@ -216,7 +216,7 @@ export async function getInstitution(id: string): Promise<CachedInstitution> {
 }
 
 export async function getRecommendedInstitutions(): Promise<
-CachedInstitution[]
+  CachedInstitution[]
 > {
   const recommendedInstitutions = (await getPreferences())
     ?.recommendedInstitutions

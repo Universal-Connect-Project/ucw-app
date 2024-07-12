@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express'
-import type { JobType } from 'src/shared/contract'
+import type { MappedJobTypes } from 'src/shared/contract'
 import type { ConnectApi } from './connectApi'
 export interface InstitutionRequest extends Request {
   connectService: ConnectApi
@@ -27,7 +27,7 @@ export const getInstitutionHandler = async (
 
 interface GetInstitutionsRequest extends InstitutionRequest {
   context: {
-    job_type: JobType
+    job_type: MappedJobTypes
   }
   query: {
     routing_number: string

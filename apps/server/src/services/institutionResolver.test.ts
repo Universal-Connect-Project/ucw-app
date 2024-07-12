@@ -1,4 +1,4 @@
-import type { InstitutionProvider } from 'src/shared/contract'
+import { MappedJobTypes, type InstitutionProvider } from '../shared/contract'
 import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
 import * as preferences from '../shared/preferences'
 import { elasticSearchInstitutionData } from '../test/testData/institution'
@@ -99,7 +99,10 @@ describe('institutionResolver', () => {
         }
       )
 
-      const institution = await resolveInstitutionProvider('test', 'aggregate')
+      const institution = await resolveInstitutionProvider(
+        'test',
+        MappedJobTypes.AGGREGATE
+      )
       expect(institution.provider).toEqual('mx_int')
     })
 
@@ -124,14 +127,20 @@ describe('institutionResolver', () => {
         }
       )
 
-      const institution = await resolveInstitutionProvider('test', 'aggregate')
+      const institution = await resolveInstitutionProvider(
+        'test',
+        MappedJobTypes.AGGREGATE
+      )
       expect(institution.provider).toEqual('sophtron')
     })
 
     it('resolves to mx if its the only option', async () => {
       mockInstitutionWithMx('test')
 
-      const institution = await resolveInstitutionProvider('test', 'aggregate')
+      const institution = await resolveInstitutionProvider(
+        'test',
+        MappedJobTypes.AGGREGATE
+      )
       expect(institution.provider).toEqual('mx')
     })
 
@@ -152,13 +161,23 @@ describe('institutionResolver', () => {
       jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.7)
 
       expect(
-        (await resolveInstitutionProvider(institutionId, 'aggregate')).provider
+        (
+          await resolveInstitutionProvider(
+            institutionId,
+            MappedJobTypes.AGGREGATE
+          )
+        ).provider
       ).toEqual('mx')
 
       jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.71)
 
       expect(
-        (await resolveInstitutionProvider(institutionId, 'aggregate')).provider
+        (
+          await resolveInstitutionProvider(
+            institutionId,
+            MappedJobTypes.AGGREGATE
+          )
+        ).provider
       ).toEqual('sophtron')
     })
 
@@ -173,13 +192,15 @@ describe('institutionResolver', () => {
       jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.5)
 
       expect(
-        (await resolveInstitutionProvider('test', 'aggregate')).provider
+        (await resolveInstitutionProvider('test', MappedJobTypes.AGGREGATE))
+          .provider
       ).toEqual('mx')
 
       jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.51)
 
       expect(
-        (await resolveInstitutionProvider('test', 'aggregate')).provider
+        (await resolveInstitutionProvider('test', MappedJobTypes.AGGREGATE))
+          .provider
       ).toEqual('sophtron')
     })
 
@@ -194,7 +215,8 @@ describe('institutionResolver', () => {
       })
 
       expect(
-        (await resolveInstitutionProvider('test', 'aggregate')).provider
+        (await resolveInstitutionProvider('test', MappedJobTypes.AGGREGATE))
+          .provider
       ).toEqual('mx')
 
       jest.spyOn(preferences, 'getPreferences').mockResolvedValue({
@@ -205,7 +227,8 @@ describe('institutionResolver', () => {
       })
 
       expect(
-        (await resolveInstitutionProvider('test', 'aggregate')).provider
+        (await resolveInstitutionProvider('test', MappedJobTypes.AGGREGATE))
+          .provider
       ).toEqual('sophtron')
     })
 
@@ -226,7 +249,8 @@ describe('institutionResolver', () => {
       mockInstitutionWithMx()
 
       expect(
-        (await resolveInstitutionProvider('test', 'aggregate')).provider
+        (await resolveInstitutionProvider('test', MappedJobTypes.AGGREGATE))
+          .provider
       ).toEqual('mx')
     })
 
@@ -247,7 +271,8 @@ describe('institutionResolver', () => {
       mockInstitutionWithMx()
 
       expect(
-        (await resolveInstitutionProvider('test', 'aggregate')).provider
+        (await resolveInstitutionProvider('test', MappedJobTypes.AGGREGATE))
+          .provider
       ).toEqual('mx')
     })
 
@@ -264,13 +289,15 @@ describe('institutionResolver', () => {
       jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.49)
 
       expect(
-        (await resolveInstitutionProvider('test', 'aggregate')).provider
+        (await resolveInstitutionProvider('test', MappedJobTypes.AGGREGATE))
+          .provider
       ).toEqual('mx')
 
       jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.5)
 
       expect(
-        (await resolveInstitutionProvider('test', 'aggregate')).provider
+        (await resolveInstitutionProvider('test', MappedJobTypes.AGGREGATE))
+          .provider
       ).toEqual('sophtron')
     })
 
@@ -282,7 +309,10 @@ describe('institutionResolver', () => {
 
       mockInstitutionWithMx()
 
-      const institution = await resolveInstitutionProvider('test', 'aggregate')
+      const institution = await resolveInstitutionProvider(
+        'test',
+        MappedJobTypes.AGGREGATE
+      )
       expect(institution.provider).toEqual(undefined)
     })
 
@@ -294,7 +324,10 @@ describe('institutionResolver', () => {
 
       mockInstitutionWithMxAndSophtron()
 
-      const institution = await resolveInstitutionProvider('test', 'aggregate')
+      const institution = await resolveInstitutionProvider(
+        'test',
+        MappedJobTypes.AGGREGATE
+      )
       expect(institution.provider).toEqual('mx')
 
       jest.spyOn(preferences, 'getPreferences').mockResolvedValue({
@@ -302,7 +335,10 @@ describe('institutionResolver', () => {
         supportedProviders: ['sophtron']
       })
 
-      const institution2 = await resolveInstitutionProvider('test', 'aggregate')
+      const institution2 = await resolveInstitutionProvider(
+        'test',
+        MappedJobTypes.AGGREGATE
+      )
       expect(institution2.provider).toEqual('sophtron')
     })
 
@@ -329,19 +365,19 @@ describe('institutionResolver', () => {
 
       const institution = await resolveInstitutionProvider(
         'test',
-        'aggregate_identity'
+        MappedJobTypes.IDENTITY
       )
       expect(institution.provider).toEqual('mx')
 
       const institution2 = await resolveInstitutionProvider(
         'test',
-        'verification'
+        MappedJobTypes.VERIFICATION
       )
       expect(institution2.provider).toEqual('mx')
 
       const institution3 = await resolveInstitutionProvider(
         'test',
-        'aggregate_identity_verification'
+        MappedJobTypes.ALL
       )
       expect(institution3.provider).toEqual('mx')
     })
@@ -369,19 +405,19 @@ describe('institutionResolver', () => {
 
       const institution = await resolveInstitutionProvider(
         'test',
-        'aggregate_identity'
+        MappedJobTypes.IDENTITY
       )
       expect(institution.provider).toEqual('sophtron')
 
       const institution2 = await resolveInstitutionProvider(
         'test',
-        'verification'
+        MappedJobTypes.VERIFICATION
       )
       expect(institution2.provider).toEqual('sophtron')
 
       const institution3 = await resolveInstitutionProvider(
         'test',
-        'aggregate_identity_verification'
+        MappedJobTypes.ALL
       )
       expect(institution3.provider).toEqual('sophtron')
     })

@@ -8,7 +8,7 @@ import {
   ConnectionStatus,
   type Institution,
   type InstitutionSearchResponseItem,
-  type JobType
+  MappedJobTypes
 } from '../shared/contract'
 
 import { ProviderAdapterBase } from '../adapters'
@@ -240,7 +240,7 @@ export class ConnectApi extends ProviderAdapterBase {
 
   async loadInstitutions(
     query: string,
-    jobType: JobType
+    jobType: MappedJobTypes
   ): Promise<InstitutionSearchResponseItem[]> {
     const institutionHits = await search(query, jobType)
     return institutionHits.map(mapCachedInstitution)

@@ -115,7 +115,21 @@ export interface ResolvedInstitution {
 
 export type Provider = 'mx' | 'mx_int' | 'sophtron' | 'finicity' | 'akoya'
 
-export type JobType = 'aggregate' | 'aggregate_identity_verification' | 'aggregate_extendedhistory' | 'verification' | 'aggregate_identity'
+export enum JobTypes {
+  AGGREGATE = 'aggregate',
+  ALL = 'all',
+  FULLHISTORY = 'fullhistory',
+  VERIFICATION = 'verification',
+  IDENTITY = 'identity'
+}
+
+export enum MappedJobTypes {
+  AGGREGATE = 'aggregate',
+  ALL = 'aggregate_identity_verification',
+  FULLHISTORY = 'aggregate_extendedhistory',
+  VERIFICATION = 'verification',
+  IDENTITY = 'aggregate_identity'
+}
 
 export interface CachedInstitution {
   name: string

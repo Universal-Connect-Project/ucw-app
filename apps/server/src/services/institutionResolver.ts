@@ -3,7 +3,7 @@ import { getInstitution, JOB_ES_MAPPING } from '../services/ElasticSearchClient'
 import type {
   CachedInstitution,
   InstitutionProvider,
-  JobType,
+  MappedJobTypes,
   Provider,
   ResolvedInstitution
 } from '../shared/contract'
@@ -33,7 +33,7 @@ const getProviderByVolume = (volumeMap: Record<string, number>): Provider => {
 
 export async function resolveInstitutionProvider(
   institutionId: string,
-  jobType: JobType
+  jobType: MappedJobTypes
 ): Promise<ResolvedInstitution> {
   const institution = await getInstitution(institutionId)
   const preferences = await getPreferences()
@@ -91,7 +91,7 @@ export async function resolveInstitutionProvider(
 
 function getAvailableProviders(
   institution: CachedInstitution,
-  jobType: JobType,
+  jobType: MappedJobTypes,
   supportedProviders?: Provider[]
 ): Provider[] {
   const providers = []
@@ -115,7 +115,7 @@ function getAvailableProviders(
 
 function providerSupportsJobType(
   institutionAttributes: InstitutionProvider | undefined,
-  jobType: JobType
+  jobType: MappedJobTypes
 ): boolean {
   return JOB_ES_MAPPING[jobType].reduce((acc, supportsProp) => {
     return (
