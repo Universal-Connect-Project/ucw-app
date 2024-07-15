@@ -1,4 +1,4 @@
-import { MappedJobTypes } from '../shared/contract'
+import { MappedJobTypes, Providers } from '../shared/contract'
 import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
 import config from '../config'
 import {
@@ -437,8 +437,57 @@ describe('getRecommendedInstitutions', () => {
       }
     )
 
-    const recommendedInstitutions = await getRecommendedInstitutions()
+    const recommendedInstitutions = await getRecommendedInstitutions(
+      MappedJobTypes.AGGREGATE
+    )
 
     expect(recommendedInstitutions).toEqual([elasticSearchInstitutionData])
+  })
+
+  it("filters out institutions that don't have available providers because of job type", async () => {
+    jest.spyOn(preferences, 'getPreferences').mockResolvedValue({
+      supportedProviders: [Providers.MX]
+    } as preferences.Preferences)
+
+    ElasticSearchMock.clearAll()
+
+    ElasticSearchMock.add(
+      {
+        method: 'POST',
+        path: '/_mget',
+        body: {
+          docs: testPreferences.recommendedInstitutions.map(
+            (institutionId: string) => ({
+              _index: 'institutions',
+              _id: institutionId
+            })
+          )
+        }
+      },
+      (params) => {
+        return {
+          docs: [
+            {
+              _source: {
+                ...elasticSearchInstitutionData,
+                mx: {
+                  supports_oauth: false,
+                  supports_identification: false,
+                  supports_verification: false,
+                  supports_account_statement: false,
+                  supports_history: false
+                }
+              }
+            }
+          ]
+        }
+      }
+    )
+
+    const recommendedInstitutions = await getRecommendedInstitutions(
+      MappedJobTypes.AGGREGATE
+    )
+
+    expect(recommendedInstitutions).toEqual([])
   })
 })

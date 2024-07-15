@@ -8,6 +8,7 @@ import { info } from '../infra/logger'
 
 import { MappedJobTypes, type CachedInstitution } from '../shared/contract'
 import { getPreferences, type Provider } from '../shared/preferences'
+import { getAvailableProviders } from '../shared/providers'
 
 type JobMappingType = {
   [key in MappedJobTypes]: string[]
@@ -215,11 +216,13 @@ export async function getInstitution(id: string): Promise<CachedInstitution> {
   return institutionResponse._source as CachedInstitution
 }
 
-export async function getRecommendedInstitutions(): Promise<
-  CachedInstitution[]
-> {
-  const recommendedInstitutions = (await getPreferences())
-    ?.recommendedInstitutions
+export async function getRecommendedInstitutions(
+  jobType: MappedJobTypes
+): Promise<CachedInstitution[]> {
+  const preferences = await getPreferences()
+
+  const supportedProviders = preferences.supportedProviders
+  const recommendedInstitutions = preferences?.recommendedInstitutions
 
   if (!recommendedInstitutions) {
     return []
@@ -236,9 +239,15 @@ export async function getRecommendedInstitutions(): Promise<
     await ElasticsearchClient.mget({
       docs: esSearch
     })
-  const institutions = recommendedInstitutionsResponse.docs.map(
-    (favoriteInstitution) => favoriteInstitution._source as CachedInstitution
-  )
+
+  const institutions = recommendedInstitutionsResponse.docs
+    .map(
+      (favoriteInstitution) => favoriteInstitution._source as CachedInstitution
+    )
+    .filter(
+      (institution) =>
+        getAvailableProviders(institution, jobType, supportedProviders).length
+    )
 
   return institutions
 }

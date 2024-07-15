@@ -267,7 +267,9 @@ export class ConnectApi extends ProviderAdapterBase {
     this.context.updated = true
     this.context.provider = null
 
-    const recommendedInstitutions = await getRecommendedInstitutions()
+    const recommendedInstitutions = await getRecommendedInstitutions(
+      this.context.job_type as MappedJobTypes
+    )
     return recommendedInstitutions
       .filter((ins) => ins != null)
       .map(mapCachedInstitution)
