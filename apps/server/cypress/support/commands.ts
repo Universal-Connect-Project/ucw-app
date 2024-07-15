@@ -44,6 +44,24 @@ Cypress.Commands.add('visitIdentity', () => {
   return cy.wrap(userId)
 })
 
+Cypress.Commands.add('visitWithPostMessageSpy', (url: string) => {
+  cy.visit(url, {
+    onBeforeLoad(window) {
+      cy.spy(window.parent, 'postMessage').as('postMessage')
+    }
+  })
+})
+
+Cypress.Commands.add('deleteUser', (userId: string, provider: string) => {
+  cy.request({
+    method: 'DELETE',
+    url: `/user/${userId}?provider=${provider}`,
+    failOnStatusCode: false
+  }).should((response) => {
+    expect(response.status).to.be.oneOf([200, 204, 400])
+  })
+})
+
 export {}
 
 declare global {
@@ -51,6 +69,8 @@ declare global {
     interface Chainable {
       visitAgg: () => Chainable<string>
       visitIdentity: () => Chainable<string>
+      visitWithPostMessageSpy: (url: string) => Chainable<string>
+      deleteUser: (userId: string, provider: string) => Chainable<string>
     }
   }
 }

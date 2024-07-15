@@ -1,12 +1,16 @@
-import { server } from '../test/testServer'
-import { SophtronAdapter } from './sophtron'
 import { HttpResponse, http } from 'msw'
+import type {
+  CreateConnectionRequest,
+  UpdateConnectionRequest
+} from '../shared/contract'
+import { ChallengeType, ConnectionStatus } from '../shared/contract'
 import {
   SOPHTRON_ANSWER_JOB_MFA_PATH,
   SOPHTRON_CREATE_CUSTOMER_PATH,
   SOPHTRON_CREATE_MEMBER_PATH,
   SOPHTRON_CUSTOMER_UNIQUE_ID_PATH,
   SOPHTRON_DELETE_MEMBER_PATH,
+  SOPHTRON_DELETE_USER_PATH,
   SOPHTRON_GET_JOB_INFO_PATH,
   SOPHTRON_INSTITUTION_BY_ID_PATH,
   SOPHTRON_MEMBER_BY_ID_PATH,
@@ -17,20 +21,16 @@ import {
   sophtronUserInstitutionAccountsData
 } from '../test/testData/institution'
 import {
-  ChallengeType,
-  ConnectionStatus,
-  CreateConnectionRequest,
-  UpdateConnectionRequest
-} from '../shared/contract'
+  createCustomerData,
+  customerFromUniqueIdData
+} from '../test/testData/sophtronCustomer'
 import {
   createMemberData,
   getMemberData,
   updateMemberData
 } from '../test/testData/sophtronMember'
-import {
-  createCustomerData,
-  customerFromUniqueIdData
-} from '../test/testData/sophtronCustomer'
+import { server } from '../test/testServer'
+import { SophtronAdapter } from './sophtron'
 
 const adapter = new SophtronAdapter()
 
@@ -270,6 +270,29 @@ describe('sophtron adapter', () => {
       expect(deleteMemberAttempted).toBe(true)
       expect(requestParams).toEqual({
         memberId: testId,
+        userId: testUserId
+      })
+    })
+  })
+
+  describe('DeleteUser', () => {
+    it('calls the delete user endpoint', async () => {
+      let deleteUserAttempted = false
+      let requestParams
+
+      server.use(
+        http.delete(SOPHTRON_DELETE_USER_PATH, ({ params }) => {
+          deleteUserAttempted = true
+          requestParams = params
+
+          return new HttpResponse(null, { status: 200 })
+        })
+      )
+
+      await adapter.DeleteUser(testUserId)
+
+      expect(deleteUserAttempted).toBe(true)
+      expect(requestParams).toEqual({
         userId: testUserId
       })
     })
@@ -645,7 +668,7 @@ describe('sophtron adapter', () => {
             data: [
               {
                 key: 'ota',
-                value: `Please enter the OTA code`
+                value: 'Please enter the OTA code'
               }
             ],
             question: 'ota'
@@ -724,7 +747,7 @@ describe('sophtron adapter', () => {
             id: 'CaptchaImage',
             type: ChallengeType.IMAGE,
             data: testCaptchaImage,
-            question: `Please enter the Captcha code`
+            question: 'Please enter the Captcha code'
           }
         ],
         id: testUserInstitutionId,
@@ -929,6 +952,21 @@ describe('sophtron adapter', () => {
       const response = await adapter.ResolveUserId(testUserId)
 
       expect(response).toEqual(testUserId)
+    })
+
+    it('throws an error if customer does not exist and failIfNotFound is true', async () => {
+      server.use(
+        http.get(
+          SOPHTRON_CUSTOMER_UNIQUE_ID_PATH,
+          () => new HttpResponse(null, { status: 200 })
+        )
+      )
+
+      const userId = 'fdasfdasfds'
+
+      await expect(
+        async () => await adapter.ResolveUserId(userId, true)
+      ).rejects.toThrow('User not resolved successfully')
     })
   })
 })

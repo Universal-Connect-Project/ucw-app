@@ -170,6 +170,10 @@ export class MxAdapter implements WidgetAdapter {
     await this.apiClient.deleteManagedMember(id, userId)
   }
 
+  async DeleteUser(providerUserId: string): Promise<any> {
+    return await this.apiClient.deleteUser(providerUserId)
+  }
+
   async UpdateConnection(
     request: UpdateConnectionRequest,
     userId: string
@@ -316,13 +320,18 @@ export class MxAdapter implements WidgetAdapter {
     return true
   }
 
-  async ResolveUserId(userId: string): Promise<string> {
+  async ResolveUserId(
+    userId: string,
+    failIfNotFound: boolean = false
+  ): Promise<string> {
     logger.debug('Resolving UserId: ' + userId)
     const res = await this.apiClient.listUsers(1, 10, userId)
     const mxUser = res.data?.users?.find((u) => u.id === userId)
     if (mxUser != null) {
       logger.trace(`Found existing mx user ${mxUser.guid}`)
       return mxUser.guid
+    } else if (failIfNotFound) {
+      throw new Error('User not resolved successfully')
     }
     logger.trace(`Creating mx user ${userId}`)
     const ret = await this.apiClient.createUser({

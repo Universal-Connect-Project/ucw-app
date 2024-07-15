@@ -117,6 +117,10 @@ export class SophtronAdapter implements WidgetAdapter {
     return this.apiClient.deleteMember(userId, id)
   }
 
+  async DeleteUser(providerUserId: string): Promise<any> {
+    return this.apiClient.deleteCustomer(providerUserId)
+  }
+
   async UpdateConnection(
     request: UpdateConnectionRequest,
     userId: string
@@ -295,12 +299,14 @@ export class SophtronAdapter implements WidgetAdapter {
   }
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  async ResolveUserId(user_id: string) {
+  async ResolveUserId(user_id: string, failIfNotFound: boolean = false) {
     debug('Resolving UserId: ' + user_id)
     const sophtronUser = await this.apiClient.getCustomerByUniqueName(user_id)
     if (sophtronUser) {
       trace(`Found existing sophtron customer ${sophtronUser.CustomerID}`)
       return sophtronUser.CustomerID
+    } else if (failIfNotFound) {
+      throw new Error('User not resolved successfully')
     }
     trace(`Creating sophtron user ${user_id}`)
     const ret = await this.apiClient.createCustomer(user_id)

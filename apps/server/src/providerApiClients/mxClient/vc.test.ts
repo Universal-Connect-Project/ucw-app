@@ -1,12 +1,12 @@
-import { mxVcAccountsData } from '../../test/testData/mxVcData'
-import { getVc } from './vc'
-import { server } from '../../test/testServer'
 import { HttpResponse, http } from 'msw'
+import providerCredentials from '../../providerCredentials'
 import {
   MX_INTEGRATION_VC_GET_ACCOUNTS_PATH,
   MX_VC_GET_ACCOUNTS_PATH
 } from '../../test/handlers'
-import providerCredentials from '../../providerCredentials'
+import { mxVcAccountsData } from '../../test/testData/mxVcData'
+import { server } from '../../test/testServer'
+import { getVc } from './vc'
 
 const accountsPath = 'users/userId/members/connectionId/accounts'
 
@@ -68,7 +68,9 @@ describe('mx vc', () => {
         )
       )
 
-      await expect(() => getVc(accountsPath, true)).rejects.toThrow()
+      await expect(
+        async () => await getVc(accountsPath, true)
+      ).rejects.toThrow()
     })
   })
 })

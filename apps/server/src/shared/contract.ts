@@ -224,7 +224,7 @@ export interface Pagination {
 }
 
 export interface WidgetAdapter {
-  ResolveUserId: (id: string) => Promise<string>
+  ResolveUserId: (id: string, failIfNotFound?: boolean) => Promise<string>
   GetInstitutionById: (id: string) => Promise<Institution>
   ListInstitutionCredentials: (institutionId: string) => Promise<Credential[]>
   ListConnectionCredentials: (
@@ -237,6 +237,7 @@ export interface WidgetAdapter {
     userId?: string
   ) => Promise<Connection | undefined>
   DeleteConnection: (connectionId: string, userId?: string) => Promise<void>
+  DeleteUser: (userId: string) => Promise<any>
   AnswerChallenge: (
     request: UpdateConnectionRequest,
     jobId: string,
