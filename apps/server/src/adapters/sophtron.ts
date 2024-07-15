@@ -8,8 +8,8 @@ import type {
   UpdateConnectionRequest,
   WidgetAdapter
 } from '../shared/contract'
-import { ChallengeType, ConnectionStatus } from '../shared/contract'
-import { JobTypes, mapJobType } from '../utils'
+import { ChallengeType, ConnectionStatus, JobTypes } from '../shared/contract'
+import { mapJobType } from '../utils'
 
 import { debug, error, trace } from '../infra/logger'
 import SophtronClientV1 from '../providerApiClients/sophtronClient'

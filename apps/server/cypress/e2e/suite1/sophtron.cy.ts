@@ -1,4 +1,4 @@
-import { JobTypes } from '../../../src/utils/index'
+import { JobTypes } from '../../../src/shared/contract'
 import generateVcDataTests from '../../utils/generateVcDataTests'
 
 const makeAConnection = async (jobType) => {

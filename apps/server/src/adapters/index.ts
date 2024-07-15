@@ -11,7 +11,7 @@ import type {
   CreateConnectionRequest,
   Credential,
   Institution,
-  JobType,
+  MappedJobTypes,
   UpdateConnectionRequest,
   WidgetAdapter
 } from '../shared/contract'
@@ -97,7 +97,7 @@ export class ProviderAdapterBase {
   async resolveInstitution(id: string): Promise<Institution> {
     const resolvedInstitution = await resolveInstitutionProvider(
       id,
-      this.context.job_type as JobType
+      this.context.job_type as MappedJobTypes
     )
     this.context.provider = resolvedInstitution.provider
     this.context.updated = true

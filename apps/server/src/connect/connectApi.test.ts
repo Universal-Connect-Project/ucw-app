@@ -1,3 +1,4 @@
+import { MappedJobTypes } from '../shared/contract'
 import { MxAdapter } from '../adapters/mx'
 import { institutionData } from '../test/testData/institution'
 import { ConnectApi } from './connectApi'
@@ -62,7 +63,10 @@ describe('connectApi', () => {
     ]
 
     it('loads formatted institutions', async () => {
-      const institutions = await connectApi.loadInstitutions('MX', 'aggregate')
+      const institutions = await connectApi.loadInstitutions(
+        'MX',
+        MappedJobTypes.AGGREGATE
+      )
 
       expect(institutions).toEqual(expectedInstitutionList)
     })

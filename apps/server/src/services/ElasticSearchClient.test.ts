@@ -1,3 +1,4 @@
+import { MappedJobTypes, Providers } from '../shared/contract'
 import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
 import config from '../config'
 import {
@@ -84,13 +85,15 @@ function searchQuery(jobTypeQuery = [] as any[], filterTestBanks = false) {
             'ucp_id.keyword': testPreferences.hiddenInstitutions
           }
         },
-        ...filterTestBanks
-          ? [{
-              term: {
-                is_test_bank: true
+        ...(filterTestBanks
+          ? [
+              {
+                term: {
+                  is_test_bank: true
+                }
               }
-            }]
-          : []
+            ]
+          : [])
       ]
     }
   }
@@ -225,33 +228,36 @@ describe('search', () => {
       }
     )
 
-    const results = await search('MX Bank', 'aggregate')
+    const results = await search('MX Bank', MappedJobTypes.AGGREGATE)
 
     expect(results).toEqual([elasticSearchInstitutionData])
   })
 
   it('excludes test banks in ES search when Env is prod', async () => {
     config.Env = 'prod'
-    ElasticSearchMock.add({
-      method: ['GET', 'POST'],
-      path: ['/_search', '/institutions/_search'],
-      body: {
-        query: searchQuery([], true),
-        size: 20
-      }
-    }, (parms) => {
-      return {
-        hits: {
-          hits: [
-            {
-              _source: elasticSearchInstitutionData
-            }
-          ]
+    ElasticSearchMock.add(
+      {
+        method: ['GET', 'POST'],
+        path: ['/_search', '/institutions/_search'],
+        body: {
+          query: searchQuery([], true),
+          size: 20
+        }
+      },
+      (parms) => {
+        return {
+          hits: {
+            hits: [
+              {
+                _source: elasticSearchInstitutionData
+              }
+            ]
+          }
         }
       }
-    })
+    )
 
-    await search('MX Bank', 'aggregate')
+    await search('MX Bank', MappedJobTypes.AGGREGATE)
     config.Env = 'test'
   })
 
@@ -261,32 +267,30 @@ describe('search', () => {
         method: ['GET', 'POST'],
         path: ['/_search', '/institutions/_search'],
         body: {
-          query: searchQuery(
-            [
-              {
-                bool: {
-                  must: [
-                    {
-                      term: {
-                        'mx.supports_identification': true
-                      }
+          query: searchQuery([
+            {
+              bool: {
+                must: [
+                  {
+                    term: {
+                      'mx.supports_identification': true
                     }
-                  ]
-                }
-              },
-              {
-                bool: {
-                  must: [
-                    {
-                      term: {
-                        'sophtron.supports_identification': true
-                      }
-                    }
-                  ]
-                }
+                  }
+                ]
               }
-            ]
-          ),
+            },
+            {
+              bool: {
+                must: [
+                  {
+                    term: {
+                      'sophtron.supports_identification': true
+                    }
+                  }
+                ]
+              }
+            }
+          ]),
           size: 20
         }
       },
@@ -303,7 +307,7 @@ describe('search', () => {
       }
     )
 
-    const results = await search('MX Bank', 'aggregate_identity')
+    const results = await search('MX Bank', MappedJobTypes.IDENTITY)
 
     expect(results).toEqual([elasticSearchInstitutionData])
   })
@@ -314,42 +318,40 @@ describe('search', () => {
         method: ['GET', 'POST'],
         path: ['/_search', '/institutions/_search'],
         body: {
-          query: searchQuery(
-            [
-              {
-                bool: {
-                  must: [
-                    {
-                      term: {
-                        'mx.supports_verification': true
-                      }
-                    },
-                    {
-                      term: {
-                        'mx.supports_identification': true
-                      }
+          query: searchQuery([
+            {
+              bool: {
+                must: [
+                  {
+                    term: {
+                      'mx.supports_verification': true
                     }
-                  ]
-                }
-              },
-              {
-                bool: {
-                  must: [
-                    {
-                      term: {
-                        'sophtron.supports_verification': true
-                      }
-                    },
-                    {
-                      term: {
-                        'sophtron.supports_identification': true
-                      }
+                  },
+                  {
+                    term: {
+                      'mx.supports_identification': true
                     }
-                  ]
-                }
+                  }
+                ]
               }
-            ]
-          ),
+            },
+            {
+              bool: {
+                must: [
+                  {
+                    term: {
+                      'sophtron.supports_verification': true
+                    }
+                  },
+                  {
+                    term: {
+                      'sophtron.supports_identification': true
+                    }
+                  }
+                ]
+              }
+            }
+          ]),
           size: 20
         }
       },
@@ -366,7 +368,7 @@ describe('search', () => {
       }
     )
 
-    const results = await search('MX Bank', 'aggregate_identity_verification')
+    const results = await search('MX Bank', MappedJobTypes.ALL)
 
     expect(results).toEqual([elasticSearchInstitutionData])
   })
@@ -384,7 +386,7 @@ describe('search', () => {
       }
     )
 
-    const results = await search('nothing', 'aggregate')
+    const results = await search('nothing', MappedJobTypes.AGGREGATE)
 
     expect(results).toEqual([])
   })
@@ -435,8 +437,57 @@ describe('getRecommendedInstitutions', () => {
       }
     )
 
-    const recommendedInstitutions = await getRecommendedInstitutions()
+    const recommendedInstitutions = await getRecommendedInstitutions(
+      MappedJobTypes.AGGREGATE
+    )
 
     expect(recommendedInstitutions).toEqual([elasticSearchInstitutionData])
+  })
+
+  it("filters out institutions that don't have available providers because of job type", async () => {
+    jest.spyOn(preferences, 'getPreferences').mockResolvedValue({
+      supportedProviders: [Providers.MX]
+    } as preferences.Preferences)
+
+    ElasticSearchMock.clearAll()
+
+    ElasticSearchMock.add(
+      {
+        method: 'POST',
+        path: '/_mget',
+        body: {
+          docs: testPreferences.recommendedInstitutions.map(
+            (institutionId: string) => ({
+              _index: 'institutions',
+              _id: institutionId
+            })
+          )
+        }
+      },
+      (params) => {
+        return {
+          docs: [
+            {
+              _source: {
+                ...elasticSearchInstitutionData,
+                mx: {
+                  supports_oauth: false,
+                  supports_identification: false,
+                  supports_verification: false,
+                  supports_account_statement: false,
+                  supports_history: false
+                }
+              }
+            }
+          ]
+        }
+      }
+    )
+
+    const recommendedInstitutions = await getRecommendedInstitutions(
+      MappedJobTypes.AGGREGATE
+    )
+
+    expect(recommendedInstitutions).toEqual([])
   })
 })

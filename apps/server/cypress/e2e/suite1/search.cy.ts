@@ -1,59 +1,88 @@
-describe('Fuzzy Search: Should be able to find certain banks with keywords and misspellings', () => {
-  it('Finds expected banks', () => {
+describe('search', () => {
+  it('filters recommended institutions by job type', () => {
     cy.visitAgg()
 
-    cy.findByPlaceholderText('Search').type('MACU')
-    cy.findByText('Mountain America Credit Union', { timeout: 45000 }).should('exist')
+    const institutionThatIsInFavoritesButDoesntSupportAll =
+      'ExxonMobil Card - Yod 9.0.3'
 
-    cy.findByPlaceholderText('Search').clear().type('AFCU')
-    cy.findByText('Altana Federal Credit Union', { timeout: 45000 }).should('exist')
+    cy.findByText(institutionThatIsInFavoritesButDoesntSupportAll).should(
+      'exist'
+    )
 
-    cy.findByPlaceholderText('Search').clear().type('chape')
-    cy.findByText('Chase UCard', { timeout: 45000 }).should('exist')
+    cy.visit(`/?job_type=all&user_id=${crypto.randomUUID()}`)
 
-    cy.findByPlaceholderText('Search').clear().type('wells')
-    cy.findByText('Wells Fargo', { timeout: 45000 }).should('exist')
+    cy.findByText('Wells Fargo').should('exist')
+
+    cy.findByText(institutionThatIsInFavoritesButDoesntSupportAll).should(
+      'not.exist'
+    )
   })
 
-  it('Ranks search results in the best way', () => {
-    cy.visitAgg()
+  describe('Fuzzy Search: Should be able to find certain banks with keywords and misspellings', () => {
+    it('Finds expected banks', () => {
+      cy.visitAgg()
 
-    cy.findByPlaceholderText('Search').clear().type('chase')
-    cy.findByText('Chase (CA)')
-    cy.get('[data-test="institution-tile"]').then(institutions => {
-      expect(institutions.length).to.be.at.least(3)
+      cy.findByPlaceholderText('Search').type('MACU')
+      cy.findByText('Mountain America Credit Union', { timeout: 45000 }).should(
+        'exist'
+      )
 
-      let chaseCaFound = false
-      let chaseUCardFound = false
+      cy.findByPlaceholderText('Search').clear().type('AFCU')
+      cy.findByText('Altana Federal Credit Union', { timeout: 45000 }).should(
+        'exist'
+      )
 
-      for (let i = 0; i < 3; i++) {
-        const ariaLabel = institutions.eq(i).attr('aria-label');
-        if (ariaLabel === 'Add account with Chase (CA)') {
-          chaseCaFound = true
-        } else if (ariaLabel === 'Add account with Chase UCard') {
-          chaseUCardFound = true
+      cy.findByPlaceholderText('Search').clear().type('chape')
+      cy.findByText('Chase UCard', { timeout: 45000 }).should('exist')
+
+      cy.findByPlaceholderText('Search').clear().type('wells')
+      cy.findByText('Wells Fargo', { timeout: 45000 }).should('exist')
+    })
+
+    it('Ranks search results in the best way', () => {
+      cy.visitAgg()
+
+      cy.findByPlaceholderText('Search').clear().type('chase')
+      cy.findByText('Chase (CA)')
+      cy.get('[data-test="institution-tile"]').then((institutions) => {
+        expect(institutions.length).to.be.at.least(3)
+
+        let chaseCaFound = false
+        let chaseUCardFound = false
+
+        for (let i = 0; i < 3; i++) {
+          const ariaLabel = institutions.eq(i).attr('aria-label')
+          if (ariaLabel === 'Add account with Chase (CA)') {
+            chaseCaFound = true
+          } else if (ariaLabel === 'Add account with Chase UCard') {
+            chaseUCardFound = true
+          }
         }
-      }
 
-      expect(chaseCaFound).to.be.true
-      expect(chaseUCardFound).to.be.true
+        expect(chaseCaFound).to.be.true
+        expect(chaseUCardFound).to.be.true
+      })
     })
   })
-})
 
-describe('Job type influences the returned institutions', () => {
-  it('shows "Liberty Federal Credit Union" for agg job type', () => {
-    cy.visitAgg()
+  describe('Job type influences the returned institutions', () => {
+    it('shows "Liberty Federal Credit Union" for agg job type', () => {
+      cy.visitAgg()
 
-    cy.findByPlaceholderText('Search').type('Liberty Federal Credit Union')
-    cy.findByText('https://www.libertyfcu.org/', { timeout: 45000 }).should('exist')
-  })
+      cy.findByPlaceholderText('Search').type('Liberty Federal Credit Union')
+      cy.findByText('https://www.libertyfcu.org/', { timeout: 45000 }).should(
+        'exist'
+      )
+    })
 
-  it('does not show "Liberty Federal Credit Union" for identity job type because that job type is not supported', () => {
-    cy.visitIdentity()
+    it('does not show "Liberty Federal Credit Union" for identity job type because that job type is not supported', () => {
+      cy.visitIdentity()
 
-    cy.findByPlaceholderText('Search').type('Liberty Federal Credit Union')
-    cy.findByText('Purdue Federal Credit Union', { timeout: 45000 }).should('exist')
-    cy.findByText('https://www.libertyfcu.org/').should('not.exist')
+      cy.findByPlaceholderText('Search').type('Liberty Federal Credit Union')
+      cy.findByText('Purdue Federal Credit Union', { timeout: 45000 }).should(
+        'exist'
+      )
+      cy.findByText('https://www.libertyfcu.org/').should('not.exist')
+    })
   })
 })
