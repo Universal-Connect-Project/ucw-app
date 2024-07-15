@@ -22,6 +22,103 @@ const institutionProvidersSupportEverything: CachedInstitution = {
   }
 } as CachedInstitution
 
+const allProviders = [Providers.MX, Providers.SOPHTRON]
+
+const filterOutProvider = (provider: Providers) =>
+  allProviders.filter((currentProvider) => currentProvider !== provider)
+
+const generateProviderTests = (provider: Providers) =>
+  describe(`getAvailableProviders tests for provider: ${provider}`, () => {
+    it(`doesnt return ${provider} if it's not in the supported providers`, () => {
+      const providersWithoutCurrentProvider = filterOutProvider(provider)
+
+      expect(
+        getAvailableProviders(
+          institutionProvidersSupportEverything,
+          MappedJobTypes.AGGREGATE,
+          providersWithoutCurrentProvider
+        )
+      ).toEqual(providersWithoutCurrentProvider)
+    })
+
+    it(`doesnt return ${provider} if it's not in the institution`, () => {
+      expect(
+        getAvailableProviders(
+          {
+            ...institutionProvidersSupportEverything,
+            [provider]: {}
+          } as any,
+          MappedJobTypes.AGGREGATE,
+          allProviders
+        )
+      ).toEqual(filterOutProvider(provider))
+    })
+
+    it(`doesnt return ${provider} if job type is all and supports_verification is falsy`, () => {
+      expect(
+        getAvailableProviders(
+          {
+            ...institutionProvidersSupportEverything,
+            [provider]: {
+              ...institutionProvidersSupportEverything.mx,
+              supports_verification: false
+            }
+          },
+          MappedJobTypes.ALL,
+          allProviders
+        )
+      ).toEqual(filterOutProvider(provider))
+    })
+
+    it(`doesnt return ${provider} if job type is all and supports_identification is falsy`, () => {
+      expect(
+        getAvailableProviders(
+          {
+            ...institutionProvidersSupportEverything,
+            [provider]: {
+              ...institutionProvidersSupportEverything.mx,
+              supports_identification: false
+            }
+          },
+          MappedJobTypes.ALL,
+          allProviders
+        )
+      ).toEqual(filterOutProvider(provider))
+    })
+
+    it(`doesnt return ${provider} if job type is verification and supports_verification is falsy`, () => {
+      expect(
+        getAvailableProviders(
+          {
+            ...institutionProvidersSupportEverything,
+            [provider]: {
+              ...institutionProvidersSupportEverything.mx,
+              supports_verification: false
+            }
+          },
+          MappedJobTypes.VERIFICATION,
+          allProviders
+        )
+      ).toEqual(filterOutProvider(provider))
+    })
+
+    it(`doesnt return ${provider} if job type is identity and supports_identity is falsy`, () => {
+      expect(
+        getAvailableProviders(
+          {
+            ...institutionProvidersSupportEverything,
+            [provider]: {
+              ...institutionProvidersSupportEverything.mx,
+              supports_identification: false
+            }
+          },
+          MappedJobTypes.IDENTITY,
+          allProviders
+        )
+      ).toEqual(filterOutProvider(provider))
+    })
+  })
+
 describe('providers', () => {
   describe('getAvailableProviders', () => {
     it('returns all the providers if they support each of the job types', () => {
@@ -30,109 +127,14 @@ describe('providers', () => {
           getAvailableProviders(
             institutionProvidersSupportEverything,
             mappedJobType,
-            [Providers.MX, Providers.SOPHTRON]
+            allProviders
           )
-        ).toEqual([Providers.MX, Providers.SOPHTRON])
+        ).toEqual(allProviders)
       })
     })
 
-    it("doesnt return mx if it's not in the supported providers", () => {
-      expect(
-        getAvailableProviders(
-          institutionProvidersSupportEverything,
-          MappedJobTypes.AGGREGATE,
-          [Providers.SOPHTRON]
-        )
-      ).toEqual([Providers.SOPHTRON])
-    })
+    generateProviderTests(Providers.MX)
 
-    it("doesnt return mx if it's not in the institution", () => {
-      expect(
-        getAvailableProviders(
-          {
-            ...institutionProvidersSupportEverything,
-            mx: {}
-          } as any,
-          MappedJobTypes.AGGREGATE,
-          [Providers.MX, Providers.SOPHTRON]
-        )
-      ).toEqual([Providers.SOPHTRON])
-    })
-
-    it('doesnt return mx if job type is all and supports_verification is falsy', () => {
-      expect(
-        getAvailableProviders(
-          {
-            ...institutionProvidersSupportEverything,
-            mx: {
-              ...institutionProvidersSupportEverything.mx,
-              supports_verification: false
-            }
-          },
-          MappedJobTypes.ALL,
-          [Providers.MX, Providers.SOPHTRON]
-        )
-      ).toEqual([Providers.SOPHTRON])
-    })
-
-    it('doesnt return mx if job type is all and supports_identification is falsy', () => {
-      expect(
-        getAvailableProviders(
-          {
-            ...institutionProvidersSupportEverything,
-            mx: {
-              ...institutionProvidersSupportEverything.mx,
-              supports_identification: false
-            }
-          },
-          MappedJobTypes.ALL,
-          [Providers.MX, Providers.SOPHTRON]
-        )
-      ).toEqual([Providers.SOPHTRON])
-    })
-
-    it('doesnt return mx if job type is verification and supports_verification is falsy', () => {
-      expect(
-        getAvailableProviders(
-          {
-            ...institutionProvidersSupportEverything,
-            mx: {
-              ...institutionProvidersSupportEverything.mx,
-              supports_verification: false
-            }
-          },
-          MappedJobTypes.VERIFICATION,
-          [Providers.MX, Providers.SOPHTRON]
-        )
-      ).toEqual([Providers.SOPHTRON])
-    })
-
-    it('doesnt return mx if job type is identity and supports_identity is falsy', () => {
-      expect(
-        getAvailableProviders(
-          {
-            ...institutionProvidersSupportEverything,
-            mx: {
-              ...institutionProvidersSupportEverything.mx,
-              supports_identification: false
-            }
-          },
-          MappedJobTypes.IDENTITY,
-          [Providers.MX, Providers.SOPHTRON]
-        )
-      ).toEqual([Providers.SOPHTRON])
-    })
-
-    it("doesnt return sophtron if it's not in the supported providers", () => {})
-
-    it("doesnt return sophtron if it's not in the institution", () => {})
-
-    it('doesnt return sophtron if job type is all and supports_verification is falsy', () => {})
-
-    it('doesnt return sophtron if job type is all and supports_identification is falsy', () => {})
-
-    it('doesnt return sophtron if job type is verification and supports_verification is falsy', () => {})
-
-    it('doesnt return sophtron if job type is identity and supports_identity is falsy', () => {})
+    generateProviderTests(Providers.SOPHTRON)
   })
 })
