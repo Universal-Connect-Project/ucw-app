@@ -1,4 +1,11 @@
 import { JobTypes } from '../../../src/shared/contract'
+import { enterMxCredentials, searchAndSelectMx } from '../../utils/mx'
+import {
+  connectToSophtron,
+  enterSophtronCredentials,
+  searchAndSelectSophtron
+} from '../../utils/sophtron'
+import { expectConnectionSuccess, submitCredentials } from '../../utils/widget'
 
 const MX_BANK_INSTITUTION_ID = 'UCP-bb5296bd5aae5d9'
 
@@ -15,9 +22,9 @@ const refreshAConnection = ({ enterCredentials, selectInstitution }) => {
 
     enterCredentials()
 
-    cy.findByRole('button', { name: 'Continue' }).click()
+    submitCredentials()
 
-    cy.findByText('Connected', { timeout: 90000 }).should('exist')
+    expectConnectionSuccess()
 
     // Capture postmessages into variables
     cy.get('@postMessage', { timeout: 90000 }).then((mySpy) => {
@@ -37,9 +44,9 @@ const refreshAConnection = ({ enterCredentials, selectInstitution }) => {
 
       cy.findByRole('button', { name: 'Back' }).should('not.exist')
 
-      cy.findByRole('button', { name: 'Continue' }).click()
+      submitCredentials()
 
-      cy.findByText('Connected', { timeout: 90000 }).should('exist')
+      expectConnectionSuccess()
     })
   })
 }
@@ -52,74 +59,49 @@ describe('query parameters', () => {
       `/?job_type=aggregate&institution_id=${MX_BANK_INSTITUTION_ID}&user_id=${userId}`
     )
 
-    cy.findByLabelText('LOGIN').type('mxuser')
-    cy.findByLabelText('PASSWORD').type('correct')
+    enterMxCredentials()
 
     cy.findByRole('button', { name: 'Back' }).should('not.exist')
 
-    cy.findByRole('button', { name: 'Continue' }).click()
+    submitCredentials()
 
-    cy.findByText('Connected', { timeout: 45000 }).should('exist')
+    expectConnectionSuccess()
   })
 
   it('refreshes a sophtron connection if given the correct parameters and hides the back button', () => {
     refreshAConnection({
-      enterCredentials: () => {
-        cy.findByLabelText('User ID').type('asdf')
-        cy.findByText('Password').type('asdf')
-      },
-      selectInstitution: () => {
-        cy.findByPlaceholderText('Search').type('Sophtron Bank NoMFA')
-        cy.findByLabelText('Add account with Sophtron Bank NoMFA')
-          .first()
-          .click()
-      }
+      enterCredentials: enterSophtronCredentials,
+      selectInstitution: searchAndSelectSophtron
     })
   })
 
   it('refreshes an mx connection if given the correct parameters and hides the back button', () => {
     refreshAConnection({
-      enterCredentials: () => {
-        cy.findByLabelText('LOGIN').type('mxuser')
-        cy.findByLabelText('PASSWORD').type('correct')
-      },
-      selectInstitution: () => {
-        cy.findByPlaceholderText('Search').type('MX Bank')
-        cy.findByLabelText('Add account with MX Bank').first().click()
-      }
+      enterCredentials: enterMxCredentials,
+      selectInstitution: searchAndSelectMx
     })
   })
 
-  it.only('shows single account select if no parameter is passed, and skips single account select if single_account_select=false', () => {
+  it('shows single account select if no parameter is passed, and skips single account select if single_account_select=false', () => {
     const userId = crypto.randomUUID()
 
     cy.visit(`/?job_type=${JobTypes.VERIFICATION}&user_id=${userId}`)
 
-    cy.findByPlaceholderText('Search').type('Sophtron Bank NoMFA')
-    cy.findByLabelText('Add account with Sophtron Bank NoMFA').first().click()
+    searchAndSelectSophtron()
 
-    cy.findByLabelText('User ID').type('asdf')
-    cy.findByText('Password').type('asdf')
+    enterSophtronCredentials()
 
-    cy.findByRole('button', { name: 'Continue' }).click()
+    submitCredentials()
 
     cy.findByText('Primary Checking 1234', { timeout: 45000 }).click()
-    cy.findByRole('button', { name: 'Continue' }).click()
+    submitCredentials()
 
-    cy.findByText('Connected', { timeout: 90000 }).should('exist')
+    expectConnectionSuccess()
 
     cy.visit(
       `/?job_type=${JobTypes.VERIFICATION}&user_id=${userId}&single_account_select=false`
     )
 
-    cy.findByPlaceholderText('Search').type('Sophtron Bank NoMFA')
-    cy.findByLabelText('Add account with Sophtron Bank NoMFA').first().click()
-
-    cy.findByLabelText('User ID').type('asdf')
-    cy.findByText('Password').type('asdf')
-
-    cy.findByRole('button', { name: 'Continue' }).click()
-
-    cy.findByText('Connected', { timeout: 90000 }).should('exist')
+    connectToSophtron()
   })
 })
