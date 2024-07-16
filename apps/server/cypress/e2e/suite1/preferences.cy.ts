@@ -1,3 +1,5 @@
+import { searchByText } from '../../utils/widget'
+
 // These tests expect local preferences to match testPreferences.json
 describe('preferences', () => {
   it('uses local preferences to show favorite institutions', () => {
@@ -19,7 +21,7 @@ describe('preferences', () => {
 
   it('uses local preferences to hide institutions when searching', () => {
     cy.visitAgg()
-    cy.findByPlaceholderText('Search').type('cando')
+    searchByText('cando')
 
     cy.findByText('First State Bank of Cando').should('exist')
     cy.findByText('CanDo CU').should('not.exist')

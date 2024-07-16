@@ -5,7 +5,11 @@ import {
   searchAndSelectSophtron,
   selectSophtronAccount
 } from '../../utils/sophtron'
-import { expectConnectionSuccess, clickContinue } from '../../utils/widget'
+import {
+  expectConnectionSuccess,
+  clickContinue,
+  searchByText
+} from '../../utils/widget'
 
 const makeAConnection = async (jobType) => {
   searchAndSelectSophtron()
@@ -22,7 +26,7 @@ const makeAConnection = async (jobType) => {
 describe('Sophtron provider', () => {
   it('Connects to Sophtron Bank with all MFA options', () => {
     cy.visitAgg()
-    cy.findByPlaceholderText('Search').type('Sophtron Bank')
+    searchByText('Sophtron Bank')
     cy.findByLabelText('Add account with Sophtron Bank').first().click()
     cy.findByLabelText('User ID').type('asdfg12X')
     cy.findByText('Password').type('asdfg12X')

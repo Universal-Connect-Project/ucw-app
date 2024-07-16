@@ -1,7 +1,7 @@
-import { expectConnectionSuccess, clickContinue } from './widget'
+import { expectConnectionSuccess, clickContinue, searchByText } from './widget'
 
 export const searchAndSelectSophtron = () => {
-  cy.findByPlaceholderText('Search').type('Sophtron Bank NoMFA')
+  searchByText('Sophtron Bank NoMFA')
   cy.findByLabelText('Add account with Sophtron Bank NoMFA').first().click()
 }
 

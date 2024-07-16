@@ -1,7 +1,7 @@
-import { expectConnectionSuccess, clickContinue } from './widget'
+import { expectConnectionSuccess, clickContinue, searchByText } from './widget'
 
 export const searchAndSelectMx = () => {
-  cy.findByPlaceholderText('Search').type('MX Bank')
+  searchByText('MX Bank')
   cy.findByLabelText('Add account with MX Bank').first().click()
 }
 
