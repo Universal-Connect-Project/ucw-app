@@ -1,4 +1,4 @@
-import { expectConnectionSuccess, submitCredentials } from './widget'
+import { expectConnectionSuccess, clickContinue } from './widget'
 
 export const searchAndSelectSophtron = () => {
   cy.findByPlaceholderText('Search').type('Sophtron Bank NoMFA')
@@ -10,12 +10,16 @@ export const enterSophtronCredentials = () => {
   cy.findByText('Password').type('asdf')
 }
 
+export const selectSophtronAccount = () => {
+  cy.findByText('Primary Checking 1234', { timeout: 45000 }).click()
+}
+
 export const connectToSophtron = () => {
   searchAndSelectSophtron()
 
   enterSophtronCredentials()
 
-  submitCredentials()
+  clickContinue()
 
   expectConnectionSuccess()
 }

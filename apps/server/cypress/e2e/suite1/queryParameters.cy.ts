@@ -3,9 +3,10 @@ import { enterMxCredentials, searchAndSelectMx } from '../../utils/mx'
 import {
   connectToSophtron,
   enterSophtronCredentials,
-  searchAndSelectSophtron
+  searchAndSelectSophtron,
+  selectSophtronAccount
 } from '../../utils/sophtron'
-import { expectConnectionSuccess, submitCredentials } from '../../utils/widget'
+import { expectConnectionSuccess, clickContinue } from '../../utils/widget'
 
 const MX_BANK_INSTITUTION_ID = 'UCP-bb5296bd5aae5d9'
 
@@ -22,7 +23,7 @@ const refreshAConnection = ({ enterCredentials, selectInstitution }) => {
 
     enterCredentials()
 
-    submitCredentials()
+    clickContinue()
 
     expectConnectionSuccess()
 
@@ -44,7 +45,7 @@ const refreshAConnection = ({ enterCredentials, selectInstitution }) => {
 
       cy.findByRole('button', { name: 'Back' }).should('not.exist')
 
-      submitCredentials()
+      clickContinue()
 
       expectConnectionSuccess()
     })
@@ -63,7 +64,7 @@ describe('query parameters', () => {
 
     cy.findByRole('button', { name: 'Back' }).should('not.exist')
 
-    submitCredentials()
+    clickContinue()
 
     expectConnectionSuccess()
   })
@@ -91,10 +92,10 @@ describe('query parameters', () => {
 
     enterSophtronCredentials()
 
-    submitCredentials()
+    clickContinue()
 
-    cy.findByText('Primary Checking 1234', { timeout: 45000 }).click()
-    submitCredentials()
+    selectSophtronAccount()
+    clickContinue()
 
     expectConnectionSuccess()
 

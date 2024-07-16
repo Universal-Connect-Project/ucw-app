@@ -1,4 +1,4 @@
-import { expectConnectionSuccess, submitCredentials } from './widget'
+import { expectConnectionSuccess, clickContinue } from './widget'
 
 export const searchAndSelectMx = () => {
   cy.findByPlaceholderText('Search').type('MX Bank')
@@ -15,7 +15,7 @@ export const connectToMx = () => {
 
   enterMxCredentials()
 
-  submitCredentials()
+  clickContinue()
 
   expectConnectionSuccess()
 }

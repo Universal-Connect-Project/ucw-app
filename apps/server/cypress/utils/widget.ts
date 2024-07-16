@@ -1,4 +1,4 @@
-export const submitCredentials = () => {
+export const clickContinue = () => {
   cy.findByRole('button', { name: 'Continue' }).click()
 }
 
