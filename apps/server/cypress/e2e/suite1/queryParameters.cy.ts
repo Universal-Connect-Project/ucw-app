@@ -1,3 +1,5 @@
+import { JobTypes } from '../../../src/shared/contract'
+
 const MX_BANK_INSTITUTION_ID = 'UCP-bb5296bd5aae5d9'
 
 const refreshAConnection = ({ enterCredentials, selectInstitution }) => {
@@ -86,5 +88,38 @@ describe('query parameters', () => {
         cy.findByLabelText('Add account with MX Bank').first().click()
       }
     })
+  })
+
+  it.only('shows single account select if no parameter is passed, and skips single account select if single_account_select=false', () => {
+    const userId = crypto.randomUUID()
+
+    cy.visit(`/?job_type=${JobTypes.VERIFICATION}&user_id=${userId}`)
+
+    cy.findByPlaceholderText('Search').type('Sophtron Bank NoMFA')
+    cy.findByLabelText('Add account with Sophtron Bank NoMFA').first().click()
+
+    cy.findByLabelText('User ID').type('asdf')
+    cy.findByText('Password').type('asdf')
+
+    cy.findByRole('button', { name: 'Continue' }).click()
+
+    cy.findByText('Primary Checking 1234', { timeout: 45000 }).click()
+    cy.findByRole('button', { name: 'Continue' }).click()
+
+    cy.findByText('Connected', { timeout: 90000 }).should('exist')
+
+    cy.visit(
+      `/?job_type=${JobTypes.VERIFICATION}&user_id=${userId}&single_account_select=false`
+    )
+
+    cy.findByPlaceholderText('Search').type('Sophtron Bank NoMFA')
+    cy.findByLabelText('Add account with Sophtron Bank NoMFA').first().click()
+
+    cy.findByLabelText('User ID').type('asdf')
+    cy.findByText('Password').type('asdf')
+
+    cy.findByRole('button', { name: 'Continue' }).click()
+
+    cy.findByText('Connected', { timeout: 90000 }).should('exist')
   })
 })
