@@ -9,13 +9,3 @@ export const enterMxCredentials = () => {
   cy.findByLabelText('LOGIN').type('mxuser')
   cy.findByLabelText('PASSWORD').type('correct')
 }
-
-export const connectToMx = () => {
-  searchAndSelectMx()
-
-  enterMxCredentials()
-
-  clickContinue()
-
-  expectConnectionSuccess()
-}
