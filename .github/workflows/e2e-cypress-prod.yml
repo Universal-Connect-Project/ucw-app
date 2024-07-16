@@ -57,11 +57,11 @@ jobs:
           ENV_FILE_PATH=./apps/server/.env
           touch ${ENV_FILE_PATH}
 
-          echo env=prod
-
           # Vars
           echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
           echo RESOURCEVERSION="" >> ${ENV_FILE_PATH}
+
+          echo ENV=prod
 
           # Secrets (can't load these from another job, due to GH security features)
           echo SOPHTRONAPIUSERID=${{ secrets.SOPHTRON_API_USER_ID }} >> ${ENV_FILE_PATH}
