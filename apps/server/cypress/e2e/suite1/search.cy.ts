@@ -1,3 +1,5 @@
+import { searchByText } from '../../utils/widget'
+
 describe('search', () => {
   it('filters recommended institutions by job type', () => {
     cy.visitAgg()
@@ -22,7 +24,7 @@ describe('search', () => {
     it('Finds expected banks', () => {
       cy.visitAgg()
 
-      cy.findByPlaceholderText('Search').type('MACU')
+      searchByText('MACU')
       cy.findByText('Mountain America Credit Union', { timeout: 45000 }).should(
         'exist'
       )
@@ -69,7 +71,7 @@ describe('search', () => {
     it('shows "Liberty Federal Credit Union" for agg job type', () => {
       cy.visitAgg()
 
-      cy.findByPlaceholderText('Search').type('Liberty Federal Credit Union')
+      searchByText('Liberty Federal Credit Union')
       cy.findByText('https://www.libertyfcu.org/', { timeout: 45000 }).should(
         'exist'
       )
@@ -78,7 +80,7 @@ describe('search', () => {
     it('does not show "Liberty Federal Credit Union" for identity job type because that job type is not supported', () => {
       cy.visitIdentity()
 
-      cy.findByPlaceholderText('Search').type('Liberty Federal Credit Union')
+      searchByText('Liberty Federal Credit Union')
       cy.findByText('Purdue Federal Credit Union', { timeout: 45000 }).should(
         'exist'
       )
