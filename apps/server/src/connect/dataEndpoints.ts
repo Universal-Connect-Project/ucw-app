@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { Response } from 'express'
+import Joi from 'joi'
 import { getProviderAdapter } from '../adapters'
 import getVC from '../services/vcProviders'
+import { Providers } from '../shared/contract'
 
 export interface AccountsDataQueryParameters {
   connection_id: string
@@ -21,10 +23,30 @@ export interface TransactionsRequest {
   query: TransactionsDataQueryParameters
 }
 
+const createProviderValidator = () =>
+  Joi.string()
+    .valid(...Object.values(Providers))
+    .required()
+
 export const accountsDataHandler = async (
   req: AccountsRequest,
   res: Response
 ) => {
+  const schema = Joi.object({
+    connection_id: Joi.string().required(),
+    provider: createProviderValidator(),
+    user_id: Joi.string().required()
+  })
+
+  const { error } = schema.validate(req.query)
+
+  if (error) {
+    res.status(400)
+    res.send(error.details[0].message)
+
+    return
+  }
+
   const { provider, connection_id, user_id } = req.query
 
   const providerAdapter = getProviderAdapter(provider)
