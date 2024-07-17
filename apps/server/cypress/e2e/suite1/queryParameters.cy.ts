@@ -57,12 +57,7 @@ describe('query parameters', () => {
     cy.visitWithPostMessageSpy(
       `/?job_type=aggregate&institution_id=${MX_BANK_INSTITUTION_ID}&user_id=${userId}`
     ).then(() => {
-      cy.findByLabelText('LOGIN').type('mxuser')
-      cy.findByLabelText('PASSWORD').type('correct')
-
       enterMxCredentials()
-
-      cy.findByRole('button', { name: 'Continue' }).click()
 
       clickContinue()
 
@@ -85,7 +80,7 @@ describe('query parameters', () => {
   })
 
   it('shows single account select if no parameter is passed, and skips single account select if single_account_select=false', () => {
-    const userId = crypto.randomUUID()
+    const userId = Cypress.env('userId')
 
     cy.visit(`/?job_type=${JobTypes.VERIFICATION}&user_id=${userId}`)
 
