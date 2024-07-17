@@ -1,4 +1,4 @@
-name: E2E Tests Alternate Preferences
+name: E2E Tests Prod
 
 on: pull_request
 
@@ -50,7 +50,7 @@ jobs:
           check-latest: true
       - run: npm ci
 
-      - run: npm run copyAltTestPreferences
+      - run: npm run copyTestPreferences
 
       - name: 'Create env file'
         run: |
@@ -60,6 +60,8 @@ jobs:
           # Vars
           echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
           echo RESOURCEVERSION="" >> ${ENV_FILE_PATH}
+
+          echo ENV=prod >> ${ENV_FILE_PATH}
 
           # Secrets (can't load these from another job, due to GH security features)
           echo SOPHTRONAPIUSERID=${{ secrets.SOPHTRON_API_USER_ID }} >> ${ENV_FILE_PATH}
@@ -79,7 +81,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          config-file: cypress.config.alternate.ts
+          config-file: cypress.config.prod.ts
           project: apps/server
           start: npm run dev:e2e
           wait-on: 'http://localhost:8080/ping, http://localhost:9200'

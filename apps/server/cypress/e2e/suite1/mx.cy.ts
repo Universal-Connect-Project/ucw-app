@@ -1,18 +1,18 @@
-import { JobTypes } from '../../../src/utils/index'
+import { JobTypes } from '../../../src/shared/contract'
 import generateVcDataTests from '../../utils/generateVcDataTests'
+import { enterMxCredentials, searchAndSelectMx } from '../../utils/mx'
+import { clickContinue, expectConnectionSuccess } from '../../utils/widget'
 
 const makeAConnection = async (jobType) => {
-  cy.findByPlaceholderText('Search').type('MX Bank')
-  cy.findByLabelText('Add account with MX Bank').first().click()
-  cy.findByLabelText('LOGIN').type('mxuser')
-  cy.findByLabelText('PASSWORD').type('correct')
-  cy.findByRole('button', { name: 'Continue' }).click()
+  searchAndSelectMx()
+  enterMxCredentials()
+  clickContinue()
 
   if ([JobTypes.ALL, JobTypes.VERIFICATION].includes(jobType)) {
     cy.findByText('Checking').click()
-    cy.findByRole('button', { name: 'Continue' }).click()
+    clickContinue()
   }
-  cy.findByText('Connected', { timeout: 90000 }).should('exist')
+  expectConnectionSuccess()
 }
 
 describe('mx provider', () => {

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import config from '../config'
 import * as logger from '../infra/logger'
 import providerCredentials from '../providerCredentials'
 import { AnalyticsClient } from '../services/analyticsClient'
@@ -12,6 +11,7 @@ import type {
   CreateConnectionRequest,
   Credential,
   Institution,
+  MappedJobTypes,
   UpdateConnectionRequest,
   WidgetAdapter
 } from '../shared/contract'
@@ -22,21 +22,22 @@ import { FinicityAdapter } from './finicity'
 import { MxAdapter } from './mx'
 import { SophtronAdapter } from './sophtron'
 
-function getProviderAdapter(provider: string, config: any): WidgetAdapter {
+export function getProviderAdapter(provider: string): WidgetAdapter {
   switch (provider) {
     case 'mx':
-      return new MxAdapter(config, false)
+      return new MxAdapter(false)
     case 'mx_int':
-      return new MxAdapter(config, true)
+      return new MxAdapter(true)
     case 'sophtron':
-      return new SophtronAdapter(config)
+      return new SophtronAdapter()
     case 'akoya':
-      return new AkoyaAdapter(config, false)
+      return new AkoyaAdapter(false)
     case 'akoya_sandbox':
-      return new AkoyaAdapter(config, true)
+      return new AkoyaAdapter(true)
     case 'finicity':
+      return new FinicityAdapter()
     case 'finicity_sandbox':
-      return new FinicityAdapter(config)
+      return new FinicityAdapter(true)
     default:
       // throw new Error(`Unsupported provider ${provider}`);
       return null
@@ -81,9 +82,8 @@ export class ProviderAdapterBase {
 
     this.analyticsClient = new AnalyticsClient(token)
     try {
-      const conf = providerCredentials
-      this.providerAdapter = getProviderAdapter(this.context?.provider, conf)
-      this.providers = Object.values(conf)
+      this.providerAdapter = getProviderAdapter(this.context?.provider)
+      this.providers = Object.values(providerCredentials)
         .filter((v: any) => v.available)
         .map((v: any) => v.provider)
       return true
@@ -95,7 +95,10 @@ export class ProviderAdapterBase {
   }
 
   async resolveInstitution(id: string): Promise<Institution> {
-    const resolvedInstitution = await resolveInstitutionProvider(id)
+    const resolvedInstitution = await resolveInstitutionProvider(
+      id,
+      this.context.job_type as MappedJobTypes
+    )
     this.context.provider = resolvedInstitution.provider
     this.context.updated = true
     this.context.institution_id = resolvedInstitution.id

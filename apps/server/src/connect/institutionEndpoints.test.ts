@@ -1,13 +1,11 @@
-import { Response } from 'express'
-import {
-  InstitutionRequest,
-  getInstitutionHandler
-} from './institutionEndpoints'
-import { ConnectApi } from './connectApi'
+import type { Response } from 'express'
 import {
   elasticSearchInstitutionData,
   institutionData
 } from '../test/testData/institution'
+import { ConnectApi } from './connectApi'
+import type { InstitutionRequest } from './institutionEndpoints'
+import { getInstitutionHandler } from './institutionEndpoints'
 
 const mxInstitution = institutionData.institution
 
@@ -49,7 +47,9 @@ describe('institutionEndpoints', () => {
     })
 
     it("returns the institution by the ucp id if it doesn't have a provider", async () => {
-      const context = {}
+      const context = {
+        job_type: 'aggregate'
+      }
       const req = {
         connectService: new ConnectApi({ context }),
         context,

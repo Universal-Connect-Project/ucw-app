@@ -1,6 +1,7 @@
 import { createCipheriv, createDecipheriv } from 'crypto'
 import { algo, enc } from 'crypto-js'
 import config from '../config'
+import { JobTypes, MappedJobTypes } from '../shared/contract'
 
 export function hmac(text: string, key: string) {
   const hmac = algo.HMAC.create(algo.SHA256, enc.Base64.parse(key))
@@ -65,27 +66,19 @@ export function decodeAuthToken(input: string) {
   }
 }
 
-export enum JobTypes {
-  AGGREGATE = 'aggregate',
-  ALL = 'all',
-  FULLHISTORY = 'fullhistory',
-  VERIFICATION = 'verification',
-  IDENTITY = 'identity'
-}
-
 export function mapJobType(input: JobTypes) {
   const inputLowerCase = input.toLowerCase()
   switch (inputLowerCase) {
     case JobTypes.AGGREGATE:
-      return 'aggregate'
+      return MappedJobTypes.AGGREGATE
     case JobTypes.ALL:
-      return 'aggregate_identity_verification'
+      return MappedJobTypes.ALL
     case JobTypes.FULLHISTORY:
-      return 'aggregate_extendedhistory'
+      return MappedJobTypes.FULLHISTORY
     case JobTypes.VERIFICATION:
-      return 'verification'
+      return MappedJobTypes.VERIFICATION
     case JobTypes.IDENTITY:
-      return 'aggregate_identity'
+      return MappedJobTypes.IDENTITY
     default:
       throw new Error('Invalid job type')
   }

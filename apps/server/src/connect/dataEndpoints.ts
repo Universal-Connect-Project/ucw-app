@@ -1,18 +1,59 @@
-import { Request, Response } from 'express'
+/* eslint-disable @typescript-eslint/naming-convention */
+import type { Response } from 'express'
+import Joi from 'joi'
+import { getProviderAdapter } from '../adapters'
 import getVC from '../services/vcProviders'
+import { Providers } from '../shared/contract'
 
 export interface AccountsDataQueryParameters {
-  connectionId: string
+  connection_id: string
   provider: string
-  userId: string
+  user_id: string
 }
 
-export const accountsDataHandler = async (req: Request, res: Response) => {
-  const { provider, connectionId, userId } =
-    req.query as unknown as AccountsDataQueryParameters
+export interface AccountsRequest {
+  query: AccountsDataQueryParameters
+}
+
+export interface IdentityRequest {
+  query: IdentityDataQueryParameters
+}
+
+export interface TransactionsRequest {
+  query: TransactionsDataQueryParameters
+}
+
+const createProviderValidator = () =>
+  Joi.string()
+    .valid(...Object.values(Providers))
+    .required()
+
+export const accountsDataHandler = async (
+  req: AccountsRequest,
+  res: Response
+) => {
+  const schema = Joi.object({
+    connection_id: Joi.string().required(),
+    provider: createProviderValidator(),
+    user_id: Joi.string().required()
+  })
+
+  const { error } = schema.validate(req.query)
+
+  if (error) {
+    res.status(400)
+    res.send(error.details[0].message)
+
+    return
+  }
+
+  const { provider, connection_id, user_id } = req.query
+
+  const providerAdapter = getProviderAdapter(provider)
+  const providerUserId = await providerAdapter.ResolveUserId(user_id)
 
   try {
-    const vc = await getVC(provider, connectionId, 'accounts', userId)
+    const vc = await getVC(provider, connection_id, 'accounts', providerUserId)
     res.send({
       jwt: vc
     })
@@ -23,17 +64,38 @@ export const accountsDataHandler = async (req: Request, res: Response) => {
 }
 
 export interface IdentityDataQueryParameters {
-  connectionId: string
+  connection_id: string
   provider: string
-  userId: string
+  user_id: string
 }
 
-export const identityDataHandler = async (req: Request, res: Response) => {
-  const { provider, connectionId, userId } =
+export const identityDataHandler = async (
+  req: IdentityRequest,
+  res: Response
+) => {
+  const schema = Joi.object({
+    connection_id: Joi.string().required(),
+    provider: createProviderValidator(),
+    user_id: Joi.string().required()
+  })
+
+  const { error } = schema.validate(req.query)
+
+  if (error) {
+    res.status(400)
+    res.send(error.details[0].message)
+
+    return
+  }
+
+  const { provider, connection_id, user_id } =
     req.query as unknown as IdentityDataQueryParameters
 
+  const providerAdapter = getProviderAdapter(provider)
+  const providerUserId = await providerAdapter.ResolveUserId(user_id)
+
   try {
-    const vc = await getVC(provider, connectionId, 'identity', userId)
+    const vc = await getVC(provider, connection_id, 'identity', providerUserId)
     res.send({
       jwt: vc
     })
@@ -44,26 +106,55 @@ export const identityDataHandler = async (req: Request, res: Response) => {
 }
 
 export interface TransactionsDataQueryParameters {
-  accountId: string
-  endTime: string
+  account_id: string
+  end_time: string
   provider: string
-  startTime: string
-  userId: string
+  start_time: string
+  user_id: string
 }
 
-export const transactionsDataHandler = async (req: Request, res: Response) => {
-  const { provider, userId, accountId, startTime, endTime } =
+export const transactionsDataHandler = async (
+  req: TransactionsRequest,
+  res: Response
+) => {
+  const schema = Joi.object({
+    account_id: Joi.string().required(),
+    end_time: Joi.when('provider', {
+      is: Providers.SOPHTRON,
+      then: Joi.string().required()
+    }),
+    provider: createProviderValidator(),
+    start_time: Joi.when('provider', {
+      is: Providers.SOPHTRON,
+      then: Joi.string().required()
+    }),
+    user_id: Joi.string().required()
+  })
+
+  const { error } = schema.validate(req.query)
+
+  if (error) {
+    res.status(400)
+    res.send(error.details[0].message)
+
+    return
+  }
+
+  const { provider, user_id, account_id, start_time, end_time } =
     req.query as unknown as TransactionsDataQueryParameters
+
+  const providerAdapter = getProviderAdapter(provider)
+  const providerUserId = await providerAdapter.ResolveUserId(user_id)
 
   try {
     const vc = await getVC(
       provider,
       undefined,
       'transactions',
-      userId,
-      accountId,
-      startTime,
-      endTime
+      providerUserId,
+      account_id,
+      start_time,
+      end_time
     )
     res.send({
       jwt: vc

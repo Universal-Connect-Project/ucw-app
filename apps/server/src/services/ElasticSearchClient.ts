@@ -6,15 +6,23 @@ import { resolve } from 'path'
 import config from '../config'
 import { info } from '../infra/logger'
 
-import type { CachedInstitution, JobType } from 'src/shared/contract'
+import { MappedJobTypes, type CachedInstitution } from '../shared/contract'
 import { getPreferences, type Provider } from '../shared/preferences'
+import { getAvailableProviders } from '../shared/providers'
 
-const JOB_ES_MAPPING = {
-  aggregate: [] as string[], // all institutions have aggregate
-  aggregate_identity_verification: ['supports_verification', 'supports_identification'] as string[],
-  aggregate_extendedhistory: [] as string[], // same filter as aggregate
-  verification: ['supports_verification'],
-  aggregate_identity: ['supports_identification']
+type JobMappingType = {
+  [key in MappedJobTypes]: string[]
+}
+
+export const JOB_ES_MAPPING: JobMappingType = {
+  [MappedJobTypes.AGGREGATE]: [] as string[], // all institutions have aggregate
+  [MappedJobTypes.ALL]: [
+    'supports_verification',
+    'supports_identification'
+  ] as string[],
+  [MappedJobTypes.FULLHISTORY]: [] as string[], // same filter as aggregate
+  [MappedJobTypes.VERIFICATION]: ['supports_verification'],
+  [MappedJobTypes.IDENTITY]: ['supports_identification']
 }
 
 function getInstitutionFilePath() {
@@ -67,7 +75,10 @@ export async function reIndexElasticSearch() {
   await Promise.all(indexPromises)
 }
 
-export async function search(searchTerm: string, jobType: JobType): Promise<any[]> {
+export async function search(
+  searchTerm: string,
+  jobType: MappedJobTypes
+): Promise<any[]> {
   const preferences = await getPreferences()
   const hiddenInstitutions = preferences?.hiddenInstitutions || []
   const supportedProviders = preferences?.supportedProviders || []
@@ -132,7 +143,7 @@ function fuzzySearchTermQuery(searchTerm: string) {
   ]
 }
 
-function mustQuery(supportedProviders: Provider[], jobType: JobType) {
+function mustQuery(supportedProviders: Provider[], jobType: MappedJobTypes) {
   const providerQueryTerms = supportedProviders.map((provider) => {
     return {
       exists: {
@@ -145,19 +156,21 @@ function mustQuery(supportedProviders: Provider[], jobType: JobType) {
 
   let jobTypeSupported = [] as any
   if (institutionJobTypeFilter.length > 0) {
-    jobTypeSupported = supportedProviders.map((provider) => {
-      return {
-        bool: {
-          must: institutionJobTypeFilter.map(jobTypeFilter => {
-            return {
-              term: {
-                [`${provider}.${jobTypeFilter}`]: true
+    jobTypeSupported = supportedProviders
+      .map((provider) => {
+        return {
+          bool: {
+            must: institutionJobTypeFilter.map((jobTypeFilter) => {
+              return {
+                term: {
+                  [`${provider}.${jobTypeFilter}`]: true
+                }
               }
-            }
-          })
+            })
+          }
         }
-      }
-    }).flat()
+      })
+      .flat()
   }
 
   return {
@@ -203,11 +216,13 @@ export async function getInstitution(id: string): Promise<CachedInstitution> {
   return institutionResponse._source as CachedInstitution
 }
 
-export async function getRecommendedInstitutions(): Promise<
-CachedInstitution[]
-> {
-  const recommendedInstitutions = (await getPreferences())
-    ?.recommendedInstitutions
+export async function getRecommendedInstitutions(
+  jobType: MappedJobTypes
+): Promise<CachedInstitution[]> {
+  const preferences = await getPreferences()
+
+  const supportedProviders = preferences.supportedProviders
+  const recommendedInstitutions = preferences?.recommendedInstitutions
 
   if (!recommendedInstitutions) {
     return []
@@ -224,9 +239,15 @@ CachedInstitution[]
     await ElasticsearchClient.mget({
       docs: esSearch
     })
-  const institutions = recommendedInstitutionsResponse.docs.map(
-    (favoriteInstitution) => favoriteInstitution._source as CachedInstitution
-  )
+
+  const institutions = recommendedInstitutionsResponse.docs
+    .map(
+      (favoriteInstitution) => favoriteInstitution._source as CachedInstitution
+    )
+    .filter(
+      (institution) =>
+        getAvailableProviders(institution, jobType, supportedProviders).length
+    )
 
   return institutions
 }

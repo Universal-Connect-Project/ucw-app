@@ -1,5 +1,6 @@
 import * as logger from '../infra/logger'
 import AkoyaClient from '../providerApiClients/akoya'
+import providerCredentials from '../providerCredentials'
 import { get, set } from '../services/storageClient/redis'
 import {
   type Connection,
@@ -18,11 +19,12 @@ export class AkoyaAdapter implements WidgetAdapter {
   sandbox: boolean
   apiClient: any
   token: string
-  constructor(config: any, sandbox: boolean) {
-    const { akoyaProd, akoyaSandbox, token } = config
-    this.token = token
+  constructor(sandbox: boolean) {
+    this.token = 'thisNeverWorked'
     this.sandbox = sandbox
-    this.apiClient = new AkoyaClient(sandbox ? akoyaSandbox : akoyaProd)
+    this.apiClient = new AkoyaClient(
+      sandbox ? providerCredentials.akoyaSandbox : providerCredentials.akoyaProd
+    )
   }
 
   async GetInstitutionById(id: string): Promise<Institution> {

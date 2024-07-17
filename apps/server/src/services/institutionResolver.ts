@@ -1,8 +1,10 @@
+import { getAvailableProviders } from '../shared/providers'
 import { debug } from '../infra/logger'
 import { getInstitution } from '../services/ElasticSearchClient'
 import type {
   CachedInstitution,
   InstitutionProvider,
+  MappedJobTypes,
   Provider,
   ResolvedInstitution
 } from '../shared/contract'
@@ -31,12 +33,14 @@ const getProviderByVolume = (volumeMap: Record<string, number>): Provider => {
 }
 
 export async function resolveInstitutionProvider(
-  institutionId: string
+  institutionId: string,
+  jobType: MappedJobTypes
 ): Promise<ResolvedInstitution> {
   const institution = await getInstitution(institutionId)
   const preferences = await getPreferences()
   const providers: Provider[] = getAvailableProviders(
     institution,
+    jobType,
     preferences.supportedProviders
   )
 
@@ -84,22 +88,4 @@ export async function resolveInstitutionProvider(
     logo_url: institution?.logo,
     provider: provider as Provider
   }
-}
-
-function getAvailableProviders(
-  institution: CachedInstitution,
-  supportedProviders?: Provider[]
-): Provider[] {
-  const providers = []
-  if (supportedProviders.includes('mx') && institution.mx.id != null) {
-    providers.push('mx')
-  }
-  if (
-    supportedProviders.includes('sophtron') &&
-    institution.sophtron.id != null
-  ) {
-    providers.push('sophtron')
-  }
-
-  return providers as Provider[]
 }

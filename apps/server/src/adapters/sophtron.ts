@@ -1,3 +1,4 @@
+import providerCredentials from '../providerCredentials'
 import type {
   Challenge,
   Connection,
@@ -7,8 +8,8 @@ import type {
   UpdateConnectionRequest,
   WidgetAdapter
 } from '../shared/contract'
-import { ChallengeType, ConnectionStatus } from '../shared/contract'
-import { JobTypes, mapJobType } from '../utils'
+import { ChallengeType, ConnectionStatus, JobTypes } from '../shared/contract'
+import { mapJobType } from '../utils'
 
 import { debug, error, trace } from '../infra/logger'
 import SophtronClientV1 from '../providerApiClients/sophtronClient'
@@ -31,10 +32,9 @@ export class SophtronAdapter implements WidgetAdapter {
   apiClient: any
   apiClientV1: any
 
-  constructor(config: any) {
-    const { sophtron } = config
-    this.apiClient = new SophtronClient(sophtron)
-    this.apiClientV1 = new SophtronClientV1(sophtron)
+  constructor() {
+    this.apiClient = new SophtronClient(providerCredentials.sophtron)
+    this.apiClientV1 = new SophtronClientV1(providerCredentials.sophtron)
   }
 
   async GetInstitutionById(id: string): Promise<Institution> {

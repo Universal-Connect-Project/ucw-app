@@ -3,9 +3,10 @@ import * as logger from '../infra/logger'
 import type {
   CredentialRequest,
   CredentialsResponseBody,
-  MemberResponse
+  MemberResponse,
+  MxPlatformApiFactory
 } from '../providerApiClients/mx'
-import { Configuration, MxPlatformApiFactory } from '../providerApiClients/mx'
+import { MxIntApiClient, MxProdApiClient } from '../providerApiClients/mx'
 import { get, set } from '../services/storageClient/redis'
 import type {
   Challenge,
@@ -55,24 +56,12 @@ function fromMxMember(member: MemberResponse, provider: string): Connection {
 
 export class MxAdapter implements WidgetAdapter {
   apiClient: ReturnType<typeof MxPlatformApiFactory>
-  mxConfig: any
   provider: string
 
-  constructor(config: any, int: boolean) {
-    const { mxInt, mxProd } = config
+  constructor(int: boolean) {
     this.provider = int ? 'mx_int' : 'mx'
-    this.mxConfig = int ? mxInt : mxProd
 
-    this.apiClient = MxPlatformApiFactory(
-      new Configuration({
-        ...this.mxConfig,
-        baseOptions: {
-          headers: {
-            Accept: 'application/vnd.mx.api.v1+json'
-          }
-        }
-      })
-    )
+    this.apiClient = int ? MxIntApiClient : MxProdApiClient
   }
 
   async GetInstitutionById(id: string): Promise<Institution> {

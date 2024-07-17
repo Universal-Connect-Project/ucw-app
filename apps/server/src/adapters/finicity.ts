@@ -1,5 +1,6 @@
 import * as logger from '../infra/logger'
 import FinicityClient from '../providerApiClients/finicity'
+import providerCredentials from '../providerCredentials'
 import { get, set } from '../services/storageClient/redis'
 import type {
   Connection,
@@ -17,10 +18,9 @@ export class FinicityAdapter implements WidgetAdapter {
   sandbox: boolean
   apiClient: any
 
-  constructor(config: any) {
-    const { finicityProd } = config
-    this.sandbox = false
-    this.apiClient = new FinicityClient(finicityProd)
+  constructor(isSandbox = false) {
+    this.sandbox = isSandbox
+    this.apiClient = new FinicityClient(providerCredentials.finicityProd)
   }
 
   async GetInstitutionById(id: string): Promise<Institution> {
@@ -121,7 +121,7 @@ export class FinicityAdapter implements WidgetAdapter {
       return finicityUser.id
     }
     logger.trace(`Creating finicity user ${userId}`)
-    const ret = await this.apiClient.createCustomer(userId)
+    const ret = await this.apiClient.createCustomer(userId, this.sandbox)
     if (ret) {
       return ret.id
     }

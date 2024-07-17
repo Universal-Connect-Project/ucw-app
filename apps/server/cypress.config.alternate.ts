@@ -1,13 +1,11 @@
 import { defineConfig } from 'cypress'
 
+import baseCypressConfig from './baseCypressConfig'
+
 export default defineConfig({
+  ...baseCypressConfig,
   e2e: {
-    retries: 1,
-    defaultCommandTimeout: 15000,
-    specPattern: 'cypress/e2e/suite2/**/*.{js,jsx,ts,tsx}',
-    baseUrl: 'http://localhost:8080',
-    setupNodeEvents (on, config) {
-      // implement node event listeners here
-    }
+    ...baseCypressConfig.e2e,
+    specPattern: 'cypress/e2e/suite2/**/*.{js,jsx,ts,tsx}'
   }
 })
