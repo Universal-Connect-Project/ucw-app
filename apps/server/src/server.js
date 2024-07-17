@@ -9,6 +9,7 @@ import ngrok from '@ngrok/ngrok'
 import 'express-async-errors'
 import RateLimit from 'express-rate-limit'
 import { initialize as initializeElastic } from './services/ElasticSearchClient'
+import { widgetHandler } from './widgetEndpoint'
 
 process.on('unhandledRejection', (error) => {
   _error(`unhandledRejection: ${error.message}`, error)
@@ -45,49 +46,7 @@ app.use(function (err, req, res, next) {
   res.send(err.message)
 })
 
-const pageQueryParameters = new RegExp(
-  [
-    'institution_id',
-    'job_type',
-    'scheme',
-    'user_id',
-    'client_guid',
-    'connection_id',
-    'provider',
-    'partner',
-    'oauth_referral_source',
-    'single_account_select',
-    'update_credentials',
-    'server',
-    'is_mobile_webview',
-    'include_identity'
-  ]
-    .map((r) => `\\$${r}`)
-    .join('|'),
-  'g'
-)
-
-function renderDefaultPage(req, res, html) {
-  if (
-    req.query.connection_id != null &&
-    (req.query.provider == null || req.query.provider === '')
-  ) {
-    delete req.query.connection_id
-  }
-  res.send(
-    html.replaceAll(pageQueryParameters, (q) =>
-      encodeURIComponent(req.query[q.substring(1)] ?? '')
-    )
-  )
-}
-
-app.get('/', (req, res) => {
-  req.metricsPath = '/catchall'
-  const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}${req.path}`
-  void _wget(resourcePath).then((html) => {
-    renderDefaultPage(req, res, html)
-  })
-})
+app.get('/', widgetHandler)
 
 app.get('*', (req, res) => {
   req.metricsPath = '/catchall'
