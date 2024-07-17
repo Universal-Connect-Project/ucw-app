@@ -38,6 +38,7 @@
     "express": "^4.19.2",
     "express-async-errors": "^3.1.1",
     "express-rate-limit": "^7.0.2",
+    "joi": "^17.13.3",
     "js-logger": "^1.6.1",
     "redis": "^4.6.12",
     "stream-browserify": "^3.0.0",

@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { Response } from 'express'
+import Joi from 'joi'
 import { getProviderAdapter } from '../adapters'
 import getVC from '../services/vcProviders'
+import { Providers } from '../shared/contract'
 
 export interface AccountsDataQueryParameters {
   connection_id: string
@@ -21,10 +23,30 @@ export interface TransactionsRequest {
   query: TransactionsDataQueryParameters
 }
 
+const createProviderValidator = () =>
+  Joi.string()
+    .valid(...Object.values(Providers))
+    .required()
+
 export const accountsDataHandler = async (
   req: AccountsRequest,
   res: Response
 ) => {
+  const schema = Joi.object({
+    connection_id: Joi.string().required(),
+    provider: createProviderValidator(),
+    user_id: Joi.string().required()
+  })
+
+  const { error } = schema.validate(req.query)
+
+  if (error) {
+    res.status(400)
+    res.send(error.details[0].message)
+
+    return
+  }
+
   const { provider, connection_id, user_id } = req.query
 
   const providerAdapter = getProviderAdapter(provider)
@@ -51,6 +73,21 @@ export const identityDataHandler = async (
   req: IdentityRequest,
   res: Response
 ) => {
+  const schema = Joi.object({
+    connection_id: Joi.string().required(),
+    provider: createProviderValidator(),
+    user_id: Joi.string().required()
+  })
+
+  const { error } = schema.validate(req.query)
+
+  if (error) {
+    res.status(400)
+    res.send(error.details[0].message)
+
+    return
+  }
+
   const { provider, connection_id, user_id } =
     req.query as unknown as IdentityDataQueryParameters
 
@@ -80,6 +117,29 @@ export const transactionsDataHandler = async (
   req: TransactionsRequest,
   res: Response
 ) => {
+  const schema = Joi.object({
+    account_id: Joi.string().required(),
+    end_time: Joi.when('provider', {
+      is: Providers.SOPHTRON,
+      then: Joi.string().required()
+    }),
+    provider: createProviderValidator(),
+    start_time: Joi.when('provider', {
+      is: Providers.SOPHTRON,
+      then: Joi.string().required()
+    }),
+    user_id: Joi.string().required()
+  })
+
+  const { error } = schema.validate(req.query)
+
+  if (error) {
+    res.status(400)
+    res.send(error.details[0].message)
+
+    return
+  }
+
   const { provider, user_id, account_id, start_time, end_time } =
     req.query as unknown as TransactionsDataQueryParameters
 
