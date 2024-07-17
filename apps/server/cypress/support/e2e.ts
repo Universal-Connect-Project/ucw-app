@@ -35,7 +35,13 @@ afterEach(() => {
   const userId = Cypress.env('userId')
 
   testProviders.forEach((provider) => {
-    cy.deleteUser(userId, provider)
+    cy.request({
+      method: 'DELETE',
+      url: `/user/${userId}?provider=${provider}`,
+      failOnStatusCode: false
+    }).should((response) => {
+      expect(response.status).to.be.oneOf([200, 204, 400])
+    })
   })
 })
 
