@@ -25,7 +25,7 @@ Take a look at the [docker-compose.yml](./docker-compose.yml) file for more deta
 docker compose up
 ```
 
-That's it! If you have questions, please reach out to us.
+That's it! If you have questions, please reach out to us at [https://universalconnectproject.org/build/](https://universalconnectproject.org/build/)
 
 ## Cached Data
 
