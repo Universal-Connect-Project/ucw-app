@@ -23,69 +23,71 @@ import {
 } from './dataEndpoints'
 import { Providers } from '../shared/contract'
 
+const providerErrorText = `"provider" must be one of [${Object.values(Providers).join(', ')}]`
+
 describe('dataEndpoints', () => {
   describe('accountsDataHandler', () => {
-    it('responds with a failure if connection_id is missing', async () => {
-      const res = {
-        send: jest.fn(),
-        status: jest.fn()
-      } as unknown as Response
+    describe('validation', () => {
+      it('responds with a failure if connection_id is missing', async () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn()
+        } as unknown as Response
 
-      await accountsDataHandler(
-        {
-          query: {
-            provider: 'mx',
-            user_id: 'testUserId'
-          }
-        } as AccountsRequest,
-        res
-      )
+        await accountsDataHandler(
+          {
+            query: {
+              provider: Providers.MX,
+              user_id: 'testUserId'
+            }
+          } as AccountsRequest,
+          res
+        )
 
-      expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.send).toHaveBeenCalledWith('"connection_id" is required')
-    })
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.send).toHaveBeenCalledWith('"connection_id" is required')
+      })
 
-    it('responds with a failure if user_id is missing', async () => {
-      const res = {
-        send: jest.fn(),
-        status: jest.fn()
-      } as unknown as Response
+      it('responds with a failure if user_id is missing', async () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn()
+        } as unknown as Response
 
-      await accountsDataHandler(
-        {
-          query: {
-            connection_id: 'testConnectionId',
-            provider: 'mx'
-          }
-        } as AccountsRequest,
-        res
-      )
+        await accountsDataHandler(
+          {
+            query: {
+              connection_id: 'testConnectionId',
+              provider: Providers.MX
+            }
+          } as AccountsRequest,
+          res
+        )
 
-      expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.send).toHaveBeenCalledWith('"user_id" is required')
-    })
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.send).toHaveBeenCalledWith('"user_id" is required')
+      })
 
-    it('responds with a failure if provider isnt valid', async () => {
-      const res = {
-        send: jest.fn(),
-        status: jest.fn()
-      } as unknown as Response
+      it('responds with a failure if provider isnt valid', async () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn()
+        } as unknown as Response
 
-      await accountsDataHandler(
-        {
-          query: {
-            connection_id: 'testConnectionId',
-            provider: 'junk',
-            user_id: 'testUserId'
-          }
-        } as AccountsRequest,
-        res
-      )
+        await accountsDataHandler(
+          {
+            query: {
+              connection_id: 'testConnectionId',
+              provider: 'junk',
+              user_id: 'testUserId'
+            }
+          } as AccountsRequest,
+          res
+        )
 
-      expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.send).toHaveBeenCalledWith(
-        `"provider" must be one of [${Object.values(Providers).join(', ')}]`
-      )
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.send).toHaveBeenCalledWith(providerErrorText)
+      })
     })
 
     it('responds with the vc data in the jwt on success', async () => {
@@ -96,7 +98,7 @@ describe('dataEndpoints', () => {
       const req: AccountsRequest = {
         query: {
           connection_id: 'testConnectionId',
-          provider: 'mx',
+          provider: Providers.MX,
           user_id: 'testUserId'
         }
       }
@@ -124,7 +126,7 @@ describe('dataEndpoints', () => {
       const req: AccountsRequest = {
         query: {
           connection_id: 'testConnectionId',
-          provider: 'mx',
+          provider: Providers.MX,
           user_id: 'testUserId'
         }
       }
@@ -132,73 +134,74 @@ describe('dataEndpoints', () => {
       await accountsDataHandler(req, res)
 
       expect(res.send).toHaveBeenCalledWith('Something went wrong')
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(res.status).toHaveBeenCalledWith(400)
     })
   })
 
   describe('identityDataHandler', () => {
-    it('responds with a failure if connection_id is missing', async () => {
-      const res = {
-        send: jest.fn(),
-        status: jest.fn()
-      } as unknown as Response
+    describe('validation', () => {
+      it('responds with a failure if connection_id is missing', async () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn()
+        } as unknown as Response
 
-      await identityDataHandler(
-        {
-          query: {
-            provider: 'mx',
-            user_id: 'testUserId'
-          }
-        } as IdentityRequest,
-        res
-      )
+        await identityDataHandler(
+          {
+            query: {
+              provider: Providers.MX,
+              user_id: 'testUserId'
+            }
+          } as IdentityRequest,
+          res
+        )
 
-      expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.send).toHaveBeenCalledWith('"connection_id" is required')
-    })
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.send).toHaveBeenCalledWith('"connection_id" is required')
+      })
 
-    it('responds with a failure if user_id is missing', async () => {
-      const res = {
-        send: jest.fn(),
-        status: jest.fn()
-      } as unknown as Response
+      it('responds with a failure if user_id is missing', async () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn()
+        } as unknown as Response
 
-      await identityDataHandler(
-        {
-          query: {
-            connection_id: 'testConnectionId',
-            provider: 'mx'
-          }
-        } as IdentityRequest,
-        res
-      )
+        await identityDataHandler(
+          {
+            query: {
+              connection_id: 'testConnectionId',
+              provider: Providers.MX
+            }
+          } as IdentityRequest,
+          res
+        )
 
-      expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.send).toHaveBeenCalledWith('"user_id" is required')
-    })
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.send).toHaveBeenCalledWith('"user_id" is required')
+      })
 
-    it('responds with a failure if provider isnt valid', async () => {
-      const res = {
-        send: jest.fn(),
-        status: jest.fn()
-      } as unknown as Response
+      it('responds with a failure if provider isnt valid', async () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn()
+        } as unknown as Response
 
-      await identityDataHandler(
-        {
-          query: {
-            connection_id: 'testConnectionId',
-            provider: 'junk',
-            user_id: 'testUserId'
-          }
-        } as IdentityRequest,
-        res
-      )
+        await identityDataHandler(
+          {
+            query: {
+              connection_id: 'testConnectionId',
+              provider: 'junk',
+              user_id: 'testUserId'
+            }
+          } as IdentityRequest,
+          res
+        )
 
-      expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.send).toHaveBeenCalledWith(
-        `"provider" must be one of [${Object.values(Providers).join(', ')}]`
-      )
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.send).toHaveBeenCalledWith(
+          `"provider" must be one of [${Object.values(Providers).join(', ')}]`
+        )
+      })
     })
 
     it('responds with the vc data in the jwt on success', async () => {
@@ -210,7 +213,7 @@ describe('dataEndpoints', () => {
       const req: IdentityRequest = {
         query: {
           connection_id: 'testConnectionId',
-          provider: 'mx',
+          provider: Providers.MX,
           user_id: 'testUserId'
         }
       }
@@ -238,7 +241,7 @@ describe('dataEndpoints', () => {
       const req: IdentityRequest = {
         query: {
           connection_id: 'testConnectionId',
-          provider: 'mx',
+          provider: Providers.MX,
           user_id: 'testUserId'
         }
       }
@@ -246,12 +249,138 @@ describe('dataEndpoints', () => {
       await identityDataHandler(req, res)
 
       expect(res.send).toHaveBeenCalledWith('Something went wrong')
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(res.status).toHaveBeenCalledWith(400)
     })
   })
 
   describe('transactionsDataHandler', () => {
+    describe('validation', () => {
+      it('responds with a 400 if account_id is missing', async () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn()
+        } as unknown as Response
+
+        const req: TransactionsRequest = {
+          query: {
+            provider: Providers.MX,
+            user_id: 'testUserId',
+            start_time: undefined,
+            end_time: undefined
+          }
+        } as TransactionsRequest
+
+        await transactionsDataHandler(req, res)
+
+        expect(res.send).toHaveBeenCalledWith('"account_id" is required')
+        expect(res.status).toHaveBeenCalledWith(400)
+      })
+
+      it('responds with a 400 if provider is wrong', async () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn()
+        } as unknown as Response
+
+        const req: TransactionsRequest = {
+          query: {
+            account_id: 'testAccountId',
+            provider: 'junk',
+            user_id: 'testUserId',
+            start_time: undefined,
+            end_time: undefined
+          }
+        } as TransactionsRequest
+
+        await transactionsDataHandler(req, res)
+
+        expect(res.send).toHaveBeenCalledWith(providerErrorText)
+        expect(res.status).toHaveBeenCalledWith(400)
+      })
+
+      it('responds with a 400 if user_id is missing', async () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn()
+        } as unknown as Response
+
+        const req: TransactionsRequest = {
+          query: {
+            account_id: 'testAccountId',
+            provider: Providers.MX,
+            start_time: undefined,
+            end_time: undefined
+          }
+        } as TransactionsRequest
+
+        await transactionsDataHandler(req, res)
+
+        expect(res.send).toHaveBeenCalledWith('"user_id" is required')
+        expect(res.status).toHaveBeenCalledWith(400)
+      })
+
+      it('doesnt respond with a 400 if its mx and there is no start or end time', async () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn()
+        } as unknown as Response
+
+        const req: TransactionsRequest = {
+          query: {
+            account_id: 'testAccountId',
+            provider: Providers.MX,
+            user_id: 'testUserId'
+          }
+        } as TransactionsRequest
+
+        await transactionsDataHandler(req, res)
+
+        expect(res.status).not.toHaveBeenCalledWith(400)
+      })
+
+      it('responds with a 400 if its sophtron and there is no start time', async () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn()
+        } as unknown as Response
+
+        const req: TransactionsRequest = {
+          query: {
+            account_id: 'testAccountId',
+            provider: Providers.SOPHTRON,
+            user_id: 'testUserId',
+            end_time: 'junk'
+          }
+        } as TransactionsRequest
+
+        await transactionsDataHandler(req, res)
+
+        expect(res.send).toHaveBeenCalledWith('"start_time" is required')
+        expect(res.status).toHaveBeenCalledWith(400)
+      })
+
+      it('responds with a 400 if its sophtron and there is no end time', async () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn()
+        } as unknown as Response
+
+        const req: TransactionsRequest = {
+          query: {
+            account_id: 'testAccountId',
+            provider: Providers.SOPHTRON,
+            user_id: 'testUserId',
+            start_time: 'junk'
+          }
+        } as TransactionsRequest
+
+        await transactionsDataHandler(req, res)
+
+        expect(res.send).toHaveBeenCalledWith('"end_time" is required')
+        expect(res.status).toHaveBeenCalledWith(400)
+      })
+    })
+
     it('responds with the vc data in the jwt on success', async () => {
       const res = {
         send: jest.fn(),
@@ -261,7 +390,7 @@ describe('dataEndpoints', () => {
       const req: TransactionsRequest = {
         query: {
           account_id: 'testAccountId',
-          provider: 'mx',
+          provider: Providers.MX,
           user_id: 'testUserId',
           start_time: undefined,
           end_time: undefined
@@ -291,7 +420,7 @@ describe('dataEndpoints', () => {
       const req: TransactionsRequest = {
         query: {
           account_id: 'testAccountId',
-          provider: 'mx',
+          provider: Providers.MX,
           user_id: 'testUserId',
           start_time: undefined,
           end_time: undefined
@@ -301,7 +430,6 @@ describe('dataEndpoints', () => {
       await transactionsDataHandler(req, res)
 
       expect(res.send).toHaveBeenCalledWith('Something went wrong')
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(res.status).toHaveBeenCalledWith(400)
     })
   })

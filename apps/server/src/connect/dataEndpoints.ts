@@ -117,6 +117,29 @@ export const transactionsDataHandler = async (
   req: TransactionsRequest,
   res: Response
 ) => {
+  const schema = Joi.object({
+    account_id: Joi.string().required(),
+    end_time: Joi.when('provider', {
+      is: Providers.SOPHTRON,
+      then: Joi.string().required()
+    }),
+    provider: createProviderValidator(),
+    start_time: Joi.when('provider', {
+      is: Providers.SOPHTRON,
+      then: Joi.string().required()
+    }),
+    user_id: Joi.string().required()
+  })
+
+  const { error } = schema.validate(req.query)
+
+  if (error) {
+    res.status(400)
+    res.send(error.details[0].message)
+
+    return
+  }
+
   const { provider, user_id, account_id, start_time, end_time } =
     req.query as unknown as TransactionsDataQueryParameters
 
