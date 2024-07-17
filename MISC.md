@@ -4,7 +4,6 @@
 
 - [Sensitive information](#sensitive-information)
 - [Deploying a Production Instance](#deploying-a-production-instance)
-- [API Documentation](#api-documentation)
 - [Cached Data](#cached-data)
 - [Troubleshooting](#troubleshooting)
 
@@ -27,10 +26,6 @@ docker compose up
 ```
 
 That's it! If you have questions, please reach out to us.
-
-## API Documentation
-
-The API documentation for this service lives in openApiDocumentation.json and uses the (OpenAPI spec)[https://swagger.io/specification/]. You can open it in your preferred tool. You may copy the file into [swagger editor](https://editor.swagger.io/) and edit the local file with updates when complete.
 
 ## Cached Data
 
