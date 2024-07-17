@@ -57,7 +57,7 @@ describe('userEndpoints', () => {
       expect(res.status).toHaveBeenCalledWith(400)
     })
 
-    it('responds with a 400 on error', async () => {
+    it('responds with a 400 on unsuported provider', async () => {
       const res = {
         send: jest.fn(),
         status: jest.fn()
