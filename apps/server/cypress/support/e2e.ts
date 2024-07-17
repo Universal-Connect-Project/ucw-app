@@ -37,7 +37,7 @@ afterEach(() => {
   testProviders.forEach((provider) => {
     cy.request({
       method: 'DELETE',
-      url: `/user/${userId}?provider=${provider}`,
+      url: `/api/provider/${provider}/user/${userId}`,
       failOnStatusCode: false
     }).should((response) => {
       expect(response.status).to.be.oneOf([200, 204, 400])

@@ -17,10 +17,8 @@ describe('userEndpoints', () => {
       } as unknown as Response
 
       const req: UserDeleteRequest = {
-        query: {
-          provider: 'mx'
-        },
         params: {
+          provider: 'mx',
           userId: user.id
         }
       }
@@ -46,10 +44,8 @@ describe('userEndpoints', () => {
       } as unknown as Response
 
       const req: UserDeleteRequest = {
-        query: {
-          provider: 'mx'
-        },
         params: {
+          provider: 'mx',
           userId: user.id
         }
       }
@@ -68,10 +64,8 @@ describe('userEndpoints', () => {
       } as unknown as Response
 
       const req: UserDeleteRequest = {
-        query: {
-          provider: 'akoya'
-        },
         params: {
+          provider: 'unsupportedProvider',
           userId: 'testUserIdWhichDoesntExist'
         }
       }

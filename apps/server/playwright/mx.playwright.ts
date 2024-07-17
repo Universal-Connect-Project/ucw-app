@@ -27,6 +27,6 @@ test('connects to mx bank with oAuth', async ({ page }) => {
 
   const apiRequest = page.context().request
   await apiRequest.delete(
-    `http://localhost:8080/user/${userId}?provider=mx_int`
+    `http://localhost:8080/api/provider/mx_int/user/${userId}`
   )
 })

@@ -268,7 +268,7 @@ export default function (app) {
     })
   })
 
-  app.delete(`${ApiEndpoints.USER}/:userId`, userDeleteHandler)
+  app.delete('/api/provider/:provider/user/:userId', userDeleteHandler)
 
   // VC Data Endpoints
   app.get('/data/accounts', accountsDataHandler)

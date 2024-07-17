@@ -250,13 +250,22 @@
         }
       }
     },
-    "/user/:user_id": {
+    "/api/provider/{provider}/user/{user_id}": {
       "delete": {
         "parameters": [
           {
+            "description": "The id assigned to the user",
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "description": "The provider for the connected user",
             "name": "provider",
-            "in": "query",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "string",
