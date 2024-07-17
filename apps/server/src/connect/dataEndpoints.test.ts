@@ -138,6 +138,69 @@ describe('dataEndpoints', () => {
   })
 
   describe('identityDataHandler', () => {
+    it('responds with a failure if connection_id is missing', async () => {
+      const res = {
+        send: jest.fn(),
+        status: jest.fn()
+      } as unknown as Response
+
+      await identityDataHandler(
+        {
+          query: {
+            provider: 'mx',
+            user_id: 'testUserId'
+          }
+        } as IdentityRequest,
+        res
+      )
+
+      expect(res.status).toHaveBeenCalledWith(400)
+      expect(res.send).toHaveBeenCalledWith('"connection_id" is required')
+    })
+
+    it('responds with a failure if user_id is missing', async () => {
+      const res = {
+        send: jest.fn(),
+        status: jest.fn()
+      } as unknown as Response
+
+      await identityDataHandler(
+        {
+          query: {
+            connection_id: 'testConnectionId',
+            provider: 'mx'
+          }
+        } as IdentityRequest,
+        res
+      )
+
+      expect(res.status).toHaveBeenCalledWith(400)
+      expect(res.send).toHaveBeenCalledWith('"user_id" is required')
+    })
+
+    it('responds with a failure if provider isnt valid', async () => {
+      const res = {
+        send: jest.fn(),
+        status: jest.fn()
+      } as unknown as Response
+
+      await identityDataHandler(
+        {
+          query: {
+            connection_id: 'testConnectionId',
+            provider: 'junk',
+            user_id: 'testUserId'
+          }
+        } as IdentityRequest,
+        res
+      )
+
+      expect(res.status).toHaveBeenCalledWith(400)
+      expect(res.send).toHaveBeenCalledWith(
+        `"provider" must be one of [${Object.values(Providers).join(', ')}]`
+      )
+    })
+
     it('responds with the vc data in the jwt on success', async () => {
       const res = {
         send: jest.fn(),

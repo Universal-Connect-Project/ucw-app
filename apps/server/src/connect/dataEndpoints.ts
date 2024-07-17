@@ -73,6 +73,21 @@ export const identityDataHandler = async (
   req: IdentityRequest,
   res: Response
 ) => {
+  const schema = Joi.object({
+    connection_id: Joi.string().required(),
+    provider: createProviderValidator(),
+    user_id: Joi.string().required()
+  })
+
+  const { error } = schema.validate(req.query)
+
+  if (error) {
+    res.status(400)
+    res.send(error.details[0].message)
+
+    return
+  }
+
   const { provider, connection_id, user_id } =
     req.query as unknown as IdentityDataQueryParameters
 
