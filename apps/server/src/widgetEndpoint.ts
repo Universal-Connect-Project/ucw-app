@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { wget as _wget } from './infra/http'
 import Joi from 'joi'
-import { JobTypes } from './shared/contract'
+import { JobTypes, Providers } from './shared/contract'
 import config from './config'
 
 const pageQueryParameters = new RegExp(
@@ -42,11 +42,13 @@ function renderDefaultPage(req: Request, res: Response, html: string) {
 
 export const widgetHandler = (req: Request, res: Response) => {
   const schema = Joi.object({
+    connection_id: Joi.string(),
     job_type: Joi.string()
       .valid(...Object.values(JobTypes))
       .required(),
+    provider: Joi.string().valid(...Object.values(Providers)),
     user_id: Joi.string().required()
-  })
+  }).and('connection_id', 'provider')
 
   const { error } = schema.validate(req.query)
 
