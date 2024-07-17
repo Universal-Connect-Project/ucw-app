@@ -962,7 +962,7 @@ describe('sophtron adapter', () => {
         )
       )
 
-      const userId = 'fdasfdasfds'
+      const userId = 'userIdNotInListUsers'
 
       await expect(
         async () => await adapter.ResolveUserId(userId, true)

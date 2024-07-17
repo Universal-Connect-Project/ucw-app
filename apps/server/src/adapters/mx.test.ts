@@ -821,7 +821,9 @@ describe('mx provider', () => {
       })
 
       it("creates the user if the user isn't in the list and returns it from there", async () => {
-        const returnedUserId = await mxAdapter.ResolveUserId('fdadfsafd')
+        const returnedUserId = await mxAdapter.ResolveUserId(
+          'userIdNotInListUsers'
+        )
 
         expect(returnedUserId).toEqual(createUserData.user.guid)
       })
@@ -834,7 +836,7 @@ describe('mx provider', () => {
           )
         )
 
-        const userId = 'fdasfdasfds'
+        const userId = 'userIdNotInListUsers'
 
         const returnedUserId = await mxAdapter.ResolveUserId(userId)
 
@@ -842,7 +844,7 @@ describe('mx provider', () => {
       })
 
       it('throws an error if customer does not exist and failIfNotFound is true', async () => {
-        const userId = 'fdasfdasfds'
+        const userId = 'userIdNotInListUsers'
 
         await expect(
           async () => await mxAdapter.ResolveUserId(userId, true)
@@ -886,7 +888,7 @@ describe('mx provider', () => {
       it('returns with pending status if not success', async () => {
         const response = await MxAdapter.HandleOauthResponse({
           member_guid: memberGuid,
-          status: 'fdsafds',
+          status: 'notSuccessOrError',
           error_reason: errorReason
         })
 
