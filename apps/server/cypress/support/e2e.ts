@@ -34,11 +34,9 @@ afterEach(() => {
   const testProviders = ['mx_int', 'sophtron']
   const userId = Cypress.env('userId')
 
-  if (userId) {
-    testProviders.forEach((provider) => {
-      cy.deleteUser(userId, provider)
-    })
-  }
+  testProviders.forEach((provider) => {
+    cy.deleteUser(userId, provider)
+  })
 })
 
 // Alternatively you can use CommonJS syntax:
