@@ -43,10 +43,12 @@ function renderDefaultPage(req: Request, res: Response, html: string) {
 export const widgetHandler = (req: Request, res: Response) => {
   const schema = Joi.object({
     connection_id: Joi.string(),
+    institution_id: Joi.string(),
     job_type: Joi.string()
       .valid(...Object.values(JobTypes))
       .required(),
     provider: Joi.string().valid(...Object.values(Providers)),
+    single_account_select: Joi.bool(),
     user_id: Joi.string().required()
   }).and('connection_id', 'provider')
 

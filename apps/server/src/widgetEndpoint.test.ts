@@ -110,6 +110,7 @@ describe('server', () => {
           '"value" contains [provider] without its required peers [connection_id]'
         )
       })
+
       it('responds with a 400 if connection_id is provided without a provider', () => {
         const res = {
           send: jest.fn(),
@@ -130,6 +131,29 @@ describe('server', () => {
         expect(res.status).toHaveBeenCalledWith(400)
         expect(res.send).toHaveBeenCalledWith(
           '"value" contains [connection_id] without its required peers [provider]'
+        )
+      })
+
+      it('responds with a 400 if single_account_select isnt a bool', () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn()
+        } as unknown as Response
+
+        widgetHandler(
+          {
+            query: {
+              job_type: JobTypes.AGGREGATE,
+              single_account_select: 'junk',
+              user_id: 'testUserId'
+            }
+          } as unknown as Request,
+          res
+        )
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.send).toHaveBeenCalledWith(
+          '"single_account_select" must be a boolean'
         )
       })
     })
