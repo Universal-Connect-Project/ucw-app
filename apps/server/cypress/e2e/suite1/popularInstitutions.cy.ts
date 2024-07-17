@@ -1,3 +1,5 @@
+import { searchByText } from '../../utils/widget'
+
 describe('popular institutions', () => {
   ;[
     { labelText: 'User ID', name: 'Citibank' },
@@ -25,7 +27,7 @@ describe('popular institutions', () => {
 
       cy.findByText('PNC Bank').should('exist')
 
-      cy.findByPlaceholderText('Search').type(name)
+      searchByText(name)
 
       cy.findByText('PNC Bank').should('not.exist')
 
