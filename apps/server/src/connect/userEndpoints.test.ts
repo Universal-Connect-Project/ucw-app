@@ -1,5 +1,6 @@
 import type { Response } from 'express'
 import { HttpResponse, http } from 'msw'
+import { Providers } from '../shared/contract'
 import { MX_DELETE_USER_PATH } from '../test/handlers'
 import { listUsersData } from '../test/testData/users'
 import { server } from '../test/testServer'
@@ -10,6 +11,27 @@ const user = listUsersData.users[0]
 
 describe('userEndpoints', () => {
   describe('userDeleteHandler', () => {
+    describe('validation', () => {
+      it('responds with a failure if userId is missing', async () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn()
+        } as unknown as Response
+
+        const req: UserDeleteRequest = {
+          params: {
+            provider: Providers.MX,
+            userId: undefined
+          }
+        }
+
+        await userDeleteHandler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.send).toHaveBeenCalledWith('"userId" is required')
+      })
+    })
+
     it('responds with 204 on success with mx', async () => {
       const res = {
         send: jest.fn(),
@@ -18,7 +40,7 @@ describe('userEndpoints', () => {
 
       const req: UserDeleteRequest = {
         params: {
-          provider: 'mx',
+          provider: Providers.MX,
           userId: user.id
         }
       }
@@ -45,7 +67,7 @@ describe('userEndpoints', () => {
 
       const req: UserDeleteRequest = {
         params: {
-          provider: 'mx',
+          provider: Providers.MX,
           userId: user.id
         }
       }
@@ -72,7 +94,9 @@ describe('userEndpoints', () => {
 
       await userDeleteHandler(req, res)
 
-      expect(res.send).toHaveBeenCalledWith('User delete failed')
+      expect(res.send).toHaveBeenCalledWith(
+        '"provider" must be one of [mx, mx_int, sophtron]'
+      )
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(res.status).toHaveBeenCalledWith(400)
     })

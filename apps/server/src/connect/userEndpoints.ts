@@ -1,5 +1,7 @@
 import type { Response } from 'express'
+import Joi from 'joi'
 import { getProviderAdapter } from '../adapters'
+import { Providers } from '../shared/contract'
 
 interface UserDeleteParameters {
   provider: string
@@ -10,11 +12,31 @@ export interface UserDeleteRequest {
   params: UserDeleteParameters
 }
 
+const createProviderValidator = () =>
+  Joi.string()
+    .valid(...Object.values(Providers))
+    .required()
+
 export const userDeleteHandler = async (
   req: UserDeleteRequest,
   res: Response
 ) => {
+  const schema = Joi.object({
+    provider: createProviderValidator(),
+    userId: Joi.string().required()
+  })
+
+  const { error } = schema.validate(req.params)
+
+  if (error) {
+    res.status(400)
+    res.send(error.details[0].message)
+
+    return
+  }
+
   const { userId, provider } = req.params
+
   try {
     const providerAdapter = getProviderAdapter(provider)
     const failIfUserNotFound = true
