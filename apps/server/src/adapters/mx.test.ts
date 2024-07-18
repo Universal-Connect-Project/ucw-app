@@ -10,6 +10,7 @@ import {
   DELETE_CONNECTION_PATH,
   DELETE_MEMBER_PATH,
   EXTEND_HISTORY_PATH,
+  MX_DELETE_USER_PATH,
   MX_INSTITUTION_BY_ID_PATH,
   READ_MEMBER_STATUS_PATH,
   UPDATE_CONNECTION_PATH,
@@ -386,6 +387,26 @@ describe('mx provider', () => {
         await mxAdapter.DeleteConnection('testId', 'testUserId')
 
         expect(connectionDeletionAttempted).toBe(true)
+      })
+    })
+
+    describe('DeleteUser', () => {
+      it('deletes the user', async () => {
+        let userDeletionAttempted = false
+
+        server.use(
+          http.delete(MX_DELETE_USER_PATH, () => {
+            userDeletionAttempted = true
+
+            return new HttpResponse(null, {
+              status: 204
+            })
+          })
+        )
+
+        await mxAdapter.DeleteUser('testUserId')
+
+        expect(userDeletionAttempted).toBe(true)
       })
     })
 
@@ -800,7 +821,9 @@ describe('mx provider', () => {
       })
 
       it("creates the user if the user isn't in the list and returns it from there", async () => {
-        const returnedUserId = await mxAdapter.ResolveUserId('fdadfsafd')
+        const returnedUserId = await mxAdapter.ResolveUserId(
+          'userIdNotInListUsers'
+        )
 
         expect(returnedUserId).toEqual(createUserData.user.guid)
       })
@@ -813,11 +836,19 @@ describe('mx provider', () => {
           )
         )
 
-        const userId = 'fdasfdasfds'
+        const userId = 'userIdNotInListUsers'
 
         const returnedUserId = await mxAdapter.ResolveUserId(userId)
 
         expect(returnedUserId).toEqual(userId)
+      })
+
+      it('throws an error if customer does not exist and failIfNotFound is true', async () => {
+        const userId = 'userIdNotInListUsers'
+
+        await expect(
+          async () => await mxAdapter.ResolveUserId(userId, true)
+        ).rejects.toThrow('User not resolved successfully')
       })
     })
 
@@ -857,7 +888,7 @@ describe('mx provider', () => {
       it('returns with pending status if not success', async () => {
         const response = await MxAdapter.HandleOauthResponse({
           member_guid: memberGuid,
-          status: 'fdsafds',
+          status: 'notSuccessOrError',
           error_reason: errorReason
         })
 

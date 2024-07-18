@@ -64,13 +64,9 @@ const generateVcDataTests = ({ makeAConnection }) =>
     it(`makes a connection with jobType: ${jobType}, gets the accounts, identity, and transaction data from the vc endpoints`, () => {
       let memberGuid: string
       let provider: string
-      const userId = crypto.randomUUID()
+      const userId = Cypress.env('userId')
 
-      cy.visit(`/?job_type=${jobType}&user_id=${userId}`, {
-        onBeforeLoad(window) {
-          cy.spy(window.parent, 'postMessage').as('postMessage')
-        }
-      })
+      cy.visitWithPostMessageSpy(`/?job_type=${jobType}&user_id=${userId}`)
         .then(() => makeAConnection(jobType))
         .then(() => {
           // Capture postmessages into variables

@@ -81,6 +81,10 @@ export class FinicityAdapter implements WidgetAdapter {
     return undefined
   }
 
+  async DeleteUser(providerUserId: string): Promise<any> {
+    throw new Error('Not Implemented')
+  }
+
   async UpdateConnection(
     request: UpdateConnectionRequest,
     userId: string
