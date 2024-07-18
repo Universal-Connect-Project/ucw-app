@@ -140,3 +140,14 @@ export const transformedInstitutionList = [
     supports_oauth: true
   }
 ]
+
+export const transformedPopularInstitutionsList = [
+  {
+    guid: 'UCP-da107e6d0da7779',
+    name: 'MX Bank (Oauth)',
+    url: 'https://mx.com',
+    logo_url:
+      'https://s3.amazonaws.com/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
+    supports_oauth: true
+  }
+]

@@ -2,7 +2,8 @@ import type { Response } from 'express'
 import {
   elasticSearchInstitutionData,
   institutionData,
-  transformedInstitutionList
+  transformedInstitutionList,
+  transformedPopularInstitutionsList
 } from '../test/testData/institution'
 import { ConnectApi } from './connectApi'
 import type {
@@ -10,6 +11,7 @@ import type {
   InstitutionRequest
 } from './institutionEndpoints'
 import {
+  favoriteInstitutionsHandler,
   getInstitutionHandler,
   getInstitutionsHandler
 } from './institutionEndpoints'
@@ -112,6 +114,27 @@ describe('institutionEndpoints', () => {
       await getInstitutionsHandler(req, res)
 
       expect(res.send).toHaveBeenCalledWith(transformedInstitutionList)
+    })
+  })
+
+  describe('favoriteInstitutionsHandler', () => {
+    it('returns a list of favorite institutions', async () => {
+      const context = {
+        job_type: MappedJobTypes.AGGREGATE
+      }
+
+      const req = {
+        connectService: new ConnectApi({ context }),
+        context
+      } as unknown as InstitutionRequest
+
+      const res = {
+        send: jest.fn()
+      } as unknown as Response
+
+      await favoriteInstitutionsHandler(req, res)
+
+      expect(res.send).toHaveBeenCalledWith(transformedPopularInstitutionsList)
     })
   })
 })

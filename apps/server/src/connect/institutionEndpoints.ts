@@ -31,7 +31,7 @@ export interface GetInstitutionsRequest extends InstitutionRequest {
     job_type: MappedJobTypes
   }
   query: {
-    routing_number: string
+    routing_number?: string
     search_name?: string
   }
 }

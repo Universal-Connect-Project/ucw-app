@@ -2,7 +2,8 @@ import { MappedJobTypes } from '../shared/contract'
 import { MxAdapter } from '../adapters/mx'
 import {
   institutionData,
-  transformedInstitutionList
+  transformedInstitutionList,
+  transformedPopularInstitutionsList
 } from '../test/testData/institution'
 import { ConnectApi } from './connectApi'
 
@@ -80,23 +81,12 @@ describe('connectApi', () => {
   })
 
   describe('loadPopularInstitutions', () => {
-    const expectedPopularInstitutionResponse = [
-      {
-        guid: 'UCP-da107e6d0da7779',
-        name: 'MX Bank (Oauth)',
-        url: 'https://mx.com',
-        logo_url:
-          'https://s3.amazonaws.com/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
-        supports_oauth: true
-      }
-    ]
-
     it('gets the popular institution list', async () => {
       connectApi.providerAdapter = mxApiClient
 
       const popularInstitutionList = await connectApi.loadPopularInstitutions()
 
-      expect(popularInstitutionList).toEqual(expectedPopularInstitutionResponse)
+      expect(popularInstitutionList).toEqual(transformedPopularInstitutionsList)
     })
   })
 })
