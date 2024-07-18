@@ -236,8 +236,8 @@ export class ProviderAdapterBase {
     )
   }
 
-  async ResolveUserId(id: string) {
-    return await this.providerAdapter?.ResolveUserId(id)
+  async ResolveUserId(id: string, failIfNotFound: boolean = false) {
+    return await this.providerAdapter?.ResolveUserId(id, failIfNotFound)
   }
 
   getUserId(): string {

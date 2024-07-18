@@ -30,7 +30,7 @@ describe('institutionEndpoints', () => {
       }
 
       const req = {
-        connectService: new ConnectApi({ context }),
+        connectApi: new ConnectApi({ context }),
         context,
         params: {
           institution_guid: 'testProviderInstitutionGuid'
@@ -64,7 +64,7 @@ describe('institutionEndpoints', () => {
         job_type: 'aggregate'
       }
       const req = {
-        connectService: new ConnectApi({ context }),
+        connectApi: new ConnectApi({ context }),
         context,
         params: {
           institution_guid: 'testProviderInstitutionGuid'

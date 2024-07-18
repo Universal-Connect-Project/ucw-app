@@ -24,4 +24,9 @@ test('connects to mx bank with oAuth', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Continue' })).toBeVisible({
     timeout: 60000
   })
+
+  const apiRequest = page.context().request
+  await apiRequest.delete(
+    `http://localhost:8080/api/provider/mx_int/user/${userId}`
+  )
 })

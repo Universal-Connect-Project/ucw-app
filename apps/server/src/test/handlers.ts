@@ -18,30 +18,30 @@ import {
   verifyMemberData
 } from './testData/members'
 import {
-  createCustomerData,
-  createUserData,
-  listUsersData
-} from './testData/users'
-import {
-  createMemberData,
-  getMemberData,
-  updateMemberData
-} from './testData/sophtronMember'
-import {
-  createCustomerData as createSophtronCustomerData,
-  customerFromUniqueIdData
-} from './testData/sophtronCustomer'
-import {
   mxVcAccountsData,
   mxVcIdentityData,
   mxVcIntegrationAccountsData,
   mxVcTranscationsData
 } from './testData/mxVcData'
 import {
+  createCustomerData as createSophtronCustomerData,
+  customerFromUniqueIdData
+} from './testData/sophtronCustomer'
+import {
+  createMemberData,
+  getMemberData,
+  updateMemberData
+} from './testData/sophtronMember'
+import {
   sophtronVcAccountsData,
   sophtronVcIdentityData,
   sophtronVcTranscationsData
 } from './testData/sophtronVcData'
+import {
+  createCustomerData,
+  createUserData,
+  listUsersData
+} from './testData/users'
 
 const MX_INTEGRATION_PATH = 'https://int-api.mx.com'
 
@@ -56,6 +56,7 @@ export const VERIFY_MEMBER_PATH = `${MX_BASE_PATH}/users/:userId/members/:guid/v
 export const IDENTIFY_MEMBER_PATH = `${MX_BASE_PATH}/users/:userId/members/:guid/identify`
 export const EXTEND_HISTORY_PATH = `${MX_BASE_PATH}/users/:userId/members/:guid/extend_history`
 export const DELETE_CONNECTION_PATH = `${MX_BASE_PATH}/users/:userId/managed_members/:id`
+export const MX_DELETE_USER_PATH = `${MX_BASE_PATH}/users/:userId`
 export const AGGREGATE_MEMBER_PATH = `${MX_BASE_PATH}/users/:userId/members/:id/aggregate`
 export const UPDATE_CONNECTION_PATH = `${MX_BASE_PATH}/users/:userId/members/:id`
 export const CONNECTION_BY_ID_PATH = `${MX_BASE_PATH}/users/:userId/members/:id`
@@ -82,6 +83,7 @@ const SOPHTRON_V2_BASE_PATH = 'https://api.sophtron.com/api/v2'
 const SOPHTRON_V1_BASE_PATH = 'https://api.sophtron.com/api'
 
 export const SOPHTRON_DELETE_MEMBER_PATH = `${SOPHTRON_V2_BASE_PATH}/customers/:userId/members/:memberId`
+export const SOPHTRON_DELETE_USER_PATH = `${SOPHTRON_V2_BASE_PATH}/customers/:userId`
 export const SOPHTRON_INSTITUTION_BY_ID_PATH = `${SOPHTRON_V1_BASE_PATH}/Institution/GetInstitutionByID`
 export const SOPHTRON_MEMBER_BY_ID_PATH = `${SOPHTRON_V2_BASE_PATH}/customers/:userId/members/:memberId`
 export const SOPHTRON_CREATE_MEMBER_PATH = `${SOPHTRON_V2_BASE_PATH}/customers/:userId/members/:jobType`
@@ -152,6 +154,10 @@ const handlers = [
     SOPHTRON_DELETE_MEMBER_PATH,
     () => new HttpResponse(null, { status: 200 })
   ),
+  http.delete(
+    SOPHTRON_DELETE_USER_PATH,
+    () => new HttpResponse(null, { status: 200 })
+  ),
   http.get(MX_INSTITUTION_BY_ID_PATH, () => HttpResponse.json(institutionData)),
   http.get(MX_TEST_INSTITUTION_BY_ID_PATH, () =>
     HttpResponse.json(institutionData)
@@ -179,6 +185,10 @@ const handlers = [
   http.delete(
     DELETE_CONNECTION_PATH,
     () => new HttpResponse(null, { status: 200 })
+  ),
+  http.delete(
+    MX_DELETE_USER_PATH,
+    () => new HttpResponse(null, { status: 204 })
   ),
   http.put(UPDATE_CONNECTION_PATH, () => HttpResponse.json(memberData)),
   http.get(CONNECTION_BY_ID_PATH, () =>

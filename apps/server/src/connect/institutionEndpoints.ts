@@ -3,7 +3,7 @@ import type { MappedJobTypes } from 'src/shared/contract'
 import type { ConnectApi } from './connectApi'
 
 export interface InstitutionRequest extends Request {
-  connectService: ConnectApi
+  connectApi: ConnectApi
 }
 
 export const getInstitutionHandler = async (
@@ -11,7 +11,7 @@ export const getInstitutionHandler = async (
   res: Response
 ) => {
   if (req.context?.provider) {
-    const institution = await req.connectService.loadInstitutionByProviderId(
+    const institution = await req.connectApi.loadInstitutionByProviderId(
       req.params.institution_guid
     )
 
@@ -20,7 +20,7 @@ export const getInstitutionHandler = async (
     return
   }
 
-  const ret = await req.connectService.loadInstitutionByUcpId(
+  const ret = await req.connectApi.loadInstitutionByUcpId(
     req.params.institution_guid
   )
   res.send(ret)
@@ -40,7 +40,7 @@ export const getInstitutionsHandler = async (
   req: GetInstitutionsRequest,
   res: Response
 ) => {
-  const ret = await req.connectService.loadInstitutions(
+  const ret = await req.connectApi.loadInstitutions(
     req.query.search_name ?? req.query.routing_number,
     req.context.job_type
   )
@@ -51,7 +51,7 @@ export const favoriteInstitutionsHandler = async (
   req: InstitutionRequest,
   res: Response
 ) => {
-  const popularInsitutions = await req.connectService.loadPopularInstitutions()
+  const popularInsitutions = await req.connectApi.loadPopularInstitutions()
   res.send(popularInsitutions)
 }
 
@@ -65,7 +65,7 @@ export const getInstitutionCredentialsHandler = async (
   req: GetInstitutionCredentialsRequest,
   res: Response
 ) => {
-  const credentials = await req.connectService.getInstitutionCredentials(
+  const credentials = await req.connectApi.getInstitutionCredentials(
     req.params.institution_guid
   )
   res.send(credentials)

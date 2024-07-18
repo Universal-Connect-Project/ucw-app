@@ -26,5 +26,24 @@ Cypress.on('uncaught:exception', () => {
   return false
 })
 
+beforeEach(() => {
+  Cypress.env('userId', crypto.randomUUID())
+})
+
+afterEach(() => {
+  const testProviders = ['mx_int', 'sophtron']
+  const userId = Cypress.env('userId')
+
+  testProviders.forEach((provider) => {
+    cy.request({
+      method: 'DELETE',
+      url: `/api/provider/${provider}/user/${userId}`,
+      failOnStatusCode: false
+    }).should((response) => {
+      expect(response.status).to.be.oneOf([200, 204, 400])
+    })
+  })
+})
+
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
