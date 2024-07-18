@@ -105,7 +105,8 @@
             "in": "query",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": ["mx", "mx_int", "sophtron"]
             }
           },
           {
@@ -153,7 +154,8 @@
             "in": "query",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": ["mx", "mx_int", "sophtron"]
             }
           },
           {
@@ -209,7 +211,8 @@
             "in": "query",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": ["mx", "mx_int", "sophtron"]
             }
           },
           {
@@ -243,6 +246,39 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/provider/{provider}/user/{user_id}": {
+      "delete": {
+        "parameters": [
+          {
+            "description": "The id assigned to the user",
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The provider for the connected user",
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["mx", "mx_int", "sophtron"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "204": {
+            "description": "Success"
           }
         }
       }

@@ -19,6 +19,7 @@ import {
   getInstitutionsHandler
 } from './institutionEndpoints'
 import stubs from './instrumentations.js'
+import { userDeleteHandler } from './userEndpoints'
 
 const AGGREGATION_JOB_TYPE = 0
 
@@ -35,10 +36,10 @@ export default function (app) {
     ) {
       return next()
     }
-    req.connectService = new ConnectApi(req)
-    if ((await req.connectService.init()) != null) {
+    req.connectApi = new ConnectApi(req)
+    if ((await req.connectApi.init()) != null) {
       if (!req.context.resolved_user_id) {
-        req.context.resolved_user_id = await req.connectService.ResolveUserId(
+        req.context.resolved_user_id = await req.connectApi.ResolveUserId(
           req.context.user_id
         )
       }
@@ -61,7 +62,7 @@ export default function (app) {
       config.AnalyticsServiceEndpoint !== '' &&
       config.AnalyticsServiceEndpoint != null
     ) {
-      const ret = await req.connectService.analytics(req.path, req.body)
+      const ret = await req.connectApi.analytics(req.path, req.body)
       res.send(ret)
     } else {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -72,21 +73,19 @@ export default function (app) {
   app.post(ApiEndpoints.MEMBERS, async (req, res) => {
     // res.send(require('./stubs/member.js'))
     // return;
-    const ret = await req.connectService.addMember(req.body)
+    const ret = await req.connectApi.addMember(req.body)
     res.send(ret)
   })
   app.put(`${ApiEndpoints.MEMBERS}/:member_guid`, async (req, res) => {
     // res.send(require('./stubs/member.js'))
     // return;
-    const ret = await req.connectService.updateMember(req.body)
+    const ret = await req.connectApi.updateMember(req.body)
     res.send(ret)
   })
   app.get(`${ApiEndpoints.MEMBERS}/:member_guid`, async (req, res) => {
     // res.send(require('./stubs/member.js'))
     // return;
-    const ret = await req.connectService.loadMemberByGuid(
-      req.params.member_guid
-    )
+    const ret = await req.connectApi.loadMemberByGuid(req.params.member_guid)
     res.send(ret)
     // res.sendFile(__dirname + '/stubs/member.json')
   })
@@ -95,7 +94,7 @@ export default function (app) {
     async (req, res) => {
       // res.send(require('./stubs/member_credentials.js'))
       // return;
-      const ret = await req.connectService.getMemberCredentials(
+      const ret = await req.connectApi.getMemberCredentials(
         req.params.member_guid
       )
       res.send(ret)
@@ -104,16 +103,14 @@ export default function (app) {
   app.get(
     `${ApiEndpoints.MEMBERS}/:member_guid/oauth_window_uri`,
     async (req, res) => {
-      const ret = await req.connectService.getOauthWindowUri(
-        req.params.member_guid
-      )
+      const ret = await req.connectApi.getOauthWindowUri(req.params.member_guid)
       res.send({ oauth_window_uri: ret })
       // res.sendFile(__dirname + '/stubs/member.json')
     }
   )
   app.delete(`${ApiEndpoints.MEMBERS}/:member_guid`, async (req, res) => {
     res.sendFile(path.join(__dirname, '/stubs/member.json'))
-    // let ret = await req.connectService.deleteMember(req.params.member_guid)
+    // let ret = await req.connectApi.deleteMember(req.params.member_guid)
     // res.send(ret)
   })
   app.get(
@@ -134,9 +131,7 @@ export default function (app) {
         res.send({ job: { guid: 'none', job_type: AGGREGATION_JOB_TYPE } })
         return
       }
-      const ret = await req.connectService.loadMemberByGuid(
-        req.params.member_guid
-      )
+      const ret = await req.connectApi.loadMemberByGuid(req.params.member_guid)
       res.send(ret)
     } else {
       res.send({
@@ -149,19 +144,19 @@ export default function (app) {
   })
 
   app.get('/oauth_states', async (req, res) => {
-    const ret = await req.connectService.getOauthStates(
+    const ret = await req.connectApi.getOauthStates(
       req.query.outbound_member_guid
     )
     res.send(ret)
   })
 
   app.get('/oauth_states/:guid', async (req, res) => {
-    const ret = await req.connectService.getOauthState(req.params.guid)
+    const ret = await req.connectApi.getOauthState(req.params.guid)
     res.send(ret)
   })
 
   app.get(ApiEndpoints.MEMBERS, async (req, res) => {
-    const ret = await req.connectService.loadMembers()
+    const ret = await req.connectApi.loadMembers()
     res.send({
       members: ret
     })
@@ -170,7 +165,7 @@ export default function (app) {
   app.post(
     `${ApiEndpoints.MEMBERS}/:member_guid/identify`,
     async (req, res) => {
-      const ret = await req.connectService.updateConnection(
+      const ret = await req.connectApi.updateConnection(
         { id: req.params.member_guid, job_type: 'aggregate_identity' },
         req.context.resolved_user_id
       )
@@ -181,7 +176,7 @@ export default function (app) {
   )
 
   app.post(`${ApiEndpoints.MEMBERS}/:member_guid/verify`, async (req, res) => {
-    const ret = await req.connectService.updateConnection(
+    const ret = await req.connectApi.updateConnection(
       { id: req.params.member_guid, job_type: 'verification' },
       req.context.resolved_user_id
     )
@@ -191,7 +186,7 @@ export default function (app) {
   })
 
   app.post(`${ApiEndpoints.MEMBERS}/:member_guid/history`, async (req, res) => {
-    const ret = await req.connectService.updateConnection(
+    const ret = await req.connectApi.updateConnection(
       { id: req.params.member_guid, job_type: 'aggregate_extendedhistory' },
       req.context.resolved_user_id
     )
@@ -209,7 +204,7 @@ export default function (app) {
   })
 
   app.post('/members/:member_guid/unthrottled_aggregate', async (req, res) => {
-    const ret = await req.connectService.updateConnection(
+    const ret = await req.connectApi.updateConnection(
       { id: req.params.member_guid, job_type: 'aggregate' },
       req.context.resolved_user_id
     )
@@ -272,6 +267,8 @@ export default function (app) {
       mapOauthParams(queries, res, html)
     })
   })
+
+  app.delete('/api/provider/:provider/user/:userId', userDeleteHandler)
 
   // VC Data Endpoints
   app.get('/data/accounts', accountsDataHandler)

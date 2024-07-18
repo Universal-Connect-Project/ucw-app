@@ -44,6 +44,14 @@ Cypress.Commands.add('visitIdentity', () => {
   return cy.wrap(userId)
 })
 
+Cypress.Commands.add('visitWithPostMessageSpy', (url: string) => {
+  cy.visit(url, {
+    onBeforeLoad(window) {
+      cy.spy(window.parent, 'postMessage').as('postMessage')
+    }
+  })
+})
+
 export {}
 
 declare global {
@@ -51,6 +59,7 @@ declare global {
     interface Chainable {
       visitAgg: () => Chainable<string>
       visitIdentity: () => Chainable<string>
+      visitWithPostMessageSpy: (url: string) => Chainable<string>
     }
   }
 }
