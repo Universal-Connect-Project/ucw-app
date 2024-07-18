@@ -103,7 +103,7 @@ describe('institutionEndpoints', () => {
       }
 
       const req = {
-        connectService: new ConnectApi({ context }),
+        connectApi: new ConnectApi({ context }),
         context,
         query: {
           search_name: 'MX'
@@ -127,7 +127,7 @@ describe('institutionEndpoints', () => {
       }
 
       const req = {
-        connectService: new ConnectApi({ context }),
+        connectApi: new ConnectApi({ context }),
         context
       } as unknown as InstitutionRequest
 
@@ -148,12 +148,12 @@ describe('institutionEndpoints', () => {
         provider: Providers.MX
       }
 
-      const connectService = new ConnectApi({ context })
+      const connectApi = new ConnectApi({ context })
 
-      await connectService.init()
+      await connectApi.init()
 
       const req = {
-        connectService,
+        connectApi,
         context,
         params: {
           institution_guid: 'test'
