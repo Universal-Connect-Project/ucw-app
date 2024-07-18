@@ -55,8 +55,14 @@ export const favoriteInstitutionsHandler = async (
   res.send(popularInsitutions)
 }
 
+export interface GetInstitutionCredentialsRequest extends InstitutionRequest {
+  params: {
+    institution_guid: string
+  }
+}
+
 export const getInstitutionCredentialsHandler = async (
-  req: InstitutionRequest,
+  req: GetInstitutionCredentialsRequest,
   res: Response
 ) => {
   const credentials = await req.connectService.getInstitutionCredentials(

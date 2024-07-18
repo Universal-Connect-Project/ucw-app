@@ -7,15 +7,18 @@ import {
 } from '../test/testData/institution'
 import { ConnectApi } from './connectApi'
 import type {
+  GetInstitutionCredentialsRequest,
   GetInstitutionsRequest,
   InstitutionRequest
 } from './institutionEndpoints'
 import {
   favoriteInstitutionsHandler,
+  getInstitutionCredentialsHandler,
   getInstitutionHandler,
   getInstitutionsHandler
 } from './institutionEndpoints'
-import { MappedJobTypes } from '../shared/contract'
+import { MappedJobTypes, Providers } from '../shared/contract'
+import { transformedInstitutionCredentials } from '../test/testData/institutionCredentials'
 
 const mxInstitution = institutionData.institution
 
@@ -135,6 +138,35 @@ describe('institutionEndpoints', () => {
       await favoriteInstitutionsHandler(req, res)
 
       expect(res.send).toHaveBeenCalledWith(transformedPopularInstitutionsList)
+    })
+  })
+
+  describe('getInstitutionCredentialsHandler', () => {
+    it('returns with the institution credentials', async () => {
+      const context = {
+        job_type: MappedJobTypes.AGGREGATE,
+        provider: Providers.MX
+      }
+
+      const connectService = new ConnectApi({ context })
+
+      await connectService.init()
+
+      const req = {
+        connectService,
+        context,
+        params: {
+          institution_guid: 'test'
+        }
+      } as unknown as GetInstitutionCredentialsRequest
+
+      const res = {
+        send: jest.fn()
+      } as unknown as Response
+
+      await getInstitutionCredentialsHandler(req, res)
+
+      expect(res.send).toHaveBeenCalledWith(transformedInstitutionCredentials)
     })
   })
 })
