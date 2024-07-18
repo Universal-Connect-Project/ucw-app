@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express'
 import type { MappedJobTypes } from 'src/shared/contract'
 import type { ConnectApi } from './connectApi'
+
 export interface InstitutionRequest extends Request {
   connectService: ConnectApi
 }
@@ -25,7 +26,7 @@ export const getInstitutionHandler = async (
   res.send(ret)
 }
 
-interface GetInstitutionsRequest extends InstitutionRequest {
+export interface GetInstitutionsRequest extends InstitutionRequest {
   context: {
     job_type: MappedJobTypes
   }

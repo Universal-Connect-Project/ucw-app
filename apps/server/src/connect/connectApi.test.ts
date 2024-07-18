@@ -1,6 +1,9 @@
 import { MappedJobTypes } from '../shared/contract'
 import { MxAdapter } from '../adapters/mx'
-import { institutionData } from '../test/testData/institution'
+import {
+  institutionData,
+  transformedInstitutionList
+} from '../test/testData/institution'
 import { ConnectApi } from './connectApi'
 
 const connectApi = new ConnectApi({
@@ -43,32 +46,13 @@ describe('connectApi', () => {
   })
 
   describe('loadInstitutions', () => {
-    const expectedInstitutionList = [
-      {
-        guid: 'UCP-da107e6d0da7779',
-        name: 'MX Bank (Oauth)',
-        url: 'https://mx.com',
-        logo_url:
-          'https://s3.amazonaws.com/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
-        supports_oauth: true
-      },
-      {
-        guid: 'UCP-da107e6d0da7779',
-        name: 'MX Bank (Oauth)',
-        url: 'https://mx.com',
-        logo_url:
-          'https://s3.amazonaws.com/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
-        supports_oauth: true
-      }
-    ]
-
     it('loads formatted institutions', async () => {
       const institutions = await connectApi.loadInstitutions(
         'MX',
         MappedJobTypes.AGGREGATE
       )
 
-      expect(institutions).toEqual(expectedInstitutionList)
+      expect(institutions).toEqual(transformedInstitutionList)
     })
   })
 

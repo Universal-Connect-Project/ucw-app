@@ -1,11 +1,19 @@
 import type { Response } from 'express'
 import {
   elasticSearchInstitutionData,
-  institutionData
+  institutionData,
+  transformedInstitutionList
 } from '../test/testData/institution'
 import { ConnectApi } from './connectApi'
-import type { InstitutionRequest } from './institutionEndpoints'
-import { getInstitutionHandler } from './institutionEndpoints'
+import type {
+  GetInstitutionsRequest,
+  InstitutionRequest
+} from './institutionEndpoints'
+import {
+  getInstitutionHandler,
+  getInstitutionsHandler
+} from './institutionEndpoints'
+import { MappedJobTypes } from '../shared/contract'
 
 const mxInstitution = institutionData.institution
 
@@ -80,6 +88,30 @@ describe('institutionEndpoints', () => {
           url: ucpInstitution.url
         }
       })
+    })
+  })
+
+  describe('getInstitutionsHandler', () => {
+    it('returns a list of institutions', async () => {
+      const context = {
+        job_type: MappedJobTypes.AGGREGATE
+      }
+
+      const req = {
+        connectService: new ConnectApi({ context }),
+        context,
+        query: {
+          search_name: 'MX'
+        }
+      } as unknown as GetInstitutionsRequest
+
+      const res = {
+        send: jest.fn()
+      } as unknown as Response
+
+      await getInstitutionsHandler(req, res)
+
+      expect(res.send).toHaveBeenCalledWith(transformedInstitutionList)
     })
   })
 })
