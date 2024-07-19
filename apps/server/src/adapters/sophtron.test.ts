@@ -622,7 +622,7 @@ describe('sophtron adapter', () => {
       expect(response).toEqual({
         challenges: [
           {
-            id: 'TokenSentFlag',
+            id: 'TokenInput',
             type: ChallengeType.QUESTION,
             data: [
               {
@@ -663,7 +663,7 @@ describe('sophtron adapter', () => {
       expect(response).toEqual({
         challenges: [
           {
-            id: 'TokenSentFlag',
+            id: 'TokenInput',
             type: ChallengeType.QUESTION,
             data: [
               {
@@ -879,7 +879,7 @@ describe('sophtron adapter', () => {
         {
           challenges: [
             {
-              id: 'TokenSentFlag',
+              id: 'TokenInput',
               response: testQuestionResponse
             }
           ]
@@ -891,7 +891,7 @@ describe('sophtron adapter', () => {
         AnswerText: testQuestionResponse
       })
       expect(requestParams).toEqual({
-        challengeId: 'TokenSentFlag',
+        challengeId: 'TokenInput',
         jobId: testId
       })
 

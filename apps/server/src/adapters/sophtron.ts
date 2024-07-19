@@ -233,7 +233,7 @@ export class SophtronAdapter implements WidgetAdapter {
             value: q
           }))
         } else if (job.TokenSentFlag === true) {
-          challenge.id = 'TokenSentFlag'
+          challenge.id = 'TokenInput'
           challenge.type = ChallengeType.QUESTION
           challenge.question = 'ota'
           challenge.data = [
@@ -283,7 +283,7 @@ export class SophtronAdapter implements WidgetAdapter {
       case 'SecurityQuestion':
         answer = JSON.stringify([c.response])
         break
-      case 'TokenSentFlag':
+      case 'TokenInput':
       case 'single_account_select':
       case 'TokenMethod':
       case 'CaptchaImage':

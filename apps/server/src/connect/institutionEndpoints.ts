@@ -26,12 +26,12 @@ export const getInstitutionHandler = async (
   res.send(ret)
 }
 
-interface GetInstitutionsRequest extends InstitutionRequest {
+export interface GetInstitutionsRequest extends InstitutionRequest {
   context: {
     job_type: MappedJobTypes
   }
   query: {
-    routing_number: string
+    routing_number?: string
     search_name?: string
   }
 }
@@ -55,8 +55,14 @@ export const favoriteInstitutionsHandler = async (
   res.send(popularInsitutions)
 }
 
+export interface GetInstitutionCredentialsRequest extends InstitutionRequest {
+  params: {
+    institution_guid: string
+  }
+}
+
 export const getInstitutionCredentialsHandler = async (
-  req: InstitutionRequest,
+  req: GetInstitutionCredentialsRequest,
   res: Response
 ) => {
   const credentials = await req.connectApi.getInstitutionCredentials(
