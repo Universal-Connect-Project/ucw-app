@@ -1,6 +1,7 @@
 import { createCipheriv, createDecipheriv } from 'crypto'
 import { algo, enc } from 'crypto-js'
 import config from '../config'
+
 import { JobTypes, MappedJobTypes } from '../shared/contract'
 
 export function hmac(text: string, key: string) {
