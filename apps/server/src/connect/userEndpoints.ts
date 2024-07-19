@@ -1,7 +1,7 @@
 import type { Response } from 'express'
 import Joi from 'joi'
 import { getProviderAdapter } from '../adapters'
-import { createProviderValidator } from '../utils'
+import { createProviderValidator } from '../utils/validators'
 interface UserDeleteParameters {
   provider: string
   userId: string

@@ -1,14 +1,8 @@
 import { createCipheriv, createDecipheriv } from 'crypto'
 import { algo, enc } from 'crypto-js'
-import Joi from 'joi'
 import config from '../config'
 
-import { JobTypes, MappedJobTypes, Providers } from '../shared/contract'
-
-export const createProviderValidator = () =>
-  Joi.string()
-    .valid(...Object.values(Providers))
-    .required()
+import { JobTypes, MappedJobTypes } from '../shared/contract'
 
 export function hmac(text: string, key: string) {
   const hmac = algo.HMAC.create(algo.SHA256, enc.Base64.parse(key))

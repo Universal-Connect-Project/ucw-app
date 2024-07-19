@@ -4,7 +4,7 @@ import Joi from 'joi'
 import { getProviderAdapter } from '../adapters'
 import getVC from '../services/vcProviders'
 import { Providers } from '../shared/contract'
-import { createProviderValidator } from '../utils'
+import { createProviderValidator } from '../utils/validators'
 
 export interface AccountsDataQueryParameters {
   connection_id: string
