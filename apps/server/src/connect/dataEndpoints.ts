@@ -4,6 +4,7 @@ import Joi from 'joi'
 import { getProviderAdapter } from '../adapters'
 import getVC from '../services/vcProviders'
 import { Providers } from '../shared/contract'
+import { createProviderValidator } from '../utils'
 
 export interface AccountsDataQueryParameters {
   connection_id: string
@@ -22,11 +23,6 @@ export interface IdentityRequest {
 export interface TransactionsRequest {
   query: TransactionsDataQueryParameters
 }
-
-const createProviderValidator = () =>
-  Joi.string()
-    .valid(...Object.values(Providers))
-    .required()
 
 export const accountsDataHandler = async (
   req: AccountsRequest,
