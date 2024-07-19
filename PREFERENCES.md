@@ -42,7 +42,7 @@ Here are details for what each setting means.
 ]
 ```
 
-`defaultProviderVolume` (`{ [key: string]: number }`) - An object of providers, with a number representing a percent of volume. The combined volume across all providers must equal 100.
+`defaultProviderVolume` (`{ [key: string]: number }`) - An object of providers, with a number representing the chance of being selected. The combined volume across all providers must equal 100.
 
 ```
 "defaultProviderVolume": {
@@ -51,7 +51,7 @@ Here are details for what each setting means.
 }
 ```
 
-`institutionProviderVolumeMap` (`{ [key: string]: { [key:string]: number } }`) - An object of institutions, with a related object of providers. The number associated with each provider represents a percent of volume. The combined volume for each individual institution must equal 100.
+`institutionProviderVolumeMap` (`{ [key: string]: { [key:string]: number } }`) - An object of institutions, with a related object of providers. The number associated with each provider represents the chance of being selected. The combined volume for each individual institution must equal 100.
 
 ```
 "institutionProviderVolumeMap": {

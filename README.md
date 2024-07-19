@@ -6,20 +6,25 @@ into an iframe.
 
 ## Table of Contents
 - [Documentation](#documentation)
+  - [API Documentation](#api-documentation)
 - [Getting Started](#getting-started)
 - [Preferences and Aggregator Credentials](#preferences-and-aggregator-credentials)
 - [Authentication](#authentication)
 
 ## Other Resources
-- [Additional Info](MISC.md)
 - [Contributing](CONTRIBUTING.md)
 - [Docker](DOCKER.md)
 - [Monorepo](MONOREPO.md)
 - [Preference Details](PREFERENCES.md)
+- [Miscellaneous](MISC.md)
 
 ## Documentation
 
-Please refer to the [UCP documentation](https://docs.universalconnectproject.org) (Coming soon) for additional information on how to use the widget.
+Please refer to the [UCP documentation](https://universalconnectproject.org/docs/introduction) for additional information on how to use the widget.
+
+### API Documentation
+
+The API documentation for this service lives in [./openApiDocumentation.json](./openApiDocumentation.json) and uses the [OpenAPI spec](https://swagger.io/specification/). You can open it in your preferred tool. You may copy the file into [swagger editor](https://editor.swagger.io/) and edit the local file with updates when complete.
 
 ## Getting Started
 
@@ -48,4 +53,4 @@ See [PREFERENCES.md](PREFERENCES.md) for details.
 
 ## Authentication
 
-The expressjs endpoints that are exposed in these repositories do not provide any authentication. You will need to fork the repo if you want to add your own authentication.
+The Express.js endpoints that are exposed in these repositories do not provide any authentication. You will need to fork the repo if you want to add your own authentication.
