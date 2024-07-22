@@ -136,13 +136,13 @@
         }
       }
     },
-    "/data/identity": {
+    "/data/provider/{provider}/user/{user_id}/connection/{connection_id}/identity": {
       "get": {
         "parameters": [
           {
             "description": "The connection id",
             "name": "connection_id",
-            "in": "query",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "string"
@@ -151,7 +151,7 @@
           {
             "description": "The provider for the connection",
             "name": "provider",
-            "in": "query",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "string",
@@ -161,7 +161,7 @@
           {
             "description": "The user id for the connection",
             "name": "user_id",
-            "in": "query",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "string"

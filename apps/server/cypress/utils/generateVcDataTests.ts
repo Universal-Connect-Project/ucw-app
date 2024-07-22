@@ -32,7 +32,7 @@ const verifyAccountsAndReturnAccountId = ({ provider, memberGuid, userId }) => {
 const verifyIdentity = ({ provider, memberGuid, userId }) => {
   cy.request(
     'GET',
-    `/data/identity?provider=${provider}&connection_id=${memberGuid}&user_id=${userId}`
+    `/data/provider/${provider}/user/${userId}/connection/${memberGuid}/identity`
   ).should((response) => {
     expect(response.status).to.equal(200)
     expect(response.body).to.haveOwnProperty('jwt')

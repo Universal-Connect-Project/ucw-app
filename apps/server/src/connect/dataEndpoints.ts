@@ -17,7 +17,7 @@ export interface AccountsRequest {
 }
 
 export interface IdentityRequest {
-  query: IdentityDataQueryParameters
+  params: IdentityDataParameters
 }
 
 export interface TransactionsRequest {
@@ -44,39 +44,24 @@ export const accountsDataHandler = async (
   }
 }
 
-export interface IdentityDataQueryParameters {
-  connection_id: string
+export interface IdentityDataParameters {
+  connectionId: string
   provider: string
-  user_id: string
+  userId: string
 }
 
 export const identityDataHandler = async (
   req: IdentityRequest,
   res: Response
 ) => {
-  const schema = Joi.object({
-    connection_id: Joi.string().required(),
-    provider: createProviderValidator(),
-    user_id: Joi.string().required()
-  })
-
-  const { error } = schema.validate(req.query)
-
-  if (error) {
-    res.status(400)
-    res.send(error.details[0].message)
-
-    return
-  }
-
-  const { provider, connection_id, user_id } =
-    req.query as unknown as IdentityDataQueryParameters
+  const { provider, connectionId, userId } =
+    req.params as unknown as IdentityDataParameters
 
   const providerAdapter = getProviderAdapter(provider)
-  const providerUserId = await providerAdapter.ResolveUserId(user_id)
+  const providerUserId = await providerAdapter.ResolveUserId(userId)
 
   try {
-    const vc = await getVC(provider, connection_id, 'identity', providerUserId)
+    const vc = await getVC(provider, connectionId, 'identity', providerUserId)
     res.send({
       jwt: vc
     })

@@ -76,71 +76,6 @@ describe('dataEndpoints', () => {
   })
 
   describe('identityDataHandler', () => {
-    describe('validation', () => {
-      it('responds with a failure if connection_id is missing', async () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn()
-        } as unknown as Response
-
-        await identityDataHandler(
-          {
-            query: {
-              provider: Providers.MX,
-              user_id: 'testUserId'
-            }
-          } as IdentityRequest,
-          res
-        )
-
-        expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.send).toHaveBeenCalledWith('"connection_id" is required')
-      })
-
-      it('responds with a failure if user_id is missing', async () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn()
-        } as unknown as Response
-
-        await identityDataHandler(
-          {
-            query: {
-              connection_id: 'testConnectionId',
-              provider: Providers.MX
-            }
-          } as IdentityRequest,
-          res
-        )
-
-        expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.send).toHaveBeenCalledWith('"user_id" is required')
-      })
-
-      it('responds with a failure if provider isnt valid', async () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn()
-        } as unknown as Response
-
-        await identityDataHandler(
-          {
-            query: {
-              connection_id: 'testConnectionId',
-              provider: 'junk',
-              user_id: 'testUserId'
-            }
-          } as IdentityRequest,
-          res
-        )
-
-        expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.send).toHaveBeenCalledWith(
-          `"provider" must be one of [${Object.values(Providers).join(', ')}]`
-        )
-      })
-    })
-
     it('responds with the vc data in the jwt on success', async () => {
       const res = {
         send: jest.fn(),
@@ -148,10 +83,10 @@ describe('dataEndpoints', () => {
       } as unknown as Response
 
       const req: IdentityRequest = {
-        query: {
-          connection_id: 'testConnectionId',
+        params: {
+          connectionId: 'testConnectionId',
           provider: Providers.MX,
-          user_id: 'testUserId'
+          userId: 'testUserId'
         }
       }
 
@@ -176,10 +111,10 @@ describe('dataEndpoints', () => {
       } as unknown as Response
 
       const req: IdentityRequest = {
-        query: {
-          connection_id: 'testConnectionId',
+        params: {
+          connectionId: 'testConnectionId',
           provider: Providers.MX,
-          user_id: 'testUserId'
+          userId: 'testUserId'
         }
       }
 
