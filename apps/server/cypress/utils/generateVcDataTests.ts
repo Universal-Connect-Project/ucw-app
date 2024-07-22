@@ -47,7 +47,7 @@ const verifyIdentity = ({ provider, memberGuid, userId }) => {
 const verifyTransactions = ({ accountId, provider, userId }) => {
   cy.request(
     'GET',
-    `/data/provider/${provider}/user/${userId}/account/${accountId}/transactions${provider === 'sophtron' ? '&start_time=1/1/2024&end_time=1/2/2024' : ''}`
+    `/data/provider/${provider}/user/${userId}/account/${accountId}/transactions${provider === 'sophtron' ? '?start_time=1/1/2024&end_time=1/2/2024' : ''}`
   ).should((response) => {
     expect(response.status).to.equal(200)
     expect(response.body).to.haveOwnProperty('jwt')

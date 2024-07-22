@@ -39,8 +39,7 @@ export function getProviderAdapter(provider: string): WidgetAdapter {
     case 'finicity_sandbox':
       return new FinicityAdapter(true)
     default:
-      // throw new Error(`Unsupported provider ${provider}`);
-      return null
+      throw new Error(`Unsupported provider ${provider}`)
   }
 }
 
