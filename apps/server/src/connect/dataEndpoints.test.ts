@@ -27,79 +27,16 @@ const providerErrorText = `"provider" must be one of [${Object.values(Providers)
 
 describe('dataEndpoints', () => {
   describe('accountsDataHandler', () => {
-    describe('validation', () => {
-      it('responds with a failure if connection_id is missing', async () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn()
-        } as unknown as Response
-
-        await accountsDataHandler(
-          {
-            query: {
-              provider: Providers.MX,
-              user_id: 'testUserId'
-            }
-          } as AccountsRequest,
-          res
-        )
-
-        expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.send).toHaveBeenCalledWith('"connection_id" is required')
-      })
-
-      it('responds with a failure if user_id is missing', async () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn()
-        } as unknown as Response
-
-        await accountsDataHandler(
-          {
-            query: {
-              connection_id: 'testConnectionId',
-              provider: Providers.MX
-            }
-          } as AccountsRequest,
-          res
-        )
-
-        expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.send).toHaveBeenCalledWith('"user_id" is required')
-      })
-
-      it('responds with a failure if provider isnt valid', async () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn()
-        } as unknown as Response
-
-        await accountsDataHandler(
-          {
-            query: {
-              connection_id: 'testConnectionId',
-              provider: 'junk',
-              user_id: 'testUserId'
-            }
-          } as AccountsRequest,
-          res
-        )
-
-        expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.send).toHaveBeenCalledWith(providerErrorText)
-      })
-    })
-
     it('responds with the vc data in the jwt on success', async () => {
       const res = {
         send: jest.fn()
       } as unknown as Response
 
       const req: AccountsRequest = {
-        query: {
-          connection_id: 'testConnectionId',
+        params: {
+          connectionId: 'testConnectionId',
           provider: Providers.MX,
-          user_id: 'testUserId'
+          userId: 'testUserId'
         }
       }
 
@@ -124,10 +61,10 @@ describe('dataEndpoints', () => {
       } as unknown as Response
 
       const req: AccountsRequest = {
-        query: {
-          connection_id: 'testConnectionId',
+        params: {
+          connectionId: 'testConnectionId',
           provider: Providers.MX,
-          user_id: 'testUserId'
+          userId: 'testUserId'
         }
       }
 

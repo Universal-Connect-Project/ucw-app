@@ -271,7 +271,10 @@ export default function (app) {
   app.delete('/api/provider/:provider/user/:userId', userDeleteHandler)
 
   // VC Data Endpoints
-  app.get('/data/accounts', accountsDataHandler)
+  app.get(
+    '/data/provider/:provider/user/:userId/connection/:connectionId/accounts',
+    accountsDataHandler
+  )
   app.get('/data/identity', identityDataHandler)
   app.get('/data/transactions', transactionsDataHandler)
 }

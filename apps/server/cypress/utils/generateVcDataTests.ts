@@ -11,7 +11,7 @@ const verifyAccountsAndReturnAccountId = ({ provider, memberGuid, userId }) => {
   return cy
     .request(
       'GET',
-      `/data/accounts?provider=${provider}&connection_id=${memberGuid}&user_id=${userId}`
+      `/data/provider/${provider}/user/${userId}/connection/${memberGuid}/accounts`
     )
     .then((response) => {
       expect(response.status).to.equal(200)

@@ -7,13 +7,13 @@ import { Providers } from '../shared/contract'
 import { createProviderValidator } from '../utils/validators'
 
 export interface AccountsDataQueryParameters {
-  connection_id: string
+  connectionId: string
   provider: string
-  user_id: string
+  userId: string
 }
 
 export interface AccountsRequest {
-  query: AccountsDataQueryParameters
+  params: AccountsDataQueryParameters
 }
 
 export interface IdentityRequest {
@@ -28,28 +28,13 @@ export const accountsDataHandler = async (
   req: AccountsRequest,
   res: Response
 ) => {
-  const schema = Joi.object({
-    connection_id: Joi.string().required(),
-    provider: createProviderValidator(),
-    user_id: Joi.string().required()
-  })
-
-  const { error } = schema.validate(req.query)
-
-  if (error) {
-    res.status(400)
-    res.send(error.details[0].message)
-
-    return
-  }
-
-  const { provider, connection_id, user_id } = req.query
+  const { provider, connectionId, userId } = req.params
 
   const providerAdapter = getProviderAdapter(provider)
-  const providerUserId = await providerAdapter.ResolveUserId(user_id)
+  const providerUserId = await providerAdapter.ResolveUserId(userId)
 
   try {
-    const vc = await getVC(provider, connection_id, 'accounts', providerUserId)
+    const vc = await getVC(provider, connectionId, 'accounts', providerUserId)
     res.send({
       jwt: vc
     })
