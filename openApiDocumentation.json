@@ -185,13 +185,13 @@
         }
       }
     },
-    "/data/transactions": {
+    "/data/provider/{provider}/user/{user_id}/account/{account_id}/transactions": {
       "get": {
         "parameters": [
           {
             "description": "The account id",
             "name": "account_id",
-            "in": "query",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "string"
@@ -208,7 +208,7 @@
           {
             "description": "The provider for the connection",
             "name": "provider",
-            "in": "query",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "string",
@@ -226,7 +226,7 @@
           {
             "description": "The user id for the connection",
             "name": "user_id",
-            "in": "query",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "string"

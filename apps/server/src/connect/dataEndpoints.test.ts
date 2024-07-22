@@ -127,70 +127,6 @@ describe('dataEndpoints', () => {
 
   describe('transactionsDataHandler', () => {
     describe('validation', () => {
-      it('responds with a 400 if account_id is missing', async () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn()
-        } as unknown as Response
-
-        const req: TransactionsRequest = {
-          query: {
-            provider: Providers.MX,
-            user_id: 'testUserId',
-            start_time: undefined,
-            end_time: undefined
-          }
-        } as TransactionsRequest
-
-        await transactionsDataHandler(req, res)
-
-        expect(res.send).toHaveBeenCalledWith('"account_id" is required')
-        expect(res.status).toHaveBeenCalledWith(400)
-      })
-
-      it('responds with a 400 if provider is wrong', async () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn()
-        } as unknown as Response
-
-        const req: TransactionsRequest = {
-          query: {
-            account_id: 'testAccountId',
-            provider: 'junk',
-            user_id: 'testUserId',
-            start_time: undefined,
-            end_time: undefined
-          }
-        } as TransactionsRequest
-
-        await transactionsDataHandler(req, res)
-
-        expect(res.send).toHaveBeenCalledWith(providerErrorText)
-        expect(res.status).toHaveBeenCalledWith(400)
-      })
-
-      it('responds with a 400 if user_id is missing', async () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn()
-        } as unknown as Response
-
-        const req: TransactionsRequest = {
-          query: {
-            account_id: 'testAccountId',
-            provider: Providers.MX,
-            start_time: undefined,
-            end_time: undefined
-          }
-        } as TransactionsRequest
-
-        await transactionsDataHandler(req, res)
-
-        expect(res.send).toHaveBeenCalledWith('"user_id" is required')
-        expect(res.status).toHaveBeenCalledWith(400)
-      })
-
       it('doesnt respond with a 400 if its mx and there is no start or end time', async () => {
         const res = {
           send: jest.fn(),
@@ -198,11 +134,12 @@ describe('dataEndpoints', () => {
         } as unknown as Response
 
         const req: TransactionsRequest = {
-          query: {
-            account_id: 'testAccountId',
+          params: {
+            accountId: 'testAccountId',
             provider: Providers.MX,
-            user_id: 'testUserId'
-          }
+            userId: 'testUserId'
+          },
+          query: {}
         } as TransactionsRequest
 
         await transactionsDataHandler(req, res)
@@ -217,10 +154,12 @@ describe('dataEndpoints', () => {
         } as unknown as Response
 
         const req: TransactionsRequest = {
-          query: {
-            account_id: 'testAccountId',
+          params: {
+            accountId: 'testAccountId',
             provider: Providers.SOPHTRON,
-            user_id: 'testUserId',
+            userId: 'testUserId'
+          },
+          query: {
             end_time: 'junk'
           }
         } as TransactionsRequest
@@ -238,10 +177,12 @@ describe('dataEndpoints', () => {
         } as unknown as Response
 
         const req: TransactionsRequest = {
-          query: {
-            account_id: 'testAccountId',
+          params: {
+            accountId: 'testAccountId',
             provider: Providers.SOPHTRON,
-            user_id: 'testUserId',
+            userId: 'testUserId'
+          },
+          query: {
             start_time: 'junk'
           }
         } as TransactionsRequest
@@ -260,10 +201,12 @@ describe('dataEndpoints', () => {
       } as unknown as Response
 
       const req: TransactionsRequest = {
-        query: {
-          account_id: 'testAccountId',
+        params: {
+          accountId: 'testAccountId',
           provider: Providers.MX,
-          user_id: 'testUserId',
+          userId: 'testUserId'
+        },
+        query: {
           start_time: undefined,
           end_time: undefined
         }
@@ -290,10 +233,12 @@ describe('dataEndpoints', () => {
       } as unknown as Response
 
       const req: TransactionsRequest = {
-        query: {
-          account_id: 'testAccountId',
+        params: {
+          accountId: 'testAccountId',
           provider: Providers.MX,
-          user_id: 'testUserId',
+          userId: 'testUserId'
+        },
+        query: {
           start_time: undefined,
           end_time: undefined
         }

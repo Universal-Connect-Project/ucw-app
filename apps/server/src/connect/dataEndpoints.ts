@@ -4,7 +4,6 @@ import Joi from 'joi'
 import { getProviderAdapter } from '../adapters'
 import getVC from '../services/vcProviders'
 import { Providers } from '../shared/contract'
-import { createProviderValidator } from '../utils/validators'
 
 export interface AccountsDataQueryParameters {
   connectionId: string
@@ -22,6 +21,7 @@ export interface IdentityRequest {
 
 export interface TransactionsRequest {
   query: TransactionsDataQueryParameters
+  params: TransactionsDataPathParameters
 }
 
 export const accountsDataHandler = async (
@@ -55,7 +55,7 @@ export const identityDataHandler = async (
   res: Response
 ) => {
   const { provider, connectionId, userId } =
-    req.params as unknown as IdentityDataParameters
+    req.params as IdentityDataParameters
 
   const providerAdapter = getProviderAdapter(provider)
   const providerUserId = await providerAdapter.ResolveUserId(userId)
@@ -72,29 +72,28 @@ export const identityDataHandler = async (
 }
 
 export interface TransactionsDataQueryParameters {
-  account_id: string
   end_time: string
-  provider: string
   start_time: string
-  user_id: string
+}
+
+export interface TransactionsDataPathParameters {
+  accountId: string
+  provider: string
+  userId: string
 }
 
 export const transactionsDataHandler = async (
   req: TransactionsRequest,
   res: Response
 ) => {
+  const { accountId, provider, userId } =
+    req.params as TransactionsDataPathParameters
+
   const schema = Joi.object({
-    account_id: Joi.string().required(),
-    end_time: Joi.when('provider', {
-      is: Providers.SOPHTRON,
-      then: Joi.string().required()
-    }),
-    provider: createProviderValidator(),
-    start_time: Joi.when('provider', {
-      is: Providers.SOPHTRON,
-      then: Joi.string().required()
-    }),
-    user_id: Joi.string().required()
+    end_time:
+      provider === Providers.SOPHTRON ? Joi.string().required() : Joi.string(),
+    start_time:
+      provider === Providers.SOPHTRON ? Joi.string().required() : Joi.string()
   })
 
   const { error } = schema.validate(req.query)
@@ -106,11 +105,10 @@ export const transactionsDataHandler = async (
     return
   }
 
-  const { provider, user_id, account_id, start_time, end_time } =
-    req.query as unknown as TransactionsDataQueryParameters
+  const { start_time, end_time } = req.query as TransactionsDataQueryParameters
 
   const providerAdapter = getProviderAdapter(provider)
-  const providerUserId = await providerAdapter.ResolveUserId(user_id)
+  const providerUserId = await providerAdapter.ResolveUserId(userId)
 
   try {
     const vc = await getVC(
@@ -118,7 +116,7 @@ export const transactionsDataHandler = async (
       undefined,
       'transactions',
       providerUserId,
-      account_id,
+      accountId,
       start_time,
       end_time
     )
