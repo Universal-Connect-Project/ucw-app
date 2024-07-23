@@ -27,6 +27,27 @@ const providerErrorText = `"provider" must be one of [${Object.values(Providers)
 
 describe('dataEndpoints', () => {
   describe('accountsDataHandler', () => {
+    it('responds with a failure if provider isnt valid', async () => {
+      const res = {
+        send: jest.fn(),
+        status: jest.fn()
+      } as unknown as Response
+
+      await accountsDataHandler(
+        {
+          params: {
+            connectionId: 'testConnectionId',
+            provider: 'junk',
+            userId: 'testUserId'
+          }
+        } as AccountsRequest,
+        res
+      )
+
+      expect(res.status).toHaveBeenCalledWith(400)
+      expect(res.send).toHaveBeenCalledWith(providerErrorText)
+    })
+
     it('responds with the vc data in the jwt on success', async () => {
       const res = {
         send: jest.fn()
@@ -76,6 +97,29 @@ describe('dataEndpoints', () => {
   })
 
   describe('identityDataHandler', () => {
+    it('responds with a failure if provider isnt valid', async () => {
+      const res = {
+        send: jest.fn(),
+        status: jest.fn()
+      } as unknown as Response
+
+      await identityDataHandler(
+        {
+          params: {
+            connectionId: 'testConnectionId',
+            provider: 'junk',
+            userId: 'testUserId'
+          }
+        } as IdentityRequest,
+        res
+      )
+
+      expect(res.status).toHaveBeenCalledWith(400)
+      expect(res.send).toHaveBeenCalledWith(
+        `"provider" must be one of [${Object.values(Providers).join(', ')}]`
+      )
+    })
+
     it('responds with the vc data in the jwt on success', async () => {
       const res = {
         send: jest.fn(),
@@ -127,6 +171,30 @@ describe('dataEndpoints', () => {
 
   describe('transactionsDataHandler', () => {
     describe('validation', () => {
+      it('responds with a 400 if provider is wrong', async () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn()
+        } as unknown as Response
+
+        const req: TransactionsRequest = {
+          params: {
+            accountId: 'testAccountId',
+            provider: 'junk',
+            userId: 'testUserId'
+          },
+          query: {
+            start_time: undefined,
+            end_time: undefined
+          }
+        } as TransactionsRequest
+
+        await transactionsDataHandler(req, res)
+
+        expect(res.send).toHaveBeenCalledWith(providerErrorText)
+        expect(res.status).toHaveBeenCalledWith(400)
+      })
+
       it('doesnt respond with a 400 if its mx and there is no start or end time', async () => {
         const res = {
           send: jest.fn(),
