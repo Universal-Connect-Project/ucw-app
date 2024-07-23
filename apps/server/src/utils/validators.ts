@@ -1,6 +1,8 @@
 import Joi from 'joi'
 import { Providers } from '../shared/contract'
 
+export const invalidProviderString = `"provider" must be one of [${Object.values(Providers).join(', ')}]`
+
 export const createProviderValidator = () =>
   Joi.string()
     .valid(...Object.values(Providers))

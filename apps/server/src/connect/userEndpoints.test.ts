@@ -6,6 +6,7 @@ import { listUsersData } from '../test/testData/users'
 import { server } from '../test/testServer'
 import type { UserDeleteRequest } from './userEndpoints'
 import { userDeleteHandler } from './userEndpoints'
+import { invalidProviderString } from '../utils/validators'
 
 const user = listUsersData.users[0]
 
@@ -26,9 +27,7 @@ describe('userEndpoints', () => {
 
       await userDeleteHandler(req, res)
 
-      expect(res.send).toHaveBeenCalledWith(
-        '"provider" must be one of [mx, mx_int, sophtron]'
-      )
+      expect(res.send).toHaveBeenCalledWith(invalidProviderString)
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(res.status).toHaveBeenCalledWith(400)
     })

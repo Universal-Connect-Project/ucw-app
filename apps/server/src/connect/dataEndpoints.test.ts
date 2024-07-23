@@ -22,8 +22,7 @@ import {
   transactionsDataHandler
 } from './dataEndpoints'
 import { Providers } from '../shared/contract'
-
-const providerErrorText = `"provider" must be one of [${Object.values(Providers).join(', ')}]`
+import { invalidProviderString } from '../utils/validators'
 
 describe('dataEndpoints', () => {
   describe('accountsDataHandler', () => {
@@ -45,7 +44,7 @@ describe('dataEndpoints', () => {
       )
 
       expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.send).toHaveBeenCalledWith(providerErrorText)
+      expect(res.send).toHaveBeenCalledWith(invalidProviderString)
     })
 
     it('responds with the vc data in the jwt on success', async () => {
@@ -115,9 +114,7 @@ describe('dataEndpoints', () => {
       )
 
       expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.send).toHaveBeenCalledWith(
-        `"provider" must be one of [${Object.values(Providers).join(', ')}]`
-      )
+      expect(res.send).toHaveBeenCalledWith(invalidProviderString)
     })
 
     it('responds with the vc data in the jwt on success', async () => {
@@ -191,7 +188,7 @@ describe('dataEndpoints', () => {
 
         await transactionsDataHandler(req, res)
 
-        expect(res.send).toHaveBeenCalledWith(providerErrorText)
+        expect(res.send).toHaveBeenCalledWith(invalidProviderString)
         expect(res.status).toHaveBeenCalledWith(400)
       })
 
