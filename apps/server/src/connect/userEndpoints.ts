@@ -1,7 +1,6 @@
 import type { Response } from 'express'
-import Joi from 'joi'
 import { getProviderAdapter } from '../adapters'
-import { createProviderValidator } from '../utils/validators'
+import { withValidateProviderInPath } from '../utils/validators'
 interface UserDeleteParameters {
   provider: string
   userId: string
@@ -11,38 +10,23 @@ export interface UserDeleteRequest {
   params: UserDeleteParameters
 }
 
-export const userDeleteHandler = async (
-  req: UserDeleteRequest,
-  res: Response
-) => {
-  const schema = Joi.object({
-    provider: createProviderValidator(),
-    userId: Joi.string().required()
-  })
+export const userDeleteHandler = withValidateProviderInPath(
+  async (req: UserDeleteRequest, res: Response) => {
+    const { userId, provider } = req.params
 
-  const { error } = schema.validate(req.params)
-
-  if (error) {
-    res.status(400)
-    res.send(error.details[0].message)
-
-    return
+    try {
+      const providerAdapter = getProviderAdapter(provider)
+      const failIfUserNotFound = true
+      const providerUserId = await providerAdapter.ResolveUserId(
+        userId,
+        failIfUserNotFound
+      )
+      const ret = await providerAdapter.DeleteUser(providerUserId)
+      res.status(ret.status)
+      res.send(ret.data)
+    } catch (error) {
+      res.status(400)
+      res.send('User delete failed')
+    }
   }
-
-  const { userId, provider } = req.params
-
-  try {
-    const providerAdapter = getProviderAdapter(provider)
-    const failIfUserNotFound = true
-    const providerUserId = await providerAdapter.ResolveUserId(
-      userId,
-      failIfUserNotFound
-    )
-    const ret = await providerAdapter.DeleteUser(providerUserId)
-    res.status(ret.status)
-    res.send(ret.data)
-  } catch (error) {
-    res.status(400)
-    res.send('User delete failed')
-  }
-}
+)

@@ -11,7 +11,7 @@ const verifyAccountsAndReturnAccountId = ({ provider, memberGuid, userId }) => {
   return cy
     .request(
       'GET',
-      `/data/accounts?provider=${provider}&connection_id=${memberGuid}&user_id=${userId}`
+      `/data/provider/${provider}/user/${userId}/connection/${memberGuid}/accounts`
     )
     .then((response) => {
       expect(response.status).to.equal(200)
@@ -32,7 +32,7 @@ const verifyAccountsAndReturnAccountId = ({ provider, memberGuid, userId }) => {
 const verifyIdentity = ({ provider, memberGuid, userId }) => {
   cy.request(
     'GET',
-    `/data/identity?provider=${provider}&connection_id=${memberGuid}&user_id=${userId}`
+    `/data/provider/${provider}/user/${userId}/connection/${memberGuid}/identity`
   ).should((response) => {
     expect(response.status).to.equal(200)
     expect(response.body).to.haveOwnProperty('jwt')
@@ -47,7 +47,7 @@ const verifyIdentity = ({ provider, memberGuid, userId }) => {
 const verifyTransactions = ({ accountId, provider, userId }) => {
   cy.request(
     'GET',
-    `/data/transactions?provider=${provider}&user_id=${userId}&account_id=${accountId}${provider === 'sophtron' ? '&start_time=1/1/2024&end_time=1/2/2024' : ''}`
+    `/data/provider/${provider}/user/${userId}/account/${accountId}/transactions${provider === 'sophtron' ? '?start_time=1/1/2024&end_time=1/2/2024' : ''}`
   ).should((response) => {
     expect(response.status).to.equal(200)
     expect(response.body).to.haveOwnProperty('jwt')

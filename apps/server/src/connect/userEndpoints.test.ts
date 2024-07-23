@@ -6,72 +6,30 @@ import { listUsersData } from '../test/testData/users'
 import { server } from '../test/testServer'
 import type { UserDeleteRequest } from './userEndpoints'
 import { userDeleteHandler } from './userEndpoints'
+import { invalidProviderString } from '../utils/validators'
 
 const user = listUsersData.users[0]
 
 describe('userEndpoints', () => {
   describe('userDeleteHandler', () => {
-    describe('validation', () => {
-      it('responds with a failure if userId is missing', async () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn()
-        } as unknown as Response
+    it('responds with a 400 on unsupported provider', async () => {
+      const res = {
+        send: jest.fn(),
+        status: jest.fn()
+      } as unknown as Response
 
-        const req: UserDeleteRequest = {
-          params: {
-            provider: Providers.MX,
-            userId: undefined
-          }
+      const req: UserDeleteRequest = {
+        params: {
+          provider: 'unsupportedProvider',
+          userId: 'testUserIdWhichDoesntExist'
         }
+      }
 
-        await userDeleteHandler(req, res)
+      await userDeleteHandler(req, res)
 
-        expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.send).toHaveBeenCalledWith('"userId" is required')
-      })
-
-      it('responds with a 400 on unsuported provider', async () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn()
-        } as unknown as Response
-
-        const req: UserDeleteRequest = {
-          params: {
-            provider: 'unsupportedProvider',
-            userId: 'testUserIdWhichDoesntExist'
-          }
-        }
-
-        await userDeleteHandler(req, res)
-
-        expect(res.send).toHaveBeenCalledWith(
-          '"provider" must be one of [mx, mx_int, sophtron]'
-        )
-        // eslint-disable-next-line @typescript-eslint/unbound-method
-        expect(res.status).toHaveBeenCalledWith(400)
-      })
-
-      it('responds with a 400 on empty provider', async () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn()
-        } as unknown as Response
-
-        const req: UserDeleteRequest = {
-          params: {
-            provider: undefined,
-            userId: 'testUserIdWhichDoesntExist'
-          }
-        }
-
-        await userDeleteHandler(req, res)
-
-        expect(res.send).toHaveBeenCalledWith('"provider" is required')
-        // eslint-disable-next-line @typescript-eslint/unbound-method
-        expect(res.status).toHaveBeenCalledWith(400)
-      })
+      expect(res.send).toHaveBeenCalledWith(invalidProviderString)
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(res.status).toHaveBeenCalledWith(400)
     })
 
     it('responds with 204 on success with mx', async () => {

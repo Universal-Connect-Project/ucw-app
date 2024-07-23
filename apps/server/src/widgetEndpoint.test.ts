@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { widgetHandler } from './widgetEndpoint'
 import { JobTypes, Providers } from './shared/contract'
+import { invalidProviderString } from './utils/validators'
 
 describe('server', () => {
   describe('widgetHandler', () => {
@@ -83,9 +84,7 @@ describe('server', () => {
         )
 
         expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.send).toHaveBeenCalledWith(
-          `"provider" must be one of [${Object.values(Providers).join(', ')}]`
-        )
+        expect(res.send).toHaveBeenCalledWith(invalidProviderString)
       })
 
       it('responds with a 400 if provider is provided without a connection_id', () => {
