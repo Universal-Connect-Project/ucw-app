@@ -84,7 +84,8 @@
           "200": {
             "description": "The widget page"
           }
-        }
+        },
+        "summary": "Widget webpage"
       }
     },
     "/data/provider/{provider}/user/{user_id}/connection/{connection_id}/accounts": {
@@ -133,7 +134,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Accounts data"
       }
     },
     "/data/provider/{provider}/user/{user_id}/connection/{connection_id}/identity": {
@@ -182,7 +184,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Identity data"
       }
     },
     "/data/provider/{provider}/user/{user_id}/account/{account_id}/transactions": {
@@ -247,7 +250,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Transactions data"
       }
     },
     "/api/provider/{provider}/user/{user_id}": {
@@ -280,7 +284,8 @@
           "204": {
             "description": "Success"
           }
-        }
+        },
+        "summary": "Delete user"
       }
     }
   }
