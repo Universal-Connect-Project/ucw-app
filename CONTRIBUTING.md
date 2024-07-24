@@ -4,7 +4,11 @@
 
 If you have an idea for an improvement to the code or the docs, then we encourage you to open an issue as a first step to discuss your proposed changes with the maintainers before proceeding. The maintainers will review requests on a regular basis.
 
-The maintainers will label an issue with "ready to take" if it's available for anyone to pick up and work on. If the maintainers want to implement the feature, then they will label it with "maintainers only". It's also possible that a feature request will be denied if it doesn't match the vision of the project, or postponed if it's not the right time. If a requested feature is denied, then you're welcome to fork the repo to make whatever changes you want.
+If the maintainers agree that the feature is something that should be included in the project, and they want the community to implement the feature, then it will be marked as "ready for technical design". At this point a member of the community can comment on the issue that they are going to work on the technical design. After a draft of technical design is complete, then a review can be requested from the maintainers. If the technical design is accepted, then the maintainers will either mark it as "ready to take"(anyone can pick it up) or "maintainers only" if they want to implement it.
+
+If the maintainers agree that the feature is something that should be included in the project and they want to implement it themselves, then they will mark the issue as "maintainers only".
+
+It's possible that a feature request will be denied if it doesn't match the vision of the project, or postponed if it's not the right time. If a requested feature is denied, then you're welcome to fork the repo to make whatever changes you want.
 
 ## Standard of quality
 
