@@ -5,8 +5,7 @@ describe('unsupported provider', () => {
     cy.visitAgg()
     searchByText('MX Bank')
 
-    cy.findByText('BBVA MX').should('exist')
-    cy.findByText('https://www.mwabank.com/index.php').should('exist')
+    cy.findByText('MWABank').should('exist')
     cy.findByText('MX Bank (Oauth)').should('not.exist')
   })
 })
