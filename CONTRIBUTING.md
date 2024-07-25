@@ -8,7 +8,7 @@ If the maintainers agree that the feature is something that should be included i
 
 If the maintainers agree that the feature should be included in the project, and they want the community to implement the feature, then it could be marked in two ways: "ready to take" or "ready for technical design"
 
-If a feature is marked "ready for technical design", then the scope of the issue is probably large, and the maintainers want to ensure that the technical design fits with the project. After an issue is marked in this way a member of the community can comment on the issue to claim the technical design. After a draft of technical design is complete, then a review can be requested from the maintainers. If the technical design is accepted, then the maintainers will either mark it as "ready to take"(anyone can pick it up) or "maintainers only" if they want to implement it.
+If a feature is marked "ready for technical design", then the scope of the issue is probably large, and the maintainers want to ensure that the technical design fits with the project. After an issue is marked in this way a member of the community can comment on the issue to claim the technical design. The [technical design template](./technicalDesignTemplate.md) may be used. After a draft of technical design is complete, then a review can be requested from the maintainers. If the technical design is accepted, then the maintainers will either mark it as "ready to take"(anyone can pick it up) or "maintainers only" if they want to implement it.
 
 If a feature is marked "ready to take", then anyone from the community can comment on the issue to claim it and start implementation.
 
