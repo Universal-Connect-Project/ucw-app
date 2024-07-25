@@ -4,9 +4,13 @@
 
 If you have an idea for an improvement to the code or the docs, then we encourage you to open an issue as a first step to discuss your proposed changes with the maintainers before proceeding. The maintainers will review requests on a regular basis.
 
-If the maintainers agree that the feature is something that should be included in the project, and they want the community to implement the feature, then it will be marked as "ready for technical design". At this point a member of the community can comment on the issue that they are going to work on the technical design. After a draft of technical design is complete, then a review can be requested from the maintainers. If the technical design is accepted, then the maintainers will either mark it as "ready to take"(anyone can pick it up) or "maintainers only" if they want to implement it.
-
 If the maintainers agree that the feature is something that should be included in the project and they want to implement it themselves, then they will mark the issue as "maintainers only".
+
+If the maintainers agree that the feature should be included in the project, and they want the community to implement the feature, then it could be marked in two ways: "ready to take" or "ready for technical design"
+
+If a feature is marked "ready for technical design", then the scope of the issue is probably large, and the maintainers want to ensure that the technical design fits with the project. After an issue is marked in this way a member of the community can comment on the issue to claim the technical design. The [technical design template](./technicalDesignTemplate.md) may be used. After a draft of technical design is complete, then a review can be requested from the maintainers. If the technical design is accepted, then the maintainers will either mark it as "ready to take"(anyone can pick it up) or "maintainers only" if they want to implement it.
+
+If a feature is marked "ready to take", then anyone from the community can comment on the issue to claim it and start implementation.
 
 It's possible that a feature request will be denied if it doesn't match the vision of the project, or postponed if it's not the right time. If a requested feature is denied, then you're welcome to fork the repo to make whatever changes you want.
 
