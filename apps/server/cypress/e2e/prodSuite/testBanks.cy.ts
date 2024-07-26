@@ -4,7 +4,7 @@ describe('testBanks', () => {
 
     cy.findByPlaceholderText('Search').type('MX Bank')
 
-    cy.findAllByText('MBank').should('exist')
+    cy.findAllByText('MWABank').should('exist')
     cy.findByText('MX Bank').should('not.exist')
   })
 })

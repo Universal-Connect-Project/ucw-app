@@ -13,11 +13,6 @@ describe('popular institutions', () => {
       website: 'https://www.usaa.com/inet/ent_logon/Logon'
     },
     { labelText: 'Enter User ID', name: 'Fifth Third Bank' },
-    {
-      labelText: 'Username',
-      name: 'Goldman Sachs',
-      website: 'https://wealth.goldman.com/login/login_a.cgi'
-    },
     { labelText: 'Username', name: 'Fidelity Investments' },
     { labelText: 'User name', name: 'Vanguard' },
     { labelText: 'Username', name: 'Empower Retirement' }

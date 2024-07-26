@@ -21,9 +21,9 @@ describe('preferences', () => {
 
   it('uses local preferences to hide institutions when searching', () => {
     cy.visitAgg()
-    searchByText('cando')
+    searchByText('Pinnacle Bank')
 
-    cy.findByText('First State Bank of Cando').should('exist')
-    cy.findByText('CanDo CU').should('not.exist')
+    cy.findByText('Pinnacle Bank (WY)').should('exist')
+    cy.findByText('Pinnacle Bank').should('not.exist')
   })
 })

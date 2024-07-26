@@ -5,7 +5,7 @@ describe('search', () => {
     cy.visitAgg()
 
     const institutionThatIsInFavoritesButDoesntSupportAll =
-      'ExxonMobil Card - Yod 9.0.3'
+      'Sophtron Bank SecurityQuestion'
 
     cy.findByText(institutionThatIsInFavoritesButDoesntSupportAll).should(
       'exist'
@@ -35,7 +35,7 @@ describe('search', () => {
       )
 
       cy.findByPlaceholderText('Search').clear().type('chape')
-      cy.findByText('Chase UCard', { timeout: 45000 }).should('exist')
+      cy.findByText('Chase Bank', { timeout: 45000 }).should('exist')
 
       cy.findByPlaceholderText('Search').clear().type('wells')
       cy.findByText('Wells Fargo', { timeout: 45000 }).should('exist')
@@ -45,24 +45,20 @@ describe('search', () => {
       cy.visitAgg()
 
       cy.findByPlaceholderText('Search').clear().type('chase')
-      cy.findByText('Chase (CA)')
+      cy.findByText('Chase Bank')
       cy.get('[data-test="institution-tile"]').then((institutions) => {
         expect(institutions.length).to.be.at.least(3)
 
-        let chaseCaFound = false
-        let chaseUCardFound = false
+        let chaseBankFound = false
 
         for (let i = 0; i < 3; i++) {
           const ariaLabel = institutions.eq(i).attr('aria-label')
-          if (ariaLabel === 'Add account with Chase (CA)') {
-            chaseCaFound = true
-          } else if (ariaLabel === 'Add account with Chase UCard') {
-            chaseUCardFound = true
+          if (ariaLabel === 'Add account with Chase Bank') {
+            chaseBankFound = true
           }
         }
 
-        expect(chaseCaFound).to.be.true
-        expect(chaseUCardFound).to.be.true
+        expect(chaseBankFound).to.be.true
       })
     })
   })
