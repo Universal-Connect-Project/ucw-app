@@ -88,6 +88,7 @@ export const elasticSearchInstitutionData: CachedInstitution = {
   url: 'https://mx.com',
   ucp_id: 'UCP-da107e6d0da7779',
   is_test_bank: true,
+  routing_numbers: ['1234567'],
   mx: {
     id: 'INS-68e96dd6-eabd-42d3-9f05-416897f0746c',
     supports_oauth: true,

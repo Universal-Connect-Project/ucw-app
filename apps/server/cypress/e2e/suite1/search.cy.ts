@@ -83,4 +83,14 @@ describe('search', () => {
       cy.findByText('https://www.libertyfcu.org/').should('not.exist')
     })
   })
+
+  describe('Search by routing number', () => {
+    it('shows "America First Credit Union" when the routing number is entered into search', () => {
+      cy.visitAgg()
+
+      searchByText('324377516')
+      cy.findByText('America First Credit Union').should('exist')
+      cy.findByText('Wells Fargo').should('not.exist')
+    })
+  })
 })

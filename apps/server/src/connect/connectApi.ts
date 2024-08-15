@@ -1,15 +1,14 @@
 import type { Member, MemberResponse } from 'interfaces/contract'
 import * as logger from '../infra/logger'
-import {
-  type CachedInstitution,
-  type Challenge,
-  ChallengeType,
-  type Connection,
-  ConnectionStatus,
-  type Institution,
-  type InstitutionSearchResponseItem,
+import type {
+  CachedInstitution,
+  Challenge,
+  Connection,
+  Institution,
+  InstitutionSearchResponseItem,
   MappedJobTypes
 } from '../shared/contract'
+import { ChallengeType, ConnectionStatus } from '../shared/contract'
 
 import { ProviderAdapterBase } from '../adapters'
 import {
@@ -32,7 +31,7 @@ function mapResolvedInstitution(ins: Institution) {
   }
 }
 
-function mapCachedInstitution(
+export function mapCachedInstitution(
   ins: CachedInstitution
 ): InstitutionSearchResponseItem {
   const supportsOauth = ins.mx.supports_oauth || ins.sophtron.supports_oauth
