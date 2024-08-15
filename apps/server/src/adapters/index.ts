@@ -2,7 +2,6 @@
 import * as logger from '../infra/logger'
 import providerCredentials from '../providerCredentials'
 import { AnalyticsClient } from '../services/analyticsClient'
-import { resolveInstitutionProvider } from '../services/institutionResolver'
 import { get, set } from '../services/storageClient/redis'
 import type {
   Challenge,
@@ -10,8 +9,6 @@ import type {
   Context,
   CreateConnectionRequest,
   Credential,
-  Institution,
-  MappedJobTypes,
   UpdateConnectionRequest,
   WidgetAdapter
 } from '../shared/contract'
@@ -21,7 +18,6 @@ import { AkoyaAdapter } from './akoya'
 import { FinicityAdapter } from './finicity'
 import { MxAdapter } from './mx'
 import { SophtronAdapter } from './sophtron'
-
 export function getProviderAdapter(provider: string): WidgetAdapter {
   switch (provider) {
     case 'mx':
@@ -93,36 +89,36 @@ export class ProviderAdapterBase {
     return false
   }
 
-  async resolveInstitution(id: string): Promise<Institution> {
-    const resolvedInstitution = await resolveInstitutionProvider(
-      id,
-      this.context.job_type as MappedJobTypes
-    )
-    this.context.provider = resolvedInstitution.provider
-    this.context.updated = true
-    this.context.institution_id = resolvedInstitution.id
-    this.context.resolved_user_id = null
-    await this.init()
-    return resolvedInstitution
-  }
+  // async resolveInstitution(id: string): Promise<Institution> {
+  //   const resolvedInstitution = await resolveInstitutionProvider(
+  //     id,
+  //     this.context.job_type as MappedJobTypes
+  //   )
+  //   this.context.provider = resolvedInstitution.provider
+  //   this.context.updated = true
+  //   this.context.institution_id = resolvedInstitution.id
+  //   this.context.resolved_user_id = null
+  //   await this.init()
+  //   return resolvedInstitution
+  // }
 
-  async getProviderInstitution(ucpId: string): Promise<Institution> {
-    const resolved = await this.resolveInstitution(ucpId)
-    const inst = await this.providerAdapter.GetInstitutionById(resolved.id)
-    if (inst != null) {
-      inst.name = resolved.name ?? inst.name
-      inst.url = resolved?.url ?? inst.url?.trim()
-      inst.logo_url = resolved?.logo_url ?? inst.logo_url?.trim()
-    }
-    return inst
-  }
+  // async getProviderInstitution(ucpId: string): Promise<Institution> {
+  //   const resolved = await this.resolveInstitution(ucpId)
+  //   const inst = await this.providerAdapter.GetInstitutionById(resolved.id)
+  //   if (inst != null) {
+  //     inst.name = resolved.name ?? inst.name
+  //     inst.url = resolved?.url ?? inst.url?.trim()
+  //     inst.logo_url = resolved?.logo_url ?? inst.logo_url?.trim()
+  //   }
+  //   return inst
+  // }
 
-  async getInstitutionCredentials(guid: string): Promise<Credential[]> {
-    this.context.updated = true
-    this.context.current_job_id = null
-    // let id = await this.resolveInstitution(guid)
-    return await this.providerAdapter.ListInstitutionCredentials(guid)
-  }
+  // async getInstitutionCredentials(guid: string): Promise<Credential[]> {
+  //   this.context.updated = true
+  //   this.context.current_job_id = null
+  //   // let id = await this.resolveInstitution(guid)
+  //   return await this.providerAdapter.ListInstitutionCredentials(guid)
+  // }
 
   async getConnection(connection_id: string): Promise<Connection> {
     return await this.providerAdapter.GetConnectionById(

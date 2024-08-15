@@ -1,7 +1,5 @@
-import type { NextFunction, Request, Response } from "express"
-import config from "../config"
-import { encrypt, decrypt } from "../utils"
-import { Context } from "../shared/contract"
+import type { NextFunction, Request, Response } from 'express'
+import type { Context } from '../shared/contract'
 
 declare global {
   namespace Express {
@@ -19,7 +17,8 @@ export function contextHandler(
   res: Response,
   next: NextFunction
 ) {
-  let context = {} as Context
+  let context: Context = {}
+
   if (req.headers.meta?.length > 0) {
     context = JSON.parse(req.headers.meta as string)
     context.updated = false
@@ -33,7 +32,7 @@ export function contextHandler(
     res.send = send
 
     if (res.context.updated) {
-      res.set("meta", JSON.stringify(res.context))
+      res.set('meta', JSON.stringify(res.context))
     }
 
     send.apply(res, args)

@@ -75,6 +75,41 @@ export async function reIndexElasticSearch() {
   await Promise.all(indexPromises)
 }
 
+export async function searchByRoutingNumber(
+  routingNumber: string,
+  jobType: MappedJobTypes
+): Promise<any[]> {
+  const preferences = await getPreferences()
+  const hiddenInstitutions = preferences?.hiddenInstitutions || []
+  const supportedProviders = preferences?.supportedProviders || []
+
+  const searchResults: estypes.SearchResponseBody =
+    await ElasticsearchClient.search({
+      index: 'institutions',
+      body: {
+        query: {
+          bool: {
+            should: {
+              match: {
+                routing_numbers: {
+                  query: routingNumber
+                }
+              }
+            },
+            minimum_should_match: 1,
+            must: mustQuery(supportedProviders, jobType),
+            must_not: buildMustNotQuery(hiddenInstitutions)
+          }
+        },
+        size: 20
+      }
+    })
+
+  return searchResults.hits.hits.map(
+    (esObject: estypes.SearchHit) => esObject._source
+  )
+}
+
 export async function search(
   searchTerm: string,
   jobType: MappedJobTypes

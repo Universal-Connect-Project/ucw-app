@@ -1,14 +1,17 @@
-import 'dotenv/config'
-import { json, urlencoded } from 'body-parser'
-import express from 'express'
-import config from './config'
-import { wget as _wget, stream } from './infra/http'
-import useConnect from './connect/connectApiExpress'
-import { error as _error, info } from './infra/logger'
 import ngrok from '@ngrok/ngrok'
+import { json, urlencoded } from 'body-parser'
+import RedisStore from 'connect-redis'
+import 'dotenv/config'
+import express from 'express'
 import 'express-async-errors'
 import RateLimit from 'express-rate-limit'
+import session from 'express-session'
+import config from './config'
+import useConnect from './connect/connectApiExpress'
+import { stream } from './infra/http'
+import { error as _error, info } from './infra/logger'
 import { initialize as initializeElastic } from './services/ElasticSearchClient'
+import { redisClient } from './services/storageClient/redis'
 import { widgetHandler } from './widgetEndpoint'
 
 process.on('unhandledRejection', (error) => {
@@ -17,6 +20,14 @@ process.on('unhandledRejection', (error) => {
 process.removeAllListeners('warning') // remove the noise caused by capacitor-community/http fetch plugin
 
 const app = express()
+app.use(
+  session({
+    store: new RedisStore({ client: redisClient }),
+    secret: 'catfood',
+    resave: false,
+    saveUninitialized: false
+  })
+)
 app.use(json())
 app.use(urlencoded({ extended: true }))
 

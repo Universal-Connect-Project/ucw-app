@@ -6,7 +6,7 @@ import config from '../../config'
 import { debug, error, info } from '../../infra/logger'
 import { PREFERENCES_REDIS_KEY } from './constants'
 
-const redisClient = createClient({
+export const redisClient = createClient({
   url: config.RedisServer
 })
 

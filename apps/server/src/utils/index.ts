@@ -1,8 +1,25 @@
 import { createCipheriv, createDecipheriv } from 'crypto'
 import { algo, enc } from 'crypto-js'
+import { AkoyaAdapter } from '../adapters/akoya'
+import { FinicityAdapter } from '../adapters/finicity'
+import { MxAdapter } from '../adapters/mx'
+import { SophtronAdapter } from '../adapters/sophtron'
 import config from '../config'
+import type {
+  CachedInstitution,
+  Connection,
+  Institution,
+  InstitutionSearchResponseItem,
+  WidgetAdapter
+} from '../shared/contract'
 
-import { JobTypes, MappedJobTypes } from '../shared/contract'
+import type { Member } from 'interfaces/contract'
+import {
+  ChallengeType,
+  ConnectionStatus,
+  JobTypes,
+  MappedJobTypes
+} from '../shared/contract'
 
 export function hmac(text: string, key: string) {
   const hmac = algo.HMAC.create(algo.SHA256, enc.Base64.parse(key))
@@ -83,4 +100,120 @@ export function mapJobType(input: JobTypes) {
     default:
       throw new Error('Invalid job type')
   }
+}
+
+export function mapResolvedInstitution(ins: Institution) {
+  return {
+    guid: ins.id,
+    code: ins.id,
+    name: ins.name,
+    url: ins.url,
+    logo_url: ins.logo_url,
+    instructional_data: {},
+    credentials: [] as any[],
+    supports_oauth: ins.oauth ?? ins.name?.includes('Oauth'),
+    providers: ins.providers,
+    provider: ins.provider
+  }
+}
+
+export function getProviderAdapter(provider: string): WidgetAdapter {
+  switch (provider) {
+    case 'mx':
+      return new MxAdapter(false)
+    case 'mx_int':
+      return new MxAdapter(true)
+    case 'sophtron':
+      return new SophtronAdapter()
+    case 'akoya':
+      return new AkoyaAdapter(false)
+    case 'akoya_sandbox':
+      return new AkoyaAdapter(true)
+    case 'finicity':
+      return new FinicityAdapter()
+    case 'finicity_sandbox':
+      return new FinicityAdapter(true)
+    default:
+      throw new Error(`Unsupported provider ${provider}`)
+  }
+}
+
+export function mapCachedInstitution(
+  ins: CachedInstitution
+): InstitutionSearchResponseItem {
+  const supportsOauth = ins.mx.supports_oauth || ins.sophtron.supports_oauth
+  // || ins.finicity.supports_oauth || ins.akoya.supports_oauth
+  return {
+    guid: ins.ucp_id,
+    name: ins.name,
+    url: ins.url,
+    logo_url: ins.logo,
+    supports_oauth: supportsOauth
+  }
+}
+
+export function mapConnection(connection: Connection): Member {
+  return {
+    // ...connection,
+    institution_guid: connection.institution_code,
+    guid: connection.id,
+    connection_status: connection.status ?? ConnectionStatus.CREATED, // ?
+    most_recent_job_guid:
+      connection.status === ConnectionStatus.CONNECTED
+        ? null
+        : connection.cur_job_id,
+    is_oauth: connection.is_oauth,
+    oauth_window_uri: connection.oauth_window_uri,
+    provider: connection.provider,
+    is_being_aggregated: connection.is_being_aggregated,
+    user_guid: connection.user_id,
+    mfa: {
+      credentials: connection.challenges?.map((c) => {
+        const ret = {
+          guid: c.id,
+          credential_guid: c.id,
+          label: c.question,
+          type: c.type,
+          options: [] as any[]
+        } as any
+        switch (c.type) {
+          case ChallengeType.QUESTION:
+            ret.type = 0
+            ret.label = (c.data as any[])?.[0].value || c.question
+            break
+          case ChallengeType.TOKEN:
+            ret.type = 2 // ?
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            ret.label = `${c.question}: ${c.data}`
+            break
+          case ChallengeType.IMAGE:
+            ret.type = 13
+            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+            ret.meta_data = (c.data as string).startsWith('data:image')
+              ? c.data
+              : 'data:image/png;base64, ' + c.data
+            break
+          case ChallengeType.OPTIONS:
+            ret.type = 2
+            ret.options = (c.data as any[]).map((d) => ({
+              guid: d.key,
+              label: d.key,
+              value: d.value,
+              credential_guid: c.id
+            }))
+            break
+          case ChallengeType.IMAGE_OPTIONS:
+            ret.type = 14
+            ret.options = (c.data as any[]).map((d) => ({
+              guid: d.key,
+              label: d.key,
+              data_uri: d.value,
+              credential_guid: c.id
+            }))
+            break
+        }
+        return ret
+      })
+    }
+  } as any
 }

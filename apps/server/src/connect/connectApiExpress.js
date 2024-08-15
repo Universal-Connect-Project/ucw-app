@@ -37,13 +37,14 @@ export default function (app) {
       return next()
     }
     req.connectApi = new ConnectApi(req)
-    if ((await req.connectApi.init()) != null) {
-      if (!req.context.resolved_user_id) {
-        req.context.resolved_user_id = await req.connectApi.ResolveUserId(
-          req.context.user_id
-        )
-      }
-    }
+    // if ((await req.connectApi.init()) != null) {
+    //   if (!req.context.resolved_user_id) {
+    //     req.context.resolved_user_id = await req.connectApi.ResolveUserId(
+    //       req.context.user_id
+    //     )
+    //   }
+    // }
+
     next()
   })
 
