@@ -1,10 +1,12 @@
 import type { Response } from 'express'
+import { MappedJobTypes, Providers } from '../shared/contract'
 import {
   elasticSearchInstitutionData,
   institutionData,
   transformedInstitutionList,
   transformedPopularInstitutionsList
 } from '../test/testData/institution'
+import { transformedInstitutionCredentials } from '../test/testData/institutionCredentials'
 import { ConnectApi } from './connectApi'
 import type {
   GetInstitutionCredentialsRequest,
@@ -17,8 +19,6 @@ import {
   getInstitutionHandler,
   getInstitutionsHandler
 } from './institutionEndpoints'
-import { MappedJobTypes, Providers } from '../shared/contract'
-import { transformedInstitutionCredentials } from '../test/testData/institutionCredentials'
 
 const mxInstitution = institutionData.institution
 
@@ -107,6 +107,28 @@ describe('institutionEndpoints', () => {
         context,
         query: {
           search_name: 'MX'
+        }
+      } as unknown as GetInstitutionsRequest
+
+      const res = {
+        send: jest.fn()
+      } as unknown as Response
+
+      await getInstitutionsHandler(req, res)
+
+      expect(res.send).toHaveBeenCalledWith(transformedInstitutionList)
+    })
+
+    it('returns institutions when searching by routing number', async () => {
+      const context = {
+        job_type: MappedJobTypes.AGGREGATE
+      }
+
+      const req = {
+        connectApi: new ConnectApi({ context }),
+        context,
+        query: {
+          routing_number: '1234567'
         }
       } as unknown as GetInstitutionsRequest
 

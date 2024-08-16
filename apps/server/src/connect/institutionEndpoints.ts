@@ -1,5 +1,7 @@
 import type { Request, Response } from 'express'
 import type { MappedJobTypes } from 'src/shared/contract'
+import { mapCachedInstitution } from '../connect/connectApi'
+import { search, searchByRoutingNumber } from '../services/ElasticSearchClient'
 import type { ConnectApi } from './connectApi'
 
 export interface InstitutionRequest extends Request {
@@ -40,11 +42,17 @@ export const getInstitutionsHandler = async (
   req: GetInstitutionsRequest,
   res: Response
 ) => {
-  const ret = await req.connectApi.loadInstitutions(
-    req.query.search_name ?? req.query.routing_number,
-    req.context.job_type
-  )
-  res.send(ret)
+  let institutionHits
+  if (req.query.routing_number) {
+    institutionHits = await searchByRoutingNumber(
+      req.query.routing_number,
+      req.context?.job_type
+    )
+  } else {
+    institutionHits = await search(req.query.search_name, req.context?.job_type)
+  }
+
+  res.send(institutionHits.map(mapCachedInstitution))
 }
 
 export const favoriteInstitutionsHandler = async (

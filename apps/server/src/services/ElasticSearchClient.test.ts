@@ -1,4 +1,3 @@
-import { MappedJobTypes, Providers } from '../shared/contract'
 import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
 import config from '../config'
 import {
@@ -7,8 +6,10 @@ import {
   getRecommendedInstitutions,
   initialize,
   reIndexElasticSearch,
-  search
+  search,
+  searchByRoutingNumber
 } from '../services/ElasticSearchClient'
+import { MappedJobTypes, Providers } from '../shared/contract'
 import * as preferences from '../shared/preferences'
 import { elasticSearchInstitutionData } from '../test/testData/institution'
 
@@ -16,45 +17,66 @@ jest
   .spyOn(preferences, 'getPreferences')
   .mockResolvedValue(testPreferences as preferences.Preferences)
 
-function searchQuery(jobTypeQuery = [] as any[], filterTestBanks = false) {
-  return {
-    bool: {
-      should: [
-        {
-          match: {
-            name: {
-              query: 'MX Bank',
-              boost: 1.5
-            }
-          }
-        },
-        {
-          match: {
-            keywords: {
-              query: 'MX Bank',
-              boost: 1.4
-            }
-          }
-        },
-        {
-          fuzzy: {
-            name: {
-              value: 'mx bank',
-              fuzziness: 'AUTO',
-              boost: 1,
-              max_expansions: 50
-            }
-          }
-        },
-        {
-          wildcard: {
-            name: {
-              value: 'MX Bank*',
-              boost: 0.8
-            }
+interface searchQueryArgs {
+  jobTypeQuery?: any[]
+  filterTestBanks?: boolean
+  routingNumber?: string
+}
+
+function searchQuery(args: searchQueryArgs = {}) {
+  const { jobTypeQuery = [], filterTestBanks = false, routingNumber } = args
+
+  let mainSearchTerm
+  if (routingNumber) {
+    mainSearchTerm = {
+      match: {
+        routing_numbers: {
+          query: routingNumber
+        }
+      }
+    }
+  } else {
+    mainSearchTerm = [
+      {
+        match: {
+          name: {
+            query: 'MX Bank',
+            boost: 1.5
           }
         }
-      ],
+      },
+      {
+        match: {
+          keywords: {
+            query: 'MX Bank',
+            boost: 1.4
+          }
+        }
+      },
+      {
+        fuzzy: {
+          name: {
+            value: 'mx bank',
+            fuzziness: 'AUTO',
+            boost: 1,
+            max_expansions: 50
+          }
+        }
+      },
+      {
+        wildcard: {
+          name: {
+            value: 'MX Bank*',
+            boost: 0.8
+          }
+        }
+      }
+    ]
+  }
+
+  return {
+    bool: {
+      should: mainSearchTerm,
       minimum_should_match: 1,
       must: {
         bool: {
@@ -240,7 +262,7 @@ describe('search', () => {
         method: ['GET', 'POST'],
         path: ['/_search', '/institutions/_search'],
         body: {
-          query: searchQuery([], true),
+          query: searchQuery({ filterTestBanks: true }),
           size: 20
         }
       },
@@ -267,30 +289,32 @@ describe('search', () => {
         method: ['GET', 'POST'],
         path: ['/_search', '/institutions/_search'],
         body: {
-          query: searchQuery([
-            {
-              bool: {
-                must: [
-                  {
-                    term: {
-                      'mx.supports_identification': true
+          query: searchQuery({
+            jobTypeQuery: [
+              {
+                bool: {
+                  must: [
+                    {
+                      term: {
+                        'mx.supports_identification': true
+                      }
                     }
-                  }
-                ]
-              }
-            },
-            {
-              bool: {
-                must: [
-                  {
-                    term: {
-                      'sophtron.supports_identification': true
+                  ]
+                }
+              },
+              {
+                bool: {
+                  must: [
+                    {
+                      term: {
+                        'sophtron.supports_identification': true
+                      }
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]),
+            ]
+          }),
           size: 20
         }
       },
@@ -318,40 +342,42 @@ describe('search', () => {
         method: ['GET', 'POST'],
         path: ['/_search', '/institutions/_search'],
         body: {
-          query: searchQuery([
-            {
-              bool: {
-                must: [
-                  {
-                    term: {
-                      'mx.supports_verification': true
+          query: searchQuery({
+            jobTypeQuery: [
+              {
+                bool: {
+                  must: [
+                    {
+                      term: {
+                        'mx.supports_verification': true
+                      }
+                    },
+                    {
+                      term: {
+                        'mx.supports_identification': true
+                      }
                     }
-                  },
-                  {
-                    term: {
-                      'mx.supports_identification': true
+                  ]
+                }
+              },
+              {
+                bool: {
+                  must: [
+                    {
+                      term: {
+                        'sophtron.supports_verification': true
+                      }
+                    },
+                    {
+                      term: {
+                        'sophtron.supports_identification': true
+                      }
                     }
-                  }
-                ]
+                  ]
+                }
               }
-            },
-            {
-              bool: {
-                must: [
-                  {
-                    term: {
-                      'sophtron.supports_verification': true
-                    }
-                  },
-                  {
-                    term: {
-                      'sophtron.supports_identification': true
-                    }
-                  }
-                ]
-              }
-            }
-          ]),
+            ]
+          }),
           size: 20
         }
       },
@@ -389,6 +415,45 @@ describe('search', () => {
     const results = await search('nothing', MappedJobTypes.AGGREGATE)
 
     expect(results).toEqual([])
+  })
+})
+
+describe('searchByRoutingNumber', () => {
+  beforeEach(() => {
+    ElasticSearchMock.clearAll()
+  })
+
+  it('includes the routing number search query in the request', async () => {
+    const routingNumber = '1234567'
+
+    ElasticSearchMock.add(
+      {
+        method: ['GET', 'POST'],
+        path: ['/_search', '/institutions/_search'],
+        body: {
+          query: searchQuery({ routingNumber }),
+          size: 20
+        }
+      },
+      () => {
+        return {
+          hits: {
+            hits: [
+              {
+                _source: elasticSearchInstitutionData
+              }
+            ]
+          }
+        }
+      }
+    )
+
+    const results = await searchByRoutingNumber(
+      routingNumber,
+      MappedJobTypes.AGGREGATE
+    )
+
+    expect(results).toEqual([elasticSearchInstitutionData])
   })
 })
 

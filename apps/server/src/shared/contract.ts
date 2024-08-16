@@ -144,6 +144,7 @@ export interface CachedInstitution {
   url: string
   ucp_id: string
   is_test_bank: boolean | false
+  routing_numbers: string[]
   mx: InstitutionProvider
   sophtron: InstitutionProvider
   finicity: InstitutionProvider
