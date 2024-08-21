@@ -34,7 +34,7 @@ function mapResolvedInstitution(ins: Institution) {
 export function mapCachedInstitution(
   ins: CachedInstitution
 ): InstitutionSearchResponseItem {
-  const supportsOauth = ins.mx.supports_oauth || ins.sophtron.supports_oauth
+  const supportsOauth = ins.mx?.supports_oauth || ins.sophtron?.supports_oauth
   // || ins.finicity.supports_oauth || ins.akoya.supports_oauth
   return {
     guid: ins.ucp_id,

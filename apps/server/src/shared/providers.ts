@@ -15,14 +15,14 @@ export function getAvailableProviders(
   const providers = []
   if (
     supportedProviders.includes(Providers.MX) &&
-    institution.mx.id != null &&
+    institution.mx?.id != null &&
     providerSupportsJobType(institution.mx, jobType)
   ) {
     providers.push(Providers.MX)
   }
   if (
     supportedProviders.includes(Providers.SOPHTRON) &&
-    institution.sophtron.id != null &&
+    institution.sophtron?.id != null &&
     providerSupportsJobType(institution.sophtron, jobType)
   ) {
     providers.push(Providers.SOPHTRON)

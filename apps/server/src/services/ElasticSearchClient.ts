@@ -15,12 +15,13 @@ type JobMappingType = {
 }
 
 export const JOB_ES_MAPPING: JobMappingType = {
-  [MappedJobTypes.AGGREGATE]: [] as string[], // all institutions have aggregate
+  [MappedJobTypes.AGGREGATE]: ['supports_aggregation'] as string[],
   [MappedJobTypes.ALL]: [
+    'supports_aggregation',
     'supports_verification',
     'supports_identification'
   ] as string[],
-  [MappedJobTypes.FULLHISTORY]: [] as string[], // same filter as aggregate
+  [MappedJobTypes.FULLHISTORY]: ['supports_aggregation'] as string[], // same filter as aggregate
   [MappedJobTypes.VERIFICATION]: ['supports_verification'],
   [MappedJobTypes.IDENTITY]: ['supports_identification']
 }
