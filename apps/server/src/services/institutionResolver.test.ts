@@ -1,4 +1,9 @@
-import { MappedJobTypes, type InstitutionProvider } from '../shared/contract'
+import {
+  JobTypeSupports,
+  MappedJobTypes,
+  Providers,
+  type InstitutionProvider
+} from '../shared/contract'
 import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
 import * as preferences from '../shared/preferences'
 import { elasticSearchInstitutionData } from '../test/testData/institution'
@@ -146,6 +151,66 @@ describe('institutionResolver', () => {
         MappedJobTypes.AGGREGATE
       )
       expect(institution.provider).toEqual('mx')
+    })
+
+    it('resolves to sophtron if it supports history and mx doesnt', async () => {
+      ElasticSearchMock.add(
+        {
+          method: 'GET',
+          path: '/institutions/_doc/test'
+        },
+        () => {
+          return {
+            _source: {
+              ...elasticSearchInstitutionData,
+              mx: {
+                id: 'mxbank',
+                [JobTypeSupports.AGGREGATE]: true
+              },
+              sophtron: {
+                id: 'sophtron_bank',
+                [JobTypeSupports.AGGREGATE]: true,
+                [JobTypeSupports.FULLHISTORY]: true
+              }
+            }
+          }
+        }
+      )
+
+      const institution = await resolveInstitutionProvider(
+        'test',
+        MappedJobTypes.FULLHISTORY
+      )
+      expect(institution.provider).toEqual(Providers.SOPHTRON)
+    })
+
+    it('resolves to sophtron if it doesnt support history, but it does support aggregation, and nothing else supports fullhistory', async () => {
+      ElasticSearchMock.add(
+        {
+          method: 'GET',
+          path: '/institutions/_doc/test'
+        },
+        () => {
+          return {
+            _source: {
+              ...elasticSearchInstitutionData,
+              mx: {
+                id: null
+              },
+              sophtron: {
+                id: 'sophtron_bank',
+                [JobTypeSupports.AGGREGATE]: true
+              }
+            }
+          }
+        }
+      )
+
+      const institution = await resolveInstitutionProvider(
+        'test',
+        MappedJobTypes.FULLHISTORY
+      )
+      expect(institution.provider).toEqual(Providers.SOPHTRON)
     })
 
     it('routes using institution specific volume', async () => {

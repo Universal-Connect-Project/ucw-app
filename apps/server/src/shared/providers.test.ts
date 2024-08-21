@@ -1,4 +1,9 @@
-import { CachedInstitution, MappedJobTypes, Providers } from './contract'
+import {
+  CachedInstitution,
+  JobTypeSupports,
+  MappedJobTypes,
+  Providers
+} from './contract'
 import { getAvailableProviders } from './providers'
 
 const institutionProvidersSupportEverything: CachedInstitution = {
@@ -129,6 +134,57 @@ const generateProviderTests = (provider: Providers) =>
         })
       ).toEqual(filterOutProvider(provider))
     })
+
+    it(`returns ${provider} if job type is fullhistory, ${JobTypeSupports.FULLHISTORY} is falsy, and shouldRequireFullSupport is false`, () => {
+      expect(
+        getAvailableProviders({
+          institution: {
+            ...institutionProvidersSupportEverything,
+            [provider]: {
+              ...institutionProvidersSupportEverything.mx,
+              [JobTypeSupports.FULLHISTORY]: false
+            }
+          },
+          jobType: MappedJobTypes.FULLHISTORY,
+          shouldRequireFullSupport: false,
+          supportedProviders: allProviders
+        })
+      ).toEqual(allProviders)
+    })
+
+    it(`returns ${provider} if job type is fullhistory, ${JobTypeSupports.FULLHISTORY} is true, and shouldRequireFullSupport is true`, () => {
+      expect(
+        getAvailableProviders({
+          institution: {
+            ...institutionProvidersSupportEverything,
+            [provider]: {
+              ...institutionProvidersSupportEverything.mx,
+              [JobTypeSupports.FULLHISTORY]: true
+            }
+          },
+          jobType: MappedJobTypes.FULLHISTORY,
+          shouldRequireFullSupport: true,
+          supportedProviders: allProviders
+        })
+      ).toEqual(allProviders)
+    })
+
+    it(`doesnt return ${provider} if job type is fullhistory, ${JobTypeSupports.FULLHISTORY} is falsy, and shouldRequireFullSupport is true`, () => {
+      expect(
+        getAvailableProviders({
+          institution: {
+            ...institutionProvidersSupportEverything,
+            [provider]: {
+              ...institutionProvidersSupportEverything.mx,
+              [JobTypeSupports.FULLHISTORY]: false
+            }
+          },
+          jobType: MappedJobTypes.FULLHISTORY,
+          shouldRequireFullSupport: true,
+          supportedProviders: allProviders
+        })
+      ).toEqual(filterOutProvider(provider))
+    })
   })
 
 describe('providers', () => {
@@ -139,7 +195,7 @@ describe('providers', () => {
           getAvailableProviders({
             institution: institutionProvidersSupportEverything,
             jobType: mappedJobType,
-            shouldRequireFullSupport: false,
+            shouldRequireFullSupport: true,
             supportedProviders: allProviders
           })
         ).toEqual(allProviders)
