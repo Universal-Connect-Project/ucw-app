@@ -91,34 +91,34 @@ export const elasticSearchInstitutionData: CachedInstitution = {
   routing_numbers: ['1234567'],
   mx: {
     id: 'INS-68e96dd6-eabd-42d3-9f05-416897f0746c',
+    supports_aggregation: true,
     supports_oauth: true,
     supports_identification: true,
     supports_verification: true,
-    supports_account_statement: false,
     supports_history: false
   },
   sophtron: {
     id: null,
+    supports_aggregation: false,
     supports_oauth: false,
     supports_identification: false,
     supports_verification: false,
-    supports_account_statement: false,
     supports_history: false
   },
   finicity: {
     id: null,
+    supports_aggregation: false,
     supports_oauth: false,
     supports_identification: false,
     supports_verification: false,
-    supports_account_statement: false,
     supports_history: false
   },
   akoya: {
     id: null,
+    supports_aggregation: false,
     supports_oauth: false,
     supports_identification: false,
     supports_verification: false,
-    supports_account_statement: false,
     supports_history: false
   }
 }

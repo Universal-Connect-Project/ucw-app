@@ -17,10 +17,12 @@ const mockInstitutionWithMxAndSophtron = (institutionId = 'test') => {
           ...elasticSearchInstitutionData,
           is_test_bank: false,
           mx: {
-            id: 'mx_id'
+            id: 'mx_id',
+            supports_aggregation: true
           },
           sophtron: {
-            id: 'sophtron_bank'
+            id: 'sophtron_bank',
+            supports_aggregation: true
           }
         }
       }
@@ -40,7 +42,8 @@ const mockInstitutionWithMx = (institutionId = 'test') => {
           ...elasticSearchInstitutionData,
           is_test_bank: false,
           mx: {
-            id: 'mx_id'
+            id: 'mx_id',
+            supports_aggregation: true
           },
           sophtron: {
             id: null
@@ -120,7 +123,8 @@ describe('institutionResolver', () => {
                 id: null
               },
               sophtron: {
-                id: 'sophtron_bank'
+                id: 'sophtron_bank',
+                supports_aggregation: true
               }
             }
           }
@@ -347,18 +351,18 @@ describe('institutionResolver', () => {
         'test',
         {
           id: 'mx_bank',
+          supports_aggregation: true,
           supports_oauth: true,
           supports_identification: true,
           supports_verification: true,
-          supports_account_statement: true,
           supports_history: true
         },
         {
           id: 'sophtron_bank',
+          supports_aggregation: true,
           supports_oauth: false,
           supports_identification: false,
           supports_verification: false,
-          supports_account_statement: false,
           supports_history: false
         }
       )
@@ -387,18 +391,18 @@ describe('institutionResolver', () => {
         'test',
         {
           id: 'mx_bank',
+          supports_aggregation: true,
           supports_oauth: false,
           supports_identification: false,
           supports_verification: false,
-          supports_account_statement: false,
           supports_history: false
         },
         {
           id: 'sophtron_bank',
+          supports_aggregation: true,
           supports_oauth: true,
           supports_identification: true,
           supports_verification: true,
-          supports_account_statement: true,
           supports_history: true
         }
       )

@@ -38,11 +38,12 @@ export async function resolveInstitutionProvider(
 ): Promise<ResolvedInstitution> {
   const institution = await getInstitution(institutionId)
   const preferences = await getPreferences()
-  const providers: Provider[] = getAvailableProviders(
+  const providers: Provider[] = getAvailableProviders({
     institution,
     jobType,
-    preferences.supportedProviders
-  )
+    shouldRequireFullSupport: false,
+    supportedProviders: preferences.supportedProviders
+  })
 
   let provider: Provider
 
