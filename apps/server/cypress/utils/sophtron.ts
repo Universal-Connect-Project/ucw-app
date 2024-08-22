@@ -11,7 +11,7 @@ export const enterSophtronCredentials = () => {
 }
 
 export const selectSophtronAccount = () => {
-  // cy.findByText('Primary Checking 1234', { timeout: 45000 }).click()
+  cy.findByText('Primary Checking 1234', { timeout: 45000 }).click()
 }
 
 export const connectToSophtron = () => {
