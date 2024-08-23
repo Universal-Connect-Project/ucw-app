@@ -1,5 +1,3 @@
-import { integrationProviderName, providerName } from '@repo/mx-adapter'
-
 export interface AuthRequest {
   provider: string
   token: string
@@ -118,8 +116,8 @@ export interface ResolvedInstitution {
 export type Provider = 'mx' | 'mx_int' | 'sophtron' | 'finicity' | 'akoya'
 
 export enum Providers {
-  MX = providerName,
-  MXINT = integrationProviderName,
+  MX = 'mx',
+  MXINT = 'mx_int',
   SOPHTRON = 'sophtron'
 }
 

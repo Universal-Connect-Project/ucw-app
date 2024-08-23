@@ -1,0 +1,10 @@
+{
+  "name": "@repo/mx-adapter",
+  "version": "0.0.1",
+  "main": "./src/index.ts",
+  "type": "commonjs",
+  "scripts": {},
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}

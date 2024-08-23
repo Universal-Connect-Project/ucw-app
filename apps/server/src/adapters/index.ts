@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import { MxAdapter, setConfig } from '@repo/mx-adapter'
 import * as logger from '../infra/logger'
 import providerCredentials from '../providerCredentials'
 import { AnalyticsClient } from '../services/analyticsClient'
@@ -15,19 +16,27 @@ import type {
   UpdateConnectionRequest,
   WidgetAdapter
 } from '../shared/contract'
-import { ConnectionStatus, OAuthStatus } from '../shared/contract'
+import { ConnectionStatus, OAuthStatus, Providers } from '../shared/contract'
 import { decodeAuthToken, mapJobType } from '../utils'
 import { AkoyaAdapter } from './akoya'
 import { FinicityAdapter } from './finicity'
-import { MxAdapter } from './mx'
 import { SophtronAdapter } from './sophtron'
+import config from '../config'
+
+setConfig({
+  HostUrl: config.HostUrl,
+  MxClientIdProd: config.MxClientIdProd,
+  MxApiSecretProd: config.MxApiSecretProd,
+  MxClientId: config.MxClientId,
+  MxApiSecret: config.MxApiSecret
+})
 
 export function getProviderAdapter(provider: string): WidgetAdapter {
   switch (provider) {
-    case 'mx':
-      return new MxAdapter(false)
-    case 'mx_int':
-      return new MxAdapter(true)
+    case Providers.MX:
+      return new MxAdapter(false, get)
+    case Providers.MXINT:
+      return new MxAdapter(true, get)
     case 'sophtron':
       return new SophtronAdapter()
     case 'akoya':
@@ -268,11 +277,14 @@ export class ProviderAdapterBase {
         break
       case 'mx':
       case 'mx_int':
-        res = await MxAdapter.HandleOauthResponse({
-          ...rawQueries,
-          ...rawParams,
-          ...body
-        })
+        res = await MxAdapter.HandleOauthResponse(
+          {
+            ...rawQueries,
+            ...rawParams,
+            ...body
+          },
+          set
+        )
         break
     }
     const ret = {

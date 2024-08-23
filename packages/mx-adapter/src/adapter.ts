@@ -1,23 +1,23 @@
-import config from '../config'
-import * as logger from '../infra/logger'
-import type {
+import {
   CredentialRequest,
   CredentialsResponseBody,
   MemberResponse,
   MxPlatformApiFactory
-} from '../providerApiClients/mx'
-import { MxIntApiClient, MxProdApiClient } from '../providerApiClients/mx'
-import { get, set } from '../services/storageClient/redis'
-import type {
+} from './mxApi'
+import { getProviderCredentials } from './providerCredentials'
+import {
   Challenge,
   Connection,
+  ChallengeType,
+  ConnectionStatus,
   CreateConnectionRequest,
   Credential,
   Institution,
   UpdateConnectionRequest,
   WidgetAdapter
-} from '../shared/contract'
-import { ChallengeType, ConnectionStatus } from '../shared/contract'
+} from './contract'
+import { HostUrl } from './config'
+import { Configuration } from './mxClient'
 
 export const EXTENDED_HISTORY_NOT_SUPPORTED_MSG =
   "Member's institution does not support extended transaction history."
@@ -57,9 +57,36 @@ function fromMxMember(member: MemberResponse, provider: string): Connection {
 export class MxAdapter implements WidgetAdapter {
   apiClient: ReturnType<typeof MxPlatformApiFactory>
   provider: string
+  redisGet: Function
 
-  constructor(int: boolean) {
+  constructor(int: boolean, redisGet: Function) {
     this.provider = int ? 'mx_int' : 'mx'
+
+    this.redisGet = redisGet
+
+    const providerCredentials = getProviderCredentials()
+
+    const MxProdApiClient = MxPlatformApiFactory(
+      new Configuration({
+        ...providerCredentials.mxProd,
+        baseOptions: {
+          headers: {
+            Accept: 'application/vnd.mx.api.v2beta+json'
+          }
+        }
+      })
+    )
+
+    const MxIntApiClient = MxPlatformApiFactory(
+      new Configuration({
+        ...providerCredentials.mxInt,
+        baseOptions: {
+          headers: {
+            Accept: 'application/vnd.mx.api.v2beta+json'
+          }
+        }
+      })
+    )
 
     this.apiClient = int ? MxIntApiClient : MxProdApiClient
   }
@@ -113,7 +140,7 @@ export class MxAdapter implements WidgetAdapter {
       (m) => m.institution_code === entityId
     )
     if (existing != null) {
-      logger.info(`Found existing member for institution ${entityId}, deleting`)
+      console.log(`Found existing member for institution ${entityId}, deleting`)
       await this.apiClient.deleteMember(existing.guid, userId)
     }
     // let res = await this.apiClient.listInstitutionCredentials(entityId)
@@ -121,7 +148,7 @@ export class MxAdapter implements WidgetAdapter {
     const memberRes = await this.apiClient.createMember(userId, {
       referral_source: 'APP', // request.is_oauth ? 'APP' : '',
       client_redirect_url: request.is_oauth
-        ? `${config.HostUrl}/oauth_redirect`
+        ? `${HostUrl}/oauth_redirect`
         : null,
       member: {
         skip_aggregation: request.skip_aggregation || jobType !== 'aggregate',
@@ -247,7 +274,7 @@ export class MxAdapter implements WidgetAdapter {
     const res = await this.apiClient.readMemberStatus(memberId, userId)
     const member = res.data.member
     let status = member.connection_status
-    const oauthStatus = await get(member.guid)
+    const oauthStatus = await this.redisGet(member.guid)
     if (oauthStatus?.error != null) {
       status = ConnectionStatus[ConnectionStatus.REJECTED]
     }
@@ -324,33 +351,34 @@ export class MxAdapter implements WidgetAdapter {
     userId: string,
     failIfNotFound: boolean = false
   ): Promise<string> {
-    logger.debug('Resolving UserId: ' + userId)
+    console.log('Resolving UserId: ' + userId)
     const res = await this.apiClient.listUsers(1, 10, userId)
     const mxUser = res.data?.users?.find((u) => u.id === userId)
     if (mxUser != null) {
-      logger.trace(`Found existing mx user ${mxUser.guid}`)
+      console.log(`Found existing mx user ${mxUser.guid}`)
       return mxUser.guid
     } else if (failIfNotFound) {
       throw new Error('User not resolved successfully')
     }
-    logger.trace(`Creating mx user ${userId}`)
+    console.log(`Creating mx user ${userId}`)
     const ret = await this.apiClient.createUser({
       user: { id: userId }
     })
     if (ret?.data?.user != null) {
       return ret.data.user.guid
     }
-    logger.trace(`Failed creating mx user, using user_id: ${userId}`)
+    console.log(`Failed creating mx user, using user_id: ${userId}`)
     return userId
   }
 
   static async HandleOauthResponse(
-    request: HandleOauthReponseRequest
+    request: HandleOauthReponseRequest,
+    redisSet: Function
   ): Promise<Connection> {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const { member_guid, status, error_reason } = request
     if (status === 'error') {
-      await set(member_guid, {
+      await redisSet(member_guid, {
         error: true,
         error_reason
       })
