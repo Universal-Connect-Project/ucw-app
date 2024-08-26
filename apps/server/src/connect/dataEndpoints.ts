@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { Response } from 'express'
 import Joi from 'joi'
-import getVC from '../services/vcProviders'
 import { Providers } from '../shared/contract'
 import { withValidateProviderInPath } from '../utils/validators'
-import { getProviderAdapter } from '../adapterSetup'
+import getVC, { getProviderAdapter } from '../adapterSetup'
 
 export interface AccountsDataQueryParameters {
   connectionId: string

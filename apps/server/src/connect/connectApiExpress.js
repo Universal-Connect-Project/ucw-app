@@ -20,6 +20,7 @@ import {
 } from './institutionEndpoints'
 import stubs from './instrumentations.js'
 import { userDeleteHandler } from './userEndpoints'
+import { handleOauthResponse } from '../adapterSetup'
 
 const AGGREGATION_JOB_TYPE = 0
 
@@ -216,7 +217,7 @@ export default function (app) {
   app.all('/webhook/:provider/*', async function (req, res) {
     const { provider } = req.params
     info(`received web hook at: ${req.path}`, req.query)
-    const ret = await ConnectApi.handleOauthResponse(
+    const ret = await handleOauthResponse(
       provider,
       req.params,
       req.query,
@@ -227,11 +228,7 @@ export default function (app) {
 
   app.get('/oauth/:provider/redirect_from/', async (req, res) => {
     const { provider } = req.params
-    const ret = await ConnectApi.handleOauthResponse(
-      provider,
-      req.params,
-      req.query
-    )
+    const ret = await handleOauthResponse(provider, req.params, req.query)
 
     const metadata = JSON.stringify({
       member_guid: ret?.id,
