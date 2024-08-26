@@ -27,6 +27,7 @@
     "@capacitor-community/http": "^1.4.1",
     "@elastic/elasticsearch": "^8.13.1",
     "@ngrok/ngrok": "^1.2.0",
+    "@repo/test-adapter": "*",
     "@types/express": "^4.17.21",
     "@types/uuid": "^9.0.8",
     "assert-browserify": "^2.0.0",

@@ -1,5 +1,5 @@
 import type { Response } from 'express'
-import { getProviderAdapter } from '../adapters'
+import { getProviderAdapter } from '../adapterSetup'
 import { withValidateProviderInPath } from '../utils/validators'
 interface UserDeleteParameters {
   provider: string

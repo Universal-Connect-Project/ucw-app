@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import { getProviderAdapter } from '../adapterSetup'
 import * as logger from '../infra/logger'
 import providerCredentials from '../providerCredentials'
 import { AnalyticsClient } from '../services/analyticsClient'
@@ -15,36 +16,11 @@ import type {
   UpdateConnectionRequest,
   WidgetAdapter
 } from '../shared/contract'
-import { ConnectionStatus, OAuthStatus, Providers } from '../shared/contract'
+import { ConnectionStatus, OAuthStatus } from '../shared/contract'
 import { decodeAuthToken, mapJobType } from '../utils'
 import { AkoyaAdapter } from './akoya'
 import { FinicityAdapter } from './finicity'
 import { MxAdapter } from './mx'
-import { SophtronAdapter } from './sophtron'
-import { TestAdapter } from './testExample'
-
-export function getProviderAdapter(provider: string): WidgetAdapter {
-  switch (provider) {
-    case Providers.TEST_EXAMPLE:
-      return new TestAdapter()
-    case 'mx':
-      return new MxAdapter(false)
-    case 'mx_int':
-      return new MxAdapter(true)
-    case 'sophtron':
-      return new SophtronAdapter()
-    case 'akoya':
-      return new AkoyaAdapter(false)
-    case 'akoya_sandbox':
-      return new AkoyaAdapter(true)
-    case 'finicity':
-      return new FinicityAdapter()
-    case 'finicity_sandbox':
-      return new FinicityAdapter(true)
-    default:
-      throw new Error(`Unsupported provider ${provider}`)
-  }
-}
 
 export async function instrumentation(context: Context, input: any) {
   const { user_id } = input
