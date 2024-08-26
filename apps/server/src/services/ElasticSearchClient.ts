@@ -8,22 +8,10 @@ import { info } from '../infra/logger'
 
 import { MappedJobTypes, type CachedInstitution } from '../shared/contract'
 import { getPreferences, type Provider } from '../shared/preferences'
-import { getAvailableProviders } from '../shared/providers'
-
-type JobMappingType = {
-  [key in MappedJobTypes]: string[]
-}
-
-export const JOB_ES_MAPPING: JobMappingType = {
-  [MappedJobTypes.AGGREGATE]: [] as string[], // all institutions have aggregate
-  [MappedJobTypes.ALL]: [
-    'supports_verification',
-    'supports_identification'
-  ] as string[],
-  [MappedJobTypes.FULLHISTORY]: [] as string[], // same filter as aggregate
-  [MappedJobTypes.VERIFICATION]: ['supports_verification'],
-  [MappedJobTypes.IDENTITY]: ['supports_identification']
-}
+import {
+  getAvailableProviders,
+  JOB_TYPE_PARTIAL_SUPPORT_MAP
+} from '../shared/providers'
 
 function getInstitutionFilePath() {
   return resolve(__dirname, '../../cachedDefaults/ucwInstitutionsMapping.json')
@@ -187,7 +175,7 @@ function mustQuery(supportedProviders: Provider[], jobType: MappedJobTypes) {
     }
   })
 
-  const institutionJobTypeFilter = JOB_ES_MAPPING[jobType]
+  const institutionJobTypeFilter = JOB_TYPE_PARTIAL_SUPPORT_MAP[jobType]
 
   let jobTypeSupported = [] as any
   if (institutionJobTypeFilter.length > 0) {
@@ -281,7 +269,12 @@ export async function getRecommendedInstitutions(
     )
     .filter(
       (institution) =>
-        getAvailableProviders(institution, jobType, supportedProviders).length
+        getAvailableProviders({
+          institution,
+          jobType,
+          shouldRequireFullSupport: false,
+          supportedProviders
+        }).length
     )
 
   return institutions

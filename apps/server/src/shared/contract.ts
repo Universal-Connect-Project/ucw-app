@@ -138,6 +138,13 @@ export enum MappedJobTypes {
   IDENTITY = 'aggregate_identity'
 }
 
+export enum JobTypeSupports {
+  AGGREGATE = 'supports_aggregation',
+  VERIFICATION = 'supports_verification',
+  IDENTIFICATION = 'supports_identification',
+  FULLHISTORY = 'supports_history'
+}
+
 export interface CachedInstitution {
   name: string
   keywords: string | null
@@ -146,18 +153,18 @@ export interface CachedInstitution {
   ucp_id: string
   is_test_bank: boolean | false
   routing_numbers: string[]
-  mx: InstitutionProvider
-  sophtron: InstitutionProvider
-  finicity: InstitutionProvider
-  akoya: InstitutionProvider
+  mx?: InstitutionProvider
+  sophtron?: InstitutionProvider
+  finicity?: InstitutionProvider
+  akoya?: InstitutionProvider
 }
 
 export interface InstitutionProvider {
   id: string | null
+  supports_aggregation: boolean | false
   supports_oauth: boolean | false
   supports_identification: boolean | false
   supports_verification: boolean | false
-  supports_account_statement: boolean | false
   supports_history: boolean | false
 }
 

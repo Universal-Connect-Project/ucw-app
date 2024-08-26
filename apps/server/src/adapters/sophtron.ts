@@ -199,7 +199,8 @@ export class SophtronAdapter implements WidgetAdapter {
           single_account_select &&
           (!job.AccountID ||
             job.AccountID === '00000000-0000-0000-0000-000000000000') &&
-          (jobType === 'authallaccounts' || jobType === 'refreshauthall')
+          (jobType.indexOf('verification') >= 0 ||
+            jobType.indexOf('verify') >= 0)
         ) {
           const accounts =
             await this.apiClientV1.getUserInstitutionAccounts(memberId)

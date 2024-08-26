@@ -1,30 +1,73 @@
-import { JOB_ES_MAPPING } from '../services/ElasticSearchClient'
 import {
   CachedInstitution,
   InstitutionProvider,
+  JobTypeSupports,
   MappedJobTypes,
   Provider
 } from './contract'
 
-export function getAvailableProviders(
-  institution: CachedInstitution,
-  jobType: MappedJobTypes,
+type JobMappingType = {
+  [key in MappedJobTypes]: JobTypeSupports[]
+}
+
+export const JOB_TYPE_PARTIAL_SUPPORT_MAP: JobMappingType = {
+  [MappedJobTypes.AGGREGATE]: [JobTypeSupports.AGGREGATE],
+  [MappedJobTypes.ALL]: [
+    JobTypeSupports.AGGREGATE,
+    JobTypeSupports.VERIFICATION,
+    JobTypeSupports.IDENTIFICATION
+  ],
+  [MappedJobTypes.FULLHISTORY]: [JobTypeSupports.AGGREGATE], // same filter as aggregate, because we fall back to aggregate if there is no fullhistory
+  [MappedJobTypes.VERIFICATION]: [JobTypeSupports.VERIFICATION],
+  [MappedJobTypes.IDENTITY]: [JobTypeSupports.IDENTIFICATION]
+}
+
+export const JOB_TYPE_FULL_SUPPORT_MAP: JobMappingType = {
+  ...JOB_TYPE_PARTIAL_SUPPORT_MAP,
+  [MappedJobTypes.FULLHISTORY]: [
+    JobTypeSupports.AGGREGATE,
+    JobTypeSupports.FULLHISTORY
+  ]
+}
+
+export function getAvailableProviders({
+  institution,
+  jobType,
+  supportedProviders,
+  shouldRequireFullSupport
+}: {
+  institution: CachedInstitution
+  jobType: MappedJobTypes
   supportedProviders?: Provider[]
-): Provider[] {
+  shouldRequireFullSupport: boolean
+}): Provider[] {
   const providers = supportedProviders?.filter(
     (provider) =>
       (institution as any)[provider]?.id != null &&
-      providerSupportsJobType((institution as any)[provider], jobType)
+      providerSupportsJobType({
+        institutionAttributes: (institution as any)[provider],
+        jobType,
+        shouldRequireFullSupport
+      })
   )
 
   return providers
 }
 
-function providerSupportsJobType(
-  institutionAttributes: InstitutionProvider | undefined,
+function providerSupportsJobType({
+  institutionAttributes,
+  jobType,
+  shouldRequireFullSupport
+}: {
+  institutionAttributes: InstitutionProvider | undefined
   jobType: MappedJobTypes
-): boolean {
-  return JOB_ES_MAPPING[jobType].reduce((acc, supportsProp) => {
+  shouldRequireFullSupport: boolean
+}): boolean {
+  return (
+    shouldRequireFullSupport
+      ? JOB_TYPE_FULL_SUPPORT_MAP
+      : JOB_TYPE_PARTIAL_SUPPORT_MAP
+  )[jobType].reduce((acc, supportsProp) => {
     return (
       acc &&
       institutionAttributes?.[supportsProp as keyof InstitutionProvider] ===

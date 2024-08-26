@@ -1,6 +1,6 @@
 const baseCypressConfig = {
   e2e: {
-    retries: 5,
+    retries: 2,
     defaultCommandTimeout: 15000,
     baseUrl: 'http://localhost:8080',
     setupNodeEvents(on, config) {
