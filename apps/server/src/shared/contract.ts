@@ -118,7 +118,8 @@ export type Provider = 'mx' | 'mx_int' | 'sophtron' | 'finicity' | 'akoya'
 export enum Providers {
   MX = 'mx',
   MXINT = 'mx_int',
-  SOPHTRON = 'sophtron'
+  SOPHTRON = 'sophtron',
+  TEST_EXAMPLE = 'testExample'
 }
 
 export enum JobTypes {

@@ -3,8 +3,7 @@ import {
   CachedInstitution,
   InstitutionProvider,
   MappedJobTypes,
-  Provider,
-  Providers
+  Provider
 } from './contract'
 
 export function getAvailableProviders(
@@ -12,23 +11,13 @@ export function getAvailableProviders(
   jobType: MappedJobTypes,
   supportedProviders?: Provider[]
 ): Provider[] {
-  const providers = []
-  if (
-    supportedProviders.includes(Providers.MX) &&
-    institution.mx.id != null &&
-    providerSupportsJobType(institution.mx, jobType)
-  ) {
-    providers.push(Providers.MX)
-  }
-  if (
-    supportedProviders.includes(Providers.SOPHTRON) &&
-    institution.sophtron.id != null &&
-    providerSupportsJobType(institution.sophtron, jobType)
-  ) {
-    providers.push(Providers.SOPHTRON)
-  }
+  const providers = supportedProviders?.filter(
+    (provider) =>
+      (institution as any)[provider]?.id != null &&
+      providerSupportsJobType((institution as any)[provider], jobType)
+  )
 
-  return providers as Provider[]
+  return providers
 }
 
 function providerSupportsJobType(

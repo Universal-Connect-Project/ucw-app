@@ -15,15 +15,18 @@ import type {
   UpdateConnectionRequest,
   WidgetAdapter
 } from '../shared/contract'
-import { ConnectionStatus, OAuthStatus } from '../shared/contract'
+import { ConnectionStatus, OAuthStatus, Providers } from '../shared/contract'
 import { decodeAuthToken, mapJobType } from '../utils'
 import { AkoyaAdapter } from './akoya'
 import { FinicityAdapter } from './finicity'
 import { MxAdapter } from './mx'
 import { SophtronAdapter } from './sophtron'
+import { TestAdapter } from './testExample'
 
 export function getProviderAdapter(provider: string): WidgetAdapter {
   switch (provider) {
+    case Providers.TEST_EXAMPLE:
+      return new TestAdapter()
     case 'mx':
       return new MxAdapter(false)
     case 'mx_int':
