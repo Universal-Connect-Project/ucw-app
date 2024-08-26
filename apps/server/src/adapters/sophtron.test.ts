@@ -473,7 +473,7 @@ describe('sophtron adapter', () => {
         http.get(SOPHTRON_GET_JOB_INFO_PATH, () =>
           HttpResponse.json({
             JobID: testJobId,
-            JobType: 'refreshauthall',
+            JobType: 'verification',
             LastStatus: accountsReadyStatus,
             UserInstitutionID: testUserInstitutionId
           })
