@@ -1,4 +1,9 @@
-import { MappedJobTypes, type InstitutionProvider } from '../shared/contract'
+import {
+  JobTypeSupports,
+  MappedJobTypes,
+  Providers,
+  type InstitutionProvider
+} from '../shared/contract'
 import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
 import * as preferences from '../shared/preferences'
 import { elasticSearchInstitutionData } from '../test/testData/institution'
@@ -17,10 +22,12 @@ const mockInstitutionWithMxAndSophtron = (institutionId = 'test') => {
           ...elasticSearchInstitutionData,
           is_test_bank: false,
           mx: {
-            id: 'mx_id'
+            id: 'mx_id',
+            supports_aggregation: true
           },
           sophtron: {
-            id: 'sophtron_bank'
+            id: 'sophtron_bank',
+            supports_aggregation: true
           }
         }
       }
@@ -40,7 +47,8 @@ const mockInstitutionWithMx = (institutionId = 'test') => {
           ...elasticSearchInstitutionData,
           is_test_bank: false,
           mx: {
-            id: 'mx_id'
+            id: 'mx_id',
+            supports_aggregation: true
           },
           sophtron: {
             id: null
@@ -120,7 +128,8 @@ describe('institutionResolver', () => {
                 id: null
               },
               sophtron: {
-                id: 'sophtron_bank'
+                id: 'sophtron_bank',
+                supports_aggregation: true
               }
             }
           }
@@ -142,6 +151,66 @@ describe('institutionResolver', () => {
         MappedJobTypes.AGGREGATE
       )
       expect(institution.provider).toEqual('mx')
+    })
+
+    it('resolves to sophtron if it supports history and mx doesnt', async () => {
+      ElasticSearchMock.add(
+        {
+          method: 'GET',
+          path: '/institutions/_doc/test'
+        },
+        () => {
+          return {
+            _source: {
+              ...elasticSearchInstitutionData,
+              mx: {
+                id: 'mxbank',
+                [JobTypeSupports.AGGREGATE]: true
+              },
+              sophtron: {
+                id: 'sophtron_bank',
+                [JobTypeSupports.AGGREGATE]: true,
+                [JobTypeSupports.FULLHISTORY]: true
+              }
+            }
+          }
+        }
+      )
+
+      const institution = await resolveInstitutionProvider(
+        'test',
+        MappedJobTypes.FULLHISTORY
+      )
+      expect(institution.provider).toEqual(Providers.SOPHTRON)
+    })
+
+    it('resolves to sophtron if it doesnt support history, but it does support aggregation, and nothing else supports fullhistory', async () => {
+      ElasticSearchMock.add(
+        {
+          method: 'GET',
+          path: '/institutions/_doc/test'
+        },
+        () => {
+          return {
+            _source: {
+              ...elasticSearchInstitutionData,
+              mx: {
+                id: null
+              },
+              sophtron: {
+                id: 'sophtron_bank',
+                [JobTypeSupports.AGGREGATE]: true
+              }
+            }
+          }
+        }
+      )
+
+      const institution = await resolveInstitutionProvider(
+        'test',
+        MappedJobTypes.FULLHISTORY
+      )
+      expect(institution.provider).toEqual(Providers.SOPHTRON)
     })
 
     it('routes using institution specific volume', async () => {
@@ -347,18 +416,18 @@ describe('institutionResolver', () => {
         'test',
         {
           id: 'mx_bank',
+          supports_aggregation: true,
           supports_oauth: true,
           supports_identification: true,
           supports_verification: true,
-          supports_account_statement: true,
           supports_history: true
         },
         {
           id: 'sophtron_bank',
+          supports_aggregation: true,
           supports_oauth: false,
           supports_identification: false,
           supports_verification: false,
-          supports_account_statement: false,
           supports_history: false
         }
       )
@@ -387,18 +456,18 @@ describe('institutionResolver', () => {
         'test',
         {
           id: 'mx_bank',
+          supports_aggregation: true,
           supports_oauth: false,
           supports_identification: false,
           supports_verification: false,
-          supports_account_statement: false,
           supports_history: false
         },
         {
           id: 'sophtron_bank',
+          supports_aggregation: true,
           supports_oauth: true,
           supports_identification: true,
           supports_verification: true,
-          supports_account_statement: true,
           supports_history: true
         }
       )

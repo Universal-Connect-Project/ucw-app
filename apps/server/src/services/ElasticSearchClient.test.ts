@@ -24,7 +24,34 @@ interface searchQueryArgs {
 }
 
 function searchQuery(args: searchQueryArgs = {}) {
-  const { jobTypeQuery = [], filterTestBanks = false, routingNumber } = args
+  const {
+    jobTypeQuery = [
+      {
+        bool: {
+          must: [
+            {
+              term: {
+                'mx.supports_aggregation': true
+              }
+            }
+          ]
+        }
+      },
+      {
+        bool: {
+          must: [
+            {
+              term: {
+                'sophtron.supports_aggregation': true
+              }
+            }
+          ]
+        }
+      }
+    ],
+    filterTestBanks = false,
+    routingNumber
+  } = args
 
   let mainSearchTerm
   if (routingNumber) {
@@ -349,6 +376,11 @@ describe('search', () => {
                   must: [
                     {
                       term: {
+                        'mx.supports_aggregation': true
+                      }
+                    },
+                    {
+                      term: {
                         'mx.supports_verification': true
                       }
                     },
@@ -363,6 +395,11 @@ describe('search', () => {
               {
                 bool: {
                   must: [
+                    {
+                      term: {
+                        'sophtron.supports_aggregation': true
+                      }
+                    },
                     {
                       term: {
                         'sophtron.supports_verification': true
@@ -536,10 +573,10 @@ describe('getRecommendedInstitutions', () => {
               _source: {
                 ...elasticSearchInstitutionData,
                 mx: {
+                  supports_aggregation: true,
                   supports_oauth: false,
                   supports_identification: false,
                   supports_verification: false,
-                  supports_account_statement: false,
                   supports_history: false
                 }
               }
