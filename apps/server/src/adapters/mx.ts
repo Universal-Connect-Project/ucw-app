@@ -54,6 +54,30 @@ function fromMxMember(member: MemberResponse, provider: string): Connection {
   }
 }
 
+export const handleOauthResponse = async (
+  request: HandleOauthReponseRequest
+): Promise<Connection> => {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const { member_guid, status, error_reason } = request
+  if (status === 'error') {
+    await set(member_guid, {
+      error: true,
+      error_reason
+    })
+  }
+  const ret = {
+    id: member_guid,
+    error: error_reason,
+    status:
+      status === 'error'
+        ? ConnectionStatus.REJECTED
+        : status === 'success'
+          ? ConnectionStatus.CONNECTED
+          : ConnectionStatus.PENDING
+  }
+  return ret
+}
+
 export class MxAdapter implements WidgetAdapter {
   apiClient: ReturnType<typeof MxPlatformApiFactory>
   provider: string
@@ -342,29 +366,5 @@ export class MxAdapter implements WidgetAdapter {
     }
     logger.trace(`Failed creating mx user, using user_id: ${userId}`)
     return userId
-  }
-
-  static async HandleOauthResponse(
-    request: HandleOauthReponseRequest
-  ): Promise<Connection> {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { member_guid, status, error_reason } = request
-    if (status === 'error') {
-      await set(member_guid, {
-        error: true,
-        error_reason
-      })
-    }
-    const ret = {
-      id: member_guid,
-      error: error_reason,
-      status:
-        status === 'error'
-          ? ConnectionStatus.REJECTED
-          : status === 'success'
-            ? ConnectionStatus.CONNECTED
-            : ConnectionStatus.PENDING
-    }
-    return ret
   }
 }

@@ -1,25 +1,52 @@
+import { adapterMapObject as testAdapterMapObject } from '@repo/test-adapter'
 import {
-  Adapter as TestAdapter,
-  PROVIDER_STRING as TEST_ADAPTER_STRING,
-  getVC as getTestAdapterVC
-} from '@repo/test-adapter'
-import { MxAdapter } from './adapters/mx'
+  handleOauthResponse as mxHandleOauthResponse,
+  MxAdapter
+} from './adapters/mx'
 import { SophtronAdapter } from './adapters/sophtron'
-import type { VCDataTypes, WidgetAdapter } from '@repo/utils'
+import type { AdapterMapObject, VCDataTypes, WidgetAdapter } from '@repo/utils'
 import { get } from './services/storageClient/redis'
 import { info } from './infra/logger'
 import { mxIntGetVC, mxProdGetVC } from './services/vcProviders/mxVc'
 import getSophtronVc from './services/vcProviders/sophtronVc'
 
-export function getProviderAdapter(provider: string): WidgetAdapter {
-  const adapterMap = {
-    [TEST_ADAPTER_STRING]: new TestAdapter(),
-    mx: new MxAdapter(false),
-    mx_int: new MxAdapter(true),
-    sophtron: new SophtronAdapter()
+const mxAdapterMapObject: AdapterMapObject = {
+  mx: {
+    oauthResponseHandler: mxHandleOauthResponse,
+    vcAdapter: mxProdGetVC,
+    widgetAdapter: new MxAdapter(false)
+  },
+  mx_int: {
+    oauthResponseHandler: mxHandleOauthResponse,
+    vcAdapter: mxIntGetVC,
+    widgetAdapter: new MxAdapter(true)
   }
+}
 
-  const widgetAdapter = (adapterMap as any)[provider]
+const sophtronAdapterMapObject: AdapterMapObject = {
+  sophtron: {
+    vcAdapter: getSophtronVc,
+    widgetAdapter: new SophtronAdapter()
+  }
+}
+
+// This is where you add adapters
+const adapterMapObjects = [
+  testAdapterMapObject,
+  mxAdapterMapObject,
+  sophtronAdapterMapObject
+]
+
+const adapterMap = adapterMapObjects.reduce(
+  (acc, adapterMapObject) => ({
+    ...acc,
+    ...adapterMapObject
+  }),
+  {}
+)
+
+export function getProviderAdapter(provider: string): WidgetAdapter {
+  const widgetAdapter = adapterMap[provider]?.widgetAdapter
 
   if (widgetAdapter) {
     return widgetAdapter
@@ -34,23 +61,15 @@ export const handleOauthResponse = async (
   rawQueries: any,
   body: any
 ) => {
-  const mxHandleOauthResponse = async () =>
-    await MxAdapter.HandleOauthResponse({
+  let res = {} as any
+  const oauthHandler = adapterMap[provider]?.oauthResponseHandler
+
+  if (oauthHandler) {
+    res = await oauthHandler({
       ...rawQueries,
       ...rawParams,
       ...body
     })
-
-  const adapterMap = {
-    mx: mxHandleOauthResponse,
-    mx_int: mxHandleOauthResponse
-  }
-
-  let res = {} as any
-  const oauthHandler = (adapterMap as any)[provider]
-
-  if (oauthHandler) {
-    res = await oauthHandler()
   }
 
   const ret = {
@@ -82,14 +101,7 @@ export default async function getVc({
   type: VCDataTypes
   userId: string
 }) {
-  const adapterMap = {
-    [TEST_ADAPTER_STRING]: getTestAdapterVC,
-    mx: mxProdGetVC,
-    mx_int: mxIntGetVC,
-    sophtron: getSophtronVc
-  }
-
-  const vcAdapter = (adapterMap as any)[provider]
+  const vcAdapter = adapterMap[provider]?.vcAdapter
 
   if (vcAdapter) {
     info('Getting vc from provider', provider)
