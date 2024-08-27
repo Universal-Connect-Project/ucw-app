@@ -1,13 +1,20 @@
 import { getVc as getSophtronVc } from '../../providerApiClients/sophtronClient/vc'
 
-export default async function getVC(
-  connectionId: string,
-  type: string,
-  userId: string,
-  accountId?: string,
-  startTime?: string,
+export default async function getVC({
+  accountId,
+  connectionId,
+  endTime,
+  startTime,
+  type,
+  userId
+}: {
+  connectionId: string
+  type: string
+  userId: string
+  accountId?: string
+  startTime?: string
   endTime?: string
-) {
+}) {
   let path = ''
   switch (type) {
     case 'identity':

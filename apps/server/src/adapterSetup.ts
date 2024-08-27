@@ -8,7 +8,7 @@ import { SophtronAdapter } from './adapters/sophtron'
 import type { VCDataTypes, WidgetAdapter } from '@repo/utils'
 import { get } from './services/storageClient/redis'
 import { info } from './infra/logger'
-import getMXVc from './services/vcProviders/mxVc'
+import { mxIntGetVC, mxProdGetVC } from './services/vcProviders/mxVc'
 import getSophtronVc from './services/vcProviders/sophtronVc'
 
 export function getProviderAdapter(provider: string): WidgetAdapter {
@@ -83,19 +83,10 @@ export default async function getVc({
   userId: string
 }) {
   const adapterMap = {
-    [TEST_ADAPTER_STRING]: () => getTestAdapterVC(type),
-    mx: async () => await getMXVc(true, connectionId, type, userId, accountId),
-    mx_int: async () =>
-      await getMXVc(false, connectionId, type, userId, accountId),
-    sophtron: async () =>
-      await getSophtronVc(
-        connectionId,
-        type,
-        userId,
-        accountId,
-        startTime,
-        endTime
-      )
+    [TEST_ADAPTER_STRING]: getTestAdapterVC,
+    mx: mxProdGetVC,
+    mx_int: mxIntGetVC,
+    sophtron: getSophtronVc
   }
 
   const vcAdapter = (adapterMap as any)[provider]
@@ -103,7 +94,15 @@ export default async function getVc({
   if (vcAdapter) {
     info('Getting vc from provider', provider)
 
-    return vcAdapter()
+    return vcAdapter({
+      accountId,
+      connectionId,
+      endTime,
+      provider,
+      startTime,
+      type,
+      userId
+    })
   }
 
   throw new Error(`Unsupported provider ${provider}`)

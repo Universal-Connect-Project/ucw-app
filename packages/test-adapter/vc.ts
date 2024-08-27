@@ -5,7 +5,7 @@ import {
   transactionsResponse
 } from './vcResponses'
 
-export const getVC = (type: VCDataTypes) => {
+export const getVC = ({ type }: { type: VCDataTypes }) => {
   switch (type) {
     case VCDataTypes.ACCOUNTS:
       return accountsResponse
