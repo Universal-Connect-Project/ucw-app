@@ -7,7 +7,7 @@ import type {
   WidgetAdapter
 } from '@repo/utils'
 import { ConnectionStatus } from '@repo/utils'
-import { PROVIDER_STRING } from './constants'
+import { PROVIDER_STRING, TEST_EXAMPLE_LABEL_TEXT } from './constants'
 
 interface HandleOauthReponseRequest {
   member_guid: string
@@ -36,7 +36,7 @@ export class TestAdapter implements WidgetAdapter {
         id: 'testId',
         field_name: 'fieldName',
         field_type: 'fieldType',
-        label: 'fieldLabel'
+        label: TEST_EXAMPLE_LABEL_TEXT
       }
     ]
   }
