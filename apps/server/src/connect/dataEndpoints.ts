@@ -33,12 +33,12 @@ export const accountsDataHandler = withValidateProviderInPath(
     const providerUserId = await providerAdapter.ResolveUserId(userId)
 
     try {
-      const vc = await getVC(
+      const vc = await getVC({
         provider,
         connectionId,
-        VCDataTypes.ACCOUNTS,
-        providerUserId
-      )
+        type: VCDataTypes.ACCOUNTS,
+        userId: providerUserId
+      })
       res.send({
         jwt: vc
       })
@@ -57,19 +57,18 @@ export interface IdentityDataParameters {
 
 export const identityDataHandler = withValidateProviderInPath(
   async (req: IdentityRequest, res: Response) => {
-    const { provider, connectionId, userId } =
-      req.params as IdentityDataParameters
+    const { provider, connectionId, userId } = req.params
 
     const providerAdapter = getProviderAdapter(provider)
     const providerUserId = await providerAdapter.ResolveUserId(userId)
 
     try {
-      const vc = await getVC(
+      const vc = await getVC({
         provider,
         connectionId,
-        VCDataTypes.IDENTITY,
-        providerUserId
-      )
+        type: VCDataTypes.IDENTITY,
+        userId: providerUserId
+      })
       res.send({
         jwt: vc
       })
@@ -93,8 +92,7 @@ export interface TransactionsDataPathParameters {
 
 export const transactionsDataHandler = withValidateProviderInPath(
   async (req: TransactionsRequest, res: Response) => {
-    const { accountId, provider, userId } =
-      req.params as TransactionsDataPathParameters
+    const { accountId, provider, userId } = req.params
 
     const schema = Joi.object({
       end_time:
@@ -114,22 +112,20 @@ export const transactionsDataHandler = withValidateProviderInPath(
       return
     }
 
-    const { start_time, end_time } =
-      req.query as TransactionsDataQueryParameters
+    const { start_time, end_time } = req.query
 
     const providerAdapter = getProviderAdapter(provider)
     const providerUserId = await providerAdapter.ResolveUserId(userId)
 
     try {
-      const vc = await getVC(
+      const vc = await getVC({
         provider,
-        undefined,
-        VCDataTypes.TRANSACTIONS,
-        providerUserId,
+        type: VCDataTypes.TRANSACTIONS,
+        userId: providerUserId,
         accountId,
-        start_time,
-        end_time
-      )
+        startTime: start_time,
+        endTime: end_time
+      })
       res.send({
         jwt: vc
       })

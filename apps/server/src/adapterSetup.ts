@@ -65,15 +65,23 @@ export const handleOauthResponse = async (
   return ret
 }
 
-export default async function getVc(
-  provider: string,
-  connectionId: string,
-  type: VCDataTypes,
-  userId: string,
-  accountId?: string,
-  startTime?: string,
+export default async function getVc({
+  accountId,
+  connectionId,
+  endTime,
+  provider,
+  startTime,
+  type,
+  userId
+}: {
+  accountId?: string
+  connectionId?: string
   endTime?: string
-) {
+  provider: string
+  startTime?: string
+  type: VCDataTypes
+  userId: string
+}) {
   const adapterMap = {
     [TEST_ADAPTER_STRING]: () => getTestAdapterVC(type),
     mx: async () => await getMXVc(true, connectionId, type, userId, accountId),
