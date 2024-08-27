@@ -4,6 +4,7 @@ import Joi from 'joi'
 import { Providers } from '../shared/contract'
 import { withValidateProviderInPath } from '../utils/validators'
 import getVC, { getProviderAdapter } from '../adapterSetup'
+import { VCDataTypes } from '@repo/utils'
 
 export interface AccountsDataQueryParameters {
   connectionId: string
@@ -32,7 +33,12 @@ export const accountsDataHandler = withValidateProviderInPath(
     const providerUserId = await providerAdapter.ResolveUserId(userId)
 
     try {
-      const vc = await getVC(provider, connectionId, 'accounts', providerUserId)
+      const vc = await getVC(
+        provider,
+        connectionId,
+        VCDataTypes.ACCOUNTS,
+        providerUserId
+      )
       res.send({
         jwt: vc
       })
@@ -58,7 +64,12 @@ export const identityDataHandler = withValidateProviderInPath(
     const providerUserId = await providerAdapter.ResolveUserId(userId)
 
     try {
-      const vc = await getVC(provider, connectionId, 'identity', providerUserId)
+      const vc = await getVC(
+        provider,
+        connectionId,
+        VCDataTypes.IDENTITY,
+        providerUserId
+      )
       res.send({
         jwt: vc
       })
@@ -113,7 +124,7 @@ export const transactionsDataHandler = withValidateProviderInPath(
       const vc = await getVC(
         provider,
         undefined,
-        'transactions',
+        VCDataTypes.TRANSACTIONS,
         providerUserId,
         accountId,
         start_time,

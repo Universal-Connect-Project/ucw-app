@@ -1,3 +1,4 @@
+import { VCDataTypes } from '@repo/utils'
 import { info } from '../../infra/logger'
 import { getVc as getMxVc } from '../../providerApiClients/mxClient/vc'
 
@@ -10,14 +11,13 @@ export default async function getVC(
 ) {
   let path = ''
   switch (type) {
-    case 'identity':
+    case VCDataTypes.IDENTITY:
       path = `users/${userId}/members/${connectionId}/customers?filters=name,addresses`
       break
-    case 'accounts':
-    case 'banking':
+    case VCDataTypes.ACCOUNTS:
       path = `users/${userId}/members/${connectionId}/accounts`
       break
-    case 'transactions':
+    case VCDataTypes.TRANSACTIONS:
       path = `users/${userId}/accounts/${accountId}/transactions`
       break
     default:

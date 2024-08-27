@@ -1,3 +1,9 @@
+export enum VCDataTypes {
+  ACCOUNTS = 'accounts',
+  IDENTITY = 'identity',
+  TRANSACTIONS = 'transactions'
+}
+
 export interface Credential {
   id: string
   label?: string

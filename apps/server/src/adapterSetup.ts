@@ -1,10 +1,11 @@
 import {
   Adapter as TestAdapter,
-  PROVIDER_STRING as TEST_ADAPTER_STRING
+  PROVIDER_STRING as TEST_ADAPTER_STRING,
+  getVC as getTestAdapterVC
 } from '@repo/test-adapter'
 import { MxAdapter } from './adapters/mx'
 import { SophtronAdapter } from './adapters/sophtron'
-import type { WidgetAdapter } from '@repo/utils'
+import type { VCDataTypes, WidgetAdapter } from '@repo/utils'
 import { get } from './services/storageClient/redis'
 import { info } from './infra/logger'
 import getMXVc from './services/vcProviders/mxVc'
@@ -67,20 +68,19 @@ export const handleOauthResponse = async (
 export default async function getVc(
   provider: string,
   connectionId: string,
-  type: string,
+  type: VCDataTypes,
   userId: string,
   accountId?: string,
   startTime?: string,
   endTime?: string
 ) {
-  info('Getting vc from provider', provider)
-  switch (provider) {
-    case 'mx':
-      return await getMXVc(true, connectionId, type, userId, accountId)
-    case 'mx_int':
-      return await getMXVc(false, connectionId, type, userId, accountId)
-    case 'sophtron':
-      return await getSophtronVc(
+  const adapterMap = {
+    [TEST_ADAPTER_STRING]: () => getTestAdapterVC(type),
+    mx: async () => await getMXVc(true, connectionId, type, userId, accountId),
+    mx_int: async () =>
+      await getMXVc(false, connectionId, type, userId, accountId),
+    sophtron: async () =>
+      await getSophtronVc(
         connectionId,
         type,
         userId,
@@ -89,4 +89,14 @@ export default async function getVc(
         endTime
       )
   }
+
+  const vcAdapter = (adapterMap as any)[provider]
+
+  if (vcAdapter) {
+    info('Getting vc from provider', provider)
+
+    return vcAdapter()
+  }
+
+  throw new Error(`Unsupported provider ${provider}`)
 }
