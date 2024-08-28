@@ -1,5 +1,6 @@
 import type { Response } from 'express'
 import { HttpResponse, http } from 'msw'
+import type { Provider } from '../shared/contract'
 import { Providers } from '../shared/contract'
 import { MX_DELETE_USER_PATH } from '../test/handlers'
 import { listUsersData } from '../test/testData/users'
@@ -20,7 +21,7 @@ describe('userEndpoints', () => {
 
       const req: UserDeleteRequest = {
         params: {
-          provider: 'unsupportedProvider',
+          provider: 'unsupportedProvider' as Provider,
           userId: 'testUserIdWhichDoesntExist'
         }
       }

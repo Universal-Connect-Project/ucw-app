@@ -21,8 +21,11 @@ import {
   identityDataHandler,
   transactionsDataHandler
 } from './dataEndpoints'
+import type { Provider } from '../shared/contract'
 import { Providers } from '../shared/contract'
 import { invalidProviderString } from '../utils/validators'
+
+/* eslint-disable @typescript-eslint/unbound-method */
 
 describe('dataEndpoints', () => {
   describe('accountsDataHandler', () => {
@@ -36,10 +39,10 @@ describe('dataEndpoints', () => {
         {
           params: {
             connectionId: 'testConnectionId',
-            provider: 'junk',
+            provider: 'junk' as Provider,
             userId: 'testUserId'
           }
-        } as AccountsRequest,
+        },
         res
       )
 
@@ -109,7 +112,7 @@ describe('dataEndpoints', () => {
             provider: 'junk',
             userId: 'testUserId'
           }
-        } as IdentityRequest,
+        },
         res
       )
 
@@ -177,14 +180,14 @@ describe('dataEndpoints', () => {
         const req: TransactionsRequest = {
           params: {
             accountId: 'testAccountId',
-            provider: 'junk',
+            provider: 'junk' as Provider,
             userId: 'testUserId'
           },
           query: {
             start_time: undefined,
             end_time: undefined
           }
-        } as TransactionsRequest
+        }
 
         await transactionsDataHandler(req, res)
 
@@ -204,8 +207,11 @@ describe('dataEndpoints', () => {
             provider: Providers.MX,
             userId: 'testUserId'
           },
-          query: {}
-        } as TransactionsRequest
+          query: {
+            end_time: undefined,
+            start_time: undefined
+          }
+        }
 
         await transactionsDataHandler(req, res)
 
@@ -225,9 +231,10 @@ describe('dataEndpoints', () => {
             userId: 'testUserId'
           },
           query: {
-            end_time: 'junk'
+            end_time: 'junk',
+            start_time: undefined
           }
-        } as TransactionsRequest
+        }
 
         await transactionsDataHandler(req, res)
 
@@ -248,9 +255,10 @@ describe('dataEndpoints', () => {
             userId: 'testUserId'
           },
           query: {
+            end_time: undefined,
             start_time: 'junk'
           }
-        } as TransactionsRequest
+        }
 
         await transactionsDataHandler(req, res)
 
