@@ -1,5 +1,4 @@
 import type { VCDataTypes, WidgetAdapter } from '@repo/utils'
-import { get } from './services/storageClient/redis'
 import { info } from './infra/logger'
 import type { Provider } from './adapterSetup'
 import { adapterMap } from './adapterSetup'
