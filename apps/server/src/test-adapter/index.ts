@@ -11,4 +11,6 @@ export const adapterMapObject = {
   }
 }
 
+export { TestAdapter }
+
 export { PROVIDER_STRING }

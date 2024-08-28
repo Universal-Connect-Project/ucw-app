@@ -6,8 +6,10 @@ import {
   mxVcIntegrationAccountsData
 } from './test/testData/mxVcData'
 import { sophtronVcAccountsData } from './test/testData/sophtronVcData'
-import { TestAdapter } from '@repo/test-adapter/adapter'
-import { PROVIDER_STRING as TEST_EXAMPLE_PROVIDER_STRING } from '@repo/test-adapter'
+import {
+  PROVIDER_STRING as TEST_EXAMPLE_PROVIDER_STRING,
+  TestAdapter
+} from './test-adapter'
 
 const connectionId = 'testConectionId'
 const type = VCDataTypes.ACCOUNTS

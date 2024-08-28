@@ -1,4 +1,4 @@
-import { adapterMapObject as testAdapterMapObject } from '@repo/test-adapter'
+import { adapterMapObject as testAdapterMapObject } from './test-adapter'
 import { MxAdapter } from './adapters/mx'
 import { SophtronAdapter } from './adapters/sophtron'
 

@@ -1,5 +1,5 @@
 import { searchByText } from './widget'
-import { TEST_EXAMPLE_LABEL_TEXT } from '@repo/test-adapter'
+import { TEST_EXAMPLE_LABEL_TEXT } from '../../src/test-adapter'
 
 export const searchAndSelectTestExample = () => {
   searchByText('TestExample1 Bank')
