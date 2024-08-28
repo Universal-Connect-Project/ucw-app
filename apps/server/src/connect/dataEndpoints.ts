@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { Response } from 'express'
 import Joi from 'joi'
+import type { Provider } from '../shared/contract'
 import { Providers } from '../shared/contract'
 import { withValidateProviderInPath } from '../utils/validators'
-import getVC, { getProviderAdapter } from '../adapterSetup'
+import { getProviderAdapter, getVC } from '../adapterIndex'
 import { VCDataTypes } from '@repo/utils'
 
 export interface AccountsDataQueryParameters {
   connectionId: string
-  provider: string
+  provider: Provider
   userId: string
 }
 
@@ -51,7 +52,7 @@ export const accountsDataHandler = withValidateProviderInPath(
 
 export interface IdentityDataParameters {
   connectionId: string
-  provider: string
+  provider: Provider
   userId: string
 }
 
@@ -86,7 +87,7 @@ export interface TransactionsDataQueryParameters {
 
 export interface TransactionsDataPathParameters {
   accountId: string
-  provider: string
+  provider: Provider
   userId: string
 }
 

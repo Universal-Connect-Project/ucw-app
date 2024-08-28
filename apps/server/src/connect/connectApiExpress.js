@@ -20,7 +20,7 @@ import {
 } from './institutionEndpoints'
 import stubs from './instrumentations.js'
 import { userDeleteHandler } from './userEndpoints'
-import { handleOauthResponse } from '../adapterSetup'
+import { handleOauthResponse } from '../adapterIndex'
 
 const AGGREGATION_JOB_TYPE = 0
 

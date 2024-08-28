@@ -4,14 +4,11 @@ export enum VCDataTypes {
   TRANSACTIONS = 'transactions'
 }
 
-export type AdapterMapObject = Record<
-  any,
-  {
-    oauthResponseHandler?: Function
-    vcAdapter: Function
-    widgetAdapter: WidgetAdapter
-  }
->
+export type AdapterMap = {
+  oauthResponseHandler?: Function
+  vcAdapter: Function
+  widgetAdapter: WidgetAdapter
+}
 
 export interface Credential {
   id: string

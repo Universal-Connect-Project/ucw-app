@@ -30,7 +30,11 @@ import {
 } from '../test/testData/members'
 import { createUserData, listUsersData } from '../test/testData/users'
 import { server } from '../test/testServer'
-import { EXTENDED_HISTORY_NOT_SUPPORTED_MSG, MxAdapter } from './mx'
+import {
+  EXTENDED_HISTORY_NOT_SUPPORTED_MSG,
+  handleOauthResponse,
+  MxAdapter
+} from './mx'
 
 const mxAdapterInt = new MxAdapter(true)
 
@@ -857,7 +861,7 @@ describe('mx provider', () => {
       const memberGuid = 'memberGuid'
 
       it('sets an error in redis if status is error', async () => {
-        const response = await MxAdapter.HandleOauthResponse({
+        const response = await handleOauthResponse({
           member_guid: memberGuid,
           status: 'error',
           error_reason: errorReason
@@ -876,7 +880,7 @@ describe('mx provider', () => {
       })
 
       it('returns with connected status if success', async () => {
-        const response = await MxAdapter.HandleOauthResponse({
+        const response = await handleOauthResponse({
           member_guid: memberGuid,
           status: 'success',
           error_reason: errorReason
@@ -886,7 +890,7 @@ describe('mx provider', () => {
       })
 
       it('returns with pending status if not success', async () => {
-        const response = await MxAdapter.HandleOauthResponse({
+        const response = await handleOauthResponse({
           member_guid: memberGuid,
           status: 'notSuccessOrError',
           error_reason: errorReason

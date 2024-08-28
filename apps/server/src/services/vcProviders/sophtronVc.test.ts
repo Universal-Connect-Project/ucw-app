@@ -4,6 +4,7 @@ import {
   sophtronVcTranscationsData
 } from '../../test/testData/sophtronVcData'
 import getVC from './sophtronVc'
+import { VCDataTypes } from '@repo/utils'
 
 describe('getVc', () => {
   const connectionId = 'connectionId'
@@ -13,25 +14,25 @@ describe('getVc', () => {
   const endTime = '6/1/2024'
 
   it('gets identity VC', async () => {
-    const vc = await getVC(connectionId, 'identity', userId)
+    const vc = await getVC({ connectionId, type: VCDataTypes.IDENTITY, userId })
 
     expect(vc).toEqual(sophtronVcIdentityData)
   })
 
   it('gets accounts VC', async () => {
-    const vc = await getVC(connectionId, 'accounts', userId)
+    const vc = await getVC({ connectionId, type: VCDataTypes.ACCOUNTS, userId })
     expect(vc).toEqual(sophtronVcAccountsData)
   })
 
   it('gets transactions VC', async () => {
-    const vc = await getVC(
+    const vc = await getVC({
       connectionId,
-      'transactions',
+      type: VCDataTypes.TRANSACTIONS,
       userId,
       accountId,
       startTime,
       endTime
-    )
+    })
     expect(vc).toEqual(sophtronVcTranscationsData)
   })
 })

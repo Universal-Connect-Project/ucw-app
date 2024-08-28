@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { getProviderAdapter } from '../adapterSetup'
+import { getProviderAdapter } from '../adapterIndex'
 import * as logger from '../infra/logger'
 import providerCredentials from '../providerCredentials'
 import { AnalyticsClient } from '../services/analyticsClient'
@@ -13,6 +13,7 @@ import type {
   Credential,
   Institution,
   MappedJobTypes,
+  Provider,
   UpdateConnectionRequest,
   WidgetAdapter
 } from '../shared/contract'
@@ -57,7 +58,9 @@ export class ProviderAdapterBase {
 
     this.analyticsClient = new AnalyticsClient(token)
     try {
-      this.providerAdapter = getProviderAdapter(this.context?.provider)
+      this.providerAdapter = getProviderAdapter(
+        this.context?.provider as Provider
+      )
       this.providers = Object.values(providerCredentials)
         .filter((v: any) => v.available)
         .map((v: any) => v.provider)

@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw'
 import { ConnectionStatus, OAuthStatus } from '../shared/contract'
 import { READ_MEMBER_STATUS_PATH } from '../test/handlers'
 import { server } from '../test/testServer'
-import { getProviderAdapter, ProviderAdapterBase } from './index'
+import { ProviderAdapterBase } from './index'
 import { MxAdapter } from './mx'
 
 const testConnectionId = 'test_connection_id'
@@ -22,14 +22,6 @@ const providerAdapterBase = new ProviderAdapterBase({
 })
 
 describe('ProviderAdapterBase', () => {
-  describe('getProviderAdapter', () => {
-    it('throws an error if its an unsupported provider', async () => {
-      expect(() => getProviderAdapter('junk')).toThrow(
-        'Unsupported provider junk'
-      )
-    })
-  })
-
   describe('getOauthState', () => {
     beforeAll(async () => {
       await providerAdapterBase.init()

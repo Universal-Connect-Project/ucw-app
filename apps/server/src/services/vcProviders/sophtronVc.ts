@@ -1,4 +1,5 @@
 import { getVc as getSophtronVc } from '../../providerApiClients/sophtronClient/vc'
+import { VCDataTypes } from '@repo/utils'
 
 export default async function getVC({
   accountId,
@@ -9,7 +10,7 @@ export default async function getVC({
   userId
 }: {
   connectionId: string
-  type: string
+  type: VCDataTypes
   userId: string
   accountId?: string
   startTime?: string
@@ -17,14 +18,13 @@ export default async function getVC({
 }) {
   let path = ''
   switch (type) {
-    case 'identity':
+    case VCDataTypes.IDENTITY:
       path = `customers/${userId}/members/${connectionId}/identity`
       break
-    case 'accounts':
-    case 'banking':
+    case VCDataTypes.ACCOUNTS:
       path = `customers/${userId}/members/${connectionId}/accounts`
       break
-    case 'transactions':
+    case VCDataTypes.TRANSACTIONS:
       path = `customers/${userId}/accounts/${accountId}/transactions?startTime=${startTime}&endTime=${endTime}`
       break
     default:

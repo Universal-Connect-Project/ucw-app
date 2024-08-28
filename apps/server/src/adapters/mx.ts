@@ -22,7 +22,7 @@ import { ChallengeType, ConnectionStatus } from '../shared/contract'
 export const EXTENDED_HISTORY_NOT_SUPPORTED_MSG =
   "Member's institution does not support extended transaction history."
 
-interface HandleOauthReponseRequest {
+export interface HandleOauthReponseRequest {
   member_guid: string
   status: string
   error_reason: string
