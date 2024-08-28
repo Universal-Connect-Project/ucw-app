@@ -5,8 +5,7 @@ import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import config from '../config'
 import { info } from '../infra/logger'
-
-import { MappedJobTypes, type CachedInstitution } from '../shared/contract'
+import type { CachedInstitution, MappedJobTypes } from '../shared/contract'
 import { getPreferences, type Provider } from '../shared/preferences'
 import {
   getAvailableProviders,
