@@ -13,6 +13,6 @@ const makeAConnection = async () => {
   expectConnectionSuccess()
 }
 
-describe('mx provider', () => {
+describe('testExample provider', () => {
   generateVcDataTests({ makeAConnection })
 })

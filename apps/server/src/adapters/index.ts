@@ -58,9 +58,11 @@ export class ProviderAdapterBase {
 
     this.analyticsClient = new AnalyticsClient(token)
     try {
-      this.providerAdapter = getProviderAdapter(
-        this.context?.provider as Provider
-      )
+      if (this.context?.provider) {
+        this.providerAdapter = getProviderAdapter(
+          this.context?.provider as Provider
+        )
+      }
       this.providers = Object.values(providerCredentials)
         .filter((v: any) => v.available)
         .map((v: any) => v.provider)

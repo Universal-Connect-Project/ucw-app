@@ -43,6 +43,18 @@ describe('adapterSetup', () => {
 
       expect(response).toEqual(sophtronVcAccountsData)
     })
+
+    it('throws an error if the provider doesnt have a handler', async () => {
+      await expect(
+        async () =>
+          await getVC({
+            provider: 'junk' as Provider,
+            connectionId,
+            type,
+            userId
+          })
+      ).rejects.toThrow('Unsupported provider junk')
+    })
   })
 
   describe('getProviderAdapter', () => {

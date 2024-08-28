@@ -9,12 +9,6 @@ import type {
 import { ConnectionStatus } from '@repo/utils'
 import { PROVIDER_STRING, TEST_EXAMPLE_LABEL_TEXT } from './constants'
 
-interface HandleOauthReponseRequest {
-  member_guid: string
-  status: string
-  error_reason: string
-}
-
 export class TestAdapter implements WidgetAdapter {
   async GetInstitutionById(id: string): Promise<Institution> {
     return {
@@ -162,14 +156,5 @@ export class TestAdapter implements WidgetAdapter {
     failIfNotFound: boolean = false
   ): Promise<string> {
     return userId
-  }
-
-  static async HandleOauthResponse(
-    request: HandleOauthReponseRequest
-  ): Promise<Connection> {
-    return {
-      id: 'member_guid',
-      status: ConnectionStatus.CONNECTED
-    }
   }
 }

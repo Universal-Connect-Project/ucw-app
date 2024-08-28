@@ -7,7 +7,7 @@ import type {
   MxPlatformApiFactory
 } from '../providerApiClients/mx'
 import { MxIntApiClient, MxProdApiClient } from '../providerApiClients/mx'
-import { get, set } from '../services/storageClient/redis'
+import { get } from '../services/storageClient/redis'
 import type {
   Challenge,
   Connection,
@@ -52,30 +52,6 @@ function fromMxMember(member: MemberResponse, provider: string): Connection {
     oauth_window_uri: member.oauth_window_uri,
     provider
   }
-}
-
-export const handleOauthResponse = async (
-  request: HandleOauthReponseRequest
-): Promise<Connection> => {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { member_guid, status, error_reason } = request
-  if (status === 'error') {
-    await set(member_guid, {
-      error: true,
-      error_reason
-    })
-  }
-  const ret = {
-    id: member_guid,
-    error: error_reason,
-    status:
-      status === 'error'
-        ? ConnectionStatus.REJECTED
-        : status === 'success'
-          ? ConnectionStatus.CONNECTED
-          : ConnectionStatus.PENDING
-  }
-  return ret
 }
 
 export class MxAdapter implements WidgetAdapter {

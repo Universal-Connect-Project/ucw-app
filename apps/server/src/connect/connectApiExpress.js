@@ -2,10 +2,7 @@ import * as path from 'path'
 import { instrumentation } from '../adapters'
 import config from '../config'
 import { contextHandler } from '../infra/context.ts'
-import { wget } from '../infra/http'
-import { info } from '../infra/logger'
 import { ApiEndpoints } from '../shared/connect/ApiEndpoint'
-import { ConnectionStatus } from '../shared/contract.ts'
 import { ConnectApi } from './connectApi'
 import {
   accountsDataHandler,
@@ -20,7 +17,6 @@ import {
 } from './institutionEndpoints'
 import stubs from './instrumentations.js'
 import { userDeleteHandler } from './userEndpoints'
-import { handleOauthResponse } from '../adapterIndex'
 
 const AGGREGATION_JOB_TYPE = 0
 
@@ -211,57 +207,6 @@ export default function (app) {
     )
     res.send({
       members: ret
-    })
-  })
-
-  app.all('/webhook/:provider/*', async function (req, res) {
-    const { provider } = req.params
-    info(`received web hook at: ${req.path}`, req.query)
-    const ret = await handleOauthResponse(
-      provider,
-      req.params,
-      req.query,
-      req.body
-    )
-    res.send(ret)
-  })
-
-  app.get('/oauth/:provider/redirect_from/', async (req, res) => {
-    const { provider } = req.params
-    const ret = await handleOauthResponse(provider, req.params, req.query)
-
-    const metadata = JSON.stringify({
-      member_guid: ret?.id,
-      error_reason: ret?.error
-    })
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const app_url = `${ret?.scheme}://oauth_complete?metadata=${encodeURIComponent(metadata)}`
-    const queries = {
-      status: ret?.status === ConnectionStatus.CONNECTED ? 'success' : 'error',
-      app_url,
-      redirect:
-        ret?.oauth_referral_source?.toLowerCase() === 'browser'
-          ? 'false'
-          : 'true',
-      error_reason: ret?.error,
-      member_guid: ret?.id
-    }
-
-    const oauthParams = new RegExp(
-      Object.keys(queries)
-        .map((r) => `\\$${r}`)
-        .join('|'),
-      'g'
-    )
-    function mapOauthParams(queries, res, html) {
-      res.send(
-        html.replaceAll(oauthParams, (q) => queries[q.substring(1)] ?? '')
-      )
-    }
-
-    const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}/oauth/success.html`
-    await wget(resourcePath).then((html) => {
-      mapOauthParams(queries, res, html)
     })
   })
 

@@ -14,35 +14,6 @@ export function getProviderAdapter(provider: Provider): WidgetAdapter {
   throw new Error(`Unsupported provider ${provider}`)
 }
 
-export const handleOauthResponse = async (
-  provider: Provider,
-  rawParams: any,
-  rawQueries: any,
-  body: any
-) => {
-  let res = {} as any
-  const oauthHandler = (adapterMap as any)[provider]?.oauthResponseHandler
-
-  if (oauthHandler) {
-    res = await oauthHandler({
-      ...rawQueries,
-      ...rawParams,
-      ...body
-    })
-  }
-
-  const ret = {
-    ...res,
-    provider
-  }
-  if (res?.id != null) {
-    const context = await get(`context_${ret.request_id ?? ret.id}`)
-    ret.scheme = context.scheme
-    ret.oauth_referral_source = context.oauth_referral_source
-  }
-  return ret
-}
-
 export async function getVC({
   accountId,
   connectionId,

@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import config from '../config'
-import { get, set } from '../services/storageClient/redis'
+import { set } from '../services/storageClient/redis'
 import { ChallengeType, ConnectionStatus } from '../shared/contract'
 import {
   AGGREGATE_MEMBER_PATH,
@@ -30,11 +30,7 @@ import {
 } from '../test/testData/members'
 import { createUserData, listUsersData } from '../test/testData/users'
 import { server } from '../test/testServer'
-import {
-  EXTENDED_HISTORY_NOT_SUPPORTED_MSG,
-  handleOauthResponse,
-  MxAdapter
-} from './mx'
+import { EXTENDED_HISTORY_NOT_SUPPORTED_MSG, MxAdapter } from './mx'
 
 const mxAdapterInt = new MxAdapter(true)
 
@@ -853,50 +849,6 @@ describe('mx provider', () => {
         await expect(
           async () => await mxAdapter.ResolveUserId(userId, true)
         ).rejects.toThrow('User not resolved successfully')
-      })
-    })
-
-    describe('HandleOauthResponse', () => {
-      const errorReason = 'errorReason'
-      const memberGuid = 'memberGuid'
-
-      it('sets an error in redis if status is error', async () => {
-        const response = await handleOauthResponse({
-          member_guid: memberGuid,
-          status: 'error',
-          error_reason: errorReason
-        })
-
-        expect(await get(memberGuid)).toEqual({
-          error: true,
-          error_reason: errorReason
-        })
-
-        expect(response).toMatchObject({
-          id: memberGuid,
-          error: errorReason,
-          status: ConnectionStatus.REJECTED
-        })
-      })
-
-      it('returns with connected status if success', async () => {
-        const response = await handleOauthResponse({
-          member_guid: memberGuid,
-          status: 'success',
-          error_reason: errorReason
-        })
-
-        expect(response.status).toEqual(ConnectionStatus.CONNECTED)
-      })
-
-      it('returns with pending status if not success', async () => {
-        const response = await handleOauthResponse({
-          member_guid: memberGuid,
-          status: 'notSuccessOrError',
-          error_reason: errorReason
-        })
-
-        expect(response.status).toEqual(ConnectionStatus.PENDING)
       })
     })
   })
