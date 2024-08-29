@@ -3,8 +3,7 @@ import {
   InstitutionProvider,
   JobTypeSupports,
   MappedJobTypes,
-  Provider,
-  Providers
+  Provider
 } from './contract'
 
 type JobMappingType = {
@@ -42,31 +41,17 @@ export function getAvailableProviders({
   supportedProviders?: Provider[]
   shouldRequireFullSupport: boolean
 }): Provider[] {
-  const providers = []
-  if (
-    supportedProviders.includes(Providers.MX) &&
-    institution.mx?.id != null &&
-    providerSupportsJobType({
-      institutionAttributes: institution.mx,
-      jobType,
-      shouldRequireFullSupport
-    })
-  ) {
-    providers.push(Providers.MX)
-  }
-  if (
-    supportedProviders.includes(Providers.SOPHTRON) &&
-    institution.sophtron?.id != null &&
-    providerSupportsJobType({
-      institutionAttributes: institution.sophtron,
-      jobType,
-      shouldRequireFullSupport
-    })
-  ) {
-    providers.push(Providers.SOPHTRON)
-  }
+  const providers = supportedProviders?.filter(
+    (provider) =>
+      (institution as any)[provider]?.id != null &&
+      providerSupportsJobType({
+        institutionAttributes: (institution as any)[provider],
+        jobType,
+        shouldRequireFullSupport
+      })
+  )
 
-  return providers as Provider[]
+  return providers
 }
 
 function providerSupportsJobType({

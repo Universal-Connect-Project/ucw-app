@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { Response } from 'express'
 import Joi from 'joi'
-import { getProviderAdapter } from '../adapters'
-import getVC from '../services/vcProviders'
+import type { Provider } from '../shared/contract'
 import { Providers } from '../shared/contract'
 import { withValidateProviderInPath } from '../utils/validators'
+import { getProviderAdapter, getVC } from '../adapterIndex'
+import { VCDataTypes } from '@repo/utils'
 
 export interface AccountsDataQueryParameters {
   connectionId: string
-  provider: string
+  provider: Provider
   userId: string
 }
 
@@ -33,7 +34,12 @@ export const accountsDataHandler = withValidateProviderInPath(
     const providerUserId = await providerAdapter.ResolveUserId(userId)
 
     try {
-      const vc = await getVC(provider, connectionId, 'accounts', providerUserId)
+      const vc = await getVC({
+        provider,
+        connectionId,
+        type: VCDataTypes.ACCOUNTS,
+        userId: providerUserId
+      })
       res.send({
         jwt: vc
       })
@@ -46,20 +52,24 @@ export const accountsDataHandler = withValidateProviderInPath(
 
 export interface IdentityDataParameters {
   connectionId: string
-  provider: string
+  provider: Provider
   userId: string
 }
 
 export const identityDataHandler = withValidateProviderInPath(
   async (req: IdentityRequest, res: Response) => {
-    const { provider, connectionId, userId } =
-      req.params as IdentityDataParameters
+    const { provider, connectionId, userId } = req.params
 
     const providerAdapter = getProviderAdapter(provider)
     const providerUserId = await providerAdapter.ResolveUserId(userId)
 
     try {
-      const vc = await getVC(provider, connectionId, 'identity', providerUserId)
+      const vc = await getVC({
+        provider,
+        connectionId,
+        type: VCDataTypes.IDENTITY,
+        userId: providerUserId
+      })
       res.send({
         jwt: vc
       })
@@ -77,14 +87,13 @@ export interface TransactionsDataQueryParameters {
 
 export interface TransactionsDataPathParameters {
   accountId: string
-  provider: string
+  provider: Provider
   userId: string
 }
 
 export const transactionsDataHandler = withValidateProviderInPath(
   async (req: TransactionsRequest, res: Response) => {
-    const { accountId, provider, userId } =
-      req.params as TransactionsDataPathParameters
+    const { accountId, provider, userId } = req.params
 
     const schema = Joi.object({
       end_time:
@@ -104,22 +113,20 @@ export const transactionsDataHandler = withValidateProviderInPath(
       return
     }
 
-    const { start_time, end_time } =
-      req.query as TransactionsDataQueryParameters
+    const { start_time, end_time } = req.query
 
     const providerAdapter = getProviderAdapter(provider)
     const providerUserId = await providerAdapter.ResolveUserId(userId)
 
     try {
-      const vc = await getVC(
+      const vc = await getVC({
         provider,
-        undefined,
-        'transactions',
-        providerUserId,
+        type: VCDataTypes.TRANSACTIONS,
+        userId: providerUserId,
         accountId,
-        start_time,
-        end_time
-      )
+        startTime: start_time,
+        endTime: end_time
+      })
       res.send({
         jwt: vc
       })

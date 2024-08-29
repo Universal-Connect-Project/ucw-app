@@ -47,6 +47,17 @@ function searchQuery(args: searchQueryArgs = {}) {
             }
           ]
         }
+      },
+      {
+        bool: {
+          must: [
+            {
+              term: {
+                'testExample.supports_aggregation': true
+              }
+            }
+          ]
+        }
       }
     ],
     filterTestBanks = false,
@@ -116,6 +127,11 @@ function searchQuery(args: searchQueryArgs = {}) {
             {
               exists: {
                 field: 'sophtron.id'
+              }
+            },
+            {
+              exists: {
+                field: 'testExample.id'
               }
             }
           ],
@@ -339,6 +355,17 @@ describe('search', () => {
                     }
                   ]
                 }
+              },
+              {
+                bool: {
+                  must: [
+                    {
+                      term: {
+                        'testExample.supports_identification': true
+                      }
+                    }
+                  ]
+                }
               }
             ]
           }),
@@ -408,6 +435,27 @@ describe('search', () => {
                     {
                       term: {
                         'sophtron.supports_identification': true
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                bool: {
+                  must: [
+                    {
+                      term: {
+                        'testExample.supports_aggregation': true
+                      }
+                    },
+                    {
+                      term: {
+                        'testExample.supports_verification': true
+                      }
+                    },
+                    {
+                      term: {
+                        'testExample.supports_identification': true
                       }
                     }
                   ]

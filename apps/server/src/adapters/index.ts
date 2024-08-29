@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import { getProviderAdapter } from '../adapterIndex'
 import * as logger from '../infra/logger'
 import providerCredentials from '../providerCredentials'
 import { AnalyticsClient } from '../services/analyticsClient'
 import { resolveInstitutionProvider } from '../services/institutionResolver'
-import { get, set } from '../services/storageClient/redis'
+import { set } from '../services/storageClient/redis'
 import type {
   Challenge,
   Connection,
@@ -12,36 +13,12 @@ import type {
   Credential,
   Institution,
   MappedJobTypes,
+  Provider,
   UpdateConnectionRequest,
   WidgetAdapter
 } from '../shared/contract'
 import { ConnectionStatus, OAuthStatus } from '../shared/contract'
 import { decodeAuthToken, mapJobType } from '../utils'
-import { AkoyaAdapter } from './akoya'
-import { FinicityAdapter } from './finicity'
-import { MxAdapter } from './mx'
-import { SophtronAdapter } from './sophtron'
-
-export function getProviderAdapter(provider: string): WidgetAdapter {
-  switch (provider) {
-    case 'mx':
-      return new MxAdapter(false)
-    case 'mx_int':
-      return new MxAdapter(true)
-    case 'sophtron':
-      return new SophtronAdapter()
-    case 'akoya':
-      return new AkoyaAdapter(false)
-    case 'akoya_sandbox':
-      return new AkoyaAdapter(true)
-    case 'finicity':
-      return new FinicityAdapter()
-    case 'finicity_sandbox':
-      return new FinicityAdapter(true)
-    default:
-      throw new Error(`Unsupported provider ${provider}`)
-  }
-}
 
 export async function instrumentation(context: Context, input: any) {
   const { user_id } = input
@@ -81,7 +58,11 @@ export class ProviderAdapterBase {
 
     this.analyticsClient = new AnalyticsClient(token)
     try {
-      this.providerAdapter = getProviderAdapter(this.context?.provider)
+      if (this.context?.provider) {
+        this.providerAdapter = getProviderAdapter(
+          this.context?.provider as Provider
+        )
+      }
       this.providers = Object.values(providerCredentials)
         .filter((v: any) => v.available)
         .map((v: any) => v.provider)
@@ -241,50 +222,6 @@ export class ProviderAdapterBase {
 
   getUserId(): string {
     return this.context.resolved_user_id
-  }
-
-  static async handleOauthResponse(
-    provider: string,
-    rawParams: any,
-    rawQueries: any,
-    body: any
-  ) {
-    let res = {} as any
-    switch (provider) {
-      case 'akoya':
-      case 'akoya_sandbox':
-        res = await AkoyaAdapter.HandleOauthResponse({
-          ...rawQueries,
-          ...rawParams
-        })
-        break
-      case 'finicity':
-      case 'finicity_sandbox':
-        res = await FinicityAdapter.HandleOauthResponse({
-          ...rawQueries,
-          ...rawParams,
-          ...body
-        })
-        break
-      case 'mx':
-      case 'mx_int':
-        res = await MxAdapter.HandleOauthResponse({
-          ...rawQueries,
-          ...rawParams,
-          ...body
-        })
-        break
-    }
-    const ret = {
-      ...res,
-      provider
-    }
-    if (res?.id != null) {
-      const context = await get(`context_${ret.request_id ?? ret.id}`)
-      ret.scheme = context.scheme
-      ret.oauth_referral_source = context.oauth_referral_source
-    }
-    return ret
   }
 
   async analytics(path: string, content: any) {

@@ -7,7 +7,7 @@ import type {
   MxPlatformApiFactory
 } from '../providerApiClients/mx'
 import { MxIntApiClient, MxProdApiClient } from '../providerApiClients/mx'
-import { get, set } from '../services/storageClient/redis'
+import { get } from '../services/storageClient/redis'
 import type {
   Challenge,
   Connection,
@@ -21,12 +21,6 @@ import { ChallengeType, ConnectionStatus } from '../shared/contract'
 
 export const EXTENDED_HISTORY_NOT_SUPPORTED_MSG =
   "Member's institution does not support extended transaction history."
-
-interface HandleOauthReponseRequest {
-  member_guid: string
-  status: string
-  error_reason: string
-}
 
 function mapCredentials(mxCreds: CredentialsResponseBody): Credential[] {
   if (mxCreds.credentials != null) {
@@ -342,29 +336,5 @@ export class MxAdapter implements WidgetAdapter {
     }
     logger.trace(`Failed creating mx user, using user_id: ${userId}`)
     return userId
-  }
-
-  static async HandleOauthResponse(
-    request: HandleOauthReponseRequest
-  ): Promise<Connection> {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { member_guid, status, error_reason } = request
-    if (status === 'error') {
-      await set(member_guid, {
-        error: true,
-        error_reason
-      })
-    }
-    const ret = {
-      id: member_guid,
-      error: error_reason,
-      status:
-        status === 'error'
-          ? ConnectionStatus.REJECTED
-          : status === 'success'
-            ? ConnectionStatus.CONNECTED
-            : ConnectionStatus.PENDING
-    }
-    return ret
   }
 }

@@ -1,3 +1,7 @@
+import type { Provider } from '../adapterSetup'
+
+export type { Provider }
+
 export interface AuthRequest {
   provider: string
   token: string
@@ -113,12 +117,11 @@ export interface ResolvedInstitution {
   oauth?: boolean
 }
 
-export type Provider = 'mx' | 'mx_int' | 'sophtron' | 'finicity' | 'akoya'
-
 export enum Providers {
   MX = 'mx',
   MXINT = 'mx_int',
-  SOPHTRON = 'sophtron'
+  SOPHTRON = 'sophtron',
+  TEST_EXAMPLE = 'testExample'
 }
 
 export enum JobTypes {

@@ -1,4 +1,4 @@
-import { expectConnectionSuccess, clickContinue, searchByText } from './widget'
+import { searchByText } from './widget'
 
 export const searchAndSelectMx = () => {
   searchByText('MX Bank')
