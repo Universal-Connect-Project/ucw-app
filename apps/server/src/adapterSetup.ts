@@ -31,3 +31,4 @@ export const adapterMap = {
 }
 
 export type Provider = keyof typeof adapterMap
+export const providers = Object.keys(adapterMap)
