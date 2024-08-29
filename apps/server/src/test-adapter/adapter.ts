@@ -7,9 +7,22 @@ import type {
   WidgetAdapter
 } from '@repo/utils'
 import { ConnectionStatus } from '@repo/utils'
-import { PROVIDER_STRING, TEST_EXAMPLE_LABEL_TEXT } from './constants'
 
 export class TestAdapter implements WidgetAdapter {
+  labelText: string
+  provider: string
+
+  constructor({
+    labelText,
+    provider
+  }: {
+    labelText: string
+    provider: string
+  }) {
+    this.labelText = labelText
+    this.provider = provider
+  }
+
   async GetInstitutionById(id: string): Promise<Institution> {
     return {
       id: 'testid',
@@ -18,7 +31,7 @@ export class TestAdapter implements WidgetAdapter {
       name: 'testname',
       oauth: false,
       url: 'testurl',
-      provider: PROVIDER_STRING
+      provider: this.provider
     }
   }
 
@@ -30,7 +43,7 @@ export class TestAdapter implements WidgetAdapter {
         id: 'testId',
         field_name: 'fieldName',
         field_type: 'fieldType',
-        label: TEST_EXAMPLE_LABEL_TEXT
+        label: this.labelText
       }
     ]
   }
@@ -44,7 +57,7 @@ export class TestAdapter implements WidgetAdapter {
         is_being_aggregated: false,
         is_oauth: false,
         oauth_window_uri: undefined,
-        provider: PROVIDER_STRING
+        provider: this.provider
       }
     ]
   }
@@ -58,7 +71,7 @@ export class TestAdapter implements WidgetAdapter {
         id: 'testId',
         field_name: 'testFieldName',
         field_type: 'testFieldType',
-        label: 'testFieldLabel'
+        label: this.labelText
       }
     ]
   }
@@ -74,7 +87,7 @@ export class TestAdapter implements WidgetAdapter {
       is_being_aggregated: false,
       is_oauth: false,
       oauth_window_uri: undefined,
-      provider: PROVIDER_STRING
+      provider: this.provider
     }
   }
 
@@ -93,7 +106,7 @@ export class TestAdapter implements WidgetAdapter {
       is_being_aggregated: false,
       is_oauth: false,
       oauth_window_uri: undefined,
-      provider: PROVIDER_STRING
+      provider: this.provider
     }
   }
 
@@ -108,7 +121,7 @@ export class TestAdapter implements WidgetAdapter {
       is_being_aggregated: false,
       is_oauth: false,
       oauth_window_uri: undefined,
-      provider: PROVIDER_STRING
+      provider: this.provider
     }
   }
 
@@ -122,7 +135,7 @@ export class TestAdapter implements WidgetAdapter {
       is_oauth: false,
       is_being_aggregated: false,
       oauth_window_uri: undefined,
-      provider: PROVIDER_STRING,
+      provider: this.provider,
       user_id: userId
     }
   }
@@ -134,7 +147,7 @@ export class TestAdapter implements WidgetAdapter {
     userId: string
   ): Promise<Connection> {
     return {
-      provider: PROVIDER_STRING,
+      provider: this.provider,
       id: 'testId',
       cur_job_id: 'testJobId',
       user_id: userId,

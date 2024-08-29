@@ -1,8 +1,13 @@
 import { ConnectionStatus } from '@repo/utils'
 import { TestAdapter } from './adapter'
-import { PROVIDER_STRING } from './constants'
 
-const testAdapter = new TestAdapter()
+const labelText = 'testLabelText'
+const provider = 'provider'
+
+const testAdapter = new TestAdapter({
+  labelText,
+  provider
+})
 
 describe('TestAdapter', () => {
   describe('GetInstitutionById', () => {
@@ -13,7 +18,7 @@ describe('TestAdapter', () => {
           'https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
         name: 'testname',
         oauth: false,
-        provider: 'testExample',
+        provider,
         url: 'testurl'
       })
     })
@@ -26,7 +31,7 @@ describe('TestAdapter', () => {
           field_name: 'fieldName',
           field_type: 'fieldType',
           id: 'testId',
-          label: 'Test Example Field Label'
+          label: labelText
         }
       ])
     })
@@ -42,7 +47,7 @@ describe('TestAdapter', () => {
           is_being_aggregated: false,
           is_oauth: false,
           oauth_window_uri: undefined,
-          provider: PROVIDER_STRING
+          provider
         }
       ])
     })
@@ -57,7 +62,7 @@ describe('TestAdapter', () => {
           id: 'testId',
           field_name: 'testFieldName',
           field_type: 'testFieldType',
-          label: 'testFieldLabel'
+          label: labelText
         }
       ])
     })
@@ -72,7 +77,7 @@ describe('TestAdapter', () => {
         is_being_aggregated: false,
         is_oauth: false,
         oauth_window_uri: undefined,
-        provider: PROVIDER_STRING
+        provider
       })
     })
   })
@@ -86,7 +91,7 @@ describe('TestAdapter', () => {
         is_being_aggregated: false,
         is_oauth: false,
         oauth_window_uri: undefined,
-        provider: PROVIDER_STRING
+        provider
       })
     })
   })
@@ -102,7 +107,7 @@ describe('TestAdapter', () => {
         is_being_aggregated: false,
         is_oauth: false,
         oauth_window_uri: undefined,
-        provider: PROVIDER_STRING
+        provider
       })
     })
   })
@@ -115,7 +120,7 @@ describe('TestAdapter', () => {
         is_oauth: false,
         is_being_aggregated: false,
         oauth_window_uri: undefined,
-        provider: PROVIDER_STRING,
+        provider,
         user_id: 'test'
       })
     })
@@ -126,7 +131,7 @@ describe('TestAdapter', () => {
       expect(
         await testAdapter.GetConnectionStatus('test', 'test', false, 'userId')
       ).toEqual({
-        provider: PROVIDER_STRING,
+        provider,
         id: 'testId',
         cur_job_id: 'testJobId',
         user_id: 'userId',

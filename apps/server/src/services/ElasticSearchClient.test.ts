@@ -9,7 +9,7 @@ import {
   search,
   searchByRoutingNumber
 } from '../services/ElasticSearchClient'
-import { MappedJobTypes, Providers } from '../shared/contract'
+import { MappedJobTypes } from '../shared/contract'
 import * as preferences from '../shared/preferences'
 import { elasticSearchInstitutionData } from '../test/testData/institution'
 
@@ -25,41 +25,17 @@ interface searchQueryArgs {
 
 function searchQuery(args: searchQueryArgs = {}) {
   const {
-    jobTypeQuery = [
-      {
-        bool: {
-          must: [
-            {
-              term: {
-                'mx.supports_aggregation': true
-              }
+    jobTypeQuery = testPreferences.supportedProviders.map((provider) => ({
+      bool: {
+        must: [
+          {
+            term: {
+              [`${provider}.supports_aggregation`]: true
             }
-          ]
-        }
-      },
-      {
-        bool: {
-          must: [
-            {
-              term: {
-                'sophtron.supports_aggregation': true
-              }
-            }
-          ]
-        }
-      },
-      {
-        bool: {
-          must: [
-            {
-              term: {
-                'testExample.supports_aggregation': true
-              }
-            }
-          ]
-        }
+          }
+        ]
       }
-    ],
+    })),
     filterTestBanks = false,
     routingNumber
   } = args
@@ -118,23 +94,11 @@ function searchQuery(args: searchQueryArgs = {}) {
       minimum_should_match: 1,
       must: {
         bool: {
-          should: [
-            {
-              exists: {
-                field: 'mx.id'
-              }
-            },
-            {
-              exists: {
-                field: 'sophtron.id'
-              }
-            },
-            {
-              exists: {
-                field: 'testExample.id'
-              }
+          should: testPreferences.supportedProviders.map((provider) => ({
+            exists: {
+              field: `${provider}.id`
             }
-          ],
+          })),
           minimum_should_match: 1,
           must: {
             bool: {
@@ -333,41 +297,19 @@ describe('search', () => {
         path: ['/_search', '/institutions/_search'],
         body: {
           query: searchQuery({
-            jobTypeQuery: [
-              {
+            jobTypeQuery: testPreferences.supportedProviders.map(
+              (provider) => ({
                 bool: {
                   must: [
                     {
                       term: {
-                        'mx.supports_identification': true
+                        [`${provider}.supports_identification`]: true
                       }
                     }
                   ]
                 }
-              },
-              {
-                bool: {
-                  must: [
-                    {
-                      term: {
-                        'sophtron.supports_identification': true
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                bool: {
-                  must: [
-                    {
-                      term: {
-                        'testExample.supports_identification': true
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
+              })
+            )
           }),
           size: 20
         }
@@ -391,77 +333,29 @@ describe('search', () => {
   })
 
   it('includes identity and verification filter when job type is aggregate_identity_verification', async () => {
+    const supportsArray = [
+      'supports_aggregation',
+      'supports_verification',
+      'supports_identification'
+    ]
+
     ElasticSearchMock.add(
       {
         method: ['GET', 'POST'],
         path: ['/_search', '/institutions/_search'],
         body: {
           query: searchQuery({
-            jobTypeQuery: [
-              {
+            jobTypeQuery: testPreferences.supportedProviders.map(
+              (provider) => ({
                 bool: {
-                  must: [
-                    {
-                      term: {
-                        'mx.supports_aggregation': true
-                      }
-                    },
-                    {
-                      term: {
-                        'mx.supports_verification': true
-                      }
-                    },
-                    {
-                      term: {
-                        'mx.supports_identification': true
-                      }
+                  must: supportsArray.map((supportsProp) => ({
+                    term: {
+                      [`${provider}.${supportsProp}`]: true
                     }
-                  ]
+                  }))
                 }
-              },
-              {
-                bool: {
-                  must: [
-                    {
-                      term: {
-                        'sophtron.supports_aggregation': true
-                      }
-                    },
-                    {
-                      term: {
-                        'sophtron.supports_verification': true
-                      }
-                    },
-                    {
-                      term: {
-                        'sophtron.supports_identification': true
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                bool: {
-                  must: [
-                    {
-                      term: {
-                        'testExample.supports_aggregation': true
-                      }
-                    },
-                    {
-                      term: {
-                        'testExample.supports_verification': true
-                      }
-                    },
-                    {
-                      term: {
-                        'testExample.supports_identification': true
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
+              })
+            )
           }),
           size: 20
         }
@@ -595,9 +489,9 @@ describe('getRecommendedInstitutions', () => {
   })
 
   it("filters out institutions that don't have available providers because of job type", async () => {
-    jest.spyOn(preferences, 'getPreferences').mockResolvedValue({
-      supportedProviders: [Providers.MX]
-    } as preferences.Preferences)
+    // jest.spyOn(preferences, 'getPreferences').mockResolvedValue({
+    //   supportedProviders: [Providers.MX]
+    // } as preferences.Preferences)
 
     ElasticSearchMock.clearAll()
 

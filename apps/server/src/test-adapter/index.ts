@@ -1,16 +1,34 @@
 import { TestAdapter } from './adapter'
-import { PROVIDER_STRING } from './constants'
+import {
+  TEST_EXAMPLE_A_PROVIDER_STRING,
+  TEST_EXAMPLE_A_LABEL_TEXT,
+  TEST_EXAMPLE_B_PROVIDER_STRING,
+  TEST_EXAMPLE_B_LABEL_TEXT
+} from './constants'
 import { getVC } from './vc'
 
-export { TEST_EXAMPLE_LABEL_TEXT } from './constants'
-
 export const adapterMapObject = {
-  [PROVIDER_STRING]: {
+  [TEST_EXAMPLE_A_PROVIDER_STRING]: {
     vcAdapter: getVC,
-    widgetAdapter: new TestAdapter()
+    widgetAdapter: new TestAdapter({
+      labelText: TEST_EXAMPLE_A_LABEL_TEXT,
+      provider: TEST_EXAMPLE_A_PROVIDER_STRING
+    })
+  },
+  [TEST_EXAMPLE_B_PROVIDER_STRING]: {
+    vcAdapter: getVC,
+    widgetAdapter: new TestAdapter({
+      labelText: TEST_EXAMPLE_B_LABEL_TEXT,
+      provider: TEST_EXAMPLE_B_PROVIDER_STRING
+    })
   }
 }
 
 export { TestAdapter }
 
-export { PROVIDER_STRING }
+export {
+  TEST_EXAMPLE_A_LABEL_TEXT,
+  TEST_EXAMPLE_B_LABEL_TEXT,
+  TEST_EXAMPLE_A_PROVIDER_STRING,
+  TEST_EXAMPLE_B_PROVIDER_STRING
+}
