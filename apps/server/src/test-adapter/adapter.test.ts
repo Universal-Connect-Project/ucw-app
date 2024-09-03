@@ -1,5 +1,6 @@
 import { ConnectionStatus } from '@repo/utils'
 import { TestAdapter } from './adapter'
+import { testExampleInstitution } from './constants'
 
 const labelText = 'testLabelText'
 const provider = 'provider'
@@ -13,13 +14,12 @@ describe('TestAdapter', () => {
   describe('GetInstitutionById', () => {
     it('returns a response object', async () => {
       expect(await testAdapter.GetInstitutionById('test')).toEqual({
-        id: 'testid',
-        logo_url:
-          'https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
-        name: 'testname',
-        oauth: false,
+        id: 'test',
+        logo_url: testExampleInstitution.logo_url,
+        name: testExampleInstitution.name,
+        oauth: testExampleInstitution.oauth,
         provider,
-        url: 'testurl'
+        url: testExampleInstitution.url
       })
     })
   })

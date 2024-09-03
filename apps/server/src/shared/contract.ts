@@ -1,3 +1,4 @@
+import type { TEST_EXAMPLE_A_PROVIDER_STRING } from '../test-adapter'
 import type { Provider } from '../adapterSetup'
 
 export type { Provider }
@@ -120,8 +121,7 @@ export interface ResolvedInstitution {
 export enum Providers {
   MX = 'mx',
   MXINT = 'mx_int',
-  SOPHTRON = 'sophtron',
-  TEST_EXAMPLE = 'testExample'
+  SOPHTRON = 'sophtron'
 }
 
 export enum JobTypes {
@@ -155,10 +155,7 @@ export interface CachedInstitution {
   ucp_id: string
   is_test_bank: boolean | false
   routing_numbers: string[]
-  mx?: InstitutionProvider
-  sophtron?: InstitutionProvider
-  finicity?: InstitutionProvider
-  akoya?: InstitutionProvider
+  [propName: string]: any
 }
 
 export interface InstitutionProvider {

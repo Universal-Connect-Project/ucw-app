@@ -1,62 +1,24 @@
 {
-  "defaultProvider": "mx",
+  "defaultProvider": "testExampleA",
 
-  "supportedProviders": ["mx", "sophtron", "testExampleA", "testExampleB"],
+  "supportedProviders": ["testExampleA", "testExampleB"],
 
   "defaultProviderVolume": {
-    "mx": 50,
-    "sophtron": 50
+    "testExampleA": 50,
+    "testExampleB": 50
   },
 
   "institutionProviderVolumeMap": {
     "UCP-8c4ca4c32dbd8de": {
-      "mx": 70,
-      "sophtron": 30
+      "testExampleA": 70,
+      "testExampleB": 30
     },
     "UCP-ce8334bbb890163": {
-      "sophtron": 100
-    },
-    "UCP-b0a4307160ecb4c": {
-      "sophtron": 100
-    },
-    "UCP-60155b7292895ed": {
-      "sophtron": 100
-    },
-    "UCP-b087caf69b372c9": {
-      "sophtron": 100
-    },
-    "UCP-ebca9a2b2ae2cca": {
-      "sophtron": 100
-    },
-    "UCP-dba9d2636344aba": {
-      "sophtron": 100
-    },
-    "UCP-cf357b89cd3f592": {
-      "sophtron": 100
-    },
-    "UCP-f4a829f9e5be589": {
-      "sophtron": 100
-    },
-    "UCP-7b326dfce0e627b": {
-      "sophtron": 100
-    },
-    "UCP-d5550e0c94ec25b": {
-      "sophtron": 100
-    },
-    "UCP-e4151e6f16f11e8": {
-      "sophtron": 100
+      "testExampleB": 100
     }
   },
 
-  "hiddenInstitutions": ["UCP-0ba7663038fd1b4"],
+  "hiddenInstitutions": ["UCP-bbbbbbbbbbbbbbb"],
 
-  "recommendedInstitutions": [
-    "UCP-0df410c12173359",
-    "UCP-b087caf69b372c9",
-    "UCP-ce8334bbb890163",
-    "UCP-ebca9a2b2ae2cca",
-    "UCP-b0a4307160ecb4c",
-    "UCP-8c4ca4c32dbd8de",
-    "UCP-412ded54698c47f"
-  ]
+  "recommendedInstitutions": ["UCP-aaaaaaaaaaaeaaa"]
 }

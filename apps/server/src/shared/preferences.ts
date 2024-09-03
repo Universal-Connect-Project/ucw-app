@@ -1,7 +1,6 @@
 import { PREFERENCES_REDIS_KEY } from '../services/storageClient/constants'
 import { get } from '../services/storageClient/redis'
-
-export type Provider = 'mx' | 'sophtron'
+import type { Provider } from './contract'
 
 export interface Preferences {
   defaultProvider?: Provider

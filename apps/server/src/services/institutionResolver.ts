@@ -9,6 +9,7 @@ import type {
   ResolvedInstitution
 } from '../shared/contract'
 import { getPreferences } from '../shared/preferences'
+import { adapterMap } from '../adapterSetup'
 
 const getProviderByVolume = (volumeMap: Record<string, number>): Provider => {
   if (!volumeMap) {
@@ -83,10 +84,12 @@ export async function resolveInstitutionProvider(
   const institutionProvider = institution[
     provider as keyof CachedInstitution
   ] as InstitutionProvider
-  if (provider === 'mx') {
-    if (institution.is_test_bank) {
-      provider = 'mx_int'
-    }
+
+  const testAdapterName = (adapterMap[provider] as any)
+    ?.testInstitutionAdapterName
+
+  if (testAdapterName && institution.is_test_bank) {
+    provider = testAdapterName
   }
 
   debug(

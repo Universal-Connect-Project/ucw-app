@@ -7,6 +7,7 @@ import getSophtronVc from './services/vcProviders/sophtronVc'
 
 const mxAdapterMapObject = {
   mx: {
+    testInstitutionAdapterName: 'mx_int',
     vcAdapter: mxProdGetVC,
     widgetAdapter: new MxAdapter(false)
   },

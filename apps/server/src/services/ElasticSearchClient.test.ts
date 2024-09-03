@@ -1,3 +1,4 @@
+import { TEST_EXAMPLE_A_PROVIDER_STRING } from '../test-adapter'
 import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
 import config from '../config'
 import {
@@ -489,9 +490,12 @@ describe('getRecommendedInstitutions', () => {
   })
 
   it("filters out institutions that don't have available providers because of job type", async () => {
-    // jest.spyOn(preferences, 'getPreferences').mockResolvedValue({
-    //   supportedProviders: [Providers.MX]
-    // } as preferences.Preferences)
+    const mockPreferences: preferences.Preferences = {
+      ...testPreferences,
+      supportedProviders: [TEST_EXAMPLE_A_PROVIDER_STRING]
+    } as any
+
+    jest.spyOn(preferences, 'getPreferences').mockResolvedValue(mockPreferences)
 
     ElasticSearchMock.clearAll()
 
@@ -514,8 +518,8 @@ describe('getRecommendedInstitutions', () => {
             {
               _source: {
                 ...elasticSearchInstitutionData,
-                mx: {
-                  supports_aggregation: true,
+                [TEST_EXAMPLE_A_PROVIDER_STRING]: {
+                  supports_aggregation: false,
                   supports_oauth: false,
                   supports_identification: false,
                   supports_verification: false,
