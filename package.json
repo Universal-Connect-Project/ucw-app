@@ -13,7 +13,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "playwright": "playwright test --ui",
     "pre-commit": "lint-staged",
-    "prepare": "husky install",
+    "prepare": "husky",
     "clean": "npx rimraf {apps,packages}/**/{node_modules,dist,.turbo} -g && npx rimraf node_modules"
   },
   "devDependencies": {
