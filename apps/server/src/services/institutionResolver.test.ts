@@ -1,12 +1,12 @@
+import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
 import {
   JobTypeSupports,
   MappedJobTypes,
   type InstitutionProvider
 } from '../shared/contract'
-import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
 import * as preferences from '../shared/preferences'
+import { ElasticSearchMock } from '../test/elasticSearchMock'
 import { elasticSearchInstitutionData } from '../test/testData/institution'
-import { ElasticSearchMock } from './ElasticSearchClient'
 import { resolveInstitutionProvider } from './institutionResolver'
 import {
   TEST_EXAMPLE_A_PROVIDER_STRING,

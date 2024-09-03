@@ -14,7 +14,8 @@ const nonSensitiveSharedConfig = {
   ServiceName: 'universal_widget',
   CryptoAlgorithm: 'aes-256-cbc',
   SophtronApiServiceEndpoint: 'https://api.sophtron.com/api',
-  SophtronVCServiceEndpoint: 'https://vc.sophtron.com/api/'
+  SophtronVCServiceEndpoint: 'https://vc.sophtron.com/api/',
+  Auth0TokenUrl: 'https://dev-d23wau8o0uc5hw8n.us.auth0.com/oauth/token'
 }
 
 const keysToPullFromEnv = [
@@ -26,6 +27,9 @@ const keysToPullFromEnv = [
   'HostUrl',
   'WebhookHostUrl',
   'LogLevel',
+
+  'UCPClientId',
+  'UCPClientSecret',
 
   'Env',
 
@@ -54,7 +58,9 @@ const keysToPullFromEnv = [
   'FinicityAppKeyProd',
   'FinicitySecretProd',
 
-  'ELASTIC_SEARCH_URL'
+  'ELASTIC_SEARCH_URL',
+  'INSTITUTION_POLLING_INTERVAL',
+  'INSTITUTION_CACHE_LIST_URL'
 ]
 
 const config: Record<string, any> = keysToPullFromEnv.reduce(

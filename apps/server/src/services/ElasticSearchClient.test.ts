@@ -1,18 +1,30 @@
-import { TEST_EXAMPLE_A_PROVIDER_STRING } from '../test-adapter'
+import * as fs from 'fs'
 import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
 import config from '../config'
+import * as logger from '../infra/logger'
 import {
-  ElasticSearchMock,
+  deleteRemovedInstitutions,
   getInstitution,
   getRecommendedInstitutions,
   initialize,
   reIndexElasticSearch,
   search,
-  searchByRoutingNumber
+  searchByRoutingNumber,
+  updateInstitutions
 } from '../services/ElasticSearchClient'
+import type { CachedInstitution } from '../shared/contract'
 import { MappedJobTypes } from '../shared/contract'
 import * as preferences from '../shared/preferences'
+import { TEST_EXAMPLE_A_PROVIDER_STRING } from '../test-adapter'
+import {
+  ElasticSearchMock,
+  elasticSearchMockError
+} from '../test/elasticSearchMock'
 import { elasticSearchInstitutionData } from '../test/testData/institution'
+import { INSTITUTION_CURRENT_LIST_IDS } from './storageClient/constants'
+import { overwriteSet } from './storageClient/redis'
+
+jest.mock('fs')
 
 jest
   .spyOn(preferences, 'getPreferences')
@@ -130,66 +142,64 @@ function searchQuery(args: searchQueryArgs = {}) {
 }
 
 describe('initialize', () => {
-  describe('elastic search already indexed', () => {
+  it('does not reindex institutions when the index already exists', async () => {
     let indexCreated: boolean = false
+    ElasticSearchMock.clearAll()
+    ElasticSearchMock.add(
+      {
+        method: 'HEAD',
+        path: '/institutions'
+      },
+      () => {
+        return ''
+      }
+    )
 
-    it('does not reindex institutions', async () => {
-      ElasticSearchMock.clearAll()
-      ElasticSearchMock.add(
-        {
-          method: 'HEAD',
-          path: '/institutions'
-        },
-        () => {
-          return ''
-        }
-      )
+    ElasticSearchMock.add(
+      {
+        method: 'PUT',
+        path: '/institutions'
+      },
+      () => {
+        indexCreated = true
+        return ''
+      }
+    )
 
-      ElasticSearchMock.add(
-        {
-          method: 'PUT',
-          path: '/institutions'
-        },
-        () => {
-          indexCreated = true
-          return ''
-        }
-      )
-
-      await initialize()
-      expect(indexCreated).toBeFalsy()
-    })
+    await initialize()
+    expect(indexCreated).toBeFalsy()
   })
 
-  describe('elastic search not indexed', () => {
+  it('triggers the reIndexElasticSearch method and creates an index if ES not already indexed', async () => {
     let indexCreated: boolean
+    jest
+      .spyOn(fs, 'readFileSync')
+      .mockReturnValue(JSON.stringify([elasticSearchInstitutionData]))
 
-    it('triggers the reIndexElasticSearch method which makes call ES create index endpoint', async () => {
-      ElasticSearchMock.clearAll()
-      ElasticSearchMock.add(
-        {
-          method: 'PUT',
-          path: '/institutions'
-        },
-        () => {
-          indexCreated = true
-          return ''
-        }
-      )
+    ElasticSearchMock.clearAll()
+    ElasticSearchMock.add(
+      {
+        method: 'PUT',
+        path: '/institutions'
+      },
+      () => {
+        indexCreated = true
+        return ''
+      }
+    )
 
-      ElasticSearchMock.add(
-        {
-          method: 'PUT',
-          path: '/institutions/_doc/*'
-        },
-        () => {
-          return ''
-        }
-      )
+    ElasticSearchMock.add(
+      {
+        method: 'PUT',
+        path: '/institutions/_doc/*'
+      },
+      () => {
+        return ''
+      }
+    )
 
-      await initialize()
-      expect(indexCreated).toBeTruthy()
-    })
+    await initialize()
+    expect(indexCreated).toBeTruthy()
   })
 })
 
@@ -199,6 +209,17 @@ describe('reIndexElasticSearch', () => {
 
   it('makes call to create index and makes call to index more than 4 institutions', async () => {
     ElasticSearchMock.clearAll()
+
+    jest
+      .spyOn(fs, 'readFileSync')
+      .mockReturnValue(
+        JSON.stringify([
+          elasticSearchInstitutionData,
+          elasticSearchInstitutionData,
+          elasticSearchInstitutionData
+        ])
+      )
+
     indexCreated = false
     institutionsIndexedCount = 0
 
@@ -226,7 +247,7 @@ describe('reIndexElasticSearch', () => {
 
     await reIndexElasticSearch()
     expect(indexCreated).toBeTruthy()
-    expect(institutionsIndexedCount).toBeGreaterThan(4)
+    expect(institutionsIndexedCount).toEqual(3)
   })
 })
 
@@ -537,5 +558,139 @@ describe('getRecommendedInstitutions', () => {
     )
 
     expect(recommendedInstitutions).toEqual([])
+  })
+})
+
+describe('deleteRemovedInstitutions', () => {
+  it('should delete institutions that are no longer in the new list', async () => {
+    const newInstitutions = [{ ucp_id: 'new1' }, { ucp_id: 'new2' }]
+
+    const oldInstitutions = [
+      { ucp_id: 'old1' },
+      { ucp_id: 'old2' },
+      { ucp_id: 'new1' }
+    ]
+
+    const infoSpy = jest.spyOn(logger, 'info').mockImplementation(() => {})
+    const shouldBeDeleted = ['old1', 'old2']
+    const deletedIds: string[] = []
+
+    await overwriteSet(
+      INSTITUTION_CURRENT_LIST_IDS,
+      oldInstitutions.map((ins) => ins.ucp_id)
+    )
+
+    ElasticSearchMock.add(
+      {
+        method: 'DELETE',
+        path: '/institutions/_doc/:id'
+      },
+      (params) => {
+        const pathStr = params.path as string
+        const id = pathStr.split('/').pop()
+        deletedIds.push(id)
+        return {}
+      }
+    )
+
+    await deleteRemovedInstitutions(newInstitutions as CachedInstitution[])
+
+    expect(infoSpy).toHaveBeenCalledWith(
+      'deleting institutions',
+      shouldBeDeleted
+    )
+
+    expect(deletedIds).toEqual(shouldBeDeleted)
+  })
+
+  it('should not try to delete anything if no institutions were removed', async () => {
+    const newInstitutions = [{ ucp_id: 'new1' }, { ucp_id: 'new2' }]
+
+    const oldInstitutions = [{ ucp_id: 'new1' }, { ucp_id: 'new2' }]
+
+    const infoSpy = jest.spyOn(logger, 'info').mockImplementation(() => {})
+
+    let deletedCount = 0
+    ElasticSearchMock.add(
+      {
+        method: 'DELETE',
+        path: '/institutions/_doc/:id'
+      },
+      (params) => {
+        deletedCount += 1
+        return {}
+      }
+    )
+
+    await overwriteSet(
+      INSTITUTION_CURRENT_LIST_IDS,
+      oldInstitutions.map((ins) => ins.ucp_id)
+    )
+
+    await deleteRemovedInstitutions(newInstitutions as CachedInstitution[])
+
+    expect(infoSpy).not.toHaveBeenCalled()
+    expect(deletedCount).toEqual(0)
+  })
+
+  it('should handle errors during deletion gracefully', async () => {
+    const logErrorSpy = jest.spyOn(logger, 'error').mockImplementation(() => {})
+
+    const newInstitutions = [{ ucp_id: 'new1' }]
+    const oldInstitutions = [{ ucp_id: 'old1' }, { ucp_id: 'new1' }]
+
+    await overwriteSet(
+      INSTITUTION_CURRENT_LIST_IDS,
+      oldInstitutions.map((ins) => ins.ucp_id)
+    )
+
+    const mockError = elasticSearchMockError({
+      message: 'Delete failed',
+      statusCode: 400
+    })
+
+    ElasticSearchMock.add(
+      {
+        method: 'DELETE',
+        path: '/institutions/_doc/:id'
+      },
+      (params) => {
+        return mockError
+      }
+    )
+
+    await deleteRemovedInstitutions(newInstitutions as CachedInstitution[])
+
+    expect(logErrorSpy).toHaveBeenCalledWith(mockError)
+  })
+})
+
+describe('updateInstitutions', () => {
+  it('calls ES update for each institution in the list', async () => {
+    const mockInstitutions = [
+      { ucp_id: '123', name: 'Institution A' },
+      { ucp_id: '456', name: 'Institution B' }
+    ] as CachedInstitution[]
+
+    interface esDocObj {
+      // eslint-disable-next-line @typescript-eslint/member-delimiter-style
+      doc: { ucp_id: string; name: string }
+    }
+    const elasticSearchUpdatesMade: esDocObj[] = []
+    ElasticSearchMock.add(
+      {
+        method: ['PUT', 'POST'],
+        path: '/institutions/_update/:id'
+      },
+      (params) => {
+        elasticSearchUpdatesMade.push(params.body as esDocObj)
+        return {}
+      }
+    )
+
+    await updateInstitutions(mockInstitutions)
+
+    const updatedInstitutions = elasticSearchUpdatesMade.map((body) => body.doc)
+    expect(updatedInstitutions).toEqual(mockInstitutions)
   })
 })
