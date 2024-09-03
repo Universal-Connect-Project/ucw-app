@@ -1,11 +1,14 @@
-import generateVcDataTests from '../../utils/generateVcDataTests'
+import generateVcDataTests from '../../shared/utils/generateVcDataTests'
 import {
   enterTestExampleACredentials,
   enterTestExampleBCredentials,
   searchAndSelectTestExampleA,
   searchAndSelectTestExampleB
-} from '../../utils/testExample'
-import { clickContinue, expectConnectionSuccess } from '../../utils/widget'
+} from '../../shared/utils/testExample'
+import {
+  clickContinue,
+  expectConnectionSuccess
+} from '../../shared/utils/widget'
 
 const makeAnAConnection = async () => {
   searchAndSelectTestExampleA()

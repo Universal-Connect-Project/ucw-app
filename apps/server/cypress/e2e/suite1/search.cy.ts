@@ -1,86 +1,93 @@
-import { searchByText } from '../../utils/widget'
+import {
+  TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME,
+  TEST_EXAMPLE_B_ONLY_INSTITUTION_NAME
+} from '../../shared/constants/testExample'
+import { searchByText } from '../../shared/utils/widget'
+
+const institutionThatIsInFavoritesButDoesntSupportIdentification =
+  'TestExample Doesnt Support Identification Bank'
 
 describe('search', () => {
   it('filters recommended institutions by job type', () => {
     cy.visitAgg()
 
-    const institutionThatIsInFavoritesButDoesntSupportAll =
-      'Sophtron Bank SecurityQuestion'
+    const institutionThatIsInFavoriteAndSupportsAll =
+      TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME
 
-    cy.findByText(institutionThatIsInFavoritesButDoesntSupportAll).should(
-      'exist'
-    )
+    cy.findByText(
+      institutionThatIsInFavoritesButDoesntSupportIdentification
+    ).should('exist')
 
     cy.visit(`/?job_type=all&user_id=${crypto.randomUUID()}`)
 
-    cy.findByText('Wells Fargo').should('exist')
+    cy.findByText(institutionThatIsInFavoriteAndSupportsAll).should('exist')
 
-    cy.findByText(institutionThatIsInFavoritesButDoesntSupportAll).should(
-      'not.exist'
-    )
+    cy.findByText(
+      institutionThatIsInFavoritesButDoesntSupportIdentification
+    ).should('not.exist')
   })
 
   describe('Fuzzy Search: Should be able to find certain banks with keywords and misspellings', () => {
     it('Finds expected banks', () => {
       cy.visitAgg()
 
-      searchByText('MACU')
-      cy.findByText('Mountain America Credit Union', { timeout: 45000 }).should(
-        'exist'
-      )
+      searchByText('tex')
+      cy.findByText(TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME, {
+        timeout: 45000
+      }).should('exist')
 
-      cy.findByPlaceholderText('Search').clear().type('AFCU')
-      cy.findByText('Altana Federal Credit Union', { timeout: 45000 }).should(
-        'exist'
-      )
-
-      cy.findByPlaceholderText('Search').clear().type('chape')
-      cy.findByText('Chase Bank', { timeout: 45000 }).should('exist')
-
-      cy.findByPlaceholderText('Search').clear().type('wells')
-      cy.findByText('Wells Fargo', { timeout: 45000 }).should('exist')
+      cy.findByPlaceholderText('Search').clear().type('testexamplo')
+      cy.findByText(TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME, {
+        timeout: 45000
+      }).should('exist')
     })
 
     it('Ranks search results in the best way', () => {
       cy.visitAgg()
 
-      cy.findByPlaceholderText('Search').clear().type('chase')
-      cy.findByText('Chase Bank')
+      cy.findByPlaceholderText('Search').clear().type('TestExample')
+      cy.findByText(TEST_EXAMPLE_B_ONLY_INSTITUTION_NAME).should('exist')
       cy.get('[data-test="institution-tile"]').then((institutions) => {
         expect(institutions.length).to.be.at.least(3)
 
-        let chaseBankFound = false
+        let noIdentificationBankFound = false
 
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 2; i++) {
           const ariaLabel = institutions.eq(i).attr('aria-label')
-          if (ariaLabel === 'Add account with Chase Bank') {
-            chaseBankFound = true
+          if (
+            ariaLabel ===
+            `Add account with ${institutionThatIsInFavoritesButDoesntSupportIdentification}`
+          ) {
+            noIdentificationBankFound = true
           }
         }
 
-        expect(chaseBankFound).to.be.true
+        expect(noIdentificationBankFound).to.be.true
       })
     })
   })
 
   describe('Job type influences the returned institutions', () => {
-    it('shows "Liberty Federal Credit Union" for agg job type', () => {
+    it(`shows ${institutionThatIsInFavoritesButDoesntSupportIdentification} for agg job type`, () => {
       cy.visitAgg()
 
-      searchByText('Liberty Federal Credit Union')
-      cy.findByText('https://www.libertyfcu.org/', { timeout: 45000 }).should(
-        'exist'
-      )
+      searchByText(institutionThatIsInFavoritesButDoesntSupportIdentification)
+      cy.findByText(
+        institutionThatIsInFavoritesButDoesntSupportIdentification,
+        { timeout: 45000 }
+      ).should('exist')
     })
 
-    it('does not show "Liberty Federal Credit Union" for identity job type because that job type is not supported', () => {
+    it(`does not show ${institutionThatIsInFavoritesButDoesntSupportIdentification} for identity job type because that job type is not supported`, () => {
       cy.visitIdentity()
 
-      searchByText('Liberty Federal Credit Union')
-      cy.findByText('Purdue Federal Credit Union', { timeout: 45000 }).should(
-        'exist'
-      )
-      cy.findByText('https://www.libertyfcu.org/').should('not.exist')
+      searchByText('test example')
+      cy.findByText(TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME, {
+        timeout: 45000
+      }).should('exist')
+      cy.findByText(
+        institutionThatIsInFavoritesButDoesntSupportIdentification
+      ).should('not.exist')
     })
   })
 
@@ -88,9 +95,9 @@ describe('search', () => {
     it('shows "America First Credit Union" when the routing number is entered into search', () => {
       cy.visitAgg()
 
-      searchByText('324377516')
-      cy.findByText('America First Credit Union').should('exist')
-      cy.findByText('Wells Fargo').should('not.exist')
+      searchByText('111111111')
+      cy.findByText(TEST_EXAMPLE_B_ONLY_INSTITUTION_NAME).should('exist')
+      cy.findByText(TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME).should('not.exist')
     })
   })
 })

@@ -20,5 +20,8 @@
 
   "hiddenInstitutions": ["UCP-hidethis"],
 
-  "recommendedInstitutions": ["UCP-testexamplea"]
+  "recommendedInstitutions": [
+    "UCP-testexamplea",
+    "UCP-testexampledoesntsupportidentification"
+  ]
 }

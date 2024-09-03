@@ -1,4 +1,4 @@
-import { searchByText } from '../../utils/widget'
+import { searchByText } from '../../shared/utils/widget'
 
 // These tests expect local preferences to match testPreferences.json
 describe('preferences', () => {

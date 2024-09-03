@@ -1,15 +1,15 @@
 import { JobTypes } from '../../../src/shared/contract'
-import generateVcDataTests from '../../utils/generateVcDataTests'
+import generateVcDataTests from '../../shared/utils/generateVcDataTests'
 import {
   enterSophtronCredentials,
   searchAndSelectSophtron,
   selectSophtronAccount
-} from '../../utils/sophtron'
+} from '../../shared/utils/sophtron'
 import {
   expectConnectionSuccess,
   clickContinue,
   searchByText
-} from '../../utils/widget'
+} from '../../shared/utils/widget'
 
 const makeAConnection = async (jobType) => {
   searchAndSelectSophtron()

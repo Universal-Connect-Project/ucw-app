@@ -1,7 +1,10 @@
 import { JobTypes } from '../../../src/shared/contract'
-import generateVcDataTests from '../../utils/generateVcDataTests'
-import { enterMxCredentials, searchAndSelectMx } from '../../utils/mx'
-import { clickContinue, expectConnectionSuccess } from '../../utils/widget'
+import generateVcDataTests from '../../shared/utils/generateVcDataTests'
+import { enterMxCredentials, searchAndSelectMx } from '../../shared/utils/mx'
+import {
+  clickContinue,
+  expectConnectionSuccess
+} from '../../shared/utils/widget'
 
 const makeAConnection = async (jobType) => {
   searchAndSelectMx()

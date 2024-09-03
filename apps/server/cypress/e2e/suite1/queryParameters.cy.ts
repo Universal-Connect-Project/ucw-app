@@ -1,12 +1,15 @@
 import { JobTypes } from '../../../src/shared/contract'
-import { enterMxCredentials, searchAndSelectMx } from '../../utils/mx'
+import { enterMxCredentials, searchAndSelectMx } from '../../shared/utils/mx'
 import {
   connectToSophtron,
   enterSophtronCredentials,
   searchAndSelectSophtron,
   selectSophtronAccount
-} from '../../utils/sophtron'
-import { clickContinue, expectConnectionSuccess } from '../../utils/widget'
+} from '../../shared/utils/sophtron'
+import {
+  clickContinue,
+  expectConnectionSuccess
+} from '../../shared/utils/widget'
 
 const MX_BANK_INSTITUTION_ID = 'UCP-bb5296bd5aae5d9'
 
