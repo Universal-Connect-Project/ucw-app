@@ -1,3 +1,4 @@
+import { TEST_EXAMPLE_B_ONLY_INSTITUTION_NAME } from '../../shared/constants/testExample'
 import { searchByText } from '../../shared/utils/widget'
 
 describe('unsupported provider', () => {
@@ -5,7 +6,7 @@ describe('unsupported provider', () => {
     cy.visitAgg()
     searchByText('MX Bank')
 
-    cy.findByText('MWABank').should('exist')
-    cy.findByText('MX Bank (Oauth)').should('not.exist')
+    cy.findByText(TEST_EXAMPLE_B_ONLY_INSTITUTION_NAME).should('exist')
+    cy.findByText('MX Bank').should('not.exist')
   })
 })
