@@ -1,18 +1,29 @@
 import generateVcDataTests from '../../utils/generateVcDataTests'
 import {
-  enterTestExampleCredentials,
-  searchAndSelectTestExample
+  enterTestExampleACredentials,
+  enterTestExampleBCredentials,
+  searchAndSelectTestExampleA,
+  searchAndSelectTestExampleB
 } from '../../utils/testExample'
 import { clickContinue, expectConnectionSuccess } from '../../utils/widget'
 
-const makeAConnection = async () => {
-  searchAndSelectTestExample()
-  enterTestExampleCredentials()
+const makeAnAConnection = async () => {
+  searchAndSelectTestExampleA()
+  enterTestExampleACredentials()
   clickContinue()
 
   expectConnectionSuccess()
 }
 
-describe('testExample provider', () => {
-  generateVcDataTests({ makeAConnection })
+const makeABConnection = async () => {
+  searchAndSelectTestExampleB()
+  enterTestExampleBCredentials()
+  clickContinue()
+
+  expectConnectionSuccess()
+}
+
+describe('testExampleA and B providers', () => {
+  generateVcDataTests({ makeAConnection: makeAnAConnection })
+  generateVcDataTests({ makeAConnection: makeABConnection })
 })

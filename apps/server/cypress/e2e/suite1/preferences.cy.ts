@@ -5,25 +5,15 @@ describe('preferences', () => {
   it('uses local preferences to show favorite institutions', () => {
     cy.visitAgg()
 
-    const institutions = [
-      'Wells Fargo',
-      'Capital One',
-      'Bank of America',
-      'Citibank',
-      'TD Bank (US)',
-      'PNC Bank'
-    ]
-
-    institutions.forEach((institutionName) => {
-      cy.findByText(institutionName).should('exist')
-    })
+    cy.findByText('TestExampleA Bank').should('exist')
   })
 
   it('uses local preferences to hide institutions when searching', () => {
     cy.visitAgg()
-    searchByText('Pinnacle Bank')
+    searchByText('test bank')
 
-    cy.findByText('Pinnacle Bank (WY)').should('exist')
-    cy.findByText('Pinnacle Bank').should('not.exist')
+    cy.findByText('TestExampleA Bank').should('exist')
+    cy.findByText('TestExampleB Bank').should('exist')
+    cy.findByText('TestExample Bank To Hide').should('not.exist')
   })
 })
