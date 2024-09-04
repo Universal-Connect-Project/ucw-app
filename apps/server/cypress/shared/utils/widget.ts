@@ -11,5 +11,5 @@ export const searchByText = (text) => {
 }
 
 export const selectInstitutionByName = (name) => {
-  cy.findByLabelText(`Add account with ${name} Bank`).first().click()
+  cy.findByLabelText(`Add account with ${name}`).first().click()
 }

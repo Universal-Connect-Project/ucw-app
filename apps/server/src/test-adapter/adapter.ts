@@ -8,6 +8,16 @@ import type {
 } from '@repo/utils'
 import { ConnectionStatus } from '@repo/utils'
 import { testExampleCredentials, testExampleInstitution } from './constants'
+import { MappedJobTypes } from '../shared/contract'
+import { get, set } from '../services/storageClient/redis'
+
+const createRedisStatusKey = ({
+  provider,
+  userId
+}: {
+  provider: string
+  userId: string
+}) => `${provider}-${userId}`
 
 export class TestAdapter implements WidgetAdapter {
   labelText: string
@@ -94,6 +104,24 @@ export class TestAdapter implements WidgetAdapter {
     request: UpdateConnectionRequest,
     userId: string
   ): Promise<Connection> {
+    const redisStatusKey = createRedisStatusKey({
+      provider: this.provider,
+      userId
+    })
+
+    const connectionInfo = await get(redisStatusKey)
+
+    if (
+      !connectionInfo?.verifiedOnce &&
+      request.job_type === MappedJobTypes.VERIFICATION
+    ) {
+      await set(redisStatusKey, {
+        verifiedOnce: true
+      })
+    } else {
+      await set(redisStatusKey, null)
+    }
+
     return {
       id: 'testId',
       cur_job_id: 'testJobId',
@@ -141,6 +169,37 @@ export class TestAdapter implements WidgetAdapter {
     singleAccountSelect: boolean,
     userId: string
   ): Promise<Connection> {
+    const connectionInfo = await get(
+      createRedisStatusKey({ provider: this.provider, userId })
+    )
+
+    if (connectionInfo?.verifiedOnce && singleAccountSelect) {
+      return {
+        provider: this.provider,
+        id: 'testId',
+        cur_job_id: 'testJobId',
+        user_id: 'testUserId',
+        status: ConnectionStatus.CHALLENGED,
+        challenges: [
+          {
+            id: 'CRD-a81b35db-28dd-41ea-aed3-6ec8ef682011',
+            type: 1,
+            question: 'Please select an account:',
+            data: [
+              {
+                key: 'Checking',
+                value: 'act-23445745'
+              },
+              {
+                key: 'Savings',
+                value: 'act-352386787'
+              }
+            ]
+          }
+        ]
+      }
+    }
+
     return {
       provider: this.provider,
       id: 'testId',

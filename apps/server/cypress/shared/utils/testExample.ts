@@ -17,6 +17,10 @@ export const enterTestExampleACredentials = () => {
   cy.findByLabelText(TEST_EXAMPLE_C_LABEL_TEXT).type('anything')
 }
 
+export const selectTestExampleAAccount = () => {
+  cy.findByText('Checking', { timeout: 45000 }).click()
+}
+
 export const searchAndSelectTestExampleB = () => {
   searchByText(TEST_EXAMPLE_B_ONLY_INSTITUTION_NAME)
   selectInstitutionByName(TEST_EXAMPLE_B_ONLY_INSTITUTION_NAME)

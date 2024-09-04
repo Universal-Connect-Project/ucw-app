@@ -17,6 +17,7 @@ import {
 } from './institutionEndpoints'
 import stubs from './instrumentations.js'
 import { userDeleteHandler } from './userEndpoints'
+import { MappedJobTypes } from '../shared/contract'
 
 const AGGREGATION_JOB_TYPE = 0
 
@@ -174,7 +175,7 @@ export default function (app) {
 
   app.post(`${ApiEndpoints.MEMBERS}/:member_guid/verify`, async (req, res) => {
     const ret = await req.connectApi.updateConnection(
-      { id: req.params.member_guid, job_type: 'verification' },
+      { id: req.params.member_guid, job_type: MappedJobTypes.VERIFICATION },
       req.context.resolved_user_id
     )
     res.send({

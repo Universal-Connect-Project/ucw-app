@@ -1,5 +1,6 @@
 import { JobTypes } from '../../../src/shared/contract'
 import generateVcDataTests from '../../shared/utils/generateVcDataTests'
+import { refreshAConnection } from '../../shared/utils/refresh'
 import {
   enterSophtronCredentials,
   searchAndSelectSophtron,
@@ -24,6 +25,13 @@ const makeAConnection = async (jobType) => {
 }
 
 describe('Sophtron provider', () => {
+  it('refreshes a sophtron connection if given the correct parameters and hides the back button', () => {
+    refreshAConnection({
+      enterCredentials: enterSophtronCredentials,
+      selectInstitution: searchAndSelectSophtron
+    })
+  })
+
   it('Connects to Sophtron Bank with all MFA options', () => {
     cy.visitAgg()
     searchByText('Sophtron Bank')

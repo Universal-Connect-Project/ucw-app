@@ -1,6 +1,7 @@
 import { JobTypes } from '../../../src/shared/contract'
 import generateVcDataTests from '../../shared/utils/generateVcDataTests'
 import { enterMxCredentials, searchAndSelectMx } from '../../shared/utils/mx'
+import { refreshAConnection } from '../../shared/utils/refresh'
 import {
   clickContinue,
   expectConnectionSuccess
@@ -20,4 +21,11 @@ const makeAConnection = async (jobType) => {
 
 describe('mx provider', () => {
   generateVcDataTests({ makeAConnection })
+
+  it('refreshes an mx connection if given the correct parameters and hides the back button', () => {
+    refreshAConnection({
+      enterCredentials: enterMxCredentials,
+      selectInstitution: searchAndSelectMx
+    })
+  })
 })

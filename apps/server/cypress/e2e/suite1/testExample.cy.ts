@@ -1,27 +1,39 @@
+import { JobTypes } from '../../../src/shared/contract'
 import generateVcDataTests from '../../shared/utils/generateVcDataTests'
 import {
   enterTestExampleACredentials,
   enterTestExampleBCredentials,
   searchAndSelectTestExampleA,
-  searchAndSelectTestExampleB
+  searchAndSelectTestExampleB,
+  selectTestExampleAAccount
 } from '../../shared/utils/testExample'
 import {
   clickContinue,
   expectConnectionSuccess
 } from '../../shared/utils/widget'
 
-const makeAnAConnection = async () => {
+const makeAnAConnection = async (jobType) => {
   searchAndSelectTestExampleA()
   enterTestExampleACredentials()
   clickContinue()
 
+  if ([JobTypes.VERIFICATION, JobTypes.ALL].includes(jobType)) {
+    selectTestExampleAAccount()
+    clickContinue()
+  }
+
   expectConnectionSuccess()
 }
 
-const makeABConnection = async () => {
+const makeABConnection = async (jobType) => {
   searchAndSelectTestExampleB()
   enterTestExampleBCredentials()
   clickContinue()
+
+  if ([JobTypes.VERIFICATION, JobTypes.ALL].includes(jobType)) {
+    selectTestExampleAAccount()
+    clickContinue()
+  }
 
   expectConnectionSuccess()
 }
