@@ -1,4 +1,4 @@
-import ConnectApi from '../../../server/connect/connectApi'
+import ConnectApi from '../../../connect/connectApi'
 
 const context = {}
 const api = new ConnectApi({ context })
@@ -17,7 +17,7 @@ const stub = {
   loadUserFeatures: async () => await sendStubData('user_features'),
   createAnalyticsSession: async () => await sendStubData('analytics_sessions'),
   loadJob: async (guid) =>
-    await Promise.resolve({
+    ({
       guid,
       job_type: 0 // must
     }),

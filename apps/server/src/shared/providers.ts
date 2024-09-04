@@ -1,13 +1,13 @@
-import {
+import { JobTypeSupports, MappedJobTypes } from './contract'
+
+import type {
   CachedInstitution,
   InstitutionProvider,
-  JobTypeSupports,
-  MappedJobTypes,
   Provider
 } from './contract'
 
 type JobMappingType = {
-  [key in MappedJobTypes]: JobTypeSupports[]
+  [key in MappedJobTypes]: JobTypeSupports[];
 }
 
 export const JOB_TYPE_PARTIAL_SUPPORT_MAP: JobMappingType = {
@@ -41,7 +41,7 @@ export function getAvailableProviders({
   supportedProviders?: Provider[]
   shouldRequireFullSupport: boolean
 }): Provider[] {
-  const providers = supportedProviders?.filter(
+  return supportedProviders?.filter(
     (provider) =>
       (institution as any)[provider]?.id != null &&
       providerSupportsJobType({
@@ -50,8 +50,6 @@ export function getAvailableProviders({
         shouldRequireFullSupport
       })
   )
-
-  return providers
 }
 
 function providerSupportsJobType({
