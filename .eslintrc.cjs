@@ -4,7 +4,4 @@ module.exports = {
   ignorePatterns: ["apps/**", "packages/**"],
   extends: ["@ucw-app/eslint-config/base"],
   parser: "@typescript-eslint/parser",
-  parserOptions: {
-    project: true,
-  },
 };
