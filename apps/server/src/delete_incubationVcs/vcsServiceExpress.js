@@ -5,14 +5,6 @@ import { VcsService } from './vcsService'
 export default function (app) {
   app.use(contextHandler)
   app.post('/api/context', async (req, res) => {
-    // res.context = req.body;
-    // res.context.job_type = res.context.job_type || 'agg';
-    // if (res.context.connection_id) {
-    //   const conn = await req.vcsService.getConnection(res.context.connection_id);
-    //   if (conn) {
-    //     res.context.institution_id = conn.institution_code;
-    //   }
-    // }
     await instrumentation(req.context, req.body)
     res.send(req.body)
     return {}
@@ -52,9 +44,6 @@ export default function (app) {
       req.body.credentials
     )
     if (data != null) {
-      // res.context.connection_id = data.cur_job_id;
-      // res.context.institution_id =
-      // res.context.institution_id || data.institution_id;
       res.send(data)
     } else {
       res.send({ error: 'Failed creating job' })

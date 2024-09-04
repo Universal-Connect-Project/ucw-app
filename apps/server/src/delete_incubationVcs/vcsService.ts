@@ -15,13 +15,8 @@ export class VcsService extends ProviderAdapterBase {
     institution: Institution
   ) {
     logger.debug(`Selecting institution ${institution.id}`)
-    // if (institution.provider) {
-    //   context.provider = institution.provider;
-    // }
-    // if (!context.provider) {
-    //   context.provider = 'sophtron';
-    // }
     if (institution.id) {
+      // @ts-expect-error ignore error on next line
       institution = await this.getInstitution(institution.id)
       const credentials = await this.getInstitutionCredentials(institution.id)
       return { institution, credentials }
@@ -59,13 +54,13 @@ export class VcsService extends ProviderAdapterBase {
         return res
       }
       logger.error(
-        `failed creating connection with instituionId : ${institution_id}`
+        `failed creating connection with institutionId : ${institution_id}`
       )
       return {
-        error: `failed creating connection with instituionId : ${institution_id}`
+        error: `failed creating connection with institutionId : ${institution_id}`
       }
     }
-    return { error: 'Unable to find instituion, invalid parameters provided' }
+    return { error: 'Unable to find institution, invalid parameters provided' }
   }
 
   async mfa (id: string) {
