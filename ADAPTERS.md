@@ -4,6 +4,8 @@ This repository only contains test adapters. Each aggregator that wants to parti
 
 ## Hosting a Universal Connect Widget
 
+If you are planning on hosting a UCW, then you'll need to import and configure aggregator adapter packages for each of the aggregators you plan to use. Our plan is to make this process as simple as possible. Examples of the integration process are in [adapterSetup.ts](./apps/server/src/adapterSetup.ts).
+
 ## Creating an adapter package
 
 In order to make it easier for aggregators to develop their own UCW adapters we are moving to a package architecture. We will be moving all aggregator specific code to their own packages.
@@ -16,6 +18,7 @@ In our opinion the easiest way to create an adapter package follows:
 1. Create a folder in the packages folder for your adapter
 1. Add a test institution to the [default institution list](./apps/server/cachedDefaults/ucwInstitutionsMapping.json) with aggregator support defined for your institution.
 1. Build your adapter
+1. Import your adapter in [adapterSetup.ts](./apps/server/src/adapterSetup.ts) on your forked version of this repo
 1. Write unit, integration, and e2e tests
 1. Bundle and publish your adapter to npm
 1. When your adapter package is ready for production use, then you'll need to gain access to the UCP institution list to update the list of institutions you support(This functionality is in progress by the UCP team)
