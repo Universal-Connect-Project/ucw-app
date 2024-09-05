@@ -24,6 +24,8 @@ import {
   testExampleCredentials,
   testExampleInstitution
 } from '../test-adapter/constants'
+import * as preferences from '../shared/preferences'
+import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
 
 describe('institutionEndpoints', () => {
   describe('getInstitutionHandler', () => {
@@ -63,6 +65,11 @@ describe('institutionEndpoints', () => {
     })
 
     it("returns the institution by the ucp id if it doesn't have a provider", async () => {
+      jest.spyOn(preferences, 'getPreferences').mockResolvedValue({
+        ...testPreferences,
+        supportedProviders: [TEST_EXAMPLE_B_PROVIDER_STRING]
+      } as any)
+
       const context = {
         job_type: 'aggregate'
       }
