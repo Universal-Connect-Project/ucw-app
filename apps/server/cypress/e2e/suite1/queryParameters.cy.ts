@@ -1,12 +1,5 @@
 import { JobTypes } from '../../../src/shared/contract'
-import { enterMxCredentials, searchAndSelectMx } from '../../shared/utils/mx'
 import { refreshAConnection } from '../../shared/utils/refresh'
-import {
-  connectToSophtron,
-  enterSophtronCredentials,
-  searchAndSelectSophtron,
-  selectSophtronAccount
-} from '../../shared/utils/sophtron'
 import {
   enterTestExampleACredentials,
   searchAndSelectTestExampleA,
@@ -16,8 +9,6 @@ import {
   clickContinue,
   expectConnectionSuccess
 } from '../../shared/utils/widget'
-
-const MX_BANK_INSTITUTION_ID = 'UCP-bb5296bd5aae5d9'
 
 const TEST_EXAMPLE_A_INSTITUTION_ID = 'UCP-testexamplea'
 

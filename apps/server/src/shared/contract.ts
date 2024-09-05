@@ -1,4 +1,3 @@
-import type { TEST_EXAMPLE_A_PROVIDER_STRING } from '../test-adapter'
 import type { Provider } from '../adapterSetup'
 
 export type { Provider }
