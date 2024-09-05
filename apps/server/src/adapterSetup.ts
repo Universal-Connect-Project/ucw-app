@@ -7,6 +7,7 @@ import getSophtronVc from './services/vcProviders/sophtronVc'
 
 const mxAdapterMapObject = {
   mx: {
+    testInstitutionAdapterName: 'mx_int',
     vcAdapter: mxProdGetVC,
     widgetAdapter: new MxAdapter(false)
   },
@@ -31,3 +32,4 @@ export const adapterMap = {
 }
 
 export type Provider = keyof typeof adapterMap
+export const providers = Object.keys(adapterMap)

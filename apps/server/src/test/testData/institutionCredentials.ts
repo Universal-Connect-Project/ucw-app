@@ -12,23 +12,3 @@ export const institutionCredentialsData = {
     }
   ]
 }
-
-const [firstCredential, secondCredential] =
-  institutionCredentialsData.credentials
-
-export const transformedInstitutionCredentials = {
-  credentials: [
-    {
-      ...firstCredential,
-      id: firstCredential.guid,
-      label: firstCredential.field_name,
-      field_type: 1
-    },
-    {
-      ...secondCredential,
-      id: secondCredential.guid,
-      label: secondCredential.field_name,
-      field_type: 3
-    }
-  ]
-}

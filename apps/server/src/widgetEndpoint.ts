@@ -3,6 +3,7 @@ import { wget as _wget } from './infra/http'
 import Joi from 'joi'
 import { JobTypes, Providers } from './shared/contract'
 import config from './config'
+import { providers } from './adapterSetup'
 
 const pageQueryParameters = new RegExp(
   [
@@ -47,7 +48,7 @@ export const widgetHandler = (req: Request, res: Response) => {
     job_type: Joi.string()
       .valid(...Object.values(JobTypes))
       .required(),
-    provider: Joi.string().valid(...Object.values(Providers)),
+    provider: Joi.string().valid(...providers),
     single_account_select: Joi.bool(),
     user_id: Joi.string().required()
   }).and('connection_id', 'provider')

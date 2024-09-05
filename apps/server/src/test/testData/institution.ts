@@ -1,3 +1,7 @@
+import {
+  TEST_EXAMPLE_A_PROVIDER_STRING,
+  TEST_EXAMPLE_B_PROVIDER_STRING
+} from '../../test-adapter'
 import type { CachedInstitution } from '../../shared/contract'
 
 export const institutionData = {
@@ -105,20 +109,20 @@ export const elasticSearchInstitutionData: CachedInstitution = {
     supports_verification: false,
     supports_history: false
   },
-  finicity: {
-    id: null,
-    supports_aggregation: false,
-    supports_oauth: false,
-    supports_identification: false,
-    supports_verification: false,
+  [TEST_EXAMPLE_A_PROVIDER_STRING]: {
+    id: 'aId',
+    supports_aggregation: true,
+    supports_oauth: true,
+    supports_identification: true,
+    supports_verification: true,
     supports_history: false
   },
-  akoya: {
-    id: null,
-    supports_aggregation: false,
-    supports_oauth: false,
-    supports_identification: false,
-    supports_verification: false,
+  [TEST_EXAMPLE_B_PROVIDER_STRING]: {
+    id: 'bId',
+    supports_aggregation: true,
+    supports_oauth: true,
+    supports_identification: true,
+    supports_verification: true,
     supports_history: false
   }
 }

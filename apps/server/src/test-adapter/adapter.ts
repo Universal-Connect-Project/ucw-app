@@ -7,18 +7,38 @@ import type {
   WidgetAdapter
 } from '@repo/utils'
 import { ConnectionStatus } from '@repo/utils'
-import { PROVIDER_STRING, TEST_EXAMPLE_LABEL_TEXT } from './constants'
+import { testExampleCredentials, testExampleInstitution } from './constants'
+import { MappedJobTypes } from '../shared/contract'
+import { get, set } from '../services/storageClient/redis'
+
+const createRedisStatusKey = ({
+  provider,
+  userId
+}: {
+  provider: string
+  userId: string
+}) => `${provider}-${userId}`
 
 export class TestAdapter implements WidgetAdapter {
+  labelText: string
+  provider: string
+
+  constructor({
+    labelText,
+    provider
+  }: {
+    labelText: string
+    provider: string
+  }) {
+    this.labelText = labelText
+    this.provider = provider
+  }
+
   async GetInstitutionById(id: string): Promise<Institution> {
     return {
-      id: 'testid',
-      logo_url:
-        'https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png',
-      name: 'testname',
-      oauth: false,
-      url: 'testurl',
-      provider: PROVIDER_STRING
+      ...testExampleInstitution,
+      id,
+      provider: this.provider
     }
   }
 
@@ -27,10 +47,8 @@ export class TestAdapter implements WidgetAdapter {
   ): Promise<Credential[]> {
     return [
       {
-        id: 'testId',
-        field_name: 'fieldName',
-        field_type: 'fieldType',
-        label: TEST_EXAMPLE_LABEL_TEXT
+        ...testExampleCredentials,
+        label: this.labelText
       }
     ]
   }
@@ -44,7 +62,7 @@ export class TestAdapter implements WidgetAdapter {
         is_being_aggregated: false,
         is_oauth: false,
         oauth_window_uri: undefined,
-        provider: PROVIDER_STRING
+        provider: this.provider
       }
     ]
   }
@@ -58,7 +76,7 @@ export class TestAdapter implements WidgetAdapter {
         id: 'testId',
         field_name: 'testFieldName',
         field_type: 'testFieldType',
-        label: 'testFieldLabel'
+        label: this.labelText
       }
     ]
   }
@@ -74,7 +92,7 @@ export class TestAdapter implements WidgetAdapter {
       is_being_aggregated: false,
       is_oauth: false,
       oauth_window_uri: undefined,
-      provider: PROVIDER_STRING
+      provider: this.provider
     }
   }
 
@@ -86,6 +104,24 @@ export class TestAdapter implements WidgetAdapter {
     request: UpdateConnectionRequest,
     userId: string
   ): Promise<Connection> {
+    const redisStatusKey = createRedisStatusKey({
+      provider: this.provider,
+      userId
+    })
+
+    const connectionInfo = await get(redisStatusKey)
+
+    if (
+      !connectionInfo?.verifiedOnce &&
+      request.job_type === MappedJobTypes.VERIFICATION
+    ) {
+      await set(redisStatusKey, {
+        verifiedOnce: true
+      })
+    } else {
+      await set(redisStatusKey, null)
+    }
+
     return {
       id: 'testId',
       cur_job_id: 'testJobId',
@@ -93,7 +129,7 @@ export class TestAdapter implements WidgetAdapter {
       is_being_aggregated: false,
       is_oauth: false,
       oauth_window_uri: undefined,
-      provider: PROVIDER_STRING
+      provider: this.provider
     }
   }
 
@@ -108,7 +144,7 @@ export class TestAdapter implements WidgetAdapter {
       is_being_aggregated: false,
       is_oauth: false,
       oauth_window_uri: undefined,
-      provider: PROVIDER_STRING
+      provider: this.provider
     }
   }
 
@@ -122,7 +158,7 @@ export class TestAdapter implements WidgetAdapter {
       is_oauth: false,
       is_being_aggregated: false,
       oauth_window_uri: undefined,
-      provider: PROVIDER_STRING,
+      provider: this.provider,
       user_id: userId
     }
   }
@@ -133,8 +169,39 @@ export class TestAdapter implements WidgetAdapter {
     singleAccountSelect: boolean,
     userId: string
   ): Promise<Connection> {
+    const connectionInfo = await get(
+      createRedisStatusKey({ provider: this.provider, userId })
+    )
+
+    if (connectionInfo?.verifiedOnce && singleAccountSelect) {
+      return {
+        provider: this.provider,
+        id: 'testId',
+        cur_job_id: 'testJobId',
+        user_id: 'testUserId',
+        status: ConnectionStatus.CHALLENGED,
+        challenges: [
+          {
+            id: 'CRD-a81b35db-28dd-41ea-aed3-6ec8ef682011',
+            type: 1,
+            question: 'Please select an account:',
+            data: [
+              {
+                key: 'Checking',
+                value: 'act-23445745'
+              },
+              {
+                key: 'Savings',
+                value: 'act-352386787'
+              }
+            ]
+          }
+        ]
+      }
+    }
+
     return {
-      provider: PROVIDER_STRING,
+      provider: this.provider,
       id: 'testId',
       cur_job_id: 'testJobId',
       user_id: userId,
