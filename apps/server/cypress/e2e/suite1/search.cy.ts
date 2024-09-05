@@ -52,7 +52,7 @@ describe('search', () => {
 
         let noIdentificationBankFound = false
 
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < 3; i++) {
           const ariaLabel = institutions.eq(i).attr('aria-label')
           if (
             ariaLabel ===
