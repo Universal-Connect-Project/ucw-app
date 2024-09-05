@@ -23,4 +23,6 @@ In our opinion the easiest way to create an adapter package is as follows:
 1. Bundle and publish your adapter to npm
 1. When your adapter package is ready for production use, then you'll need to gain access to the UCP institution list to update the list of institutions you support(This functionality is in progress by the UCP team)
 
-An example adapter lives [here](./apps/server/src/test-adapter/index.ts). Each adapter needs to export an adapterMapObject, and the testAdapter needs to support all properties of an adapterMapObject. These adapterMapObjects are imported and setup by hosters of the UCW in [adapterSetup.ts](./apps/server/src/adapterSetup.ts). This repo accesses adapter specific logic via [adapterIndex.ts](./apps/server/src/adapterIndex.ts)
+An example adapter lives [here](./apps/server/src/test-adapter/index.ts). Each adapter needs to export an adapterMapObject. These adapterMapObjects are imported and setup by hosters of the UCW in [adapterSetup.ts](./apps/server/src/adapterSetup.ts). If the test adapterMapObject doesn't support a property you need to use for your adapter, then you'll need to add it to the test example adapter to ensure it continues to get support.
+
+This repo accesses adapter specific logic via [adapterIndex.ts](./apps/server/src/adapterIndex.ts)
