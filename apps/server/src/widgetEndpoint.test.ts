@@ -1,7 +1,9 @@
-import { Request, Response } from 'express'
+import type { Request, Response } from 'express'
 import { widgetHandler } from './widgetEndpoint'
 import { JobTypes, Providers } from './shared/contract'
 import { invalidProviderString } from './utils/validators'
+
+/* eslint-disable @typescript-eslint/unbound-method  */
 
 describe('server', () => {
   describe('widgetHandler', () => {

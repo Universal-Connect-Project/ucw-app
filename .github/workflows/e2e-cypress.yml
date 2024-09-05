@@ -62,15 +62,6 @@ jobs:
           echo RESOURCEVERSION="" >> ${ENV_FILE_PATH}
 
           # Secrets (can't load these from another job, due to GH security features)
-          echo SOPHTRONAPIUSERID=${{ secrets.SOPHTRON_API_USER_ID }} >> ${ENV_FILE_PATH}
-          echo SOPHTRONAPIUSERSECRET=${{ secrets.SOPHTRON_API_USER_SECRET }} >> ${ENV_FILE_PATH}
-
-          echo MXCLIENTID=${{ secrets.MX_CLIENT_ID }} >> ${ENV_FILE_PATH}
-          echo MXAPISECRET=${{ secrets.MX_API_SECRET }} >> ${ENV_FILE_PATH}
-
-          echo FINICITYPARTNERID=${{ secrets.FINICITY_PARTNER_ID }} >> ${ENV_FILE_PATH}
-          echo FINICITYSECRET=${{ secrets.FINICITY_SECRET }} >> ${ENV_FILE_PATH}
-          echo FINICITYAPPKEY=${{ secrets.FINICITY_APP_KEY }} >> ${ENV_FILE_PATH}
 
           cat ${ENV_FILE_PATH}
 

@@ -1,12 +1,10 @@
 import type { Response } from 'express'
-import { MappedJobTypes, Providers } from '../shared/contract'
+import { MappedJobTypes } from '../shared/contract'
 import {
   elasticSearchInstitutionData,
-  institutionData,
   transformedInstitutionList,
   transformedPopularInstitutionsList
 } from '../test/testData/institution'
-import { transformedInstitutionCredentials } from '../test/testData/institutionCredentials'
 import { ConnectApi } from './connectApi'
 import type {
   GetInstitutionCredentialsRequest,
@@ -19,14 +17,21 @@ import {
   getInstitutionHandler,
   getInstitutionsHandler
 } from './institutionEndpoints'
-
-const mxInstitution = institutionData.institution
+import { TEST_EXAMPLE_A_PROVIDER_STRING } from '../test-adapter'
+import {
+  TEST_EXAMPLE_A_LABEL_TEXT,
+  TEST_EXAMPLE_B_PROVIDER_STRING,
+  testExampleCredentials,
+  testExampleInstitution
+} from '../test-adapter/constants'
+import * as preferences from '../shared/preferences'
+import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
 
 describe('institutionEndpoints', () => {
   describe('getInstitutionHandler', () => {
     it('returns the institution by the provider id if it has a provider', async () => {
       const context = {
-        provider: 'mx'
+        provider: TEST_EXAMPLE_A_PROVIDER_STRING
       }
 
       const req = {
@@ -45,21 +50,26 @@ describe('institutionEndpoints', () => {
 
       expect(res.send).toHaveBeenCalledWith({
         institution: {
-          code: mxInstitution.code,
+          code: 'testProviderInstitutionGuid',
           credentials: [],
-          guid: mxInstitution.code,
+          guid: 'testProviderInstitutionGuid',
           instructional_data: {},
-          logo_url: mxInstitution.medium_logo_url,
-          name: mxInstitution.name,
-          provider: 'mx',
+          logo_url: testExampleInstitution.logo_url,
+          name: testExampleInstitution.name,
+          provider: TEST_EXAMPLE_A_PROVIDER_STRING,
           providers: undefined,
-          supports_oauth: mxInstitution.supports_oauth,
-          url: mxInstitution.url
+          supports_oauth: testExampleInstitution.oauth,
+          url: testExampleInstitution.url
         }
       })
     })
 
     it("returns the institution by the ucp id if it doesn't have a provider", async () => {
+      jest.spyOn(preferences, 'getPreferences').mockResolvedValue({
+        ...testPreferences,
+        supportedProviders: [TEST_EXAMPLE_B_PROVIDER_STRING]
+      } as any)
+
       const context = {
         job_type: 'aggregate'
       }
@@ -78,18 +88,20 @@ describe('institutionEndpoints', () => {
       await getInstitutionHandler(req, res)
 
       const ucpInstitution = elasticSearchInstitutionData
+      const ucpTestExampleInstitution =
+        ucpInstitution[TEST_EXAMPLE_B_PROVIDER_STRING]
 
       expect(res.send).toHaveBeenCalledWith({
         institution: {
-          code: mxInstitution.code,
+          code: ucpTestExampleInstitution.id,
           credentials: [],
-          guid: mxInstitution.code,
+          guid: ucpTestExampleInstitution.id,
           instructional_data: {},
           logo_url: ucpInstitution.logo,
           name: ucpInstitution.name,
-          provider: 'mx_int',
+          provider: TEST_EXAMPLE_B_PROVIDER_STRING,
           providers: undefined,
-          supports_oauth: ucpInstitution.mx.supports_oauth,
+          supports_oauth: testExampleInstitution.oauth,
           url: ucpInstitution.url
         }
       })
@@ -167,7 +179,7 @@ describe('institutionEndpoints', () => {
     it('returns with the institution credentials', async () => {
       const context = {
         job_type: MappedJobTypes.AGGREGATE,
-        provider: Providers.MX
+        provider: TEST_EXAMPLE_A_PROVIDER_STRING
       }
 
       const connectApi = new ConnectApi({ context })
@@ -188,7 +200,17 @@ describe('institutionEndpoints', () => {
 
       await getInstitutionCredentialsHandler(req, res)
 
-      expect(res.send).toHaveBeenCalledWith(transformedInstitutionCredentials)
+      expect(res.send).toHaveBeenCalledWith({
+        credentials: [
+          {
+            field_name: testExampleCredentials.field_name,
+            field_type: 3,
+            guid: testExampleCredentials.id,
+            id: testExampleCredentials.id,
+            label: TEST_EXAMPLE_A_LABEL_TEXT
+          }
+        ]
+      })
     })
   })
 })

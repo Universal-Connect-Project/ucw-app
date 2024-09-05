@@ -5,8 +5,12 @@ import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import config from '../config'
 import { info } from '../infra/logger'
-import type { CachedInstitution, MappedJobTypes } from '../shared/contract'
-import { getPreferences, type Provider } from '../shared/preferences'
+import type {
+  CachedInstitution,
+  MappedJobTypes,
+  Provider
+} from '../shared/contract'
+import { getPreferences } from '../shared/preferences'
 import {
   getAvailableProviders,
   JOB_TYPE_PARTIAL_SUPPORT_MAP

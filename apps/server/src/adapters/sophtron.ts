@@ -166,7 +166,7 @@ export class SophtronAdapter implements WidgetAdapter {
   async GetConnectionStatus(
     memberId: string,
     jobId: string,
-    single_account_select: boolean,
+    singleAccountSelect: boolean,
     userId: string
   ): Promise<Connection> {
     if (!jobId) {
@@ -196,7 +196,7 @@ export class SophtronAdapter implements WidgetAdapter {
       case 'AccountsReady': {
         const jobType = job.JobType.toLowerCase()
         if (
-          single_account_select &&
+          singleAccountSelect &&
           (!job.AccountID ||
             job.AccountID === '00000000-0000-0000-0000-000000000000') &&
           (jobType.indexOf('verification') >= 0 ||

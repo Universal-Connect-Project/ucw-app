@@ -6,10 +6,7 @@ import {
   mxVcIntegrationAccountsData
 } from './test/testData/mxVcData'
 import { sophtronVcAccountsData } from './test/testData/sophtronVcData'
-import {
-  PROVIDER_STRING as TEST_EXAMPLE_PROVIDER_STRING,
-  TestAdapter
-} from './test-adapter'
+import { TEST_EXAMPLE_A_PROVIDER_STRING, TestAdapter } from './test-adapter'
 
 const connectionId = 'testConectionId'
 const type = VCDataTypes.ACCOUNTS
@@ -69,7 +66,7 @@ describe('adapterSetup', () => {
     })
 
     it('returns the testExample widget adapter', () => {
-      const adapter = getProviderAdapter(TEST_EXAMPLE_PROVIDER_STRING)
+      const adapter = getProviderAdapter(TEST_EXAMPLE_A_PROVIDER_STRING)
 
       expect(adapter).toBeInstanceOf(TestAdapter)
     })
