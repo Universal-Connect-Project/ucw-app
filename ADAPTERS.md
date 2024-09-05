@@ -8,11 +8,11 @@ If you are planning on hosting a UCW, then you'll need to import and configure a
 
 ## Creating an adapter package
 
-In order to make it easier for aggregators to develop their own UCW adapters we are moving to a package architecture. We will be moving all aggregator specific code to their own packages.
+In order to make it easier for aggregators to develop their own UCW adapters we are moving to a package architecture. We will be moving all aggregator-specific code to their own packages.
 
-The only adapter packages in this repo should be test adapters. In order to be able to support aggregator specific features these adapters must support all the features of all the aggregators' adapters. We should have enough tests on the test adapters that we have confidence that the aggregator adapters will continue to function. If you need to modify code in this repository for your adapter package to function, then you'll need to make sure you test that functionality with the test adapter.
+The only adapter packages in this repo should be test adapters. In order to be able to support aggregator-specific features these adapters must support all the features of all the aggregators' adapters. We should have enough tests on the test adapters that we have confidence that the aggregator adapters will continue to function. If you need to modify code in this repository for your adapter package to function, then you'll need to make sure you test that functionality with the test adapter.
 
-In our opinion the easiest way to create an adapter package follows:
+In our opinion the easiest way to create an adapter package is as follows:
 
 1. Fork this repository
 1. Create a folder in the packages folder for your adapter
