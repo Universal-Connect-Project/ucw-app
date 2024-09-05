@@ -17,6 +17,7 @@ module.exports = {
   },
   ignorePatterns: [
     '.eslintrc.js',
+    '.eslintrc.cjs',
     'jest.config.js',
     'jestSetup.ts',
     'babel.config.js',

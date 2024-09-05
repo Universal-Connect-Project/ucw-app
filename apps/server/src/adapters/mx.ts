@@ -5,8 +5,14 @@ import type {
   CredentialsResponseBody,
   MemberResponse,
   MxPlatformApiFactory
-} from '../providerApiClients/mx'
-import { MxIntApiClient, MxProdApiClient } from '../providerApiClients/mx'
+} from 'mx-platform-node'
+// import type {
+//   CredentialRequest,
+//   CredentialsResponseBody,
+//   MemberResponse,
+//   MxPlatformApiFactory
+// } from '../providerApiClients/mx'
+import { /* MxIntApiClient,  */MxProdApiClient, MxIntApiClientSDK } from '../providerApiClients/mx'
 import { get } from '../services/storageClient/redis'
 import type {
   Challenge,
@@ -55,7 +61,8 @@ export class MxAdapter implements WidgetAdapter {
   constructor(int: boolean) {
     this.provider = int ? 'mx_int' : 'mx'
 
-    this.apiClient = int ? MxIntApiClient : MxProdApiClient
+    // @ts-expect-error Ignore type error for now
+    this.apiClient = int ? MxIntApiClientSDK : MxProdApiClient
   }
 
   async GetInstitutionById(id: string): Promise<Institution> {
@@ -173,24 +180,25 @@ export class MxAdapter implements WidgetAdapter {
     userId: string
   ): Promise<Connection> {
     let ret
-    if (request.job_type === 'verification') {
-      ret = await this.apiClient.verifyMember(request.id, userId)
-    } else if (request.job_type === 'aggregate_identity') {
-      ret = await this.apiClient.identifyMember(request.id, userId, {
-        data: { member: { include_transactions: true } }
-      })
-    } else if (request.job_type === 'aggregate_extendedhistory') {
-      ret = await this.apiClient.extendHistory(request.id, userId)
-    } else {
-      ret = await this.apiClient.aggregateMember(request.id, userId)
-    }
 
-    if (ret?.data?.error?.message === EXTENDED_HISTORY_NOT_SUPPORTED_MSG) {
-      ret = await this.apiClient.aggregateMember(request.id, userId)
-    }
-
-    if (ret.data?.error) {
-      return { id: request.id, error_message: ret.data.error.message }
+    try {
+      if (request.job_type === 'verification') {
+        ret = await this.apiClient.verifyMember(request.id, userId)
+      } else if (request.job_type === 'aggregate_identity') {
+        ret = await this.apiClient.identifyMember(request.id, userId, {
+          data: { member: { include_transactions: true } }
+        })
+      } else if (request.job_type === 'aggregate_extendedhistory') {
+        ret = await this.apiClient.extendHistory(request.id, userId)
+      } else {
+        ret = await this.apiClient.aggregateMember(request.id, userId)
+      }
+    } catch (e) {
+      if (e?.response?.data?.error?.message === EXTENDED_HISTORY_NOT_SUPPORTED_MSG) {
+        ret = await this.apiClient.aggregateMember(request.id, userId)
+      } else {
+        return { id: request.id, error_message: e?.response?.data?.error?.message }
+      }
     }
 
     return fromMxMember(ret.data.member, this.provider)

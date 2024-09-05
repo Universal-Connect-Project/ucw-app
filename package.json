@@ -6,6 +6,7 @@
     "copyTestPreferences": "cp ./apps/server/cachedDefaults/testData/testPreferences.json ./apps/server/cachedDefaults/preferences.json",
     "copyAltTestPreferences": "cp ./apps/server/cachedDefaults/testData/alternateTestPreferences.json ./apps/server/cachedDefaults/preferences.json",
     "dev": "turbo dev",
+    "dev:debug": "turbo dev:debug",
     "dev:e2e": "turbo dev:e2e",
     "lint": "turbo lint",
     "test": "turbo run test",
