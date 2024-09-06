@@ -5,13 +5,16 @@ application, which anyone can clone and self-host as a way to serve the connect 
 into an iframe.
 
 ## Table of Contents
+
 - [Documentation](#documentation)
-  - [API Documentation](#api-documentation)
+- [API Documentation](#api-documentation)
 - [Getting Started](#getting-started)
 - [Preferences and Aggregator Credentials](#preferences-and-aggregator-credentials)
 - [Authentication](#authentication)
 
 ## Other Resources
+
+- [Adapters](ADAPTERS.md)
 - [Contributing](CONTRIBUTING.md)
 - [Docker](DOCKER.md)
 - [Monorepo](MONOREPO.md)
@@ -36,10 +39,11 @@ The API documentation for this service lives in [./openApiDocumentation.json](./
       1. See [PREFERENCES.md](PREFERENCES.md) for details on what values you must provide in the `./apps/server/.env` file
    1. `cp ./apps/server/cachedDefaults/preferences.example.json ./apps/server/cachedDefaults/preferences.json`
       1. Make sure you then set up your preferences (see [PREFERENCES.md](PREFERENCES.md) for details)
+1. If you are planning to host a UCW, then you'll need to import and configure your [aggregators' adapters](ADAPTERS.md)
 1. Make sure you have Docker installed (or another compatible container runtime), which is a required dependency for the institution search feature to function, even when running via Node.js (more info in [DOCKER.md](DOCKER.md))
 1. Finally, you can run the docker containers, or simply run from the cli, via node.
-    1. For docker: `docker compose up`
-    1. For node: `npm run dev`
+   1. For docker: `docker compose up`
+   1. For node: `npm run dev`
 
 It can take a minute or so for the server to initialize and set up elasticsearch.
 
