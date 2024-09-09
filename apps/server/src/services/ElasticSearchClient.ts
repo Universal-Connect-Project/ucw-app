@@ -66,8 +66,13 @@ async function getInstitutions(): Promise<CachedInstitution[]> {
   const response = await fetchInstitutions()
   if (response?.ok) {
     info('Elasticsearch indexing from server list')
-    const newInstitutions = await response.json()
-    if (newInstitutions.length > 0) {
+    let newInstitutions
+    try {
+      newInstitutions = await response.json()
+    } catch {
+      newInstitutions = null
+    }
+    if (newInstitutions?.length > 0) {
       info('Updating institution cache list')
       return newInstitutions
     } else {
