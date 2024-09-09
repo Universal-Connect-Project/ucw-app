@@ -1,8 +1,12 @@
-import { getPreferences } from '../../shared/preferences'
-import { get, set, setNoExpiration } from './redis'
 import preferences from '../../../cachedDefaults/preferences.json'
-import { set as mockSet } from '../../__mocks__/redis'
+import {
+  del as mockDel,
+  sAdd as mockSAdd,
+  set as mockSet
+} from '../../__mocks__/redis'
 import config from '../../config'
+import { getPreferences } from '../../shared/preferences'
+import { get, getSet, overwriteSet, set, setNoExpiration } from './redis'
 
 describe('redis', () => {
   it('loads the preferences into the cache after successful connection', async () => {
@@ -42,6 +46,23 @@ describe('redis', () => {
       await set('test', 'test', {})
 
       expect(mockSet).toHaveBeenCalledWith('test', JSON.stringify('test'), {})
+    })
+  })
+
+  describe('overwriteSet', () => {
+    it('calls del on the client and then sAdd', async () => {
+      await overwriteSet('test', ['value1', 'value2'])
+
+      expect(mockDel).toHaveBeenCalledWith('test')
+      expect(mockSAdd).toHaveBeenCalledWith('test', ['value1', 'value2'])
+    })
+  })
+
+  describe('getSet', () => {
+    it('calls del on the client and then sAdd', async () => {
+      const values = ['value1', 'value2']
+      await overwriteSet('test', values)
+      expect(await getSet('test')).toEqual(values)
     })
   })
 

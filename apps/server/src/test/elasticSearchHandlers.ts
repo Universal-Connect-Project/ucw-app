@@ -1,5 +1,5 @@
-import { ElasticSearchMock } from '../services/ElasticSearchClient'
 import { elasticSearchInstitutionData } from '../test/testData/institution'
+import { ElasticSearchMock } from './elasticSearchMock'
 
 const GET_INSTITUTION = { method: 'GET', path: '/institutions/_doc/*' }
 const GET_INSTITUTION_RESPONSE = () => {
@@ -28,7 +28,7 @@ const GET_FAVORITE_INSTITUTIONS_RESPONSE = () => {
   return { docs: [{ _source: elasticSearchInstitutionData }] }
 }
 
-export function initializeDefaultElasticSearchHandlers () {
+export function initializeDefaultElasticSearchHandlers() {
   ElasticSearchMock.add(GET_INSTITUTION, GET_INSTITUTION_RESPONSE)
   ElasticSearchMock.add(GET_INSTITUTIONS, GET_INSTITUTIONS_RESPONSE)
   ElasticSearchMock.add(
@@ -37,7 +37,7 @@ export function initializeDefaultElasticSearchHandlers () {
   )
 }
 
-export function resetDefaultElasticSearchHandlers () {
+export function resetDefaultElasticSearchHandlers() {
   ElasticSearchMock.clearAll()
   initializeDefaultElasticSearchHandlers()
 }

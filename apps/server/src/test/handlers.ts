@@ -1,5 +1,7 @@
 import { http, HttpResponse } from 'msw'
+import config from '../config'
 import { BASE_PATH as MX_BASE_PATH } from '../providerApiClients/mx'
+import { accessTokenResponse } from './testData/auth0'
 import {
   finicityInsitutionData,
   institutionData,
@@ -210,7 +212,8 @@ const handlers = [
   http.post(FINICITY_CONNECT_PATH, () =>
     HttpResponse.json({ link: FINICITY_CONNECT_LITE_URL })
   ),
-  http.post(CREATE_CUSTOMER_PATH, () => HttpResponse.json(createCustomerData))
+  http.post(CREATE_CUSTOMER_PATH, () => HttpResponse.json(createCustomerData)),
+  http.post(config.Auth0TokenUrl, () => HttpResponse.json(accessTokenResponse))
 ]
 
 export default handlers

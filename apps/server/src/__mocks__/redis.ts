@@ -12,6 +12,17 @@ export const clearRedisMock = () => {
   }
 }
 
+export const sAdd = jest.fn((key: string, values: string[]) => {
+  storageObject[key] = values
+})
+export const del = jest.fn((key: string) => {
+  delete storageObject[key]
+})
+
+export const sMembers = jest.fn((key: string) => {
+  return storageObject[key]
+})
+
 export const get = jest.fn((key: string) => {
   return storageObject[key]
 })
@@ -26,5 +37,8 @@ export const createClient = () => ({
   },
   get,
   isReady: true,
-  set
+  set,
+  sAdd,
+  sMembers,
+  del
 })
