@@ -15,6 +15,7 @@ import {
   JOB_TYPE_PARTIAL_SUPPORT_MAP
 } from '../shared/providers'
 import { ElasticSearchMock } from '../test/elasticSearchMock'
+import { getCachedInstitutionListFromServer } from './institutionSyncer'
 import { INSTITUTION_CURRENT_LIST_IDS } from './storageClient/constants'
 import { getSet, overwriteSet } from './storageClient/redis'
 
@@ -48,25 +49,37 @@ export async function reIndexElasticSearch() {
   } catch {
     info('Elasticsearch "institutions" index did not exist')
   }
-  info('Elasticsearch indexing institutions')
-  const dataFilePath = getInstitutionFilePath()
-  const rawData = readFileSync(dataFilePath)
-  const jsonData = JSON.parse(rawData.toString())
-  const insIds = jsonData.map((ins: CachedInstitution) => ins.ucp_id)
+  const institutionData = await getCachedInstitutions()
+  const insIds = institutionData.map((ins: CachedInstitution) => ins.ucp_id)
 
   await overwriteSet(INSTITUTION_CURRENT_LIST_IDS, insIds)
 
   await ElasticsearchClient.indices.create({ index: 'institutions' })
 
-  const indexPromises = jsonData.map(async (institution: { ucp_id: any }) => {
-    return await ElasticsearchClient.index({
-      index: 'institutions',
-      id: institution.ucp_id,
-      document: institution
-    })
-  })
+  const indexPromises = institutionData.map(
+    async (institution: { ucp_id: any }) => {
+      return await ElasticsearchClient.index({
+        index: 'institutions',
+        id: institution.ucp_id,
+        document: institution
+      })
+    }
+  )
 
   await Promise.all(indexPromises)
+}
+
+async function getCachedInstitutions(): Promise<CachedInstitution[]> {
+  const response = await getCachedInstitutionListFromServer()
+  if (response?.ok) {
+    info('Elasticsearch indexing from server list')
+    return await response.json()
+  } else {
+    info('Elasticsearch indexing from local file')
+    const dataFilePath = getInstitutionFilePath()
+    const rawData = readFileSync(dataFilePath)
+    return JSON.parse(rawData.toString())
+  }
 }
 
 export async function searchByRoutingNumber(

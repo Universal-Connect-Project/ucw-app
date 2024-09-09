@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw'
 import { clearIntervalAsync } from 'set-interval-async'
 import { server } from '../test/testServer'
 import {
+  getCachedInstitutionListFromServer,
   loadCachedInstitutions,
   setInstitutionSyncSchedule
 } from './institutionSyncer'
@@ -141,7 +142,31 @@ describe('loadCachedInstitutions', () => {
     await loadCachedInstitutions()
 
     expect(warningLogSpy).toHaveBeenCalledWith(
-      'Unable to get institution cache list from server: Failed to fetch'
+      'Institution Server not responding'
     )
+  })
+})
+
+describe('getCachedInstitutionListFromServer', () => {
+  it('returns a response when the server is available', async () => {
+    server.use(
+      http.get(
+        config.INSTITUTION_CACHE_LIST_URL,
+        () =>
+          new HttpResponse(null, { status: 304, statusText: 'Not Modified' })
+      )
+    )
+
+    const response = await getCachedInstitutionListFromServer()
+    expect(response).not.toBeNull()
+  })
+
+  it('returns null when the server is unavailable', async () => {
+    server.use(
+      http.get(config.INSTITUTION_CACHE_LIST_URL, () => HttpResponse.error())
+    )
+
+    const response = await getCachedInstitutionListFromServer()
+    expect(response).toBeNull()
   })
 })

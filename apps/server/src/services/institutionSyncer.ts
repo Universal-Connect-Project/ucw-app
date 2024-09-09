@@ -25,17 +25,11 @@ export async function setInstitutionSyncSchedule(minutes: number = 1) {
 }
 
 export const loadCachedInstitutions = async () => {
-  const institutionCacheETag = await get(INSTITUTION_ETAG_REDIS_KEY)
   try {
-    const accessToken = await getAccessToken()
-    const response = await fetch(config.INSTITUTION_CACHE_LIST_URL, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'If-None-Match': institutionCacheETag,
-        'Cache-Control': 'public'
-      }
-    })
-    if (response.status === RESPONSE_NOT_MODIFIED) {
+    const response = await getCachedInstitutionListFromServer()
+    if (!response) {
+      logWarning('Institution Server not responding')
+    } else if (response.status === RESPONSE_NOT_MODIFIED) {
       info('Institution Cache List unchanged. Skipping Update')
     } else if (response.status === SUCCESS_RESPONSE) {
       const newInstitutions = await response.json()
@@ -56,6 +50,22 @@ export const loadCachedInstitutions = async () => {
     logWarning(
       `Unable to get institution cache list from server: ${error.message}`
     )
+  }
+}
+
+export async function getCachedInstitutionListFromServer(): Promise<Response | null> {
+  const institutionCacheETag = await get(INSTITUTION_ETAG_REDIS_KEY)
+  const accessToken = await getAccessToken()
+  try {
+    return await fetch(config.INSTITUTION_CACHE_LIST_URL, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'If-None-Match': institutionCacheETag,
+        'Cache-Control': 'public'
+      }
+    })
+  } catch {
+    return null
   }
 }
 

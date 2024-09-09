@@ -1,4 +1,5 @@
 import * as fs from 'fs'
+import { http, HttpResponse } from 'msw'
 import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
 import config from '../config'
 import * as logger from '../infra/logger'
@@ -21,6 +22,7 @@ import {
   elasticSearchMockError
 } from '../test/elasticSearchMock'
 import { elasticSearchInstitutionData } from '../test/testData/institution'
+import { server } from '../test/testServer'
 import { INSTITUTION_CURRENT_LIST_IDS } from './storageClient/constants'
 import { overwriteSet } from './storageClient/redis'
 
@@ -176,6 +178,10 @@ describe('initialize', () => {
       .spyOn(fs, 'readFileSync')
       .mockReturnValue(JSON.stringify([elasticSearchInstitutionData]))
 
+    server.use(
+      http.get(config.INSTITUTION_CACHE_LIST_URL, () => HttpResponse.error())
+    )
+
     ElasticSearchMock.clearAll()
     ElasticSearchMock.add(
       {
@@ -207,8 +213,12 @@ describe('reIndexElasticSearch', () => {
   let indexCreated: boolean
   let institutionsIndexedCount: number
 
-  it('makes call to create index and makes call to index more than 4 institutions', async () => {
+  it('makes call to create index and makes call to index 3 institutions retrieved from the local cache file because the institution cache list server is unavailable', async () => {
     ElasticSearchMock.clearAll()
+
+    server.use(
+      http.get(config.INSTITUTION_CACHE_LIST_URL, () => HttpResponse.error())
+    )
 
     jest
       .spyOn(fs, 'readFileSync')
@@ -248,6 +258,46 @@ describe('reIndexElasticSearch', () => {
     await reIndexElasticSearch()
     expect(indexCreated).toBeTruthy()
     expect(institutionsIndexedCount).toEqual(3)
+  })
+
+  it('it indexes institutions retrieved from the institution server', async () => {
+    ElasticSearchMock.clearAll()
+
+    server.use(
+      http.get(config.INSTITUTION_CACHE_LIST_URL, () => {
+        return HttpResponse.json([
+          elasticSearchInstitutionData,
+          elasticSearchInstitutionData
+        ])
+      })
+    )
+
+    institutionsIndexedCount = 0
+    ElasticSearchMock.add(
+      {
+        method: 'PUT',
+        path: '/institutions'
+      },
+      () => {
+        indexCreated = true
+        return ''
+      }
+    )
+
+    ElasticSearchMock.add(
+      {
+        method: 'PUT',
+        path: '/institutions/_doc/*'
+      },
+      () => {
+        institutionsIndexedCount += 1
+        return ''
+      }
+    )
+
+    await reIndexElasticSearch()
+    expect(indexCreated).toBeTruthy()
+    expect(institutionsIndexedCount).toEqual(2)
   })
 })
 
