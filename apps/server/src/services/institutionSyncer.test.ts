@@ -2,9 +2,9 @@ import { http, HttpResponse } from 'msw'
 import { clearIntervalAsync } from 'set-interval-async'
 import { server } from '../test/testServer'
 import {
-  getCachedInstitutionListFromServer,
-  loadCachedInstitutions,
-  setInstitutionSyncSchedule
+  fetchInstitutions,
+  setInstitutionSyncSchedule,
+  syncInstitutions
 } from './institutionSyncer'
 
 import config from '../config'
@@ -44,7 +44,7 @@ describe('setInstitutionSyncSchedule', () => {
   })
 })
 
-describe('loadCachedInstitutions', () => {
+describe('syncInstitutions', () => {
   beforeEach(async () => {
     const mockETag = 'etag123'
     await set(INSTITUTION_ETAG_REDIS_KEY, mockETag)
@@ -61,7 +61,7 @@ describe('loadCachedInstitutions', () => {
       )
     )
 
-    await loadCachedInstitutions()
+    await syncInstitutions()
 
     expect(infoLogSpy).toHaveBeenCalledWith(
       'Institution Cache List unchanged. Skipping Update'
@@ -109,7 +109,7 @@ describe('loadCachedInstitutions', () => {
       )
     )
 
-    await loadCachedInstitutions()
+    await syncInstitutions()
 
     expect(infoLogSpy).toHaveBeenCalledWith('Updating institution cache list')
     expect(deletedInsIds).toEqual([oldInstitutionUcpId])
@@ -125,7 +125,7 @@ describe('loadCachedInstitutions', () => {
       )
     )
 
-    await loadCachedInstitutions()
+    await syncInstitutions()
 
     expect(warningLogSpy).toHaveBeenCalledWith(
       'Unauthorized access to institution cache list'
@@ -139,7 +139,7 @@ describe('loadCachedInstitutions', () => {
       http.get(config.INSTITUTION_CACHE_LIST_URL, () => HttpResponse.error())
     )
 
-    await loadCachedInstitutions()
+    await syncInstitutions()
 
     expect(warningLogSpy).toHaveBeenCalledWith(
       'Institution Server not responding'
@@ -147,7 +147,7 @@ describe('loadCachedInstitutions', () => {
   })
 })
 
-describe('getCachedInstitutionListFromServer', () => {
+describe('fetchInstitutions', () => {
   it('returns a response when the server is available', async () => {
     server.use(
       http.get(
@@ -157,7 +157,7 @@ describe('getCachedInstitutionListFromServer', () => {
       )
     )
 
-    const response = await getCachedInstitutionListFromServer()
+    const response = await fetchInstitutions()
     expect(response).not.toBeNull()
   })
 
@@ -166,7 +166,7 @@ describe('getCachedInstitutionListFromServer', () => {
       http.get(config.INSTITUTION_CACHE_LIST_URL, () => HttpResponse.error())
     )
 
-    const response = await getCachedInstitutionListFromServer()
+    const response = await fetchInstitutions()
     expect(response).toBeNull()
   })
 })

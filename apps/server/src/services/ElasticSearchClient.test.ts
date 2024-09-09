@@ -7,8 +7,8 @@ import {
   deleteRemovedInstitutions,
   getInstitution,
   getRecommendedInstitutions,
+  indexElasticSearch,
   initialize,
-  reIndexElasticSearch,
   search,
   searchByRoutingNumber,
   updateInstitutions
@@ -172,7 +172,7 @@ describe('initialize', () => {
     expect(indexCreated).toBeFalsy()
   })
 
-  it('triggers the reIndexElasticSearch method and creates an index if ES not already indexed', async () => {
+  it('triggers the indexElasticSearch method and creates an index if ES not already indexed', async () => {
     let indexCreated: boolean
     jest
       .spyOn(fs, 'readFileSync')
@@ -209,7 +209,7 @@ describe('initialize', () => {
   })
 })
 
-describe('reIndexElasticSearch', () => {
+describe('indexElasticSearch', () => {
   let indexCreated: boolean
   let institutionsIndexedCount: number
 
@@ -255,7 +255,7 @@ describe('reIndexElasticSearch', () => {
       }
     )
 
-    await reIndexElasticSearch()
+    await indexElasticSearch()
     expect(indexCreated).toBeTruthy()
     expect(institutionsIndexedCount).toEqual(3)
   })
@@ -295,7 +295,7 @@ describe('reIndexElasticSearch', () => {
       }
     )
 
-    await reIndexElasticSearch()
+    await indexElasticSearch()
     expect(indexCreated).toBeTruthy()
     expect(institutionsIndexedCount).toEqual(2)
   })

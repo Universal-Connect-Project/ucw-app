@@ -15,7 +15,7 @@ import {
   JOB_TYPE_PARTIAL_SUPPORT_MAP
 } from '../shared/providers'
 import { ElasticSearchMock } from '../test/elasticSearchMock'
-import { getCachedInstitutionListFromServer } from './institutionSyncer'
+import { fetchInstitutions } from './institutionSyncer'
 import { INSTITUTION_CURRENT_LIST_IDS } from './storageClient/constants'
 import { getSet, overwriteSet } from './storageClient/redis'
 
@@ -35,21 +35,14 @@ export async function initialize() {
     index: 'institutions'
   })
   if (!elasticSearchLoaded) {
-    await reIndexElasticSearch()
+    await indexElasticSearch()
   } else {
     info('ElasticSearch already indexed')
   }
 }
 
-export async function reIndexElasticSearch() {
-  try {
-    await ElasticsearchClient.indices.delete({
-      index: 'institutions'
-    })
-  } catch {
-    info('Elasticsearch "institutions" index did not exist')
-  }
-  const institutionData = await getCachedInstitutions()
+export async function indexElasticSearch() {
+  const institutionData = await getInstitutions()
   const insIds = institutionData.map((ins: CachedInstitution) => ins.ucp_id)
 
   await overwriteSet(INSTITUTION_CURRENT_LIST_IDS, insIds)
@@ -69,17 +62,27 @@ export async function reIndexElasticSearch() {
   await Promise.all(indexPromises)
 }
 
-async function getCachedInstitutions(): Promise<CachedInstitution[]> {
-  const response = await getCachedInstitutionListFromServer()
+async function getInstitutions(): Promise<CachedInstitution[]> {
+  const response = await fetchInstitutions()
   if (response?.ok) {
     info('Elasticsearch indexing from server list')
-    return await response.json()
+    const newInstitutions = await response.json()
+    if (newInstitutions.length > 0) {
+      info('Updating institution cache list')
+      return newInstitutions
+    } else {
+      return getInstitutionDataFromFile()
+    }
   } else {
-    info('Elasticsearch indexing from local file')
-    const dataFilePath = getInstitutionFilePath()
-    const rawData = readFileSync(dataFilePath)
-    return JSON.parse(rawData.toString())
+    return getInstitutionDataFromFile()
   }
+}
+
+function getInstitutionDataFromFile(): CachedInstitution[] {
+  info('Elasticsearch indexing from local file')
+  const dataFilePath = getInstitutionFilePath()
+  const rawData = readFileSync(dataFilePath)
+  return JSON.parse(rawData.toString())
 }
 
 export async function searchByRoutingNumber(

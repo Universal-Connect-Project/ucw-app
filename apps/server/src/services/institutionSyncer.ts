@@ -18,15 +18,15 @@ export async function setInstitutionSyncSchedule(minutes: number = 1) {
   return setIntervalAsync(
     async () => {
       info('Checking for institution list updates')
-      await loadCachedInstitutions()
+      await syncInstitutions()
     },
     minutes * 60 * 1000
   )
 }
 
-export const loadCachedInstitutions = async () => {
+export const syncInstitutions = async () => {
   try {
-    const response = await getCachedInstitutionListFromServer()
+    const response = await fetchInstitutions()
     if (!response) {
       logWarning('Institution Server not responding')
     } else if (response.status === RESPONSE_NOT_MODIFIED) {
@@ -53,7 +53,7 @@ export const loadCachedInstitutions = async () => {
   }
 }
 
-export async function getCachedInstitutionListFromServer(): Promise<Response | null> {
+export async function fetchInstitutions(): Promise<Response | null> {
   const institutionCacheETag = await get(INSTITUTION_ETAG_REDIS_KEY)
   const accessToken = await getAccessToken()
   try {
