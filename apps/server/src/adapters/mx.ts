@@ -1,11 +1,12 @@
-import config from '../config'
-import * as logger from '../infra/logger'
 import type {
   CredentialRequest,
   CredentialsResponseBody,
   MemberResponse,
   MxPlatformApiFactory
 } from 'mx-platform-node'
+
+import config from '../config'
+import * as logger from '../infra/logger'
 import { MxProdApiClient, MxIntApiClient } from '../providerApiClients/mx'
 import { get } from '../services/storageClient/redis'
 import type {
