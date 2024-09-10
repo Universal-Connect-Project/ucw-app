@@ -1,4 +1,5 @@
 import { http, HttpResponse } from 'msw'
+
 import config from '../config'
 import { set } from '../services/storageClient/redis'
 import { ChallengeType, ConnectionStatus } from '../shared/contract'
@@ -468,13 +469,12 @@ describe('mx provider', () => {
 
       it('returns the member from aggregateMember if extended history is not supported', async () => {
         server.use(
-          http.post(EXTEND_HISTORY_PATH, () =>
-            HttpResponse.json({
-              error: {
-                message: EXTENDED_HISTORY_NOT_SUPPORTED_MSG
-              }
-            })
-          )
+          http.post(EXTEND_HISTORY_PATH, () => {
+            return HttpResponse.json(
+              { error: { message: EXTENDED_HISTORY_NOT_SUPPORTED_MSG } },
+              { status: 400 }
+            )
+          })
         )
 
         const member = await mxAdapter.UpdateConnection(
@@ -493,11 +493,14 @@ describe('mx provider', () => {
 
         server.use(
           http.post(VERIFY_MEMBER_PATH, () =>
-            HttpResponse.json({
-              error: {
-                message: errorMessage
-              }
-            })
+            HttpResponse.json(
+              {
+                error: {
+                  message: errorMessage
+                }
+              },
+              { status: 400 }
+            )
           )
         )
 
@@ -522,7 +525,7 @@ describe('mx provider', () => {
               error: {
                 message: EXTENDED_HISTORY_NOT_SUPPORTED_MSG
               }
-            })
+            }, { status: 400 })
           )
         )
 
@@ -534,7 +537,7 @@ describe('mx provider', () => {
               error: {
                 message: errorMessage
               }
-            })
+            }, { status: 400 })
           )
         )
 

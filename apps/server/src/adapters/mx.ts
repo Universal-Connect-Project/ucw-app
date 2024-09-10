@@ -6,13 +6,7 @@ import type {
   MemberResponse,
   MxPlatformApiFactory
 } from 'mx-platform-node'
-// import type {
-//   CredentialRequest,
-//   CredentialsResponseBody,
-//   MemberResponse,
-//   MxPlatformApiFactory
-// } from '../providerApiClients/mx'
-import { /* MxIntApiClient,  */MxProdApiClient, MxIntApiClientSDK } from '../providerApiClients/mx'
+import { MxProdApiClient, MxIntApiClient } from '../providerApiClients/mx'
 import { get } from '../services/storageClient/redis'
 import type {
   Challenge,
@@ -60,9 +54,7 @@ export class MxAdapter implements WidgetAdapter {
 
   constructor(int: boolean) {
     this.provider = int ? 'mx_int' : 'mx'
-
-    // @ts-expect-error Ignore type error for now
-    this.apiClient = int ? MxIntApiClientSDK : MxProdApiClient
+    this.apiClient = int ? MxIntApiClient : MxProdApiClient
   }
 
   async GetInstitutionById(id: string): Promise<Institution> {
@@ -195,7 +187,11 @@ export class MxAdapter implements WidgetAdapter {
       }
     } catch (e) {
       if (e?.response?.data?.error?.message === EXTENDED_HISTORY_NOT_SUPPORTED_MSG) {
-        ret = await this.apiClient.aggregateMember(request.id, userId)
+        try {
+          ret = await this.apiClient.aggregateMember(request.id, userId)
+        } catch (e) {
+          return { id: request.id, error_message: e?.response?.data?.error?.message }
+        }
       } else {
         return { id: request.id, error_message: e?.response?.data?.error?.message }
       }
@@ -327,22 +323,31 @@ export class MxAdapter implements WidgetAdapter {
     failIfNotFound: boolean = false
   ): Promise<string> {
     logger.debug('Resolving UserId: ' + userId)
+
+    let ret
     const res = await this.apiClient.listUsers(1, 10, userId)
     const mxUser = res.data?.users?.find((u) => u.id === userId)
+
     if (mxUser != null) {
       logger.trace(`Found existing mx user ${mxUser.guid}`)
       return mxUser.guid
     } else if (failIfNotFound) {
       throw new Error('User not resolved successfully')
     }
+
     logger.trace(`Creating mx user ${userId}`)
-    const ret = await this.apiClient.createUser({
-      user: { id: userId }
-    })
-    if (ret?.data?.user != null) {
-      return ret.data.user.guid
+
+    try {
+      ret = await this.apiClient.createUser({
+        user: { id: userId }
+      })
+
+      if (ret?.data?.user != null) {
+        return ret.data.user.guid
+      }
+    } catch (e) {
+      logger.trace(`Failed creating mx user, using user_id: ${userId}`)
+      return userId
     }
-    logger.trace(`Failed creating mx user, using user_id: ${userId}`)
-    return userId
   }
 }

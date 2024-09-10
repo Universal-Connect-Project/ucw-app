@@ -75,7 +75,7 @@ describe('userEndpoints', () => {
 
       await userDeleteHandler(req, res)
 
-      expect(res.send).toHaveBeenCalledWith('')
+      expect(res.send).toHaveBeenCalledWith('User delete failed')
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(res.status).toHaveBeenCalledWith(400)
     })
