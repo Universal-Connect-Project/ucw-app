@@ -3,6 +3,8 @@ import { widgetHandler } from './widgetEndpoint'
 import { JobTypes, Providers } from './shared/contract'
 import { invalidProviderString } from './utils/validators'
 
+/* eslint-disable @typescript-eslint/unbound-method  */
+
 describe('server', () => {
   describe('widgetHandler', () => {
     describe('validation', () => {

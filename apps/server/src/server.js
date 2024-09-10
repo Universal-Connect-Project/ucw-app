@@ -1,13 +1,15 @@
+import ngrok from '@ngrok/ngrok'
 import 'dotenv/config'
 import express from 'express'
-import config from './config'
-import { stream } from './infra/http'
-import useConnect from './connect/connectApiExpress'
-import { error as _error, info } from './infra/logger'
-import ngrok from '@ngrok/ngrok'
 import 'express-async-errors'
 import RateLimit from 'express-rate-limit'
+
+import config from './config'
+import useConnect from './connect/connectApiExpress'
+import { stream } from './infra/http'
+import { error as _error, info } from './infra/logger'
 import { initialize as initializeElastic } from './services/ElasticSearchClient'
+import { setInstitutionSyncSchedule } from './services/institutionSyncer'
 import { widgetHandler } from './widgetEndpoint'
 
 process.on('unhandledRejection', (error) => {
@@ -28,6 +30,15 @@ app.use(limiter)
 initializeElastic()
   .then((_) => {
     info('App initialized successfully')
+    setInstitutionSyncSchedule(config.INSTITUTION_POLLING_INTERVAL)
+      .then((_) => {
+        info(
+          `Started institution poller for every ${config.INSTITUTION_POLLING_INTERVAL} minutes`
+        )
+      })
+      .catch((_error) => {
+        _error('Failed to start institution poller', _error)
+      })
   })
   .catch((error) => {
     _error(`Failed to initialized: ${error}`)

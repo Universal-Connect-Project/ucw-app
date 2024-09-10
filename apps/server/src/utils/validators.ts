@@ -1,14 +1,15 @@
 import Joi from 'joi'
-import { Providers } from '../shared/contract'
+import { providers } from '../adapterSetup'
 
-export const invalidProviderString = `"provider" must be one of [${Object.values(Providers).join(', ')}]`
+export const invalidProviderString = `"provider" must be one of [${providers.join(', ')}]`
 
 export const createProviderValidator = () =>
   Joi.string()
-    .valid(...Object.values(Providers))
+    .valid(...providers)
     .required()
 
 export const withValidateProviderInPath =
+  // eslint-disable-next-line @typescript-eslint/ban-types
   (handler: Function) => async (req: any, res: any) => {
     const schema = Joi.object({
       provider: createProviderValidator()

@@ -1,22 +1,27 @@
 import type { estypes } from '@elastic/elasticsearch'
 import { Client } from '@elastic/elasticsearch'
-import Mock from '@elastic/elasticsearch-mock'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import config from '../config'
-import { info } from '../infra/logger'
-import type { CachedInstitution, MappedJobTypes } from '../shared/contract'
-import { getPreferences, type Provider } from '../shared/preferences'
+import { info, error as logError } from '../infra/logger'
+import type {
+  CachedInstitution,
+  MappedJobTypes,
+  Provider
+} from '../shared/contract'
+import { getPreferences } from '../shared/preferences'
 import {
   getAvailableProviders,
   JOB_TYPE_PARTIAL_SUPPORT_MAP
 } from '../shared/providers'
+import { ElasticSearchMock } from '../test/elasticSearchMock'
+import { fetchInstitutions } from './institutionSyncer'
+import { INSTITUTION_CURRENT_LIST_IDS } from './storageClient/constants'
+import { getSet, overwriteSet } from './storageClient/redis'
 
-function getInstitutionFilePath() {
+export function getInstitutionFilePath() {
   return resolve(__dirname, '../../cachedDefaults/ucwInstitutionsMapping.json')
 }
-
-export const ElasticSearchMock = new Mock()
 
 export const ElasticsearchClient = new Client({
   node: config.ELASTIC_SEARCH_URL ?? 'http://localhost:9200',
@@ -30,36 +35,59 @@ export async function initialize() {
     index: 'institutions'
   })
   if (!elasticSearchLoaded) {
-    await reIndexElasticSearch()
+    await indexElasticSearch()
   } else {
     info('ElasticSearch already indexed')
   }
 }
 
-export async function reIndexElasticSearch() {
-  try {
-    await ElasticsearchClient.indices.delete({
-      index: 'institutions'
-    })
-  } catch {
-    info('Elasticsearch "institutions" index did not exist')
-  }
-  info('Elasticsearch indexing institutions')
-  const dataFilePath = getInstitutionFilePath()
-  const rawData = readFileSync(dataFilePath)
-  const jsonData = JSON.parse(rawData.toString())
+export async function indexElasticSearch() {
+  const institutionData = await getInstitutions()
+  const insIds = institutionData.map((ins: CachedInstitution) => ins.ucp_id)
+
+  await overwriteSet(INSTITUTION_CURRENT_LIST_IDS, insIds)
 
   await ElasticsearchClient.indices.create({ index: 'institutions' })
 
-  const indexPromises = jsonData.map(async (institution: { ucp_id: any }) => {
-    return await ElasticsearchClient.index({
-      index: 'institutions',
-      id: institution.ucp_id,
-      document: institution
-    })
-  })
+  const indexPromises = institutionData.map(
+    async (institution: { ucp_id: any }) => {
+      return await ElasticsearchClient.index({
+        index: 'institutions',
+        id: institution.ucp_id,
+        document: institution
+      })
+    }
+  )
 
   await Promise.all(indexPromises)
+}
+
+async function getInstitutions(): Promise<CachedInstitution[]> {
+  const response = await fetchInstitutions()
+  if (response?.ok) {
+    info('Elasticsearch indexing from server list')
+    let newInstitutions
+    try {
+      newInstitutions = await response.json()
+    } catch {
+      newInstitutions = null
+    }
+    if (newInstitutions?.length > 0) {
+      info('Updating institution cache list')
+      return newInstitutions
+    } else {
+      return getInstitutionDataFromFile()
+    }
+  } else {
+    return getInstitutionDataFromFile()
+  }
+}
+
+function getInstitutionDataFromFile(): CachedInstitution[] {
+  info('Elasticsearch indexing from local file')
+  const dataFilePath = getInstitutionFilePath()
+  const rawData = readFileSync(dataFilePath)
+  return JSON.parse(rawData.toString())
 }
 
 export async function searchByRoutingNumber(
@@ -277,4 +305,50 @@ export async function getRecommendedInstitutions(
     )
 
   return institutions
+}
+
+export async function deleteRemovedInstitutions(
+  newInstitutions: CachedInstitution[]
+) {
+  const newInsIdsSet = new Set(
+    newInstitutions.map((ins: CachedInstitution) => ins.ucp_id)
+  )
+
+  const oldInsIds = await getSet(INSTITUTION_CURRENT_LIST_IDS)
+
+  const deletedInstitutionsIds = oldInsIds.filter(
+    (ucpId: string) => !newInsIdsSet.has(ucpId)
+  )
+
+  if (deletedInstitutionsIds.length === 0) {
+    return
+  }
+  info('deleting institutions', deletedInstitutionsIds)
+  const deletePromises = deletedInstitutionsIds.map(async (ucpId: string) => {
+    return await ElasticsearchClient.delete({
+      index: 'institutions',
+      id: ucpId
+    })
+  })
+
+  try {
+    await Promise.all(deletePromises)
+    await overwriteSet(INSTITUTION_CURRENT_LIST_IDS, Array.from(newInsIdsSet))
+  } catch (error) {
+    logError(error)
+  }
+}
+
+export async function updateInstitutions(institutions: CachedInstitution[]) {
+  const updatePromises = institutions.map(
+    async (institution: CachedInstitution) => {
+      return await ElasticsearchClient.update({
+        index: 'institutions',
+        id: institution.ucp_id,
+        doc: institution,
+        doc_as_upsert: true
+      })
+    }
+  )
+  await Promise.all(updatePromises)
 }

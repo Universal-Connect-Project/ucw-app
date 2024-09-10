@@ -1,9 +1,7 @@
 {
   "defaultProvider": "sophtron",
 
-  "supportedProviders": [
-    "sophtron"
-  ],
+  "supportedProviders": ["mx", "sophtron"],
 
   "defaultProviderVolume": {},
 
@@ -11,12 +9,5 @@
 
   "hiddenInstitutions": [],
 
-  "recommendedInstitutions": [
-    "UCP-b087caf69b372c9",
-    "UCP-ce8334bbb890163",
-    "UCP-ebca9a2b2ae2cca",
-    "UCP-b0a4307160ecb4c",
-    "UCP-8c4ca4c32dbd8de",
-    "UCP-412ded54698c47f"
-  ]
+  "recommendedInstitutions": ["UCP-bb5296bd5aae5d9"]
 }
