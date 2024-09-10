@@ -1,7 +1,8 @@
-import { Request, Response } from 'express'
-import { wget as _wget } from './infra/http'
 import Joi from 'joi'
-import { JobTypes, Providers } from './shared/contract'
+import type { Request, Response } from 'express'
+
+import { wget as _wget } from './infra/http'
+import { JobTypes } from './shared/contract'
 import config from './config'
 import { providers } from './adapterSetup'
 
