@@ -530,7 +530,7 @@ describe('getInstitution', () => {
 })
 
 describe('getRecommendedInstitutions', () => {
-  it('makes expected call to ES and gets a list of favorite institutions', async () => {
+  it('makes expected call to ES, gets a list of favorite institutions, and doesnt fail if an institution isnt found', async () => {
     ElasticSearchMock.clearAll()
 
     ElasticSearchMock.add(
@@ -548,7 +548,7 @@ describe('getRecommendedInstitutions', () => {
       },
       (params) => {
         return {
-          docs: [{ _source: elasticSearchInstitutionData }]
+          docs: [{ _source: elasticSearchInstitutionData }, {}]
         }
       }
     )
