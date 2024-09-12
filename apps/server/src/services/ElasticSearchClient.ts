@@ -291,6 +291,7 @@ export async function getRecommendedInstitutions(
     })
 
   const institutions = recommendedInstitutionsResponse.docs
+    .filter(({ _source }) => _source)
     .map(
       (favoriteInstitution) => favoriteInstitution._source as CachedInstitution
     )
