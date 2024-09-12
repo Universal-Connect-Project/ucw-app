@@ -1,3 +1,4 @@
+import type { CipherKey, BinaryLike } from 'crypto'
 import { createCipheriv, createDecipheriv } from 'crypto'
 import { algo, enc } from 'crypto-js'
 import config from '../config'
@@ -29,8 +30,8 @@ export function encrypt(text: string, keyHex: string, ivHex: string) {
   if (text == null || text === '') {
     return ''
   }
-  const key = Buffer.from(keyHex, 'hex')
-  const iv = Buffer.from(ivHex, 'hex')
+  const key = Buffer.from(keyHex, 'hex') as CipherKey
+  const iv = Buffer.from(ivHex, 'hex') as BinaryLike
   const cipher = createCipheriv(algorithm, key, iv)
   let encrypted = cipher.update(text)
   encrypted = Buffer.concat([encrypted, cipher.final()])
@@ -41,8 +42,8 @@ export function decrypt(text: string, keyHex: string, ivHex: string) {
   if (text == null || text === '') {
     return ''
   }
-  const key = Buffer.from(keyHex, 'hex')
-  const iv = Buffer.from(ivHex, 'hex')
+  const key = Buffer.from(keyHex, 'hex') as CipherKey
+  const iv = Buffer.from(ivHex, 'hex') as BinaryLike
   const encryptedText = Buffer.from(text, 'hex')
   const decipher = createDecipheriv(algorithm, key, iv)
   let decrypted = decipher.update(encryptedText)

@@ -20,6 +20,7 @@ dist-ssr
 out/
 build/
 coverage/
+.ngrok/
 
 # Editor directories and files
 .vscode/*
