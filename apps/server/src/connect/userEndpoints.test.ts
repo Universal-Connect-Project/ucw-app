@@ -53,7 +53,7 @@ describe('userEndpoints', () => {
       expect(res.status).toHaveBeenCalledWith(204)
     })
 
-    it('responds with failure response returned from provider api', async () => {
+    it('responds with a failure if mx deletion api fails', async () => {
       server.use(
         http.delete(
           MX_DELETE_USER_PATH,
