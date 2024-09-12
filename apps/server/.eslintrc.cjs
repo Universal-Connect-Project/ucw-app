@@ -1,6 +1,6 @@
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
-  extends: ['../../packages/eslint-config/base'],
+  extends: ['../../packages/eslint-config/node.cjs'],
   env: {
     browser: true,
     node: true,
