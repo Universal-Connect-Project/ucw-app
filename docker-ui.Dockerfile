@@ -4,8 +4,8 @@
 # the UCW-APP project, which this Dockerfile is part of.
 ARG WRKDR=/opt/app
 
-FROM alpine:3.19.1 as base
-ENV NODE_VERSION 20.12.2
+FROM alpine:3.20.3 as base
+ENV NODE_VERSION 20.15.0
 
 RUN apk --update --no-cache --virtual add nodejs npm \
     && rm -rf /var/cache/apk/*
@@ -29,8 +29,9 @@ WORKDIR ${WRKDR}
 COPY --from=pruner ${WRKDR}/out/json/apps/${APP}/package.json .
 COPY --from=pruner ${WRKDR}/out/package-lock.json .
 
+# Using npm i here until we move to new version of the MX Connect Widget...
 RUN npm i -g turbo  \
-    && npm ci --omit=dev
+    && npm i --omit=dev
 
 COPY --from=pruner ${WRKDR}/out/full/ .
 RUN turbo run build --filter=${APP}

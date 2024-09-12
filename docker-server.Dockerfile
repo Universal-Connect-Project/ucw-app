@@ -4,8 +4,8 @@
 # the UCW-APP project, which this Dockerfile is part of.
 ARG WRKDR=/opt/app
 
-FROM alpine:3.19.1 as base
-ENV NODE_VERSION 20.12.2
+FROM alpine:3.20.3 as base
+ENV NODE_VERSION 20.15.0
 
 RUN apk --update --no-cache --virtual add nodejs npm \
     && rm -rf /var/cache/apk/*
