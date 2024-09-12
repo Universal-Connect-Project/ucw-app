@@ -1,5 +1,5 @@
 import providerCredentials from '../providerCredentials'
-import { Configuration, MxPlatformApiFactory } from './mxClient'
+import { Configuration, MxPlatformApiFactory } from 'mx-platform-node'
 
 export const BASE_PATH = 'https://api.mx.com'.replace(/\/+$/, '')
 
