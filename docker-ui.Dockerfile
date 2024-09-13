@@ -51,8 +51,6 @@ COPY --from=builder --chown=nodejs:nodejs ${WRKDR}/apps/${APP}/vite.config.ts .
 COPY --from=builder --chown=nodejs:nodejs ${WRKDR}/apps/${APP}/dist .
 COPY --from=builder --chown=nodejs:nodejs ${WRKDR}/package.json .
 
-ENV Env=prod
-
 EXPOSE ${UI_PORT}
 
 CMD ["sh", "-c", "serve -n -p ${UI_PORT} ."]

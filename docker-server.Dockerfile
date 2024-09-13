@@ -47,8 +47,6 @@ COPY --from=pruner --chown=nodejs:nodejs ${WRKDR}/out/full/apps/${APP}/ .
 COPY --from=pruner --chown=nodejs:nodejs ${WRKDR}/out/full/packages/utils/ ./packages/utils
 COPY --from=builder --chown=nodejs:nodejs ${WRKDR}/node_modules/ ./node_modules
 
-ENV Env=prod
-
 EXPOSE ${PORT}
 
 CMD ["ts-node", "./src/server.js"]
