@@ -5,4 +5,4 @@ node_modules/
 .idea
 .turbo
 .ngrok
-**/dump.rdb
+*.rdb
