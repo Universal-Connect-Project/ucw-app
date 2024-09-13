@@ -65,14 +65,22 @@ jobs:
           DOCKER_IMAGE_SERVER=$(npm pkg get version --prefix ./apps/server | xargs)
           echo DOCKER_IMAGE_SERVER="${DOCKER_IMAGE_SERVER}" >> ./.env
           echo DOCKER_IMAGE_SERVER="${DOCKER_IMAGE_SERVER}" >> $GITHUB_ENV
-          cat ./.env
 
       - name: 'Get UI version'
         run: |
           DOCKER_IMAGE_UI=$(npm pkg get version --prefix ./apps/ui | xargs)
           echo DOCKER_IMAGE_UI="${DOCKER_IMAGE_UI}" >> ./.env
           echo DOCKER_IMAGE_UI="${DOCKER_IMAGE_UI}" >> $GITHUB_ENV
-          cat ./.env
+
+      - name: 'Build SERVER image and run'
+        run: |
+          docker build -f ./docker-server.Dockerfile -t ucw-app-server-cli --build-arg APP=server .
+          docker run --name ucw-app-server-cli -p 8080:8080 --env-file ./apps/server/.env -t ucw-app-server-cli          
+
+      - name: 'Build UI image and run'
+        run: |
+          docker build -f ./docker-ui.Dockerfile -t ucw-app-ui-cli --build-arg APP=ui .
+          docker run --name ucw-app-ui-cli -p 5137:5137 -e UI_PORT=5137 -t ucw-app-ui-cli
 
       - name: 'Check if version exists on Docker Hub'
         env:
