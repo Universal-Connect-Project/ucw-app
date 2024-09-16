@@ -88,9 +88,17 @@ jobs:
 
       - name: 'Test docker images'
         run: |
-          docker compose up --exit-code-from server
+          docker compose up --pull never -d
+          BUILD_CHECK=$(docker logs ucw-app-server-cli | grep "App initialized successfully")
+          
+          if [ "${BUILD_CHECK}" == "Message: 'App initialized successfully'" ]; then
+            echo "BUILD_CHECK=true" >> $GITHUB_ENV
+          else
+            echo "BUILD_CHECK=false" >> $GITHUB_ENV
+          fi
 
       - name: 'Check if version exists on Docker Hub'
+        if: env.BUILD_CHECK == 'true'
         env:
           UI_VERSION: ${{ env.DOCKER_IMAGE_SERVER }}
           SERVER_VERSION: ${{ env.DOCKER_IMAGE_UI }}
