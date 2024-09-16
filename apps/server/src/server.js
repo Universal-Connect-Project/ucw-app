@@ -1,9 +1,9 @@
 import ngrok from '@ngrok/ngrok'
-import { json, urlencoded } from 'body-parser'
 import 'dotenv/config'
 import express from 'express'
 import 'express-async-errors'
 import RateLimit from 'express-rate-limit'
+
 import config from './config'
 import useConnect from './connect/connectApiExpress'
 import { stream } from './infra/http'
@@ -18,8 +18,8 @@ process.on('unhandledRejection', (error) => {
 process.removeAllListeners('warning') // remove the noise caused by capacitor-community/http fetch plugin
 
 const app = express()
-app.use(json())
-app.use(urlencoded({ extended: true }))
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 const limiter = RateLimit({
   windowMs: 10 * 60 * 1000,

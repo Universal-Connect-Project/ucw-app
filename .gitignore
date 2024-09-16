@@ -4,6 +4,7 @@
 test.js
 test.ts
 .env
+
 # Logs
 logs
 *.log
@@ -47,3 +48,5 @@ apps/server/cypress/screenshots
 
 apps/server/cachedDefaults/preferences.json
 apps/server/dump.rdb
+
+.ngrok/

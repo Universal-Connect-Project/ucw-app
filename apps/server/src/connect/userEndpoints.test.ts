@@ -53,7 +53,7 @@ describe('userEndpoints', () => {
       expect(res.status).toHaveBeenCalledWith(204)
     })
 
-    it('responds with failure response returned from provider api', async () => {
+    it('responds with a failure if mx deletion api fails', async () => {
       server.use(
         http.delete(
           MX_DELETE_USER_PATH,
@@ -75,7 +75,7 @@ describe('userEndpoints', () => {
 
       await userDeleteHandler(req, res)
 
-      expect(res.send).toHaveBeenCalledWith('')
+      expect(res.send).toHaveBeenCalledWith('User delete failed')
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(res.status).toHaveBeenCalledWith(400)
     })
