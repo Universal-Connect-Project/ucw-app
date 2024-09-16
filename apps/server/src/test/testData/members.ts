@@ -1,5 +1,3 @@
-import { ConnectionStatus } from '../../shared/contract'
-
 export const memberData = {
   member: {
     guid: 'testGuid1',

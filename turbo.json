@@ -1,5 +1,5 @@
 {
-  "$schema": "https://turbo.build/schema.json",
+  "$schema": "https://turbo.build/schema.v1.json",
   "globalDependencies": [],
   "tasks": {
     "build": {
@@ -18,6 +18,10 @@
       "persistent": true
     },
     "dev:e2e": {
+      "cache": false,
+      "persistent": true
+    },
+    "dev:debug": {
       "cache": false,
       "persistent": true
     }

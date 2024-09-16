@@ -1,5 +1,6 @@
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
+  extends: ['../../packages/eslint-config/node.json'],
   env: {
     browser: true,
     node: true,
@@ -10,7 +11,7 @@ module.exports = {
     project: './tsconfig.json',
   },
   ignorePatterns: [
-    '.eslintrc.js',
+    '.eslintrc.cjs',
     'jest.config.js',
     'jestSetup.ts',
     'babel.config.js',
