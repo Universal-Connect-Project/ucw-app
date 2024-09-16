@@ -1,11 +1,11 @@
 name: 'Test and Publish Docker images'
 
-#on: pull_request
+on: pull_request
 
-on:
-  push:
-    branches:
-      - main
+#on:
+#  push:
+#    branches:
+#      - main
 
 jobs:
   setup-env:
@@ -79,12 +79,16 @@ jobs:
       - name: 'Build SERVER image and run'
         run: |
           docker build -f ./docker-server.Dockerfile -t ucw-app-server-cli --build-arg APP=server .
-          docker run --name ucw-app-server-cli -p 8080:8080 --env-file ./apps/server/.env -t ucw-app-server-cli          
+#          docker run --name ucw-app-server-cli -p 8080:8080 --env-file ./apps/server/.env -t -rm ucw-app-server-cli
 
       - name: 'Build UI image and run'
         run: |
           docker build -f ./docker-ui.Dockerfile -t ucw-app-ui-cli --build-arg APP=ui .
-          docker run --name ucw-app-ui-cli -p 5137:5137 -e UI_PORT=5137 -t ucw-app-ui-cli
+#          docker run --name ucw-app-ui-cli -p 5137:5137 -e UI_PORT=5137 -t -rm ucw-app-ui-cli
+
+      - name: 'Test docker images'
+        run: |
+          docker compose -up --exit-code-from server
 
       - name: 'Check if version exists on Docker Hub'
         env:
