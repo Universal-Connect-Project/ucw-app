@@ -85,7 +85,7 @@ jobs:
   
           docker compose rm -f -s
           docker compose pull --ignore-buildable --quiet
-          docker compose up
+          docker compose up --build
 
           BUILD_CHECK=$(docker logs ucw-app-server 2>&1 | grep "App initialized successfully")
             
