@@ -88,7 +88,9 @@ jobs:
 
       - name: 'Test docker images'
         run: |
-          docker compose up -d
+          docker-compose rm -f
+          docker-compose pull
+          docker compose up --build -d
           BUILD_CHECK=$(docker logs ucw-app-server-cli | grep "App initialized successfully")
           
           if [ "${BUILD_CHECK}" == "Message: 'App initialized successfully'" ]; then
