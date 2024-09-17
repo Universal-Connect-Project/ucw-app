@@ -76,16 +76,6 @@ jobs:
           echo DOCKER_IMAGE_UI="${DOCKER_IMAGE_UI}" >> ./.env
           echo DOCKER_IMAGE_UI="${DOCKER_IMAGE_UI}" >> $GITHUB_ENV
 
-      - name: 'Build SERVER image and run'
-        run: |
-          docker build -f ./docker-server.Dockerfile -t ucw-app-server-cli --build-arg APP=server .
-#          docker run --name ucw-app-server-cli -p 8080:8080 --env-file ./apps/server/.env -t -rm ucw-app-server-cli
-
-      - name: 'Build UI image and run'
-        run: |
-          docker build -f ./docker-ui.Dockerfile -t ucw-app-ui-cli --build-arg APP=ui .
-#          docker run --name ucw-app-ui-cli -p 5137:5137 -e UI_PORT=5137 -t -rm ucw-app-ui-cli
-
       - name: 'Test docker images'
         run: |
           docker compose rm -f
