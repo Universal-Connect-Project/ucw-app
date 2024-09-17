@@ -78,14 +78,14 @@ jobs:
 
       - name: 'Test docker images'
         run: |
-          docker compose rm -f -s -v
+          docker compose rm -f
           docker compose pull --ignore-buildable --ignore-pull-failures
           docker compose up --build
 #          docker compose up --build --wait-timeout 180 -d
 
           BUILD_CHECK=$(docker logs ucw-app-server | grep "App initialized successfully")
           
-          if [ "${BUILD_CHECK}" == "Message: 'App initialized successfully'" ]; then
+          if [ "${BUILD_CHECK}" == "Message':' 'App initialized successfully'" ]; then
             echo "BUILD_CHECK=true" >> $GITHUB_ENV
           else
             echo "BUILD_CHECK=false" >> $GITHUB_ENV
