@@ -78,8 +78,9 @@ jobs:
 
       - name: 'Test docker images'
         run: |
-          docker compose pull --ignore-buildable --ignore-pull-failures --quiet
-          docker compose up --build
+          docker compose pull --ignore-buildable --quiet
+          docker buildx bake --file ./docker-compose.yml
+          docker compose up
 
           BUILD_CHECK=$(docker logs ucw-app-server 2>&1 | grep "App initialized successfully")
             
