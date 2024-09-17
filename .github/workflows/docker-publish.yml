@@ -88,8 +88,8 @@ jobs:
 
       - name: 'Test docker images'
         run: |
-          docker-compose rm -f
-          docker-compose pull
+          docker compose rm -f
+          docker compose pull
           docker compose up --build -d
           BUILD_CHECK=$(docker logs ucw-app-server-cli | grep "App initialized successfully")
           
