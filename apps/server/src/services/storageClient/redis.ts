@@ -81,7 +81,7 @@ redisClient
     await setNoExpiration(PREFERENCES_REDIS_KEY, preferencesToSet || {})
   })
   .catch((reason) => {
-    debug('Error details: ' + JSON.stringify(reason))
+    console.log('Error details: ' + JSON.stringify(reason))
     error('Failed to connect to redis server: ' + reason)
     info('No redis connection')
   })
