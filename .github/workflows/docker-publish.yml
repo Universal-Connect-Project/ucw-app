@@ -77,7 +77,8 @@ jobs:
           echo DOCKER_IMAGE_UI="${DOCKER_IMAGE_UI}" >> $GITHUB_ENV
 
       - name: 'Test docker images'
-        run: |
+        run: |  
+          docker compose rm -f -s
           docker compose pull --ignore-buildable --quiet
           docker buildx bake --file ./docker-compose.yml
           docker compose up

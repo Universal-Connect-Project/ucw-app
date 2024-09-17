@@ -49,3 +49,5 @@ apps/server/cypress/screenshots
 
 apps/server/cachedDefaults/preferences.json
 *.rdb
+
+./docker-test.sh
