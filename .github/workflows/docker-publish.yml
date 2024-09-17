@@ -78,24 +78,28 @@ jobs:
 
       - name: 'Test docker images'
         run: |  
+          # docker compose rm -f -s
+          # docker compose pull --ignore-buildable --quiet
+          # docker buildx bake --file ./docker-compose.yml
+          # docker compose up
+  
           docker compose rm -f -s
           docker compose pull --ignore-buildable --quiet
-          docker buildx bake --file ./docker-compose.yml
-          docker compose up
+          docker compose up --build --wait-timeout 300 --detach
 
           BUILD_CHECK=$(docker logs ucw-app-server 2>&1 | grep "App initialized successfully")
             
-#          echo "-----------------"
-#          echo "${BUILD_CHECK}"
-#          echo "-----------------"
-#
-#          if [[ ${BUILD_CHECK} == *"App initialized successfully"* ]]; then
-#            echo "Build passed!"
-#            echo "BUILD_PASS=true" >> $GITHUB_ENV
-#          else
-#            echo "Build failed! :("
-#            echo "BUILD_PASS=false" >> $GITHUB_ENV
-#          fi
+          echo "-----------------"
+          echo "${BUILD_CHECK}"
+          echo "-----------------"
+
+          if [[ ${BUILD_CHECK} == *"App initialized successfully"* ]]; then
+            echo "Build passed!"
+            echo "BUILD_PASS=true" >> $GITHUB_ENV
+          else
+            echo "Build failed! :("
+            echo "BUILD_PASS=false" >> $GITHUB_ENV
+          fi
 
       - name: 'Check if version exists on Docker Hub'
         if: env.BUILD_PASS == 'true'
