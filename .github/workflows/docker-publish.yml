@@ -79,9 +79,9 @@ jobs:
       - name: 'Test docker images'
         run: |
           docker compose rm -f
-          docker compose pull --ignore-buildable --ignore-pull-failures
-          docker compose up --build
-          # docker compose up --build --wait-timeout 180 -d
+          docker compose pull --ignore-buildable --ignore-pull-failures --quiet-pull
+          docker compose up --build --wait-timeout 300 --detach
+          # docker compose up --build
 
           BUILD_CHECK=$(docker logs ucw-app-server | grep "App initialized successfully")
           
