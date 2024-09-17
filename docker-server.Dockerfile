@@ -4,13 +4,13 @@
 # the UCW-APP project, which this Dockerfile is part of.
 ARG WRKDR=/opt/app
 
-FROM alpine:3.20.3 as base
+FROM alpine:3.20.3 AS base
 ENV NODE_VERSION 20.15.0
 
 RUN apk --update --no-cache --virtual add nodejs npm \
     && rm -rf /var/cache/apk/*
 
-FROM base as pruner
+FROM base AS pruner
 RUN npm i -g turbo
 ARG APP
 ARG WRKDR
@@ -20,7 +20,7 @@ WORKDIR ${WRKDR}
 COPY . ${WRKDR}
 RUN turbo prune --scope=${APP} --docker
 
-FROM base as builder
+FROM base AS builder
 ARG APP
 ARG WRKDR
 
@@ -32,7 +32,7 @@ COPY --from=pruner ${WRKDR}/out/package-lock.json .
 
 RUN npm ci --omit=dev
 
-FROM base as runner
+FROM base AS runner
 ARG APP
 ARG WRKDR
 

@@ -78,15 +78,17 @@ jobs:
 
       - name: 'Test docker images'
         run: |
-          docker compose rm -f
-          docker compose pull --ignore-buildable --ignore-pull-failures
-          docker compose up --build -d
+          docker compose rm -f -s -v
+          docker compose pull --ignore-buildable
+          docker compose up --build --wait-timeout 180 -d 
+          
           BUILD_CHECK=$(docker logs ucw-app-server | grep "App initialized successfully")
           
           if [ "${BUILD_CHECK}" == "Message: 'App initialized successfully'" ]; then
             echo "BUILD_CHECK=true" >> $GITHUB_ENV
           else
             echo "BUILD_CHECK=false" >> $GITHUB_ENV
+            echo 
           fi
 
       - name: 'Check if version exists on Docker Hub'
@@ -116,7 +118,7 @@ jobs:
           fi
 
       - name: 'Show warning if UI version exists on Docker Hub'
-        if: env.UI_VERSION_EXISTS == 'true'
+        if: env.BUILD_CHECK == 'true' && env.UI_VERSION_EXISTS == 'true'
         run: |
           {
             echo "### UI Version Check Results"
@@ -125,7 +127,7 @@ jobs:
           } >> $GITHUB_STEP_SUMMARY
 
       - name: 'Show warning if SERVER version exists on Docker Hub'
-        if: env.SERVER_VERSION_EXISTS == 'true'
+        if: env.BUILD_CHECK == 'true' && env.SERVER_VERSION_EXISTS == 'true'
         run: |
           {
             echo "### Server Version Check Results"
@@ -134,13 +136,13 @@ jobs:
           } >> $GITHUB_STEP_SUMMARY
 
       - name: 'Log in to Docker Hub'
-        if: env.UI_VERSION_EXISTS == 'false' && env.SERVER_VERSION_EXISTS == 'false'
+        if: env.BUILD_CHECK == 'true' && env.UI_VERSION_EXISTS == 'false' && env.SERVER_VERSION_EXISTS == 'false'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
       - name: 'Build and Push Docker images'
-        if: env.UI_VERSION_EXISTS == 'false' && env.SERVER_VERSION_EXISTS == 'false'
+        if: env.BUILD_CHECK == 'true' && env.UI_VERSION_EXISTS == 'false' && env.SERVER_VERSION_EXISTS == 'false'
         run: |
           docker buildx bake --file ./docker-compose.yml --push
