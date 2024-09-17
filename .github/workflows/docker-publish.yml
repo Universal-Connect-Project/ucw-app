@@ -81,7 +81,7 @@ jobs:
           docker compose rm -f
           docker compose pull --ignore-buildable --ignore-pull-failures
           docker compose up --build
-#          docker compose up --build --wait-timeout 180 -d
+          # docker compose up --build --wait-timeout 180 -d
 
           BUILD_CHECK=$(docker logs ucw-app-server | grep "App initialized successfully")
           
