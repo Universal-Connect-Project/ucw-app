@@ -79,7 +79,7 @@ jobs:
       - name: 'Test docker images'
         run: |
           docker compose rm -f
-          docker compose pull --ignore-buildable --ignore-pull-failures --quiet-pull
+          docker compose pull --ignore-buildable --ignore-pull-failures --quiet
           docker compose up --build --wait-timeout 300 --detach
           # docker compose up --build
 
