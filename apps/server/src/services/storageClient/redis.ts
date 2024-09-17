@@ -35,11 +35,14 @@ export const get = async (key: string) => {
   try {
     const ret = await redisClient.get(key)
     return JSON.parse(ret)
-  } catch {}
+  } catch {
+    error('Failed to get value from Redis')
+  }
 }
 
 export const set = async (
   key: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any,
   params: object = {
     EX: config.RedisCacheTimeSeconds
@@ -49,9 +52,12 @@ export const set = async (
 
   try {
     await redisClient.set(key, JSON.stringify(value), params)
-  } catch {}
+  } catch {
+    error('Failed to set value in Redis')
+  }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const setNoExpiration = async (key: string, value: any) => {
   await set(key, value, {})
 }
@@ -75,6 +81,7 @@ redisClient
     await setNoExpiration(PREFERENCES_REDIS_KEY, preferencesToSet || {})
   })
   .catch((reason) => {
+    debug('Error details: ' + JSON.stringify(reason))
     error('Failed to connect to redis server: ' + reason)
     info('No redis connection')
   })

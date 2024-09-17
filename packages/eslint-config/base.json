@@ -5,8 +5,7 @@
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
-    "prettier",
-    "turbo"
+    "prettier"
   ],
   "ignorePatterns": [
     ".turbo",
@@ -22,21 +21,5 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint", "cypress"],
-  "rules": {
-    "import-helpers/order-imports": [
-      "warn",
-      {
-        "newlinesBetween": "always",
-        "groups": [
-          "/^react/",
-          "module"
-        ],
-        "alphabetize": {
-          "order": "asc",
-          "ignoreCase": true
-        }
-      }
-    ]
-  }
+  "plugins": ["@typescript-eslint", "cypress"]
 }
