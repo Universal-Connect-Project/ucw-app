@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#docker compose rm -f -s
+docker compose rm -f -s
 #docker compose pull --ignore-buildable --quiet
 #docker compose up --build --wait-timeout 300 --detach
 
