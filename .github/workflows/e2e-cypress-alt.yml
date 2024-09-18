@@ -1,6 +1,6 @@
 name: E2E Tests Alternate Preferences
 
-on: pull_request
+on: pull_request_target
 
 jobs:
   setup-env:
