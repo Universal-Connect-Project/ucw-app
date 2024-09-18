@@ -50,7 +50,8 @@ app.get('/ping', function (req, res) {
 
 useConnect(app)
 
-app.use(function (err, req, res) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use(function (err, req, res, next) {
   _error(`Unhandled error on ${req.method} ${req.path}: `, err)
   res.status(500)
   res.send(err.message)
