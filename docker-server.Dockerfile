@@ -30,7 +30,7 @@ COPY --from=pruner ${WRKDR}/out/json/apps/${APP}/package.json .
 COPY --from=pruner ${WRKDR}/out/json/packages/utils/package.json ./packages/utils
 COPY --from=pruner ${WRKDR}/out/package-lock.json .
 
-RUN npm ci
+RUN npm ci --omit=dev
 
 FROM base AS runner
 ARG APP
