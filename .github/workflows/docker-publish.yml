@@ -72,10 +72,6 @@ jobs:
           echo DOCKER_IMAGE_UI="${DOCKER_IMAGE_UI}" >> ./.env
           echo DOCKER_IMAGE_UI="${DOCKER_IMAGE_UI}" >> $GITHUB_ENV
 
-      - name: 'Remove old container'
-        run: |
-          docker compose rm -f -s
-
       - name: 'Pull docker images'
         run: |
           docker compose pull --ignore-buildable --quiet
