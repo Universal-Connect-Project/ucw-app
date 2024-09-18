@@ -111,12 +111,12 @@ jobs:
       - name: 'Check if version exists on Docker Hub'
         if: env.BUILD_PASS == 'true'
         env:
-          UI_VERSION: ${{ env.DOCKER_IMAGE_SERVER }}
-          SERVER_VERSION: ${{ env.DOCKER_IMAGE_UI }}
+          UI_VERSION: ${{ env.DOCKER_IMAGE_UI }}
+          SERVER_VERSION: ${{ env.DOCKER_IMAGE_SERVER }}
         run: |
           echo "-----------------"
-          echo "${{ env.UI_VERSION }}"
-          echo "${{ env.SERVER_VERSION }}"
+          echo "UI: ${{ env.UI_VERSION }}"
+          echo "SERVER: ${{ env.SERVER_VERSION }}"
           echo "-----------------"
           
           UI_DIGEST=$(docker buildx imagetools inspect universalconnectfoundation/ucw-app-ui:v${{ env.UI_VERSION }} --format "{{json .Manifest}}" | jq -r .digest)
