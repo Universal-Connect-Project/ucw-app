@@ -86,10 +86,6 @@ jobs:
 
       - name: 'Build docker images'
         run: |  
-          # docker compose pull --ignore-buildable --quiet
-          # docker buildx bake --file ./docker-compose.yml
-          # docker compose up
-  
           docker compose up --build --wait --detach
 
       - name: 'Check if build passed'
@@ -97,7 +93,7 @@ jobs:
           BUILD_CHECK=$(docker logs ucw-app-server 2>&1 | grep "App initialized successfully")
             
           echo "-----------------"
-          echo "${{ BUILD_CHECK }}"
+          echo "${BUILD_CHECK}"
           echo "-----------------"
 
           if [[ ${BUILD_CHECK} == *"App initialized successfully"* ]]; then
