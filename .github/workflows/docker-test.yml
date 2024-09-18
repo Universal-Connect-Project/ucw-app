@@ -1,0 +1,93 @@
+name: 'Test Docker images'
+
+on: pull_request
+
+jobs:
+  setup-env:
+    name: 'Load ENV Vars'
+    uses: ./.github/workflows/setup-env.yml
+    secrets: inherit
+
+  push_to_registry:
+    name: 'Test Docker Images'
+    runs-on: ubuntu-latest
+    needs: [setup-env]
+
+    steps:
+
+      - name: 'Check out the repo'
+        uses: actions/checkout@v4
+
+      - name: 'Set up Node'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          check-latest: true
+
+      - name: 'Create Server env file'
+        env:
+          UI_PORT: ${{ vars.RESOURCE_PORT }}
+          env_vars: ${{ needs.setup-env.outputs.env_vars }}
+          DO_PUBLISH: ${{ env.BRANCH_NAME == 'main' }}
+        run: |
+          ENV_FILE_PATH=./apps/server/.env
+          touch ${ENV_FILE_PATH}
+          
+          # Vars
+          echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
+          # Override ENV to Env=prod
+          echo ENV=prod >> ${ENV_FILE_PATH}
+          echo RESOURCEPREFIX="http://ui:${UI_PORT}" >> ${ENV_FILE_PATH}
+          cat ${ENV_FILE_PATH}
+
+      - name: 'Create Root env file'
+        run: |
+          ENV_FILE_PATH=.env
+          touch ${ENV_FILE_PATH}
+          
+          # Vars
+          echo REDIS_PORT=${{ vars.REDIS_PORT }} >> ${ENV_FILE_PATH}
+          echo SERVER_PORT=${{ vars.PORT }} >> ${ENV_FILE_PATH}
+          echo UI_PORT=${{ vars.RESOURCE_PORT }} >> ${ENV_FILE_PATH}
+            
+          # Secrets (can't load these from another job, due to GH security features)
+          echo DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} >> ${ENV_FILE_PATH}
+          echo DOCKER_TOKEN=${{ secrets.DOCKER_TOKEN }} >> ${ENV_FILE_PATH}
+          cat ${ENV_FILE_PATH}
+
+      - name: 'Pull docker images'
+        run: |
+          docker compose pull --ignore-buildable --quiet
+
+      - name: 'Build docker images'
+        run: |  
+          docker compose up --build --wait --detach
+
+      - name: 'Check if build passed'
+        run: |
+          BUILD_CHECK=$(docker logs ucw-app-server 2>&1 | grep "App initialized successfully")
+            
+          echo "-----------------"
+          echo "${BUILD_CHECK}"
+          echo "-----------------"
+
+          if [[ ${BUILD_CHECK} == *"App initialized successfully"* ]]; then
+            echo "Build passed!"
+          
+            {
+              echo "### 🐳 Docker Images Test Results"
+              echo "The tests passed! 🎉🎉🎉"
+            } >> $GITHUB_STEP_SUMMARY
+
+            exit 0
+          else
+            echo "Build failed! :("
+          
+            {
+              echo "### 🐳 Docker Images Test Results"
+              echo "The tests failed! 😭😭😭"
+              echo "Please check the logs."
+            } >> $GITHUB_STEP_SUMMARY
+
+            exit 1
+          fi

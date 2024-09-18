@@ -1,4 +1,5 @@
 name: Playwright Tests
+
 on: pull_request
 
 jobs:
