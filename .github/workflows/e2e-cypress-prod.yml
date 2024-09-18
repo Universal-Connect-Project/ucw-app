@@ -1,6 +1,6 @@
 name: E2E Tests Prod
 
-on: pull_request_target
+on: pull_request
 
 jobs:
   setup-env:
