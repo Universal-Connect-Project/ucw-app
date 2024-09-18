@@ -1,6 +1,9 @@
-node_modules
+node_modules/
+.ngrok/
+.idea/
+.turbo/
+.husky/
+.github/
+
 .env
-.husky
-.github
-.idea
-.turbo
+*.rdb

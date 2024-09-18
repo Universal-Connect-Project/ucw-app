@@ -4,13 +4,13 @@
 # the UCW-APP project, which this Dockerfile is part of.
 ARG WRKDR=/opt/app
 
-FROM alpine:3.19.1 as base
-ENV NODE_VERSION 20.12.2
+FROM alpine:3.20.3 AS base
+ENV NODE_VERSION 20.15.0
 
 RUN apk --update --no-cache --virtual add nodejs npm \
     && rm -rf /var/cache/apk/*
 
-FROM base as pruner
+FROM base AS pruner
 RUN npm i -g turbo
 ARG APP
 ARG WRKDR
@@ -20,7 +20,7 @@ WORKDIR ${WRKDR}
 COPY . ${WRKDR}
 RUN turbo prune --scope=${APP} --docker
 
-FROM base as builder
+FROM base AS builder
 ARG APP
 ARG WRKDR
 
@@ -29,13 +29,14 @@ WORKDIR ${WRKDR}
 COPY --from=pruner ${WRKDR}/out/json/apps/${APP}/package.json .
 COPY --from=pruner ${WRKDR}/out/package-lock.json .
 
+# Using npm i here until we move to new version of the MX Connect Widget...
 RUN npm i -g turbo  \
-    && npm ci --omit=dev
+    && npm i --omit=dev
 
 COPY --from=pruner ${WRKDR}/out/full/ .
 RUN turbo run build --filter=${APP}
 
-FROM base as runner
+FROM base AS runner
 ARG APP
 ARG WRKDR
 
@@ -49,8 +50,6 @@ USER nodejs
 COPY --from=builder --chown=nodejs:nodejs ${WRKDR}/apps/${APP}/vite.config.ts .
 COPY --from=builder --chown=nodejs:nodejs ${WRKDR}/apps/${APP}/dist .
 COPY --from=builder --chown=nodejs:nodejs ${WRKDR}/package.json .
-
-ENV Env=prod
 
 EXPOSE ${UI_PORT}
 

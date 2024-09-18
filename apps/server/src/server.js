@@ -28,10 +28,10 @@ const limiter = RateLimit({
 app.use(limiter)
 
 initializeElastic()
-  .then((_) => {
+  .then(() => {
     info('App initialized successfully')
     setInstitutionSyncSchedule(config.INSTITUTION_POLLING_INTERVAL)
-      .then((_) => {
+      .then(() => {
         info(
           `Started institution poller for every ${config.INSTITUTION_POLLING_INTERVAL} minutes`
         )
@@ -50,6 +50,7 @@ app.get('/ping', function (req, res) {
 
 useConnect(app)
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use(function (err, req, res, next) {
   _error(`Unhandled error on ${req.method} ${req.path}: `, err)
   res.status(500)

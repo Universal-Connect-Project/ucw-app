@@ -21,6 +21,7 @@ dist-ssr
 out/
 build/
 coverage/
+.ngrok/
 
 # Editor directories and files
 .vscode/*
@@ -47,6 +48,4 @@ apps/server/cypress/screenshots
 /playwright/.cache/
 
 apps/server/cachedDefaults/preferences.json
-apps/server/dump.rdb
-
-.ngrok/
+*.rdb
