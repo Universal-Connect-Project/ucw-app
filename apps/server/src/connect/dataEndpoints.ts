@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { Response } from 'express'
 import Joi from 'joi'
-import type { Provider } from '../shared/contract'
-import { Providers } from '../shared/contract'
-import { withValidateProviderInPath } from '../utils/validators'
-import { getProviderAdapter, getVC } from '../adapterIndex'
+import type { Aggregator } from '../shared/contract'
+import { Aggregators } from '../shared/contract'
+import { withValidateAggregatorInPath } from '../utils/validators'
+import { getAggregatorAdapter, getVC } from '../adapterIndex'
 import { VCDataTypes } from '@repo/utils'
 
 export interface AccountsDataQueryParameters {
   connectionId: string
-  provider: Provider
+  aggregator: Aggregator
   userId: string
 }
 
@@ -26,19 +26,19 @@ export interface TransactionsRequest {
   params: TransactionsDataPathParameters
 }
 
-export const accountsDataHandler = withValidateProviderInPath(
+export const accountsDataHandler = withValidateAggregatorInPath(
   async (req: AccountsRequest, res: Response) => {
-    const { provider, connectionId, userId } = req.params
+    const { aggregator, connectionId, userId } = req.params
 
-    const providerAdapter = getProviderAdapter(provider)
-    const providerUserId = await providerAdapter.ResolveUserId(userId)
+    const aggregatorAdapter = getAggregatorAdapter(aggregator)
+    const aggregatorUserId = await aggregatorAdapter.ResolveUserId(userId)
 
     try {
       const vc = await getVC({
-        provider,
+        aggregator,
         connectionId,
         type: VCDataTypes.ACCOUNTS,
-        userId: providerUserId
+        userId: aggregatorUserId
       })
       res.send({
         jwt: vc
@@ -52,23 +52,23 @@ export const accountsDataHandler = withValidateProviderInPath(
 
 export interface IdentityDataParameters {
   connectionId: string
-  provider: Provider
+  aggregator: Aggregator
   userId: string
 }
 
-export const identityDataHandler = withValidateProviderInPath(
+export const identityDataHandler = withValidateAggregatorInPath(
   async (req: IdentityRequest, res: Response) => {
-    const { provider, connectionId, userId } = req.params
+    const { aggregator, connectionId, userId } = req.params
 
-    const providerAdapter = getProviderAdapter(provider)
-    const providerUserId = await providerAdapter.ResolveUserId(userId)
+    const aggregatorAdapter = getAggregatorAdapter(aggregator)
+    const aggregatorUserId = await aggregatorAdapter.ResolveUserId(userId)
 
     try {
       const vc = await getVC({
-        provider,
+        aggregator,
         connectionId,
         type: VCDataTypes.IDENTITY,
-        userId: providerUserId
+        userId: aggregatorUserId
       })
       res.send({
         jwt: vc
@@ -87,21 +87,21 @@ export interface TransactionsDataQueryParameters {
 
 export interface TransactionsDataPathParameters {
   accountId: string
-  provider: Provider
+  aggregator: Aggregator
   userId: string
 }
 
-export const transactionsDataHandler = withValidateProviderInPath(
+export const transactionsDataHandler = withValidateAggregatorInPath(
   async (req: TransactionsRequest, res: Response) => {
-    const { accountId, provider, userId } = req.params
+    const { accountId, aggregator, userId } = req.params
 
     const schema = Joi.object({
       end_time:
-        provider === Providers.SOPHTRON
+        aggregator === Aggregators.SOPHTRON
           ? Joi.string().required()
           : Joi.string(),
       start_time:
-        provider === Providers.SOPHTRON ? Joi.string().required() : Joi.string()
+        aggregator === Aggregators.SOPHTRON ? Joi.string().required() : Joi.string()
     })
 
     const { error } = schema.validate(req.query)
@@ -115,14 +115,14 @@ export const transactionsDataHandler = withValidateProviderInPath(
 
     const { start_time, end_time } = req.query
 
-    const providerAdapter = getProviderAdapter(provider)
-    const providerUserId = await providerAdapter.ResolveUserId(userId)
+    const aggregatorAdapter = getAggregatorAdapter(aggregator)
+    const aggregatorUserId = await aggregatorAdapter.ResolveUserId(userId)
 
     try {
       const vc = await getVC({
-        provider,
+        aggregator,
         type: VCDataTypes.TRANSACTIONS,
-        userId: providerUserId,
+        userId: aggregatorUserId,
         accountId,
         startTime: start_time,
         endTime: end_time

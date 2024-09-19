@@ -1,15 +1,15 @@
 import { PREFERENCES_REDIS_KEY } from '../services/storageClient/constants'
 import { get } from '../services/storageClient/redis'
-import type { Provider } from './contract'
+import type { Aggregator } from './contract'
 
 export interface Preferences {
-  defaultProvider?: Provider
+  defaultAggregator?: Aggregator
 
-  supportedProviders?: Provider[]
+  supportedAggregators?: Aggregator[]
 
-  defaultProviderVolume?: Record<string, number>
+  defaultAggregatorVolume?: Record<string, number>
 
-  institutionProviderVolumeMap?: Record<string, Record<string, number>>
+  institutionAggregatorVolumeMap?: Record<string, Record<string, number>>
 
   hiddenInstitutions?: string[]
 

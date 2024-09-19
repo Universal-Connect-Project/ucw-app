@@ -106,8 +106,8 @@ export default class FinicityClient {
       partnerId: this.apiConfig.partnerId,
       customerId,
       institutionId,
-      redirectUri: `${config.HostUrl}/oauth/${this.apiConfig.provider}/redirect_from?connection_id=${requestId}`,
-      webhook: `${config.WebhookHostUrl}/webhook/${this.apiConfig.provider}/?connection_id=${requestId}`,
+      redirectUri: `${config.HostUrl}/oauth/${this.apiConfig.aggregator}/redirect_from?connection_id=${requestId}`,
+      webhook: `${config.WebhookHostUrl}/webhook/${this.apiConfig.aggregator}/?connection_id=${requestId}`,
       webhookContentType: 'application/json',
       isWebView: true
       // 'singleUseUrl': true,
@@ -127,8 +127,8 @@ export default class FinicityClient {
       partnerId: this.apiConfig.partnerId,
       customerId,
       institutionLoginId,
-      redirectUri: `${config.HostUrl}/oauth/${this.apiConfig.provider}/redirect_from?connection_id=${requestId}`,
-      webhook: `${config.WebhookHostUrl}/webhook/${this.apiConfig.provider}/?connection_id=${requestId}`,
+      redirectUri: `${config.HostUrl}/oauth/${this.apiConfig.aggregator}/redirect_from?connection_id=${requestId}`,
+      webhook: `${config.WebhookHostUrl}/webhook/${this.apiConfig.aggregator}/?connection_id=${requestId}`,
       webhookContentType: 'application/json'
     }).then((ret) => ret.link)
   }

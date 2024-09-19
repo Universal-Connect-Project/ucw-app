@@ -7,13 +7,13 @@ import { info, error as logError } from '../infra/logger'
 import type {
   CachedInstitution,
   MappedJobTypes,
-  Provider
+  Aggregator
 } from '../shared/contract'
 import { getPreferences } from '../shared/preferences'
 import {
-  getAvailableProviders,
+  getAvailableAggregators,
   JOB_TYPE_PARTIAL_SUPPORT_MAP
-} from '../shared/providers'
+} from 'src/shared/aggregators'
 import { ElasticSearchMock } from '../test/elasticSearchMock'
 import { fetchInstitutions } from './institutionSyncer'
 import { INSTITUTION_CURRENT_LIST_IDS } from './storageClient/constants'
@@ -96,7 +96,7 @@ export async function searchByRoutingNumber(
 ): Promise<any[]> {
   const preferences = await getPreferences()
   const hiddenInstitutions = preferences?.hiddenInstitutions || []
-  const supportedProviders = preferences?.supportedProviders || []
+  const supportedAggregators = preferences?.supportedAggregators || []
 
   const searchResults: estypes.SearchResponseBody =
     await ElasticsearchClient.search({
@@ -112,7 +112,7 @@ export async function searchByRoutingNumber(
               }
             },
             minimum_should_match: 1,
-            must: mustQuery(supportedProviders, jobType),
+            must: mustQuery(supportedAggregators, jobType),
             must_not: buildMustNotQuery(hiddenInstitutions)
           }
         },
@@ -131,7 +131,7 @@ export async function search(
 ): Promise<any[]> {
   const preferences = await getPreferences()
   const hiddenInstitutions = preferences?.hiddenInstitutions || []
-  const supportedProviders = preferences?.supportedProviders || []
+  const supportedAggregators = preferences?.supportedAggregators || []
 
   const searchResults: estypes.SearchResponseBody =
     await ElasticsearchClient.search({
@@ -141,7 +141,7 @@ export async function search(
           bool: {
             should: fuzzySearchTermQuery(searchTerm),
             minimum_should_match: 1,
-            must: mustQuery(supportedProviders, jobType),
+            must: mustQuery(supportedAggregators, jobType),
             must_not: buildMustNotQuery(hiddenInstitutions)
           }
         },
@@ -193,11 +193,11 @@ function fuzzySearchTermQuery(searchTerm: string) {
   ]
 }
 
-function mustQuery(supportedProviders: Provider[], jobType: MappedJobTypes) {
-  const providerQueryTerms = supportedProviders.map((provider) => {
+function mustQuery(supportedAggregators: Aggregator[], jobType: MappedJobTypes) {
+  const aggregatorQueryTerms = supportedAggregators.map((aggregator) => {
     return {
       exists: {
-        field: `${provider}.id`
+        field: `${aggregator}.id`
       }
     }
   })
@@ -206,14 +206,14 @@ function mustQuery(supportedProviders: Provider[], jobType: MappedJobTypes) {
 
   let jobTypeSupported = [] as any
   if (institutionJobTypeFilter.length > 0) {
-    jobTypeSupported = supportedProviders
-      .map((provider) => {
+    jobTypeSupported = supportedAggregators
+      .map((aggregator) => {
         return {
           bool: {
             must: institutionJobTypeFilter.map((jobTypeFilter) => {
               return {
                 term: {
-                  [`${provider}.${jobTypeFilter}`]: true
+                  [`${aggregator}.${jobTypeFilter}`]: true
                 }
               }
             })
@@ -225,7 +225,7 @@ function mustQuery(supportedProviders: Provider[], jobType: MappedJobTypes) {
 
   return {
     bool: {
-      should: providerQueryTerms,
+      should: aggregatorQueryTerms,
       minimum_should_match: 1,
       must: {
         bool: {
@@ -271,7 +271,7 @@ export async function getRecommendedInstitutions(
 ): Promise<CachedInstitution[]> {
   const preferences = await getPreferences()
 
-  const supportedProviders = preferences.supportedProviders
+  const supportedAggregators = preferences.supportedAggregators
   const recommendedInstitutions = preferences?.recommendedInstitutions
 
   if (!recommendedInstitutions) {
@@ -297,11 +297,11 @@ export async function getRecommendedInstitutions(
     )
     .filter(
       (institution) =>
-        getAvailableProviders({
+        getAvailableAggregators({
           institution,
           jobType,
           shouldRequireFullSupport: false,
-          supportedProviders
+          supportedAggregators: supportedAggregators
         }).length
     )
 

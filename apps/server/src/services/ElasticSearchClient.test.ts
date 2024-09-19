@@ -16,7 +16,7 @@ import {
 import type { CachedInstitution } from '../shared/contract'
 import { MappedJobTypes } from '../shared/contract'
 import * as preferences from '../shared/preferences'
-import { TEST_EXAMPLE_A_PROVIDER_STRING } from '../test-adapter'
+import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from '../test-adapter'
 import {
   ElasticSearchMock,
   elasticSearchMockError
@@ -33,6 +33,7 @@ jest
   .mockResolvedValue(testPreferences as preferences.Preferences)
 
 interface searchQueryArgs {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   jobTypeQuery?: any[]
   filterTestBanks?: boolean
   routingNumber?: string
@@ -40,12 +41,12 @@ interface searchQueryArgs {
 
 function searchQuery(args: searchQueryArgs = {}) {
   const {
-    jobTypeQuery = testPreferences.supportedProviders.map((provider) => ({
+    jobTypeQuery = testPreferences.supportedAggregators.map((aggregator) => ({
       bool: {
         must: [
           {
             term: {
-              [`${provider}.supports_aggregation`]: true
+              [`${aggregator}.supports_aggregation`]: true
             }
           }
         ]
@@ -109,9 +110,9 @@ function searchQuery(args: searchQueryArgs = {}) {
       minimum_should_match: 1,
       must: {
         bool: {
-          should: testPreferences.supportedProviders.map((provider) => ({
+          should: testPreferences.supportedAggregators.map((aggregator) => ({
             exists: {
-              field: `${provider}.id`
+              field: `${aggregator}.id`
             }
           })),
           minimum_should_match: 1,
@@ -345,7 +346,7 @@ describe('search', () => {
           size: 20
         }
       },
-      (parms) => {
+      () => {
         return {
           hits: {
             hits: [
@@ -369,13 +370,13 @@ describe('search', () => {
         path: ['/_search', '/institutions/_search'],
         body: {
           query: searchQuery({
-            jobTypeQuery: testPreferences.supportedProviders.map(
-              (provider) => ({
+            jobTypeQuery: testPreferences.supportedAggregators.map(
+              (aggregator) => ({
                 bool: {
                   must: [
                     {
                       term: {
-                        [`${provider}.supports_identification`]: true
+                        [`${aggregator}.supports_identification`]: true
                       }
                     }
                   ]
@@ -417,12 +418,12 @@ describe('search', () => {
         path: ['/_search', '/institutions/_search'],
         body: {
           query: searchQuery({
-            jobTypeQuery: testPreferences.supportedProviders.map(
-              (provider) => ({
+            jobTypeQuery: testPreferences.supportedAggregators.map(
+              (aggregator) => ({
                 bool: {
                   must: supportsArray.map((supportsProp) => ({
                     term: {
-                      [`${provider}.${supportsProp}`]: true
+                      [`${aggregator}.${supportsProp}`]: true
                     }
                   }))
                 }
@@ -432,7 +433,7 @@ describe('search', () => {
           size: 20
         }
       },
-      (params) => {
+      () => {
         return {
           hits: {
             hits: [
@@ -517,7 +518,7 @@ describe('getInstitution', () => {
         method: 'GET',
         path: '/institutions/_doc/UCP-1234'
       },
-      (params) => {
+      () => {
         return {
           _source: elasticSearchInstitutionData
         }
@@ -546,7 +547,7 @@ describe('getRecommendedInstitutions', () => {
           )
         }
       },
-      (params) => {
+      () => {
         return {
           docs: [{ _source: elasticSearchInstitutionData }, {}]
         }
@@ -560,10 +561,11 @@ describe('getRecommendedInstitutions', () => {
     expect(recommendedInstitutions).toEqual([elasticSearchInstitutionData])
   })
 
-  it("filters out institutions that don't have available providers because of job type", async () => {
+  it("filters out institutions that don't have available aggregators because of job type", async () => {
     const mockPreferences: preferences.Preferences = {
       ...testPreferences,
-      supportedProviders: [TEST_EXAMPLE_A_PROVIDER_STRING]
+      supportedAggregators: [TEST_EXAMPLE_A_AGGREGATOR_STRING]
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any
 
     jest.spyOn(preferences, 'getPreferences').mockResolvedValue(mockPreferences)
@@ -583,13 +585,13 @@ describe('getRecommendedInstitutions', () => {
           )
         }
       },
-      (params) => {
+      () => {
         return {
           docs: [
             {
               _source: {
                 ...elasticSearchInstitutionData,
-                [TEST_EXAMPLE_A_PROVIDER_STRING]: {
+                [TEST_EXAMPLE_A_AGGREGATOR_STRING]: {
                   supports_aggregation: false,
                   supports_oauth: false,
                   supports_identification: false,
@@ -666,7 +668,7 @@ describe('deleteRemovedInstitutions', () => {
         method: 'DELETE',
         path: '/institutions/_doc/:id'
       },
-      (params) => {
+      () => {
         deletedCount += 1
         return {}
       }
@@ -704,7 +706,7 @@ describe('deleteRemovedInstitutions', () => {
         method: 'DELETE',
         path: '/institutions/_doc/:id'
       },
-      (params) => {
+      () => {
         return mockError
       }
     )

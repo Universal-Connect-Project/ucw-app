@@ -1,23 +1,23 @@
 import type { VCDataTypes, WidgetAdapter } from '@repo/utils'
 import { info } from './infra/logger'
-import type { Provider } from './adapterSetup'
+import type { Aggregator } from './adapterSetup'
 import { adapterMap } from './adapterSetup'
 
-export function getProviderAdapter(provider: Provider): WidgetAdapter {
-  const widgetAdapter = adapterMap[provider]?.widgetAdapter
+export function getAggregatorAdapter(aggregator: Aggregator): WidgetAdapter {
+  const widgetAdapter = adapterMap[aggregator]?.widgetAdapter
 
   if (widgetAdapter) {
     return widgetAdapter
   }
 
-  throw new Error(`Unsupported provider ${provider}`)
+  throw new Error(`Unsupported aggregator ${aggregator}`)
 }
 
 export async function getVC({
   accountId,
   connectionId,
   endTime,
-  provider,
+  aggregator,
   startTime,
   type,
   userId
@@ -25,17 +25,17 @@ export async function getVC({
   accountId?: string
   connectionId?: string
   endTime?: string
-  provider: Provider
+  aggregator: Aggregator
   startTime?: string
   type: VCDataTypes
   userId: string
 }) {
-  const vcAdapter = adapterMap[provider]?.vcAdapter
+  const vcAdapter = adapterMap[aggregator]?.vcAdapter
 
   if (vcAdapter) {
-    info('Getting vc from provider', provider)
+    info('Getting vc from aggregator', aggregator)
 
-    return await vcAdapter({
+    return vcAdapter({
       accountId,
       connectionId,
       endTime,
@@ -45,5 +45,5 @@ export async function getVC({
     })
   }
 
-  throw new Error(`Unsupported provider ${provider}`)
+  throw new Error(`Unsupported aggregator ${aggregator}`)
 }

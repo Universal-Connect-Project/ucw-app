@@ -1,22 +1,22 @@
 import Joi from 'joi'
-import { providers } from '../adapterSetup'
+import { aggregators } from '../adapterSetup'
 
-export const invalidProviderString = `"provider" must be one of [${providers.join(', ')}]`
+export const invalidAggregatorString = `"aggregator" must be one of [${aggregators.join(', ')}]`
 
-export const createProviderValidator = () =>
+export const createAggregatorValidator = () =>
   Joi.string()
-    .valid(...providers)
+    .valid(...aggregators)
     .required()
 
-export const withValidateProviderInPath =
-  // eslint-disable-next-line @typescript-eslint/ban-types
+export const withValidateAggregatorInPath =
+  // eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any
   (handler: Function) => async (req: any, res: any) => {
     const schema = Joi.object({
-      provider: createProviderValidator()
+      aggregator: createAggregatorValidator()
     })
 
     const { error } = schema.validate({
-      provider: req.params.provider
+      aggregator: req.params.aggregator
     })
 
     if (error) {

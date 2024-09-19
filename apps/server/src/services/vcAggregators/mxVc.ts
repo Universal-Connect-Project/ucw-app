@@ -1,6 +1,6 @@
 import { VCDataTypes } from '@repo/utils'
 import { info } from '../../infra/logger'
-import { getVc as getMxVc } from '../../providerApiClients/mxClient/vc'
+import { getVc as getMxVc } from 'src/aggregatorApiClients/mxClient/vc'
 
 export const createMXGetVC = (isProd: boolean) => {
   return async ({

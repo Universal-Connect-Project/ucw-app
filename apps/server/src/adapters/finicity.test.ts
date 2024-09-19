@@ -16,7 +16,7 @@ const finicityApi = new FinicityAdapter(isSandbox)
 
 const institutionResponse = finicityInsitutionData.institution
 
-describe('finicity provider', () => {
+describe('finicity aggregator', () => {
   describe('FinicityAdapter', () => {
     describe('GetInstitutionById', () => {
       it('gets institution data correctly', async () => {
@@ -26,7 +26,7 @@ describe('finicity provider', () => {
           name: institutionResponse.name,
           oauth: true, // this is hardcoded true because finicity has an external widget we use
           url: institutionResponse.urlHomeApp,
-          provider: 'finicity'
+          aggregator: 'finicity'
         })
       })
     })
@@ -45,10 +45,11 @@ describe('finicity provider', () => {
           id: response.id,
           is_oauth: true,
           user_id: 'testUserId',
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           credentials: [] as any,
           institution_code: 'testInstitutionId',
           oauth_window_uri: FINICITY_CONNECT_LITE_URL,
-          provider: 'finicity',
+          aggregator: 'finicity',
           status: ConnectionStatus.PENDING
         }
 

@@ -7,7 +7,7 @@ import type {
 
 import config from '../config'
 import * as logger from '../infra/logger'
-import { MxProdApiClient, MxIntApiClient } from '../providerApiClients/mx'
+import { MxProdApiClient, MxIntApiClient } from 'src/aggregatorApiClients/mx'
 import { get } from '../services/storageClient/redis'
 import type {
   Challenge,
@@ -36,7 +36,7 @@ function mapCredentials(mxCreds: CredentialsResponseBody): Credential[] {
   }
 }
 
-function fromMxMember(member: MemberResponse, provider: string): Connection {
+function fromMxMember(member: MemberResponse, aggregator: string): Connection {
   return {
     id: member.guid,
     cur_job_id: member.guid,
@@ -45,16 +45,16 @@ function fromMxMember(member: MemberResponse, provider: string): Connection {
     is_being_aggregated: member.is_being_aggregated,
     is_oauth: member.is_oauth,
     oauth_window_uri: member.oauth_window_uri,
-    provider
+    aggregator
   }
 }
 
 export class MxAdapter implements WidgetAdapter {
   apiClient: ReturnType<typeof MxPlatformApiFactory>
-  provider: string
+  aggregator: string
 
   constructor(int: boolean) {
-    this.provider = int ? 'mx_int' : 'mx'
+    this.aggregator = int ? 'mx_int' : 'mx'
     this.apiClient = int ? MxIntApiClient : MxProdApiClient
   }
 
@@ -68,7 +68,7 @@ export class MxAdapter implements WidgetAdapter {
       name: institution.name,
       oauth: institution.supports_oauth,
       url: institution.url,
-      provider: this.provider
+      aggregator: this.aggregator
     }
   }
 
@@ -83,7 +83,7 @@ export class MxAdapter implements WidgetAdapter {
     const res = await this.apiClient.listMembers(userId)
 
     return (
-      res.data.members?.map((member) => fromMxMember(member, this.provider)) ??
+      res.data.members?.map((member) => fromMxMember(member, this.aggregator)) ??
       []
     )
   }
@@ -129,6 +129,7 @@ export class MxAdapter implements WidgetAdapter {
         ),
         institution_code: entityId
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any)
     // console.log(memberRes)
     const member = memberRes.data.member
@@ -141,31 +142,32 @@ export class MxAdapter implements WidgetAdapter {
           member.guid,
           userId
         )
-        return fromMxMember(updatedMemberRes.data.member, this.provider)
+        return fromMxMember(updatedMemberRes.data.member, this.aggregator)
       } else if (jobType === 'aggregate_identity') {
         const updatedMemberRes = await this.apiClient.identifyMember(
           member.guid,
           userId
         )
-        return fromMxMember(updatedMemberRes.data.member, this.provider)
+        return fromMxMember(updatedMemberRes.data.member, this.aggregator)
       } else if (jobType === 'aggregate_extendedhistory') {
         const updatedMemberRes = await this.apiClient.extendHistory(
           member.guid,
           userId
         )
-        return fromMxMember(updatedMemberRes.data.member, this.provider)
+        return fromMxMember(updatedMemberRes.data.member, this.aggregator)
       }
     }
 
-    return fromMxMember(member, this.provider)
+    return fromMxMember(member, this.aggregator)
   }
 
   async DeleteConnection(id: string, userId: string): Promise<void> {
     await this.apiClient.deleteManagedMember(id, userId)
   }
 
-  async DeleteUser(providerUserId: string): Promise<any> {
-    return await this.apiClient.deleteUser(providerUserId)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async DeleteUser(aggregatorUserId: string): Promise<any> {
+    return await this.apiClient.deleteUser(aggregatorUserId)
   }
 
   async UpdateConnection(
@@ -198,7 +200,7 @@ export class MxAdapter implements WidgetAdapter {
       }
     }
 
-    return fromMxMember(ret.data.member, this.provider)
+    return fromMxMember(ret.data.member, this.aggregator)
   }
 
   async UpdateConnectionInternal(
@@ -217,7 +219,7 @@ export class MxAdapter implements WidgetAdapter {
       }
     })
     const member = ret.data.member
-    return fromMxMember(member, this.provider)
+    return fromMxMember(member, this.aggregator)
   }
 
   async GetConnectionById(
@@ -232,7 +234,7 @@ export class MxAdapter implements WidgetAdapter {
       is_oauth: member.is_oauth,
       is_being_aggregated: member.is_being_aggregated,
       oauth_window_uri: member.oauth_window_uri,
-      provider: this.provider,
+      aggregator: this.aggregator,
       user_id: userId
     }
   }
@@ -251,7 +253,7 @@ export class MxAdapter implements WidgetAdapter {
       status = ConnectionStatus[ConnectionStatus.REJECTED]
     }
     return {
-      provider: this.provider,
+      aggregator: this.aggregator,
       id: member.guid,
       cur_job_id: member.guid,
       user_id: userId,

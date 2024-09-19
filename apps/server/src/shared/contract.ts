@@ -1,9 +1,9 @@
-import type { Provider } from '../adapterSetup'
+import type { Aggregator } from '../adapterSetup'
 
-export type { Provider }
+export type { Aggregator }
 
 export interface AuthRequest {
-  provider: string
+  aggregator: string
   token: string
   iv: string
   key: string
@@ -17,7 +17,7 @@ export interface Context {
   current_job_id?: string
   user_id?: string
   resolved_user_id?: string
-  provider?: string | null
+  aggregator?: string | null
   job_type?: string
   partner?: string
   single_account_select?: boolean
@@ -99,13 +99,13 @@ export interface Institution {
   name: string
   url: string
   logo_url: string | null
-  provider?: string | null
+  aggregator?: string | null
   oauth?: boolean | false
   code?: string | null
   instructional_text?: string | null
   small_logo_url?: string | null
   // eslint-disable-next-line @typescript-eslint/ban-types
-  providers?: Object | {}
+  aggregators?: Object | {}
 }
 
 export interface ResolvedInstitution {
@@ -113,11 +113,11 @@ export interface ResolvedInstitution {
   url: string
   name: string
   logo_url: string
-  provider: Provider
+  aggregator: Aggregator
   oauth?: boolean
 }
 
-export enum Providers {
+export enum Aggregators {
   MX = 'mx',
   MXINT = 'mx_int',
   SOPHTRON = 'sophtron'
@@ -154,10 +154,11 @@ export interface CachedInstitution {
   ucp_id: string
   is_test_bank: boolean | false
   routing_numbers: string[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [propName: string]: any
 }
 
-export interface InstitutionProvider {
+export interface InstitutionAggregator {
   id: string | null
   supports_aggregation: boolean | false
   supports_oauth: boolean | false
@@ -202,7 +203,7 @@ export interface Connection {
   is_being_aggregated?: boolean | null
   is_oauth?: boolean | null
   name?: string | null
-  provider?: string | null
+  aggregator?: string | null
   user_id?: string | null
   challenges?: Challenge[]
   has_accounts?: boolean | null
@@ -244,6 +245,7 @@ export interface WidgetAdapter {
     userId?: string
   ) => Promise<Connection | undefined>
   DeleteConnection: (connectionId: string, userId?: string) => Promise<void>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   DeleteUser: (userId: string) => Promise<any>
   AnswerChallenge: (
     request: UpdateConnectionRequest,

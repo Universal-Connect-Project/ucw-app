@@ -4,7 +4,7 @@ import type { Request, Response } from 'express'
 import { wget as _wget } from './infra/http'
 import { JobTypes } from './shared/contract'
 import config from './config'
-import { providers } from './adapterSetup'
+import { aggregators } from './adapterSetup'
 
 const pageQueryParameters = new RegExp(
   [
@@ -14,7 +14,7 @@ const pageQueryParameters = new RegExp(
     'user_id',
     'client_guid',
     'connection_id',
-    'provider',
+    'aggregator',
     'partner',
     'oauth_referral_source',
     'single_account_select',
@@ -31,12 +31,13 @@ const pageQueryParameters = new RegExp(
 function renderDefaultPage(req: Request, res: Response, html: string) {
   if (
     req.query.connection_id != null &&
-    (req.query.provider == null || req.query.provider === '')
+    (req.query.aggregator == null || req.query.aggregator === '')
   ) {
     delete req.query.connection_id
   }
   res.send(
     html.replaceAll(pageQueryParameters, (q: string) =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       encodeURIComponent((req.query as any)[q.substring(1)] ?? '')
     )
   )
@@ -49,10 +50,10 @@ export const widgetHandler = (req: Request, res: Response) => {
     job_type: Joi.string()
       .valid(...Object.values(JobTypes))
       .required(),
-    provider: Joi.string().valid(...providers),
+    aggregator: Joi.string().valid(...aggregators),
     single_account_select: Joi.bool(),
     user_id: Joi.string().required()
-  }).and('connection_id', 'provider')
+  }).and('connection_id', 'aggregator')
 
   const { error } = schema.validate(req.query)
 
@@ -63,6 +64,7 @@ export const widgetHandler = (req: Request, res: Response) => {
     return
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ;(req as any).metricsPath = '/catchall'
   const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}${req.path}`
   void _wget(resourcePath).then((html) => {

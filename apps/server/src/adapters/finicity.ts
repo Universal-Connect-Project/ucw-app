@@ -1,6 +1,6 @@
 import * as logger from '../infra/logger'
-import FinicityClient from '../providerApiClients/finicity'
-import providerCredentials from '../providerCredentials'
+import FinicityClient from 'src/aggregatorApiClients/finicity'
+import aggregatorCredentials from 'src/aggregatorCredentials'
 import { get, set } from '../services/storageClient/redis'
 import type {
   Connection,
@@ -20,7 +20,7 @@ export class FinicityAdapter implements WidgetAdapter {
 
   constructor(isSandbox = false) {
     this.sandbox = isSandbox
-    this.apiClient = new FinicityClient(providerCredentials.finicityProd)
+    this.apiClient = new FinicityClient(aggregatorCredentials.finicityProd)
   }
 
   async GetInstitutionById(id: string): Promise<Institution> {
@@ -31,7 +31,7 @@ export class FinicityAdapter implements WidgetAdapter {
       logo_url: institution?.branding?.icon, // this doesn't seem to be used anywhere
       url: institution?.urlHomeApp,
       oauth: true,
-      provider: this.apiClient.apiConfig.provider
+      aggregator: this.apiClient.apiConfig.aggregator
     }
   }
 
@@ -64,10 +64,11 @@ export class FinicityAdapter implements WidgetAdapter {
       id: requestId,
       is_oauth: true, // true because like oauth, you are taken to another window to enter username/password
       user_id: userId,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       credentials: [] as any[],
       institution_code: request.institution_id,
       oauth_window_uri: connectUrl,
-      provider: this.apiClient.apiConfig.provider,
+      aggregator: this.apiClient.apiConfig.aggregator,
       status: ConnectionStatus.PENDING
     }
     await set(requestId, obj)
@@ -81,7 +82,7 @@ export class FinicityAdapter implements WidgetAdapter {
     return undefined
   }
 
-  async DeleteUser(providerUserId: string): Promise<any> {
+  async DeleteUser(aggregatorUserId: string): Promise<any> {
     throw new Error('Not Implemented')
   }
 
@@ -188,7 +189,7 @@ export class FinicityAdapter implements WidgetAdapter {
           user_id,
           request_id
         ),
-        provider: this.apiClient.apiConfig.provider,
+        aggregator: this.apiClient.apiConfig.aggregator,
         status: ConnectionStatus.PENDING
       }
       await set(request_id, obj)

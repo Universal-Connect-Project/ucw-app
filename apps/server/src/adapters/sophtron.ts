@@ -1,4 +1,4 @@
-import providerCredentials from '../providerCredentials'
+import aggregatorCredentials from 'src/aggregatorCredentials'
 import type {
   Challenge,
   Connection,
@@ -12,9 +12,10 @@ import { ChallengeType, ConnectionStatus, JobTypes } from '../shared/contract'
 import { mapJobType } from '../utils'
 
 import { debug, error, trace } from '../infra/logger'
-import SophtronClientV1 from '../providerApiClients/sophtronClient'
-import SophtronClient from '../providerApiClients/sophtronClient/v2'
+import SophtronClientV1 from 'src/aggregatorApiClients/sophtronClient'
+import SophtronClient from 'src/aggregatorApiClients/sophtronClient/v2'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function fromSophtronInstitution(ins: any): Institution | undefined {
   if (!ins) {
     return undefined
@@ -24,17 +25,19 @@ function fromSophtronInstitution(ins: any): Institution | undefined {
     logo_url: ins.Logo,
     name: ins.InstitutionName,
     url: ins.URL,
-    provider: 'sophtron'
+    aggregator: 'sophtron'
   }
 }
 
 export class SophtronAdapter implements WidgetAdapter {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   apiClient: any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   apiClientV1: any
 
   constructor() {
-    this.apiClient = new SophtronClient(providerCredentials.sophtron)
-    this.apiClientV1 = new SophtronClientV1(providerCredentials.sophtron)
+    this.apiClient = new SophtronClient(aggregatorCredentials.sophtron)
+    this.apiClientV1 = new SophtronClientV1(aggregatorCredentials.sophtron)
   }
 
   async GetInstitutionById(id: string): Promise<Institution> {
@@ -107,7 +110,7 @@ export class SophtronAdapter implements WidgetAdapter {
         cur_job_id: ret.JobID,
         institution_code: request.institution_id,
         status: ConnectionStatus.CREATED,
-        provider: 'sophtron'
+        aggregator: 'sophtron'
       }
     }
     return undefined
@@ -117,8 +120,9 @@ export class SophtronAdapter implements WidgetAdapter {
     return this.apiClient.deleteMember(userId, id)
   }
 
-  async DeleteUser(providerUserId: string): Promise<any> {
-    return this.apiClient.deleteCustomer(providerUserId)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async DeleteUser(aggregatorUserId: string): Promise<any> {
+    return this.apiClient.deleteCustomer(aggregatorUserId)
   }
 
   async UpdateConnection(
@@ -145,7 +149,7 @@ export class SophtronAdapter implements WidgetAdapter {
       id: ret.MemberID,
       cur_job_id: ret.JobID,
       institution_code: 'institution_code', // TODO
-      provider: 'sophtron'
+      aggregator: 'sophtron'
     }
   }
 
@@ -157,7 +161,7 @@ export class SophtronAdapter implements WidgetAdapter {
     return {
       id: m.MemberID,
       institution_code: m.InstitutionID,
-      provider: 'sophtron',
+      aggregator: 'sophtron',
       user_id: userId
     }
   }
@@ -208,6 +212,7 @@ export class SophtronAdapter implements WidgetAdapter {
           challenge.external_id = 'single_account_select'
           challenge.type = ChallengeType.OPTIONS
           challenge.question = 'Please select an account to proceed:'
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           challenge.data = accounts.map((a: any) => ({
             key: `${a.AccountName} ${a.AccountNumber}`,
             value: a.AccountID
@@ -267,7 +272,7 @@ export class SophtronAdapter implements WidgetAdapter {
       cur_job_id: job.JobID,
       status,
       challenges: challenge?.id ? [challenge] : undefined,
-      provider: 'sophtron'
+      aggregator: 'sophtron'
     }
   }
 

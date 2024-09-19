@@ -1,5 +1,5 @@
 import { HttpResponse, http } from 'msw'
-import providerCredentials from '../../providerCredentials'
+import aggregatorCredentials from 'src/aggregatorCredentials'
 import {
   MX_INTEGRATION_VC_GET_ACCOUNTS_PATH,
   MX_VC_GET_ACCOUNTS_PATH
@@ -29,9 +29,9 @@ describe('mx vc', () => {
       expect(auth).toEqual(
         'Basic ' +
           Buffer.from(
-            providerCredentials.mxProd.username +
+            aggregatorCredentials.mxProd.username +
               ':' +
-              providerCredentials.mxProd.password
+              aggregatorCredentials.mxProd.password
           ).toString('base64')
       )
     })
@@ -53,9 +53,9 @@ describe('mx vc', () => {
       expect(auth).toEqual(
         'Basic ' +
           Buffer.from(
-            providerCredentials.mxInt.username +
+            aggregatorCredentials.mxInt.username +
               ':' +
-              providerCredentials.mxInt.password
+              aggregatorCredentials.mxInt.password
           ).toString('base64')
       )
     })
