@@ -96,7 +96,7 @@ describe('syncInstitutions', () => {
         method: ['PUT', 'POST'],
         path: '/institutions/_update/:id'
       },
-      (params) => {
+      () => {
         esUpdatesCount += 1
         return {}
       }

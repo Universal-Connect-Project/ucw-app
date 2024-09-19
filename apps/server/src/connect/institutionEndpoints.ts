@@ -12,7 +12,7 @@ export const getInstitutionHandler = async (
   req: InstitutionRequest,
   res: Response
 ) => {
-  if (req.context?.aggregator) {
+  if (req.context?.provider) {
     const institution = await req.connectApi.loadInstitutionByAggregatorId(
       req.params.institution_guid
     )

@@ -211,7 +211,7 @@ export default function (app) {
     })
   })
 
-  app.delete('/api/provider/:provider/user/:userId', userDeleteHandler)
+  app.delete('/api/aggregator/:aggregator/user/:userId', userDeleteHandler)
 
   // VC Data Endpoints
   app.get(
