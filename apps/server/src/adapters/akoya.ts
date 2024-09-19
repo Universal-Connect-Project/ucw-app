@@ -1,6 +1,6 @@
 import * as logger from '../infra/logger'
-import AkoyaClient from 'src/aggregatorApiClients/akoya'
-import aggregatorCredentials from 'src/aggregatorCredentials'
+import AkoyaClient from '../aggregatorApiClients/akoya'
+import aggregatorCredentials from '../aggregatorCredentials'
 import { get, set } from '../services/storageClient/redis'
 import {
   type Connection,

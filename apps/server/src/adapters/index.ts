@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { getAggregatorAdapter } from '../adapterIndex'
 import * as logger from '../infra/logger'
-import aggregatorCredentials from 'src/aggregatorCredentials'
+import aggregatorCredentials from '../aggregatorCredentials'
 import { AnalyticsClient } from '../services/analyticsClient'
 import { resolveInstitutionAggregator } from '../services/institutionResolver'
 import { set } from '../services/storageClient/redis'

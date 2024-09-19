@@ -1,5 +1,5 @@
 import { HttpResponse, http } from 'msw'
-import aggregatorCredentials from 'src/aggregatorCredentials'
+import aggregatorCredentials from '../../aggregatorCredentials'
 import {
   MX_INTEGRATION_VC_GET_ACCOUNTS_PATH,
   MX_VC_GET_ACCOUNTS_PATH

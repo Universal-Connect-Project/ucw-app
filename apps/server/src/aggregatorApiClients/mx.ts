@@ -1,8 +1,9 @@
-import aggregatorCredentials from 'src/aggregatorCredentials'
+import aggregatorCredentials from '../aggregatorCredentials'
 import { Configuration, MxPlatformApiFactory } from 'mx-platform-node'
 
 export const BASE_PATH = 'https://api.mx.com'.replace(/\/+$/, '')
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const MxProdApiClient: any = MxPlatformApiFactory(
   new Configuration({
     ...aggregatorCredentials.mxProd,
@@ -14,6 +15,7 @@ export const MxProdApiClient: any = MxPlatformApiFactory(
   })
 )
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const MxIntApiClient: any = MxPlatformApiFactory(
   new Configuration({
     ...aggregatorCredentials.mxInt,

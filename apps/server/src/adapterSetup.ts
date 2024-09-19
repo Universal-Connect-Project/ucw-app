@@ -2,8 +2,8 @@ import { adapterMapObject as testAdapterMapObject } from './test-adapter'
 import { MxAdapter } from './adapters/mx'
 import { SophtronAdapter } from './adapters/sophtron'
 
-import { mxIntGetVC, mxProdGetVC } from 'src/services/vcAggregators/mxVc'
-import getSophtronVc from 'src/services/vcAggregators/sophtronVc'
+import { mxIntGetVC, mxProdGetVC } from './services/vcAggregators/mxVc'
+import getSophtronVc from './services/vcAggregators/sophtronVc'
 
 const mxAdapterMapObject = {
   mx: {

@@ -5,7 +5,7 @@ import {
   MappedJobTypes,
   Aggregators
 } from './contract'
-import { getAvailableAggregators } from 'src/shared/aggregators'
+import { getAvailableAggregators } from '../shared/aggregators'
 
 const institutionAggregatorsSupportEverything: CachedInstitution = {
   url: 'testUrl',

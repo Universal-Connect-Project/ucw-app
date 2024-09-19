@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import config from '../config'
-import { BASE_PATH as MX_BASE_PATH } from 'src/aggregatorApiClients/mx'
+import { BASE_PATH as MX_BASE_PATH } from '../aggregatorApiClients/mx'
 import { accessTokenResponse } from './testData/auth0'
 import {
   finicityInsitutionData,

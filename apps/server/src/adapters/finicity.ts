@@ -1,6 +1,6 @@
 import * as logger from '../infra/logger'
-import FinicityClient from 'src/aggregatorApiClients/finicity'
-import aggregatorCredentials from 'src/aggregatorCredentials'
+import FinicityClient from '../aggregatorApiClients/finicity'
+import aggregatorCredentials from '../aggregatorCredentials'
 import { get, set } from '../services/storageClient/redis'
 import type {
   Connection,

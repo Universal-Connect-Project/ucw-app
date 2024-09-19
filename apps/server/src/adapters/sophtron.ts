@@ -1,4 +1,4 @@
-import aggregatorCredentials from 'src/aggregatorCredentials'
+import aggregatorCredentials from '../aggregatorCredentials'
 import type {
   Challenge,
   Connection,
@@ -12,8 +12,8 @@ import { ChallengeType, ConnectionStatus, JobTypes } from '../shared/contract'
 import { mapJobType } from '../utils'
 
 import { debug, error, trace } from '../infra/logger'
-import SophtronClientV1 from 'src/aggregatorApiClients/sophtronClient'
-import SophtronClient from 'src/aggregatorApiClients/sophtronClient/v2'
+import SophtronClientV1 from '../aggregatorApiClients/sophtronClient'
+import SophtronClient from '../aggregatorApiClients/sophtronClient/v2'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function fromSophtronInstitution(ins: any): Institution | undefined {

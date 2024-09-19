@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { debug, error } from '../../infra/logger'
-import aggregatorCredentials from 'src/aggregatorCredentials'
+import aggregatorCredentials from '../../aggregatorCredentials'
 
 export const getVc = async (path: string, isProd: boolean) => {
   const configuration = isProd

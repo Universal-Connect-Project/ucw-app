@@ -13,7 +13,7 @@ import { getPreferences } from '../shared/preferences'
 import {
   getAvailableAggregators,
   JOB_TYPE_PARTIAL_SUPPORT_MAP
-} from 'src/shared/aggregators'
+} from '../shared/aggregators'
 import { ElasticSearchMock } from '../test/elasticSearchMock'
 import { fetchInstitutions } from './institutionSyncer'
 import { INSTITUTION_CURRENT_LIST_IDS } from './storageClient/constants'

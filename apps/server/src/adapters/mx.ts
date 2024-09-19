@@ -7,7 +7,7 @@ import type {
 
 import config from '../config'
 import * as logger from '../infra/logger'
-import { MxProdApiClient, MxIntApiClient } from 'src/aggregatorApiClients/mx'
+import { MxProdApiClient, MxIntApiClient } from '../aggregatorApiClients/mx'
 import { get } from '../services/storageClient/redis'
 import type {
   Challenge,

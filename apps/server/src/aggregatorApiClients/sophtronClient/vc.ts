@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { buildSophtronAuthCode } from '../../utils'
 import SophtronClient from './'
-import aggregatorCredentials from 'src/aggregatorCredentials'
+import aggregatorCredentials from '../../aggregatorCredentials'
 
 interface VcResponse {
   vc: string
