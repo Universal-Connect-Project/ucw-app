@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@types/node": "^20.11.16",
-    "@ucp-npm/components": "^0.0.15-beta",
+    "@ucp-npm/components": "file:../../../universal-connect-widget-new/ucp-npm-components-0.0.16-beta.tgz",
     "@vitejs/plugin-react": "^4.2.1",
     "@vitejs/plugin-react-swc": "^3.6.0",
     "react": "^16.13.1",

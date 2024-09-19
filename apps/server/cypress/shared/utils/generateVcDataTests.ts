@@ -78,7 +78,7 @@ const generateVcDataTests = ({ makeAConnection }) =>
               )
             const { metadata } = connection?.args[0]
             memberGuid = metadata.member_guid
-            aggregator = metadata.provider
+            aggregator = metadata.aggregator
 
             verifyAccountsAndReturnAccountId({
               memberGuid,
