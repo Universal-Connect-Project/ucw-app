@@ -254,7 +254,7 @@ describe('institutionResolver', () => {
     it('routes using default volume', async () => {
       mockInstitutionWithAAndB()
 
-      expect(testPreferences.defaultAggregator).toEqual({
+      expect(testPreferences.defaultAggregatorVolume).toEqual({
         [TEST_EXAMPLE_A_AGGREGATOR_STRING]: 50,
         [TEST_EXAMPLE_B_AGGREGATOR_STRING]: 50
       })
