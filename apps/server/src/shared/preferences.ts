@@ -17,7 +17,5 @@ export interface Preferences {
 }
 
 export const getPreferences = async (): Promise<Preferences> => {
-  const preferencesGotten = await get(PREFERENCES_REDIS_KEY)
-
-  return preferencesGotten
+  return await get(PREFERENCES_REDIS_KEY)
 }

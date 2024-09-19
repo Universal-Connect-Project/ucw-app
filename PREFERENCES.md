@@ -6,14 +6,14 @@ _See [testPreferences.json](./apps/server/cachedDefaults/testData/testPreference
 
 ## Table of Contents
 
-- [Aggregator Credentials](#provider-credentials)
+- [Aggregator Credentials](#aggregator-credentials)
 - [Preference Settings](#preference-settings)
 
 ## Aggregator Credentials
 
-__NOTE:__ For any aggregators listed in the section labeled `supportedAggregators`, you must provide your own credentials for each of these aggregators in the `./apps/server/.env` file. You need to have credentials for a minimum of one provider in order for the UCW to function correctly.
+__NOTE:__ For any aggregators listed in the section labeled `supportedAggregators`, you must provide your own credentials for each of these aggregators in the `./apps/server/.env` file. You need to have credentials for a minimum of one aggregator in order for the UCW to function correctly.
 
-Follow these links to sign-up for credentials for each provider that the UCW currently supports:
+Follow these links to sign-up for credentials for each aggregator that the UCW currently supports:
 
 - MX - [Register for a developer account](https://dashboard.mx.com/sign_up)
   - Once you have created an account, go to [https://dashboard.mx.com/home](https://dashboard.mx.com/home), and look for your `API Key` and `Client ID`. Put those values in `./apps/server/.env`
@@ -51,7 +51,7 @@ Here are details for what each setting means.
 }
 ```
 
-`institutionAggregatorVolumeMap` (`{ [key: string]: { [key:string]: number } }`) - An object of institutions, with a related object of aggregators. The number associated with each provider represents the chance of being selected. The combined volume for each individual institution must equal 100.
+`institutionAggregatorVolumeMap` (`{ [key: string]: { [key:string]: number } }`) - An object of institutions, with a related object of aggregators. The number associated with each aggregator represents the chance of being selected. The combined volume for each individual institution must equal 100.
 
 ```
 "institutionAggregatorVolumeMap": {

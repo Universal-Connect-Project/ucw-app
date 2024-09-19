@@ -21,11 +21,11 @@ export const refreshAConnection = ({ enterCredentials, selectInstitution }) => {
           .find((call) => call.args[0].type === 'vcs/connect/memberConnected')
         const { metadata } = connection?.args[0]
         const memberGuid = metadata.member_guid
-        const provider = metadata.provider
+        const aggregator = metadata.aggregator
 
         //Refresh the connection
         cy.visit(
-          `/?job_type=aggregate&connection_id=${memberGuid}&provider=${provider}&user_id=${userId}`
+          `/?job_type=aggregate&connection_id=${memberGuid}&aggregator=${aggregator}&user_id=${userId}`
         )
 
         enterCredentials()

@@ -290,7 +290,7 @@ export async function getRecommendedInstitutions(
       docs: esSearch
     })
 
-  const institutions = recommendedInstitutionsResponse.docs
+  return recommendedInstitutionsResponse.docs
     .filter(({ _source }) => _source)
     .map(
       (favoriteInstitution) => favoriteInstitution._source as CachedInstitution
@@ -304,8 +304,6 @@ export async function getRecommendedInstitutions(
           supportedAggregators: supportedAggregators
         }).length
     )
-
-  return institutions
 }
 
 export async function deleteRemovedInstitutions(
