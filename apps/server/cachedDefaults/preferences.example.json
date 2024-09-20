@@ -2,8 +2,8 @@
   "defaultAggregator": "aggregator1",
 
   "supportedAggregators": [
-    "mx",
-    "sophtron"
+    "aggregator1",
+    "aggregator2"
   ],
 
   "defaultAggregatorVolume": {
