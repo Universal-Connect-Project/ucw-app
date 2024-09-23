@@ -1,65 +1,65 @@
-import { JobTypes } from '../../../src/shared/contract'
-import { refreshAConnection } from '../../shared/utils/refresh'
+import { JobTypes } from "../../../src/shared/contract";
+import { refreshAConnection } from "../../shared/utils/refresh";
 import {
   enterTestExampleACredentials,
   searchAndSelectTestExampleA,
-  selectTestExampleAAccount
-} from '../../shared/utils/testExample'
+  selectTestExampleAAccount,
+} from "../../shared/utils/testExample";
 import {
   clickContinue,
-  expectConnectionSuccess
-} from '../../shared/utils/widget'
+  expectConnectionSuccess,
+} from "../../shared/utils/widget";
 
-const TEST_EXAMPLE_A_INSTITUTION_ID = 'UCP-testexamplea'
+const TEST_EXAMPLE_A_INSTITUTION_ID = "5e498f60-3496-4299-96ed-f8eb328ae8af";
 
-describe('query parameters', () => {
-  it('skips straight to the institution if an institution_id is provided in the query parameters, hides the back button, and completes the connection', () => {
-    const userId = Cypress.env('userId')
+describe("query parameters", () => {
+  it("skips straight to the institution if an institution_id is provided in the query parameters, hides the back button, and completes the connection", () => {
+    const userId = Cypress.env("userId");
 
     cy.visitWithPostMessageSpy(
-      `/?job_type=aggregate&institution_id=${TEST_EXAMPLE_A_INSTITUTION_ID}&user_id=${userId}`
+      `/?job_type=aggregate&institution_id=${TEST_EXAMPLE_A_INSTITUTION_ID}&user_id=${userId}`,
     ).then(() => {
-      enterTestExampleACredentials()
+      enterTestExampleACredentials();
 
-      clickContinue()
+      clickContinue();
 
-      expectConnectionSuccess()
-    })
-  })
+      expectConnectionSuccess();
+    });
+  });
 
-  it('refreshes a testExampleA connection if given the correct parameters and hides the back button', () => {
+  it("refreshes a testExampleA connection if given the correct parameters and hides the back button", () => {
     refreshAConnection({
       enterCredentials: enterTestExampleACredentials,
-      selectInstitution: searchAndSelectTestExampleA
-    })
-  })
+      selectInstitution: searchAndSelectTestExampleA,
+    });
+  });
 
-  it('shows single account select if no parameter is passed, and skips single account select if single_account_select=false', () => {
-    const userId = Cypress.env('userId')
+  it("shows single account select if no parameter is passed, and skips single account select if single_account_select=false", () => {
+    const userId = Cypress.env("userId");
 
-    cy.visit(`/?job_type=${JobTypes.VERIFICATION}&user_id=${userId}`)
+    cy.visit(`/?job_type=${JobTypes.VERIFICATION}&user_id=${userId}`);
 
-    searchAndSelectTestExampleA()
+    searchAndSelectTestExampleA();
 
-    enterTestExampleACredentials()
+    enterTestExampleACredentials();
 
-    clickContinue()
+    clickContinue();
 
-    selectTestExampleAAccount()
-    clickContinue()
+    selectTestExampleAAccount();
+    clickContinue();
 
-    expectConnectionSuccess()
+    expectConnectionSuccess();
 
     cy.visit(
-      `/?job_type=${JobTypes.VERIFICATION}&user_id=${userId}&single_account_select=false`
-    )
+      `/?job_type=${JobTypes.VERIFICATION}&user_id=${userId}&single_account_select=false`,
+    );
 
-    searchAndSelectTestExampleA()
+    searchAndSelectTestExampleA();
 
-    enterTestExampleACredentials()
+    enterTestExampleACredentials();
 
-    clickContinue()
+    clickContinue();
 
-    expectConnectionSuccess()
-  })
-})
+    expectConnectionSuccess();
+  });
+});
