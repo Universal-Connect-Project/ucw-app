@@ -30,46 +30,46 @@ const institutionAggregatorsSupportEverything: CachedInstitution = {
 
 const allAggregators = [Aggregators.MX, Aggregators.SOPHTRON];
 
-const filterOutAggregator = (provider: Aggregators) =>
-  allAggregators.filter((currentAggregator) => currentAggregator !== provider);
+const filterOutAggregator = (aggregator: Aggregators) =>
+  allAggregators.filter((currentAggregator) => currentAggregator !== aggregator);
 
-const generateAggregatorTests = (provider: Aggregators) =>
+const generateAggregatorTests = (aggregator: Aggregators) =>
   // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-  describe(`getAvailableAggregators tests for provider: ${provider}`, () => {
-    it(`doesnt return ${provider} if it's not in the supported providers`, () => {
-      const providersWithoutCurrentAggregator = filterOutAggregator(provider);
+  describe(`getAvailableAggregators tests for aggregator: ${aggregator}`, () => {
+    it(`doesnt return ${aggregator} if it's not in the supported aggregators`, () => {
+      const aggregatorsWithoutCurrentAggregator = filterOutAggregator(aggregator);
 
       expect(
         getAvailableAggregators({
           institution: institutionAggregatorsSupportEverything,
           jobType: MappedJobTypes.AGGREGATE,
           shouldRequireFullSupport: false,
-          supportedAggregators: providersWithoutCurrentAggregator,
+          supportedAggregators: aggregatorsWithoutCurrentAggregator,
         }),
-      ).toEqual(providersWithoutCurrentAggregator);
+      ).toEqual(aggregatorsWithoutCurrentAggregator);
     });
 
-    it(`doesnt return ${provider} if it's not in the institution`, () => {
+    it(`doesnt return ${aggregator} if it's not in the institution`, () => {
       expect(
         getAvailableAggregators({
           institution: {
             ...institutionAggregatorsSupportEverything,
-            [provider]: {},
+            [aggregator]: {},
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any,
           jobType: MappedJobTypes.AGGREGATE,
           shouldRequireFullSupport: false,
           supportedAggregators: allAggregators,
         }),
-      ).toEqual(filterOutAggregator(provider));
+      ).toEqual(filterOutAggregator(aggregator));
     });
 
-    it(`doesnt return ${provider} if job type is all and supports_verification is falsy`, () => {
+    it(`doesnt return ${aggregator} if job type is all and supports_verification is falsy`, () => {
       expect(
         getAvailableAggregators({
           institution: {
             ...institutionAggregatorsSupportEverything,
-            [provider]: {
+            [aggregator]: {
               ...institutionAggregatorsSupportEverything.mx,
               supports_verification: false,
             },
@@ -78,15 +78,15 @@ const generateAggregatorTests = (provider: Aggregators) =>
           shouldRequireFullSupport: false,
           supportedAggregators: allAggregators,
         }),
-      ).toEqual(filterOutAggregator(provider));
+      ).toEqual(filterOutAggregator(aggregator));
     });
 
-    it(`doesnt return ${provider} if job type is all and supports_identification is falsy`, () => {
+    it(`doesnt return ${aggregator} if job type is all and supports_identification is falsy`, () => {
       expect(
         getAvailableAggregators({
           institution: {
             ...institutionAggregatorsSupportEverything,
-            [provider]: {
+            [aggregator]: {
               ...institutionAggregatorsSupportEverything.mx,
               supports_identification: false,
             },
@@ -95,15 +95,15 @@ const generateAggregatorTests = (provider: Aggregators) =>
           shouldRequireFullSupport: false,
           supportedAggregators: allAggregators,
         }),
-      ).toEqual(filterOutAggregator(provider));
+      ).toEqual(filterOutAggregator(aggregator));
     });
 
-    it(`doesnt return ${provider} if job type is verification and supports_verification is falsy`, () => {
+    it(`doesnt return ${aggregator} if job type is verification and supports_verification is falsy`, () => {
       expect(
         getAvailableAggregators({
           institution: {
             ...institutionAggregatorsSupportEverything,
-            [provider]: {
+            [aggregator]: {
               ...institutionAggregatorsSupportEverything.mx,
               supports_verification: false,
             },
@@ -112,15 +112,15 @@ const generateAggregatorTests = (provider: Aggregators) =>
           shouldRequireFullSupport: false,
           supportedAggregators: allAggregators,
         }),
-      ).toEqual(filterOutAggregator(provider));
+      ).toEqual(filterOutAggregator(aggregator));
     });
 
-    it(`doesnt return ${provider} if job type is identity and supports_identity is falsy`, () => {
+    it(`doesnt return ${aggregator} if job type is identity and supports_identity is falsy`, () => {
       expect(
         getAvailableAggregators({
           institution: {
             ...institutionAggregatorsSupportEverything,
-            [provider]: {
+            [aggregator]: {
               ...institutionAggregatorsSupportEverything.mx,
               supports_identification: false,
             },
@@ -129,15 +129,15 @@ const generateAggregatorTests = (provider: Aggregators) =>
           shouldRequireFullSupport: false,
           supportedAggregators: allAggregators,
         }),
-      ).toEqual(filterOutAggregator(provider));
+      ).toEqual(filterOutAggregator(aggregator));
     });
 
-    it(`returns ${provider} if job type is fullhistory, ${JobTypeSupports.FULLHISTORY} is falsy, and shouldRequireFullSupport is false`, () => {
+    it(`returns ${aggregator} if job type is fullhistory, ${JobTypeSupports.FULLHISTORY} is falsy, and shouldRequireFullSupport is false`, () => {
       expect(
         getAvailableAggregators({
           institution: {
             ...institutionAggregatorsSupportEverything,
-            [provider]: {
+            [aggregator]: {
               ...institutionAggregatorsSupportEverything.mx,
               [JobTypeSupports.FULLHISTORY]: false,
             },
@@ -149,12 +149,12 @@ const generateAggregatorTests = (provider: Aggregators) =>
       ).toEqual(allAggregators);
     });
 
-    it(`returns ${provider} if job type is fullhistory, ${JobTypeSupports.FULLHISTORY} is true, and shouldRequireFullSupport is true`, () => {
+    it(`returns ${aggregator} if job type is fullhistory, ${JobTypeSupports.FULLHISTORY} is true, and shouldRequireFullSupport is true`, () => {
       expect(
         getAvailableAggregators({
           institution: {
             ...institutionAggregatorsSupportEverything,
-            [provider]: {
+            [aggregator]: {
               ...institutionAggregatorsSupportEverything.mx,
               [JobTypeSupports.FULLHISTORY]: true,
             },
@@ -166,12 +166,12 @@ const generateAggregatorTests = (provider: Aggregators) =>
       ).toEqual(allAggregators);
     });
 
-    it(`doesnt return ${provider} if job type is fullhistory, ${JobTypeSupports.FULLHISTORY} is falsy, and shouldRequireFullSupport is true`, () => {
+    it(`doesnt return ${aggregator} if job type is fullhistory, ${JobTypeSupports.FULLHISTORY} is falsy, and shouldRequireFullSupport is true`, () => {
       expect(
         getAvailableAggregators({
           institution: {
             ...institutionAggregatorsSupportEverything,
-            [provider]: {
+            [aggregator]: {
               ...institutionAggregatorsSupportEverything.mx,
               [JobTypeSupports.FULLHISTORY]: false,
             },
@@ -180,13 +180,13 @@ const generateAggregatorTests = (provider: Aggregators) =>
           shouldRequireFullSupport: true,
           supportedAggregators: allAggregators,
         }),
-      ).toEqual(filterOutAggregator(provider));
+      ).toEqual(filterOutAggregator(aggregator));
     });
   });
 
-describe("providers", () => {
+describe("aggregators", () => {
   describe("getAvailableAggregators", () => {
-    it("returns all the providers if they support each of the job types", () => {
+    it("returns all the aggregators if they support each of the job types", () => {
       Object.values(MappedJobTypes).forEach((mappedJobType) => {
         expect(
           getAvailableAggregators({
