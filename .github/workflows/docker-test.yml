@@ -72,13 +72,13 @@ jobs:
           echo "-----------------"
 
           if [[ ${BUILD_CHECK} == *"App initialized successfully"* ]]; then
-            echo "Build passed!"
+            echo "Build passed"
             {
               echo "### 🐳 Docker Images Test Results"
               echo "The tests passed! 🎉🎉🎉"
             } >> $GITHUB_STEP_SUMMARY            
           else
-            echo "Build failed! :("
+            echo "Build failed"
 
             {
               echo "### 🐳 Docker Images Test Results"
