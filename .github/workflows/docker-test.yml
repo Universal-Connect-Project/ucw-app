@@ -65,6 +65,7 @@ jobs:
 
       - name: 'Check if build passed'
         run: |
+          sleep 20
           BUILD_CHECK=$(docker logs ucw-app-server 2>&1 | grep "App initialized successfully")
             
           echo "-----------------"
