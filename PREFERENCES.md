@@ -11,7 +11,7 @@ _See [testPreferences.json](./apps/server/cachedDefaults/testData/testPreference
 
 ## Aggregator Credentials
 
-__NOTE:__ For any aggregators listed in the section labeled `supportedAggregators`, you must provide your own credentials for each of these aggregators in the `./apps/server/.env` file. You need to have credentials for a minimum of one aggregator in order for the UCW to function correctly.
+**NOTE:** For any aggregators listed in the section labeled `supportedAggregators`, you must provide your own credentials for each of these aggregators in the `./apps/server/.env` file. You need to have credentials for a minimum of one aggregator in order for the UCW to function correctly.
 
 Follow these links to sign-up for credentials for each aggregator that the UCW currently supports:
 
@@ -55,11 +55,11 @@ Here are details for what each setting means.
 
 ```
 "institutionAggregatorVolumeMap": {
-  "UCP-8c4ca4c32dbd8de": {
+  "1e65df13-be46-46c1-9aab-b950ef6523dd": {
     "mx": 70,
     "sophtron": 30
   },
-  "UCP-ce8334bbb890163": {
+  "33232943-49ca-49ae-bea6-bc40acb9f207": {
     "sophtron": 100
   }
 }
@@ -68,18 +68,18 @@ Here are details for what each setting means.
 `hiddenInstitutions` (`string[]`) - An array of institutions that should not be shown in the institution search results.
 
 ```
-"hiddenInstitutions": ["UCP-2e2b825bd378172"]
+"hiddenInstitutions": ["7a909e62-98b6-4a34-8725-b2a6a63e830a"]
 ```
 
 `recommendedInstitutions` (`string[]`) - An array of institutions that should be shown on the institution search page by default, prior to the user entering any search criteria.
 
 ```
 "recommendedInstitutions": [
-  "UCP-b087caf69b372c9",
-  "UCP-ce8334bbb890163",
-  "UCP-ebca9a2b2ae2cca",
-  "UCP-b0a4307160ecb4c",
-  "UCP-8c4ca4c32dbd8de",
-  "UCP-412ded54698c47f"
+  "9ea81818-c36d-41d6-93b8-f9d4c1398e3d",
+  "33232943-49ca-49ae-bea6-bc40acb9f207",
+  "e4996bf9-9540-456f-8287-30da92edf326",
+  "956af43b-c894-4640-8594-f774ceee3ce6",
+  "1e65df13-be46-46c1-9aab-b950ef6523dd",
+  "10b0aa0d-ee76-4015-b065-d0db092a7423"
 ]
 ```

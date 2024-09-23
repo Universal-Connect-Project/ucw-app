@@ -9,19 +9,19 @@
   },
 
   "institutionAggregatorVolumeMap": {
-    "UCP-8c4ca4c32dbd8de": {
+    "1e65df13-be46-46c1-9aab-b950ef6523dd": {
       "testExampleA": 70,
       "testExampleB": 30
     },
-    "UCP-ce8334bbb890163": {
+    "33232943-49ca-49ae-bea6-bc40acb9f207": {
       "testExampleB": 100
     }
   },
 
-  "hiddenInstitutions": ["UCP-hidethis"],
+  "hiddenInstitutions": ["7a909e62-98b6-4a34-8725-b2a6a63e830a"],
 
   "recommendedInstitutions": [
-    "UCP-testexamplea",
-    "UCP-testexampledoesntsupportidentification"
+    "5e498f60-3496-4299-96ed-f8eb328ae8af",
+    "4c1b2595-a5aa-41a1-a2c6-f6caa1e226a6"
   ]
 }

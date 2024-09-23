@@ -28,16 +28,16 @@ export interface Context {
 }
 
 export interface KeyValuePair {
-  key: string
-  value?: string | null
+  key: string;
+  value?: string | null;
 }
 
 export interface Credential {
-  id: string
-  label?: string
-  value?: string
-  field_type?: string
-  field_name?: string
+  id: string;
+  label?: string;
+  value?: string;
+  field_type?: string;
+  field_name?: string;
 }
 export enum ConnectionStatus {
   CREATED,
@@ -61,14 +61,14 @@ export enum ConnectionStatus {
   RESUMED,
   EXPIRED,
   IMPAIRED,
-  PENDING
+  PENDING,
 }
 
 export enum OAuthStatus {
   _,
   PENDING,
   COMPLETE,
-  ERROR
+  ERROR,
 }
 
 export enum ChallengeType {
@@ -76,22 +76,22 @@ export enum ChallengeType {
   OPTIONS,
   IMAGE,
   IMAGE_OPTIONS,
-  TOKEN
+  TOKEN,
 }
 
 export enum VcType {
   IDENTITY,
   ACCOUNTS,
-  TRANSACTIONS
+  TRANSACTIONS,
 }
 
 export interface Challenge {
-  id: string
-  external_id?: string
-  question?: string | null
-  data?: string | KeyValuePair[]
-  type?: ChallengeType
-  response?: string | number[]
+  id: string;
+  external_id?: string;
+  question?: string | null;
+  data?: string | KeyValuePair[];
+  type?: ChallengeType;
+  response?: string | number[];
 }
 
 export interface Institution {
@@ -124,26 +124,26 @@ export enum Aggregators {
 }
 
 export enum JobTypes {
-  AGGREGATE = 'aggregate',
-  ALL = 'all',
-  FULLHISTORY = 'fullhistory',
-  VERIFICATION = 'verification',
-  IDENTITY = 'identity'
+  AGGREGATE = "aggregate",
+  ALL = "all",
+  FULLHISTORY = "fullhistory",
+  VERIFICATION = "verification",
+  IDENTITY = "identity",
 }
 
 export enum MappedJobTypes {
-  AGGREGATE = 'aggregate',
-  ALL = 'aggregate_identity_verification',
-  FULLHISTORY = 'aggregate_extendedhistory',
-  VERIFICATION = 'verification',
-  IDENTITY = 'aggregate_identity'
+  AGGREGATE = "aggregate",
+  ALL = "aggregate_identity_verification",
+  FULLHISTORY = "aggregate_extendedhistory",
+  VERIFICATION = "verification",
+  IDENTITY = "aggregate_identity",
 }
 
 export enum JobTypeSupports {
-  AGGREGATE = 'supports_aggregation',
-  VERIFICATION = 'supports_verification',
-  IDENTIFICATION = 'supports_identification',
-  FULLHISTORY = 'supports_history'
+  AGGREGATE = "supports_aggregation",
+  VERIFICATION = "supports_verification",
+  IDENTIFICATION = "supports_identification",
+  FULLHISTORY = "supports_history",
 }
 
 export interface CachedInstitution {
@@ -168,27 +168,27 @@ export interface InstitutionAggregator {
 }
 
 export interface InstitutionSearchResponseItem {
-  guid: string | null
-  name: string
-  url: string
-  logo_url: string | null
-  supports_oauth?: boolean | false
+  guid: string | null;
+  name: string;
+  url: string;
+  logo_url: string | null;
+  supports_oauth?: boolean | false;
 }
 
 export interface Institutions {
-  institutions: Institution[]
-  pagination?: Pagination
+  institutions: Institution[];
+  pagination?: Pagination;
 }
 
 export interface CreateConnectionRequest {
-  id?: string
-  initial_job_type?: string
-  background_aggregation_is_disabled?: boolean
-  credentials: Credential[]
-  institution_id: string
-  is_oauth?: boolean
-  skip_aggregation?: boolean
-  metadata?: string
+  id?: string;
+  initial_job_type?: string;
+  background_aggregation_is_disabled?: boolean;
+  credentials: Credential[];
+  institution_id: string;
+  is_oauth?: boolean;
+  skip_aggregation?: boolean;
+  metadata?: string;
 }
 
 export interface Connection {
@@ -214,32 +214,32 @@ export interface Connection {
   error_message?: string | null
 }
 export interface UpdateConnectionRequest {
-  id: string | undefined
-  job_type?: string
-  credentials?: Credential[]
-  challenges?: Challenge[]
+  id: string | undefined;
+  job_type?: string;
+  credentials?: Credential[];
+  challenges?: Challenge[];
 }
 export interface Connections {
-  members?: Connection[]
-  pagination?: Pagination
+  members?: Connection[];
+  pagination?: Pagination;
 }
 
 export interface Pagination {
-  current_page?: number
-  per_page?: number
-  total_entries?: number
-  total_pages?: number
+  current_page?: number;
+  per_page?: number;
+  total_entries?: number;
+  total_pages?: number;
 }
 
 export interface WidgetAdapter {
-  ResolveUserId: (id: string, failIfNotFound?: boolean) => Promise<string>
-  GetInstitutionById: (id: string) => Promise<Institution>
-  ListInstitutionCredentials: (institutionId: string) => Promise<Credential[]>
+  ResolveUserId: (id: string, failIfNotFound?: boolean) => Promise<string>;
+  GetInstitutionById: (id: string) => Promise<Institution>;
+  ListInstitutionCredentials: (institutionId: string) => Promise<Credential[]>;
   ListConnectionCredentials: (
     connectionId: string,
-    userId: string
-  ) => Promise<Credential[]>
-  ListConnections: (userId: string) => Promise<Connection[]>
+    userId: string,
+  ) => Promise<Credential[]>;
+  ListConnections: (userId: string) => Promise<Connection[]>;
   CreateConnection: (
     connection: CreateConnectionRequest,
     userId?: string
@@ -250,20 +250,20 @@ export interface WidgetAdapter {
   AnswerChallenge: (
     request: UpdateConnectionRequest,
     jobId: string,
-    userId?: string
-  ) => Promise<boolean>
+    userId?: string,
+  ) => Promise<boolean>;
   UpdateConnection: (
     UpdateConnectionRequest: UpdateConnectionRequest,
-    userId?: string
-  ) => Promise<Connection>
+    userId?: string,
+  ) => Promise<Connection>;
   GetConnectionById: (
     connectionId: string,
-    userId?: string
-  ) => Promise<Connection | undefined>
+    userId?: string,
+  ) => Promise<Connection | undefined>;
   GetConnectionStatus: (
     connectionId: string,
     jobId: string,
     single_account_select?: boolean,
-    userId?: string
-  ) => Promise<Connection | undefined>
+    userId?: string,
+  ) => Promise<Connection | undefined>;
 }

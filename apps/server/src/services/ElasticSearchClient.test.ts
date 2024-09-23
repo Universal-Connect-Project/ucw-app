@@ -1,8 +1,8 @@
-import * as fs from 'fs'
-import { http, HttpResponse } from 'msw'
-import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
-import config from '../config'
-import * as logger from '../infra/logger'
+import * as fs from "fs";
+import { http, HttpResponse } from "msw";
+import testPreferences from "../../cachedDefaults/testData/testPreferences.json";
+import config from "../config";
+import * as logger from "../infra/logger";
 import {
   deleteRemovedInstitutions,
   getInstitution,
@@ -19,18 +19,18 @@ import * as preferences from '../shared/preferences'
 import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from '../test-adapter'
 import {
   ElasticSearchMock,
-  elasticSearchMockError
-} from '../test/elasticSearchMock'
-import { elasticSearchInstitutionData } from '../test/testData/institution'
-import { server } from '../test/testServer'
-import { INSTITUTION_CURRENT_LIST_IDS } from './storageClient/constants'
-import { overwriteSet } from './storageClient/redis'
+  elasticSearchMockError,
+} from "../test/elasticSearchMock";
+import { elasticSearchInstitutionData } from "../test/testData/institution";
+import { server } from "../test/testServer";
+import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
+import { overwriteSet } from "./storageClient/redis";
 
-jest.mock('fs')
+jest.mock("fs");
 
 jest
-  .spyOn(preferences, 'getPreferences')
-  .mockResolvedValue(testPreferences as preferences.Preferences)
+  .spyOn(preferences, "getPreferences")
+  .mockResolvedValue(testPreferences as preferences.Preferences);
 
 interface searchQueryArgs {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -53,55 +53,55 @@ function searchQuery(args: searchQueryArgs = {}) {
       }
     })),
     filterTestBanks = false,
-    routingNumber
-  } = args
+    routingNumber,
+  } = args;
 
-  let mainSearchTerm
+  let mainSearchTerm;
   if (routingNumber) {
     mainSearchTerm = {
       match: {
         routing_numbers: {
-          query: routingNumber
-        }
-      }
-    }
+          query: routingNumber,
+        },
+      },
+    };
   } else {
     mainSearchTerm = [
       {
         match: {
           name: {
-            query: 'MX Bank',
-            boost: 1.5
-          }
-        }
+            query: "MX Bank",
+            boost: 1.5,
+          },
+        },
       },
       {
         match: {
           keywords: {
-            query: 'MX Bank',
-            boost: 1.4
-          }
-        }
+            query: "MX Bank",
+            boost: 1.4,
+          },
+        },
       },
       {
         fuzzy: {
           name: {
-            value: 'mx bank',
-            fuzziness: 'AUTO',
+            value: "mx bank",
+            fuzziness: "AUTO",
             boost: 1,
-            max_expansions: 50
-          }
-        }
+            max_expansions: 50,
+          },
+        },
       },
       {
         wildcard: {
           name: {
-            value: 'MX Bank*',
-            boost: 0.8
-          }
-        }
-      }
-    ]
+            value: "MX Bank*",
+            boost: 0.8,
+          },
+        },
+      },
+    ];
   }
 
   return {
@@ -119,255 +119,255 @@ function searchQuery(args: searchQueryArgs = {}) {
           must: {
             bool: {
               should: jobTypeQuery,
-              minimum_should_match: 1
-            }
-          }
-        }
+              minimum_should_match: 1,
+            },
+          },
+        },
       },
       must_not: [
         {
           terms: {
-            'ucp_id.keyword': testPreferences.hiddenInstitutions
-          }
+            "id.keyword": testPreferences.hiddenInstitutions,
+          },
         },
         ...(filterTestBanks
           ? [
               {
                 term: {
-                  is_test_bank: true
-                }
-              }
+                  is_test_bank: true,
+                },
+              },
             ]
-          : [])
-      ]
-    }
-  }
+          : []),
+      ],
+    },
+  };
 }
 
-describe('initialize', () => {
-  it('does not reindex institutions when the index already exists', async () => {
-    let indexCreated: boolean = false
-    ElasticSearchMock.clearAll()
+describe("initialize", () => {
+  it("does not reindex institutions when the index already exists", async () => {
+    let indexCreated: boolean = false;
+    ElasticSearchMock.clearAll();
     ElasticSearchMock.add(
       {
-        method: 'HEAD',
-        path: '/institutions'
+        method: "HEAD",
+        path: "/institutions",
       },
       () => {
-        return ''
-      }
-    )
+        return "";
+      },
+    );
 
     ElasticSearchMock.add(
       {
-        method: 'PUT',
-        path: '/institutions'
+        method: "PUT",
+        path: "/institutions",
       },
       () => {
-        indexCreated = true
-        return ''
-      }
-    )
+        indexCreated = true;
+        return "";
+      },
+    );
 
-    await initialize()
-    expect(indexCreated).toBeFalsy()
-  })
+    await initialize();
+    expect(indexCreated).toBeFalsy();
+  });
 
-  it('triggers the indexElasticSearch method and creates an index if ES not already indexed', async () => {
-    let indexCreated: boolean
+  it("triggers the indexElasticSearch method and creates an index if ES not already indexed", async () => {
+    let indexCreated: boolean;
     jest
-      .spyOn(fs, 'readFileSync')
-      .mockReturnValue(JSON.stringify([elasticSearchInstitutionData]))
+      .spyOn(fs, "readFileSync")
+      .mockReturnValue(JSON.stringify([elasticSearchInstitutionData]));
 
     server.use(
-      http.get(config.INSTITUTION_CACHE_LIST_URL, () => HttpResponse.error())
-    )
+      http.get(config.INSTITUTION_CACHE_LIST_URL, () => HttpResponse.error()),
+    );
 
-    ElasticSearchMock.clearAll()
+    ElasticSearchMock.clearAll();
     ElasticSearchMock.add(
       {
-        method: 'PUT',
-        path: '/institutions'
+        method: "PUT",
+        path: "/institutions",
       },
       () => {
-        indexCreated = true
-        return ''
-      }
-    )
+        indexCreated = true;
+        return "";
+      },
+    );
 
     ElasticSearchMock.add(
       {
-        method: 'PUT',
-        path: '/institutions/_doc/*'
+        method: "PUT",
+        path: "/institutions/_doc/*",
       },
       () => {
-        return ''
-      }
-    )
+        return "";
+      },
+    );
 
-    await initialize()
-    expect(indexCreated).toBeTruthy()
-  })
-})
+    await initialize();
+    expect(indexCreated).toBeTruthy();
+  });
+});
 
-describe('indexElasticSearch', () => {
-  let indexCreated: boolean
-  let institutionsIndexedCount: number
+describe("indexElasticSearch", () => {
+  let indexCreated: boolean;
+  let institutionsIndexedCount: number;
 
-  it('makes call to create index and makes call to index 3 institutions retrieved from the local cache file because the institution cache list server is unavailable', async () => {
-    ElasticSearchMock.clearAll()
+  it("makes call to create index and makes call to index 3 institutions retrieved from the local cache file because the institution cache list server is unavailable", async () => {
+    ElasticSearchMock.clearAll();
 
     server.use(
-      http.get(config.INSTITUTION_CACHE_LIST_URL, () => HttpResponse.error())
-    )
+      http.get(config.INSTITUTION_CACHE_LIST_URL, () => HttpResponse.error()),
+    );
 
     jest
-      .spyOn(fs, 'readFileSync')
+      .spyOn(fs, "readFileSync")
       .mockReturnValue(
         JSON.stringify([
           elasticSearchInstitutionData,
           elasticSearchInstitutionData,
-          elasticSearchInstitutionData
-        ])
-      )
+          elasticSearchInstitutionData,
+        ]),
+      );
 
-    indexCreated = false
-    institutionsIndexedCount = 0
-
-    ElasticSearchMock.add(
-      {
-        method: 'PUT',
-        path: '/institutions'
-      },
-      () => {
-        indexCreated = true
-        return ''
-      }
-    )
+    indexCreated = false;
+    institutionsIndexedCount = 0;
 
     ElasticSearchMock.add(
       {
-        method: 'PUT',
-        path: '/institutions/_doc/*'
+        method: "PUT",
+        path: "/institutions",
       },
       () => {
-        institutionsIndexedCount += 1
-        return ''
-      }
-    )
+        indexCreated = true;
+        return "";
+      },
+    );
 
-    await indexElasticSearch()
-    expect(indexCreated).toBeTruthy()
-    expect(institutionsIndexedCount).toEqual(3)
-  })
+    ElasticSearchMock.add(
+      {
+        method: "PUT",
+        path: "/institutions/_doc/*",
+      },
+      () => {
+        institutionsIndexedCount += 1;
+        return "";
+      },
+    );
 
-  it('it indexes institutions retrieved from the institution server', async () => {
-    ElasticSearchMock.clearAll()
+    await indexElasticSearch();
+    expect(indexCreated).toBeTruthy();
+    expect(institutionsIndexedCount).toEqual(3);
+  });
+
+  it("it indexes institutions retrieved from the institution server", async () => {
+    ElasticSearchMock.clearAll();
 
     server.use(
       http.get(config.INSTITUTION_CACHE_LIST_URL, () => {
         return HttpResponse.json([
           elasticSearchInstitutionData,
-          elasticSearchInstitutionData
-        ])
-      })
-    )
+          elasticSearchInstitutionData,
+        ]);
+      }),
+    );
 
-    institutionsIndexedCount = 0
+    institutionsIndexedCount = 0;
     ElasticSearchMock.add(
       {
-        method: 'PUT',
-        path: '/institutions'
+        method: "PUT",
+        path: "/institutions",
       },
       () => {
-        indexCreated = true
-        return ''
-      }
-    )
+        indexCreated = true;
+        return "";
+      },
+    );
 
     ElasticSearchMock.add(
       {
-        method: 'PUT',
-        path: '/institutions/_doc/*'
+        method: "PUT",
+        path: "/institutions/_doc/*",
       },
       () => {
-        institutionsIndexedCount += 1
-        return ''
-      }
-    )
+        institutionsIndexedCount += 1;
+        return "";
+      },
+    );
 
-    await indexElasticSearch()
-    expect(indexCreated).toBeTruthy()
-    expect(institutionsIndexedCount).toEqual(2)
-  })
-})
+    await indexElasticSearch();
+    expect(indexCreated).toBeTruthy();
+    expect(institutionsIndexedCount).toEqual(2);
+  });
+});
 
-describe('search', () => {
+describe("search", () => {
   beforeEach(() => {
-    ElasticSearchMock.clearAll()
-  })
+    ElasticSearchMock.clearAll();
+  });
 
-  it('makes the expected ES call and maps the data', async () => {
+  it("makes the expected ES call and maps the data", async () => {
     ElasticSearchMock.add(
       {
-        method: ['GET', 'POST'],
-        path: ['/_search', '/institutions/_search'],
+        method: ["GET", "POST"],
+        path: ["/_search", "/institutions/_search"],
         body: {
           query: searchQuery(),
-          size: 20
-        }
+          size: 20,
+        },
       },
       () => {
         return {
           hits: {
             hits: [
               {
-                _source: elasticSearchInstitutionData
-              }
-            ]
-          }
-        }
-      }
-    )
+                _source: elasticSearchInstitutionData,
+              },
+            ],
+          },
+        };
+      },
+    );
 
-    const results = await search('MX Bank', MappedJobTypes.AGGREGATE)
+    const results = await search("MX Bank", MappedJobTypes.AGGREGATE);
 
-    expect(results).toEqual([elasticSearchInstitutionData])
-  })
+    expect(results).toEqual([elasticSearchInstitutionData]);
+  });
 
-  it('excludes test banks in ES search when Env is prod', async () => {
-    config.Env = 'prod'
+  it("excludes test banks in ES search when Env is prod", async () => {
+    config.Env = "prod";
     ElasticSearchMock.add(
       {
-        method: ['GET', 'POST'],
-        path: ['/_search', '/institutions/_search'],
+        method: ["GET", "POST"],
+        path: ["/_search", "/institutions/_search"],
         body: {
           query: searchQuery({ filterTestBanks: true }),
-          size: 20
-        }
+          size: 20,
+        },
       },
       () => {
         return {
           hits: {
             hits: [
               {
-                _source: elasticSearchInstitutionData
-              }
-            ]
-          }
-        }
-      }
-    )
+                _source: elasticSearchInstitutionData,
+              },
+            ],
+          },
+        };
+      },
+    );
 
-    await search('MX Bank', MappedJobTypes.AGGREGATE)
-    config.Env = 'test'
-  })
+    await search("MX Bank", MappedJobTypes.AGGREGATE);
+    config.Env = "test";
+  });
 
-  it('includes a filter when job type is identity', async () => {
+  it("includes a filter when job type is identity", async () => {
     ElasticSearchMock.add(
       {
-        method: ['GET', 'POST'],
-        path: ['/_search', '/institutions/_search'],
+        method: ["GET", "POST"],
+        path: ["/_search", "/institutions/_search"],
         body: {
           query: searchQuery({
             jobTypeQuery: testPreferences.supportedAggregators.map(
@@ -384,38 +384,38 @@ describe('search', () => {
               })
             )
           }),
-          size: 20
-        }
+          size: 20,
+        },
       },
       () => {
         return {
           hits: {
             hits: [
               {
-                _source: elasticSearchInstitutionData
-              }
-            ]
-          }
-        }
-      }
-    )
+                _source: elasticSearchInstitutionData,
+              },
+            ],
+          },
+        };
+      },
+    );
 
-    const results = await search('MX Bank', MappedJobTypes.IDENTITY)
+    const results = await search("MX Bank", MappedJobTypes.IDENTITY);
 
-    expect(results).toEqual([elasticSearchInstitutionData])
-  })
+    expect(results).toEqual([elasticSearchInstitutionData]);
+  });
 
-  it('includes identity and verification filter when job type is aggregate_identity_verification', async () => {
+  it("includes identity and verification filter when job type is aggregate_identity_verification", async () => {
     const supportsArray = [
-      'supports_aggregation',
-      'supports_verification',
-      'supports_identification'
-    ]
+      "supports_aggregation",
+      "supports_verification",
+      "supports_identification",
+    ];
 
     ElasticSearchMock.add(
       {
-        method: ['GET', 'POST'],
-        path: ['/_search', '/institutions/_search'],
+        method: ["GET", "POST"],
+        path: ["/_search", "/institutions/_search"],
         body: {
           query: searchQuery({
             jobTypeQuery: testPreferences.supportedAggregators.map(
@@ -430,136 +430,136 @@ describe('search', () => {
               })
             )
           }),
-          size: 20
-        }
+          size: 20,
+        },
       },
       () => {
         return {
           hits: {
             hits: [
               {
-                _source: elasticSearchInstitutionData
-              }
-            ]
-          }
-        }
-      }
-    )
+                _source: elasticSearchInstitutionData,
+              },
+            ],
+          },
+        };
+      },
+    );
 
-    const results = await search('MX Bank', MappedJobTypes.ALL)
+    const results = await search("MX Bank", MappedJobTypes.ALL);
 
-    expect(results).toEqual([elasticSearchInstitutionData])
-  })
+    expect(results).toEqual([elasticSearchInstitutionData]);
+  });
 
-  it('does not break when ES returns an empty array', async () => {
+  it("does not break when ES returns an empty array", async () => {
     ElasticSearchMock.add(
       {
-        method: ['GET', 'POST'],
-        path: ['/_search', '/institutions/_search']
+        method: ["GET", "POST"],
+        path: ["/_search", "/institutions/_search"],
       },
       () => {
         return {
-          hits: { hits: [] }
-        }
-      }
-    )
+          hits: { hits: [] },
+        };
+      },
+    );
 
-    const results = await search('nothing', MappedJobTypes.AGGREGATE)
+    const results = await search("nothing", MappedJobTypes.AGGREGATE);
 
-    expect(results).toEqual([])
-  })
-})
+    expect(results).toEqual([]);
+  });
+});
 
-describe('searchByRoutingNumber', () => {
+describe("searchByRoutingNumber", () => {
   beforeEach(() => {
-    ElasticSearchMock.clearAll()
-  })
+    ElasticSearchMock.clearAll();
+  });
 
-  it('includes the routing number search query in the request', async () => {
-    const routingNumber = '1234567'
+  it("includes the routing number search query in the request", async () => {
+    const routingNumber = "1234567";
 
     ElasticSearchMock.add(
       {
-        method: ['GET', 'POST'],
-        path: ['/_search', '/institutions/_search'],
+        method: ["GET", "POST"],
+        path: ["/_search", "/institutions/_search"],
         body: {
           query: searchQuery({ routingNumber }),
-          size: 20
-        }
+          size: 20,
+        },
       },
       () => {
         return {
           hits: {
             hits: [
               {
-                _source: elasticSearchInstitutionData
-              }
-            ]
-          }
-        }
-      }
-    )
+                _source: elasticSearchInstitutionData,
+              },
+            ],
+          },
+        };
+      },
+    );
 
     const results = await searchByRoutingNumber(
       routingNumber,
-      MappedJobTypes.AGGREGATE
-    )
+      MappedJobTypes.AGGREGATE,
+    );
 
-    expect(results).toEqual([elasticSearchInstitutionData])
-  })
-})
+    expect(results).toEqual([elasticSearchInstitutionData]);
+  });
+});
 
-describe('getInstitution', () => {
-  it('makes the expected ES call and gets the expected institution response', async () => {
-    ElasticSearchMock.clearAll()
+describe("getInstitution", () => {
+  it("makes the expected ES call and gets the expected institution response", async () => {
+    ElasticSearchMock.clearAll();
 
     ElasticSearchMock.add(
       {
-        method: 'GET',
-        path: '/institutions/_doc/UCP-1234'
+        method: "GET",
+        path: "/institutions/_doc/UCP-1234",
       },
       () => {
         return {
-          _source: elasticSearchInstitutionData
-        }
-      }
-    )
+          _source: elasticSearchInstitutionData,
+        };
+      },
+    );
 
-    const institutionResponse = await getInstitution('UCP-1234')
-    expect(institutionResponse).toEqual(elasticSearchInstitutionData)
-  })
-})
+    const institutionResponse = await getInstitution("UCP-1234");
+    expect(institutionResponse).toEqual(elasticSearchInstitutionData);
+  });
+});
 
-describe('getRecommendedInstitutions', () => {
-  it('makes expected call to ES, gets a list of favorite institutions, and doesnt fail if an institution isnt found', async () => {
-    ElasticSearchMock.clearAll()
+describe("getRecommendedInstitutions", () => {
+  it("makes expected call to ES, gets a list of favorite institutions, and doesnt fail if an institution isnt found", async () => {
+    ElasticSearchMock.clearAll();
 
     ElasticSearchMock.add(
       {
-        method: 'POST',
-        path: '/_mget',
+        method: "POST",
+        path: "/_mget",
         body: {
           docs: testPreferences.recommendedInstitutions.map(
             (institutionId: string) => ({
-              _index: 'institutions',
-              _id: institutionId
-            })
-          )
-        }
+              _index: "institutions",
+              _id: institutionId,
+            }),
+          ),
+        },
       },
       () => {
         return {
-          docs: [{ _source: elasticSearchInstitutionData }, {}]
-        }
-      }
-    )
+          docs: [{ _source: elasticSearchInstitutionData }, {}],
+        };
+      },
+    );
 
     const recommendedInstitutions = await getRecommendedInstitutions(
-      MappedJobTypes.AGGREGATE
-    )
+      MappedJobTypes.AGGREGATE,
+    );
 
-    expect(recommendedInstitutions).toEqual([elasticSearchInstitutionData])
-  })
+    expect(recommendedInstitutions).toEqual([elasticSearchInstitutionData]);
+  });
 
   it("filters out institutions that don't have available aggregators because of job type", async () => {
     const mockPreferences: preferences.Preferences = {
@@ -568,22 +568,24 @@ describe('getRecommendedInstitutions', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any
 
-    jest.spyOn(preferences, 'getPreferences').mockResolvedValue(mockPreferences)
+    jest
+      .spyOn(preferences, "getPreferences")
+      .mockResolvedValue(mockPreferences);
 
-    ElasticSearchMock.clearAll()
+    ElasticSearchMock.clearAll();
 
     ElasticSearchMock.add(
       {
-        method: 'POST',
-        path: '/_mget',
+        method: "POST",
+        path: "/_mget",
         body: {
           docs: testPreferences.recommendedInstitutions.map(
             (institutionId: string) => ({
-              _index: 'institutions',
-              _id: institutionId
-            })
-          )
-        }
+              _index: "institutions",
+              _id: institutionId,
+            }),
+          ),
+        },
       },
       () => {
         return {
@@ -596,77 +598,73 @@ describe('getRecommendedInstitutions', () => {
                   supports_oauth: false,
                   supports_identification: false,
                   supports_verification: false,
-                  supports_history: false
-                }
-              }
-            }
-          ]
-        }
-      }
-    )
+                  supports_history: false,
+                },
+              },
+            },
+          ],
+        };
+      },
+    );
 
     const recommendedInstitutions = await getRecommendedInstitutions(
-      MappedJobTypes.AGGREGATE
-    )
+      MappedJobTypes.AGGREGATE,
+    );
 
-    expect(recommendedInstitutions).toEqual([])
-  })
-})
+    expect(recommendedInstitutions).toEqual([]);
+  });
+});
 
-describe('deleteRemovedInstitutions', () => {
-  it('should delete institutions that are no longer in the new list', async () => {
-    const newInstitutions = [{ ucp_id: 'new1' }, { ucp_id: 'new2' }]
+describe("deleteRemovedInstitutions", () => {
+  it("should delete institutions that are no longer in the new list", async () => {
+    const newInstitutions = [{ id: "new1" }, { id: "new2" }];
 
-    const oldInstitutions = [
-      { ucp_id: 'old1' },
-      { ucp_id: 'old2' },
-      { ucp_id: 'new1' }
-    ]
+    const oldInstitutions = [{ id: "old1" }, { id: "old2" }, { id: "new1" }];
 
-    const infoSpy = jest.spyOn(logger, 'info').mockImplementation(() => {})
-    const shouldBeDeleted = ['old1', 'old2']
-    const deletedIds: string[] = []
+    const infoSpy = jest.spyOn(logger, "info").mockImplementation(() => {});
+    const shouldBeDeleted = ["old1", "old2"];
+    const deletedIds: string[] = [];
 
     await overwriteSet(
       INSTITUTION_CURRENT_LIST_IDS,
-      oldInstitutions.map((ins) => ins.ucp_id)
-    )
+      oldInstitutions.map((ins) => ins.id),
+    );
 
     ElasticSearchMock.add(
       {
-        method: 'DELETE',
-        path: '/institutions/_doc/:id'
+        method: "DELETE",
+        path: "/institutions/_doc/:id",
       },
       (params) => {
-        const pathStr = params.path as string
-        const id = pathStr.split('/').pop()
-        deletedIds.push(id)
-        return {}
-      }
-    )
+        const pathStr = params.path as string;
+        const id = pathStr.split("/").pop();
+        deletedIds.push(id);
+        return {};
+      },
+    );
 
-    await deleteRemovedInstitutions(newInstitutions as CachedInstitution[])
+    await deleteRemovedInstitutions(newInstitutions as CachedInstitution[]);
 
     expect(infoSpy).toHaveBeenCalledWith(
-      'deleting institutions',
-      shouldBeDeleted
-    )
+      "deleting institutions",
+      shouldBeDeleted,
+    );
 
-    expect(deletedIds).toEqual(shouldBeDeleted)
-  })
+    expect(deletedIds).toEqual(shouldBeDeleted);
+  });
 
-  it('should not try to delete anything if no institutions were removed', async () => {
-    const newInstitutions = [{ ucp_id: 'new1' }, { ucp_id: 'new2' }]
+  it("should not try to delete anything if no institutions were removed", async () => {
+    const newInstitutions = [{ id: "new1" }, { id: "new2" }];
 
-    const oldInstitutions = [{ ucp_id: 'new1' }, { ucp_id: 'new2' }]
+    const oldInstitutions = [{ id: "new1" }, { id: "new2" }];
 
-    const infoSpy = jest.spyOn(logger, 'info').mockImplementation(() => {})
+    const infoSpy = jest.spyOn(logger, "info").mockImplementation(() => {});
 
-    let deletedCount = 0
+    let deletedCount = 0;
     ElasticSearchMock.add(
       {
-        method: 'DELETE',
-        path: '/institutions/_doc/:id'
+        method: "DELETE",
+        path: "/institutions/_doc/:id",
       },
       () => {
         deletedCount += 1
@@ -676,73 +674,77 @@ describe('deleteRemovedInstitutions', () => {
 
     await overwriteSet(
       INSTITUTION_CURRENT_LIST_IDS,
-      oldInstitutions.map((ins) => ins.ucp_id)
-    )
+      oldInstitutions.map((ins) => ins.id),
+    );
 
-    await deleteRemovedInstitutions(newInstitutions as CachedInstitution[])
+    await deleteRemovedInstitutions(newInstitutions as CachedInstitution[]);
 
-    expect(infoSpy).not.toHaveBeenCalled()
-    expect(deletedCount).toEqual(0)
-  })
+    expect(infoSpy).not.toHaveBeenCalled();
+    expect(deletedCount).toEqual(0);
+  });
 
-  it('should handle errors during deletion gracefully', async () => {
-    const logErrorSpy = jest.spyOn(logger, 'error').mockImplementation(() => {})
+  it("should handle errors during deletion gracefully", async () => {
+    const logErrorSpy = jest
+      .spyOn(logger, "error")
+      .mockImplementation(() => {});
 
-    const newInstitutions = [{ ucp_id: 'new1' }]
-    const oldInstitutions = [{ ucp_id: 'old1' }, { ucp_id: 'new1' }]
+    const newInstitutions = [{ id: "new1" }];
+    const oldInstitutions = [{ id: "old1" }, { id: "new1" }];
 
     await overwriteSet(
       INSTITUTION_CURRENT_LIST_IDS,
-      oldInstitutions.map((ins) => ins.ucp_id)
-    )
+      oldInstitutions.map((ins) => ins.id),
+    );
 
     const mockError = elasticSearchMockError({
-      message: 'Delete failed',
-      statusCode: 400
-    })
+      message: "Delete failed",
+      statusCode: 400,
+    });
 
     ElasticSearchMock.add(
       {
-        method: 'DELETE',
-        path: '/institutions/_doc/:id'
+        method: "DELETE",
+        path: "/institutions/_doc/:id",
       },
       () => {
         return mockError
       }
     )
 
-    await deleteRemovedInstitutions(newInstitutions as CachedInstitution[])
+    await deleteRemovedInstitutions(newInstitutions as CachedInstitution[]);
 
-    expect(logErrorSpy).toHaveBeenCalledWith(mockError)
-  })
-})
+    expect(logErrorSpy).toHaveBeenCalledWith(mockError);
+  });
+});
 
-describe('updateInstitutions', () => {
-  it('calls ES update for each institution in the list', async () => {
+describe("updateInstitutions", () => {
+  it("calls ES update for each institution in the list", async () => {
     const mockInstitutions = [
-      { ucp_id: '123', name: 'Institution A' },
-      { ucp_id: '456', name: 'Institution B' }
-    ] as CachedInstitution[]
+      { id: "123", name: "Institution A" },
+      { id: "456", name: "Institution B" },
+    ] as CachedInstitution[];
 
     interface esDocObj {
       // eslint-disable-next-line @typescript-eslint/member-delimiter-style
-      doc: { ucp_id: string; name: string }
+      doc: { id: string; name: string };
     }
-    const elasticSearchUpdatesMade: esDocObj[] = []
+    const elasticSearchUpdatesMade: esDocObj[] = [];
     ElasticSearchMock.add(
       {
-        method: ['PUT', 'POST'],
-        path: '/institutions/_update/:id'
+        method: ["PUT", "POST"],
+        path: "/institutions/_update/:id",
       },
       (params) => {
-        elasticSearchUpdatesMade.push(params.body as esDocObj)
-        return {}
-      }
-    )
+        elasticSearchUpdatesMade.push(params.body as esDocObj);
+        return {};
+      },
+    );
 
-    await updateInstitutions(mockInstitutions)
+    await updateInstitutions(mockInstitutions);
 
-    const updatedInstitutions = elasticSearchUpdatesMade.map((body) => body.doc)
-    expect(updatedInstitutions).toEqual(mockInstitutions)
-  })
-})
+    const updatedInstitutions = elasticSearchUpdatesMade.map(
+      (body) => body.doc,
+    );
+    expect(updatedInstitutions).toEqual(mockInstitutions);
+  });
+});
