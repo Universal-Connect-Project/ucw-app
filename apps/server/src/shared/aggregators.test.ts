@@ -9,7 +9,7 @@ import { getAvailableAggregators } from '../shared/aggregators'
 
 const institutionAggregatorsSupportEverything: CachedInstitution = {
   url: 'testUrl',
-  ucp_id: 'testId',
+  id: 'testId',
   logo: '',
   is_test_bank: false,
   routing_numbers: [],
