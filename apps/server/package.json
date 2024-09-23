@@ -34,7 +34,7 @@
     "@types/express": "^4.17.21",
     "@types/uuid": "^9.0.8",
     "assert-browserify": "^2.0.0",
-    "axios": "^1.6.8",
+    "axios": "^1.7.4",
     "buffer-browserify": "^0.2.5",
     "crypto-browserify": "^3.12.0",
     "crypto-js": "^4.2.0",
