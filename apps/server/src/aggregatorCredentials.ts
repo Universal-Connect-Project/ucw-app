@@ -1,12 +1,12 @@
 import config from './config'
 
-const providerCredentials = {
+const aggregatorCredentials = {
   mxInt: {
     username: config.MxClientId,
     password: config.MxApiSecret,
     basePath: 'https://int-api.mx.com',
     vcEndpoint: 'https://int-api.mx.com/',
-    provider: 'mx_int',
+    aggregator: 'mx_int',
     available: true
   },
   mxProd: {
@@ -14,7 +14,7 @@ const providerCredentials = {
     password: config.MxApiSecretProd,
     basePath: 'https://api.mx.com',
     vcEndpoint: 'https://api.mx.com/',
-    provider: 'mx',
+    aggregator: 'mx',
     available: true
   },
   akoyaSandbox: {
@@ -22,7 +22,7 @@ const providerCredentials = {
     secret: config.AkoyaApiSecret,
     basePath: 'sandbox-idp.ddp.akoya.com',
     productPath: 'sandbox-products.ddp.akoya.com',
-    provider: 'akoya_sandbox',
+    aggregator: 'akoya_sandbox',
     available: true
   },
   akoyaProd: {
@@ -30,7 +30,7 @@ const providerCredentials = {
     secret: config.AkoyaApiSecretProd,
     basePath: 'idp.ddp.akoya.com',
     productPath: 'products.ddp.akoya.com',
-    provider: 'akoya',
+    aggregator: 'akoya',
     available: true
   },
   finicityProd: {
@@ -38,7 +38,7 @@ const providerCredentials = {
     partnerId: config.FinicityPartnerId,
     appKey: config.FinicityAppKey,
     secret: config.FinicitySecret,
-    provider: 'finicity',
+    aggregator: 'finicity',
     available: true
   },
   sophtron: {
@@ -46,9 +46,9 @@ const providerCredentials = {
     secret: config.SophtronApiUserSecret,
     endpoint: config.SophtronApiServiceEndpoint,
     vcEndpoint: config.SophtronVCServiceEndpoint,
-    provider: 'sophtron',
+    aggregator: 'sophtron',
     available: true
   }
 }
 
-export default providerCredentials
+export default aggregatorCredentials

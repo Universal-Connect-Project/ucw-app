@@ -10,7 +10,7 @@ import type {
 } from "../shared/contract";
 import { ChallengeType, ConnectionStatus } from "../shared/contract";
 
-import { ProviderAdapterBase } from "../adapters";
+import { AggregatorAdapterBase } from "../adapters";
 import {
   getRecommendedInstitutions,
   search,
@@ -24,10 +24,11 @@ function mapResolvedInstitution(ins: Institution) {
     url: ins.url,
     logo_url: ins.logo_url,
     instructional_data: {},
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     credentials: [] as any[],
     supports_oauth: ins.oauth ?? ins.name?.includes("Oauth"),
-    providers: ins.providers,
-    provider: ins.provider,
+    aggregators: ins.aggregators,
+    aggregator: ins.aggregator,
   };
 }
 
@@ -58,7 +59,7 @@ function mapConnection(connection: Connection): Member {
         : connection.cur_job_id,
     is_oauth: connection.is_oauth,
     oauth_window_uri: connection.oauth_window_uri,
-    provider: connection.provider,
+    aggregator: connection.aggregator,
     is_being_aggregated: connection.is_being_aggregated,
     user_guid: connection.user_id,
     mfa: {
@@ -68,11 +69,14 @@ function mapConnection(connection: Connection): Member {
           credential_guid: c.id,
           label: c.question,
           type: c.type,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           options: [] as any[],
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any;
         switch (c.type) {
           case ChallengeType.QUESTION:
             ret.type = 0;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ret.label = (c.data as any[])?.[0].value || c.question;
             break;
           case ChallengeType.TOKEN:
@@ -89,6 +93,7 @@ function mapConnection(connection: Connection): Member {
             break;
           case ChallengeType.OPTIONS:
             ret.type = 2;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ret.options = (c.data as any[]).map((d) => ({
               guid: d.key,
               label: d.key,
@@ -98,6 +103,7 @@ function mapConnection(connection: Connection): Member {
             break;
           case ChallengeType.IMAGE_OPTIONS:
             ret.type = 14;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ret.options = (c.data as any[]).map((d) => ({
               guid: d.key,
               label: d.key,
@@ -109,11 +115,12 @@ function mapConnection(connection: Connection): Member {
         return ret;
       }),
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any;
 }
 
-export class ConnectApi extends ProviderAdapterBase {
-  // eslint-disable-next-line @typescript-eslint/no-useless-constructor
+export class ConnectApi extends AggregatorAdapterBase {
+  // eslint-disable-next-line @typescript-eslint/no-useless-constructor, @typescript-eslint/no-explicit-any
   constructor(req: any) {
     super(req);
   }
@@ -159,6 +166,7 @@ export class ConnectApi extends ProviderAdapterBase {
               ret.type = c.value ? ChallengeType.OPTIONS : ChallengeType.TOKEN;
               if (c.value) {
                 ret.response = challenge?.options.find(
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   (o: any) => o.guid === c.value,
                 )?.value;
                 if (!ret.response) {
@@ -218,6 +226,7 @@ export class ConnectApi extends ProviderAdapterBase {
     await this.deleteConnection(member.guid);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async getMemberCredentials(memberGuid: string): Promise<any> {
     const crs = await this.getConnectionCredentials(memberGuid);
     return {
@@ -229,6 +238,7 @@ export class ConnectApi extends ProviderAdapterBase {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async getInstitutionCredentials(guid: string): Promise<any> {
     const crs = await super.getInstitutionCredentials(guid);
     return {
@@ -248,18 +258,20 @@ export class ConnectApi extends ProviderAdapterBase {
     return institutionHits.map(mapCachedInstitution);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async loadInstitutionByUcpId(ucpId: string): Promise<any> {
-    const inst = await this.getProviderInstitution(ucpId);
+    const inst = await this.getAggregatorInstitution(ucpId);
     return { institution: mapResolvedInstitution(inst) };
   }
 
-  async loadInstitutionByProviderId(
-    providerInstitutionId: string,
+  async loadInstitutionByAggregatorId(
+    aggregatorInstitutionId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     await this.init();
 
-    const institution = await this.providerAdapter.GetInstitutionById(
-      providerInstitutionId,
+    const institution = await this.aggregatorAdapter.GetInstitutionById(
+      aggregatorInstitutionId,
     );
 
     return { institution: mapResolvedInstitution(institution) };
@@ -267,7 +279,7 @@ export class ConnectApi extends ProviderAdapterBase {
 
   async loadPopularInstitutions() {
     this.context.updated = true;
-    this.context.provider = null;
+    this.context.aggregator = null;
 
     const recommendedInstitutions = await getRecommendedInstitutions(
       this.context.job_type as MappedJobTypes,

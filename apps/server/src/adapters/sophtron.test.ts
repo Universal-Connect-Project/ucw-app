@@ -51,7 +51,7 @@ describe('sophtron adapter', () => {
         id: sophtronInstitutionData.InstitutionID,
         logo_url: sophtronInstitutionData.Logo,
         name: sophtronInstitutionData.InstitutionName,
-        provider: 'sophtron',
+        aggregator: 'sophtron',
         url: sophtronInstitutionData.URL
       })
     })
@@ -180,6 +180,7 @@ describe('sophtron adapter', () => {
     })
 
     it('uses a None password if there is no password specified', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let createMemberPayload: any
 
       server.use(
@@ -207,6 +208,7 @@ describe('sophtron adapter', () => {
     })
 
     it('calls the create member api with the correct payload and returns the new connection', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let createMemberPayload: any
 
       server.use(
@@ -240,7 +242,7 @@ describe('sophtron adapter', () => {
         cur_job_id: 'jobId',
         institution_code: 'testId',
         status: ConnectionStatus.CREATED,
-        provider: 'sophtron'
+        aggregator: 'sophtron'
       })
 
       expect(createMemberPayload).toEqual({
@@ -336,7 +338,7 @@ describe('sophtron adapter', () => {
         cur_job_id: updateMemberData.JobID,
         id: updateMemberData.MemberID,
         institution_code: 'institution_code',
-        provider: 'sophtron'
+        aggregator: 'sophtron'
       })
     })
   })
@@ -358,7 +360,7 @@ describe('sophtron adapter', () => {
       expect(response).toEqual({
         id: getMemberData.MemberID,
         institution_code: getMemberData.InstitutionID,
-        provider: 'sophtron',
+        aggregator: 'sophtron',
         user_id: testUserId
       })
 
@@ -381,7 +383,7 @@ describe('sophtron adapter', () => {
       expect(response).toEqual({
         id: getMemberData.MemberID,
         institution_code: getMemberData.InstitutionID,
-        provider: 'sophtron',
+        aggregator: 'sophtron',
         user_id: testUserId
       })
     })
@@ -409,7 +411,7 @@ describe('sophtron adapter', () => {
         user_id: testUserId,
         cur_job_id: testJobId,
         status: ConnectionStatus.CONNECTED,
-        provider: 'sophtron'
+        aggregator: 'sophtron'
       })
     })
 
@@ -436,7 +438,7 @@ describe('sophtron adapter', () => {
         user_id: testUserId,
         cur_job_id: testJobId,
         status: ConnectionStatus.FAILED,
-        provider: 'sophtron'
+        aggregator: 'sophtron'
       })
     })
 
@@ -464,7 +466,7 @@ describe('sophtron adapter', () => {
         user_id: testUserId,
         cur_job_id: testJobId,
         status: ConnectionStatus.CREATED,
-        provider: 'sophtron'
+        aggregator: 'sophtron'
       })
     })
 
@@ -508,7 +510,7 @@ describe('sophtron adapter', () => {
         user_id: testUserId,
         cur_job_id: testJobId,
         status: ConnectionStatus.CHALLENGED,
-        provider: 'sophtron'
+        aggregator: 'sophtron'
       })
     })
 
@@ -550,7 +552,7 @@ describe('sophtron adapter', () => {
         user_id: testUserId,
         cur_job_id: testJobId,
         status: ConnectionStatus.CHALLENGED,
-        provider: 'sophtron'
+        aggregator: 'sophtron'
       })
     })
 
@@ -593,7 +595,7 @@ describe('sophtron adapter', () => {
         user_id: testUserId,
         cur_job_id: testJobId,
         status: ConnectionStatus.CHALLENGED,
-        provider: 'sophtron'
+        aggregator: 'sophtron'
       })
     })
 
@@ -637,7 +639,7 @@ describe('sophtron adapter', () => {
         user_id: testUserId,
         cur_job_id: testJobId,
         status: ConnectionStatus.CHALLENGED,
-        provider: 'sophtron'
+        aggregator: 'sophtron'
       })
     })
 
@@ -678,7 +680,7 @@ describe('sophtron adapter', () => {
         user_id: testUserId,
         cur_job_id: testJobId,
         status: ConnectionStatus.CHALLENGED,
-        provider: 'sophtron'
+        aggregator: 'sophtron'
       })
     })
 
@@ -716,7 +718,7 @@ describe('sophtron adapter', () => {
         user_id: testUserId,
         cur_job_id: testJobId,
         status: ConnectionStatus.CHALLENGED,
-        provider: 'sophtron'
+        aggregator: 'sophtron'
       })
     })
 
@@ -754,7 +756,7 @@ describe('sophtron adapter', () => {
         user_id: testUserId,
         cur_job_id: testJobId,
         status: ConnectionStatus.CHALLENGED,
-        provider: 'sophtron'
+        aggregator: 'sophtron'
       })
     })
   })
@@ -782,7 +784,7 @@ describe('sophtron adapter', () => {
       user_id: testUserId,
       cur_job_id: testJobId,
       status: ConnectionStatus.CREATED,
-      provider: 'sophtron'
+      aggregator: 'sophtron'
     })
   })
 

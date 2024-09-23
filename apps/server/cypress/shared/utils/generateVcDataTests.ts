@@ -7,11 +7,11 @@ const decodeVcDataFromResponse = (response) => {
   return JSON.parse(atob(data))
 }
 
-const verifyAccountsAndReturnAccountId = ({ provider, memberGuid, userId }) => {
+const verifyAccountsAndReturnAccountId = ({ aggregator, memberGuid, userId }) => {
   return cy
     .request(
       'GET',
-      `/data/provider/${provider}/user/${userId}/connection/${memberGuid}/accounts`
+      `/data/aggregator/${aggregator}/user/${userId}/connection/${memberGuid}/accounts`
     )
     .then((response) => {
       expect(response.status).to.equal(200)
@@ -29,10 +29,10 @@ const verifyAccountsAndReturnAccountId = ({ provider, memberGuid, userId }) => {
     })
 }
 
-const verifyIdentity = ({ provider, memberGuid, userId }) => {
+const verifyIdentity = ({ aggregator, memberGuid, userId }) => {
   cy.request(
     'GET',
-    `/data/provider/${provider}/user/${userId}/connection/${memberGuid}/identity`
+    `/data/aggregator/${aggregator}/user/${userId}/connection/${memberGuid}/identity`
   ).should((response) => {
     expect(response.status).to.equal(200)
     expect(response.body).to.haveOwnProperty('jwt')
@@ -44,10 +44,10 @@ const verifyIdentity = ({ provider, memberGuid, userId }) => {
   })
 }
 
-const verifyTransactions = ({ accountId, provider, userId }) => {
+const verifyTransactions = ({ accountId, aggregator, userId }) => {
   cy.request(
     'GET',
-    `/data/provider/${provider}/user/${userId}/account/${accountId}/transactions${provider === 'sophtron' ? '?start_time=2021/1/1&end_time=2024/12/31' : ''}`
+    `/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions${aggregator === 'sophtron' ? '?start_time=2021/1/1&end_time=2024/12/31' : ''}`
   ).should((response) => {
     expect(response.status).to.equal(200)
     expect(response.body).to.haveOwnProperty('jwt')
@@ -63,7 +63,7 @@ const generateVcDataTests = ({ makeAConnection }) =>
   jobTypes.map((jobType) =>
     it(`makes a connection with jobType: ${jobType}, gets the accounts, identity, and transaction data from the vc endpoints`, () => {
       let memberGuid: string
-      let provider: string
+      let aggregator: string
       const userId = Cypress.env('userId')
 
       cy.visitWithPostMessageSpy(`/?job_type=${jobType}&user_id=${userId}`)
@@ -78,22 +78,22 @@ const generateVcDataTests = ({ makeAConnection }) =>
               )
             const { metadata } = connection?.args[0]
             memberGuid = metadata.member_guid
-            provider = metadata.provider
+            aggregator = metadata.aggregator
 
             verifyAccountsAndReturnAccountId({
               memberGuid,
-              provider,
+              aggregator,
               userId
             }).then((accountId) => {
               verifyIdentity({
                 memberGuid,
-                provider,
+                aggregator,
                 userId
               })
 
               verifyTransactions({
                 accountId,
-                provider,
+                aggregator,
                 userId
               })
             })

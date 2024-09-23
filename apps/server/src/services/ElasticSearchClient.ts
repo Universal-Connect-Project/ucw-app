@@ -7,13 +7,13 @@ import { info, error as logError } from "../infra/logger";
 import type {
   CachedInstitution,
   MappedJobTypes,
-  Provider,
+  Aggregator,
 } from "../shared/contract";
 import { getPreferences } from "../shared/preferences";
 import {
-  getAvailableProviders,
+  getAvailableAggregators,
   JOB_TYPE_PARTIAL_SUPPORT_MAP,
-} from "../shared/providers";
+} from "../shared/aggregators";
 import { ElasticSearchMock } from "../test/elasticSearchMock";
 import { fetchInstitutions } from "./institutionSyncer";
 import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
@@ -50,6 +50,7 @@ export async function indexElasticSearch() {
   await ElasticsearchClient.indices.create({ index: "institutions" });
 
   const indexPromises = institutionData.map(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async (institution: { id: any }) => {
       return await ElasticsearchClient.index({
         index: "institutions",
@@ -93,10 +94,11 @@ function getInstitutionDataFromFile(): CachedInstitution[] {
 export async function searchByRoutingNumber(
   routingNumber: string,
   jobType: MappedJobTypes,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any[]> {
   const preferences = await getPreferences();
   const hiddenInstitutions = preferences?.hiddenInstitutions || [];
-  const supportedProviders = preferences?.supportedProviders || [];
+  const supportedAggregators = preferences?.supportedAggregators || [];
 
   const searchResults: estypes.SearchResponseBody =
     await ElasticsearchClient.search({
@@ -112,7 +114,7 @@ export async function searchByRoutingNumber(
               },
             },
             minimum_should_match: 1,
-            must: mustQuery(supportedProviders, jobType),
+            must: mustQuery(supportedAggregators, jobType),
             must_not: buildMustNotQuery(hiddenInstitutions),
           },
         },
@@ -128,10 +130,11 @@ export async function searchByRoutingNumber(
 export async function search(
   searchTerm: string,
   jobType: MappedJobTypes,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any[]> {
   const preferences = await getPreferences();
   const hiddenInstitutions = preferences?.hiddenInstitutions || [];
-  const supportedProviders = preferences?.supportedProviders || [];
+  const supportedAggregators = preferences?.supportedAggregators || [];
 
   const searchResults: estypes.SearchResponseBody =
     await ElasticsearchClient.search({
@@ -141,7 +144,7 @@ export async function search(
           bool: {
             should: fuzzySearchTermQuery(searchTerm),
             minimum_should_match: 1,
-            must: mustQuery(supportedProviders, jobType),
+            must: mustQuery(supportedAggregators, jobType),
             must_not: buildMustNotQuery(hiddenInstitutions),
           },
         },
@@ -193,27 +196,31 @@ function fuzzySearchTermQuery(searchTerm: string) {
   ];
 }
 
-function mustQuery(supportedProviders: Provider[], jobType: MappedJobTypes) {
-  const providerQueryTerms = supportedProviders.map((provider) => {
+function mustQuery(
+  supportedAggregators: Aggregator[],
+  jobType: MappedJobTypes,
+) {
+  const aggregatorQueryTerms = supportedAggregators.map((aggregator) => {
     return {
       exists: {
-        field: `${provider}.id`,
+        field: `${aggregator}.id`,
       },
     };
   });
 
   const institutionJobTypeFilter = JOB_TYPE_PARTIAL_SUPPORT_MAP[jobType];
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let jobTypeSupported = [] as any;
   if (institutionJobTypeFilter.length > 0) {
-    jobTypeSupported = supportedProviders
-      .map((provider) => {
+    jobTypeSupported = supportedAggregators
+      .map((aggregator) => {
         return {
           bool: {
             must: institutionJobTypeFilter.map((jobTypeFilter) => {
               return {
                 term: {
-                  [`${provider}.${jobTypeFilter}`]: true,
+                  [`${aggregator}.${jobTypeFilter}`]: true,
                 },
               };
             }),
@@ -225,7 +232,7 @@ function mustQuery(supportedProviders: Provider[], jobType: MappedJobTypes) {
 
   return {
     bool: {
-      should: providerQueryTerms,
+      should: aggregatorQueryTerms,
       minimum_should_match: 1,
       must: {
         bool: {
@@ -237,6 +244,7 @@ function mustQuery(supportedProviders: Provider[], jobType: MappedJobTypes) {
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function buildMustNotQuery(hiddenInstitutions: string[]): any[] {
   const mustNotClauses = [];
 
@@ -271,7 +279,7 @@ export async function getRecommendedInstitutions(
 ): Promise<CachedInstitution[]> {
   const preferences = await getPreferences();
 
-  const supportedProviders = preferences.supportedProviders;
+  const supportedAggregators = preferences.supportedAggregators;
   const recommendedInstitutions = preferences?.recommendedInstitutions;
 
   if (!recommendedInstitutions) {
@@ -290,22 +298,20 @@ export async function getRecommendedInstitutions(
       docs: esSearch,
     });
 
-  const institutions = recommendedInstitutionsResponse.docs
+  return recommendedInstitutionsResponse.docs
     .filter(({ _source }) => _source)
     .map(
       (favoriteInstitution) => favoriteInstitution._source as CachedInstitution,
     )
     .filter(
       (institution) =>
-        getAvailableProviders({
+        getAvailableAggregators({
           institution,
           jobType,
           shouldRequireFullSupport: false,
-          supportedProviders,
+          supportedAggregators: supportedAggregators,
         }).length,
     );
-
-  return institutions;
 }
 
 export async function deleteRemovedInstitutions(

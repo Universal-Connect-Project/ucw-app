@@ -51,7 +51,7 @@ Once the server is running, and you see a message that says, `"Message":"App ini
 
 ## Preferences and Aggregator Credentials
 
-For any aggregator/provider you are planning on using, you will need to create your own developer account, and then provide your credentials.
+For any aggregator you are planning on using, you will need to create your own developer account, and then provide your credentials.
 
 See [PREFERENCES.md](PREFERENCES.md) for details.
 

@@ -38,7 +38,7 @@ const makeABConnection = async (jobType) => {
   expectConnectionSuccess()
 }
 
-describe('testExampleA and B providers', () => {
+describe('testExampleA and B aggregators', () => {
   generateVcDataTests({ makeAConnection: makeAnAConnection })
   generateVcDataTests({ makeAConnection: makeABConnection })
 })

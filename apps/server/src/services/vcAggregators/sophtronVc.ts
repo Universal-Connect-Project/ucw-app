@@ -1,4 +1,4 @@
-import { getVc as getSophtronVc } from '../../providerApiClients/sophtronClient/vc'
+import { getVc as getSophtronVc } from '../../aggregatorApiClients/sophtronClient/vc'
 import { VCDataTypes } from '@repo/utils'
 
 export default async function getVC({

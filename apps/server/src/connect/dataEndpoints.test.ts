@@ -21,15 +21,15 @@ import {
   identityDataHandler,
   transactionsDataHandler
 } from './dataEndpoints'
-import type { Provider } from '../shared/contract'
-import { Providers } from '../shared/contract'
-import { invalidProviderString } from '../utils/validators'
+import type { Aggregator } from '../shared/contract'
+import { Aggregators } from '../shared/contract'
+import { invalidAggregatorString } from '../utils/validators'
 
 /* eslint-disable @typescript-eslint/unbound-method */
 
 describe('dataEndpoints', () => {
   describe('accountsDataHandler', () => {
-    it('responds with a failure if provider isnt valid', async () => {
+    it('responds with a failure if aggregator isnt valid', async () => {
       const res = {
         send: jest.fn(),
         status: jest.fn()
@@ -39,7 +39,7 @@ describe('dataEndpoints', () => {
         {
           params: {
             connectionId: 'testConnectionId',
-            provider: 'junk' as Provider,
+            aggregator: 'junk' as Aggregator,
             userId: 'testUserId'
           }
         },
@@ -47,7 +47,7 @@ describe('dataEndpoints', () => {
       )
 
       expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.send).toHaveBeenCalledWith(invalidProviderString)
+      expect(res.send).toHaveBeenCalledWith(invalidAggregatorString)
     })
 
     it('responds with the vc data in the jwt on success', async () => {
@@ -58,7 +58,7 @@ describe('dataEndpoints', () => {
       const req: AccountsRequest = {
         params: {
           connectionId: 'testConnectionId',
-          provider: Providers.MX,
+          aggregator: Aggregators.MX,
           userId: 'testUserId'
         }
       }
@@ -86,7 +86,7 @@ describe('dataEndpoints', () => {
       const req: AccountsRequest = {
         params: {
           connectionId: 'testConnectionId',
-          provider: Providers.MX,
+          aggregator: Aggregators.MX,
           userId: 'testUserId'
         }
       }
@@ -99,7 +99,7 @@ describe('dataEndpoints', () => {
   })
 
   describe('identityDataHandler', () => {
-    it('responds with a failure if provider isnt valid', async () => {
+    it('responds with a failure if aggregator isnt valid', async () => {
       const res = {
         send: jest.fn(),
         status: jest.fn()
@@ -109,7 +109,7 @@ describe('dataEndpoints', () => {
         {
           params: {
             connectionId: 'testConnectionId',
-            provider: 'junk',
+            aggregator: 'junk',
             userId: 'testUserId'
           }
         },
@@ -117,7 +117,7 @@ describe('dataEndpoints', () => {
       )
 
       expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.send).toHaveBeenCalledWith(invalidProviderString)
+      expect(res.send).toHaveBeenCalledWith(invalidAggregatorString)
     })
 
     it('responds with the vc data in the jwt on success', async () => {
@@ -129,7 +129,7 @@ describe('dataEndpoints', () => {
       const req: IdentityRequest = {
         params: {
           connectionId: 'testConnectionId',
-          provider: Providers.MX,
+          aggregator: Aggregators.MX,
           userId: 'testUserId'
         }
       }
@@ -157,7 +157,7 @@ describe('dataEndpoints', () => {
       const req: IdentityRequest = {
         params: {
           connectionId: 'testConnectionId',
-          provider: Providers.MX,
+          aggregator: Aggregators.MX,
           userId: 'testUserId'
         }
       }
@@ -171,7 +171,7 @@ describe('dataEndpoints', () => {
 
   describe('transactionsDataHandler', () => {
     describe('validation', () => {
-      it('responds with a 400 if provider is wrong', async () => {
+      it('responds with a 400 if aggregator is wrong', async () => {
         const res = {
           send: jest.fn(),
           status: jest.fn()
@@ -180,7 +180,7 @@ describe('dataEndpoints', () => {
         const req: TransactionsRequest = {
           params: {
             accountId: 'testAccountId',
-            provider: 'junk' as Provider,
+            aggregator: 'junk' as Aggregator,
             userId: 'testUserId'
           },
           query: {
@@ -191,7 +191,7 @@ describe('dataEndpoints', () => {
 
         await transactionsDataHandler(req, res)
 
-        expect(res.send).toHaveBeenCalledWith(invalidProviderString)
+        expect(res.send).toHaveBeenCalledWith(invalidAggregatorString)
         expect(res.status).toHaveBeenCalledWith(400)
       })
 
@@ -204,7 +204,7 @@ describe('dataEndpoints', () => {
         const req: TransactionsRequest = {
           params: {
             accountId: 'testAccountId',
-            provider: Providers.MX,
+            aggregator: Aggregators.MX,
             userId: 'testUserId'
           },
           query: {
@@ -227,7 +227,7 @@ describe('dataEndpoints', () => {
         const req: TransactionsRequest = {
           params: {
             accountId: 'testAccountId',
-            provider: Providers.SOPHTRON,
+            aggregator: Aggregators.SOPHTRON,
             userId: 'testUserId'
           },
           query: {
@@ -251,7 +251,7 @@ describe('dataEndpoints', () => {
         const req: TransactionsRequest = {
           params: {
             accountId: 'testAccountId',
-            provider: Providers.SOPHTRON,
+            aggregator: Aggregators.SOPHTRON,
             userId: 'testUserId'
           },
           query: {
@@ -276,7 +276,7 @@ describe('dataEndpoints', () => {
       const req: TransactionsRequest = {
         params: {
           accountId: 'testAccountId',
-          provider: Providers.MX,
+          aggregator: Aggregators.MX,
           userId: 'testUserId'
         },
         query: {
@@ -308,7 +308,7 @@ describe('dataEndpoints', () => {
       const req: TransactionsRequest = {
         params: {
           accountId: 'testAccountId',
-          provider: Providers.MX,
+          aggregator: Aggregators.MX,
           userId: 'testUserId'
         },
         query: {

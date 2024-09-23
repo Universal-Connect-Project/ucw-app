@@ -21,7 +21,7 @@
         institution_id: '$institution_id',
         connection_id: '$connection_id',
         user_id: '$user_id',
-        provider: '$provider'
+        aggregator: '$aggregator'
       }
 
       window.app = {
@@ -47,7 +47,7 @@
             current_institution_code: params.institution_id,
             current_institution_guid: null,
             current_member_guid: params.connection_id,
-            current_provider: params.provider,
+            current_aggregator: params.aggregator,
             current_partner: '$partner',
             user_id: params.user_id,
             current_microdeposit_guid: null,

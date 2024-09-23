@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express'
 import { widgetHandler } from './widgetEndpoint'
-import { JobTypes, Providers } from './shared/contract'
-import { invalidProviderString } from './utils/validators'
+import { JobTypes, Aggregators } from './shared/contract'
+import { invalidAggregatorString } from './utils/validators'
 
 /* eslint-disable @typescript-eslint/unbound-method  */
 
@@ -68,7 +68,7 @@ describe('server', () => {
         expect(res.send).toHaveBeenCalledWith('"user_id" is required')
       })
 
-      it('responds with a 400 if provider is invalid', () => {
+      it('responds with a 400 if aggregator is invalid', () => {
         const res = {
           send: jest.fn(),
           status: jest.fn()
@@ -78,7 +78,7 @@ describe('server', () => {
           {
             query: {
               job_type: JobTypes.AGGREGATE,
-              provider: 'junk',
+              aggregator: 'junk',
               user_id: 'testUserId'
             }
           } as unknown as Request,
@@ -86,10 +86,10 @@ describe('server', () => {
         )
 
         expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.send).toHaveBeenCalledWith(invalidProviderString)
+        expect(res.send).toHaveBeenCalledWith(invalidAggregatorString)
       })
 
-      it('responds with a 400 if provider is provided without a connection_id', () => {
+      it('responds with a 400 if aggregator is provided without a connection_id', () => {
         const res = {
           send: jest.fn(),
           status: jest.fn()
@@ -99,7 +99,7 @@ describe('server', () => {
           {
             query: {
               job_type: JobTypes.AGGREGATE,
-              provider: Providers.MX,
+              aggregator: Aggregators.MX,
               user_id: 'testUserId'
             }
           } as unknown as Request,
@@ -108,11 +108,11 @@ describe('server', () => {
 
         expect(res.status).toHaveBeenCalledWith(400)
         expect(res.send).toHaveBeenCalledWith(
-          '"value" contains [provider] without its required peers [connection_id]'
+          '"value" contains [aggregator] without its required peers [connection_id]'
         )
       })
 
-      it('responds with a 400 if connection_id is provided without a provider', () => {
+      it('responds with a 400 if connection_id is provided without a aggregator', () => {
         const res = {
           send: jest.fn(),
           status: jest.fn()
@@ -131,7 +131,7 @@ describe('server', () => {
 
         expect(res.status).toHaveBeenCalledWith(400)
         expect(res.send).toHaveBeenCalledWith(
-          '"value" contains [connection_id] without its required peers [provider]'
+          '"value" contains [connection_id] without its required peers [aggregator]'
         )
       })
 

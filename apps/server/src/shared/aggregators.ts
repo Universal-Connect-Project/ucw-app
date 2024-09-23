@@ -2,8 +2,8 @@ import { JobTypeSupports, MappedJobTypes } from './contract'
 
 import type {
   CachedInstitution,
-  InstitutionProvider,
-  Provider
+  InstitutionAggregator,
+  Aggregator
 } from './contract'
 
 type JobMappingType = {
@@ -30,34 +30,36 @@ export const JOB_TYPE_FULL_SUPPORT_MAP: JobMappingType = {
   ]
 }
 
-export function getAvailableProviders({
+export function getAvailableAggregators({
   institution,
   jobType,
-  supportedProviders,
+  supportedAggregators,
   shouldRequireFullSupport
 }: {
   institution: CachedInstitution
   jobType: MappedJobTypes
-  supportedProviders?: Provider[]
+  supportedAggregators?: Aggregator[]
   shouldRequireFullSupport: boolean
-}): Provider[] {
-  return supportedProviders?.filter(
-    (provider) =>
-      (institution as any)[provider]?.id != null &&
-      providerSupportsJobType({
-        institutionAttributes: (institution as any)[provider],
+}): Aggregator[] {
+  return supportedAggregators?.filter(
+    (aggregator) =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (institution as any)[aggregator]?.id != null &&
+      aggregatorSupportsJobType({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        institutionAttributes: (institution as any)[aggregator],
         jobType,
         shouldRequireFullSupport
       })
   )
 }
 
-function providerSupportsJobType({
+function aggregatorSupportsJobType({
   institutionAttributes,
   jobType,
   shouldRequireFullSupport
 }: {
-  institutionAttributes: InstitutionProvider | undefined
+  institutionAttributes: InstitutionAggregator | undefined
   jobType: MappedJobTypes
   shouldRequireFullSupport: boolean
 }): boolean {
@@ -68,7 +70,7 @@ function providerSupportsJobType({
   )[jobType].reduce((acc, supportsProp) => {
     return (
       acc &&
-      institutionAttributes?.[supportsProp as keyof InstitutionProvider] ===
+      institutionAttributes?.[supportsProp as keyof InstitutionAggregator] ===
         true
     )
   }, true)

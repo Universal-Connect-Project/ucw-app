@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw'
 import { ConnectionStatus, OAuthStatus } from '../shared/contract'
 import { READ_MEMBER_STATUS_PATH } from '../test/handlers'
 import { server } from '../test/testServer'
-import { ProviderAdapterBase } from './index'
+import { AggregatorAdapterBase } from './index'
 import { MxAdapter } from './mx'
 
 const testConnectionId = 'test_connection_id'
@@ -10,9 +10,9 @@ const testConnectionId = 'test_connection_id'
 const isIntEnv = false
 const mxAdapter = new MxAdapter(isIntEnv)
 
-const providerAdapterBase = new ProviderAdapterBase({
+const aggregatorAdapterBase = new AggregatorAdapterBase({
   context: {
-    provider: 'mx',
+    aggregator: 'mx',
     auth: {
       token: 'test_token',
       iv: 'test_iv'
@@ -21,11 +21,11 @@ const providerAdapterBase = new ProviderAdapterBase({
   }
 })
 
-describe('ProviderAdapterBase', () => {
+describe('AggregatorAdapterBase', () => {
   describe('getOauthState', () => {
     beforeAll(async () => {
-      await providerAdapterBase.init()
-      providerAdapterBase.providerAdapter = mxAdapter
+      await aggregatorAdapterBase.init()
+      aggregatorAdapterBase.aggregatorAdapter = mxAdapter
     })
 
     it('returns a pending oauth state', async () => {
@@ -40,7 +40,7 @@ describe('ProviderAdapterBase', () => {
         )
       )
 
-      expect(await providerAdapterBase.getOauthState(testConnectionId)).toEqual(
+      expect(await aggregatorAdapterBase.getOauthState(testConnectionId)).toEqual(
         {
           oauth_state: {
             guid: 'test_connection_id',
@@ -64,7 +64,7 @@ describe('ProviderAdapterBase', () => {
         )
       )
 
-      expect(await providerAdapterBase.getOauthState(testConnectionId)).toEqual(
+      expect(await aggregatorAdapterBase.getOauthState(testConnectionId)).toEqual(
         {
           oauth_state: {
             guid: 'test_connection_id',
@@ -88,7 +88,7 @@ describe('ProviderAdapterBase', () => {
         )
       )
 
-      expect(await providerAdapterBase.getOauthState(testConnectionId)).toEqual(
+      expect(await aggregatorAdapterBase.getOauthState(testConnectionId)).toEqual(
         {
           oauth_state: {
             guid: 'test_connection_id',

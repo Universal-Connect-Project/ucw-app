@@ -1,8 +1,8 @@
-import type { CachedInstitution } from "../../shared/contract";
 import {
-  TEST_EXAMPLE_A_PROVIDER_STRING,
-  TEST_EXAMPLE_B_PROVIDER_STRING,
+  TEST_EXAMPLE_A_AGGREGATOR_STRING,
+  TEST_EXAMPLE_B_AGGREGATOR_STRING,
 } from "../../test-adapter";
+import type { CachedInstitution } from "../../shared/contract";
 
 export const institutionData = {
   institution: {
@@ -109,7 +109,7 @@ export const elasticSearchInstitutionData: CachedInstitution = {
     supports_verification: false,
     supports_history: false,
   },
-  [TEST_EXAMPLE_A_PROVIDER_STRING]: {
+  [TEST_EXAMPLE_A_AGGREGATOR_STRING]: {
     id: "aId",
     supports_aggregation: true,
     supports_oauth: true,
@@ -117,7 +117,7 @@ export const elasticSearchInstitutionData: CachedInstitution = {
     supports_verification: true,
     supports_history: false,
   },
-  [TEST_EXAMPLE_B_PROVIDER_STRING]: {
+  [TEST_EXAMPLE_B_AGGREGATOR_STRING]: {
     id: "bId",
     supports_aggregation: true,
     supports_oauth: true,
