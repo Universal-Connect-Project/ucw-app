@@ -1,30 +1,30 @@
-import type { Aggregator } from '../adapterSetup'
+import type { Aggregator } from "../adapterSetup";
 
-export type { Aggregator }
+export type { Aggregator };
 
 export interface AuthRequest {
-  aggregator: string
-  token: string
-  iv: string
-  key: string
+  aggregator: string;
+  token: string;
+  iv: string;
+  key: string;
 }
 
 export interface Context {
-  institution_id?: string
-  institution_uid?: string
-  include_identity?: boolean
-  connection_id?: string
-  current_job_id?: string
-  user_id?: string
-  resolved_user_id?: string
-  aggregator?: string | null
-  job_type?: string
-  partner?: string
-  single_account_select?: boolean
-  auth?: AuthRequest
-  oauth_referral_source?: string
-  scheme?: string
-  updated?: boolean
+  institution_id?: string;
+  institution_uid?: string;
+  include_identity?: boolean;
+  connection_id?: string;
+  current_job_id?: string;
+  user_id?: string;
+  resolved_user_id?: string;
+  aggregator?: string | null;
+  job_type?: string;
+  partner?: string;
+  single_account_select?: boolean;
+  auth?: AuthRequest;
+  oauth_referral_source?: string;
+  scheme?: string;
+  updated?: boolean;
 }
 
 export interface KeyValuePair {
@@ -95,32 +95,32 @@ export interface Challenge {
 }
 
 export interface Institution {
-  id: string | null
-  name: string
-  url: string
-  logo_url: string | null
-  aggregator?: string | null
-  oauth?: boolean | false
-  code?: string | null
-  instructional_text?: string | null
-  small_logo_url?: string | null
+  id: string | null;
+  name: string;
+  url: string;
+  logo_url: string | null;
+  aggregator?: string | null;
+  oauth?: boolean | false;
+  code?: string | null;
+  instructional_text?: string | null;
+  small_logo_url?: string | null;
   // eslint-disable-next-line @typescript-eslint/ban-types
-  aggregators?: Object | {}
+  aggregators?: Object | {};
 }
 
 export interface ResolvedInstitution {
-  id: string
-  url: string
-  name: string
-  logo_url: string
-  aggregator: Aggregator
-  oauth?: boolean
+  id: string;
+  url: string;
+  name: string;
+  logo_url: string;
+  aggregator: Aggregator;
+  oauth?: boolean;
 }
 
 export enum Aggregators {
-  MX = 'mx',
-  MXINT = 'mx_int',
-  SOPHTRON = 'sophtron'
+  MX = "mx",
+  MXINT = "mx_int",
+  SOPHTRON = "sophtron",
 }
 
 export enum JobTypes {
@@ -147,24 +147,24 @@ export enum JobTypeSupports {
 }
 
 export interface CachedInstitution {
-  name: string
-  keywords: string | null
-  logo: string
-  url: string
-  ucp_id: string
-  is_test_bank: boolean | false
-  routing_numbers: string[]
+  name: string;
+  keywords: string | null;
+  logo: string;
+  url: string;
+  id: string;
+  is_test_bank: boolean | false;
+  routing_numbers: string[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [propName: string]: any
+  [propName: string]: any;
 }
 
 export interface InstitutionAggregator {
-  id: string | null
-  supports_aggregation: boolean | false
-  supports_oauth: boolean | false
-  supports_identification: boolean | false
-  supports_verification: boolean | false
-  supports_history: boolean | false
+  id: string | null;
+  supports_aggregation: boolean | false;
+  supports_oauth: boolean | false;
+  supports_identification: boolean | false;
+  supports_verification: boolean | false;
+  supports_history: boolean | false;
 }
 
 export interface InstitutionSearchResponseItem {
@@ -192,26 +192,26 @@ export interface CreateConnectionRequest {
 }
 
 export interface Connection {
-  id: string | null
-  cur_job_id?: string | null
-  last_refresh_utc?: string | null
-  last_refreshed_utc?: string | null
-  last_updated_utc?: string | null
-  background_aggregation_is_disabled?: boolean
-  status?: ConnectionStatus | null
-  institution_code?: string | null
-  is_being_aggregated?: boolean | null
-  is_oauth?: boolean | null
-  name?: string | null
-  aggregator?: string | null
-  user_id?: string | null
-  challenges?: Challenge[]
-  has_accounts?: boolean | null
-  has_transactions?: boolean | null
-  is_authenticated?: boolean | null
-  vc?: string | null
-  oauth_window_uri?: string | null
-  error_message?: string | null
+  id: string | null;
+  cur_job_id?: string | null;
+  last_refresh_utc?: string | null;
+  last_refreshed_utc?: string | null;
+  last_updated_utc?: string | null;
+  background_aggregation_is_disabled?: boolean;
+  status?: ConnectionStatus | null;
+  institution_code?: string | null;
+  is_being_aggregated?: boolean | null;
+  is_oauth?: boolean | null;
+  name?: string | null;
+  aggregator?: string | null;
+  user_id?: string | null;
+  challenges?: Challenge[];
+  has_accounts?: boolean | null;
+  has_transactions?: boolean | null;
+  is_authenticated?: boolean | null;
+  vc?: string | null;
+  oauth_window_uri?: string | null;
+  error_message?: string | null;
 }
 export interface UpdateConnectionRequest {
   id: string | undefined;
@@ -242,11 +242,11 @@ export interface WidgetAdapter {
   ListConnections: (userId: string) => Promise<Connection[]>;
   CreateConnection: (
     connection: CreateConnectionRequest,
-    userId?: string
-  ) => Promise<Connection | undefined>
-  DeleteConnection: (connectionId: string, userId?: string) => Promise<void>
+    userId?: string,
+  ) => Promise<Connection | undefined>;
+  DeleteConnection: (connectionId: string, userId?: string) => Promise<void>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  DeleteUser: (userId: string) => Promise<any>
+  DeleteUser: (userId: string) => Promise<any>;
   AnswerChallenge: (
     request: UpdateConnectionRequest,
     jobId: string,

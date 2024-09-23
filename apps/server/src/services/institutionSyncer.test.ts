@@ -97,10 +97,10 @@ describe("syncInstitutions", () => {
         path: "/institutions/_update/:id",
       },
       () => {
-        esUpdatesCount += 1
-        return {}
-      }
-    )
+        esUpdatesCount += 1;
+        return {};
+      },
+    );
 
     const institutionData = [elasticSearchInstitutionData];
     server.use(

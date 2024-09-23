@@ -29,7 +29,7 @@ function mapResolvedInstitution(ins: Institution) {
     supports_oauth: ins.oauth ?? ins.name?.includes("Oauth"),
     aggregators: ins.aggregators,
     aggregator: ins.aggregator,
-  }
+  };
 }
 
 export function mapCachedInstitution(
@@ -72,13 +72,13 @@ function mapConnection(connection: Connection): Member {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           options: [] as any[],
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any
+        } as any;
         switch (c.type) {
           case ChallengeType.QUESTION:
             ret.type = 0;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ret.label = (c.data as any[])?.[0].value || c.question;
-            break
+            break;
           case ChallengeType.TOKEN:
             ret.type = 2; // ?
             // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
@@ -113,10 +113,10 @@ function mapConnection(connection: Connection): Member {
             break;
         }
         return ret;
-      })
-    }
+      }),
+    },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any
+  } as any;
 }
 
 export class ConnectApi extends AggregatorAdapterBase {
@@ -272,7 +272,7 @@ export class ConnectApi extends AggregatorAdapterBase {
 
     const institution = await this.aggregatorAdapter.GetInstitutionById(
       aggregatorInstitutionId,
-    )
+    );
 
     return { institution: mapResolvedInstitution(institution) };
   }

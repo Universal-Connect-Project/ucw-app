@@ -7,17 +7,17 @@ import { info, error as logError } from "../infra/logger";
 import type {
   CachedInstitution,
   MappedJobTypes,
-  Aggregator
-} from '../shared/contract'
-import { getPreferences } from '../shared/preferences'
+  Aggregator,
+} from "../shared/contract";
+import { getPreferences } from "../shared/preferences";
 import {
   getAvailableAggregators,
-  JOB_TYPE_PARTIAL_SUPPORT_MAP
-} from '../shared/aggregators'
-import { ElasticSearchMock } from '../test/elasticSearchMock'
-import { fetchInstitutions } from './institutionSyncer'
-import { INSTITUTION_CURRENT_LIST_IDS } from './storageClient/constants'
-import { getSet, overwriteSet } from './storageClient/redis'
+  JOB_TYPE_PARTIAL_SUPPORT_MAP,
+} from "../shared/aggregators";
+import { ElasticSearchMock } from "../test/elasticSearchMock";
+import { fetchInstitutions } from "./institutionSyncer";
+import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
+import { getSet, overwriteSet } from "./storageClient/redis";
 
 export function getInstitutionFilePath() {
   return resolve(__dirname, "../../cachedDefaults/ucwInstitutionsMapping.json");
@@ -50,6 +50,7 @@ export async function indexElasticSearch() {
   await ElasticsearchClient.indices.create({ index: "institutions" });
 
   const indexPromises = institutionData.map(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async (institution: { id: any }) => {
       return await ElasticsearchClient.index({
         index: "institutions",
@@ -93,10 +94,11 @@ function getInstitutionDataFromFile(): CachedInstitution[] {
 export async function searchByRoutingNumber(
   routingNumber: string,
   jobType: MappedJobTypes,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any[]> {
-  const preferences = await getPreferences()
-  const hiddenInstitutions = preferences?.hiddenInstitutions || []
-  const supportedAggregators = preferences?.supportedAggregators || []
+  const preferences = await getPreferences();
+  const hiddenInstitutions = preferences?.hiddenInstitutions || [];
+  const supportedAggregators = preferences?.supportedAggregators || [];
 
   const searchResults: estypes.SearchResponseBody =
     await ElasticsearchClient.search({
@@ -113,8 +115,8 @@ export async function searchByRoutingNumber(
             },
             minimum_should_match: 1,
             must: mustQuery(supportedAggregators, jobType),
-            must_not: buildMustNotQuery(hiddenInstitutions)
-          }
+            must_not: buildMustNotQuery(hiddenInstitutions),
+          },
         },
         size: 20,
       },
@@ -128,10 +130,11 @@ export async function searchByRoutingNumber(
 export async function search(
   searchTerm: string,
   jobType: MappedJobTypes,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any[]> {
-  const preferences = await getPreferences()
-  const hiddenInstitutions = preferences?.hiddenInstitutions || []
-  const supportedAggregators = preferences?.supportedAggregators || []
+  const preferences = await getPreferences();
+  const hiddenInstitutions = preferences?.hiddenInstitutions || [];
+  const supportedAggregators = preferences?.supportedAggregators || [];
 
   const searchResults: estypes.SearchResponseBody =
     await ElasticsearchClient.search({
@@ -142,8 +145,8 @@ export async function search(
             should: fuzzySearchTermQuery(searchTerm),
             minimum_should_match: 1,
             must: mustQuery(supportedAggregators, jobType),
-            must_not: buildMustNotQuery(hiddenInstitutions)
-          }
+            must_not: buildMustNotQuery(hiddenInstitutions),
+          },
         },
         size: 20,
       },
@@ -193,17 +196,21 @@ function fuzzySearchTermQuery(searchTerm: string) {
   ];
 }
 
-function mustQuery(supportedAggregators: Aggregator[], jobType: MappedJobTypes) {
+function mustQuery(
+  supportedAggregators: Aggregator[],
+  jobType: MappedJobTypes,
+) {
   const aggregatorQueryTerms = supportedAggregators.map((aggregator) => {
     return {
       exists: {
-        field: `${aggregator}.id`
-      }
-    }
-  })
+        field: `${aggregator}.id`,
+      },
+    };
+  });
 
   const institutionJobTypeFilter = JOB_TYPE_PARTIAL_SUPPORT_MAP[jobType];
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let jobTypeSupported = [] as any;
   if (institutionJobTypeFilter.length > 0) {
     jobTypeSupported = supportedAggregators
@@ -213,12 +220,12 @@ function mustQuery(supportedAggregators: Aggregator[], jobType: MappedJobTypes) 
             must: institutionJobTypeFilter.map((jobTypeFilter) => {
               return {
                 term: {
-                  [`${aggregator}.${jobTypeFilter}`]: true
-                }
-              }
-            })
-          }
-        }
+                  [`${aggregator}.${jobTypeFilter}`]: true,
+                },
+              };
+            }),
+          },
+        };
       })
       .flat();
   }
@@ -237,6 +244,7 @@ function mustQuery(supportedAggregators: Aggregator[], jobType: MappedJobTypes) 
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function buildMustNotQuery(hiddenInstitutions: string[]): any[] {
   const mustNotClauses = [];
 
@@ -271,8 +279,8 @@ export async function getRecommendedInstitutions(
 ): Promise<CachedInstitution[]> {
   const preferences = await getPreferences();
 
-  const supportedAggregators = preferences.supportedAggregators
-  const recommendedInstitutions = preferences?.recommendedInstitutions
+  const supportedAggregators = preferences.supportedAggregators;
+  const recommendedInstitutions = preferences?.recommendedInstitutions;
 
   if (!recommendedInstitutions) {
     return [];
@@ -301,9 +309,9 @@ export async function getRecommendedInstitutions(
           institution,
           jobType,
           shouldRequireFullSupport: false,
-          supportedAggregators: supportedAggregators
-        }).length
-    )
+          supportedAggregators: supportedAggregators,
+        }).length,
+    );
 }
 
 export async function deleteRemovedInstitutions(

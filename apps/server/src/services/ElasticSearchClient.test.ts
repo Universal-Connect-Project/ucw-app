@@ -11,12 +11,12 @@ import {
   initialize,
   search,
   searchByRoutingNumber,
-  updateInstitutions
-} from '../services/ElasticSearchClient'
-import type { CachedInstitution } from '../shared/contract'
-import { MappedJobTypes } from '../shared/contract'
-import * as preferences from '../shared/preferences'
-import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from '../test-adapter'
+  updateInstitutions,
+} from "../services/ElasticSearchClient";
+import type { CachedInstitution } from "../shared/contract";
+import { MappedJobTypes } from "../shared/contract";
+import * as preferences from "../shared/preferences";
+import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../test-adapter";
 import {
   ElasticSearchMock,
   elasticSearchMockError,
@@ -34,9 +34,9 @@ jest
 
 interface searchQueryArgs {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  jobTypeQuery?: any[]
-  filterTestBanks?: boolean
-  routingNumber?: string
+  jobTypeQuery?: any[];
+  filterTestBanks?: boolean;
+  routingNumber?: string;
 }
 
 function searchQuery(args: searchQueryArgs = {}) {
@@ -46,11 +46,11 @@ function searchQuery(args: searchQueryArgs = {}) {
         must: [
           {
             term: {
-              [`${aggregator}.supports_aggregation`]: true
-            }
-          }
-        ]
-      }
+              [`${aggregator}.supports_aggregation`]: true,
+            },
+          },
+        ],
+      },
     })),
     filterTestBanks = false,
     routingNumber,
@@ -112,8 +112,8 @@ function searchQuery(args: searchQueryArgs = {}) {
         bool: {
           should: testPreferences.supportedAggregators.map((aggregator) => ({
             exists: {
-              field: `${aggregator}.id`
-            }
+              field: `${aggregator}.id`,
+            },
           })),
           minimum_should_match: 1,
           must: {
@@ -376,13 +376,13 @@ describe("search", () => {
                   must: [
                     {
                       term: {
-                        [`${aggregator}.supports_identification`]: true
-                      }
-                    }
-                  ]
-                }
-              })
-            )
+                        [`${aggregator}.supports_identification`]: true,
+                      },
+                    },
+                  ],
+                },
+              }),
+            ),
           }),
           size: 20,
         },
@@ -423,12 +423,12 @@ describe("search", () => {
                 bool: {
                   must: supportsArray.map((supportsProp) => ({
                     term: {
-                      [`${aggregator}.${supportsProp}`]: true
-                    }
-                  }))
-                }
-              })
-            )
+                      [`${aggregator}.${supportsProp}`]: true,
+                    },
+                  })),
+                },
+              }),
+            ),
           }),
           size: 20,
         },
@@ -564,9 +564,9 @@ describe("getRecommendedInstitutions", () => {
   it("filters out institutions that don't have available aggregators because of job type", async () => {
     const mockPreferences: preferences.Preferences = {
       ...testPreferences,
-      supportedAggregators: [TEST_EXAMPLE_A_AGGREGATOR_STRING]
+      supportedAggregators: [TEST_EXAMPLE_A_AGGREGATOR_STRING],
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any
+    } as any;
 
     jest
       .spyOn(preferences, "getPreferences")
@@ -667,10 +667,10 @@ describe("deleteRemovedInstitutions", () => {
         path: "/institutions/_doc/:id",
       },
       () => {
-        deletedCount += 1
-        return {}
-      }
-    )
+        deletedCount += 1;
+        return {};
+      },
+    );
 
     await overwriteSet(
       INSTITUTION_CURRENT_LIST_IDS,
@@ -707,9 +707,9 @@ describe("deleteRemovedInstitutions", () => {
         path: "/institutions/_doc/:id",
       },
       () => {
-        return mockError
-      }
-    )
+        return mockError;
+      },
+    );
 
     await deleteRemovedInstitutions(newInstitutions as CachedInstitution[]);
 
