@@ -58,7 +58,7 @@ const testChallenge = {
   response: 'testResponse'
 }
 
-describe('mx provider', () => {
+describe('mx aggregator', () => {
   describe('MxAdapter', () => {
     it('works with integration credentials', async () => {
       expect(await mxAdapterInt.GetInstitutionById('testId')).toEqual({
@@ -67,7 +67,7 @@ describe('mx provider', () => {
         name: institutionResponse.name,
         oauth: institutionResponse.supports_oauth,
         url: institutionResponse.url,
-        provider: 'mx_int'
+        aggregator: 'mx_int'
       })
     })
 
@@ -79,7 +79,7 @@ describe('mx provider', () => {
           name: institutionResponse.name,
           oauth: institutionResponse.supports_oauth,
           url: institutionResponse.url,
-          provider: 'mx'
+          aggregator: 'mx'
         })
       })
 
@@ -102,7 +102,7 @@ describe('mx provider', () => {
           name: institutionResponse.name,
           oauth: institutionResponse.supports_oauth,
           url: institutionResponse.url,
-          provider: 'mx'
+          aggregator: 'mx'
         })
       })
     })
@@ -141,7 +141,7 @@ describe('mx provider', () => {
             is_being_aggregated: firstMember.is_being_aggregated,
             is_oauth: firstMember.is_oauth,
             oauth_window_uri: firstMember.oauth_window_uri,
-            provider: 'mx'
+            aggregator: 'mx'
           },
           {
             id: secondMember.guid,
@@ -150,7 +150,7 @@ describe('mx provider', () => {
             is_being_aggregated: secondMember.is_being_aggregated,
             is_oauth: secondMember.is_oauth,
             oauth_window_uri: secondMember.oauth_window_uri,
-            provider: 'mx'
+            aggregator: 'mx'
           }
         ])
       })
@@ -221,6 +221,7 @@ describe('mx provider', () => {
       })
 
       describe('createMemberPayload spy tests', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let createMemberPayload: any
 
         beforeEach(() => {
@@ -598,7 +599,7 @@ describe('mx provider', () => {
           is_being_aggregated: testMember.is_being_aggregated,
           is_oauth: testMember.is_oauth,
           oauth_window_uri: testMember.oauth_window_uri,
-          provider: 'mx'
+          aggregator: 'mx'
         })
       })
     })
@@ -619,7 +620,7 @@ describe('mx provider', () => {
           is_being_aggregated: testMember.is_being_aggregated,
           is_oauth: testMember.is_oauth,
           oauth_window_uri: testMember.oauth_window_uri,
-          provider: 'mx',
+          aggregator: 'mx',
           user_id: testUserId
         })
       })
@@ -713,7 +714,7 @@ describe('mx provider', () => {
           )
         ).toEqual({
           cur_job_id: testMember.guid,
-          provider: 'mx',
+          aggregator: 'mx',
           id: testMember.guid,
           user_id: userId,
           status:

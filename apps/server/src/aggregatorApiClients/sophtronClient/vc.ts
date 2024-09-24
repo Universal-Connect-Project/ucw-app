@@ -1,17 +1,17 @@
 import axios from 'axios'
 import { buildSophtronAuthCode } from '../../utils'
 import SophtronClient from './'
-import providerCredentials from '../../providerCredentials'
+import aggregatorCredentials from '../../aggregatorCredentials'
 
 interface VcResponse {
   vc: string
 }
 
-const { sophtron: sophtronProviderCredentials } = providerCredentials
+const { sophtron: sophtronAggregatorCredentials } = aggregatorCredentials
 
-const { clientId, secret, vcEndpoint } = sophtronProviderCredentials
+const { clientId, secret, vcEndpoint } = sophtronAggregatorCredentials
 
-const sophtronClient = new SophtronClient(sophtronProviderCredentials)
+const sophtronClient = new SophtronClient(sophtronAggregatorCredentials)
 
 export const getVc = async (path: string) => {
   const res = await sophtronClient.getUserIntegrationKey()

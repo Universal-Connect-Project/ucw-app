@@ -31,13 +31,13 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  const testProviders = ['mx_int', 'sophtron']
+  const testAggregators = ['mx_int', 'sophtron']
   const userId = Cypress.env('userId')
 
-  testProviders.forEach((provider) => {
+  testAggregators.forEach((aggregator) => {
     cy.request({
       method: 'DELETE',
-      url: `/api/provider/${provider}/user/${userId}`,
+      url: `/api/aggregator/${aggregator}/user/${userId}`,
       failOnStatusCode: false
     }).should((response) => {
       expect(response.status).to.be.oneOf([200, 204, 400])

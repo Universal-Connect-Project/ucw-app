@@ -1,11 +1,11 @@
 import axios from 'axios'
 import { debug, error } from '../../infra/logger'
-import providerCredentials from '../../providerCredentials'
+import aggregatorCredentials from '../../aggregatorCredentials'
 
 export const getVc = async (path: string, isProd: boolean) => {
   const configuration = isProd
-    ? providerCredentials.mxProd
-    : providerCredentials.mxInt
+    ? aggregatorCredentials.mxProd
+    : aggregatorCredentials.mxInt
 
   const authHeader =
     'Basic ' +

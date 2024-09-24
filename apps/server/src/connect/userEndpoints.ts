@@ -1,10 +1,10 @@
 import type { Response } from 'express'
-import { getProviderAdapter } from '../adapterIndex'
-import { withValidateProviderInPath } from '../utils/validators'
-import type { Provider } from '../adapterSetup'
+import { getAggregatorAdapter } from '../adapterIndex'
+import { withValidateAggregatorInPath } from '../utils/validators'
+import type { Aggregator } from '../adapterSetup'
 
 interface UserDeleteParameters {
-  provider: Provider
+  aggregator: Aggregator
   userId: string
 }
 
@@ -12,18 +12,18 @@ export interface UserDeleteRequest {
   params: UserDeleteParameters
 }
 
-export const userDeleteHandler = withValidateProviderInPath(
+export const userDeleteHandler = withValidateAggregatorInPath(
   async (req: UserDeleteRequest, res: Response) => {
-    const { userId, provider } = req.params
+    const { userId, aggregator } = req.params
 
     try {
-      const providerAdapter = getProviderAdapter(provider)
+      const aggregatorAdapter = getAggregatorAdapter(aggregator)
       const failIfUserNotFound = true
-      const providerUserId = await providerAdapter.ResolveUserId(
+      const aggregatorUserId = await aggregatorAdapter.ResolveUserId(
         userId,
         failIfUserNotFound
       )
-      const ret = await providerAdapter.DeleteUser(providerUserId)
+      const ret = await aggregatorAdapter.DeleteUser(aggregatorUserId)
       res.status(ret.status)
       res.send(ret.data)
     } catch (error) {

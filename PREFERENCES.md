@@ -6,14 +6,14 @@ _See [testPreferences.json](./apps/server/cachedDefaults/testData/testPreference
 
 ## Table of Contents
 
-- [Provider Credentials](#provider-credentials)
+- [Aggregator Credentials](#aggregator-credentials)
 - [Preference Settings](#preference-settings)
 
-## Provider Credentials
+## Aggregator Credentials
 
-**NOTE:** For any providers listed in the section labeled `supportedProviders`, you must provide your own credentials for each of these providers in the `./apps/server/.env` file. You need to have credentials for a minimum of one provider in order for the UCW to function correctly.
+**NOTE:** For any aggregators listed in the section labeled `supportedAggregators`, you must provide your own credentials for each of these aggregators in the `./apps/server/.env` file. You need to have credentials for a minimum of one aggregator in order for the UCW to function correctly.
 
-Follow these links to sign-up for credentials for each provider that the UCW currently supports:
+Follow these links to sign-up for credentials for each aggregator that the UCW currently supports:
 
 - MX - [Register for a developer account](https://dashboard.mx.com/sign_up)
   - Once you have created an account, go to [https://dashboard.mx.com/home](https://dashboard.mx.com/home), and look for your `API Key` and `Client ID`. Put those values in `./apps/server/.env`
@@ -21,40 +21,40 @@ Follow these links to sign-up for credentials for each provider that the UCW cur
 - Sophtron - [Register for a developer account](https://sophtron.com/Account/Register)
   - Once you have created an account, go to [https://sophtron.com/Manage](https://sophtron.com/Manage), and look for your `UserId` and `AccessKey`. Put those values in `./apps/server/.env`
 
-_Note: Providers require a contract to access their production APIs._
+_Note: Aggregators require a contract to access their production APIs._
 
 ## Preference Settings
 
 Here are details for what each setting means.
 
-`defaultProvider` (`string`) - Set the default aggregator for all connections. This value is used as a fall-back in cases where other providers you also support are not available.
+`defaultAggregator` (`string`) - Set the default aggregator for all connections. This value is used as a fall-back in cases where other aggregators you also support are not available.
 
 ```
-"defaultProvider": "mx"
+"defaultAggregator": "mx"
 ```
 
-`supportedProviders` (`string[]`) - Set which providers you want to use for connections.
+`supportedAggregators` (`string[]`) - Set which aggregators you want to use for connections.
 
 ```
-"supportedProviders": [
+"supportedAggregators": [
   "mx",
   "sophtron"
 ]
 ```
 
-`defaultProviderVolume` (`{ [key: string]: number }`) - An object of providers, with a number representing the chance of being selected. The combined volume across all providers must equal 100.
+`defaultAggregatorVolume` (`{ [key: string]: number }`) - An object of aggregators, with a number representing the chance of being selected. The combined volume across all aggregators must equal 100.
 
 ```
-"defaultProviderVolume": {
+"defaultAggregatorVolume": {
   "mx": 50,
   "sophtron": 50
 }
 ```
 
-`institutionProviderVolumeMap` (`{ [key: string]: { [key:string]: number } }`) - An object of institutions, with a related object of providers. The number associated with each provider represents the chance of being selected. The combined volume for each individual institution must equal 100.
+`institutionAggregatorVolumeMap` (`{ [key: string]: { [key:string]: number } }`) - An object of institutions, with a related object of aggregators. The number associated with each aggregator represents the chance of being selected. The combined volume for each individual institution must equal 100.
 
 ```
-"institutionProviderVolumeMap": {
+"institutionAggregatorVolumeMap": {
   "1e65df13-be46-46c1-9aab-b950ef6523dd": {
     "mx": 70,
     "sophtron": 30

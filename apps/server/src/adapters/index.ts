@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { getProviderAdapter } from '../adapterIndex'
+import { getAggregatorAdapter } from '../adapterIndex'
 import * as logger from '../infra/logger'
-import providerCredentials from '../providerCredentials'
+import aggregatorCredentials from '../aggregatorCredentials'
 import { AnalyticsClient } from '../services/analyticsClient'
-import { resolveInstitutionProvider } from '../services/institutionResolver'
+import { resolveInstitutionAggregator } from '../services/institutionResolver'
 import { set } from '../services/storageClient/redis'
 import type {
   Challenge,
@@ -13,13 +13,14 @@ import type {
   Credential,
   Institution,
   MappedJobTypes,
-  Provider,
+  Aggregator,
   UpdateConnectionRequest,
   WidgetAdapter
 } from '../shared/contract'
 import { ConnectionStatus, OAuthStatus } from '../shared/contract'
 import { decodeAuthToken, mapJobType } from '../utils'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function instrumentation(context: Context, input: any) {
   const { user_id } = input
   context.user_id = user_id
@@ -28,11 +29,12 @@ export async function instrumentation(context: Context, input: any) {
     return false
   }
 
-  if (Boolean(input.current_member_guid) && Boolean(input.current_provider)) {
-    context.provider = input.current_provider
+  if (Boolean(input.current_member_guid) && Boolean(input.current_aggregator)) {
+    context.aggregator = input.current_aggregator
     context.connection_id = input.current_member_guid
   }
   if (input.auth != null) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     context.auth = decodeAuthToken(input.auth) as any
   }
   context.partner = input.current_partner
@@ -44,11 +46,13 @@ export async function instrumentation(context: Context, input: any) {
   return true
 }
 
-export class ProviderAdapterBase {
+export class AggregatorAdapterBase {
   context: Context
-  providerAdapter: WidgetAdapter
+  aggregatorAdapter: WidgetAdapter
   analyticsClient: AnalyticsClient
-  providers: string[]
+  aggregators: string[]
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(req: any) {
     this.context = req.context
   }
@@ -58,14 +62,16 @@ export class ProviderAdapterBase {
 
     this.analyticsClient = new AnalyticsClient(token)
     try {
-      if (this.context?.provider) {
-        this.providerAdapter = getProviderAdapter(
-          this.context?.provider as Provider
+      if (this.context?.aggregator) {
+        this.aggregatorAdapter = getAggregatorAdapter(
+          this.context?.aggregator as Aggregator
         )
       }
-      this.providers = Object.values(providerCredentials)
+      this.aggregators = Object.values(aggregatorCredentials)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .filter((v: any) => v.available)
-        .map((v: any) => v.provider)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .map((v: any) => v.aggregator)
       return true
     } catch (err) {
       logger.error('Error parsing auth token', err)
@@ -75,11 +81,11 @@ export class ProviderAdapterBase {
   }
 
   async resolveInstitution(id: string): Promise<Institution> {
-    const resolvedInstitution = await resolveInstitutionProvider(
+    const resolvedInstitution = await resolveInstitutionAggregator(
       id,
       this.context.job_type as MappedJobTypes
     )
-    this.context.provider = resolvedInstitution.provider
+    this.context.aggregator = resolvedInstitution.aggregator
     this.context.updated = true
     this.context.institution_id = resolvedInstitution.id
     this.context.resolved_user_id = null
@@ -87,9 +93,9 @@ export class ProviderAdapterBase {
     return resolvedInstitution
   }
 
-  async getProviderInstitution(ucpId: string): Promise<Institution> {
+  async getAggregatorInstitution(ucpId: string): Promise<Institution> {
     const resolved = await this.resolveInstitution(ucpId)
-    const inst = await this.providerAdapter.GetInstitutionById(resolved.id)
+    const inst = await this.aggregatorAdapter.GetInstitutionById(resolved.id)
     if (inst != null) {
       inst.name = resolved.name ?? inst.name
       inst.url = resolved?.url ?? inst.url?.trim()
@@ -102,18 +108,18 @@ export class ProviderAdapterBase {
     this.context.updated = true
     this.context.current_job_id = null
     // let id = await this.resolveInstitution(guid)
-    return await this.providerAdapter.ListInstitutionCredentials(guid)
+    return await this.aggregatorAdapter.ListInstitutionCredentials(guid)
   }
 
   async getConnection(connection_id: string): Promise<Connection> {
-    return await this.providerAdapter.GetConnectionById(
+    return await this.aggregatorAdapter.GetConnectionById(
       connection_id,
       this.getUserId()
     )
   }
 
   async getConnectionStatus(connection_id: string): Promise<Connection> {
-    return await this.providerAdapter.GetConnectionStatus(
+    return await this.aggregatorAdapter.GetConnectionStatus(
       connection_id,
       this.context.current_job_id,
       this.context.single_account_select,
@@ -126,7 +132,7 @@ export class ProviderAdapterBase {
   ): Promise<Connection> {
     this.context.updated = true
     this.context.current_job_id = null
-    const ret = await this.providerAdapter.CreateConnection(
+    const ret = await this.aggregatorAdapter.CreateConnection(
       connection,
       this.getUserId()
     )
@@ -143,7 +149,7 @@ export class ProviderAdapterBase {
   async updateConnection(
     connection: UpdateConnectionRequest
   ): Promise<Connection> {
-    const ret = await this.providerAdapter.UpdateConnection(
+    const ret = await this.aggregatorAdapter.UpdateConnection(
       connection,
       this.getUserId()
     )
@@ -159,7 +165,7 @@ export class ProviderAdapterBase {
   }
 
   async answerChallenge(connection_id: string, challenges: Challenge[]) {
-    return await this.providerAdapter.AnswerChallenge(
+    return await this.aggregatorAdapter.AnswerChallenge(
       {
         id: connection_id ?? this.context.connection_id,
         challenges
@@ -189,6 +195,7 @@ export class ProviderAdapterBase {
           : connection.status === ConnectionStatus.CONNECTED
             ? OAuthStatus.COMPLETE
             : OAuthStatus.ERROR
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any
     if (ret.auth_status === OAuthStatus.ERROR) {
       ret.error_reason = connection.status
@@ -204,26 +211,27 @@ export class ProviderAdapterBase {
   }
 
   async deleteConnection(connection_id: string): Promise<void> {
-    await this.providerAdapter.DeleteConnection(connection_id, this.getUserId())
+    await this.aggregatorAdapter.DeleteConnection(connection_id, this.getUserId())
   }
 
   async getConnectionCredentials(memberGuid: string): Promise<Credential[]> {
     this.context.updated = true
     this.context.current_job_id = null
-    return await this.providerAdapter.ListConnectionCredentials(
+    return await this.aggregatorAdapter.ListConnectionCredentials(
       memberGuid,
       this.getUserId()
     )
   }
 
   async ResolveUserId(id: string, failIfNotFound: boolean = false) {
-    return await this.providerAdapter?.ResolveUserId(id, failIfNotFound)
+    return await this.aggregatorAdapter?.ResolveUserId(id, failIfNotFound)
   }
 
   getUserId(): string {
     return this.context.resolved_user_id
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async analytics(path: string, content: any) {
     return await this.analyticsClient?.analytics(
       path.replaceAll('/', ''),

@@ -1,19 +1,19 @@
 import type { Response } from 'express'
 import { HttpResponse, http } from 'msw'
-import type { Provider } from '../shared/contract'
-import { Providers } from '../shared/contract'
+import type { Aggregator } from '../shared/contract'
+import { Aggregators } from '../shared/contract'
 import { MX_DELETE_USER_PATH } from '../test/handlers'
 import { listUsersData } from '../test/testData/users'
 import { server } from '../test/testServer'
 import type { UserDeleteRequest } from './userEndpoints'
 import { userDeleteHandler } from './userEndpoints'
-import { invalidProviderString } from '../utils/validators'
+import { invalidAggregatorString } from '../utils/validators'
 
 const user = listUsersData.users[0]
 
 describe('userEndpoints', () => {
   describe('userDeleteHandler', () => {
-    it('responds with a 400 on unsupported provider', async () => {
+    it('responds with a 400 on unsupported aggregator', async () => {
       const res = {
         send: jest.fn(),
         status: jest.fn()
@@ -21,14 +21,14 @@ describe('userEndpoints', () => {
 
       const req: UserDeleteRequest = {
         params: {
-          provider: 'unsupportedProvider' as Provider,
+          aggregator: 'unsupportedAggregator' as Aggregator,
           userId: 'testUserIdWhichDoesntExist'
         }
       }
 
       await userDeleteHandler(req, res)
 
-      expect(res.send).toHaveBeenCalledWith(invalidProviderString)
+      expect(res.send).toHaveBeenCalledWith(invalidAggregatorString)
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(res.status).toHaveBeenCalledWith(400)
     })
@@ -41,7 +41,7 @@ describe('userEndpoints', () => {
 
       const req: UserDeleteRequest = {
         params: {
-          provider: Providers.MX,
+          aggregator: Aggregators.MX,
           userId: user.id
         }
       }
@@ -68,7 +68,7 @@ describe('userEndpoints', () => {
 
       const req: UserDeleteRequest = {
         params: {
-          provider: Providers.MX,
+          aggregator: Aggregators.MX,
           userId: user.id
         }
       }

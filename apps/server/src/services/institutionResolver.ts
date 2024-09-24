@@ -1,17 +1,17 @@
-import { getAvailableProviders } from '../shared/providers'
+import { getAvailableAggregators } from '../shared/aggregators'
 import { debug } from '../infra/logger'
 import { getInstitution } from '../services/ElasticSearchClient'
 import type {
   CachedInstitution,
-  InstitutionProvider,
+  InstitutionAggregator,
   MappedJobTypes,
-  Provider,
+  Aggregator,
   ResolvedInstitution
 } from '../shared/contract'
 import { getPreferences } from '../shared/preferences'
 import { adapterMap } from '../adapterSetup'
 
-const getProviderByVolume = (volumeMap: Record<string, number>): Provider => {
+const getAggregatorByVolume = (volumeMap: Record<string, number>): Aggregator => {
   if (!volumeMap) {
     return undefined
   }
@@ -30,77 +30,78 @@ const getProviderByVolume = (volumeMap: Record<string, number>): Provider => {
     randomNumberCutoffTotal += volume
 
     return false
-  })?.[0] as Provider
+  })?.[0] as Aggregator
 }
 
-export async function resolveInstitutionProvider(
+export async function resolveInstitutionAggregator(
   institutionId: string,
   jobType: MappedJobTypes
 ): Promise<ResolvedInstitution> {
   const institution = await getInstitution(institutionId)
   const preferences = await getPreferences()
-  const providersWithAtLeastPartialSupport: Provider[] = getAvailableProviders({
+  const aggregatorsWithAtLeastPartialSupport: Aggregator[] = getAvailableAggregators({
     institution,
     jobType,
     shouldRequireFullSupport: false,
-    supportedProviders: preferences.supportedProviders
+    supportedAggregators: preferences.supportedAggregators
   })
 
-  const providersWithFullSupport: Provider[] = getAvailableProviders({
+  const aggregatorsWithFullSupport: Aggregator[] = getAvailableAggregators({
     institution,
     jobType,
     shouldRequireFullSupport: true,
-    supportedProviders: preferences.supportedProviders
+    supportedAggregators: preferences.supportedAggregators
   })
 
-  const providers = providersWithFullSupport.length
-    ? providersWithFullSupport
-    : providersWithAtLeastPartialSupport
+  const aggregators = aggregatorsWithFullSupport.length
+    ? aggregatorsWithFullSupport
+    : aggregatorsWithAtLeastPartialSupport
 
-  let provider: Provider
+  let aggregator: Aggregator
 
   const potentialResolvers = [
     () =>
-      getProviderByVolume(
-        preferences?.institutionProviderVolumeMap?.[institutionId]
+      getAggregatorByVolume(
+        preferences?.institutionAggregatorVolumeMap?.[institutionId]
       ),
-    () => getProviderByVolume(preferences?.defaultProviderVolume),
-    () => preferences?.defaultProvider
+    () => getAggregatorByVolume(preferences?.defaultAggregatorVolume),
+    () => preferences?.defaultAggregator
   ]
 
   for (const resolver of potentialResolvers) {
-    const possibleProvider = resolver()
+    const possibleAggregator = resolver()
 
-    if (providers.includes(possibleProvider)) {
-      provider = possibleProvider
+    if (aggregators.includes(possibleAggregator)) {
+      aggregator = possibleAggregator
       break
     }
   }
 
-  if (!provider) {
-    provider = providers[Math.floor(Math.random() * providers.length)]
+  if (!aggregator) {
+    aggregator = aggregators[Math.floor(Math.random() * aggregators.length)]
   }
 
-  const institutionProvider = institution[
-    provider as keyof CachedInstitution
-  ] as InstitutionProvider
+  const institutionAggregator = institution[
+    aggregator as keyof CachedInstitution
+  ] as InstitutionAggregator
 
-  const testAdapterName = (adapterMap[provider] as any)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const testAdapterName = (adapterMap[aggregator] as any)
     ?.testInstitutionAdapterName
 
   if (testAdapterName && institution.is_test_bank) {
-    provider = testAdapterName
+    aggregator = testAdapterName
   }
 
   debug(
-    `Resolving institution: ${institutionId} to provider: ${provider} available providers: ${JSON.stringify(providers)}`
+    `Resolving institution: ${institutionId} to aggregator: ${aggregator} available aggregators: ${JSON.stringify(aggregators)}`
   )
 
   return {
-    id: institutionProvider?.id,
+    id: institutionAggregator?.id,
     url: institution?.url,
     name: institution?.name,
     logo_url: institution?.logo,
-    provider: provider as Provider
+    aggregator: aggregator as Aggregator
   }
 }

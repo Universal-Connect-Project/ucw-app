@@ -12,37 +12,38 @@ import { MappedJobTypes } from '../shared/contract'
 import { get, set } from '../services/storageClient/redis'
 
 const createRedisStatusKey = ({
-  provider,
+  aggregator,
   userId
 }: {
-  provider: string
+  aggregator: string
   userId: string
-}) => `${provider}-${userId}`
+}) => `${aggregator}-${userId}`
 
 export class TestAdapter implements WidgetAdapter {
   labelText: string
-  provider: string
+  aggregator: string
 
   constructor({
     labelText,
-    provider
+    aggregator
   }: {
     labelText: string
-    provider: string
+    aggregator: string
   }) {
     this.labelText = labelText
-    this.provider = provider
+    this.aggregator = aggregator
   }
 
   async GetInstitutionById(id: string): Promise<Institution> {
     return {
       ...testExampleInstitution,
       id,
-      provider: this.provider
+      aggregator: this.aggregator
     }
   }
 
   async ListInstitutionCredentials(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     institutionId: string
   ): Promise<Credential[]> {
     return [
@@ -53,6 +54,7 @@ export class TestAdapter implements WidgetAdapter {
     ]
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async ListConnections(userId: string): Promise<Connection[]> {
     return [
       {
@@ -62,13 +64,15 @@ export class TestAdapter implements WidgetAdapter {
         is_being_aggregated: false,
         is_oauth: false,
         oauth_window_uri: undefined,
-        provider: this.provider
+        aggregator: this.aggregator
       }
     ]
   }
 
   async ListConnectionCredentials(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     memberId: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     userId: string
   ): Promise<Credential[]> {
     return [
@@ -82,7 +86,9 @@ export class TestAdapter implements WidgetAdapter {
   }
 
   async CreateConnection(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     request: CreateConnectionRequest,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     userId: string
   ): Promise<Connection> {
     return {
@@ -92,20 +98,23 @@ export class TestAdapter implements WidgetAdapter {
       is_being_aggregated: false,
       is_oauth: false,
       oauth_window_uri: undefined,
-      provider: this.provider
+      aggregator: this.aggregator
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async DeleteConnection(id: string, userId: string): Promise<void> {}
 
-  async DeleteUser(providerUserId: string): Promise<any> {}
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+  async DeleteUser(aggregatorUserId: string): Promise<any> {}
 
   async UpdateConnection(
     request: UpdateConnectionRequest,
     userId: string
   ): Promise<Connection> {
     const redisStatusKey = createRedisStatusKey({
-      provider: this.provider,
+      aggregator: this.aggregator,
       userId
     })
 
@@ -129,12 +138,14 @@ export class TestAdapter implements WidgetAdapter {
       is_being_aggregated: false,
       is_oauth: false,
       oauth_window_uri: undefined,
-      provider: this.provider
+      aggregator: this.aggregator
     }
   }
 
   async UpdateConnectionInternal(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     request: UpdateConnectionRequest,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     userId: string
   ): Promise<Connection> {
     return {
@@ -144,7 +155,7 @@ export class TestAdapter implements WidgetAdapter {
       is_being_aggregated: false,
       is_oauth: false,
       oauth_window_uri: undefined,
-      provider: this.provider
+      aggregator: this.aggregator
     }
   }
 
@@ -158,7 +169,7 @@ export class TestAdapter implements WidgetAdapter {
       is_oauth: false,
       is_being_aggregated: false,
       oauth_window_uri: undefined,
-      provider: this.provider,
+      aggregator: this.aggregator,
       user_id: userId
     }
   }
@@ -170,12 +181,12 @@ export class TestAdapter implements WidgetAdapter {
     userId: string
   ): Promise<Connection> {
     const connectionInfo = await get(
-      createRedisStatusKey({ provider: this.provider, userId })
+      createRedisStatusKey({ aggregator: this.aggregator, userId })
     )
 
     if (connectionInfo?.verifiedOnce && singleAccountSelect) {
       return {
-        provider: this.provider,
+        aggregator: this.aggregator,
         id: 'testId',
         cur_job_id: 'testJobId',
         user_id: 'testUserId',
@@ -201,7 +212,7 @@ export class TestAdapter implements WidgetAdapter {
     }
 
     return {
-      provider: this.provider,
+      aggregator: this.aggregator,
       id: 'testId',
       cur_job_id: 'testJobId',
       user_id: userId,
@@ -211,8 +222,11 @@ export class TestAdapter implements WidgetAdapter {
   }
 
   async AnswerChallenge(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     request: UpdateConnectionRequest,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     jobId: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     userId: string
   ): Promise<boolean> {
     return true
@@ -220,6 +234,7 @@ export class TestAdapter implements WidgetAdapter {
 
   async ResolveUserId(
     userId: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     failIfNotFound: boolean = false
   ): Promise<string> {
     return userId

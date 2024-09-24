@@ -58,7 +58,7 @@ export function decodeAuthToken(input: string) {
       return input
     }
     return {
-      provider: arr[0],
+      aggregator: arr[0],
       token: arr[1],
       iv: arr[2]
     }

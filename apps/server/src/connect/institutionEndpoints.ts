@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express'
-import type { MappedJobTypes } from 'src/shared/contract'
-import { mapCachedInstitution } from '../connect/connectApi'
+import type { MappedJobTypes } from '../shared/contract'
+import { mapCachedInstitution } from './connectApi'
 import { search, searchByRoutingNumber } from '../services/ElasticSearchClient'
 import type { ConnectApi } from './connectApi'
 
@@ -12,8 +12,8 @@ export const getInstitutionHandler = async (
   req: InstitutionRequest,
   res: Response
 ) => {
-  if (req.context?.provider) {
-    const institution = await req.connectApi.loadInstitutionByProviderId(
+  if (req.context?.aggregator) {
+    const institution = await req.connectApi.loadInstitutionByAggregatorId(
       req.params.institution_guid
     )
 
@@ -59,8 +59,8 @@ export const favoriteInstitutionsHandler = async (
   req: InstitutionRequest,
   res: Response
 ) => {
-  const popularInsitutions = await req.connectApi.loadPopularInstitutions()
-  res.send(popularInsitutions)
+  const popularInstitutions = await req.connectApi.loadPopularInstitutions()
+  res.send(popularInstitutions)
 }
 
 export interface GetInstitutionCredentialsRequest extends InstitutionRequest {

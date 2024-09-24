@@ -75,7 +75,7 @@ jobs:
           config-file: cypress.config.prod.ts
           project: apps/server
           start: npm run dev:e2e
-          wait-on: 'http://localhost:8080/ping, http://localhost:9200'
+          wait-on: 'http://localhost:8080/health, http://localhost:9200'
 
       - name: Upload screenshots
         uses: actions/upload-artifact@v4

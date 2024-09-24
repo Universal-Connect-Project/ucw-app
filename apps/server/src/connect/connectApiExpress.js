@@ -124,7 +124,7 @@ export default function (app) {
   )
   app.get(ApiEndpoints.INSTITUTIONS, getInstitutionsHandler)
   app.get('/jobs/:member_guid', async (req, res) => {
-    if (['mx_int', 'mx'].includes(req.context.provider)) {
+    if (['mx_int', 'mx'].includes(req.context.aggregator)) {
       if (req.params.member_guid === 'null') {
         res.send({ job: { guid: 'none', job_type: AGGREGATION_JOB_TYPE } })
         return
@@ -211,19 +211,19 @@ export default function (app) {
     })
   })
 
-  app.delete('/api/provider/:provider/user/:userId', userDeleteHandler)
+  app.delete('/api/aggregator/:aggregator/user/:userId', userDeleteHandler)
 
   // VC Data Endpoints
   app.get(
-    '/data/provider/:provider/user/:userId/connection/:connectionId/accounts',
+    '/data/aggregator/:aggregator/user/:userId/connection/:connectionId/accounts',
     accountsDataHandler
   )
   app.get(
-    '/data/provider/:provider/user/:userId/connection/:connectionId/identity',
+    '/data/aggregator/:aggregator/user/:userId/connection/:connectionId/identity',
     identityDataHandler
   )
   app.get(
-    '/data/provider/:provider/user/:userId/account/:accountId/transactions',
+    '/data/aggregator/:aggregator/user/:userId/account/:accountId/transactions',
     transactionsDataHandler
   )
 }

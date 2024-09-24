@@ -19,7 +19,7 @@ const makeAConnection = async (jobType) => {
   expectConnectionSuccess()
 }
 
-describe('mx provider', () => {
+describe('mx aggregator', () => {
   generateVcDataTests({ makeAConnection })
 
   it('refreshes an mx connection if given the correct parameters and hides the back button', () => {

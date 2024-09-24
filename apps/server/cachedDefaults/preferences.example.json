@@ -1,24 +1,24 @@
 {
-  "defaultProvider": "provider1",
+  "defaultAggregator": "aggregator1",
 
-  "supportedProviders": [
-    "mx",
-    "sophtron"
+  "supportedAggregators": [
+    "aggregator1",
+    "aggregator2"
   ],
 
-  "defaultProviderVolume": {
-    "provider1": 70,
-    "provider2": 30
+  "defaultAggregatorVolume": {
+    "aggregator1": 70,
+    "aggregator2": 30
   },
 
-  "institutionProviderVolumeMap": {
+  "institutionAggregatorVolumeMap": {
     "institutionId1": {
-      "provider1": 33.33,
-      "provider2": 33.33,
-      "provider3": 33.34
+      "aggregator1": 33.33,
+      "aggregator2": 33.33,
+      "aggregator3": 33.34
     },
     "institutionId2": {
-      "provider1": 100
+      "aggregator1": 100
     }
   },
 

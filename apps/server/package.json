@@ -13,7 +13,7 @@
     "dev": "concurrently --kill-others \"npm run elasticsearch\" \"npm run server\" \"npm run redisserver\"",
     "dev:debug": "concurrently --kill-others \"npm run elasticsearch\" \"npm run server:debug\" \"npm run redisserver\"",
     "dev:e2e": "nodemon src/server.js",
-    "redisserver": "docker run --rm --name ucw_redis -p 6379:6379 redis",
+    "redisserver": "docker run --rm --name ucw_redis -p 6379:6379 redis:7.2-alpine",
     "server": "wait-on http://localhost:9200 && nodemon src/server.js",
     "server:debug": "wait-on http://localhost:9200 && node --inspect -r ts-node/register ./src/server.js",
     "lint": "eslint . --ext .js,.ts",

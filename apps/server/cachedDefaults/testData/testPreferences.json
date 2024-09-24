@@ -1,14 +1,14 @@
 {
-  "defaultProvider": "testExampleB",
+  "defaultAggregator": "testExampleB",
 
-  "supportedProviders": ["testExampleA", "testExampleB"],
+  "supportedAggregators": ["testExampleA", "testExampleB"],
 
-  "defaultProviderVolume": {
+  "defaultAggregatorVolume": {
     "testExampleA": 50,
     "testExampleB": 50
   },
 
-  "institutionProviderVolumeMap": {
+  "institutionAggregatorVolumeMap": {
     "1e65df13-be46-46c1-9aab-b950ef6523dd": {
       "testExampleA": 70,
       "testExampleB": 30

@@ -24,7 +24,7 @@ const makeAConnection = async (jobType) => {
   expectConnectionSuccess()
 }
 
-describe('Sophtron provider', () => {
+describe('Sophtron aggregator', () => {
   it('refreshes a sophtron connection if given the correct parameters and hides the back button', () => {
     refreshAConnection({
       enterCredentials: enterSophtronCredentials,

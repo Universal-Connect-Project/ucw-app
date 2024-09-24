@@ -1,12 +1,12 @@
 import { VCDataTypes } from '@repo/utils'
-import { getProviderAdapter, getVC } from './adapterIndex'
-import type { Provider } from './adapterSetup'
+import { getAggregatorAdapter, getVC } from './adapterIndex'
+import type { Aggregator } from './adapterSetup'
 import {
   mxVcAccountsData,
   mxVcIntegrationAccountsData
 } from './test/testData/mxVcData'
 import { sophtronVcAccountsData } from './test/testData/sophtronVcData'
-import { TEST_EXAMPLE_A_PROVIDER_STRING, TestAdapter } from './test-adapter'
+import { TEST_EXAMPLE_A_AGGREGATOR_STRING, TestAdapter } from './test-adapter'
 
 const connectionId = 'testConectionId'
 const type = VCDataTypes.ACCOUNTS
@@ -14,9 +14,9 @@ const userId = 'testUserId'
 
 describe('adapterSetup', () => {
   describe('getVC', () => {
-    it('uses mx integration if the provider is mx_int', async () => {
+    it('uses mx integration if the aggregator is mx_int', async () => {
       const response = await getVC({
-        provider: 'mx_int',
+        aggregator: 'mx_int',
         connectionId,
         type,
         userId
@@ -24,9 +24,9 @@ describe('adapterSetup', () => {
 
       expect(response).toEqual(mxVcIntegrationAccountsData)
     })
-    it('uses mx prod if the provider is mx', async () => {
+    it('uses mx prod if the aggregator is mx', async () => {
       const response = await getVC({
-        provider: 'mx',
+        aggregator: 'mx',
         connectionId,
         type,
         userId
@@ -34,9 +34,9 @@ describe('adapterSetup', () => {
 
       expect(response).toEqual(mxVcAccountsData)
     })
-    it('uses sophtron if the provider is sophtron', async () => {
+    it('uses sophtron if the aggregator is sophtron', async () => {
       const response = await getVC({
-        provider: 'sophtron',
+        aggregator: 'sophtron',
         connectionId,
         type,
         userId
@@ -45,28 +45,28 @@ describe('adapterSetup', () => {
       expect(response).toEqual(sophtronVcAccountsData)
     })
 
-    it('throws an error if the provider doesnt have a handler', async () => {
+    it('throws an error if the aggregator doesnt have a handler', async () => {
       await expect(
         async () =>
           await getVC({
-            provider: 'junk' as Provider,
+            aggregator: 'junk' as Aggregator,
             connectionId,
             type,
             userId
           })
-      ).rejects.toThrow('Unsupported provider junk')
+      ).rejects.toThrow('Unsupported aggregator junk')
     })
   })
 
-  describe('getProviderAdapter', () => {
-    it('throws an error if its an unsupported provider', async () => {
-      expect(() => getProviderAdapter('junk' as Provider)).toThrow(
-        'Unsupported provider junk'
+  describe('getAggregatorAdapter', () => {
+    it('throws an error if its an unsupported aggregator', async () => {
+      expect(() => getAggregatorAdapter('junk' as Aggregator)).toThrow(
+        'Unsupported aggregator junk'
       )
     })
 
     it('returns the testExample widget adapter', () => {
-      const adapter = getProviderAdapter(TEST_EXAMPLE_A_PROVIDER_STRING)
+      const adapter = getAggregatorAdapter(TEST_EXAMPLE_A_AGGREGATOR_STRING)
 
       expect(adapter).toBeInstanceOf(TestAdapter)
     })

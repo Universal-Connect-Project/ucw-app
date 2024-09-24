@@ -38,9 +38,8 @@ docker run --name ucw-app-ui-cli -p 5137:5137 -e UI_PORT=5137 -t ucw-app-ui-cli
 
 ## Testing with Docker Compose
 
-While developing the UCW with docker compose, using ` --ignore-buildable` will ensure that the docker images used are always 
-local, and not from dockerhub. This ensures that our local changes can be tested.
+While developing the UCW with docker compose, using ` --build` should build the docker images, so local changes can be tested.
 
 ```shell
-docker compose up --ignore-buildable
+docker compose up --build
 ```

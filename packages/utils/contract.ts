@@ -23,13 +23,13 @@ export interface Institution {
   name: string
   url: string
   logo_url: string | null
-  provider?: string | null
+  aggregator?: string | null
   oauth?: boolean | false
   code?: string | null
   instructional_text?: string | null
   small_logo_url?: string | null
   // eslint-disable-next-line @typescript-eslint/ban-types
-  providers?: Object | {}
+  aggregators?: Object | {}
 }
 
 export interface KeyValuePair {
@@ -102,7 +102,7 @@ export interface Connection {
   is_being_aggregated?: boolean | null
   is_oauth?: boolean | null
   name?: string | null
-  provider?: string | null
+  aggregator?: string | null
   user_id?: string | null
   challenges?: Challenge[]
   has_accounts?: boolean | null

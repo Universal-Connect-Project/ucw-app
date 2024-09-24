@@ -1,18 +1,18 @@
-import { Request, Response } from 'express'
-import { invalidProviderString, withValidateProviderInPath } from './validators'
-import { Providers } from '../shared/contract'
+import type { Request, Response } from 'express'
+import { invalidAggregatorString, withValidateAggregatorInPath } from './validators'
+import { Aggregators } from '../shared/contract'
 
 const successString = 'success!'
 
-const validatedHandler = withValidateProviderInPath(
+const validatedHandler = withValidateAggregatorInPath(
   (req: Request, res: Response) => {
     res.send(successString)
   }
 )
 
 describe('validators', () => {
-  describe('withValidateProviderInPath', () => {
-    it("fails with an error if the provider is missing and doesn't call the handler", () => {
+  describe('withValidateAggregatorInPath', () => {
+    it("fails with an error if the aggregator is missing and doesn't call the handler", () => {
       const req = {
         params: {}
       }
@@ -24,15 +24,15 @@ describe('validators', () => {
 
       validatedHandler(req, res)
 
-      expect(res.send).toHaveBeenCalledWith('"provider" is required')
+      expect(res.send).toHaveBeenCalledWith('"aggregator" is required')
       expect(res.status).toHaveBeenCalledWith(400)
       expect(res.send).not.toHaveBeenCalledWith(successString)
     })
 
-    it("fails with an error if the provider is wrong and doesn't call the handler", () => {
+    it("fails with an error if the aggregator is wrong and doesn't call the handler", () => {
       const req = {
         params: {
-          provider: 'junk'
+          aggregator: 'junk'
         }
       }
 
@@ -43,15 +43,15 @@ describe('validators', () => {
 
       validatedHandler(req, res)
 
-      expect(res.send).toHaveBeenCalledWith(invalidProviderString)
+      expect(res.send).toHaveBeenCalledWith(invalidAggregatorString)
       expect(res.status).toHaveBeenCalledWith(400)
       expect(res.send).not.toHaveBeenCalledWith(successString)
     })
 
-    it('calls the handler if the provider is valid', () => {
+    it('calls the handler if the aggregator is valid', () => {
       const req = {
         params: {
-          provider: Providers.MX
+          aggregator: Aggregators.MX
         }
       }
 
@@ -62,7 +62,7 @@ describe('validators', () => {
 
       validatedHandler(req, res)
 
-      expect(res.send).not.toHaveBeenCalledWith(invalidProviderString)
+      expect(res.send).not.toHaveBeenCalledWith(invalidAggregatorString)
       expect(res.status).not.toHaveBeenCalledWith(400)
       expect(res.send).toHaveBeenCalledWith(successString)
     })
