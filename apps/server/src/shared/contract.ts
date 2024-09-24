@@ -148,7 +148,7 @@ export enum JobTypeSupports {
 
 export interface CachedInstitution {
   name: string;
-  keywords: string | null;
+  keywords: string[];
   logo: string;
   url: string;
   id: string;
