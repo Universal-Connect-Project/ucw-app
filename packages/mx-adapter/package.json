@@ -1,0 +1,26 @@
+{
+  "name": "mx-adapter",
+  "version": "1.0.0",
+  "description": "MX Adapter for the Universal Connect Widget",
+  "main": "./src/index.ts",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Universal-Connect-Project/ucw-adapter-mx.git"
+  },
+  "keywords": [
+    "MX",
+    "Fintech",
+    "Connect",
+    "Widget",
+    "UCW"
+  ],
+  "author": "MX",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Universal-Connect-Project/ucw-adapter-mx/issues"
+  },
+  "homepage": "https://github.com/Universal-Connect-Project/ucw-adapter-mx#readme"
+}
