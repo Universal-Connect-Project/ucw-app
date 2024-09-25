@@ -9,7 +9,7 @@ const institutionAggregatorsSupportEverything: CachedInstitution = {
   is_test_bank: false,
   routing_numbers: [],
   name: "test",
-  keywords: null,
+  keywords: [],
   mx: {
     id: "mx",
     supports_aggregation: true,
