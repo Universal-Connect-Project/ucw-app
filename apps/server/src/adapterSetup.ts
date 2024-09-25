@@ -34,7 +34,7 @@ export const adapterMap = {
       get: get
     },
     logClient: logger,
-    credentials: aggregatorCredentials
+    aggregatorCredentials
   }),
   ...sophtronAdapterMapObject,
   ...testAdapterMapObject

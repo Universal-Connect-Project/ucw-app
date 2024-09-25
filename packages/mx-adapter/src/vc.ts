@@ -1,18 +1,37 @@
-import { VCDataTypes } from '@repo/utils'
-import {
-  accountsResponse,
-  identityResponse,
-  transactionsResponse
-} from './vcResponses'
+import get from "axios";
+import { logClient, aggregatorCredentials } from "./adapter";
 
-export const getVC = ({ type }: { type: VCDataTypes }) => {
-  switch (type) {
-    case VCDataTypes.ACCOUNTS:
-      return accountsResponse
+export const getVC = async (path: string, isProd: boolean): Promise<any> => {
+  const configuration = isProd
+    ? aggregatorCredentials.mxProd
+    : aggregatorCredentials.mxInt;
 
-    case VCDataTypes.IDENTITY:
-      return identityResponse
-    case VCDataTypes.TRANSACTIONS:
-      return transactionsResponse
-  }
-}
+  const authHeader =
+    "Basic " +
+    Buffer.from(configuration.username + ":" + configuration.password).toString(
+      "base64"
+    );
+
+  const url = `${configuration.basePath}/vc/${path}`;
+
+  return get({
+    url,
+    headers: {
+      Accept: "application/vnd.mx.api.v1beta+json",
+      "content-type": "application/json",
+      Authorization: authHeader
+    }
+  })
+    .then((res) => {
+      logClient.debug(`mx vc client http response status ${res.status} from ${url}`);
+      return res.data?.verifiableCredential;
+    })
+    .catch((err) => {
+      logClient.error(
+        `mx vc client http response status ${err.response?.status} from ${url}`,
+        err.response?.data || err
+      );
+
+      throw new Error("MX VC endpoint failure");
+    });
+};

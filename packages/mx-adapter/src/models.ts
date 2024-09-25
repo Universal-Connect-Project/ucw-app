@@ -14,7 +14,7 @@ export type LogClient = {
 export type AdapterDependencies = {
   cacheClient: CacheClient;
   logClient: LogClient;
-  credentials: any;
+  aggregatorCredentials: any;
 }
 
 export type AdapterConfig = {

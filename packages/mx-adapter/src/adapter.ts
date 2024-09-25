@@ -58,17 +58,21 @@ const fromMxMember = (member: MemberResponse, aggregator: string): Connection =>
   };
 };
 
+export let cacheClient: CacheClient;
+export let logClient: LogClient;
+export let aggregatorCredentials: any;
+
 export class MxAdapter implements WidgetAdapter {
   aggregator: string;
   apiClient: ReturnType<typeof MxPlatformApiFactory>;
-  cacheClient: CacheClient;
-  logClient: LogClient;
 
   constructor(args: AdapterConfig) {
     const { int, dependencies } = args;
     this.aggregator = int ? "mx_int" : "mx";
     this.apiClient = int ? MxIntApiClient : MxProdApiClient;
-    this.cacheClient = dependencies?.cacheClient;
+    cacheClient = dependencies?.cacheClient;
+    logClient = dependencies?.logClient;
+    aggregatorCredentials = dependencies?.aggregatorCredentials;
   }
 
   async GetInstitutionById(id: string): Promise<Institution> {
@@ -120,7 +124,7 @@ export class MxAdapter implements WidgetAdapter {
       (m) => m.institution_code === entityId
     );
     if (existing != null) {
-      this.logClient.info(`Found existing member for institution ${entityId}, deleting`);
+      logClient.info(`Found existing member for institution ${entityId}, deleting`);
       await this.apiClient.deleteMember(existing.guid, userId);
     }
     // let res = await this.apiClient.listInstitutionCredentials(entityId)
@@ -144,9 +148,9 @@ export class MxAdapter implements WidgetAdapter {
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
-    // console.log(memberRes)
+
     const member = memberRes.data.member;
-    // console.log(member)
+
     if (!request?.is_oauth) {
       if (
         ["verification", "aggregate_identity_verification"].includes(jobType)
@@ -261,7 +265,7 @@ export class MxAdapter implements WidgetAdapter {
     const res = await this.apiClient.readMemberStatus(memberId, userId);
     const member = res.data.member;
     let status = member.connection_status;
-    const oauthStatus = await this.cacheClient.get(member.guid);
+    const oauthStatus = await cacheClient.get(member.guid);
 
     if (oauthStatus?.error != null) {
       status = ConnectionStatus[ConnectionStatus.REJECTED];
@@ -305,7 +309,6 @@ export class MxAdapter implements WidgetAdapter {
             challenge.data = item.image_data!;
             break;
           case "IMAGE_OPTIONS":
-            // console.log(c)
             challenge.type = ChallengeType.IMAGE_OPTIONS;
             challenge.data = (item.image_options ?? []).map((io) => ({
               key: io.label ?? io.value,
@@ -340,20 +343,20 @@ export class MxAdapter implements WidgetAdapter {
     userId: string,
     failIfNotFound: boolean = false
   ): Promise<string> {
-    this.logClient.debug("Resolving UserId: " + userId);
+    logClient.debug("Resolving UserId: " + userId);
 
     let ret;
     const res = await this.apiClient.listUsers(1, 10, userId);
     const mxUser = res.data?.users?.find((u) => u.id === userId);
 
     if (mxUser != null) {
-      this.logClient.trace(`Found existing mx user ${mxUser.guid}`);
+      logClient.trace(`Found existing mx user ${mxUser.guid}`);
       return mxUser.guid;
     } else if (failIfNotFound) {
       throw new Error("User not resolved successfully");
     }
 
-    this.logClient.trace(`Creating mx user ${userId}`);
+    logClient.trace(`Creating mx user ${userId}`);
 
     try {
       ret = await this.apiClient.createUser({
@@ -364,7 +367,7 @@ export class MxAdapter implements WidgetAdapter {
         return ret.data.user.guid;
       }
     } catch (e) {
-      this.logClient.trace(`Failed creating mx user, using user_id: ${userId}`);
+      logClient.trace(`Failed creating mx user, using user_id: ${userId}`);
       return userId;
     }
   }

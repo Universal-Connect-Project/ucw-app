@@ -5,9 +5,9 @@ import type { ApiCredentials } from "./models";
 export const BASE_PATH = "https://api.mx.com".replace(/\/+$/, "");
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const MxProdApiClient: any = (credentials: ApiCredentials) => MxPlatformApiFactory(
+export const MxProdApiClient: any = (aggregatorCredentials: ApiCredentials) => MxPlatformApiFactory(
   new Configuration({
-    ...credentials.mxProd,
+    ...aggregatorCredentials.mxProd,
     baseOptions: {
       headers: {
         Accept: "application/vnd.mx.api.v2beta+json"
@@ -17,9 +17,9 @@ export const MxProdApiClient: any = (credentials: ApiCredentials) => MxPlatformA
 );
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const MxIntApiClient: any = (credentials: ApiCredentials) => MxPlatformApiFactory(
+export const MxIntApiClient: any = (aggregatorCredentials: ApiCredentials) => MxPlatformApiFactory(
   new Configuration({
-    ...credentials.mxInt,
+    ...aggregatorCredentials.mxInt,
     baseOptions: {
       headers: {
         Accept: "application/vnd.mx.api.v2beta+json"
