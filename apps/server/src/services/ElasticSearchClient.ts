@@ -3,7 +3,7 @@ import { Client } from "@elastic/elasticsearch";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 import config from "../config";
-import { info, error as logError } from "../infra/logger";
+import { info, error as logError } from "src/infra/logger";
 import type {
   CachedInstitution,
   MappedJobTypes,

@@ -1,10 +1,10 @@
-import { getVC } from 'packages/mx-adapter/src/vc'
-import { VCDataTypes } from 'packages/utils'
+import { getVC } from './vc'
+import { VCDataTypes } from '@repo/utils'
 import {
   accountsResponse,
   identityResponse,
   transactionsResponse
-} from 'packages/mx-adapter/src/vcResponses'
+} from './vcResponses'
 
 describe('vc', () => {
   describe('getVC', () => {

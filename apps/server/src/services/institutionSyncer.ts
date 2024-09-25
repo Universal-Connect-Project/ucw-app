@@ -1,6 +1,6 @@
 import { setIntervalAsync } from 'set-interval-async'
 import config from '../config'
-import { info, warning as logWarning } from '../infra/logger'
+import { info, warning as logWarning } from 'src/infra/logger'
 import {
   deleteRemovedInstitutions,
   updateInstitutions

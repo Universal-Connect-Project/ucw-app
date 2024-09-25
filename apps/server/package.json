@@ -24,6 +24,7 @@
     "test-clear": "npm test -- --clearCache"
   },
   "dependencies": {
+    "@ucp-npm/mx-adapter": "*",
     "@babel/eslint-parser": "^7.18.2",
     "@capacitor-community/http": "^1.4.1",
     "@elastic/elasticsearch": "^8.13.1",
@@ -44,7 +45,7 @@
     "express-rate-limit": "^7.0.2",
     "joi": "^17.13.3",
     "js-logger": "^1.6.1",
-    "mx-platform-node": "^0.40.0",
+    "mx-platform-node": "^0.42.0",
     "redis": "^4.6.12",
     "set-interval-async": "^3.0.3",
     "stream-browserify": "^3.0.0",

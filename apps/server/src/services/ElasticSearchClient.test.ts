@@ -2,7 +2,7 @@ import * as fs from "fs";
 import { http, HttpResponse } from "msw";
 import testPreferences from "../../cachedDefaults/testData/testPreferences.json";
 import config from "../config";
-import * as logger from "../infra/logger";
+import * as logger from "src/infra/logger";
 import {
   deleteRemovedInstitutions,
   getInstitution,

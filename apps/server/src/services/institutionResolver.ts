@@ -1,5 +1,5 @@
 import { getAvailableAggregators } from '../shared/aggregators'
-import { debug } from '../infra/logger'
+import { debug } from 'src/infra/logger'
 import { getInstitution } from '../services/ElasticSearchClient'
 import type {
   CachedInstitution,

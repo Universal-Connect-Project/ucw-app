@@ -11,7 +11,7 @@ import type {
 import { ChallengeType, ConnectionStatus, JobTypes } from '../shared/contract'
 import { mapJobType } from '../utils'
 
-import { debug, error, trace } from '../infra/logger'
+import { debug, error, trace } from 'src/infra/logger'
 import SophtronClientV1 from '../aggregatorApiClients/sophtronClient'
 import SophtronClient from '../aggregatorApiClients/sophtronClient/v2'
 

@@ -8,7 +8,7 @@ import {
 } from "./institutionSyncer";
 
 import config from "../config";
-import * as logger from "../infra/logger";
+import * as logger from "src/infra/logger";
 import { ElasticSearchMock } from "../test/elasticSearchMock";
 import { elasticSearchInstitutionData } from "../test/testData/institution";
 import {

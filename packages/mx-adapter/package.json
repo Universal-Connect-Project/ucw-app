@@ -1,5 +1,5 @@
 {
-  "name": "mx-adapter",
+  "name": "@ucp-npm/mx-adapter",
   "version": "1.0.0",
   "description": "MX Adapter for the Universal Connect Widget",
   "main": "./src/index.ts",
@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/Universal-Connect-Project/ucw-adapter-mx/issues"
   },
-  "homepage": "https://github.com/Universal-Connect-Project/ucw-adapter-mx#readme"
+  "homepage": "https://github.com/Universal-Connect-Project/ucw-adapter-mx#readme",
+  "dependencies": {
+    "mx-platform-node": "^0.42.0"
+  }
 }

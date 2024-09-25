@@ -3,7 +3,7 @@ import { resolve } from 'path'
 import { createClient } from 'redis'
 import config from '../../config'
 
-import { debug, error, info } from '../../infra/logger'
+import { debug, error, info } from 'src/infra/logger'
 import { PREFERENCES_REDIS_KEY } from './constants'
 
 const redisClient = createClient({

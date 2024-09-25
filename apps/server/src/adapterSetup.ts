@@ -1,21 +1,23 @@
-import { adapterMapObject as testAdapterMapObject } from './test-adapter'
-import { MxAdapter } from './adapters/mx'
-import { SophtronAdapter } from './adapters/sophtron'
+import { getMxAdapterMapObject } from "@ucp-npm/mx-adapter";
 
-import { mxIntGetVC, mxProdGetVC } from './services/vcAggregators/mxVc'
+import aggregatorCredentials from "./aggregatorCredentials";
+import { adapterMapObject as testAdapterMapObject } from './test-adapter'
+import { SophtronAdapter } from './adapters/sophtron'
+import * as logger from 'src/infra/logger'
+import { get, set } from './services/storageClient/redis'
 import getSophtronVc from './services/vcAggregators/sophtronVc'
 
-const mxAdapterMapObject = {
-  mx: {
-    testInstitutionAdapterName: 'mx_int',
-    vcAdapter: mxProdGetVC,
-    widgetAdapter: new MxAdapter(false)
-  },
-  mx_int: {
-    vcAdapter: mxIntGetVC,
-    widgetAdapter: new MxAdapter(true)
-  }
-}
+// const mxAdapterMapObject = {
+//   mx: {
+//     testInstitutionAdapterName: 'mx_int',
+//     vcAdapter: mxProdGetVC,
+//     widgetAdapter: new MxAdapter(false)
+//   },
+//   mx_int: {
+//     vcAdapter: mxIntGetVC,
+//     widgetAdapter: new MxAdapter(true)
+//   }
+// }
 
 const sophtronAdapterMapObject = {
   sophtron: {
@@ -26,7 +28,14 @@ const sophtronAdapterMapObject = {
 
 // This is where you add adapters
 export const adapterMap = {
-  ...mxAdapterMapObject,
+  ...getMxAdapterMapObject({
+    cacheClient: {
+      set: set,
+      get: get
+    },
+    logClient: logger,
+    credentials: aggregatorCredentials
+  }),
   ...sophtronAdapterMapObject,
   ...testAdapterMapObject
 }

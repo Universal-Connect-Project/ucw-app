@@ -1,20 +1,20 @@
-import { ConnectionStatus } from 'packages/utils'
-import { TestAdapter } from 'packages/mx-adapter/src/adapter'
-import { testExampleInstitution } from 'packages/mx-adapter/src/constants'
+import { ConnectionStatus } from '@repo/utils'
+import { MxAdapter } from './adapter'
+import { testExampleInstitution } from './constants'
 import { MappedJobTypes } from '../shared/contract'
 
 const labelText = 'testLabelText'
-const provider = 'provider'
+const aggregator = 'aggregator'
 
-const testAdapter = new TestAdapter({
+const testAdapter = new MxAdapter({
   labelText,
-  provider
+  aggregator
 })
 
 jest.mock('../services/storageClient/redis')
 
 const successConnectionStatus = {
-  provider,
+  aggregator,
   id: 'testId',
   cur_job_id: 'testJobId',
   user_id: 'userId',
@@ -22,7 +22,7 @@ const successConnectionStatus = {
   challenges: []
 } as any
 
-describe('TestAdapter', () => {
+describe('MxAdapter', () => {
   describe('GetInstitutionById', () => {
     it('returns a response object', async () => {
       expect(await testAdapter.GetInstitutionById('test')).toEqual({
@@ -30,7 +30,7 @@ describe('TestAdapter', () => {
         logo_url: testExampleInstitution.logo_url,
         name: testExampleInstitution.name,
         oauth: testExampleInstitution.oauth,
-        provider,
+        aggregator,
         url: testExampleInstitution.url
       })
     })
@@ -59,7 +59,7 @@ describe('TestAdapter', () => {
           is_being_aggregated: false,
           is_oauth: false,
           oauth_window_uri: undefined,
-          provider
+          aggregator
         }
       ])
     })
@@ -89,7 +89,7 @@ describe('TestAdapter', () => {
         is_being_aggregated: false,
         is_oauth: false,
         oauth_window_uri: undefined,
-        provider
+        aggregator
       })
     })
   })
@@ -141,7 +141,7 @@ describe('TestAdapter', () => {
       expect(
         await testAdapter.GetConnectionStatus('test', 'test', true, userId)
       ).toEqual({
-        provider,
+        aggregator,
         id: 'testId',
         cur_job_id: 'testJobId',
         user_id: 'testUserId',
@@ -198,7 +198,7 @@ describe('TestAdapter', () => {
         is_being_aggregated: false,
         is_oauth: false,
         oauth_window_uri: undefined,
-        provider
+        aggregator
       })
     })
   })
@@ -214,7 +214,7 @@ describe('TestAdapter', () => {
         is_being_aggregated: false,
         is_oauth: false,
         oauth_window_uri: undefined,
-        provider
+        aggregator
       })
     })
   })
@@ -227,7 +227,7 @@ describe('TestAdapter', () => {
         is_oauth: false,
         is_being_aggregated: false,
         oauth_window_uri: undefined,
-        provider,
+        aggregator,
         user_id: 'test'
       })
     })

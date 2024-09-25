@@ -39,6 +39,7 @@ export interface Credential {
   field_type?: string;
   field_name?: string;
 }
+
 export enum ConnectionStatus {
   CREATED,
   PREVENTED,

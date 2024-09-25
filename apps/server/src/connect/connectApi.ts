@@ -1,5 +1,5 @@
 import type { Member, MemberResponse } from "interfaces/contract";
-import * as logger from "../infra/logger";
+import * as logger from "src/infra/logger";
 import type {
   CachedInstitution,
   Challenge,

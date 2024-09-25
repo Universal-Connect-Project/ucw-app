@@ -1,9 +1,9 @@
-import { VCDataTypes } from 'packages/utils'
+import { VCDataTypes } from '@repo/utils'
 import {
   accountsResponse,
   identityResponse,
   transactionsResponse
-} from 'packages/mx-adapter/src/vcResponses'
+} from './vcResponses'
 
 export const getVC = ({ type }: { type: VCDataTypes }) => {
   switch (type) {

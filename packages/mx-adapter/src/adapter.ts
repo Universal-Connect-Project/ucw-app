@@ -1,166 +1,255 @@
 import type {
+  CredentialRequest,
+  CredentialsResponseBody,
+  MemberResponse,
+  MxPlatformApiFactory
+} from "mx-platform-node";
+
+import type {
+  Challenge,
   Connection,
   CreateConnectionRequest,
   Credential,
   Institution,
   UpdateConnectionRequest,
   WidgetAdapter
-} from 'packages/utils'
-import { ConnectionStatus } from 'packages/utils'
-import { testExampleCredentials, testExampleInstitution } from 'packages/mx-adapter/src/constants'
-import { MappedJobTypes } from '../shared/contract'
-import { get, set } from '../services/storageClient/redis'
+} from "@repo/utils";
+import { ConnectionStatus, ChallengeType } from "@repo/utils";
 
-const createRedisStatusKey = ({
-  provider,
-  userId
-}: {
-  provider: string
-  userId: string
-}) => `${provider}-${userId}`
+import config from "server/src/config";
 
-export class TestAdapter implements WidgetAdapter {
-  labelText: string
-  provider: string
+import { MxIntApiClient, MxProdApiClient } from "./apiClient";
+import type { AdapterConfig, CacheClient, LogClient } from "./models";
 
-  constructor({
-    labelText,
-    provider
-  }: {
-    labelText: string
-    provider: string
-  }) {
-    this.labelText = labelText
-    this.provider = provider
+// const createRedisStatusKey = ({
+//                                 aggregator,
+//                                 userId
+//                               }: {
+//   aggregator: string
+//   userId: string
+// }) => `${aggregator}-${userId}`;
+
+export const EXTENDED_HISTORY_NOT_SUPPORTED_MSG =
+  "Member's institution does not support extended transaction history."
+
+const mapCredentials = (mxCreds: CredentialsResponseBody): Credential[] => {
+  if (mxCreds.credentials != null) {
+    return mxCreds.credentials.map((item) => ({
+      id: item.guid,
+      label: item.field_name,
+      field_type: item.field_type,
+      field_name: item.field_name
+    }));
+  } else {
+    return [];
+  }
+};
+
+const fromMxMember = (member: MemberResponse, aggregator: string): Connection => {
+  return {
+    id: member.guid,
+    cur_job_id: member.guid,
+    // institution_code: entityId, // TODO
+    institution_code: member.institution_code, // TODO
+    is_being_aggregated: member.is_being_aggregated,
+    is_oauth: member.is_oauth,
+    oauth_window_uri: member.oauth_window_uri,
+    aggregator
+  };
+};
+
+export class MxAdapter implements WidgetAdapter {
+  aggregator: string;
+  apiClient: ReturnType<typeof MxPlatformApiFactory>;
+  cacheClient: CacheClient;
+  logClient: LogClient;
+
+  constructor(args: AdapterConfig) {
+    const { int, dependencies } = args;
+    this.aggregator = int ? "mx_int" : "mx";
+    this.apiClient = int ? MxIntApiClient : MxProdApiClient;
+    this.cacheClient = dependencies?.cacheClient;
   }
 
   async GetInstitutionById(id: string): Promise<Institution> {
+    const res = await this.apiClient.readInstitution(id);
+    // TODO: if this is 401 we should throw an error
+    const institution = res.data.institution;
     return {
-      ...testExampleInstitution,
-      id,
-      provider: this.provider
-    }
+      id: institution.code,
+      logo_url: institution.medium_logo_url ?? institution.small_logo_url,
+      name: institution.name,
+      oauth: institution.supports_oauth,
+      url: institution.url,
+      aggregator: this.aggregator
+    };
   }
 
   async ListInstitutionCredentials(
     institutionId: string
   ): Promise<Credential[]> {
-    return [
-      {
-        ...testExampleCredentials,
-        label: this.labelText
-      }
-    ]
+    const res = await this.apiClient.listInstitutionCredentials(institutionId);
+    return mapCredentials(res.data);
   }
 
   async ListConnections(userId: string): Promise<Connection[]> {
-    return [
-      {
-        id: 'testId',
-        cur_job_id: 'testJobId',
-        institution_code: 'testCode',
-        is_being_aggregated: false,
-        is_oauth: false,
-        oauth_window_uri: undefined,
-        provider: this.provider
-      }
-    ]
+    const res = await this.apiClient.listMembers(userId);
+
+    return (
+      res.data.members?.map((member) => fromMxMember(member, this.aggregator)) ??
+      []
+    );
   }
 
   async ListConnectionCredentials(
     memberId: string,
     userId: string
   ): Promise<Credential[]> {
-    return [
-      {
-        id: 'testId',
-        field_name: 'testFieldName',
-        field_type: 'testFieldType',
-        label: this.labelText
-      }
-    ]
+    const res = await this.apiClient.listMemberCredentials(memberId, userId);
+    return mapCredentials(res.data);
   }
 
   async CreateConnection(
     request: CreateConnectionRequest,
     userId: string
   ): Promise<Connection> {
-    return {
-      id: 'testId',
-      cur_job_id: 'testJobId',
-      institution_code: 'testCode',
-      is_being_aggregated: false,
-      is_oauth: false,
-      oauth_window_uri: undefined,
-      provider: this.provider
+    const jobType = request.initial_job_type;
+    const entityId = request.institution_id;
+    const existings = await this.apiClient.listMembers(userId);
+    const existing = existings.data.members.find(
+      (m) => m.institution_code === entityId
+    );
+    if (existing != null) {
+      this.logClient.info(`Found existing member for institution ${entityId}, deleting`);
+      await this.apiClient.deleteMember(existing.guid, userId);
     }
+    // let res = await this.apiClient.listInstitutionCredentials(entityId)
+    // console.log(request)
+    const memberRes = await this.apiClient.createMember(userId, {
+      referral_source: "APP", // request.is_oauth ? 'APP' : '',
+      client_redirect_url: request.is_oauth
+        ? `${config.HostUrl}/oauth_redirect`
+        : null,
+      member: {
+        skip_aggregation: request.skip_aggregation || jobType !== "aggregate",
+        is_oauth: request.is_oauth,
+        credentials: request.credentials?.map(
+          (c) =>
+            ({
+              guid: c.id,
+              value: c.value
+            }) satisfies CredentialRequest
+        ),
+        institution_code: entityId
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
+    // console.log(memberRes)
+    const member = memberRes.data.member;
+    // console.log(member)
+    if (!request?.is_oauth) {
+      if (
+        ["verification", "aggregate_identity_verification"].includes(jobType)
+      ) {
+        const updatedMemberRes = await this.apiClient.verifyMember(
+          member.guid,
+          userId
+        );
+        return fromMxMember(updatedMemberRes.data.member, this.aggregator);
+      } else if (jobType === "aggregate_identity") {
+        const updatedMemberRes = await this.apiClient.identifyMember(
+          member.guid,
+          userId
+        );
+        return fromMxMember(updatedMemberRes.data.member, this.aggregator);
+      } else if (jobType === "aggregate_extendedhistory") {
+        const updatedMemberRes = await this.apiClient.extendHistory(
+          member.guid,
+          userId
+        );
+        return fromMxMember(updatedMemberRes.data.member, this.aggregator);
+      }
+    }
+
+    return fromMxMember(member, this.aggregator);
   }
 
-  async DeleteConnection(id: string, userId: string): Promise<void> {}
+  async DeleteConnection(id: string, userId: string): Promise<void> {
+    await this.apiClient.deleteManagedMember(id, userId);
+  }
 
-  async DeleteUser(providerUserId: string): Promise<any> {}
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async DeleteUser(aggregatorUserId: string): Promise<any> {
+    return await this.apiClient.deleteUser(aggregatorUserId);
+  }
 
   async UpdateConnection(
     request: UpdateConnectionRequest,
     userId: string
   ): Promise<Connection> {
-    const redisStatusKey = createRedisStatusKey({
-      provider: this.provider,
-      userId
-    })
+    let ret;
 
-    const connectionInfo = await get(redisStatusKey)
-
-    if (
-      !connectionInfo?.verifiedOnce &&
-      request.job_type === MappedJobTypes.VERIFICATION
-    ) {
-      await set(redisStatusKey, {
-        verifiedOnce: true
-      })
-    } else {
-      await set(redisStatusKey, null)
+    try {
+      if (request.job_type === "verification") {
+        ret = await this.apiClient.verifyMember(request.id, userId);
+      } else if (request.job_type === "aggregate_identity") {
+        ret = await this.apiClient.identifyMember(request.id, userId, {
+          data: { member: { include_transactions: true } }
+        });
+      } else if (request.job_type === "aggregate_extendedhistory") {
+        ret = await this.apiClient.extendHistory(request.id, userId);
+      } else {
+        ret = await this.apiClient.aggregateMember(request.id, userId);
+      }
+    } catch (e) {
+      if (e?.response?.data?.error?.message === EXTENDED_HISTORY_NOT_SUPPORTED_MSG) {
+        try {
+          ret = await this.apiClient.aggregateMember(request.id, userId);
+        } catch (e) {
+          return { id: request.id, error_message: e?.response?.data?.error?.message };
+        }
+      } else {
+        return { id: request.id, error_message: e?.response?.data?.error?.message };
+      }
     }
 
-    return {
-      id: 'testId',
-      cur_job_id: 'testJobId',
-      institution_code: 'testCode',
-      is_being_aggregated: false,
-      is_oauth: false,
-      oauth_window_uri: undefined,
-      provider: this.provider
-    }
+    return fromMxMember(ret.data.member, this.aggregator);
   }
 
   async UpdateConnectionInternal(
     request: UpdateConnectionRequest,
     userId: string
   ): Promise<Connection> {
-    return {
-      id: 'testId',
-      cur_job_id: 'testJobId',
-      institution_code: 'testCode',
-      is_being_aggregated: false,
-      is_oauth: false,
-      oauth_window_uri: undefined,
-      provider: this.provider
-    }
+    const ret = await this.apiClient.updateMember(request.id, userId, {
+      member: {
+        credentials: request.credentials.map(
+          (credential) =>
+            ({
+              guid: credential.id,
+              value: credential.value
+            }) satisfies CredentialRequest
+        )
+      }
+    });
+    const member = ret.data.member;
+    return fromMxMember(member, this.aggregator);
   }
 
   async GetConnectionById(
     connectionId: string,
     userId: string
   ): Promise<Connection> {
+    const res = await this.apiClient.readMember(connectionId, userId);
+    const member = res.data.member;
     return {
-      id: 'testId',
-      institution_code: 'testCode',
-      is_oauth: false,
-      is_being_aggregated: false,
-      oauth_window_uri: undefined,
-      provider: this.provider,
+      id: member.guid,
+      institution_code: member.institution_code,
+      is_oauth: member.is_oauth,
+      is_being_aggregated: member.is_being_aggregated,
+      oauth_window_uri: member.oauth_window_uri,
+      aggregator: this.aggregator,
       user_id: userId
-    }
+    };
   }
 
   async GetConnectionStatus(
@@ -169,45 +258,66 @@ export class TestAdapter implements WidgetAdapter {
     singleAccountSelect: boolean,
     userId: string
   ): Promise<Connection> {
-    const connectionInfo = await get(
-      createRedisStatusKey({ provider: this.provider, userId })
-    )
+    const res = await this.apiClient.readMemberStatus(memberId, userId);
+    const member = res.data.member;
+    let status = member.connection_status;
+    const oauthStatus = await this.cacheClient.get(member.guid);
 
-    if (connectionInfo?.verifiedOnce && singleAccountSelect) {
-      return {
-        provider: this.provider,
-        id: 'testId',
-        cur_job_id: 'testJobId',
-        user_id: 'testUserId',
-        status: ConnectionStatus.CHALLENGED,
-        challenges: [
-          {
-            id: 'CRD-a81b35db-28dd-41ea-aed3-6ec8ef682011',
-            type: 1,
-            question: 'Please select an account:',
-            data: [
-              {
-                key: 'Checking',
-                value: 'act-23445745'
-              },
-              {
-                key: 'Savings',
-                value: 'act-352386787'
-              }
-            ]
-          }
-        ]
-      }
+    if (oauthStatus?.error != null) {
+      status = ConnectionStatus[ConnectionStatus.REJECTED];
     }
 
     return {
-      provider: this.provider,
-      id: 'testId',
-      cur_job_id: 'testJobId',
+      aggregator: this.aggregator,
+      id: member.guid,
+      cur_job_id: member.guid,
       user_id: userId,
-      status: ConnectionStatus.CONNECTED,
-      challenges: []
-    }
+      // is_oauth: member.is_oauth,
+      // oauth_window_uri: member.oauth_window_uri,
+      // status: member.connection_status,
+      // error_reason: oauthStatus?.error_reason,
+      status: ConnectionStatus[status as keyof typeof ConnectionStatus],
+      challenges: (member.challenges ?? []).map((item, idx) => {
+        const challenge: Challenge = {
+          id: item.guid ?? `${idx}`,
+          type: ChallengeType.QUESTION,
+          question: item.label
+        };
+        switch (item.type) {
+          case "TEXT":
+            challenge.type = ChallengeType.QUESTION;
+            challenge.data = [{ key: `${idx}`, value: item.label }];
+            break;
+          case "OPTIONS":
+            challenge.type = ChallengeType.OPTIONS;
+            challenge.question = item.label;
+            challenge.data = (item.options ?? []).map((o) => ({
+              key: o.label ?? o.value,
+              value: o.value
+            }));
+            break;
+          case "TOKEN":
+            challenge.type = ChallengeType.TOKEN;
+            challenge.data = item.label!;
+            break;
+          case "IMAGE_DATA":
+            challenge.type = ChallengeType.IMAGE;
+            challenge.data = item.image_data!;
+            break;
+          case "IMAGE_OPTIONS":
+            // console.log(c)
+            challenge.type = ChallengeType.IMAGE_OPTIONS;
+            challenge.data = (item.image_options ?? []).map((io) => ({
+              key: io.label ?? io.value,
+              value: io.data_uri ?? io.value
+            }));
+            break;
+          default:
+            break; // todo?
+        }
+        return challenge;
+      })
+    };
   }
 
   async AnswerChallenge(
@@ -215,13 +325,47 @@ export class TestAdapter implements WidgetAdapter {
     jobId: string,
     userId: string
   ): Promise<boolean> {
-    return true
+    await this.apiClient.resumeAggregation(request.id, userId, {
+      member: {
+        challenges: request.challenges.map((item, idx) => ({
+          guid: item.id ?? `${idx}`,
+          value: item.response as string
+        }))
+      }
+    });
+    return true;
   }
 
   async ResolveUserId(
     userId: string,
     failIfNotFound: boolean = false
   ): Promise<string> {
-    return userId
+    this.logClient.debug("Resolving UserId: " + userId);
+
+    let ret;
+    const res = await this.apiClient.listUsers(1, 10, userId);
+    const mxUser = res.data?.users?.find((u) => u.id === userId);
+
+    if (mxUser != null) {
+      this.logClient.trace(`Found existing mx user ${mxUser.guid}`);
+      return mxUser.guid;
+    } else if (failIfNotFound) {
+      throw new Error("User not resolved successfully");
+    }
+
+    this.logClient.trace(`Creating mx user ${userId}`);
+
+    try {
+      ret = await this.apiClient.createUser({
+        user: { id: userId }
+      });
+
+      if (ret?.data?.user != null) {
+        return ret.data.user.guid;
+      }
+    } catch (e) {
+      this.logClient.trace(`Failed creating mx user, using user_id: ${userId}`);
+      return userId;
+    }
   }
 }
