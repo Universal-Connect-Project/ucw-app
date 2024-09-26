@@ -5,7 +5,8 @@
   "main": "./src/index.ts",
   "packageManager": "npm@10.7.0",
   "scripts": {
-    "test": "jest --no-coverage"
+    "test": "jest --no-coverage",
+    "test:watch": "cross-env DEBUG_PRINT_LIMIT=50000 jest --no-coverage --watch"
   },
   "repository": {
     "type": "git",
