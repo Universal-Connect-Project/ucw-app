@@ -1,7 +1,7 @@
 {
   "name": "server",
   "version": "0.0.13-beta",
-  "packageManager": "npm@10.5.0",
+  "packageManager": "npm@10.7.0",
   "scripts": {
     "cypress:open": "cypress open --config-file cypress.config.ts",
     "cypress:open:alternate": "cypress open --config-file cypress.config.alternate.ts",
@@ -51,24 +51,6 @@
     "stream-browserify": "^3.0.0",
     "typescript": "^5.3.3",
     "uuid": "^9.0.1"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
   },
   "devDependencies": {
     "@babel/core": "^7.21.3",

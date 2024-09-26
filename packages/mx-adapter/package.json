@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "MX Adapter for the Universal Connect Widget",
   "main": "./src/index.ts",
+  "packageManager": "npm@10.7.0",
   "scripts": {
     "test": "jest --no-coverage"
   },
