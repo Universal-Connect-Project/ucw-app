@@ -7,7 +7,7 @@ export const BASE_PATH = "https://api.mx.com".replace(/\/+$/, "");
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const MxProdApiClient: any = (aggregatorCredentials: ApiCredentials) => MxPlatformApiFactory(
   new Configuration({
-    ...aggregatorCredentials.mxProd,
+    ...aggregatorCredentials,
     baseOptions: {
       headers: {
         Accept: "application/vnd.mx.api.v2beta+json"
@@ -19,7 +19,7 @@ export const MxProdApiClient: any = (aggregatorCredentials: ApiCredentials) => M
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const MxIntApiClient: any = (aggregatorCredentials: ApiCredentials) => MxPlatformApiFactory(
   new Configuration({
-    ...aggregatorCredentials.mxInt,
+    ...aggregatorCredentials,
     baseOptions: {
       headers: {
         Accept: "application/vnd.mx.api.v2beta+json"

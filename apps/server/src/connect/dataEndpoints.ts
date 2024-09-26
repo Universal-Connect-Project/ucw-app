@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { Response } from 'express'
 import Joi from 'joi'
+
+import { VCDataTypes } from '@repo/utils'
 import type { Aggregator } from '../shared/contract'
 import { Aggregators } from '../shared/contract'
 import { withValidateAggregatorInPath } from '../utils/validators'
 import { getAggregatorAdapter, getVC } from '../adapterIndex'
-import { VCDataTypes } from '@repo/utils'
 
 export interface AccountsDataQueryParameters {
   connectionId: string

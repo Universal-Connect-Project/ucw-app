@@ -22,7 +22,7 @@ import { MxIntApiClient, MxProdApiClient } from "./apiClient";
 import type { AdapterConfig, CacheClient, LogClient } from "./models";
 
 export const EXTENDED_HISTORY_NOT_SUPPORTED_MSG =
-  "Member's institution does not support extended transaction history."
+  "Member's institution does not support extended transaction history.";
 export let cacheClient: CacheClient;
 export let logClient: LogClient;
 export let aggregatorCredentials: any;
@@ -61,12 +61,13 @@ export class MxAdapter implements WidgetAdapter {
   constructor(args: AdapterConfig) {
     const { int, dependencies } = args;
     this.aggregator = int ? "mx_int" : "mx";
-    this.apiClient = int ? MxIntApiClient : MxProdApiClient;
+    this.apiClient = int
+      ? MxIntApiClient(dependencies?.aggregatorCredentials.mxInt)
+      : MxProdApiClient(dependencies?.aggregatorCredentials.mxProd);
     cacheClient = dependencies?.cacheClient;
     logClient = dependencies?.logClient;
     aggregatorCredentials = dependencies?.aggregatorCredentials;
     serverConfig = dependencies?.serverConfig;
-    console.log('-------> serverConfig', serverConfig);
   }
 
   async GetInstitutionById(id: string): Promise<Institution> {
