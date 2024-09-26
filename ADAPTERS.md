@@ -15,7 +15,7 @@ The only adapter packages in this repo should be test adapters. In order to be a
 In our opinion the easiest way to create an adapter package is as follows:
 
 1. Fork this repository
-1. Create a folder in the packages folder for your adapter
+1. Create a folder in the [packages](./packages) folder for your adapter
 1. Add a test institution to the [default institution list](./apps/server/cachedDefaults/ucwInstitutionsMapping.json) with aggregator support defined for your institution.
 1. Build your adapter
 1. Import your adapter in [adapterSetup.ts](./apps/server/src/adapterSetup.ts) on your forked version of this repo

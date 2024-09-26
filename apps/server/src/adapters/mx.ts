@@ -6,7 +6,7 @@ import type {
 } from 'mx-platform-node'
 
 import config from '../config'
-import * as logger from 'src/infra/logger'
+import * as logger from '../infra/logger'
 import { MxProdApiClient, MxIntApiClient } from '../aggregatorApiClients/mx'
 import { get } from '../services/storageClient/redis'
 import type {

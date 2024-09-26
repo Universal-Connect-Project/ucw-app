@@ -2,7 +2,7 @@ module.exports = {
   clearMocks: true,
   coverageProvider: 'babel',
   collectCoverage: true,
-  collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/config/*.js'],
+  collectCoverageFrom: ['src/**/*.{js,ts}', '!src/config/*.js'],
   coverageDirectory: 'coverage',
   coverageReporters: ['json', 'lcov', 'text', 'json-summary'],
   setupFiles: ['dotenv/config'],

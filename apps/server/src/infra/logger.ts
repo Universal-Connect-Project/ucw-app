@@ -61,7 +61,7 @@ const logMessage = (message: string, level: string, data?: any, isError?: boolea
 
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const error = (message: string, error: any): void => {
+export const error = (message: string, error?: any): void => {
   logMessage(message, "error", error, true);
 };
 
@@ -73,14 +73,14 @@ export const info = (message: string, data?: any): void => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const warning = (message: string, data?: any): void => {
   logMessage(message, "warning", data);
-}
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const trace = (message: string, data?: any): void => {
   logMessage(message, "trace", data);
-}
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const debug = (message: string, data?: any): void => {
   logMessage(message, "debug", data);
-}
+};

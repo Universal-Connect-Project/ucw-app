@@ -23,6 +23,10 @@ build/
 coverage/
 .ngrok/
 
+
+# See https://github.com/vitejs/vite/issues/13267
+vite.config*timestamp*
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

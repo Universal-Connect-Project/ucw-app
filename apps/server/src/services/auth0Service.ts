@@ -1,5 +1,5 @@
 import config from '../config'
-import { warning as logWarning } from 'src/infra/logger'
+import { warning as logWarning } from '../infra/logger'
 import { get, set } from './storageClient/redis'
 
 export const REDIS_AUTH_ACCESS_KEY = 'auth0AccessToken'

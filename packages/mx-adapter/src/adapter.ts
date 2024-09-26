@@ -21,16 +21,12 @@ import config from "server/src/config";
 import { MxIntApiClient, MxProdApiClient } from "./apiClient";
 import type { AdapterConfig, CacheClient, LogClient } from "./models";
 
-// const createRedisStatusKey = ({
-//                                 aggregator,
-//                                 userId
-//                               }: {
-//   aggregator: string
-//   userId: string
-// }) => `${aggregator}-${userId}`;
-
 export const EXTENDED_HISTORY_NOT_SUPPORTED_MSG =
   "Member's institution does not support extended transaction history."
+export let cacheClient: CacheClient;
+export let logClient: LogClient;
+export let aggregatorCredentials: any;
+export let serverConfig: any;
 
 const mapCredentials = (mxCreds: CredentialsResponseBody): Credential[] => {
   if (mxCreds.credentials != null) {
@@ -58,10 +54,6 @@ const fromMxMember = (member: MemberResponse, aggregator: string): Connection =>
   };
 };
 
-export let cacheClient: CacheClient;
-export let logClient: LogClient;
-export let aggregatorCredentials: any;
-
 export class MxAdapter implements WidgetAdapter {
   aggregator: string;
   apiClient: ReturnType<typeof MxPlatformApiFactory>;
@@ -73,6 +65,8 @@ export class MxAdapter implements WidgetAdapter {
     cacheClient = dependencies?.cacheClient;
     logClient = dependencies?.logClient;
     aggregatorCredentials = dependencies?.aggregatorCredentials;
+    serverConfig = dependencies?.serverConfig;
+    console.log('-------> serverConfig', serverConfig);
   }
 
   async GetInstitutionById(id: string): Promise<Institution> {

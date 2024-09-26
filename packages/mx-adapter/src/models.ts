@@ -1,6 +1,21 @@
+export type ApiCredentials = {
+  clientId?: string;
+  secret?: string;
+  username?: string;
+  password?: string;
+  partnerId?: string;
+  appKey?: string;
+  basePath?: string;
+  vcEndpoint?: string;
+  aggregator?: string;
+  available?: boolean;
+  [key: string]: any;
+}
+
 export type CacheClient = {
   set: (key: string, value: any) => Promise<void>;
   get: (key: string) => Promise<any>;
+  constants: Record<string, string>;
 };
 
 export type LogClient = {
@@ -14,7 +29,8 @@ export type LogClient = {
 export type AdapterDependencies = {
   cacheClient: CacheClient;
   logClient: LogClient;
-  aggregatorCredentials: any;
+  aggregatorCredentials: Record<string, ApiCredentials>;
+  serverConfig: any;
 }
 
 export type AdapterConfig = {
@@ -29,12 +45,3 @@ export enum MappedJobTypes {
   VERIFICATION = "verification",
   IDENTITY = "aggregate_identity",
 }
-
-export type ApiCredentials = Record<string, {
-  username: string;
-  password: string;
-  basePath: string;
-  vcEndpoint: string;
-  aggregator: string;
-  available: boolean;
-}>

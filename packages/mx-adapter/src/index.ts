@@ -8,22 +8,22 @@ import {
   MX_EXAMPLE_C_LABEL_TEXT,
   MX_EXAMPLE_C_PROVIDER_STRING
 } from "./constants";
-import { getVC } from "./vc";
+import { mxProdGetVC, mxIntGetVC } from "./createVc";
 
 export const getMxAdapterMapObject = (dependencies: AdapterDependencies) => {
   return {
     mx: {
       testInstitutionAdapterName: 'mx_int',
-      vcAdapter: getVC,
+      vcAdapter: mxProdGetVC,
       widgetAdapter: new MxAdapter({
         int: false,
         dependencies
       })
     },
     mx_int: {
-      vcAdapter: getVC,
+      vcAdapter: mxIntGetVC,
       widgetAdapter: new MxAdapter({
-        int: false,
+        int: true,
         dependencies
       })
     }

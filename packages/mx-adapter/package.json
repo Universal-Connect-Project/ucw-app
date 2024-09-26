@@ -4,7 +4,7 @@
   "description": "MX Adapter for the Universal Connect Widget",
   "main": "./src/index.ts",
   "scripts": {
-    "test": "npm run test"
+    "test": "jest --no-coverage"
   },
   "repository": {
     "type": "git",
@@ -26,5 +26,8 @@
   "dependencies": {
     "axios": "^1.7.7",
     "mx-platform-node": "^0.42.0"
+  },
+  "devDependencies": {
+    "msw": "^2.4.9"
   }
 }

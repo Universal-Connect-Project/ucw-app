@@ -1,5 +1,5 @@
 import type { VCDataTypes, WidgetAdapter } from '@repo/utils'
-import { info } from 'src/infra/logger'
+import { info } from './infra/logger'
 import type { Aggregator } from './adapterSetup'
 import { adapterMap } from './adapterSetup'
 

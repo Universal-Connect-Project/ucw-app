@@ -1,6 +1,6 @@
 import { VCDataTypes } from '@repo/utils'
-import { info } from '../../infra/logger'
-import { getVc as getMxVc } from '../../aggregatorApiClients/mxClient/vc'
+import { logClient } from './adapter'
+import { getVC as getMxVc } from './getVc'
 
 export const createMXGetVC = (isProd: boolean) => {
   return async ({
@@ -29,7 +29,7 @@ export const createMXGetVC = (isProd: boolean) => {
         break
     }
 
-    info(`Getting mx vc ${type}`, path)
+    logClient.info(`Getting mx vc ${type}`, path)
 
     return await getMxVc(path, isProd)
   }

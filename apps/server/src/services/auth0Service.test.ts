@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import config from '../config'
-import * as logger from 'src/infra/logger'
+import * as logger from '../infra/logger'
 import { server } from '../test/testServer'
 import { getAccessToken, REDIS_AUTH_ACCESS_KEY } from './auth0Service'
 import { set } from './storageClient/redis'

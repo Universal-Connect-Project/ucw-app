@@ -1,12 +1,11 @@
-import { PREFERENCES_REDIS_KEY } from '../services/storageClient/constants'
+import { cacheClient } from '../adapter'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let storageObject: Record<string, any> = {}
 
 export const clearRedisMock = () => {
-  if (storageObject?.[PREFERENCES_REDIS_KEY]) {
+  if (storageObject?.[cacheClient.constants.PREFERENCES_REDIS_KEY]) {
     storageObject = {
-      [PREFERENCES_REDIS_KEY]: storageObject[PREFERENCES_REDIS_KEY]
+      [cacheClient.constants.PREFERENCES_REDIS_KEY]: storageObject[cacheClient.constants.PREFERENCES_REDIS_KEY]
     }
   } else {
     storageObject = {}
@@ -28,7 +27,6 @@ export const get = jest.fn((key: string) => {
   return storageObject[key]
 })
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const set = jest.fn((key: string, value: any) => {
   storageObject[key] = value
 })

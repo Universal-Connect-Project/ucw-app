@@ -1,4 +1,4 @@
-import * as logger from 'src/infra/logger'
+import * as logger from '../infra/logger'
 import AkoyaClient from '../aggregatorApiClients/akoya'
 import aggregatorCredentials from '../aggregatorCredentials'
 import { get, set } from '../services/storageClient/redis'

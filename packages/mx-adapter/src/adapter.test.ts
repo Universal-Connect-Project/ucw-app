@@ -1,257 +1,878 @@
-import { ConnectionStatus } from '@repo/utils'
-import { MxAdapter } from './adapter'
-import { testExampleInstitution } from './constants'
-import { MappedJobTypes } from '../shared/contract'
+import { http, HttpResponse } from "msw";
 
-const labelText = 'testLabelText'
-const aggregator = 'aggregator'
+import {
+  cacheClient,
+  logClient,
+  aggregatorCredentials,
+  serverConfig,
+  EXTENDED_HISTORY_NOT_SUPPORTED_MSG,
+  MxAdapter
+} from "./adapter";
+import { ChallengeType, ConnectionStatus } from "@repo/utils";
 
-const testAdapter = new MxAdapter({
-  labelText,
-  aggregator
-})
+import {
+  AGGREGATE_MEMBER_PATH,
+  ANSWER_CHALLENGE_PATH,
+  CREATE_MEMBER_PATH,
+  CREATE_USER_PATH,
+  DELETE_CONNECTION_PATH,
+  DELETE_MEMBER_PATH,
+  EXTEND_HISTORY_PATH,
+  MX_DELETE_USER_PATH,
+  MX_INSTITUTION_BY_ID_PATH,
+  READ_MEMBER_STATUS_PATH,
+  UPDATE_CONNECTION_PATH,
+  VERIFY_MEMBER_PATH
+} from "./test/handlers";
+import { institutionData } from "./test/testData/institution";
+import { institutionCredentialsData } from "./test/testData/institutionCredentials";
+import {
+  aggregateMemberMemberData,
+  connectionByIdMemberData,
+  extendHistoryMemberData,
+  identifyMemberData,
+  memberData,
+  membersData,
+  memberStatusData,
+  verifyMemberData
+} from "./test/testData/members";
+import { createUserData, listUsersData } from "./test/testData/users";
+import { server } from "./test/testServer";
 
-jest.mock('../services/storageClient/redis')
+const mxAdapterInt = new MxAdapter({
+  int: true,
+  dependencies: {
+    cacheClient,
+    logClient,
+    aggregatorCredentials,
+    serverConfig
+  }
+});
+const mxAdapter = new MxAdapter({
+  int: false,
+  dependencies: {
+    cacheClient,
+    logClient,
+    aggregatorCredentials,
+    serverConfig
+  }
+});
+const institutionResponse = institutionData.institution;
+const clientRedirectUrl = `${serverConfig.HostUrl}/oauth_redirect`;
 
-const successConnectionStatus = {
-  aggregator,
-  id: 'testId',
-  cur_job_id: 'testJobId',
-  user_id: 'userId',
-  status: ConnectionStatus.CONNECTED,
-  challenges: []
-} as any
+const testCredential = {
+  id: "testCredentialId",
+  label: "testCredentialLabel",
+  value: "testCredentialValue",
+  field_type: "testCredentialFieldType",
+  field_name: "testCredentialFieldName"
+};
 
-describe('MxAdapter', () => {
-  describe('GetInstitutionById', () => {
-    it('returns a response object', async () => {
-      expect(await testAdapter.GetInstitutionById('test')).toEqual({
-        id: 'test',
-        logo_url: testExampleInstitution.logo_url,
-        name: testExampleInstitution.name,
-        oauth: testExampleInstitution.oauth,
-        aggregator,
-        url: testExampleInstitution.url
-      })
-    })
-  })
+const testChallenge = {
+  id: "testChallengeId",
+  external_id: "testExternalId",
+  question: "testQuestion",
+  data: "testData",
+  type: ChallengeType.QUESTION,
+  response: "testResponse"
+};
 
-  describe('ListInstitutionCredentials', () => {
-    it('returns a response object', async () => {
-      expect(await testAdapter.ListInstitutionCredentials('test')).toEqual([
-        {
-          field_name: 'fieldName',
-          field_type: 'fieldType',
-          id: 'testId',
-          label: labelText
-        }
-      ])
-    })
-  })
+describe("mx aggregator", () => {
+  describe("MxAdapter", () => {
+    it("works with integration credentials", async () => {
+      expect(await mxAdapterInt.GetInstitutionById("testId")).toEqual({
+        id: institutionResponse.code,
+        logo_url: institutionResponse.medium_logo_url,
+        name: institutionResponse.name,
+        oauth: institutionResponse.supports_oauth,
+        url: institutionResponse.url,
+        aggregator: "mx_int"
+      });
+    });
 
-  describe('ListConnections', () => {
-    it('returns a response object', async () => {
-      expect(await testAdapter.ListConnections('test')).toEqual([
-        {
-          id: 'testId',
-          cur_job_id: 'testJobId',
-          institution_code: 'testCode',
-          is_being_aggregated: false,
-          is_oauth: false,
-          oauth_window_uri: undefined,
-          aggregator
-        }
-      ])
-    })
-  })
+    describe("GetInsitutionById", () => {
+      it("uses the medium logo if available", async () => {
+        expect(await mxAdapter.GetInstitutionById("testId")).toEqual({
+          id: institutionResponse.code,
+          logo_url: institutionResponse.medium_logo_url,
+          name: institutionResponse.name,
+          oauth: institutionResponse.supports_oauth,
+          url: institutionResponse.url,
+          aggregator: "mx"
+        });
+      });
 
-  describe('ListConnectionCredentials', () => {
-    it('returns a response object', async () => {
-      expect(
-        await testAdapter.ListConnectionCredentials('test', 'test')
-      ).toEqual([
-        {
-          id: 'testId',
-          field_name: 'testFieldName',
-          field_type: 'testFieldType',
-          label: labelText
-        }
-      ])
-    })
-  })
+      it("uses the small logo if no medium logo", async () => {
+        server.use(
+          http.get(MX_INSTITUTION_BY_ID_PATH, () =>
+            HttpResponse.json({
+              ...institutionData,
+              institution: {
+                ...institutionData.institution,
+                medium_logo_url: undefined
+              }
+            })
+          )
+        );
 
-  describe('CreateConnection', () => {
-    it('returns a response object', async () => {
-      expect(await testAdapter.CreateConnection(undefined, 'test')).toEqual({
-        id: 'testId',
-        cur_job_id: 'testJobId',
-        institution_code: 'testCode',
-        is_being_aggregated: false,
-        is_oauth: false,
-        oauth_window_uri: undefined,
-        aggregator
-      })
-    })
-  })
+        expect(await mxAdapter.GetInstitutionById("testId")).toEqual({
+          id: institutionResponse.code,
+          logo_url: institutionResponse.small_logo_url,
+          name: institutionResponse.name,
+          oauth: institutionResponse.supports_oauth,
+          url: institutionResponse.url,
+          aggregator: "mx"
+        });
+      });
+    });
 
-  describe('verification flow', () => {
-    it('doesnt return a challenge if the job type isnt verification', async () => {
-      const userId = 'testUserId'
+    describe("ListInstitutionCredentials", () => {
+      const [firstCredential, secondCredential] =
+        institutionCredentialsData.credentials;
 
-      const successStatus = {
-        ...successConnectionStatus,
-        user_id: userId
-      }
-
-      await testAdapter.UpdateConnection(
-        {
-          job_type: MappedJobTypes.AGGREGATE
-        } as any,
-        userId
-      )
-
-      expect(
-        await testAdapter.GetConnectionStatus('test', 'test', true, userId)
-      ).toEqual(successStatus)
-    })
-
-    it('returns success if it hasnt been verified once, returns success if the job type is verification, it has been verified once, and single_account_select is false, returns a challenge if the job type if verification and it has been verified once and single_account_select is true. returns success after a second verification', async () => {
-      const userId = 'testUserId'
-
-      const successStatus = {
-        ...successConnectionStatus,
-        user_id: userId
-      }
-
-      expect(
-        await testAdapter.GetConnectionStatus('test', 'test', true, userId)
-      ).toEqual(successStatus)
-
-      await testAdapter.UpdateConnection(
-        {
-          job_type: MappedJobTypes.VERIFICATION
-        } as any,
-        userId
-      )
-
-      expect(
-        await testAdapter.GetConnectionStatus('test', 'test', false, userId)
-      ).toEqual(successStatus)
-
-      expect(
-        await testAdapter.GetConnectionStatus('test', 'test', true, userId)
-      ).toEqual({
-        aggregator,
-        id: 'testId',
-        cur_job_id: 'testJobId',
-        user_id: 'testUserId',
-        status: ConnectionStatus.CHALLENGED,
-        challenges: [
+      it("transforms the credentials into useable form", async () => {
+        expect(await mxAdapter.ListInstitutionCredentials("testId")).toEqual([
           {
-            id: 'CRD-a81b35db-28dd-41ea-aed3-6ec8ef682011',
-            type: 1,
-            question: 'Please select an account:',
-            data: [
+            id: firstCredential.guid,
+            field_name: firstCredential.field_name,
+            field_type: firstCredential.field_type,
+            label: firstCredential.field_name
+          },
+          {
+            id: secondCredential.guid,
+            field_name: secondCredential.field_name,
+            field_type: secondCredential.field_type,
+            label: secondCredential.field_name
+          }
+        ]);
+      });
+    });
+
+    describe("ListConnections", () => {
+      const [firstMember, secondMember] = membersData.members;
+
+      it("retrieves and transforms the members", async () => {
+        expect(await mxAdapter.ListConnections("testId")).toEqual([
+          {
+            id: firstMember.guid,
+            cur_job_id: firstMember.guid,
+            institution_code: firstMember.institution_code,
+            is_being_aggregated: firstMember.is_being_aggregated,
+            is_oauth: firstMember.is_oauth,
+            oauth_window_uri: firstMember.oauth_window_uri,
+            aggregator: "mx"
+          },
+          {
+            id: secondMember.guid,
+            cur_job_id: secondMember.guid,
+            institution_code: secondMember.institution_code,
+            is_being_aggregated: secondMember.is_being_aggregated,
+            is_oauth: secondMember.is_oauth,
+            oauth_window_uri: secondMember.oauth_window_uri,
+            aggregator: "mx"
+          }
+        ]);
+      });
+    });
+
+    describe("ListConnectionCredentials", () => {
+      const [firstCredential, secondCredential] =
+        institutionCredentialsData.credentials;
+
+      it("retreieves and transforms member credentials", async () => {
+        expect(
+          await mxAdapter.ListConnectionCredentials(
+            "testMemberId",
+            "testUserId"
+          )
+        ).toEqual([
+          {
+            id: firstCredential.guid,
+            field_name: firstCredential.field_name,
+            field_type: firstCredential.field_type,
+            label: firstCredential.field_name
+          },
+          {
+            id: secondCredential.guid,
+            field_name: secondCredential.field_name,
+            field_type: secondCredential.field_type,
+            label: secondCredential.field_name
+          }
+        ]);
+      });
+    });
+
+    describe("CreateConnection", () => {
+      const baseConnectionRequest = {
+        id: "testId",
+        initial_job_type: "verification",
+        background_aggregation_is_disabled: false,
+        credentials: [testCredential],
+        institution_id: "testInstitutionId",
+        is_oauth: false,
+        skip_aggregation: false,
+        metadata: "testMetadata"
+      };
+
+      it("deletes the existing member if one is found", async () => {
+        let memberDeletionAttempted = false;
+
+        server.use(
+          http.delete(DELETE_MEMBER_PATH, () => {
+            memberDeletionAttempted = true;
+
+            return new HttpResponse(null, {
+              status: 200
+            });
+          })
+        );
+
+        await mxAdapter.CreateConnection(
+          {
+            ...baseConnectionRequest,
+            institution_id: membersData.members[0].institution_code,
+            is_oauth: true
+          },
+          "testUserId"
+        );
+
+        expect(memberDeletionAttempted).toBe(true);
+      });
+
+      describe("createMemberPayload spy tests", () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let createMemberPayload: any;
+
+        beforeEach(() => {
+          createMemberPayload = null;
+
+          server.use(
+            http.post(CREATE_MEMBER_PATH, async ({ request }) => {
+              createMemberPayload = await request.json();
+
+              return HttpResponse.json(memberData);
+            })
+          );
+        });
+
+        it("creates member with a client_redirect_url if is_oauth", async () => {
+          await mxAdapter.CreateConnection(
+            {
+              ...baseConnectionRequest,
+              is_oauth: true
+            },
+            "testUserId"
+          );
+
+          expect(createMemberPayload.client_redirect_url).toEqual(
+            clientRedirectUrl
+          );
+        });
+
+        it("creates member without a client_redirect_url if !is_oauth", async () => {
+          await mxAdapter.CreateConnection(
+            {
+              ...baseConnectionRequest,
+              is_oauth: false
+            },
+            "testUserId"
+          );
+
+          expect(createMemberPayload.client_redirect_url).toEqual(null);
+        });
+
+        it("creates a member with skip_aggregation if requested", async () => {
+          await mxAdapter.CreateConnection(
+            {
+              ...baseConnectionRequest,
+              skip_aggregation: true
+            },
+            "testUserId"
+          );
+
+          expect(createMemberPayload.member.skip_aggregation).toEqual(true);
+        });
+
+        it("creates a member with skip_aggregation if jobType is not aggregate", async () => {
+          await mxAdapter.CreateConnection(
+            {
+              ...baseConnectionRequest,
+              initial_job_type: "auth"
+            },
+            "testUserId"
+          );
+
+          expect(createMemberPayload.member.skip_aggregation).toEqual(true);
+        });
+
+        it("creates a member with !skip_aggregation if jobType is aggregate", async () => {
+          await mxAdapter.CreateConnection(
+            {
+              ...baseConnectionRequest,
+              initial_job_type: "aggregate"
+            },
+            "testUserId"
+          );
+
+          expect(createMemberPayload.member.skip_aggregation).toEqual(false);
+        });
+
+        it("creates a member with correctly mapped request options and returns the member from that response when is_oauth", async () => {
+          await mxAdapter.CreateConnection(
+            {
+              ...baseConnectionRequest,
+              is_oauth: true
+            },
+            "testUserId"
+          );
+
+          expect(createMemberPayload).toEqual({
+            client_redirect_url: clientRedirectUrl,
+            member: {
+              credentials: [
+                {
+                  guid: baseConnectionRequest.credentials[0].id,
+                  value: baseConnectionRequest.credentials[0].value
+                }
+              ],
+              institution_code: baseConnectionRequest.institution_id,
+              is_oauth: true,
+              skip_aggregation: true
+            },
+            referral_source: "APP"
+          });
+        });
+      });
+
+      it("returns the member from verifyMember if job type is verification or aggregate_identity_verification", async () => {
+        const verificationMember = await mxAdapter.CreateConnection(
+          {
+            ...baseConnectionRequest,
+            initial_job_type: "verification"
+          },
+          "testUserId"
+        );
+
+        expect(verificationMember.id).toEqual(verifyMemberData.member.guid);
+
+        const aggregateMember = await mxAdapter.CreateConnection(
+          {
+            ...baseConnectionRequest,
+            initial_job_type: "aggregate_identity_verification"
+          },
+          "testUserId"
+        );
+
+        expect(aggregateMember.id).toEqual(verifyMemberData.member.guid);
+      });
+
+      it("returns the member from identifyMember if job type is aggregate_identity", async () => {
+        const member = await mxAdapter.CreateConnection(
+          {
+            ...baseConnectionRequest,
+            initial_job_type: "aggregate_identity"
+          },
+          "testUserId"
+        );
+
+        expect(member.id).toEqual(identifyMemberData.member.guid);
+      });
+
+      it("returns the member from extendHistory if job type is aggregate_extendedhistory", async () => {
+        const member = await mxAdapter.CreateConnection(
+          {
+            ...baseConnectionRequest,
+            initial_job_type: "aggregate_extendedhistory"
+          },
+          "testUserId"
+        );
+
+        expect(member.id).toEqual(extendHistoryMemberData.member.guid);
+      });
+    });
+
+    describe("DeleteConnection", () => {
+      it("deletes the connection", async () => {
+        let connectionDeletionAttempted = false;
+
+        server.use(
+          http.delete(DELETE_CONNECTION_PATH, () => {
+            connectionDeletionAttempted = true;
+
+            return new HttpResponse(null, {
+              status: 200
+            });
+          })
+        );
+
+        await mxAdapter.DeleteConnection("testId", "testUserId");
+
+        expect(connectionDeletionAttempted).toBe(true);
+      });
+    });
+
+    describe("DeleteUser", () => {
+      it("deletes the user", async () => {
+        let userDeletionAttempted = false;
+
+        server.use(
+          http.delete(MX_DELETE_USER_PATH, () => {
+            userDeletionAttempted = true;
+
+            return new HttpResponse(null, {
+              status: 204
+            });
+          })
+        );
+
+        await mxAdapter.DeleteUser("testUserId");
+
+        expect(userDeletionAttempted).toBe(true);
+      });
+    });
+
+    describe("UpdateConnection", () => {
+      const baseUpdateConnectionRequest = {
+        id: "testUpdateConnectionId",
+        job_type: "auth",
+        credentials: [testCredential],
+        challenges: [testChallenge]
+      };
+
+      it("returns the member from verifyMember if jobType is verification", async () => {
+        const member = await mxAdapter.UpdateConnection(
+          {
+            ...baseUpdateConnectionRequest,
+            job_type: "verification"
+          },
+          "testUserId"
+        );
+
+        expect(member.id).toEqual(verifyMemberData.member.guid);
+      });
+
+      it("returns the member from identifyMember if jobType is aggregate_identity", async () => {
+        const member = await mxAdapter.UpdateConnection(
+          {
+            ...baseUpdateConnectionRequest,
+            job_type: "aggregate_identity"
+          },
+          "testUserId"
+        );
+
+        expect(member.id).toEqual(identifyMemberData.member.guid);
+      });
+
+      it("returns the member from extendHistory if jobType is aggregate_extendedhistory", async () => {
+        const member = await mxAdapter.UpdateConnection(
+          {
+            ...baseUpdateConnectionRequest,
+            job_type: "aggregate_extendedhistory"
+          },
+          "testUserId"
+        );
+
+        expect(member.id).toEqual(extendHistoryMemberData.member.guid);
+      });
+
+      it("returns the member from aggregateMember if jobType is agg", async () => {
+        const member = await mxAdapter.UpdateConnection(
+          {
+            ...baseUpdateConnectionRequest,
+            job_type: "agg"
+          },
+          "testUserId"
+        );
+
+        expect(member.id).toEqual(aggregateMemberMemberData.member.guid);
+      });
+
+      it("returns the member from aggregateMember if extended history is not supported", async () => {
+        server.use(
+          http.post(EXTEND_HISTORY_PATH, () => {
+            return HttpResponse.json(
+              { error: { message: EXTENDED_HISTORY_NOT_SUPPORTED_MSG } },
+              { status: 400 }
+            );
+          })
+        );
+
+        const member = await mxAdapter.UpdateConnection(
+          {
+            ...baseUpdateConnectionRequest,
+            job_type: "aggregate_extendedhistory"
+          },
+          "testUserId"
+        );
+
+        expect(member.id).toEqual(aggregateMemberMemberData.member.guid);
+      });
+
+      it("returns an error message if a request fails", async () => {
+        const errorMessage = "testError";
+
+        server.use(
+          http.post(VERIFY_MEMBER_PATH, () =>
+            HttpResponse.json(
               {
-                key: 'Checking',
-                value: 'act-23445745'
+                error: {
+                  message: errorMessage
+                }
               },
+              { status: 400 }
+            )
+          )
+        );
+
+        const error = await mxAdapter.UpdateConnection(
+          {
+            ...baseUpdateConnectionRequest,
+            job_type: "verification"
+          },
+          "testUserId"
+        );
+
+        expect(error).toEqual({
+          error_message: errorMessage,
+          id: baseUpdateConnectionRequest.id
+        });
+      });
+
+      it("returns an error message if the aggregate member request fails after extended history is not supported", async () => {
+        server.use(
+          http.post(EXTEND_HISTORY_PATH, () =>
+            HttpResponse.json({
+              error: {
+                message: EXTENDED_HISTORY_NOT_SUPPORTED_MSG
+              }
+            }, { status: 400 })
+          )
+        );
+
+        const errorMessage = "testError";
+
+        server.use(
+          http.post(AGGREGATE_MEMBER_PATH, () =>
+            HttpResponse.json({
+              error: {
+                message: errorMessage
+              }
+            }, { status: 400 })
+          )
+        );
+
+        const error = await mxAdapter.UpdateConnection(
+          {
+            ...baseUpdateConnectionRequest,
+            job_type: "aggregate_extendedhistory"
+          },
+          "testUserId"
+        );
+
+        expect(error).toEqual({
+          error_message: errorMessage,
+          id: baseUpdateConnectionRequest.id
+        });
+      });
+    });
+
+    describe("UpdateConnectionInternal", () => {
+      it("it calls updateMember with the correct request body and returns the member", async () => {
+        let updateConnectionPaylod;
+
+        server.use(
+          http.put(UPDATE_CONNECTION_PATH, async ({ request }) => {
+            updateConnectionPaylod = await request.json();
+
+            return HttpResponse.json(memberData);
+          })
+        );
+
+        const member = await mxAdapter.UpdateConnectionInternal(
+          {
+            id: "updateConnectionId",
+            job_type: "testJobType",
+            credentials: [testCredential],
+            challenges: [testChallenge]
+          },
+          "testUserId"
+        );
+
+        expect(updateConnectionPaylod).toEqual({
+          member: {
+            credentials: [
               {
-                key: 'Savings',
-                value: 'act-352386787'
+                guid: testCredential.id,
+                value: testCredential.value
               }
             ]
           }
-        ]
-      })
+        });
 
-      await testAdapter.UpdateConnection(
-        {
-          job_type: MappedJobTypes.VERIFICATION
-        } as any,
-        userId
-      )
+        const testMember = memberData.member;
 
-      expect(
-        await testAdapter.GetConnectionStatus('test', 'test', false, userId)
-      ).toEqual(successStatus)
+        expect(member).toEqual({
+          cur_job_id: testMember.guid,
+          id: testMember.guid,
+          institution_code: testMember.institution_code,
+          is_being_aggregated: testMember.is_being_aggregated,
+          is_oauth: testMember.is_oauth,
+          oauth_window_uri: testMember.oauth_window_uri,
+          aggregator: "mx"
+        });
+      });
+    });
 
-      expect(
-        await testAdapter.GetConnectionStatus('test', 'test', true, userId)
-      ).toEqual(successStatus)
-    })
-  })
+    describe("GetConnectionById", () => {
+      it("returns the member from readMember", async () => {
+        const testUserId = "userId";
+        const member = await mxAdapter.GetConnectionById(
+          "connectionId",
+          testUserId
+        );
 
-  describe('UpdateConnection', () => {
-    it('returns a response object', async () => {
-      expect(
-        await testAdapter.UpdateConnection(
+        const testMember = connectionByIdMemberData.member;
+
+        expect(member).toEqual({
+          id: testMember.guid,
+          institution_code: testMember.institution_code,
+          is_being_aggregated: testMember.is_being_aggregated,
+          is_oauth: testMember.is_oauth,
+          oauth_window_uri: testMember.oauth_window_uri,
+          aggregator: "mx",
+          user_id: testUserId
+        });
+      });
+    });
+
+    describe("GetConnectionStatus", () => {
+      it("returns a rejected connection status if there's an error with oauthStatus", async () => {
+        await cacheClient.set(memberStatusData.member.guid, { error: true });
+
+        const connectionStatus = await mxAdapter.GetConnectionStatus(
+          "testMemberId",
+          "testJobId",
+          false,
+          "testUserId"
+        );
+
+        expect(connectionStatus.status).toEqual(ConnectionStatus.REJECTED);
+      });
+
+      it("returns a properly mapped response with TEXT, OPTIONS< TOKEN< IMAGE_DATA, and IMAGE_OPTIONS challenges", async () => {
+        const challenges = [
           {
-            job_type: MappedJobTypes.AGGREGATE
-          } as any,
-          'test'
-        )
-      ).toEqual({
-        id: 'testId',
-        cur_job_id: 'testJobId',
-        institution_code: 'testCode',
-        is_being_aggregated: false,
-        is_oauth: false,
-        oauth_window_uri: undefined,
-        aggregator
-      })
-    })
-  })
+            guid: "challengeGuid1",
+            label: "challengeLabel1",
+            type: "TEXT"
+          },
+          {
+            guid: "challengeGuid2",
+            label: "challengeLabel2",
+            options: [
+              {
+                label: "optionLabel1",
+                value: "optionValue1"
+              }
+            ],
+            type: "OPTIONS"
+          },
+          {
+            guid: "challengeGuid3",
+            label: "challengeLabel3",
+            type: "TOKEN"
+          },
+          {
+            guid: "challengeGuid4",
+            label: "challengeLabel4",
+            image_data: "imageData",
+            type: "IMAGE_DATA"
+          },
+          {
+            guid: "challengeGuid5",
+            image_options: [
+              {
+                label: "optionLabel1",
+                value: "optionValue1"
+              }
+            ],
+            label: "challengeLabel5",
+            type: "IMAGE_OPTIONS"
+          }
+        ];
 
-  describe('UpdateConnectionInternal', () => {
-    it('returns a response object', async () => {
-      expect(
-        await testAdapter.UpdateConnectionInternal(undefined, 'test')
-      ).toEqual({
-        id: 'testId',
-        cur_job_id: 'testJobId',
-        institution_code: 'testCode',
-        is_being_aggregated: false,
-        is_oauth: false,
-        oauth_window_uri: undefined,
-        aggregator
-      })
-    })
-  })
+        const [
+          textChallenge,
+          optionsChallenge,
+          tokenChallenge,
+          imageChallenge,
+          imageOptionsChallenge
+        ] = challenges;
 
-  describe('GetConnectionById', () => {
-    it('returns a response object', async () => {
-      expect(await testAdapter.GetConnectionById(undefined, 'test')).toEqual({
-        id: 'testId',
-        institution_code: 'testCode',
-        is_oauth: false,
-        is_being_aggregated: false,
-        oauth_window_uri: undefined,
-        aggregator,
-        user_id: 'test'
-      })
-    })
-  })
+        server.use(
+          http.get(READ_MEMBER_STATUS_PATH, () =>
+            HttpResponse.json({
+              ...memberStatusData,
+              member: {
+                ...memberStatusData.member,
+                challenges
+              }
+            })
+          )
+        );
 
-  describe('GetConnectionStatus', () => {
-    it('returns a response object', async () => {
-      expect(
-        await testAdapter.GetConnectionStatus('test', 'test', false, 'userId')
-      ).toEqual(successConnectionStatus)
-    })
-  })
+        const testMember = memberStatusData.member;
+        const userId = "testUserId";
 
-  describe('AnswerChallenge', () => {
-    it('returns a response object', async () => {
-      expect(
-        await testAdapter.AnswerChallenge(undefined, 'test', 'test')
-      ).toEqual(true)
-    })
-  })
+        expect(
+          await mxAdapter.GetConnectionStatus(
+            "testMemberId",
+            "testJobId",
+            false,
+            userId
+          )
+        ).toEqual({
+          cur_job_id: testMember.guid,
+          aggregator: "mx",
+          id: testMember.guid,
+          user_id: userId,
+          status:
+            ConnectionStatus[
+              testMember.connection_status as keyof typeof ConnectionStatus
+              ],
+          challenges: [
+            {
+              data: [
+                {
+                  key: "0",
+                  value: textChallenge.label
+                }
+              ],
+              id: textChallenge.guid,
+              type: ChallengeType.QUESTION,
+              question: textChallenge.label
+            },
+            {
+              data: [
+                {
+                  key: optionsChallenge.options[0].label,
+                  value: optionsChallenge.options[0].value
+                }
+              ],
+              id: optionsChallenge.guid,
+              question: optionsChallenge.label,
+              type: ChallengeType.OPTIONS
+            },
+            {
+              id: tokenChallenge.guid,
+              data: tokenChallenge.label,
+              question: tokenChallenge.label,
+              type: ChallengeType.TOKEN
+            },
+            {
+              data: imageChallenge.image_data,
+              id: imageChallenge.guid,
+              question: imageChallenge.label,
+              type: ChallengeType.IMAGE
+            },
+            {
+              data: [
+                {
+                  key: imageOptionsChallenge.image_options[0].label,
+                  value: imageOptionsChallenge.image_options[0].value
+                }
+              ],
+              id: imageOptionsChallenge.guid,
+              question: imageOptionsChallenge.label,
+              type: ChallengeType.IMAGE_OPTIONS
+            }
+          ]
+        });
+      });
+    });
 
-  describe('ResolveUserId', () => {
-    it('returns a response object', async () => {
-      expect(await testAdapter.ResolveUserId('userId', false)).toEqual('userId')
-    })
-  })
-})
+    describe("AnswerChallenge", () => {
+      it("calls the resumeAggregation endpoint with the correct payload and returns true", async () => {
+        let answerChallengePayload;
+
+        server.use(
+          http.put(ANSWER_CHALLENGE_PATH, async ({ request }) => {
+            answerChallengePayload = await request.json();
+
+            return new HttpResponse(null, { status: 200 });
+          })
+        );
+
+        const challenge = {
+          id: "challengeId",
+          response: "challengeResponse"
+        };
+
+        expect(
+          await mxAdapter.AnswerChallenge(
+            {
+              id: "requestId",
+              job_type: "auth",
+              credentials: [],
+              challenges: [challenge]
+            },
+            "jobId",
+            "userId"
+          )
+        );
+
+        expect(answerChallengePayload).toEqual({
+          member: {
+            challenges: [
+              {
+                guid: challenge.id,
+                value: challenge.response
+              }
+            ]
+          }
+        });
+      });
+    });
+
+    describe("ResolveUserId", () => {
+      it("returns the mx user from listUsers if it's available", async () => {
+        const user = listUsersData.users[0];
+
+        const returnedUserId = await mxAdapter.ResolveUserId(user.id);
+
+        expect(returnedUserId).toEqual(user.guid);
+      });
+
+      it("creates the user if the user isn't in the list and returns it from there", async () => {
+        const returnedUserId = await mxAdapter.ResolveUserId(
+          "userIdNotInListUsers"
+        );
+
+        expect(returnedUserId).toEqual(createUserData.user.guid);
+      });
+
+      it("returns the provided userId if creating a user fails", async () => {
+        server.use(
+          http.post(
+            CREATE_USER_PATH,
+            () => new HttpResponse(null, { status: 400 })
+          )
+        );
+
+        const userId = "userIdNotInListUsers";
+
+        const returnedUserId = await mxAdapter.ResolveUserId(userId);
+
+        expect(returnedUserId).toEqual(userId);
+      });
+
+      it("throws an error if customer does not exist and failIfNotFound is true", async () => {
+        const userId = "userIdNotInListUsers";
+
+        await expect(
+          async () => await mxAdapter.ResolveUserId(userId, true)
+        ).rejects.toThrow("User not resolved successfully");
+      });
+    });
+  });
+});
