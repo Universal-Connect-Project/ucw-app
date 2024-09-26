@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-_Provide here a descriptive overview of the the feature._
+_Provide here a descriptive overview of the feature._
 
 ## 2. Architecture
 
