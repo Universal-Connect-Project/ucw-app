@@ -11,29 +11,26 @@ export const init = (path = ".env") => {
 
   const { parsed: envs } = result;
 
-  if (
-    !(
-      envs?.HOST_URL &&
-      (!(
-        envs?.MX_CLIENT_ID &&
-        envs?.MX_API_SECRET
-      ) || !(
-        envs?.MX_CLIENT_ID_PROD &&
-        envs?.MX_API_SECRET_PROD
-      ))
-    )
-  ) {
-    throw new Error(
-      "Missing required environment variables. Check README.md and `../.env.example` for more info."
-    );
+  // Validate envs
+
+  if (!envs?.HostUrl) {
+    throw new Error("Missing HostUrl. Check README.md and `../.env.example` for more info.");
+  }
+
+  if (!envs?.MxClientId && !envs?.MxClientIdProd) {
+    throw new Error("Missing MxClientId or MxClientIdProd. Check README.md and `../.env.example` for more info.");
+  }
+
+  if (!envs?.MxApiSecret && !envs?.MxApiSecretProd) {
+    throw new Error("Missing MxApiSecret or MxApiSecretProd. Check README.md and `../.env.example` for more info.");
   }
 
   return {
-    HOST_URL: envs?.HOST_URL,
-    MX_CLIENT_ID: envs?.MX_CLIENT_ID,
-    MX_API_SECRET: envs?.MX_API_SECRET,
-    MX_CLIENT_ID_PROD: envs?.MX_CLIENT_ID_PROD,
-    MX_API_SECRET_PROD: envs?.MX_API_SECRET_PROD
+    HostUrl: envs?.HostUrl,
+    MxClientId: envs?.MxClientId,
+    MxApiSecret: envs?.MxApiSecret,
+    MxClientIdProd: envs?.MxClientIdProd,
+    MxApiSecretProd: envs?.MxApiSecretProd
   };
 };
 

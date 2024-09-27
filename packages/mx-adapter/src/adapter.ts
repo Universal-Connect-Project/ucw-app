@@ -125,7 +125,7 @@ export class MxAdapter implements WidgetAdapter {
     const memberRes = await this.apiClient.createMember(userId, {
       referral_source: "APP", // request.is_oauth ? 'APP' : '',
       client_redirect_url: request.is_oauth
-        ? `${envConfig.HOST_URL}/oauth_redirect`
+        ? `${envConfig.HostUrl}/oauth_redirect`
         : null,
       member: {
         skip_aggregation: request.skip_aggregation || jobType !== "aggregate",

@@ -44,16 +44,16 @@ const cacheClient = createCacheClient();
 
 export const aggregatorCredentials = {
   mxInt: {
-    username: config.MX_CLIENT_ID,
-    password: config.MX_API_SECRET,
+    username: config.MxClientId,
+    password: config.MxApiSecret,
     basePath: 'https://int-api.mx.com',
     vcEndpoint: 'https://int-api.mx.com/',
     aggregator: 'mx_int',
     available: true
   },
   mxProd: {
-    username: config.MX_CLIENT_ID_PROD,
-    password: config.MX_API_SECRET_PROD,
+    username: config.MxClientIdProd,
+    password: config.MxApiSecretProd,
     basePath: 'https://api.mx.com',
     vcEndpoint: 'https://api.mx.com/',
     aggregator: 'mx',
@@ -81,7 +81,7 @@ const mxAdapter = new MxAdapter({
   }
 });
 const institutionResponse = institutionData.institution;
-const clientRedirectUrl = `${config.HOST_URL}/oauth_redirect`;
+const clientRedirectUrl = `${config.HostUrl}/oauth_redirect`;
 
 const testCredential = {
   id: "testCredentialId",
