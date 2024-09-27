@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw'
 
-import { serverConfig } from '../adapter'
+// import { envConfig } from '../adapter'
 import { BASE_PATH as MX_BASE_PATH } from '../apiClient'
 
 import { accessTokenResponse } from './testData/auth0'
@@ -115,7 +115,7 @@ const handlers = [
   ),
   http.get(USERS_PATH, () => HttpResponse.json(listUsersData)),
   http.post(CREATE_USER_PATH, () => HttpResponse.json(createUserData)),
-  http.post(serverConfig.Auth0TokenUrl, () => HttpResponse.json(accessTokenResponse))
+  // http.post(envConfig.Auth0TokenUrl, () => HttpResponse.json(accessTokenResponse))
 ]
 
 export default handlers

@@ -1,7 +1,9 @@
 import get from "axios";
-import { logClient, aggregatorCredentials } from "./adapter";
+import type { VCDependencies } from "./models";
 
-export const getVC = async (path: string, isProd: boolean): Promise<any> => {
+export const getVC = async (path: string, isProd: boolean, dependencies: VCDependencies): Promise<any> => {
+  const { logClient, aggregatorCredentials } = dependencies;
+
   const configuration = isProd
     ? aggregatorCredentials.mxProd
     : aggregatorCredentials.mxInt;

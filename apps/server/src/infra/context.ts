@@ -1,7 +1,5 @@
 import type { NextFunction, Request, Response } from "express"
-import config from "../config"
-import { encrypt, decrypt } from "../utils"
-import { Context } from "../shared/contract"
+import type { Context } from "../shared/contract"
 
 declare global {
   namespace Express {

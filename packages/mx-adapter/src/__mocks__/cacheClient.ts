@@ -1,11 +1,13 @@
-import { cacheClient } from '../adapter'
-
 let storageObject: Record<string, any> = {}
 
+export const constants = {
+  PREFERENCES_REDIS_KEY: 'preferences'
+};
+
 export const clearRedisMock = () => {
-  if (storageObject?.[cacheClient.constants.PREFERENCES_REDIS_KEY]) {
+  if (storageObject?.[constants.PREFERENCES_REDIS_KEY]) {
     storageObject = {
-      [cacheClient.constants.PREFERENCES_REDIS_KEY]: storageObject[cacheClient.constants.PREFERENCES_REDIS_KEY]
+      [constants.PREFERENCES_REDIS_KEY]: storageObject[constants.PREFERENCES_REDIS_KEY]
     }
   } else {
     storageObject = {}
@@ -15,6 +17,7 @@ export const clearRedisMock = () => {
 export const sAdd = jest.fn((key: string, values: string[]) => {
   storageObject[key] = values
 })
+
 export const del = jest.fn((key: string) => {
   delete storageObject[key]
 })
@@ -40,5 +43,6 @@ export const createClient = () => ({
   set,
   sAdd,
   sMembers,
-  del
+  del,
+  constants
 })

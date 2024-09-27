@@ -16,8 +16,6 @@ import type {
 } from "@repo/utils";
 import { ConnectionStatus, ChallengeType } from "@repo/utils";
 
-import config from "server/src/config";
-
 import { MxIntApiClient, MxProdApiClient } from "./apiClient";
 import type { AdapterConfig, CacheClient, LogClient } from "./models";
 
@@ -26,7 +24,7 @@ export const EXTENDED_HISTORY_NOT_SUPPORTED_MSG =
 export let cacheClient: CacheClient;
 export let logClient: LogClient;
 export let aggregatorCredentials: any;
-export let serverConfig: any;
+export let envConfig: any;
 
 const mapCredentials = (mxCreds: CredentialsResponseBody): Credential[] => {
   if (mxCreds.credentials != null) {
@@ -67,7 +65,7 @@ export class MxAdapter implements WidgetAdapter {
     cacheClient = dependencies?.cacheClient;
     logClient = dependencies?.logClient;
     aggregatorCredentials = dependencies?.aggregatorCredentials;
-    serverConfig = dependencies?.serverConfig;
+    envConfig = dependencies?.envConfig;
   }
 
   async GetInstitutionById(id: string): Promise<Institution> {
@@ -127,7 +125,7 @@ export class MxAdapter implements WidgetAdapter {
     const memberRes = await this.apiClient.createMember(userId, {
       referral_source: "APP", // request.is_oauth ? 'APP' : '',
       client_redirect_url: request.is_oauth
-        ? `${config.HostUrl}/oauth_redirect`
+        ? `${envConfig.HOST_URL}/oauth_redirect`
         : null,
       member: {
         skip_aggregation: request.skip_aggregation || jobType !== "aggregate",

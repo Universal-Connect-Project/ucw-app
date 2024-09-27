@@ -25,7 +25,7 @@ export const adapterMap = {
     },
     logClient: logger,
     aggregatorCredentials,
-    serverConfig: config
+    envConfig: config
   }),
   ...sophtronAdapterMapObject,
   ...testAdapterMapObject

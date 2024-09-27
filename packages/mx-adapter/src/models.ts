@@ -13,8 +13,8 @@ export type ApiCredentials = {
 }
 
 export type CacheClient = {
-  set: (key: string, value: any) => Promise<void>;
-  get: (key: string) => Promise<any>;
+  set: (key: string, value: any) => Promise<void> | void;
+  get: (key: string) => Promise<any> | any;
   constants: Record<string, string>;
 };
 
@@ -30,7 +30,7 @@ export type AdapterDependencies = {
   cacheClient: CacheClient;
   logClient: LogClient;
   aggregatorCredentials: Record<string, ApiCredentials>;
-  serverConfig: any;
+  envConfig: any;
 }
 
 export type AdapterConfig = {
@@ -38,10 +38,15 @@ export type AdapterConfig = {
   dependencies: AdapterDependencies;
 }
 
-export enum MappedJobTypes {
-  AGGREGATE = "aggregate",
-  ALL = "aggregate_identity_verification",
-  FULLHISTORY = "aggregate_extendedhistory",
-  VERIFICATION = "verification",
-  IDENTITY = "aggregate_identity",
-}
+export type VCDependencies = {
+  logClient: LogClient;
+  aggregatorCredentials: any;
+};
+
+// export enum MappedJobTypes {
+//   AGGREGATE = "aggregate",
+//   ALL = "aggregate_identity_verification",
+//   FULLHISTORY = "aggregate_extendedhistory",
+//   VERIFICATION = "verification",
+//   IDENTITY = "aggregate_identity",
+// }

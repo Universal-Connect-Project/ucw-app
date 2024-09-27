@@ -1,4 +1,4 @@
-import { clearRedisMock } from './src/__mocks__/redis'
+import { clearRedisMock } from './src/__mocks__/cacheClient'
 import { server } from './src/test/testServer'
 
 beforeAll(() => {

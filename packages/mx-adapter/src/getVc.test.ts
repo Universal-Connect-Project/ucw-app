@@ -7,9 +7,16 @@ import {
 import { mxVcAccountsData } from "./test/testData/mxVcData";
 import { server } from "./test/testServer";
 import { getVC } from "./getVc";
-import { aggregatorCredentials } from "./adapter";
+
+import { logClient } from "./__mocks__/logClient";
+import { aggregatorCredentials } from "./adapter.test";
 
 const accountsPath = "users/userId/members/connectionId/accounts";
+
+const dependencies = {
+  logClient,
+  aggregatorCredentials
+};
 
 describe("mx vc", () => {
   describe("MxVcClient", () => {
@@ -23,7 +30,7 @@ describe("mx vc", () => {
         })
       );
 
-      const response = await getVC(accountsPath, true);
+      const response = await getVC(accountsPath, true, dependencies);
 
       expect(response).toEqual(mxVcAccountsData);
 
@@ -47,7 +54,7 @@ describe("mx vc", () => {
         })
       );
 
-      const response = await getVC(accountsPath, false);
+      const response = await getVC(accountsPath, false, dependencies);
 
       expect(response).toEqual(mxVcAccountsData);
 
@@ -70,7 +77,7 @@ describe("mx vc", () => {
       );
 
       await expect(
-        async () => await getVC(accountsPath, true)
+        async () => await getVC(accountsPath, true, dependencies)
       ).rejects.toThrow();
     });
   });

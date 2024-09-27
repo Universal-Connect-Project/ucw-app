@@ -1,4 +1,5 @@
 import { VCDataTypes } from '@repo/utils'
+
 import {
   mxVcAccountsData,
   mxVcIdentityData,
@@ -6,6 +7,15 @@ import {
   mxVcTranscationsData
 } from './test/testData/mxVcData'
 import { mxIntGetVC, mxProdGetVC } from './createVc'
+import { logClient } from "./__mocks__/logClient";
+import { aggregatorCredentials } from "./adapter.test";
+
+
+const dependencies = {
+  logClient,
+  aggregatorCredentials
+};
+
 
 describe('getVc', () => {
   const connectionId = 'connectionId'
@@ -13,7 +23,7 @@ describe('getVc', () => {
   const accountId = 'accountId'
 
   it('gets accounts VC from INT environment', async () => {
-    const vc = await mxIntGetVC({
+    const vc = await mxIntGetVC(dependencies)({
       connectionId,
       type: VCDataTypes.ACCOUNTS,
       userId
@@ -22,7 +32,7 @@ describe('getVc', () => {
   })
 
   it('gets identity VC from Prod environment', async () => {
-    const vc = await mxProdGetVC({
+    const vc = await mxProdGetVC(dependencies)({
       connectionId,
       type: VCDataTypes.IDENTITY,
       userId
@@ -31,7 +41,7 @@ describe('getVc', () => {
   })
 
   it('gets accounts VC from Prod environment', async () => {
-    const vc = await mxProdGetVC({
+    const vc = await mxProdGetVC(dependencies)({
       connectionId,
       type: VCDataTypes.ACCOUNTS,
       userId
@@ -40,7 +50,7 @@ describe('getVc', () => {
   })
 
   it('gets transactions VC from Prod environment', async () => {
-    const vc = await mxProdGetVC({
+    const vc = await mxProdGetVC(dependencies)({
       connectionId,
       type: VCDataTypes.TRANSACTIONS,
       userId,

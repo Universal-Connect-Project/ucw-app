@@ -30,6 +30,7 @@
     "mx-platform-node": "^0.42.0"
   },
   "devDependencies": {
+    "dotenv": "^16.4.5",
     "msw": "^2.4.9"
   }
 }

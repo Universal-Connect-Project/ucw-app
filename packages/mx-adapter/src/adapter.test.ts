@@ -1,14 +1,15 @@
 import { http, HttpResponse } from "msw";
 
+import config from "./config";
+
 import {
-  cacheClient,
-  logClient,
-  aggregatorCredentials,
-  serverConfig,
   EXTENDED_HISTORY_NOT_SUPPORTED_MSG,
   MxAdapter
 } from "./adapter";
 import { ChallengeType, ConnectionStatus } from "@repo/utils";
+
+import { createClient as createCacheClient } from "./__mocks__/cacheClient";
+import { logClient } from "./__mocks__/logClient";
 
 import {
   AGGREGATE_MEMBER_PATH,
@@ -39,26 +40,48 @@ import {
 import { createUserData, listUsersData } from "./test/testData/users";
 import { server } from "./test/testServer";
 
+const cacheClient = createCacheClient();
+
+export const aggregatorCredentials = {
+  mxInt: {
+    username: config.MX_CLIENT_ID,
+    password: config.MX_API_SECRET,
+    basePath: 'https://int-api.mx.com',
+    vcEndpoint: 'https://int-api.mx.com/',
+    aggregator: 'mx_int',
+    available: true
+  },
+  mxProd: {
+    username: config.MX_CLIENT_ID_PROD,
+    password: config.MX_API_SECRET_PROD,
+    basePath: 'https://api.mx.com',
+    vcEndpoint: 'https://api.mx.com/',
+    aggregator: 'mx',
+    available: true
+  },
+}
+
 const mxAdapterInt = new MxAdapter({
   int: true,
   dependencies: {
     cacheClient,
     logClient,
     aggregatorCredentials,
-    serverConfig
+    envConfig: config
   }
 });
+
 const mxAdapter = new MxAdapter({
   int: false,
   dependencies: {
     cacheClient,
     logClient,
     aggregatorCredentials,
-    serverConfig
+    envConfig: config
   }
 });
 const institutionResponse = institutionData.institution;
-const clientRedirectUrl = `${serverConfig.HostUrl}/oauth_redirect`;
+const clientRedirectUrl = `${config.HOST_URL}/oauth_redirect`;
 
 const testCredential = {
   id: "testCredentialId",
