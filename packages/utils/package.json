@@ -2,7 +2,7 @@
   "name": "@repo/utils",
   "version": "0.0.1",
   "main": "./src/index.ts",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {},
   "devDependencies": {
     "typescript": "^5.5.4"

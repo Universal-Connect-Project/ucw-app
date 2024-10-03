@@ -1,35 +1,35 @@
-import { getMxAdapterMapObject } from "@ucp-npm/mx-adapter";
-
-import config from "./config";
-import aggregatorCredentials from "./aggregatorCredentials";
+import { config } from "dotenv";
+import { get, REDIS_CONSTANTS, set } from "./services/storageClient/redis";
 import { adapterMapObject as testAdapterMapObject } from "./test-adapter";
+import { getMxAdapterMapObject as mxAdapterMapObject } from "@ucp-npm/mx-adapter";
 import { SophtronAdapter } from "./adapters/sophtron";
 import * as logger from "./infra/logger";
-import { get, set, REDIS_CONSTANTS } from "./services/storageClient/redis";
+
 import getSophtronVc from "./services/vcAggregators/sophtronVc";
+import aggregatorCredentials from "./aggregatorCredentials";
 
 const sophtronAdapterMapObject = {
   sophtron: {
     vcAdapter: getSophtronVc,
-    widgetAdapter: new SophtronAdapter()
-  }
+    widgetAdapter: new SophtronAdapter(),
+  },
 };
 
 // This is where you add adapters
 export const adapterMap = {
-  ...getMxAdapterMapObject({
+  ...mxAdapterMapObject({
     cacheClient: {
       set: set,
       get: get,
-      constants: REDIS_CONSTANTS
+      constants: REDIS_CONSTANTS,
     },
     logClient: logger,
     aggregatorCredentials,
-    envConfig: config
+    envConfig: config,
   }),
   ...sophtronAdapterMapObject,
-  ...testAdapterMapObject
+  ...testAdapterMapObject,
 };
 
-export type Aggregator = keyof typeof adapterMap
+export type Aggregator = keyof typeof adapterMap;
 export const aggregators = Object.keys(adapterMap);

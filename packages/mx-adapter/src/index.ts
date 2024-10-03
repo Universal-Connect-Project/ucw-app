@@ -14,14 +14,14 @@ export const getMxAdapterMapObject = (dependencies: AdapterDependencies) => {
   return {
     mx: {
       testInstitutionAdapterName: 'mx_int',
-      vcAdapter: mxProdGetVC,
+      vcAdapter: mxProdGetVC(dependencies),
       widgetAdapter: new MxAdapter({
         int: false,
         dependencies
       })
     },
     mx_int: {
-      vcAdapter: mxIntGetVC,
+      vcAdapter: mxIntGetVC(dependencies),
       widgetAdapter: new MxAdapter({
         int: true,
         dependencies
