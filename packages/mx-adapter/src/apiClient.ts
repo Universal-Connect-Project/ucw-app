@@ -1,6 +1,6 @@
 import { Configuration, MxPlatformApiFactory } from "mx-platform-node";
 
-import type { ApiCredentials } from "./models.js";
+import type { ApiCredentials } from "./models";
 
 export const BASE_PATH = "https://api.mx.com".replace(/\/+$/, "");
 

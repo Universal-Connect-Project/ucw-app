@@ -1,4 +1,4 @@
-import { MxAdapter } from "./adapter.js";
+import { MxAdapter } from "./adapter";
 import {
   MX_EXAMPLE_A_LABEL_TEXT,
   MX_EXAMPLE_A_PROVIDER_STRING,
@@ -6,11 +6,11 @@ import {
   MX_EXAMPLE_B_PROVIDER_STRING,
   MX_EXAMPLE_C_LABEL_TEXT,
   MX_EXAMPLE_C_PROVIDER_STRING
-} from "./constants.js";
+} from "./constants";
 
-import * as contract from "./contract.js";
-import { mxIntGetVC, mxProdGetVC } from "./createVc.js";
-import type { AdapterDependencies } from "./models.js";
+import * as contract from "./contract";
+import { mxIntGetVC, mxProdGetVC } from "./createVc";
+import type { AdapterDependencies } from "./models";
 
 export const getMxAdapterMapObject = (dependencies: AdapterDependencies) => {
   return {

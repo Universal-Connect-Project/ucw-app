@@ -5,7 +5,7 @@ export default {
     jest: true
   },
   parserOptions: {
-    project: './tsconfig.base.json',
+    project: './tsconfig.json',
   },
   ignorePatterns: [
     '.eslintrc.mjs',

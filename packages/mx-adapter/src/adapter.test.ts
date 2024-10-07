@@ -1,12 +1,12 @@
 import {http, HttpResponse} from "msw";
 
-import {createClient as createCacheClient} from "./__mocks__/cacheClient.js";
-import {logClient} from "./__mocks__/logClient.js";
+import {createClient as createCacheClient} from "./__mocks__/cacheClient";
+import {logClient} from "./__mocks__/logClient";
 
-import {EXTENDED_HISTORY_NOT_SUPPORTED_MSG, MxAdapter} from "./adapter.js";
+import {EXTENDED_HISTORY_NOT_SUPPORTED_MSG, MxAdapter} from "./adapter";
 
-import config from "./config.js";
-import {ChallengeType, ConnectionStatus} from "./contract.js";
+import config from "./config";
+import {ChallengeType, ConnectionStatus} from "./contract";
 
 import {
   AGGREGATE_MEMBER_PATH,
@@ -21,9 +21,9 @@ import {
   READ_MEMBER_STATUS_PATH,
   UPDATE_CONNECTION_PATH,
   VERIFY_MEMBER_PATH
-} from "./test/handlers.js";
-import {institutionData} from "./test/testData/institution.js";
-import {institutionCredentialsData} from "./test/testData/institutionCredentials.js";
+} from "./test/handlers";
+import {institutionData} from "./test/testData/institution";
+import {institutionCredentialsData} from "./test/testData/institutionCredentials";
 import {
   aggregateMemberMemberData,
   connectionByIdMemberData,
@@ -33,9 +33,9 @@ import {
   membersData,
   memberStatusData,
   verifyMemberData
-} from "./test/testData/members.js";
-import {createUserData, listUsersData} from "./test/testData/users.js";
-import {server} from "./test/testServer.js";
+} from "./test/testData/members";
+import {createUserData, listUsersData} from "./test/testData/users";
+import {server} from "./test/testServer";
 
 const cacheClient = createCacheClient();
 
