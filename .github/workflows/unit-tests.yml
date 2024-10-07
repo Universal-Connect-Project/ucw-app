@@ -52,7 +52,6 @@ jobs:
           
           # Copy the env file to the authentication service
           cp ${ENV_FILE_PATH} ${MXADAPTER_ENV_FILE_PATH}
-      - run: npm run build --workspace packages/mx-adapter
 
       - name: Run Jest Tests
         run: |
