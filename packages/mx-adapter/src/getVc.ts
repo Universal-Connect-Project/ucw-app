@@ -1,5 +1,5 @@
 import get from "axios";
-import type { VCDependencies } from "./models";
+import type { VCDependencies } from "./models.js";
 
 export const getVC = async (path: string, isProd: boolean, dependencies: VCDependencies): Promise<any> => {
   const { logClient, aggregatorCredentials } = dependencies;

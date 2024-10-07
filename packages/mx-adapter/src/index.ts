@@ -1,19 +1,21 @@
-import type { AdapterDependencies } from "./models";
-import { MxAdapter } from "./adapter";
+import { MxAdapter } from "./adapter.js";
 import {
-  MX_EXAMPLE_A_PROVIDER_STRING,
   MX_EXAMPLE_A_LABEL_TEXT,
-  MX_EXAMPLE_B_PROVIDER_STRING,
+  MX_EXAMPLE_A_PROVIDER_STRING,
   MX_EXAMPLE_B_LABEL_TEXT,
+  MX_EXAMPLE_B_PROVIDER_STRING,
   MX_EXAMPLE_C_LABEL_TEXT,
   MX_EXAMPLE_C_PROVIDER_STRING
-} from "./constants";
-import { mxProdGetVC, mxIntGetVC } from "./createVc";
+} from "./constants.js";
+
+import * as contract from "./contract.js";
+import { mxIntGetVC, mxProdGetVC } from "./createVc.js";
+import type { AdapterDependencies } from "./models.js";
 
 export const getMxAdapterMapObject = (dependencies: AdapterDependencies) => {
   return {
     mx: {
-      testInstitutionAdapterName: 'mx_int',
+      testInstitutionAdapterName: "mx_int",
       vcAdapter: mxProdGetVC(dependencies),
       widgetAdapter: new MxAdapter({
         int: false,
@@ -38,3 +40,6 @@ export {
   MX_EXAMPLE_B_PROVIDER_STRING,
   MX_EXAMPLE_C_PROVIDER_STRING
 };
+
+export * from "./models";
+export { contract };

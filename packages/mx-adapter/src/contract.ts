@@ -4,10 +4,16 @@ export enum VCDataTypes {
   TRANSACTIONS = 'transactions'
 }
 
+export enum JobTypes {
+  AGGREGATE = "aggregate",
+  ALL = "all",
+  FULLHISTORY = "fullhistory",
+  VERIFICATION = "verification",
+  IDENTITY = "identity",
+}
+
 export type AdapterMap = {
-  // eslint-disable-next-line @typescript-eslint/ban-types
   oauthResponseHandler?: Function
-  // eslint-disable-next-line @typescript-eslint/ban-types
   vcAdapter: Function
   widgetAdapter: WidgetAdapter
 }

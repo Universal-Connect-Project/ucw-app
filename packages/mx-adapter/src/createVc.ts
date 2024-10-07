@@ -1,7 +1,7 @@
-import { VCDataTypes } from "@repo/utils";
+import { VCDataTypes } from "./contract.js";
 
-import { getVC as getMxVc } from "./getVc";
-import type { VCDependencies } from "./models";
+import { getVC as getMxVc } from "./getVc.js";
+import type { VCDependencies } from "./models.js";
 
 export const createMXGetVC = (isProd: boolean, dependencies: VCDependencies) => {
   return async ({

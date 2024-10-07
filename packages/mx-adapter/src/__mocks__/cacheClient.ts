@@ -1,6 +1,6 @@
 let storageObject: Record<string, any> = {}
 
-export const constants = {
+const constants = {
   PREFERENCES_REDIS_KEY: 'preferences'
 };
 
@@ -18,19 +18,19 @@ export const sAdd = jest.fn((key: string, values: string[]) => {
   storageObject[key] = values
 })
 
-export const del = jest.fn((key: string) => {
+const del = jest.fn((key: string) => {
   delete storageObject[key]
 })
 
-export const sMembers = jest.fn((key: string) => {
+const sMembers = jest.fn((key: string) => {
   return storageObject[key]
 })
 
-export const get = jest.fn((key: string) => {
+const get = jest.fn((key: string) => {
   return storageObject[key]
 })
 
-export const set = jest.fn((key: string, value: any) => {
+const set = jest.fn((key: string, value: any) => {
   storageObject[key] = value
 })
 

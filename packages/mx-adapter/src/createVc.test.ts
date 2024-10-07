@@ -1,14 +1,14 @@
-import { VCDataTypes } from '@repo/utils'
+import { VCDataTypes } from './contract.js'
 
 import {
   mxVcAccountsData,
   mxVcIdentityData,
   mxVcIntegrationAccountsData,
   mxVcTranscationsData
-} from './test/testData/mxVcData'
-import { mxIntGetVC, mxProdGetVC } from './createVc'
-import { logClient } from "./__mocks__/logClient";
-import { aggregatorCredentials } from "./adapter.test";
+} from './test/testData/mxVcData.js'
+import { mxIntGetVC, mxProdGetVC } from './createVc.js'
+import { logClient } from "./__mocks__/logClient.js";
+import { aggregatorCredentials } from "./adapter.test.js";
 
 
 const dependencies = {

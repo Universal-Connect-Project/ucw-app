@@ -6,7 +6,7 @@ import type {
   MxPlatformApiFactory
 } from "mx-platform-node";
 
-import {MxIntApiClient, MxProdApiClient} from "./apiClient";
+import {MxIntApiClient, MxProdApiClient} from "./apiClient.js";
 import type {
   Challenge,
   Connection,
@@ -15,9 +15,9 @@ import type {
   Institution, KeyValuePair,
   UpdateConnectionRequest,
   WidgetAdapter
-} from "./contract";
-import {ChallengeType, ConnectionStatus} from "./contract";
-import type {AdapterConfig, CacheClient, LogClient} from "./models";
+} from "./contract.js";
+import {ChallengeType, ConnectionStatus} from "./contract.js";
+import type {AdapterConfig, CacheClient, LogClient} from "./models.js";
 
 export const EXTENDED_HISTORY_NOT_SUPPORTED_MSG =
   "Member's institution does not support extended transaction history.";

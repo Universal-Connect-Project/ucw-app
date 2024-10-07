@@ -1,15 +1,12 @@
-import { http, HttpResponse } from "msw";
+import {http, HttpResponse} from "msw";
 
-import config from "./config";
+import {createClient as createCacheClient} from "./__mocks__/cacheClient.js";
+import {logClient} from "./__mocks__/logClient.js";
 
-import {
-  EXTENDED_HISTORY_NOT_SUPPORTED_MSG,
-  MxAdapter
-} from "./adapter";
-import { ChallengeType, ConnectionStatus } from "@repo/utils";
+import {EXTENDED_HISTORY_NOT_SUPPORTED_MSG, MxAdapter} from "./adapter.js";
 
-import { createClient as createCacheClient } from "./__mocks__/cacheClient";
-import { logClient } from "./__mocks__/logClient";
+import config from "./config.js";
+import {ChallengeType, ConnectionStatus} from "./contract.js";
 
 import {
   AGGREGATE_MEMBER_PATH,
@@ -24,9 +21,9 @@ import {
   READ_MEMBER_STATUS_PATH,
   UPDATE_CONNECTION_PATH,
   VERIFY_MEMBER_PATH
-} from "./test/handlers";
-import { institutionData } from "./test/testData/institution";
-import { institutionCredentialsData } from "./test/testData/institutionCredentials";
+} from "./test/handlers.js";
+import {institutionData} from "./test/testData/institution.js";
+import {institutionCredentialsData} from "./test/testData/institutionCredentials.js";
 import {
   aggregateMemberMemberData,
   connectionByIdMemberData,
@@ -36,9 +33,9 @@ import {
   membersData,
   memberStatusData,
   verifyMemberData
-} from "./test/testData/members";
-import { createUserData, listUsersData } from "./test/testData/users";
-import { server } from "./test/testServer";
+} from "./test/testData/members.js";
+import {createUserData, listUsersData} from "./test/testData/users.js";
+import {server} from "./test/testServer.js";
 
 const cacheClient = createCacheClient();
 
@@ -270,7 +267,7 @@ describe("mx aggregator", () => {
           createMemberPayload = null;
 
           server.use(
-            http.post(CREATE_MEMBER_PATH, async ({ request }) => {
+            http.post(CREATE_MEMBER_PATH, async ({request}) => {
               createMemberPayload = await request.json();
 
               return HttpResponse.json(memberData);
@@ -514,8 +511,8 @@ describe("mx aggregator", () => {
         server.use(
           http.post(EXTEND_HISTORY_PATH, () => {
             return HttpResponse.json(
-              { error: { message: EXTENDED_HISTORY_NOT_SUPPORTED_MSG } },
-              { status: 400 }
+              {error: {message: EXTENDED_HISTORY_NOT_SUPPORTED_MSG}},
+              {status: 400}
             );
           })
         );
@@ -542,7 +539,7 @@ describe("mx aggregator", () => {
                   message: errorMessage
                 }
               },
-              { status: 400 }
+              {status: 400}
             )
           )
         );
@@ -568,7 +565,7 @@ describe("mx aggregator", () => {
               error: {
                 message: EXTENDED_HISTORY_NOT_SUPPORTED_MSG
               }
-            }, { status: 400 })
+            }, {status: 400})
           )
         );
 
@@ -580,7 +577,7 @@ describe("mx aggregator", () => {
               error: {
                 message: errorMessage
               }
-            }, { status: 400 })
+            }, {status: 400})
           )
         );
 
@@ -604,7 +601,7 @@ describe("mx aggregator", () => {
         let updateConnectionPaylod;
 
         server.use(
-          http.put(UPDATE_CONNECTION_PATH, async ({ request }) => {
+          http.put(UPDATE_CONNECTION_PATH, async ({request}) => {
             updateConnectionPaylod = await request.json();
 
             return HttpResponse.json(memberData);
@@ -670,7 +667,7 @@ describe("mx aggregator", () => {
 
     describe("GetConnectionStatus", () => {
       it("returns a rejected connection status if there's an error with oauthStatus", async () => {
-        await cacheClient.set(memberStatusData.member.guid, { error: true });
+        await cacheClient.set(memberStatusData.member.guid, {error: true});
 
         const connectionStatus = await mxAdapter.GetConnectionStatus(
           "testMemberId",
@@ -778,8 +775,8 @@ describe("mx aggregator", () => {
             {
               data: [
                 {
-                  key: optionsChallenge.options[0].label,
-                  value: optionsChallenge.options[0].value
+                  key: optionsChallenge.options ? optionsChallenge.options[0].label : '',
+                  value: optionsChallenge.options ? optionsChallenge.options[0].value : ''
                 }
               ],
               id: optionsChallenge.guid,
@@ -801,8 +798,12 @@ describe("mx aggregator", () => {
             {
               data: [
                 {
-                  key: imageOptionsChallenge.image_options[0].label,
-                  value: imageOptionsChallenge.image_options[0].value
+                  key: imageOptionsChallenge.image_options
+                    ? imageOptionsChallenge.image_options[0].label
+                    : '',
+                  value: imageOptionsChallenge.image_options
+                    ? imageOptionsChallenge.image_options[0].value
+                    : ''
                 }
               ],
               id: imageOptionsChallenge.guid,
@@ -819,10 +820,10 @@ describe("mx aggregator", () => {
         let answerChallengePayload;
 
         server.use(
-          http.put(ANSWER_CHALLENGE_PATH, async ({ request }) => {
+          http.put(ANSWER_CHALLENGE_PATH, async ({request}) => {
             answerChallengePayload = await request.json();
 
-            return new HttpResponse(null, { status: 200 });
+            return new HttpResponse(null, {status: 200});
           })
         );
 
@@ -878,7 +879,7 @@ describe("mx aggregator", () => {
         server.use(
           http.post(
             CREATE_USER_PATH,
-            () => new HttpResponse(null, { status: 400 })
+            () => new HttpResponse(null, {status: 400})
           )
         );
 

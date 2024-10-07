@@ -3,13 +3,13 @@ import { HttpResponse, http } from "msw";
 import {
   MX_INTEGRATION_VC_GET_ACCOUNTS_PATH,
   MX_VC_GET_ACCOUNTS_PATH
-} from "./test/handlers";
-import { mxVcAccountsData } from "./test/testData/mxVcData";
-import { server } from "./test/testServer";
-import { getVC } from "./getVc";
+} from "./test/handlers.js";
+import { mxVcAccountsData } from "./test/testData/mxVcData.js";
+import { server } from "./test/testServer.js";
+import { getVC } from "./getVc.js";
 
-import { logClient } from "./__mocks__/logClient";
-import { aggregatorCredentials } from "./adapter.test";
+import { logClient } from "./__mocks__/logClient.js";
+import { aggregatorCredentials } from "./adapter.test.js";
 
 const accountsPath = "users/userId/members/connectionId/accounts";
 

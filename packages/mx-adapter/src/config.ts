@@ -12,7 +12,6 @@ export const init = (path = ".env") => {
   const { parsed: envs } = result;
 
   // Validate envs
-
   if (!envs?.HostUrl) {
     throw new Error("Missing HostUrl. Check README.md and `../.env.example` for more info.");
   }

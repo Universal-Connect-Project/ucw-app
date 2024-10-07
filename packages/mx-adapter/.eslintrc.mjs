@@ -1,20 +1,17 @@
-/** @type {import("eslint").Linter.Config} */
-module.exports = {
-  extends: ['../eslint-config/node.json'],
+export default {
   env: {
-    browser: true,
     node: true,
     es6: true,
     jest: true
   },
   parserOptions: {
-    project: './tsconfig.json',
+    project: './tsconfig.base.json',
   },
   ignorePatterns: [
-    '.eslintrc.cjs',
-    'jest.config.js',
+    '.eslintrc.mjs',
+    'jest.config.cjs',
     'jestSetup.ts',
-    'cypress.config.ts',
+    'cypress.config.mjs',
     'cypress/**/*'
   ],
   rules: {

@@ -1,4 +1,3 @@
-
 export const institutionData = {
   institution: {
     code: "testCode",
