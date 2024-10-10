@@ -79,6 +79,7 @@
     "@types/jest": "^29.5.12",
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "babel-plugin-js-logger": "^1.0.17",
+    "concurrently": "^9.0.1",
     "cross-env": "^7.0.3",
     "customize-cra": "^1.0.0",
     "cypress": "^13.7.1",
@@ -93,6 +94,7 @@
     "msw": "^2.2.13",
     "nodemon": "^3.1.0",
     "ts-jest": "^29.1.2",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "wait-on": "^8.0.1"
   }
 }
