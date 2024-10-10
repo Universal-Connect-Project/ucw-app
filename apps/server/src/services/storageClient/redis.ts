@@ -1,86 +1,88 @@
-import { readFileSync } from 'fs'
-import { resolve } from 'path'
-import { createClient } from 'redis'
-import config from '../../config'
+import { readFileSync } from "fs";
+import { resolve } from "path";
+import { createClient } from "redis";
+import config from "../../config";
 
-import { debug, error, info } from '../../infra/logger'
-import { PREFERENCES_REDIS_KEY } from './constants'
+import { debug, error, info } from "../../infra/logger";
+import { PREFERENCES_REDIS_KEY } from "./constants";
+
+export * as REDIS_CONSTANTS from "./constants";
 
 const redisClient = createClient({
-  url: config.RedisServer
-})
+  url: config.RedisServer,
+});
 
 export const overwriteSet = async (key: string, values: string[]) => {
-  debug(`Redis overwriteSet: ${key}, ready: ${redisClient.isReady}`)
+  debug(`Redis overwriteSet: ${key}, ready: ${redisClient.isReady}`);
   try {
-    await redisClient.del(key)
-    await redisClient.sAdd(key, values)
+    await redisClient.del(key);
+    await redisClient.sAdd(key, values);
   } catch {
-    error('Failed to add to Redis SET with SADD command')
+    error("Failed to add to Redis SET with SADD command");
   }
-}
+};
 
 export const getSet = async (key: string) => {
-  debug(`Redis getSet: ${key}, ready: ${redisClient.isReady}`)
+  debug(`Redis getSet: ${key}, ready: ${redisClient.isReady}`);
   try {
-    return await redisClient.sMembers(key)
+    return await redisClient.sMembers(key);
   } catch {
-    error('Failed to get set from Redis')
+    error("Failed to get set from Redis");
   }
-}
+};
 
 export const get = async (key: string) => {
-  debug(`Redis get: ${key}, ready: ${redisClient.isReady}`)
+  debug(`Redis get: ${key}, ready: ${redisClient.isReady}`);
 
   try {
-    const ret = await redisClient.get(key)
-    return JSON.parse(ret)
+    const ret = await redisClient.get(key);
+    return JSON.parse(ret);
   } catch {
-    error('Failed to get value from Redis')
+    error("Failed to get value from Redis");
   }
-}
+};
 
 export const set = async (
   key: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any,
   params: object = {
-    EX: config.RedisCacheTimeSeconds
-  }
+    EX: config.RedisCacheTimeSeconds,
+  },
 ) => {
-  debug(`Redis set: ${key}, ready: ${redisClient.isReady}`)
+  debug(`Redis set: ${key}, ready: ${redisClient.isReady}`);
 
   try {
-    await redisClient.set(key, JSON.stringify(value), params)
+    await redisClient.set(key, JSON.stringify(value), params);
   } catch {
-    error('Failed to set value in Redis')
+    error("Failed to set value in Redis");
   }
-}
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const setNoExpiration = async (key: string, value: any) => {
-  await set(key, value, {})
-}
+  await set(key, value, {});
+};
 
 redisClient
   .connect()
   .then(async () => {
-    info('Redis connection established with server: ' + config.RedisServer)
+    info("Redis connection established with server: " + config.RedisServer);
 
-    let preferencesToSet
+    let preferencesToSet;
     try {
       preferencesToSet = JSON.parse(
         readFileSync(
-          resolve(__dirname, '../../../cachedDefaults/preferences.json')
-        )?.toString()
-      )
+          resolve(__dirname, "../../../cachedDefaults/preferences.json"),
+        )?.toString(),
+      );
     } catch (error) {
-      error(`Failed to resolve preferences: ${error}`)
+      error(`Failed to resolve preferences: ${error}`);
     }
 
-    await setNoExpiration(PREFERENCES_REDIS_KEY, preferencesToSet || {})
+    await setNoExpiration(PREFERENCES_REDIS_KEY, preferencesToSet || {});
   })
   .catch((reason) => {
-    error('Failed to connect to redis server: ' + reason)
-    info('No redis connection')
-  })
+    error("Failed to connect to redis server: " + reason);
+    info("No redis connection");
+  });
