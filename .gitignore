@@ -4,6 +4,8 @@
 test.js
 test.ts
 .env
+.env.*
+!.env.example
 
 # Logs
 logs
@@ -22,6 +24,9 @@ out/
 build/
 coverage/
 .ngrok/
+
+# See https://github.com/vitejs/vite/issues/13267
+vite.config*timestamp*
 
 # Editor directories and files
 .vscode/*

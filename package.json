@@ -18,24 +18,16 @@
     "clean": "npx rimraf {apps,packages}/**/{node_modules,dist,.turbo} -g && npx rimraf node_modules"
   },
   "devDependencies": {
-    "@playwright/test": "^1.44.1",
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
-    "@types/node": "^20.12.12",
-    "concurrently": "^8.2.2",
-    "eslint": "^8.57.0",
-    "husky": "^9.0.11",
-    "lint-staged": "^15.2.2",
-    "prettier": "^3.2.5",
-    "prettier-eslint": "^16.3.0",
-    "turbo": "^2.1.1",
-    "typescript": "^5.4.5",
-    "wait-on": "^7.2.0"
+    "@playwright/test": "^1.47.2",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
+    "turbo": "^2.1.3"
   },
   "engines": {
     "node": ">=20"
   },
-  "packageManager": "npm@10.5.0",
+  "packageManager": "npm@10.7.0",
   "workspaces": [
     "apps/*",
     "packages/*"
