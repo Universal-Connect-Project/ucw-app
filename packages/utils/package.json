@@ -1,7 +1,7 @@
 {
   "name": "@repo/utils",
   "version": "0.0.1",
-  "main": "./src/index.ts",
+  "main": "index.ts",
   "type": "commonjs",
   "scripts": {},
   "devDependencies": {
