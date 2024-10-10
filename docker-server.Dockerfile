@@ -31,7 +31,7 @@ COPY --from=pruner ${WRKDR}/out/json/packages/utils/package.json ./packages/util
 COPY --from=pruner ${WRKDR}/out/package-lock.json .
 
 RUN npm pkg delete scripts.prepare  \
-    && npm ci
+    && npm ci --omit=dev
 
 FROM base AS runner
 ARG APP
