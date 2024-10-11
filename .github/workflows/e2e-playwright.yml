@@ -60,7 +60,7 @@ jobs:
           echo MXCLIENTID=${{ secrets.MX_CLIENT_ID }} >> ${ENV_FILE_PATH}
           echo MXAPISECRET=${{ secrets.MX_API_SECRET }} >> ${ENV_FILE_PATH}
 
-          echo HostUrl=http://localhost:8080 >> ${ENV_FILE_PATH}
+          echo HOSTURL=http://localhost:8080 >> ${ENV_FILE_PATH}
 
           cat ${ENV_FILE_PATH}
 
