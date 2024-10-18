@@ -45,7 +45,7 @@ For now, add this manually to the [ucwInstitutionsMapping.json](./apps/server/ca
 const testInstitution = {
   "name": "My Test Bank",
   "id": "00000000-0000-0000-0000-000000000000",
-  "keywords": ["test", "example"],
+  "keywords": ["test bank", "text bank", "test bakn"],
   "logo": "https://universalconnectproject.org/images/ucp-logo-icon.svg",
   "url": "https://my-test-bank.com",
   "is_test_bank": true,
