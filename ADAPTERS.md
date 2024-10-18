@@ -37,4 +37,36 @@ This repo accesses adapter-specific logic in [adapterIndex.ts](./apps/server/src
 
 ## Monorepo 
 
-Because this repo is a monorepo, there are some caveats to consider with regard to adapter creation. See [the MONOREPO readme](MONOREPO.md#creating-an-aggregator-adapter-package-within-a-monorepo) for more details.
+Because this repo is a monorepo, here are some caveats to consider with regard to adapter creation.
+
+### Aggregator adapter package and Turborepo
+
+See [the ADAPTERS readme](ADAPTERS.md) for more details on what aggregator adapter packages are.
+
+There are two ways to create a shared package within a Turborepo monorepo. You can create Just-in-Time (JIT) packages or compiled packages. Please see [Turborepo's Documentation](https://turbo.build/repo/docs/core-concepts/internal-packages#compiled-packages) for more detailed information.
+
+Adapter Packages are considered compiled packages, and even though end-users will install your adapter package using NPM, the preferred way what we've chosen to create and test an adapter package is to use it as a compiled package.
+
+Below you'll find some tips on how to successfully run the UCW with a compiled package.
+
+We will use [the MX Adapter](https://github.com/Universal-Connect-Project/ucw-adapter-mx/tree/main/packages/mx-adapter) as a reference.
+
+### Development tips
+
+When you create an adapter package, you'll need to install it in your monorepo workspace using the following command:
+
+```bash
+npm install <your_package_name> --workspace apps/server
+```
+_Package name is the `name` property in your adapter package's `package.json`_
+
+Here's an example from the [MX Adapter Package Fork](https://github.com/Universal-Connect-Project/ucw-adapter-mx/blob/main/apps/server/package.json)
+
+```shell
+"@ucp-npm/mx-adapter": "*",
+```
+
+In this example, `@ucp-npm/mx-adapter` is installed as a dependency in the `apps/server` workspace, but it will use the local files in the adapter package, which also lives in the monorepo, under the "packages" folder.
+
+Next, it is important that you build your package, which creates a `dist` folder, which is where the `apps/server` project will actually be able to pull the package from. If you don't do this, your code will not run properly. 
+
