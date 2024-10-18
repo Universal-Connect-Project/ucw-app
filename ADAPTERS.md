@@ -22,7 +22,7 @@ In our opinion the easiest way to create an adapter package is as follows:
 
 1. Fork this repository
 1. Create a folder in the [packages](./packages) folder for your adapter
-1. Add a test institution to the [default institution list](./apps/server/cachedDefaults/ucwInstitutionsMapping.json) with aggregator support defined for your institution
+1. Add a test institution to the [default institution list](./apps/server/cachedDefaults/ucwInstitutionsMapping.json) with aggregator support defined for your institution (See [below](#test-institutions))
 1. Build your adapter
 1. Import your adapter in [adapterSetup.ts](./apps/server/src/adapterSetup.ts) on your forked version of this repo
 1. Write unit, integration, and e2e tests
@@ -35,6 +35,31 @@ An example adapter lives [here](./apps/server/src/test-adapter/index.ts). Each a
 
 This repo accesses adapter-specific logic in [adapterIndex.ts](./apps/server/src/adapterIndex.ts)
 
+## Test institutions
+
+Adding a test institution to the [default institution list](./apps/server/cachedDefaults/ucwInstitutionsMapping.json) allows you to test your adapter. 
+
+For now, add this manually to the [ucwInstitutionsMapping.json](./apps/server/cachedDefaults/ucwInstitutionsMapping.json) file. In the future, UCP will have a way to manage and sync your aggregator and aggregator/institution mappings via an online service.
+
+```typescript
+const testInstitution = {
+  "name": "My Test Bank",
+  "id": "00000000-0000-0000-0000-000000000000",
+  "keywords": ["test", "example"],
+  "logo": "https://universalconnectproject.org/images/ucp-logo-icon.svg",
+  "url": "https://my-test-bank.com",
+  "is_test_bank": true,
+  "routing_numbers": [],
+  "myAggregatorName": {
+    "id": "myAggregatorId",
+    "supports_aggregation": true,
+    "supports_history": true,
+    "supports_identification": true,
+    "supports_oauth": true,
+    "supports_verification": true
+  }
+};
+```
 ## Monorepo 
 
 Because this repo is a monorepo, here are some caveats to consider with regard to adapter creation.
@@ -51,7 +76,7 @@ Below you'll find some tips on how to successfully run the UCW with a compiled p
 
 We will use [the MX Adapter](https://github.com/Universal-Connect-Project/ucw-adapter-mx/tree/main/packages/mx-adapter) as a reference.
 
-### Development tips
+#### Development tips
 
 When you create an adapter package, you'll need to install it in your monorepo workspace using the following command:
 
@@ -69,4 +94,5 @@ Here's an example from the [MX Adapter Package Fork](https://github.com/Universa
 In this example, `@ucp-npm/mx-adapter` is installed as a dependency in the `apps/server` workspace, but it will use the local files in the adapter package, which also lives in the monorepo, under the "packages" folder.
 
 Next, it is important that you build your package, which creates a `dist` folder, which is where the `apps/server` project will actually be able to pull the package from. If you don't do this, your code will not run properly. 
+
 
