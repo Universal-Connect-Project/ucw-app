@@ -28,7 +28,7 @@ For a PR to be considered ready to merge it must adhere to the ADRs.
 
 **IMPORTANT**: Prior to merging your PR to main, make sure the versions of `ui` and `ucw-app` are up-to-date. The `version` property in
 their respective `package.json` files should be up-to-date. This is where the versions for the docker images is pulled from
-for automated publishing.
+for automated publishing. If the versions already exist on Dockerhub, your code changes will not be published.
 
 ## Publishing manually
 
@@ -56,3 +56,8 @@ Note: To update the versions that are pulled/published, update the `./.env` file
 the `DOCKER_IMAGE_{UI|SERVER}` values.
 
 These variables are used in the `./docker-compose.yml` file when building/pulling/publishing the images.
+
+## Aggregator Adapter Packages
+
+If you are an aggregator, and would like to create your own adapter package that can be used with the UCW, See [ADAPTERS.md](ADAPTERS.md) for more info.
+
