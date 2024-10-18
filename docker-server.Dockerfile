@@ -7,31 +7,56 @@ ARG WRKDR=/opt/app
 FROM alpine:3.20.3 AS base
 ENV NODE_VERSION 20.15.0
 
-RUN apk --update --no-cache --virtual add nodejs npm \
+RUN apk --update --no-cache --virtual add nodejs npm bash \
     && rm -rf /var/cache/apk/*
 
-FROM base AS pruner
-RUN npm i -g turbo
+FROM base AS server-pruner
 ARG APP
 ARG WRKDR
 
 WORKDIR ${WRKDR}
-
 COPY . ${WRKDR}
-RUN turbo prune --scope=${APP} --docker
 
-FROM base AS builder
+RUN npm i -g turbo \
+    && turbo prune --scope=${APP} --docker
+
+FROM base AS adapter-pruner
+ARG APP
+ARG WRKDR
+
+WORKDIR ${WRKDR}
+COPY . ${WRKDR}
+
+RUN npm i -g turbo \
+    && turbo prune --scope=@ucp-npm/mx-adapter --docker
+
+FROM base AS server-builder
 ARG APP
 ARG WRKDR
 
 WORKDIR ${WRKDR}
 
-COPY --from=pruner ${WRKDR}/out/json/apps/${APP}/package.json .
-COPY --from=pruner ${WRKDR}/out/json/packages/utils/package.json ./packages/utils
-COPY --from=pruner ${WRKDR}/out/package-lock.json .
+COPY --from=server-pruner ${WRKDR}/out/json/apps/${APP}/package.json .
+COPY --from=server-pruner ${WRKDR}/out/json/packages/utils/package.json ./packages/utils/package.json
+COPY --from=server-pruner ${WRKDR}/out/json/packages/mx-adapter/package.json ./packages/mx-adapter/package.json
+COPY --from=server-pruner ${WRKDR}/out/package-lock.json .
 
-RUN npm pkg delete scripts.prepare  \
-    && npm ci --omit=dev
+RUN npm ci --omit=dev --ignore-scripts
+
+FROM base AS adapter-builder
+ARG APP
+ARG WRKDR
+
+WORKDIR ${WRKDR}
+
+COPY --from=adapter-pruner ${WRKDR}/out/json/packages/mx-adapter/package.json .
+COPY --from=adapter-pruner ${WRKDR}/out/package-lock.json .
+
+RUN npm i -g turbo typescript \
+    && npm ci --omit=dev --ignore-scripts
+
+COPY --from=adapter-pruner ${WRKDR}/out/full/ .
+RUN turbo build --filter=./packages/mx-adapter
 
 FROM base AS runner
 ARG APP
@@ -44,9 +69,12 @@ RUN npm i -g ts-node  \
     && adduser --system --uid 1001 nodejs
 USER nodejs
 
-COPY --from=pruner --chown=nodejs:nodejs ${WRKDR}/out/full/apps/${APP}/ .
-COPY --from=pruner --chown=nodejs:nodejs ${WRKDR}/out/full/packages/utils/ ./packages/utils
-COPY --from=builder --chown=nodejs:nodejs ${WRKDR}/node_modules/ ./node_modules
+COPY --from=server-pruner --chown=nodejs:nodejs ${WRKDR}/out/full/apps/${APP}/ .
+COPY --from=server-pruner --chown=nodejs:nodejs ${WRKDR}/out/full/packages/utils/ ./packages/utils
+COPY --from=server-builder --chown=nodejs:nodejs ${WRKDR}/node_modules/ ./node_modules
+
+COPY --from=adapter-builder --chown=nodejs:nodejs ${WRKDR}/packages/mx-adapter/dist ./packages/mx-adapter/dist
+COPY --from=adapter-builder --chown=nodejs:nodejs ${WRKDR}/packages/mx-adapter/package.json ./packages/mx-adapter/package.json
 
 EXPOSE ${PORT}
 

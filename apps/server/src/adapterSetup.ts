@@ -1,35 +1,43 @@
-import { adapterMapObject as testAdapterMapObject } from './test-adapter'
-import { MxAdapter } from './adapters/mx'
-import { SophtronAdapter } from './adapters/sophtron'
+import { getMxAdapterMapObject as mxAdapterMapObject } from "@ucp-npm/mx-adapter";
 
-import { mxIntGetVC, mxProdGetVC } from './services/vcAggregators/mxVc'
-import getSophtronVc from './services/vcAggregators/sophtronVc'
-
-const mxAdapterMapObject = {
-  mx: {
-    testInstitutionAdapterName: 'mx_int',
-    vcAdapter: mxProdGetVC,
-    widgetAdapter: new MxAdapter(false)
-  },
-  mx_int: {
-    vcAdapter: mxIntGetVC,
-    widgetAdapter: new MxAdapter(true)
-  }
-}
+import config from "./config";
+import { adapterMapObject as testAdapterMapObject } from "./test-adapter";
+import { SophtronAdapter } from "./adapters/sophtron";
+import { get, set } from "./services/storageClient/redis";
+import * as logger from "./infra/logger";
+import getSophtronVc from "./services/vcAggregators/sophtronVc";
+import aggregatorCredentials from "./aggregatorCredentials";
 
 const sophtronAdapterMapObject = {
   sophtron: {
     vcAdapter: getSophtronVc,
-    widgetAdapter: new SophtronAdapter()
-  }
-}
+    widgetAdapter: new SophtronAdapter(),
+  },
+};
 
 // This is where you add adapters
 export const adapterMap = {
-  ...mxAdapterMapObject,
+  ...mxAdapterMapObject({
+    cacheClient: {
+      set: set,
+      get: get,
+    },
+    logClient: logger,
+    aggregatorCredentials: {
+      mxInt: aggregatorCredentials.mxInt,
+      mxProd: aggregatorCredentials.mxProd,
+    },
+    envConfig: {
+      HOSTURL: config.HOSTURL,
+      MXCLIENTID: config.MXCLIENTID,
+      MXAPISECRET: config.MXAPISECRET,
+      MXCLIENTIDPROD: config.MXCLIENTIDPROD,
+      MXAPISECRETPROD: config.MXAPISECRETPROD,
+    },
+  }),
   ...sophtronAdapterMapObject,
-  ...testAdapterMapObject
-}
+  ...testAdapterMapObject,
+};
 
-export type Aggregator = keyof typeof adapterMap
-export const aggregators = Object.keys(adapterMap)
+export type Aggregator = keyof typeof adapterMap;
+export const aggregators = Object.keys(adapterMap);

@@ -1,7 +1,7 @@
 {
   "name": "server",
   "version": "0.0.13-beta",
-  "packageManager": "npm@10.5.0",
+  "packageManager": "npm@10.8.2",
   "scripts": {
     "cypress:open": "cypress open --config-file cypress.config.ts",
     "cypress:open:alternate": "cypress open --config-file cypress.config.alternate.ts",
@@ -33,6 +33,7 @@
     "@types/crypto-js": "^4.2.2",
     "@types/express": "^4.17.21",
     "@types/uuid": "^9.0.8",
+    "@ucp-npm/mx-adapter": "*",
     "assert-browserify": "^2.0.0",
     "axios": "^1.6.8",
     "buffer-browserify": "^0.2.5",

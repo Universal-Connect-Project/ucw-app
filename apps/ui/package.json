@@ -3,7 +3,7 @@
   "version": "0.0.13-beta",
   "private": true,
   "type": "module",
-  "packageManager": "npm@10.7.0",
+  "packageManager": "npm@10.8.2",
   "scripts": {
     "dev": "npx cross-env BROWSER=none && vite",
     "dev:debug": "npm run dev",

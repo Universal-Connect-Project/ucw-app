@@ -56,3 +56,6 @@ apps/server/cachedDefaults/preferences.json
 *.rdb
 
 *-test.sh
+
+# Test pack files
+ucp-npm-*.tgz

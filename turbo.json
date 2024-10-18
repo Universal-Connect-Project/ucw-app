@@ -4,7 +4,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist"]
+      "outputs": ["dist/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]
@@ -19,6 +19,7 @@
     },
     "dev:e2e": {
       "cache": false,
+      "dependsOn": ["^build"],
       "persistent": true
     },
     "dev:debug": {

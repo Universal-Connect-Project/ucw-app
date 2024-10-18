@@ -1,0 +1,70 @@
+name: 'NPM Version Check'
+
+on: pull_request
+
+jobs:
+  push_to_registry:
+    name: 'NPM Version Check'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 'Check out the repo'
+        uses: actions/checkout@v4
+
+      - name: 'Set up Node'
+        uses: actions/setup-node@v4
+        with:
+          registry-url: 'https://registry.npmjs.org'
+          node-version: 'lts/*'
+          check-latest: true
+
+      - name: 'Check if version is published'
+        run: |
+          package_version=$(npm pkg get version --workspaces=false | tr -d \")
+          echo "VERSION=$package_version" >> $GITHUB_ENV
+          
+          npm_versions=$(npm view @ucp-npm/components versions)
+          compare=$package_version
+          
+          # Convert JSON array to string
+          versions=$(echo "$npm_versions" | tr -d '\n' | tr -d ' ' | tr -d '"')
+          
+          # Check if compare is present in JSON array
+          if [[ $versions == *"$compare"* ]]; then
+            # Check if the compare is an exact match
+            if [[ $versions == *"$compare""']"* || $versions == *"$compare""',"* ]]; then
+              echo "VERSION_FOUND=true" >> $GITHUB_ENV
+              echo "=========================================================================="
+              echo "Version $compare is already published."
+              echo "Please update 'version' in package.json. Good to go."
+              echo "=========================================================================="
+              #echo "::error::Version $compare already exists on NPMJS.com. Please update the version in 'package.json' and try again."
+            else
+              echo "VERSION_FOUND=false" >> $GITHUB_ENV
+              echo "Version $compare not found in NPM"
+              #echo "::notice::Version check successful. Version $compare will be published to NPMJS.com on merge to main."
+            fi
+          else
+            echo "VERSION_FOUND=false" >> $GITHUB_ENV
+            echo "Version $compare not found in NPM"
+            #echo "::notice::Version check successful. Version $compare will be published to NPMJS.com on merge to main."
+          fi
+
+      - name: Update Summary if version not found
+        if: env.VERSION_FOUND == 'false'
+        run: |
+          {
+            echo "### Version Check Results"
+            echo "Version check successful. 🚀🎉"
+            echo "Version $VERSION will be published to npmjs.com on merge to main."
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: Update Summary if version found
+        if: env.VERSION_FOUND == 'true'
+        run: |
+          {
+            echo "### Version Check Results"
+            echo "Version $VERSION already exists on npmjs.com. 😬🫠"
+            echo "Please update the 'version' property in 'package.json' and try again."
+          } >> $GITHUB_STEP_SUMMARY
+          exit 1

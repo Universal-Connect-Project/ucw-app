@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "lib": [
+      "ES5",
+      "ESNext"
+    ],
+
+    "module": "ES2015",
+    "moduleResolution": "Node",
+
+    "allowJs": true,
+    "checkJs": false,
+
+    "declaration": true,
+    "declarationMap": true,
+    "declarationDir": "./dist/types",
+
+    "strict": false,
+    "noImplicitThis": false,
+    "alwaysStrict": false,
+
+    "isolatedModules": true,
+
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "allowArbitraryExtensions": true,
+
+    "types": [
+      "node",
+      "jest"
+    ]
+  },
+  "include": [
+    "src/*.ts",
+    "jest.config.js",
+  ],
+  "exclude": [
+    "dist",
+    "node_modules",
+    "**/*.test.*",
+    "**/__mocks__/**",
+    "**/test/**"
+  ]
+}

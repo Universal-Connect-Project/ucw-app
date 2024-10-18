@@ -14,7 +14,7 @@ jobs:
     needs: [setup-env]
 
     steps:
-      - name: Checkout under $GITHUB_WORKSPACE
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up NodeJS
@@ -28,6 +28,8 @@ jobs:
           npm ci
 
       - run: npm run copyTestPreferences
+
+      - run: npm run build --workspace packages/mx-adapter
 
       - name: 'Create env file'
         env:
@@ -47,7 +49,9 @@ jobs:
           echo MXAPISECRET=testClientSecret >> ${ENV_FILE_PATH}
 
           # Secrets (can't load these from another job, due to GH security features)          
-          cat ${ENV_FILE_PATH}
+          
+          # Copy the env file to the mx package
+          cp ${ENV_FILE_PATH} ./packages/mx-adapter/.env.test
 
       - name: Run Jest Tests
         run: |
