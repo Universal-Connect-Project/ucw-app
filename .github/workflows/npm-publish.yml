@@ -28,4 +28,5 @@ jobs:
       - name: 'Publish to NPM'
         uses: JS-DevTools/npm-publish@v3
         with:
+          package: './packages/mx-adapter/package.json'
           token: ${{ secrets.NPM_TOKEN }}
