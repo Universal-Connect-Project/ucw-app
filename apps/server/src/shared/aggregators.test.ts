@@ -1,73 +1,71 @@
-import type {
-  CachedInstitution} from './contract';
-import {
-  JobTypeSupports,
-  MappedJobTypes,
-  Aggregators
-} from './contract'
-import { getAvailableAggregators } from '../shared/aggregators'
+import { getAvailableAggregators } from "../shared/aggregators";
+import type { CachedInstitution } from "./contract";
+import { Aggregators, JobTypeSupports, MappedJobTypes } from "./contract";
 
 const institutionAggregatorsSupportEverything: CachedInstitution = {
-  url: 'testUrl',
-  id: 'testId',
-  logo: '',
+  url: "testUrl",
+  id: "testId",
+  logo: "",
   is_test_bank: false,
   routing_numbers: [],
-  name: 'test',
+  name: "test",
   keywords: null,
   mx: {
-    id: 'mx',
+    id: "mx",
     supports_aggregation: true,
     supports_oauth: true,
     supports_identification: true,
     supports_verification: true,
-    supports_history: true
+    supports_history: true,
   },
   sophtron: {
-    id: 'sophtron',
+    id: "sophtron",
     supports_aggregation: true,
     supports_oauth: true,
     supports_identification: true,
     supports_verification: true,
-    supports_history: true
-  }
-}
+    supports_history: true,
+  },
+};
 
-const allAggregators = [Aggregators.MX, Aggregators.SOPHTRON]
+const allAggregators = [Aggregators.SOPHTRON];
 
 const filterOutAggregator = (aggregator: Aggregators) =>
-  allAggregators.filter((currentAggregator) => currentAggregator !== aggregator)
+  allAggregators.filter(
+    (currentAggregator) => currentAggregator !== aggregator,
+  );
 
 const generateAggregatorTests = (aggregator: Aggregators) =>
   // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
   describe(`getAvailableAggregators tests for aggregator: ${aggregator}`, () => {
     it(`doesnt return ${aggregator} if it's not in the supported aggregators`, () => {
-      const aggregatorsWithoutCurrentAggregator = filterOutAggregator(aggregator)
+      const aggregatorsWithoutCurrentAggregator =
+        filterOutAggregator(aggregator);
 
       expect(
         getAvailableAggregators({
           institution: institutionAggregatorsSupportEverything,
           jobType: MappedJobTypes.AGGREGATE,
           shouldRequireFullSupport: false,
-          supportedAggregators: aggregatorsWithoutCurrentAggregator
-        })
-      ).toEqual(aggregatorsWithoutCurrentAggregator)
-    })
+          supportedAggregators: aggregatorsWithoutCurrentAggregator,
+        }),
+      ).toEqual(aggregatorsWithoutCurrentAggregator);
+    });
 
     it(`doesnt return ${aggregator} if it's not in the institution`, () => {
       expect(
         getAvailableAggregators({
           institution: {
             ...institutionAggregatorsSupportEverything,
-            [aggregator]: {}
+            [aggregator]: {},
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any,
           jobType: MappedJobTypes.AGGREGATE,
           shouldRequireFullSupport: false,
-          supportedAggregators: allAggregators
-        })
-      ).toEqual(filterOutAggregator(aggregator))
-    })
+          supportedAggregators: allAggregators,
+        }),
+      ).toEqual(filterOutAggregator(aggregator));
+    });
 
     it(`doesnt return ${aggregator} if job type is all and supports_verification is falsy`, () => {
       expect(
@@ -76,15 +74,15 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
               ...institutionAggregatorsSupportEverything.mx,
-              supports_verification: false
-            }
+              supports_verification: false,
+            },
           },
           jobType: MappedJobTypes.ALL,
           shouldRequireFullSupport: false,
-          supportedAggregators: allAggregators
-        })
-      ).toEqual(filterOutAggregator(aggregator))
-    })
+          supportedAggregators: allAggregators,
+        }),
+      ).toEqual(filterOutAggregator(aggregator));
+    });
 
     it(`doesnt return ${aggregator} if job type is all and supports_identification is falsy`, () => {
       expect(
@@ -93,15 +91,15 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
               ...institutionAggregatorsSupportEverything.mx,
-              supports_identification: false
-            }
+              supports_identification: false,
+            },
           },
           jobType: MappedJobTypes.ALL,
           shouldRequireFullSupport: false,
-          supportedAggregators: allAggregators
-        })
-      ).toEqual(filterOutAggregator(aggregator))
-    })
+          supportedAggregators: allAggregators,
+        }),
+      ).toEqual(filterOutAggregator(aggregator));
+    });
 
     it(`doesnt return ${aggregator} if job type is verification and supports_verification is falsy`, () => {
       expect(
@@ -110,15 +108,15 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
               ...institutionAggregatorsSupportEverything.mx,
-              supports_verification: false
-            }
+              supports_verification: false,
+            },
           },
           jobType: MappedJobTypes.VERIFICATION,
           shouldRequireFullSupport: false,
-          supportedAggregators: allAggregators
-        })
-      ).toEqual(filterOutAggregator(aggregator))
-    })
+          supportedAggregators: allAggregators,
+        }),
+      ).toEqual(filterOutAggregator(aggregator));
+    });
 
     it(`doesnt return ${aggregator} if job type is identity and supports_identity is falsy`, () => {
       expect(
@@ -127,15 +125,15 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
               ...institutionAggregatorsSupportEverything.mx,
-              supports_identification: false
-            }
+              supports_identification: false,
+            },
           },
           jobType: MappedJobTypes.IDENTITY,
           shouldRequireFullSupport: false,
-          supportedAggregators: allAggregators
-        })
-      ).toEqual(filterOutAggregator(aggregator))
-    })
+          supportedAggregators: allAggregators,
+        }),
+      ).toEqual(filterOutAggregator(aggregator));
+    });
 
     it(`returns ${aggregator} if job type is fullhistory, ${JobTypeSupports.FULLHISTORY} is falsy, and shouldRequireFullSupport is false`, () => {
       expect(
@@ -144,15 +142,15 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
               ...institutionAggregatorsSupportEverything.mx,
-              [JobTypeSupports.FULLHISTORY]: false
-            }
+              [JobTypeSupports.FULLHISTORY]: false,
+            },
           },
           jobType: MappedJobTypes.FULLHISTORY,
           shouldRequireFullSupport: false,
-          supportedAggregators: allAggregators
-        })
-      ).toEqual(allAggregators)
-    })
+          supportedAggregators: allAggregators,
+        }),
+      ).toEqual(allAggregators);
+    });
 
     it(`returns ${aggregator} if job type is fullhistory, ${JobTypeSupports.FULLHISTORY} is true, and shouldRequireFullSupport is true`, () => {
       expect(
@@ -161,15 +159,15 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
               ...institutionAggregatorsSupportEverything.mx,
-              [JobTypeSupports.FULLHISTORY]: true
-            }
+              [JobTypeSupports.FULLHISTORY]: true,
+            },
           },
           jobType: MappedJobTypes.FULLHISTORY,
           shouldRequireFullSupport: true,
-          supportedAggregators: allAggregators
-        })
-      ).toEqual(allAggregators)
-    })
+          supportedAggregators: allAggregators,
+        }),
+      ).toEqual(allAggregators);
+    });
 
     it(`doesnt return ${aggregator} if job type is fullhistory, ${JobTypeSupports.FULLHISTORY} is falsy, and shouldRequireFullSupport is true`, () => {
       expect(
@@ -178,34 +176,32 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
               ...institutionAggregatorsSupportEverything.mx,
-              [JobTypeSupports.FULLHISTORY]: false
-            }
+              [JobTypeSupports.FULLHISTORY]: false,
+            },
           },
           jobType: MappedJobTypes.FULLHISTORY,
           shouldRequireFullSupport: true,
-          supportedAggregators: allAggregators
-        })
-      ).toEqual(filterOutAggregator(aggregator))
-    })
-  })
+          supportedAggregators: allAggregators,
+        }),
+      ).toEqual(filterOutAggregator(aggregator));
+    });
+  });
 
-describe('aggregators', () => {
-  describe('getAvailableAggregators', () => {
-    it('returns all the aggregators if they support each of the job types', () => {
+describe("aggregators", () => {
+  describe("getAvailableAggregators", () => {
+    it("returns all the aggregators if they support each of the job types", () => {
       Object.values(MappedJobTypes).forEach((mappedJobType) => {
         expect(
           getAvailableAggregators({
             institution: institutionAggregatorsSupportEverything,
             jobType: mappedJobType,
             shouldRequireFullSupport: true,
-            supportedAggregators: allAggregators
-          })
-        ).toEqual(allAggregators)
-      })
-    })
+            supportedAggregators: allAggregators,
+          }),
+        ).toEqual(allAggregators);
+      });
+    });
 
-    generateAggregatorTests(Aggregators.MX)
-
-    generateAggregatorTests(Aggregators.SOPHTRON)
-  })
-})
+    generateAggregatorTests(Aggregators.SOPHTRON);
+  });
+});
