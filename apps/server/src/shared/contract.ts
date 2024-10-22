@@ -118,6 +118,9 @@ export interface ResolvedInstitution {
 }
 
 export enum Aggregators {
+  TEST_A = "testExampleA",
+  TEST_B = "testExampleB",
+  TEST_C = "testExampleC",
   MX = "mx",
   MXINT = "mx_int",
   SOPHTRON = "sophtron",

@@ -10,13 +10,37 @@ const institutionAggregatorsSupportEverything: CachedInstitution = {
   routing_numbers: [],
   name: "test",
   keywords: null,
-  mx: {
-    id: "mx",
+  // mx: {
+  //   id: "mx",
+  //   supports_aggregation: true,
+  //   supports_oauth: true,
+  //   supports_identification: true,
+  //   supports_verification: true,
+  //   supports_history: true,
+  // },
+  testExampleA: {
+    id: "testExampleA",
     supports_aggregation: true,
-    supports_oauth: true,
-    supports_identification: true,
-    supports_verification: true,
-    supports_history: true,
+    supports_oauth: false,
+    supports_identification: false,
+    supports_verification: false,
+    supports_history: false,
+  },
+  testExampleB: {
+    id: "testExampleB",
+    supports_aggregation: true,
+    supports_oauth: false,
+    supports_identification: false,
+    supports_verification: false,
+    supports_history: false,
+  },
+  testExampleC: {
+    id: "testExampleC",
+    supports_aggregation: true,
+    supports_oauth: false,
+    supports_identification: false,
+    supports_verification: false,
+    supports_history: false,
   },
   sophtron: {
     id: "sophtron",
@@ -28,9 +52,14 @@ const institutionAggregatorsSupportEverything: CachedInstitution = {
   },
 };
 
-const allAggregators = [Aggregators.SOPHTRON];
+const allAggregators = [
+  Aggregators.TEST_A,
+  Aggregators.TEST_B,
+  Aggregators.TEST_C,
+  Aggregators.SOPHTRON,
+];
 
-const filterOutAggregator = (aggregator: Aggregators) =>
+const filterOutAggregator = (aggregator: Aggregators): Aggregators[] =>
   allAggregators.filter(
     (currentAggregator) => currentAggregator !== aggregator,
   );
@@ -73,7 +102,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           institution: {
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
-              ...institutionAggregatorsSupportEverything.mx,
+              ...institutionAggregatorsSupportEverything.sophtron,
               supports_verification: false,
             },
           },
@@ -90,7 +119,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           institution: {
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
-              ...institutionAggregatorsSupportEverything.mx,
+              ...institutionAggregatorsSupportEverything.sophtron,
               supports_identification: false,
             },
           },
@@ -107,7 +136,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           institution: {
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
-              ...institutionAggregatorsSupportEverything.mx,
+              ...institutionAggregatorsSupportEverything.sophtron,
               supports_verification: false,
             },
           },
@@ -124,7 +153,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           institution: {
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
-              ...institutionAggregatorsSupportEverything.mx,
+              ...institutionAggregatorsSupportEverything.sophtron,
               supports_identification: false,
             },
           },
@@ -141,7 +170,6 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           institution: {
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
-              ...institutionAggregatorsSupportEverything.mx,
               [JobTypeSupports.FULLHISTORY]: false,
             },
           },
@@ -158,7 +186,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           institution: {
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
-              ...institutionAggregatorsSupportEverything.mx,
+              ...institutionAggregatorsSupportEverything.sophtron,
               [JobTypeSupports.FULLHISTORY]: true,
             },
           },
@@ -175,7 +203,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           institution: {
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
-              ...institutionAggregatorsSupportEverything.mx,
+              ...institutionAggregatorsSupportEverything.sophtron,
               [JobTypeSupports.FULLHISTORY]: false,
             },
           },
@@ -202,6 +230,9 @@ describe("aggregators", () => {
       });
     });
 
+    generateAggregatorTests(Aggregators.TEST_A);
+    generateAggregatorTests(Aggregators.TEST_B);
+    generateAggregatorTests(Aggregators.TEST_C);
     generateAggregatorTests(Aggregators.SOPHTRON);
   });
 });
