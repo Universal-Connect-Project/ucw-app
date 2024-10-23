@@ -81,7 +81,11 @@ npm install <your_package_name> --workspace apps/server
 ```
 _Package name is the `name` property in your adapter package's `package.json`_
 
-Once you run the above command, change the version of the package to a start with `*`. In the context of npm, this means install the latest version of the package. This is also a convention of Turborepo, and is what is recommended when developing package locally. 
+Once you run the above command, change the version of the package to a start with `*`. In the context of npm, this means install the latest version of the package. This is also a convention of Turborepo, and is what is recommended when developing package locally.
+
+After changing the version to `*`, run `npm i` again to update your lock file.
+
+#### Example
 
 Here's an example from the [MX Adapter Package Fork](https://github.com/Universal-Connect-Project/ucw-adapter-mx/blob/main/apps/server/package.json)
 
