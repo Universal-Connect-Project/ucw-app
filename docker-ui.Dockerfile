@@ -30,7 +30,7 @@ COPY --from=pruner ${WRKDR}/out/json/apps/${APP}/package.json .
 COPY --from=pruner ${WRKDR}/out/package-lock.json .
 
 # Using npm i here until we move to new version of the MX Connect Widget...
-RUN npm i -g turbo  \
+RUN npm i -g turbo \
     && npm i --omit=dev
 
 COPY --from=pruner ${WRKDR}/out/full/ .
