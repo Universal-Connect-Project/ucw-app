@@ -17,7 +17,7 @@ We've tried to make this process as simple as possible.
 Publishing your adapter package to NPM is a mostly automated process that happens as part of the GitHub Actions workflows that run during the PR process. The workflow for publishing to NPM happens when a PR is merged to `main`.
 
 In order to publish your adapter package to NPM as part of the workflow, you'll need to do the following.
-f
+
 ### Setup NPMJS.com account and generate Access Token
 
 1. [Create an NPM account](https://docs.npmjs.com/creating-a-new-npm-user-account). If you already have one, you can skip this step. If you want to create an organization, you can do this by following the [instructions here](https://docs.npmjs.com/creating-an-organization).
