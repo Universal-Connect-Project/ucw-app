@@ -4,7 +4,8 @@
 
 Each aggregator that wants to participate in the UCP needs to create their own adapter package. This allows the UCW to interact with the aggregator.
 
-> ⚠️ This repository only contains test adapters to allow the UCP to have test paths for aggregator adapters. Real aggregator adapters should be created in a fork of this repository. See [the MX Adapter Package Fork](https://github.com/Universal-Connect-Project/ucw-adapter-mx) for an example of how an adapter package can be created. 
+> [!NOTE]  
+> This repository only contains test adapters to allow the UCP to have test paths for aggregator adapters. Real aggregator adapters should be created in a fork of this repository. See [the MX Adapter Package Fork](https://github.com/Universal-Connect-Project/ucw-adapter-mx) for an example of how an adapter package can be created.
 
 ## Hosting your own UCW
 
@@ -33,14 +34,18 @@ An example adapter lives [here](./apps/server/src/test-adapter/index.ts). Each a
 
 This repo accesses adapter-specific logic in [adapterIndex.ts](./apps/server/src/adapterIndex.ts)
 
+## Publishing to NPM
+
+Your adapter package should be published to NPM in order for end-users to use it with the UCW. See [NPM.md](./NPM.md) for more information.
+
 ## Test institutions
 
-Adding a test institution to the [default institution list](./apps/server/cachedDefaults/ucwInstitutionsMapping.json) allows you to test your adapter. 
+Adding a test institution to the [default institution list](./apps/server/cachedDefaults/ucwInstitutionsMapping.json) allows you to test your adapter.
 
-For now, add this manually to the [ucwInstitutionsMapping.json](./apps/server/cachedDefaults/ucwInstitutionsMapping.json) file. In the future, UCP will have a way to manage and sync your aggregator and aggregator/institution mappings via an online service.
+Here is an example of what a test institution should look like:
 
-```typescript
-const testInstitution = {
+```json
+{
   "name": "My Test Bank",
   "id": "00000000-0000-0000-0000-000000000000",
   "keywords": ["test bank", "text bank", "test bakn"],
@@ -56,8 +61,11 @@ const testInstitution = {
     "supports_oauth": true,
     "supports_verification": true
   }
-};
+}
 ```
+
+For now, you should add this manually to the [ucwInstitutionsMapping.json](./apps/server/cachedDefaults/ucwInstitutionsMapping.json) file. In the future, UCP will have a way to manage and sync your aggregator and aggregator/institution mappings via an online service.
+
 ## Monorepo 
 
 Because this repo is a monorepo, here are some caveats to consider with regard to adapter creation.
