@@ -20,7 +20,7 @@ In order to publish your adapter package to NPM as part of the workflow, you'll 
 f
 ### Setup NPMJS.com account and generate Access Token
 
-1. [Create an NPM account](https://docs.npmjs.com/creating-a-new-npm-user-account). If you already have one, then you can skip this step. If you want to create an organization, you can do this by following the [instructions here](https://docs.npmjs.com/creating-an-organization).
+1. [Create an NPM account](https://docs.npmjs.com/creating-a-new-npm-user-account). If you already have one, you can skip this step. If you want to create an organization, you can do this by following the [instructions here](https://docs.npmjs.com/creating-an-organization).
 1. Generate an Access Token for your account. You can do this by following the [instructions here](https://docs.npmjs.com/about-access-tokens). You can decide which type of token you want to use. We recommend using a legacy token of the "Automation" type. We have not tested the new Granular Access Token, but it should work as well.
 1. Add this new secret to your project's GitHub repository secrets. Name this new secret `NPM_TOKEN`, and enter the access token in the "Secret" field. 
 
