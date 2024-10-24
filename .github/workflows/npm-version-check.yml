@@ -20,36 +20,38 @@ jobs:
 
       - name: 'Check if version is published'
         run: |
-          cd ./packages/mx-adapter
+          # NOTE: Change this to the directory where your package lives
+          PACKAGE_DIR=packages/mx-adapter
+          # NOTE: Change this to the name of your package on NPMJS.com
+          NPM_PACKAGE_NAME=@ucp-npm/mx-adapter
           
-          package_version=$(npm pkg get version --workspaces=false | tr -d \")
-          echo "VERSION=$package_version" >> $GITHUB_ENV
+          cd ./$PACKAGE_DIR
           
-          npm_versions=$(npm view @ucp-npm/mx-adapter versions)
-          compare=$package_version
+          PACKAGE_VERSION=$(npm pkg get version --workspaces=false | tr -d \")
+          echo "VERSION=$PACKAGE_VERSION" >> $GITHUB_ENV
+          
+          NPM_VERSIONS=$(npm view $NPM_PACKAGE_NAME versions)
+          COMPARE=$PACKAGE_VERSION
           
           # Convert JSON array to string
-          versions=$(echo "$npm_versions" | tr -d '\n' | tr -d ' ' | tr -d '"')
+          VERSIONS=$(echo "$NPM_VERSIONS" | tr -d '\n' | tr -d ' ' | tr -d '"')
           
-          # Check if compare is present in JSON array
-          if [[ $versions == *"$compare"* ]]; then
-            # Check if the compare is an exact match
-            if [[ $versions == *"$compare""']"* || $versions == *"$compare""',"* ]]; then
+          # Check if COMPARE is present in JSON array
+          if [[ $VERSIONS == *"$COMPARE"* ]]; then
+            # Check if the COMPARE is an exact match
+            if [[ $VERSIONS == *"$COMPARE""']"* || $VERSIONS == *"$COMPARE""',"* ]]; then
               echo "VERSION_FOUND=true" >> $GITHUB_ENV
               echo "=========================================================================="
-              echo "Version $compare is already published."
-              echo "Please update 'version' in package.json. Good to go."
+              echo "Version $COMPARE is already published."
+              echo "Please update 'version' in package.json."
               echo "=========================================================================="
-              #echo "::error::Version $compare already exists on NPMJS.com. Please update the version in 'package.json' and try again."
             else
               echo "VERSION_FOUND=false" >> $GITHUB_ENV
-              echo "Version $compare not found in NPM"
-              #echo "::notice::Version check successful. Version $compare will be published to NPMJS.com on merge to main."
+              echo "Version $COMPARE not found in NPM"
             fi
           else
             echo "VERSION_FOUND=false" >> $GITHUB_ENV
-            echo "Version $compare not found in NPM"
-            #echo "::notice::Version check successful. Version $compare will be published to NPMJS.com on merge to main."
+            echo "Version $COMPARE not found in NPM"
           fi
 
       - name: Update Summary if version not found
