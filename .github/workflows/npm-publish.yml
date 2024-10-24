@@ -24,8 +24,10 @@ jobs:
       - name: 'Dependencies and tests'
         run: |
           npm ci
+          npm run build --workspace packages/mx-adapter
 
       - name: 'Publish to NPM'
         uses: JS-DevTools/npm-publish@v3
         with:
+          package: './packages/mx-adapter/package.json'
           token: ${{ secrets.NPM_TOKEN }}

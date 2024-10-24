@@ -1,6 +1,10 @@
 {
-  "watch": ["."],
+  "watch": [
+    ".",
+    "../../packages/**/dist/**/*.ts"
+  ],
+  "delay": 1000,
   "ext": "js,ts,json,env",
-  "ignore": ["**/cypress/**", "**/cachedDefaults/ucwInstitutionsMapping.json"],
+  "ignore": ["**/cypress/**", "**/cachedDefaults/ucwInstitutionsMapping.json", "./*.ts", "./*.json", "./*.js"],
   "exec": "ts-node src/server.js"
 }

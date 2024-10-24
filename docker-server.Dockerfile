@@ -56,6 +56,11 @@ RUN npm i -g turbo typescript \
     && npm ci --omit=dev --ignore-scripts
 
 COPY --from=adapter-pruner ${WRKDR}/out/full/ .
+
+# Remove test files/folders
+RUN find . -name "*.test.*" -delete
+RUN find . -name "test" -type d -delete
+
 RUN turbo build --filter=./packages/mx-adapter
 
 FROM base AS runner

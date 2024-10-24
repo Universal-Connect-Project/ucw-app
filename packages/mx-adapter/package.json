@@ -21,6 +21,8 @@
     "access": "public"
   },
   "scripts": {
+    "dev": "nodemon",
+    "dev:e2e": "npm run dev",
     "cypress:open": "cypress open --config-file cypress.config.js",
     "cypress:run": "cypress run --config-file cypress.config.js",
     "build:cjs": "tsc -p tsconfig.cjs.json",

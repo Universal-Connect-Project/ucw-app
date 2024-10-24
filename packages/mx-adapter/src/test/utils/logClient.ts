@@ -1,4 +1,4 @@
-import type { LogClient } from "../models";
+import type { LogClient } from "../../models";
 
 export const logClient: LogClient = {
   debug: () => {},

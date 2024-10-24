@@ -8,7 +8,7 @@ import {
 import { mxVcAccountsData } from "./test/testData/mxVcData";
 import { server } from "./test/testServer";
 
-import { logClient } from "./__mocks__/logClient";
+import { logClient } from "./test/utils/logClient";
 
 import { getVC } from "./getVc";
 import type { AdapterDependencies } from "./models";

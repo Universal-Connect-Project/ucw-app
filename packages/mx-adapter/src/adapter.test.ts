@@ -1,8 +1,8 @@
 import { http, HttpResponse } from "msw";
 import 'dotenv/config'
 
-import { createClient as createCacheClient } from "./__mocks__/cacheClient";
-import { logClient } from "./__mocks__/logClient";
+import { createClient as createCacheClient } from "./test/utils/cacheClient";
+import { logClient } from "./test/utils/logClient";
 import { EXTENDED_HISTORY_NOT_SUPPORTED_MSG, MxAdapter } from "./adapter";
 import { ChallengeType, ConnectionStatus } from "./contract";
 

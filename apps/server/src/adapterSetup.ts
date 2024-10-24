@@ -6,7 +6,6 @@ import { SophtronAdapter } from "./adapters/sophtron";
 import { get, set } from "./services/storageClient/redis";
 import * as logger from "./infra/logger";
 import getSophtronVc from "./services/vcAggregators/sophtronVc";
-import aggregatorCredentials from "./aggregatorCredentials";
 
 const sophtronAdapterMapObject = {
   sophtron: {
@@ -24,15 +23,25 @@ export const adapterMap = {
     },
     logClient: logger,
     aggregatorCredentials: {
-      mxInt: aggregatorCredentials.mxInt,
-      mxProd: aggregatorCredentials.mxProd,
+      mxInt: {
+        username: config.MxClientId,
+        password: config.MxApiSecret,
+        basePath: 'https://int-api.mx.com',
+        vcEndpoint: 'https://int-api.mx.com/',
+        aggregator: 'mx_int',
+        available: true
+      },
+      mxProd: {
+        username: config.MxClientIdProd,
+        password: config.MxApiSecretProd,
+        basePath: 'https://api.mx.com',
+        vcEndpoint: 'https://api.mx.com/',
+        aggregator: 'mx',
+        available: true
+      },
     },
     envConfig: {
-      HOSTURL: config.HOSTURL,
-      MXCLIENTID: config.MXCLIENTID,
-      MXAPISECRET: config.MXAPISECRET,
-      MXCLIENTIDPROD: config.MXCLIENTIDPROD,
-      MXAPISECRETPROD: config.MXAPISECRETPROD,
+      HOSTURL: config.HOSTURL
     },
   }),
   ...sophtronAdapterMapObject,

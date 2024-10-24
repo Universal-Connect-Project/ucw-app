@@ -1,15 +1,15 @@
-import { clearRedisMock } from './src/__mocks__/cacheClient'
-import { server } from './src/test/testServer'
+import { server } from "./src/test/testServer";
+import { clearRedisMock } from "./src/test/utils/cacheClient";
 
 beforeAll(() => {
-  server.listen()
+  server.listen();
   // initializeDefaultElasticSearchHandlers()
-})
+});
 
 afterEach(() => {
-  server.resetHandlers()
+  server.resetHandlers();
   // resetDefaultElasticSearchHandlers()
-  clearRedisMock()
-})
+  clearRedisMock();
+});
 
-afterAll(() => server.close())
+afterAll(() => server.close());

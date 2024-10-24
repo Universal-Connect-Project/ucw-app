@@ -37,3 +37,4 @@ export const getVC = async (path: string, isProd: boolean, dependencies: VCDepen
       throw new Error("MX VC endpoint failure");
     });
 };
+

@@ -1,10 +1,10 @@
 import 'dotenv/config'
 
 import type { AdapterDependencies } from "./models";
-import { logClient } from "./__mocks__/logClient";
+import { logClient } from "./test/utils/logClient";
 import { aggregatorCredentials, cacheClient } from "./adapter.test";
 import { VCDataTypes } from "./contract";
-import { mxIntGetVC, mxProdGetVC } from "./createVc";
+import { createMxIntGetVC, createMxProdGetVC } from "./createVc";
 
 import {
   mxVcAccountsData,
@@ -28,7 +28,7 @@ describe("getVc", () => {
   const accountId = "accountId";
 
   it("gets accounts VC from INT environment", async () => {
-    const vc = await mxIntGetVC(dependencies)({
+    const vc = await createMxIntGetVC(dependencies)({
       connectionId,
       type: VCDataTypes.ACCOUNTS,
       userId
@@ -37,7 +37,7 @@ describe("getVc", () => {
   });
 
   it("gets identity VC from Prod environment", async () => {
-    const vc = await mxProdGetVC(dependencies)({
+    const vc = await createMxProdGetVC(dependencies)({
       connectionId,
       type: VCDataTypes.IDENTITY,
       userId
@@ -46,7 +46,7 @@ describe("getVc", () => {
   });
 
   it("gets accounts VC from Prod environment", async () => {
-    const vc = await mxProdGetVC(dependencies)({
+    const vc = await createMxProdGetVC(dependencies)({
       connectionId,
       type: VCDataTypes.ACCOUNTS,
       userId
@@ -55,7 +55,7 @@ describe("getVc", () => {
   });
 
   it("gets transactions VC from Prod environment", async () => {
-    const vc = await mxProdGetVC(dependencies)({
+    const vc = await createMxProdGetVC(dependencies)({
       connectionId,
       type: VCDataTypes.TRANSACTIONS,
       userId,

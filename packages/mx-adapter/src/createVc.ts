@@ -2,7 +2,7 @@ import { VCDataTypes } from "./contract";
 import { getVC as getMxVc } from "./getVc";
 import type { VCDependencies } from "./models";
 
-export const createMXGetVC = (isProd: boolean, dependencies: VCDependencies) => {
+const createMXGetVC = (isProd: boolean, dependencies: VCDependencies) => {
   return async ({
                   connectionId,
                   type,
@@ -40,5 +40,5 @@ export const createMXGetVC = (isProd: boolean, dependencies: VCDependencies) => 
   };
 };
 
-export const mxProdGetVC = (dependencies: VCDependencies) => createMXGetVC(true, dependencies);
-export const mxIntGetVC = (dependencies: VCDependencies) => createMXGetVC(false, dependencies);
+export const createMxProdGetVC = (dependencies: VCDependencies) => createMXGetVC(true, dependencies);
+export const createMxIntGetVC = (dependencies: VCDependencies) => createMXGetVC(false, dependencies);

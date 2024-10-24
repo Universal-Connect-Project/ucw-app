@@ -20,10 +20,12 @@ jobs:
 
       - name: 'Check if version is published'
         run: |
+          cd ./packages/mx-adapter
+          
           package_version=$(npm pkg get version --workspaces=false | tr -d \")
           echo "VERSION=$package_version" >> $GITHUB_ENV
           
-          npm_versions=$(npm view @ucp-npm/components versions)
+          npm_versions=$(npm view @ucp-npm/mx-adapter versions)
           compare=$package_version
           
           # Convert JSON array to string
