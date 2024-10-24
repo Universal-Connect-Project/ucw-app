@@ -42,7 +42,7 @@ We recommend using semantic versioning. For more information, see the [semantic 
 
 The version that will be published as part of the CI pipeline is taken from the `package.json` file for your adapter package. If the version in the `package.json` file already exists on NPMJS.com, then your package will not be published, so be sure to update the version your adapter's `package.json` file.
 
-The `npm-publish.yml` workflow runs for each commit to a PR. It will check if the version in the `package.json` file already exists on NPMJS.com. If it does, the workflow will fail.
+The `npm-version-check.yml` workflow runs for each commit to a PR. It will check if the version in the `package.json` file already exists on NPMJS.com. If it does, the workflow will fail.
 
 ## Scoped packages
 
