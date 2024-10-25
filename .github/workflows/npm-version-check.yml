@@ -6,6 +6,11 @@ jobs:
   push_to_registry:
     name: 'NPM Version Check'
     runs-on: ubuntu-latest
+    env:
+      # NOTE: Change this to the directory where your package lives
+      PACKAGE_DIR: 'packages/mx-adapter'
+      # NOTE: Change this to the name of your package on NPMJS.com
+      NPM_PACKAGE_NAME: '@ucp-npm/mx-adapter'
 
     steps:
       - name: 'Check out the repo'
@@ -20,17 +25,12 @@ jobs:
 
       - name: 'Check if version is published'
         run: |
-          # NOTE: Change this to the directory where your package lives
-          PACKAGE_DIR=packages/mx-adapter
-          # NOTE: Change this to the name of your package on NPMJS.com
-          NPM_PACKAGE_NAME=@ucp-npm/mx-adapter
-          
-          cd ./$PACKAGE_DIR
+          cd ./${{ env.PACKAGE_DIR }}
           
           PACKAGE_VERSION=$(npm pkg get version --workspaces=false | tr -d \")
           echo "VERSION=$PACKAGE_VERSION" >> $GITHUB_ENV
           
-          NPM_VERSIONS=$(npm view $NPM_PACKAGE_NAME versions)
+          NPM_VERSIONS=$(npm view ${{ env.NPM_PACKAGE_NAME }} versions)
           COMPARE=$PACKAGE_VERSION
           
           # Convert JSON array to string

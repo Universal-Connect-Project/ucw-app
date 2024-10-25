@@ -79,10 +79,11 @@ Copy the example env file, and fill in your own values.
   cp ./packages/mx-adapter/.env.example ./packages/mx-adapter/.env.test
 ```
 
+## Published NPM Package
+
+https://www.npmjs.com/package/@ucp-npm/mx-adapter
+
 ## More Info
 
 See [https://universalconnectproject.org/](https://universalconnectproject.org/) for more information.
 
-## NPM Published Package
-
-https://www.npmjs.com/package/@ucp-npm/mx-adapter
