@@ -1,7 +1,7 @@
 {
   "defaultAggregator": "sophtron",
 
-  "supportedAggregators": ["mx", "sophtron"],
+  "supportedAggregators": ["sophtron"],
 
   "defaultAggregatorVolume": {},
 
@@ -9,5 +9,5 @@
 
   "hiddenInstitutions": [],
 
-  "recommendedInstitutions": ["a76f5333-8493-42cf-bc86-dcc8a0f17d4c"]
+  "recommendedInstitutions": ["14627498-29cb-4296-a77f-910859eef104"]
 }

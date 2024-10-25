@@ -1,40 +1,34 @@
-import { MappedJobTypes } from '../shared/contract'
-import { MxAdapter } from '../adapters/mx'
+import { MappedJobTypes } from "../shared/contract";
 import {
   elasticSearchInstitutionData,
   transformedInstitutionList,
-  transformedPopularInstitutionsList
-} from '../test/testData/institution'
-import { ConnectApi } from './connectApi'
-import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from '../test-adapter'
+  transformedPopularInstitutionsList,
+} from "../test/testData/institution";
+import { ConnectApi } from "./connectApi";
+import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../test-adapter";
 import {
   TEST_EXAMPLE_B_AGGREGATOR_STRING,
-  testExampleInstitution
-} from '../test-adapter/constants'
-import * as preferences from '../shared/preferences'
-import testPreferences from '../../cachedDefaults/testData/testPreferences.json'
+  testExampleInstitution,
+} from "../test-adapter/constants";
+import * as preferences from "../shared/preferences";
+import testPreferences from "../../cachedDefaults/testData/testPreferences.json";
 
 const connectApi = new ConnectApi({
   context: {
     aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
     updated: false,
-    institution_id: 'xxx',
+    institution_id: "xxx",
     resolved_user_id: null,
-    job_type: 'aggregate'
-  }
-})
+    job_type: "aggregate",
+  },
+});
 
-const isIntEnv = false
-const mxApiClient = new MxAdapter(isIntEnv)
+describe("connectApi", () => {
+  describe("loadInstitutionByAggregatorId", () => {
+    it("returns the institution", async () => {
+      const testId = "testId";
 
-connectApi.aggregatorAdapter = mxApiClient
-
-describe('connectApi', () => {
-  describe('loadInstitutionByAggregatorId', () => {
-    it('returns the institution', async () => {
-      const testId = 'testId'
-
-      const response = await connectApi.loadInstitutionByAggregatorId(testId)
+      const response = await connectApi.loadInstitutionByAggregatorId(testId);
 
       expect(response).toEqual({
         institution: {
@@ -47,24 +41,24 @@ describe('connectApi', () => {
           aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
           aggregators: undefined,
           supports_oauth: testExampleInstitution.oauth,
-          url: testExampleInstitution.url
-        }
-      })
-    })
-  })
+          url: testExampleInstitution.url,
+        },
+      });
+    });
+  });
 
-  describe('loadInstitutions', () => {
-    it('loads formatted institutions', async () => {
+  describe("loadInstitutions", () => {
+    it("loads formatted institutions", async () => {
       const institutions = await connectApi.loadInstitutions(
-        'MX',
-        MappedJobTypes.AGGREGATE
-      )
+        "MX",
+        MappedJobTypes.AGGREGATE,
+      );
 
-      expect(institutions).toEqual(transformedInstitutionList)
-    })
-  })
+      expect(institutions).toEqual(transformedInstitutionList);
+    });
+  });
 
-  describe('loadInstitutionByUcpId', () => {
+  describe("loadInstitutionByUcpId", () => {
     const expectedInstitutionResponse = {
       institution: {
         guid: elasticSearchInstitutionData[TEST_EXAMPLE_B_AGGREGATOR_STRING].id,
@@ -78,30 +72,20 @@ describe('connectApi', () => {
         supports_oauth: false,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         aggregators: undefined as any,
-        aggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING
-      }
-    }
+        aggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING,
+      },
+    };
 
-    it('finds the institution', async () => {
-      jest.spyOn(preferences, 'getPreferences').mockResolvedValue({
+    it("finds the institution", async () => {
+      jest.spyOn(preferences, "getPreferences").mockResolvedValue({
         ...(testPreferences as preferences.Preferences),
         institutionAggregatorVolumeMap: undefined,
         defaultAggregatorVolume: undefined,
-        defaultAggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING
-      })
+        defaultAggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING,
+      });
 
-      const institution = await connectApi.loadInstitutionByUcpId('UCP-1234')
-      expect(institution).toEqual(expectedInstitutionResponse)
-    })
-  })
-
-  describe('loadPopularInstitutions', () => {
-    it('gets the popular institution list', async () => {
-      connectApi.aggregatorAdapter = mxApiClient
-
-      const popularInstitutionList = await connectApi.loadPopularInstitutions()
-
-      expect(popularInstitutionList).toEqual(transformedPopularInstitutionsList)
-    })
-  })
-})
+      const institution = await connectApi.loadInstitutionByUcpId("UCP-1234");
+      expect(institution).toEqual(expectedInstitutionResponse);
+    });
+  });
+});
