@@ -10,30 +10,6 @@ const institutionAggregatorsSupportEverything: CachedInstitution = {
   routing_numbers: [],
   name: "test",
   keywords: null,
-  testExampleA: {
-    id: "testExampleA",
-    supports_aggregation: true,
-    supports_oauth: false,
-    supports_identification: false,
-    supports_verification: false,
-    supports_history: false,
-  },
-  testExampleB: {
-    id: "testExampleB",
-    supports_aggregation: true,
-    supports_oauth: false,
-    supports_identification: false,
-    supports_verification: false,
-    supports_history: false,
-  },
-  testExampleC: {
-    id: "testExampleC",
-    supports_aggregation: true,
-    supports_oauth: false,
-    supports_identification: false,
-    supports_verification: false,
-    supports_history: false,
-  },
   sophtron: {
     id: "sophtron",
     supports_aggregation: true,
@@ -44,12 +20,7 @@ const institutionAggregatorsSupportEverything: CachedInstitution = {
   },
 };
 
-const allAggregators = [
-  Aggregators.TEST_A,
-  Aggregators.TEST_B,
-  Aggregators.TEST_C,
-  Aggregators.SOPHTRON,
-];
+const allAggregators = [Aggregators.SOPHTRON];
 
 const filterOutAggregator = (aggregator: Aggregators): Aggregators[] =>
   allAggregators.filter(
@@ -163,6 +134,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           institution: {
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
+              ...institutionAggregatorsSupportEverything.sophtron,
               [JobTypeSupports.FULLHISTORY]: false,
             },
           },
