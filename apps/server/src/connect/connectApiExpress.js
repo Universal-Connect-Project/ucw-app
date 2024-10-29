@@ -17,12 +17,14 @@ import {
 } from "./institutionEndpoints";
 import { userDeleteHandler } from "./userEndpoints";
 import { MappedJobTypes } from "../shared/contract";
+import stubs from "./instrumentations.js";
 
 const AGGREGATION_JOB_TYPE = 0;
 
 const disableAnalytics = true;
 
 export default function (app) {
+  stubs(app);
   app.use(contextHandler);
   app.use(async (req, res, next) => {
     if (

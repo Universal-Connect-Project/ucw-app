@@ -63,22 +63,11 @@ function aggregatorSupportsJobType({
   jobType: MappedJobTypes;
   shouldRequireFullSupport: boolean;
 }): boolean {
-  console.log(
-    "shouldRequireFullSupport[jobType]",
-    (shouldRequireFullSupport
-      ? JOB_TYPE_FULL_SUPPORT_MAP
-      : JOB_TYPE_PARTIAL_SUPPORT_MAP)[jobType],
-  );
   return (
     shouldRequireFullSupport
       ? JOB_TYPE_FULL_SUPPORT_MAP
       : JOB_TYPE_PARTIAL_SUPPORT_MAP
   )[jobType].reduce((acc, supportsProp) => {
-    console.log("supportsProp", supportsProp);
-    console.log(
-      "institutionAttributes",
-      institutionAttributes?.[supportsProp as keyof InstitutionAggregator],
-    );
     return (
       acc &&
       institutionAttributes?.[supportsProp as keyof InstitutionAggregator] ===
