@@ -1,104 +1,97 @@
-import { http, HttpResponse } from 'msw'
-import { ConnectionStatus, OAuthStatus } from '../shared/contract'
-import { READ_MEMBER_STATUS_PATH } from '../test/handlers'
-import { server } from '../test/testServer'
-import { AggregatorAdapterBase } from './index'
-import { MxAdapter } from './mx'
+import { ConnectionStatus, OAuthStatus } from "../shared/contract";
+import { AggregatorAdapterBase } from "./index";
+import { TestAdapter } from "../test-adapter/adapter";
 
-const testConnectionId = 'test_connection_id'
+const testAdapter = new TestAdapter({
+  labelText: "testLabelText",
+  aggregator: "testAdapterA",
+});
 
-const isIntEnv = false
-const mxAdapter = new MxAdapter(isIntEnv)
+const testConnectionId = "test_connection_id";
 
 const aggregatorAdapterBase = new AggregatorAdapterBase({
   context: {
-    aggregator: 'mx',
+    aggregator: "testAdapterA",
     auth: {
-      token: 'test_token',
-      iv: 'test_iv'
+      token: "test_token",
+      iv: "test_iv",
     },
-    resolved_user_id: 'test_user_id'
-  }
-})
+    resolved_user_id: "test_user_id",
+  },
+});
 
-describe('AggregatorAdapterBase', () => {
-  describe('getOauthState', () => {
+describe("AggregatorAdapterBase", () => {
+  describe("getOauthState", () => {
     beforeAll(async () => {
-      await aggregatorAdapterBase.init()
-      aggregatorAdapterBase.aggregatorAdapter = mxAdapter
-    })
+      await aggregatorAdapterBase.init();
+      aggregatorAdapterBase.aggregatorAdapter = testAdapter;
+    });
 
-    it('returns a pending oauth state', async () => {
-      server.use(
-        http.get(READ_MEMBER_STATUS_PATH, () =>
-          HttpResponse.json({
-            member: {
-              connection_status: 'PENDING',
-              guid: 'memberStatusGuid'
-            }
-          })
-        )
-      )
+    it("returns a pending oauth state", async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (aggregatorAdapterBase as any).aggregatorAdapter = {
+        GetConnectionStatus: jest.fn().mockImplementation(() =>
+          Promise.resolve({
+            status: ConnectionStatus.PENDING,
+          }),
+        ),
+      };
 
-      expect(await aggregatorAdapterBase.getOauthState(testConnectionId)).toEqual(
-        {
-          oauth_state: {
-            guid: 'test_connection_id',
-            inbound_member_guid: 'test_connection_id',
-            outbound_member_guid: 'test_connection_id',
-            auth_status: OAuthStatus.PENDING
-          }
-        }
-      )
-    })
+      expect(
+        await aggregatorAdapterBase.getOauthState(testConnectionId),
+      ).toEqual({
+        oauth_state: {
+          guid: "test_connection_id",
+          inbound_member_guid: "test_connection_id",
+          outbound_member_guid: "test_connection_id",
+          auth_status: OAuthStatus.PENDING,
+        },
+      });
+    });
 
-    it('returns a connected oauth state', async () => {
-      server.use(
-        http.get(READ_MEMBER_STATUS_PATH, () =>
-          HttpResponse.json({
-            member: {
-              connection_status: 'CONNECTED',
-              guid: 'memberStatusGuid'
-            }
-          })
-        )
-      )
+    it("returns a connected oauth state", async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (aggregatorAdapterBase as any).aggregatorAdapter = {
+        GetConnectionStatus: jest.fn().mockImplementation(() =>
+          Promise.resolve({
+            status: ConnectionStatus.CONNECTED,
+          }),
+        ),
+      };
 
-      expect(await aggregatorAdapterBase.getOauthState(testConnectionId)).toEqual(
-        {
-          oauth_state: {
-            guid: 'test_connection_id',
-            inbound_member_guid: 'test_connection_id',
-            outbound_member_guid: 'test_connection_id',
-            auth_status: OAuthStatus.COMPLETE
-          }
-        }
-      )
-    })
+      expect(
+        await aggregatorAdapterBase.getOauthState(testConnectionId),
+      ).toEqual({
+        oauth_state: {
+          guid: "test_connection_id",
+          inbound_member_guid: "test_connection_id",
+          outbound_member_guid: "test_connection_id",
+          auth_status: OAuthStatus.COMPLETE,
+        },
+      });
+    });
 
-    it('returns an errored oauth state', async () => {
-      server.use(
-        http.get(READ_MEMBER_STATUS_PATH, () =>
-          HttpResponse.json({
-            member: {
-              connection_status: 'DENIED',
-              guid: 'memberStatusGuid'
-            }
-          })
-        )
-      )
+    it("returns an errored oauth state", async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (aggregatorAdapterBase as any).aggregatorAdapter = {
+        GetConnectionStatus: jest.fn().mockImplementation(() =>
+          Promise.resolve({
+            status: ConnectionStatus.DENIED,
+          }),
+        ),
+      };
 
-      expect(await aggregatorAdapterBase.getOauthState(testConnectionId)).toEqual(
-        {
-          oauth_state: {
-            guid: 'test_connection_id',
-            inbound_member_guid: 'test_connection_id',
-            outbound_member_guid: 'test_connection_id',
-            auth_status: OAuthStatus.ERROR,
-            error_reason: ConnectionStatus.DENIED
-          }
-        }
-      )
-    })
-  })
-})
+      expect(
+        await aggregatorAdapterBase.getOauthState(testConnectionId),
+      ).toEqual({
+        oauth_state: {
+          guid: "test_connection_id",
+          inbound_member_guid: "test_connection_id",
+          outbound_member_guid: "test_connection_id",
+          auth_status: OAuthStatus.ERROR,
+          error_reason: ConnectionStatus.DENIED,
+        },
+      });
+    });
+  });
+});

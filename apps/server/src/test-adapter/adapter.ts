@@ -4,221 +4,220 @@ import type {
   Credential,
   Institution,
   UpdateConnectionRequest,
-  WidgetAdapter
-} from '@repo/utils'
-import { ConnectionStatus } from '@repo/utils'
-import { testExampleCredentials, testExampleInstitution } from './constants'
-import { MappedJobTypes } from '../shared/contract'
-import { get, set } from '../services/storageClient/redis'
+  WidgetAdapter,
+} from "@repo/utils";
+import { ConnectionStatus } from "@repo/utils";
+import { get, set } from "../services/storageClient/redis";
+import { MappedJobTypes } from "../shared/contract";
+import { testExampleCredentials, testExampleInstitution } from "./constants";
 
 const createRedisStatusKey = ({
   aggregator,
-  userId
+  userId,
 }: {
-  aggregator: string
-  userId: string
-}) => `${aggregator}-${userId}`
+  aggregator: string;
+  userId: string;
+}) => `${aggregator}-${userId}`;
 
 export class TestAdapter implements WidgetAdapter {
-  labelText: string
-  aggregator: string
+  labelText: string;
+  aggregator: string;
 
   constructor({
     labelText,
-    aggregator
+    aggregator,
   }: {
-    labelText: string
-    aggregator: string
+    labelText: string;
+    aggregator: string;
   }) {
-    this.labelText = labelText
-    this.aggregator = aggregator
+    this.labelText = labelText;
+    this.aggregator = aggregator;
   }
 
   async GetInstitutionById(id: string): Promise<Institution> {
     return {
       ...testExampleInstitution,
       id,
-      aggregator: this.aggregator
-    }
+      aggregator: this.aggregator,
+    };
   }
 
   async ListInstitutionCredentials(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    institutionId: string
+    institutionId: string,
   ): Promise<Credential[]> {
     return [
       {
         ...testExampleCredentials,
-        label: this.labelText
-      }
-    ]
+        label: this.labelText,
+      },
+    ];
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async ListConnections(userId: string): Promise<Connection[]> {
     return [
       {
-        id: 'testId',
-        cur_job_id: 'testJobId',
-        institution_code: 'testCode',
+        id: "testId",
+        cur_job_id: "testJobId",
+        institution_code: "testCode",
         is_being_aggregated: false,
         is_oauth: false,
         oauth_window_uri: undefined,
-        aggregator: this.aggregator
-      }
-    ]
+        aggregator: this.aggregator,
+      },
+    ];
   }
 
   async ListConnectionCredentials(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     memberId: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    userId: string
+    userId: string,
   ): Promise<Credential[]> {
     return [
       {
-        id: 'testId',
-        field_name: 'testFieldName',
-        field_type: 'testFieldType',
-        label: this.labelText
-      }
-    ]
+        id: "testId",
+        field_name: "testFieldName",
+        field_type: "testFieldType",
+        label: this.labelText,
+      },
+    ];
   }
 
   async CreateConnection(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     request: CreateConnectionRequest,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    userId: string
+    userId: string,
   ): Promise<Connection> {
     return {
-      id: 'testId',
-      cur_job_id: 'testJobId',
-      institution_code: 'testCode',
+      id: "testId",
+      cur_job_id: "testJobId",
+      institution_code: "testCode",
       is_being_aggregated: false,
       is_oauth: false,
       oauth_window_uri: undefined,
-      aggregator: this.aggregator
-    }
+      aggregator: this.aggregator,
+    };
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async DeleteConnection(id: string, userId: string): Promise<void> {}
-
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
   async DeleteUser(aggregatorUserId: string): Promise<any> {}
 
   async UpdateConnection(
     request: UpdateConnectionRequest,
-    userId: string
+    userId: string,
   ): Promise<Connection> {
     const redisStatusKey = createRedisStatusKey({
       aggregator: this.aggregator,
-      userId
-    })
+      userId,
+    });
 
-    const connectionInfo = await get(redisStatusKey)
+    const connectionInfo = await get(redisStatusKey);
 
     if (
       !connectionInfo?.verifiedOnce &&
       request.job_type === MappedJobTypes.VERIFICATION
     ) {
       await set(redisStatusKey, {
-        verifiedOnce: true
-      })
+        verifiedOnce: true,
+      });
     } else {
-      await set(redisStatusKey, null)
+      await set(redisStatusKey, null);
     }
 
     return {
-      id: 'testId',
-      cur_job_id: 'testJobId',
-      institution_code: 'testCode',
+      id: "testId",
+      cur_job_id: "testJobId",
+      institution_code: "testCode",
       is_being_aggregated: false,
       is_oauth: false,
       oauth_window_uri: undefined,
-      aggregator: this.aggregator
-    }
+      aggregator: this.aggregator,
+    };
   }
 
   async UpdateConnectionInternal(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     request: UpdateConnectionRequest,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    userId: string
+    userId: string,
   ): Promise<Connection> {
     return {
-      id: 'testId',
-      cur_job_id: 'testJobId',
-      institution_code: 'testCode',
+      id: "testId",
+      cur_job_id: "testJobId",
+      institution_code: "testCode",
       is_being_aggregated: false,
       is_oauth: false,
       oauth_window_uri: undefined,
-      aggregator: this.aggregator
-    }
+      aggregator: this.aggregator,
+    };
   }
 
   async GetConnectionById(
     connectionId: string,
-    userId: string
+    userId: string,
   ): Promise<Connection> {
     return {
-      id: 'testId',
-      institution_code: 'testCode',
+      id: "testId",
+      institution_code: "testCode",
       is_oauth: false,
       is_being_aggregated: false,
       oauth_window_uri: undefined,
       aggregator: this.aggregator,
-      user_id: userId
-    }
+      user_id: userId,
+    };
   }
 
   async GetConnectionStatus(
     memberId: string,
     jobId: string,
     singleAccountSelect: boolean,
-    userId: string
+    userId: string,
   ): Promise<Connection> {
     const connectionInfo = await get(
-      createRedisStatusKey({ aggregator: this.aggregator, userId })
-    )
+      createRedisStatusKey({ aggregator: this.aggregator, userId }),
+    );
 
     if (connectionInfo?.verifiedOnce && singleAccountSelect) {
       return {
         aggregator: this.aggregator,
-        id: 'testId',
-        cur_job_id: 'testJobId',
-        user_id: 'testUserId',
+        id: "testId",
+        cur_job_id: "testJobId",
+        user_id: "testUserId",
         status: ConnectionStatus.CHALLENGED,
         challenges: [
           {
-            id: 'CRD-a81b35db-28dd-41ea-aed3-6ec8ef682011',
+            id: "CRD-a81b35db-28dd-41ea-aed3-6ec8ef682011",
             type: 1,
-            question: 'Please select an account:',
+            question: "Please select an account:",
             data: [
               {
-                key: 'Checking',
-                value: 'act-23445745'
+                key: "Checking",
+                value: "act-23445745",
               },
               {
-                key: 'Savings',
-                value: 'act-352386787'
-              }
-            ]
-          }
-        ]
-      }
+                key: "Savings",
+                value: "act-352386787",
+              },
+            ],
+          },
+        ],
+      };
     }
 
     return {
       aggregator: this.aggregator,
-      id: 'testId',
-      cur_job_id: 'testJobId',
+      id: "testId",
+      cur_job_id: "testJobId",
       user_id: userId,
       status: ConnectionStatus.CONNECTED,
-      challenges: []
-    }
+      challenges: [],
+    };
   }
 
   async AnswerChallenge(
@@ -227,16 +226,16 @@ export class TestAdapter implements WidgetAdapter {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     jobId: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    userId: string
+    userId: string,
   ): Promise<boolean> {
-    return true
+    return true;
   }
 
   async ResolveUserId(
     userId: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    failIfNotFound: boolean = false
+    failIfNotFound: boolean = false,
   ): Promise<string> {
-    return userId
+    return userId;
   }
 }

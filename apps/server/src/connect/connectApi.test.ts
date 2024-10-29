@@ -2,7 +2,6 @@ import { MappedJobTypes } from "../shared/contract";
 import {
   elasticSearchInstitutionData,
   transformedInstitutionList,
-  transformedPopularInstitutionsList,
 } from "../test/testData/institution";
 import { ConnectApi } from "./connectApi";
 import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../test-adapter";

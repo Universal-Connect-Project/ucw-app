@@ -1,5 +1,5 @@
 import { getAvailableAggregators } from "../shared/aggregators";
-import type { CachedInstitution } from "./contract";
+import type { Aggregator, CachedInstitution } from "./contract";
 import { Aggregators, JobTypeSupports, MappedJobTypes } from "./contract";
 
 const institutionAggregatorsSupportEverything: CachedInstitution = {
@@ -10,14 +10,6 @@ const institutionAggregatorsSupportEverything: CachedInstitution = {
   routing_numbers: [],
   name: "test",
   keywords: null,
-  // mx: {
-  //   id: "mx",
-  //   supports_aggregation: true,
-  //   supports_oauth: true,
-  //   supports_identification: true,
-  //   supports_verification: true,
-  //   supports_history: true,
-  // },
   testExampleA: {
     id: "testExampleA",
     supports_aggregation: true,
@@ -76,7 +68,8 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           institution: institutionAggregatorsSupportEverything,
           jobType: MappedJobTypes.AGGREGATE,
           shouldRequireFullSupport: false,
-          supportedAggregators: aggregatorsWithoutCurrentAggregator,
+          supportedAggregators:
+            aggregatorsWithoutCurrentAggregator as Aggregator[],
         }),
       ).toEqual(aggregatorsWithoutCurrentAggregator);
     });
@@ -91,7 +84,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           } as any,
           jobType: MappedJobTypes.AGGREGATE,
           shouldRequireFullSupport: false,
-          supportedAggregators: allAggregators,
+          supportedAggregators: allAggregators as Aggregator[],
         }),
       ).toEqual(filterOutAggregator(aggregator));
     });
@@ -108,7 +101,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           },
           jobType: MappedJobTypes.ALL,
           shouldRequireFullSupport: false,
-          supportedAggregators: allAggregators,
+          supportedAggregators: allAggregators as Aggregator[],
         }),
       ).toEqual(filterOutAggregator(aggregator));
     });
@@ -125,7 +118,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           },
           jobType: MappedJobTypes.ALL,
           shouldRequireFullSupport: false,
-          supportedAggregators: allAggregators,
+          supportedAggregators: allAggregators as Aggregator[],
         }),
       ).toEqual(filterOutAggregator(aggregator));
     });
@@ -142,7 +135,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           },
           jobType: MappedJobTypes.VERIFICATION,
           shouldRequireFullSupport: false,
-          supportedAggregators: allAggregators,
+          supportedAggregators: allAggregators as Aggregator[],
         }),
       ).toEqual(filterOutAggregator(aggregator));
     });
@@ -159,7 +152,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           },
           jobType: MappedJobTypes.IDENTITY,
           shouldRequireFullSupport: false,
-          supportedAggregators: allAggregators,
+          supportedAggregators: allAggregators as Aggregator[],
         }),
       ).toEqual(filterOutAggregator(aggregator));
     });
@@ -175,7 +168,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           },
           jobType: MappedJobTypes.FULLHISTORY,
           shouldRequireFullSupport: false,
-          supportedAggregators: allAggregators,
+          supportedAggregators: allAggregators as Aggregator[],
         }),
       ).toEqual(allAggregators);
     });
@@ -192,7 +185,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           },
           jobType: MappedJobTypes.FULLHISTORY,
           shouldRequireFullSupport: true,
-          supportedAggregators: allAggregators,
+          supportedAggregators: allAggregators as Aggregator[],
         }),
       ).toEqual(allAggregators);
     });
@@ -209,7 +202,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           },
           jobType: MappedJobTypes.FULLHISTORY,
           shouldRequireFullSupport: true,
-          supportedAggregators: allAggregators,
+          supportedAggregators: allAggregators as Aggregator[],
         }),
       ).toEqual(filterOutAggregator(aggregator));
     });
@@ -224,7 +217,7 @@ describe("aggregators", () => {
             institution: institutionAggregatorsSupportEverything,
             jobType: mappedJobType,
             shouldRequireFullSupport: true,
-            supportedAggregators: allAggregators,
+            supportedAggregators: allAggregators as Aggregator[],
           }),
         ).toEqual(allAggregators);
       });
