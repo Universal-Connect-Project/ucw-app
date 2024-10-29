@@ -72,7 +72,7 @@ services:
     restart: on-failure
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
-      start_period: 5s
+      start_period: 10s
       interval: 20s
       timeout: 5s
       retries: 3
