@@ -10,6 +10,7 @@ import {
   testExampleInstitution,
 } from "../test-adapter/constants";
 import * as preferences from "../shared/preferences";
+// @ts-expect-error json file
 import testPreferences from "../../cachedDefaults/testData/testPreferences.json";
 
 const connectApi = new ConnectApi({

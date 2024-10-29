@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import { http, HttpResponse } from "msw";
+// @ts-expect-error json file
 import testPreferences from "../../cachedDefaults/testData/testPreferences.json";
 import config from "../config";
 import * as logger from "../infra/logger";
