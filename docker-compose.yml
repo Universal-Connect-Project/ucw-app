@@ -71,8 +71,8 @@ services:
     image: redis:7.2-alpine
     restart: on-failure
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
-      start_period: 10s
+      test: ["CMD", "redis-cli", "ping"]
+      start_period: 5s
       interval: 20s
       timeout: 5s
       retries: 3
