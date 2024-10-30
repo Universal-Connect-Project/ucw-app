@@ -1,11 +1,5 @@
 import { ConnectionStatus, OAuthStatus } from "../shared/contract";
 import { AggregatorAdapterBase } from "./index";
-import { TestAdapter } from "../test-adapter/adapter";
-
-const testAdapter = new TestAdapter({
-  labelText: "testLabelText",
-  aggregator: "testAdapterA",
-});
 
 const testConnectionId = "test_connection_id";
 
@@ -24,7 +18,6 @@ describe("AggregatorAdapterBase", () => {
   describe("getOauthState", () => {
     beforeAll(async () => {
       await aggregatorAdapterBase.init();
-      aggregatorAdapterBase.aggregatorAdapter = testAdapter;
     });
 
     it("returns a pending oauth state", async () => {
