@@ -23,11 +23,9 @@ describe("AggregatorAdapterBase", () => {
     it("returns a pending oauth state", async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (aggregatorAdapterBase as any).aggregatorAdapter = {
-        GetConnectionStatus: jest.fn().mockImplementation(() =>
-          Promise.resolve({
-            status: ConnectionStatus.PENDING,
-          }),
-        ),
+        GetConnectionStatus: jest.fn().mockResolvedValue({
+          status: ConnectionStatus.PENDING,
+        }),
       };
 
       expect(
@@ -45,11 +43,9 @@ describe("AggregatorAdapterBase", () => {
     it("returns a connected oauth state", async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (aggregatorAdapterBase as any).aggregatorAdapter = {
-        GetConnectionStatus: jest.fn().mockImplementation(() =>
-          Promise.resolve({
-            status: ConnectionStatus.CONNECTED,
-          }),
-        ),
+        GetConnectionStatus: jest.fn().mockResolvedValue({
+          status: ConnectionStatus.CONNECTED,
+        }),
       };
 
       expect(
@@ -67,11 +63,9 @@ describe("AggregatorAdapterBase", () => {
     it("returns an errored oauth state", async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (aggregatorAdapterBase as any).aggregatorAdapter = {
-        GetConnectionStatus: jest.fn().mockImplementation(() =>
-          Promise.resolve({
-            status: ConnectionStatus.DENIED,
-          }),
-        ),
+        GetConnectionStatus: jest.fn().mockResolvedValue({
+          status: ConnectionStatus.DENIED,
+        }),
       };
 
       expect(
