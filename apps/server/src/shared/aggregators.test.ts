@@ -10,6 +10,30 @@ const institutionAggregatorsSupportEverything: CachedInstitution = {
   routing_numbers: [],
   name: "test",
   keywords: null,
+  testExampleA: {
+    id: "testExampleA",
+    supports_aggregation: true,
+    supports_oauth: true,
+    supports_identification: true,
+    supports_verification: true,
+    supports_history: true,
+  },
+  testExampleB: {
+    id: "testExampleB",
+    supports_aggregation: true,
+    supports_oauth: true,
+    supports_identification: true,
+    supports_verification: true,
+    supports_history: true,
+  },
+  testExampleC: {
+    id: "testExampleC",
+    supports_aggregation: true,
+    supports_oauth: true,
+    supports_identification: true,
+    supports_verification: true,
+    supports_history: true,
+  },
   sophtron: {
     id: "sophtron",
     supports_aggregation: true,
@@ -20,7 +44,12 @@ const institutionAggregatorsSupportEverything: CachedInstitution = {
   },
 };
 
-const allAggregators = [Aggregators.SOPHTRON];
+const allAggregators = [
+  Aggregators.TEST_A,
+  Aggregators.TEST_B,
+  Aggregators.TEST_C,
+  Aggregators.SOPHTRON,
+];
 
 const filterOutAggregator = (aggregator: Aggregators): Aggregators[] =>
   allAggregators.filter(
@@ -66,7 +95,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           institution: {
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
-              ...institutionAggregatorsSupportEverything.sophtron,
+              ...institutionAggregatorsSupportEverything[aggregator],
               supports_verification: false,
             },
           },
@@ -83,7 +112,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           institution: {
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
-              ...institutionAggregatorsSupportEverything.sophtron,
+              ...institutionAggregatorsSupportEverything[aggregator],
               supports_identification: false,
             },
           },
@@ -100,7 +129,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           institution: {
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
-              ...institutionAggregatorsSupportEverything.sophtron,
+              ...institutionAggregatorsSupportEverything[aggregator],
               supports_verification: false,
             },
           },
@@ -117,7 +146,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           institution: {
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
-              ...institutionAggregatorsSupportEverything.sophtron,
+              ...institutionAggregatorsSupportEverything[aggregator],
               supports_identification: false,
             },
           },
@@ -134,7 +163,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           institution: {
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
-              ...institutionAggregatorsSupportEverything.sophtron,
+              ...institutionAggregatorsSupportEverything[aggregator],
               [JobTypeSupports.FULLHISTORY]: false,
             },
           },
@@ -151,7 +180,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           institution: {
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
-              ...institutionAggregatorsSupportEverything.sophtron,
+              ...institutionAggregatorsSupportEverything[aggregator],
               [JobTypeSupports.FULLHISTORY]: true,
             },
           },
@@ -168,7 +197,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
           institution: {
             ...institutionAggregatorsSupportEverything,
             [aggregator]: {
-              ...institutionAggregatorsSupportEverything.sophtron,
+              ...institutionAggregatorsSupportEverything[aggregator],
               [JobTypeSupports.FULLHISTORY]: false,
             },
           },
