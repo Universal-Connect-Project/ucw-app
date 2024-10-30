@@ -182,6 +182,23 @@ describe("TestAdapter", () => {
     });
   });
 
+  describe("DeleteConnection", () => {
+    it("responds with a ", async () => {
+      expect(
+        await testAdapter.DeleteConnection("testId", "testUserId"),
+      ).toEqual(undefined);
+    });
+  });
+
+  describe("DeleteUser", () => {
+    it("responds with 204 on success", async () => {
+      expect(await testAdapter.DeleteUser("testUserId")).toEqual({
+        status: 204,
+        data: "",
+      });
+    });
+  });
+
   describe("UpdateConnection", () => {
     it("returns a response object", async () => {
       expect(

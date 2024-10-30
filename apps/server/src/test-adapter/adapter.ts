@@ -106,7 +106,12 @@ export class TestAdapter implements WidgetAdapter {
   async DeleteConnection(id: string, userId: string): Promise<void> {}
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
-  async DeleteUser(aggregatorUserId: string): Promise<any> {}
+  async DeleteUser(aggregatorUserId: string): Promise<any> {
+    return {
+      status: 204,
+      data: "",
+    };
+  }
 
   async UpdateConnection(
     request: UpdateConnectionRequest,
