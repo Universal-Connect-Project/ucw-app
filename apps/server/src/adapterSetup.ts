@@ -1,4 +1,4 @@
-import type { AdapterMap } from "@repo/utils";
+import { SophtronAdapter } from "./adapters/sophtron";
 
 import getSophtronVc from "./services/vcAggregators/sophtronVc";
 import { adapterMapObject as testAdapterMapObject } from "./test-adapter";
