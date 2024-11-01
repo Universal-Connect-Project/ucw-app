@@ -5,6 +5,7 @@ import { aggregators } from "./adapterSetup";
 import config from "./config";
 
 import { wget as _wget } from "./infra/http";
+import he from "he";
 
 const pageQueryParameters = new RegExp(
   [
@@ -59,7 +60,7 @@ export const widgetHandler = (req: Request, res: Response) => {
 
   if (error) {
     res.status(400);
-    res.send(error.details[0].message);
+    res.send(he.encode(error.details[0].message));
 
     return;
   }
