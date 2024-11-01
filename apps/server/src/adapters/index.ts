@@ -5,18 +5,17 @@ import aggregatorCredentials from "../aggregatorCredentials";
 import { AnalyticsClient } from "../services/analyticsClient";
 import { resolveInstitutionAggregator } from "../services/institutionResolver";
 import { set } from "../services/storageClient/redis";
+import type { Context, MappedJobTypes, Aggregator } from "../shared/contract";
 import type {
   Challenge,
   Connection,
-  Context,
   CreateConnectionRequest,
   Credential,
   Institution,
-  MappedJobTypes,
-  Aggregator,
   UpdateConnectionRequest,
   WidgetAdapter,
-} from "../shared/contract";
+} from "@repo/utils";
+
 import { ConnectionStatus, OAuthStatus } from "../shared/contract";
 import { decodeAuthToken, mapJobType } from "../utils";
 

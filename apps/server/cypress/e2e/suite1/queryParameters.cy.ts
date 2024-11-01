@@ -1,4 +1,4 @@
-import { JobTypes } from "../../../src/shared/contract";
+import { JobTypes } from "@repo/utils";
 import { refreshAConnection } from "../../shared/utils/refresh";
 import {
   enterTestExampleACredentials,

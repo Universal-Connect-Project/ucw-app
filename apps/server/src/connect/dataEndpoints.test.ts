@@ -1,11 +1,5 @@
 import type { Response } from "express";
-import { HttpResponse, http } from "msw";
-import { server } from "../test/testServer";
-import type {
-  AccountsRequest,
-  IdentityRequest,
-  TransactionsRequest,
-} from "./dataEndpoints";
+import type { TransactionsRequest } from "./dataEndpoints";
 import {
   accountsDataHandler,
   identityDataHandler,
@@ -42,7 +36,7 @@ describe("dataEndpoints", () => {
   });
 
   describe("identityDataHandler", () => {
-    it("responds with a failure if aggregator isnt valid", async () => {
+    it("responds with a failure if aggregator isn't valid", async () => {
       const res = {
         send: jest.fn(),
         status: jest.fn(),

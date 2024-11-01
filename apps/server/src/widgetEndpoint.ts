@@ -1,46 +1,46 @@
-import Joi from 'joi'
-import type { Request, Response } from 'express'
+import { JobTypes } from "@repo/utils";
+import type { Request, Response } from "express";
+import Joi from "joi";
+import { aggregators } from "./adapterSetup";
+import config from "./config";
 
-import { wget as _wget } from './infra/http'
-import { JobTypes } from './shared/contract'
-import config from './config'
-import { aggregators } from './adapterSetup'
+import { wget as _wget } from "./infra/http";
 
 const pageQueryParameters = new RegExp(
   [
-    'institution_id',
-    'job_type',
-    'scheme',
-    'user_id',
-    'client_guid',
-    'connection_id',
-    'aggregator',
-    'partner',
-    'oauth_referral_source',
-    'single_account_select',
-    'update_credentials',
-    'server',
-    'is_mobile_webview',
-    'include_identity'
+    "institution_id",
+    "job_type",
+    "scheme",
+    "user_id",
+    "client_guid",
+    "connection_id",
+    "aggregator",
+    "partner",
+    "oauth_referral_source",
+    "single_account_select",
+    "update_credentials",
+    "server",
+    "is_mobile_webview",
+    "include_identity",
   ]
     .map((r) => `\\$${r}`)
-    .join('|'),
-  'g'
-)
+    .join("|"),
+  "g",
+);
 
 function renderDefaultPage(req: Request, res: Response, html: string) {
   if (
     req.query.connection_id != null &&
-    (req.query.aggregator == null || req.query.aggregator === '')
+    (req.query.aggregator == null || req.query.aggregator === "")
   ) {
-    delete req.query.connection_id
+    delete req.query.connection_id;
   }
   res.send(
     html.replaceAll(pageQueryParameters, (q: string) =>
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      encodeURIComponent((req.query as any)[q.substring(1)] ?? '')
-    )
-  )
+      encodeURIComponent((req.query as any)[q.substring(1)] ?? ""),
+    ),
+  );
 }
 
 export const widgetHandler = (req: Request, res: Response) => {
@@ -52,22 +52,22 @@ export const widgetHandler = (req: Request, res: Response) => {
       .required(),
     aggregator: Joi.string().valid(...aggregators),
     single_account_select: Joi.bool(),
-    user_id: Joi.string().required()
-  }).and('connection_id', 'aggregator')
+    user_id: Joi.string().required(),
+  }).and("connection_id", "aggregator");
 
-  const { error } = schema.validate(req.query)
+  const { error } = schema.validate(req.query);
 
   if (error) {
-    res.status(400)
-    res.send(error.details[0].message)
+    res.status(400);
+    res.send(error.details[0].message);
 
-    return
+    return;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ;(req as any).metricsPath = '/catchall'
-  const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}${req.path}`
+  (req as any).metricsPath = "/catchall";
+  const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}${req.path}`;
   void _wget(resourcePath).then((html) => {
-    renderDefaultPage(req, res, html)
-  })
-}
+    renderDefaultPage(req, res, html);
+  });
+};

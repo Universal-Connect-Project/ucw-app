@@ -1,7 +1,7 @@
-import { adapterMapObject as testAdapterMapObject } from "./test-adapter";
-import { SophtronAdapter } from "./adapters/sophtron";
+import type { AdapterMap } from "@repo/utils";
 
 import getSophtronVc from "./services/vcAggregators/sophtronVc";
+import { adapterMapObject as testAdapterMapObject } from "./test-adapter";
 
 const sophtronAdapterMapObject = {
   sophtron: {

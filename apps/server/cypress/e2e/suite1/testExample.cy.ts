@@ -1,44 +1,44 @@
-import { JobTypes } from '../../../src/shared/contract'
-import generateVcDataTests from '../../shared/utils/generateVcDataTests'
+import { JobTypes } from "@repo/utils";
+import generateVcDataTests from "../../shared/utils/generateVcDataTests";
 import {
   enterTestExampleACredentials,
   enterTestExampleBCredentials,
   searchAndSelectTestExampleA,
   searchAndSelectTestExampleB,
-  selectTestExampleAAccount
-} from '../../shared/utils/testExample'
+  selectTestExampleAAccount,
+} from "../../shared/utils/testExample";
 import {
   clickContinue,
-  expectConnectionSuccess
-} from '../../shared/utils/widget'
+  expectConnectionSuccess,
+} from "../../shared/utils/widget";
 
 const makeAnAConnection = async (jobType) => {
-  searchAndSelectTestExampleA()
-  enterTestExampleACredentials()
-  clickContinue()
+  searchAndSelectTestExampleA();
+  enterTestExampleACredentials();
+  clickContinue();
 
   if ([JobTypes.VERIFICATION, JobTypes.ALL].includes(jobType)) {
-    selectTestExampleAAccount()
-    clickContinue()
+    selectTestExampleAAccount();
+    clickContinue();
   }
 
-  expectConnectionSuccess()
-}
+  expectConnectionSuccess();
+};
 
 const makeABConnection = async (jobType) => {
-  searchAndSelectTestExampleB()
-  enterTestExampleBCredentials()
-  clickContinue()
+  searchAndSelectTestExampleB();
+  enterTestExampleBCredentials();
+  clickContinue();
 
   if ([JobTypes.VERIFICATION, JobTypes.ALL].includes(jobType)) {
-    selectTestExampleAAccount()
-    clickContinue()
+    selectTestExampleAAccount();
+    clickContinue();
   }
 
-  expectConnectionSuccess()
-}
+  expectConnectionSuccess();
+};
 
-describe('testExampleA and B aggregators', () => {
-  generateVcDataTests({ makeAConnection: makeAnAConnection })
-  generateVcDataTests({ makeAConnection: makeABConnection })
-})
+describe("testExampleA and B aggregators", () => {
+  generateVcDataTests({ makeAConnection: makeAnAConnection });
+  generateVcDataTests({ makeAConnection: makeABConnection });
+});

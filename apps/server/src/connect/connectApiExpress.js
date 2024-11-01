@@ -126,6 +126,7 @@ export default function (app) {
   );
   app.get(ApiEndpoints.INSTITUTIONS, getInstitutionsHandler);
   app.get("/jobs/:member_guid", async (req, res) => {
+    req.context.aggregator.
     if (["mx_int", "mx"].includes(req.context.aggregator)) {
       if (req.params.member_guid === "null") {
         res.send({ job: { guid: "none", job_type: AGGREGATION_JOB_TYPE } });

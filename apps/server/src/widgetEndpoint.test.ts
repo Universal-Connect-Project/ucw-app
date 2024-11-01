@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { widgetHandler } from "./widgetEndpoint";
-import { JobTypes, Aggregators } from "./shared/contract";
+import { JobTypes } from "@repo/utils";
+import { Aggregators } from "./shared/contract";
 import { invalidAggregatorString } from "./utils/validators";
 
 /* eslint-disable @typescript-eslint/unbound-method  */
