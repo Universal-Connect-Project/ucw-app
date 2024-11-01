@@ -27,7 +27,9 @@ describe("validators", () => {
 
       validatedHandler(req, res);
 
-      expect(res.send).toHaveBeenCalledWith('"aggregator" is required');
+      expect(res.send).toHaveBeenCalledWith(
+        "&#x22;aggregator&#x22; is required",
+      );
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).not.toHaveBeenCalledWith(successString);
     });

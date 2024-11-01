@@ -1,7 +1,8 @@
+import he from "he";
 import Joi from "joi";
 import { aggregators } from "../adapterSetup";
 
-export const invalidAggregatorString = `"aggregator" must be one of [${aggregators.join(", ")}]`;
+export const invalidAggregatorString = `&#x22;aggregator&#x22; must be one of [${aggregators.join(", ")}]`;
 
 export const createAggregatorValidator = () =>
   Joi.string()
@@ -21,7 +22,7 @@ export const withValidateAggregatorInPath =
 
     if (error) {
       res.status(400);
-      res.send(error.details[0].message);
+      res.send(he.encode(error.details[0].message));
 
       return;
     }

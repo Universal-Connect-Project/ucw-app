@@ -92,9 +92,7 @@ describe("server", () => {
         );
 
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith(
-          he.encode(invalidAggregatorString),
-        );
+        expect(res.send).toHaveBeenCalledWith(invalidAggregatorString);
       });
 
       it("responds with a 400 if aggregator is provided without a connection_id", () => {
