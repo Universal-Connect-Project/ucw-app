@@ -126,7 +126,10 @@ export default function (app) {
   );
   app.get(ApiEndpoints.INSTITUTIONS, getInstitutionsHandler);
   app.get("/jobs/:member_guid", async (req, res) => {
-    if (req.context.aggregator.jobRequestHandler) {
+    if (
+      Object.hasOwn(req.context.aggregator, "jobRequestHandler") &&
+      typeof req.context.aggregator.jobRequestHandler === "function"
+    ) {
       await req.context.aggregator.jobRequestHandler(req, res);
     } else {
       res.send({
