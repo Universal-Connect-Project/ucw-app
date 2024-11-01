@@ -19,7 +19,9 @@ export type AdapterMap = {
   vcAdapter: Function;
   widgetAdapter: WidgetAdapter;
   oauthResponseHandler?: Function;
-  jobRequestHandler?: (req: any, res: any) => Promise<void>;
+  requestHandlers?: {
+    jobRequestHandler?: (req: any, res: any) => Promise<void>;
+  };
 };
 
 export interface Credential {
