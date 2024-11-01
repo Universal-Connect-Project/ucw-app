@@ -104,7 +104,9 @@ describe("dataEndpoints", () => {
 
         await transactionsDataHandler(req, res);
 
-        expect(res.send).toHaveBeenCalledWith('"start_time" is required');
+        expect(res.send).toHaveBeenCalledWith(
+          "&#x22;start_time&#x22; is required",
+        );
         expect(res.status).toHaveBeenCalledWith(400);
       });
 
@@ -128,7 +130,9 @@ describe("dataEndpoints", () => {
 
         await transactionsDataHandler(req, res);
 
-        expect(res.send).toHaveBeenCalledWith('"end_time" is required');
+        expect(res.send).toHaveBeenCalledWith(
+          "&#x22;end_time&#x22; is required",
+        );
         expect(res.status).toHaveBeenCalledWith(400);
       });
     });
