@@ -1,30 +1,30 @@
-import Joi from 'joi'
-import { aggregators } from '../adapterSetup'
+import Joi from "joi";
+import { aggregators } from "../adapterSetup";
 
-export const invalidAggregatorString = `"aggregator" must be one of [${aggregators.join(', ')}]`
+export const invalidAggregatorString = `"aggregator" must be one of [${aggregators.join(", ")}]`;
 
 export const createAggregatorValidator = () =>
   Joi.string()
     .valid(...aggregators)
-    .required()
+    .required();
 
 export const withValidateAggregatorInPath =
   // eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any
   (handler: Function) => async (req: any, res: any) => {
     const schema = Joi.object({
-      aggregator: createAggregatorValidator()
-    })
+      aggregator: createAggregatorValidator(),
+    });
 
     const { error } = schema.validate({
-      aggregator: req.params.aggregator
-    })
+      aggregator: req.params.aggregator,
+    });
 
     if (error) {
-      res.status(400)
-      res.send(error.details[0].message)
+      res.status(400);
+      res.send(error.details[0].message);
 
-      return
+      return;
     }
 
-    await handler(req, res)
-  }
+    await handler(req, res);
+  };

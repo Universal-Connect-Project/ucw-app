@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import he from "he";
 import { widgetHandler } from "./widgetEndpoint";
 import { JobTypes } from "@repo/utils";
 import { Aggregators } from "./shared/contract";
@@ -25,7 +26,9 @@ describe("server", () => {
         );
 
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith('"job_type" is required');
+        expect(res.send).toHaveBeenCalledWith(
+          "&#x22;job_type&#x22; is required",
+        );
       });
 
       it("responds with a 400 if job_type is invalid", () => {
@@ -46,7 +49,7 @@ describe("server", () => {
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith(
-          `"job_type" must be one of [${Object.values(JobTypes).join(", ")}]`,
+          `&#x22;job_type&#x22; must be one of [${Object.values(JobTypes).join(", ")}]`,
         );
       });
 
@@ -66,7 +69,9 @@ describe("server", () => {
         );
 
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith('"user_id" is required');
+        expect(res.send).toHaveBeenCalledWith(
+          "&#x22;user_id&#x22; is required",
+        );
       });
 
       it("responds with a 400 if aggregator is invalid", () => {
@@ -87,7 +92,9 @@ describe("server", () => {
         );
 
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith(invalidAggregatorString);
+        expect(res.send).toHaveBeenCalledWith(
+          he.encode(invalidAggregatorString),
+        );
       });
 
       it("responds with a 400 if aggregator is provided without a connection_id", () => {
@@ -109,7 +116,7 @@ describe("server", () => {
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith(
-          '"value" contains [aggregator] without its required peers [connection_id]',
+          "&#x22;value&#x22; contains [aggregator] without its required peers [connection_id]",
         );
       });
 
@@ -132,7 +139,7 @@ describe("server", () => {
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith(
-          '"value" contains [connection_id] without its required peers [aggregator]',
+          "&#x22;value&#x22; contains [connection_id] without its required peers [aggregator]",
         );
       });
 
@@ -155,7 +162,7 @@ describe("server", () => {
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith(
-          '"single_account_select" must be a boolean',
+          "&#x22;single_account_select&#x22; must be a boolean",
         );
       });
     });
