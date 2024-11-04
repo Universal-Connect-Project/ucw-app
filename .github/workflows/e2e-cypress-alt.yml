@@ -1,4 +1,4 @@
-name: E2E Tests Alternate Preferences
+name: E2E Tests (Server) Alternate Preferences
 
 on: pull_request
 

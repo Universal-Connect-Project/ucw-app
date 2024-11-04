@@ -1,4 +1,4 @@
-name: E2E Tests Prod
+name: E2E Tests (Server) Prod
 
 on: pull_request
 
