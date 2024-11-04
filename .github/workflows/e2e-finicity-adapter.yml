@@ -60,6 +60,8 @@ jobs:
           echo RESOURCEVERSION="" >> ${ENV_FILE_PATH}
           # Secrets (can't load these from another job, due to GH security features)
 
+          cat ${ENV_FILE_PATH}
+
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
