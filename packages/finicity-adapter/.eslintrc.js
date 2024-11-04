@@ -1,25 +1,23 @@
-/** @type {import("eslint").Linter.Config} */
 module.exports = {
   extends: ["../../packages/eslint-config/node.json"],
   env: {
-    browser: true,
     node: true,
     es6: true,
     jest: true,
   },
   parserOptions: {
-    project: "./tsconfig.json",
+    project: "tsconfig.json",
   },
   ignorePatterns: [
-    ".eslintrc.cjs",
-    "jest.config.js",
+    ".eslintrc.js",
+    "jest.config.cjs",
     "jestSetup.ts",
-    "babel.config.js",
-    "cypress.config.*.ts",
+    "cypress.config.js",
+    "cypress.config.base.js",
     "cypress/**/*",
-    "baseCypressConfig.ts",
   ],
   rules: {
+    "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-namespace": "off", // TODO: remove and fix later
     "@typescript-eslint/strict-boolean-expressions": "off", // TODO: remove and fix later
     "@typescript-eslint/prefer-nullish-coalescing": "off", // TODO: remove and fix later

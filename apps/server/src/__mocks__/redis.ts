@@ -1,44 +1,46 @@
-import { PREFERENCES_REDIS_KEY } from '../services/storageClient/constants'
+import { PREFERENCES_REDIS_KEY } from "../services/storageClient/constants";
 
-let storageObject: Record<string, any> = {}
+/* eslint-disable @typescript-eslint/no-explicit-any*/
+
+let storageObject: Record<string, any> = {};
 
 export const clearRedisMock = () => {
   if (storageObject?.[PREFERENCES_REDIS_KEY]) {
     storageObject = {
-      [PREFERENCES_REDIS_KEY]: storageObject[PREFERENCES_REDIS_KEY]
-    }
+      [PREFERENCES_REDIS_KEY]: storageObject[PREFERENCES_REDIS_KEY],
+    };
   } else {
-    storageObject = {}
+    storageObject = {};
   }
-}
+};
 
 export const sAdd = jest.fn((key: string, values: string[]) => {
-  storageObject[key] = values
-})
+  storageObject[key] = values;
+});
 export const del = jest.fn((key: string) => {
-  delete storageObject[key]
-})
+  delete storageObject[key];
+});
 
 export const sMembers = jest.fn((key: string) => {
-  return storageObject[key]
-})
+  return storageObject[key];
+});
 
 export const get = jest.fn((key: string) => {
-  return storageObject[key]
-})
+  return storageObject[key];
+});
 
 export const set = jest.fn((key: string, value: any) => {
-  storageObject[key] = value
-})
+  storageObject[key] = value;
+});
 
 export const createClient = () => ({
   connect: async () => {
-    return true
+    return true;
   },
   get,
   isReady: true,
   set,
   sAdd,
   sMembers,
-  del
-})
+  del,
+});

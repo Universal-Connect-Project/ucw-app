@@ -1,0 +1,74 @@
+name: "NPM Version Check"
+
+on: pull_request
+
+jobs:
+  push_to_registry:
+    name: "NPM Version Check"
+    runs-on: ubuntu-latest
+    env:
+      # NOTE: Change this to the directory where your package lives
+      PACKAGE_DIR: "packages/finicity-adapter"
+      # NOTE: Change this to the name of your package on NPMJS.com
+      NPM_PACKAGE_NAME: "@ucp-npm/finicity-adapter"
+
+    steps:
+      - name: "Check out the repo"
+        uses: actions/checkout@v4
+
+      - name: "Set up Node"
+        uses: actions/setup-node@v4
+        with:
+          registry-url: "https://registry.npmjs.org"
+          node-version: "lts/*"
+          check-latest: true
+
+      - name: "Check if version is published"
+        run: |
+          cd ./${{ env.PACKAGE_DIR }}
+
+          PACKAGE_VERSION=$(npm pkg get version --workspaces=false | tr -d \")
+          echo "VERSION=$PACKAGE_VERSION" >> $GITHUB_ENV
+
+          NPM_VERSIONS=$(npm view ${{ env.NPM_PACKAGE_NAME }} versions)
+          COMPARE=$PACKAGE_VERSION
+
+          # Convert JSON array to string
+          VERSIONS=$(echo "$NPM_VERSIONS" | tr -d '\n' | tr -d ' ' | tr -d '"')
+
+          # Check if COMPARE is present in JSON array
+          if [[ $VERSIONS == *"$COMPARE"* ]]; then
+            # Check if the COMPARE is an exact match
+            if [[ $VERSIONS == *"$COMPARE""']"* || $VERSIONS == *"$COMPARE""',"* ]]; then
+              echo "VERSION_FOUND=true" >> $GITHUB_ENV
+              echo "=========================================================================="
+              echo "Version $COMPARE is already published."
+              echo "Please update 'version' in package.json."
+              echo "=========================================================================="
+            else
+              echo "VERSION_FOUND=false" >> $GITHUB_ENV
+              echo "Version $COMPARE not found in NPM"
+            fi
+          else
+            echo "VERSION_FOUND=false" >> $GITHUB_ENV
+            echo "Version $COMPARE not found in NPM"
+          fi
+
+      - name: Update Summary if version not found
+        if: env.VERSION_FOUND == 'false'
+        run: |
+          {
+            echo "### Version Check Results"
+            echo "Version check successful. 🚀🎉"
+            echo "Version $VERSION will be published to npmjs.com on merge to main."
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: Update Summary if version found
+        if: env.VERSION_FOUND == 'true'
+        run: |
+          {
+            echo "### Version Check Results"
+            echo "Version $VERSION already exists on npmjs.com. 😬🫠"
+            echo "Please update the 'version' property in 'package.json' and try again."
+          } >> $GITHUB_STEP_SUMMARY
+          exit 1
