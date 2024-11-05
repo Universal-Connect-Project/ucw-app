@@ -1,5 +1,5 @@
-export const getFinicityAdapterMapObject = () => ({
-  finicity: {
+export const getChangeThisAdapterMapObject = () => ({
+  changeThis: {
     vcAdapter: undefined,
     widgetAdapter: undefined,
   },
