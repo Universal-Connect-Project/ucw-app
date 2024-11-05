@@ -99,7 +99,3 @@ jobs:
             
             exit 1
           fi
-
-      - name: Setup tmate.io session on failure
-        if: failure()
-        uses: mxschmitt/action-tmate@v3
