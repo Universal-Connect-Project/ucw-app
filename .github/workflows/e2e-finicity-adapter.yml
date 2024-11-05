@@ -43,31 +43,30 @@ jobs:
           sudo sysctl -w vm.swappiness=1
           sudo sysctl -w fs.file-max=262144
           sudo sysctl -w vm.max_map_count=262144
+
       - uses: actions/setup-node@v4
         with:
           node-version: "lts/*"
           check-latest: true
       - run: npm ci
 
-      - run: npm run copyTestPreferences
+      - run: npm run copyAltTestPreferences
 
       - name: "Create env file"
         run: |
           ENV_FILE_PATH=./apps/server/.env
           touch ${ENV_FILE_PATH}
+
           # Vars
           echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
           echo RESOURCEVERSION="" >> ${ENV_FILE_PATH}
-          # Secrets (can't load these from another job, due to GH security features)
 
-          cat ${ENV_FILE_PATH}
+          # Secrets (can't load these from another job, due to GH security features)
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DEBUG: "cypress:*"
-
         with:
           config-file: cypress.config.ts
           project: packages/finicity-adapter
