@@ -27,10 +27,12 @@ jobs:
         run: |
           cd ./${{ env.PACKAGE_DIR }}
 
+          VERSION_FOUND=false
+
           PACKAGE_VERSION=$(npm pkg get version --workspaces=false | tr -d \")
           echo "VERSION=$PACKAGE_VERSION" >> $GITHUB_ENV
 
-          NPM_VERSIONS=$(npm view ${{ env.NPM_PACKAGE_NAME }} versions)
+          NPM_VERSIONS=$(npm view ${{ env.NPM_PACKAGE_NAME }} versions || exit 0)
           COMPARE=$PACKAGE_VERSION
 
           # Convert JSON array to string

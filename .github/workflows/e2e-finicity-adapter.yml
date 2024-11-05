@@ -1,4 +1,4 @@
-name: E2E Tests (Change This Adapter)
+name: E2E Tests (Template Adapter)
 
 on: pull_request
 
