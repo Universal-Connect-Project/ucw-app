@@ -1,5 +1,5 @@
 {
-  "name": "@ucp-npm/change-this-adapter",
+  "name": "@ucp-npm/template-adapter",
   "version": "0.0.1-alpha",
   "description": "Finicity Adapter for the Universal Connect Widget",
   "packageManager": "npm@10.8.2",

@@ -8,7 +8,7 @@ jobs:
     uses: ./.github/workflows/setup-env.yml
     secrets: inherit
 
-  e2e-tests-change-this-adapter:
+  e2e-tests-template-adapter:
     runs-on: ubuntu-latest
     needs: [setup-env]
 
@@ -69,7 +69,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           config-file: cypress.config.ts
-          project: packages/change-this-adapter
+          project: packages/template-adapter
           start: npm run dev:e2e
           wait-on: "http://localhost:8080/health, http://localhost:9200"
 
@@ -78,4 +78,4 @@ jobs:
         if: failure()
         with:
           name: cypress-screenshots
-          path: ./packages/change-this-adapter/cypress/screenshots
+          path: ./packages/template-adapter/cypress/screenshots

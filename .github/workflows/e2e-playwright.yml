@@ -4,7 +4,7 @@ on: pull_request
 
 jobs:
   setup-env:
-    name: 'Load ENV Vars'
+    name: "Load ENV Vars"
     uses: ./.github/workflows/setup-env.yml
     secrets: inherit
 
@@ -32,7 +32,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
         ports:
-          - '${{vars.REDIS_PORT}}:${{vars.REDIS_PORT}}'
+          - "${{vars.REDIS_PORT}}:${{vars.REDIS_PORT}}"
 
     steps:
       - uses: actions/checkout@v4
@@ -44,7 +44,7 @@ jobs:
 
       - run: npm run copyAltTestPreferences
 
-      - name: 'Create env file'
+      - name: "Create env file"
         run: |
           ENV_FILE_PATH=./apps/server/.env
           touch ${ENV_FILE_PATH}

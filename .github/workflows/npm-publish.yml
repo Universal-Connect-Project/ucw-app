@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # NOTE: Change this to the directory where your package lives
-      PACKAGE_DIR: "packages/change-this-adapter"
+      PACKAGE_DIR: "packages/template-adapter"
 
     steps:
       - name: "Check out the repo"
@@ -36,5 +36,5 @@ jobs:
       - name: "Publish to NPM"
         uses: JS-DevTools/npm-publish@v3
         with:
-          package: "./packages/change-this-adapter/package.json"
+          package: "./packages/template-adapter/package.json"
           token: ${{ secrets.NPM_TOKEN }}

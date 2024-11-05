@@ -33,7 +33,7 @@
     "@types/crypto-js": "^4.2.2",
     "@types/express": "^4.17.21",
     "@types/uuid": "^9.0.8",
-    "@ucp-npm/change-this-adapter": "*",
+    "@ucp-npm/template-adapter": "*",
     "assert-browserify": "^2.0.0",
     "axios": "^1.6.8",
     "buffer-browserify": "^0.2.5",

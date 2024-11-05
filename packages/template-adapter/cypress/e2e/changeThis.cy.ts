@@ -16,7 +16,7 @@
 //   expectConnectionSuccess()
 // }
 
-describe("changeThis aggregator", () => {
+describe("template aggregator", () => {
   // generateVcDataTests({makeAConnection})
   // it('refreshes an mx connection if given the correct parameters and hides the back button', () => {
   //   refreshAConnection({
