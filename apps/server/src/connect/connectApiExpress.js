@@ -69,29 +69,20 @@ export default function (app) {
   });
 
   app.post(ApiEndpoints.MEMBERS, async (req, res) => {
-    // res.send(require('./stubs/member.js'))
-    // return;
     const ret = await req.connectApi.addMember(req.body);
     res.send(ret);
   });
   app.put(`${ApiEndpoints.MEMBERS}/:member_guid`, async (req, res) => {
-    // res.send(require('./stubs/member.js'))
-    // return;
     const ret = await req.connectApi.updateMember(req.body);
     res.send(ret);
   });
   app.get(`${ApiEndpoints.MEMBERS}/:member_guid`, async (req, res) => {
-    // res.send(require('./stubs/member.js'))
-    // return;
     const ret = await req.connectApi.loadMemberByGuid(req.params.member_guid);
     res.send(ret);
-    // res.sendFile(__dirname + '/stubs/member.json')
   });
   app.get(
     `${ApiEndpoints.MEMBERS}/:member_guid/credentials`,
     async (req, res) => {
-      // res.send(require('./stubs/member_credentials.js'))
-      // return;
       const ret = await req.connectApi.getMemberCredentials(
         req.params.member_guid,
       );
@@ -105,13 +96,10 @@ export default function (app) {
         req.params.member_guid,
       );
       res.send({ oauth_window_uri: ret });
-      // res.sendFile(__dirname + '/stubs/member.json')
     },
   );
   app.delete(`${ApiEndpoints.MEMBERS}/:member_guid`, async (req, res) => {
     res.sendFile(path.join(__dirname, "/stubs/member.json"));
-    // let ret = await req.connectApi.deleteMember(req.params.member_guid)
-    // res.send(ret)
   });
   app.get(
     `${ApiEndpoints.INSTITUTIONS}/:institution_guid/credentials`,
