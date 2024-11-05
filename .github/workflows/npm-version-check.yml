@@ -8,9 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # NOTE: Change this to the directory where your package lives
-      PACKAGE_DIR: "packages/finicity-adapter"
+      PACKAGE_DIR: "packages/change-this-adapter"
       # NOTE: Change this to the name of your package on NPMJS.com
-      NPM_PACKAGE_NAME: "@ucp-npm/finicity-adapter"
+      NPM_PACKAGE_NAME: "@ucp-npm/change-this-adapter"
 
     steps:
       - name: "Check out the repo"

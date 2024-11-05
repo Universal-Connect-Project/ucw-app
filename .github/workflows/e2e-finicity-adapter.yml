@@ -1,4 +1,4 @@
-name: E2E Tests (Finicity Adapter)
+name: E2E Tests (Change This Adapter)
 
 on: pull_request
 
@@ -8,7 +8,7 @@ jobs:
     uses: ./.github/workflows/setup-env.yml
     secrets: inherit
 
-  e2e-tests-finicity-adapter:
+  e2e-tests-change-this-adapter:
     runs-on: ubuntu-latest
     needs: [setup-env]
 
@@ -69,7 +69,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           config-file: cypress.config.ts
-          project: packages/finicity-adapter
+          project: packages/change-this-adapter
           start: npm run dev:e2e
           wait-on: "http://localhost:8080/health, http://localhost:9200"
 
@@ -78,4 +78,4 @@ jobs:
         if: failure()
         with:
           name: cypress-screenshots
-          path: ./packages/finicity-adapter/cypress/screenshots
+          path: ./packages/change-this-adapter/cypress/screenshots

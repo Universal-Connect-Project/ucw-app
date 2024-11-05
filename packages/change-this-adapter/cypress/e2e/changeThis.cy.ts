@@ -16,7 +16,7 @@
 //   expectConnectionSuccess()
 // }
 
-describe("finicity aggregator", () => {
+describe("changeThis aggregator", () => {
   // generateVcDataTests({makeAConnection})
   // it('refreshes an mx connection if given the correct parameters and hides the back button', () => {
   //   refreshAConnection({
