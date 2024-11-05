@@ -1,10 +1,8 @@
 import type { Response } from "express";
 import { getAggregatorAdapter } from "../adapterIndex";
-// import { http, HttpResponse } from "msw";
 import type { Aggregator } from "../shared/contract";
 import { Aggregators } from "../shared/contract";
 import { listUsersData } from "../test/testData/users";
-// import { server } from "../test/testServer";
 import { invalidAggregatorString } from "../utils/validators";
 import type { UserDeleteRequest } from "./userEndpoints";
 import { userDeleteHandler } from "./userEndpoints";
