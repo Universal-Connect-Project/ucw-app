@@ -70,7 +70,7 @@ jobs:
         with:
           config-file: cypress.config.ts
           project: packages/finicity-adapter
-          start: npm run dev:e2e
+          start: npm run dev:e2e --workspace=packages/finicity-adapter && npm run dev:e2e --workspace=apps/server && npm run dev:e2e --workspace=apps/ui
           wait-on: "http://localhost:8080/health, http://localhost:9200"
 
       - name: Upload screenshots
