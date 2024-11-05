@@ -1,5 +1,5 @@
 import { defineConfig } from "cypress";
-import baseCypressConfig from "./cypress.config.base.js";
+import baseCypressConfig from "./cypress.config.base.ts";
 
 export default defineConfig({
   ...baseCypressConfig,
