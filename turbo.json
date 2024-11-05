@@ -19,6 +19,7 @@
     },
     "dev:e2e": {
       "cache": false,
+      "dependsOn": ["^build"],
       "persistent": true
     },
     "dev:debug": {
