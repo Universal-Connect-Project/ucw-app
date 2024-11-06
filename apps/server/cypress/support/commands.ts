@@ -1,4 +1,4 @@
-import '@testing-library/cypress/add-commands'
+import "@testing-library/cypress/add-commands";
 
 // ***********************************************
 // This example commands.ts shows you how to
@@ -28,38 +28,10 @@ import '@testing-library/cypress/add-commands'
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 //
 
-Cypress.Commands.add('visitAgg', () => {
-  const userId = crypto.randomUUID()
-
-  cy.visit(`/?job_type=aggregate&user_id=${userId}`)
-
-  return cy.wrap(userId)
-})
-
-Cypress.Commands.add('visitIdentity', () => {
-  const userId = crypto.randomUUID()
-
-  cy.visit(`/?job_type=identity&user_id=${userId}`)
-
-  return cy.wrap(userId)
-})
-
-Cypress.Commands.add('visitWithPostMessageSpy', (url: string) => {
-  cy.visit(url, {
-    onBeforeLoad(window) {
-      cy.spy(window.parent, 'postMessage').as('postMessage')
-    }
-  })
-})
-
-export {}
+export {};
 
 declare global {
   namespace Cypress {
-    interface Chainable {
-      visitAgg: () => Chainable<string>
-      visitIdentity: () => Chainable<string>
-      visitWithPostMessageSpy: (url: string) => Chainable<string>
-    }
+    interface Chainable {}
   }
 }
