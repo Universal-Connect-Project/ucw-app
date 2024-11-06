@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: "Check for package dir"
-        if: ${{ env.PACKAGE_DIR == '' }}
+        if: ${{ vars.PACKAGE_DIR == '' }}
         run: |
           echo Missing required env variable
           exit 1
@@ -30,14 +30,14 @@ jobs:
       - name: "Dependencies and tests"
         run: |
           npm ci
-          npm run build --workspace ${{ env.PACKAGE_DIR }}
+          npm run build --workspace ${{ vars.PACKAGE_DIR }}
 
           # Remove test files/folders so they aren't published to NPM
-          find ./${{ env.PACKAGE_DIR }}/dist -name "*.test.*" -delete
-          find ./${{ env.PACKAGE_DIR }}/dist -name "test" -type d  | xargs rm -rf;
+          find ./${{ vars.PACKAGE_DIR }}/dist -name "*.test.*" -delete
+          find ./${{ vars.PACKAGE_DIR }}/dist -name "test" -type d  | xargs rm -rf;
 
       - name: "Publish to NPM"
         uses: JS-DevTools/npm-publish@v3
         with:
-          package: "./${{ env.PACKAGE_DIR }}/package.json"
+          package: "./${{ vars.PACKAGE_DIR }}/package.json"
           token: ${{ secrets.NPM_TOKEN }}

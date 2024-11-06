@@ -19,27 +19,27 @@ jobs:
           check-latest: true
 
       - name: "Check for package name"
-        if: ${{ env.NPM_PACKAGE_NAME == '' }}
+        if: ${{ vars.NPM_PACKAGE_NAME == '' }}
         run: |
           echo Missing required env variable
           exit 1
 
       - name: "Check for package dir"
-        if: ${{ env.PACKAGE_DIR == '' }}
+        if: ${{ vars.PACKAGE_DIR == '' }}
         run: |
           echo Missing required env variable
           exit 1
 
       - name: "Check if version is published"
         run: |
-          cd ./${{ env.PACKAGE_DIR }}
+          cd ./${{ vars.PACKAGE_DIR }}
 
           VERSION_FOUND=false
 
           PACKAGE_VERSION=$(npm pkg get version --workspaces=false | tr -d \")
           echo "VERSION=$PACKAGE_VERSION" >> $GITHUB_ENV
 
-          NPM_VERSIONS=$(npm view ${{ env.NPM_PACKAGE_NAME }} versions || exit 0)
+          NPM_VERSIONS=$(npm view ${{ vars.NPM_PACKAGE_NAME }} versions || exit 0)
           COMPARE=$PACKAGE_VERSION
 
           # Convert JSON array to string
