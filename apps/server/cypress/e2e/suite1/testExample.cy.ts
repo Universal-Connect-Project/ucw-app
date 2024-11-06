@@ -1,5 +1,9 @@
 import { JobTypes } from "@repo/utils";
-import generateVcDataTests from "../../shared/utils/generateVcDataTests";
+import {
+  clickContinue,
+  expectConnectionSuccess,
+  generateVcDataTests,
+} from "@repo/utils-dev-dependency";
 import {
   enterTestExampleACredentials,
   enterTestExampleBCredentials,
@@ -7,10 +11,6 @@ import {
   searchAndSelectTestExampleB,
   selectTestExampleAAccount,
 } from "../../shared/utils/testExample";
-import {
-  clickContinue,
-  expectConnectionSuccess,
-} from "../../shared/utils/widget";
 
 const makeAnAConnection = async (jobType) => {
   searchAndSelectTestExampleA();

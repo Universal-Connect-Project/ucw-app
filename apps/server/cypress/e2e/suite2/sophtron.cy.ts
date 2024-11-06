@@ -1,16 +1,16 @@
 import { JobTypes } from "@repo/utils";
-import generateVcDataTests from "../../shared/utils/generateVcDataTests";
-import { refreshAConnection } from "../../shared/utils/refresh";
+import { generateVcDataTests, visitAgg } from "@repo/utils-dev-dependency";
+import {
+  expectConnectionSuccess,
+  clickContinue,
+  searchByText,
+  refreshAConnection,
+} from "@repo/utils-dev-dependency";
 import {
   enterSophtronCredentials,
   searchAndSelectSophtron,
   selectSophtronAccount,
 } from "../../shared/utils/sophtron";
-import {
-  expectConnectionSuccess,
-  clickContinue,
-  searchByText,
-} from "../../shared/utils/widget";
 
 const makeAConnection = async (jobType) => {
   searchAndSelectSophtron();
@@ -33,7 +33,7 @@ describe("Sophtron aggregator", () => {
   });
 
   it("Connects to Sophtron Bank with all MFA options", () => {
-    cy.visitAgg();
+    visitAgg();
     searchByText("Sophtron Bank");
     cy.findByLabelText("Add account with Sophtron Bank").first().click();
     cy.findByLabelText("User ID").type("asdfg12X");

@@ -1,14 +1,15 @@
 import { JobTypes } from "@repo/utils";
-import { refreshAConnection } from "../../shared/utils/refresh";
+import {
+  clickContinue,
+  expectConnectionSuccess,
+  refreshAConnection,
+  visitWithPostMessageSpy,
+} from "@repo/utils-dev-dependency";
 import {
   enterTestExampleACredentials,
   searchAndSelectTestExampleA,
   selectTestExampleAAccount,
 } from "../../shared/utils/testExample";
-import {
-  clickContinue,
-  expectConnectionSuccess,
-} from "../../shared/utils/widget";
 
 const TEST_EXAMPLE_A_INSTITUTION_ID = "5e498f60-3496-4299-96ed-f8eb328ae8af";
 
@@ -16,7 +17,7 @@ describe("query parameters", () => {
   it("skips straight to the institution if an institution_id is provided in the query parameters, hides the back button, and completes the connection", () => {
     const userId = Cypress.env("userId");
 
-    cy.visitWithPostMessageSpy(
+    visitWithPostMessageSpy(
       `/?job_type=aggregate&institution_id=${TEST_EXAMPLE_A_INSTITUTION_ID}&user_id=${userId}`,
     ).then(() => {
       enterTestExampleACredentials();
