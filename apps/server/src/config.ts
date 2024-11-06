@@ -1,10 +1,12 @@
 const processEnv = {};
 const envs = {
   ...process.env,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ...(process as Record<string, any>).client_envs,
 };
 
 Object.keys(envs).forEach((k) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (processEnv as Record<string, any>)[k.toUpperCase()] = envs[k];
 });
 
@@ -66,10 +68,12 @@ const keysToPullFromEnv = [
   "INSTITUTION_CACHE_LIST_URL",
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const config: Record<string, any> = keysToPullFromEnv.reduce(
   (acc, envKey) => {
     return {
       ...acc,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       [envKey]: (processEnv as Record<string, any>)[envKey.toUpperCase()],
     };
   },

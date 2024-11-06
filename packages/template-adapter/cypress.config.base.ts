@@ -3,7 +3,7 @@ const baseCypressConfig = {
     retries: 2,
     defaultCommandTimeout: 15000,
     baseUrl: "http://localhost:8080",
-    setupNodeEvents() {
+    setupNodeEvents(on, config) {
       // implement node event listeners here
     },
   },
