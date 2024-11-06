@@ -13,7 +13,9 @@ jobs:
     steps:
       - name: "Check for package dir"
         if: ${{ env.PACKAGE_DIR == '' }}
-        run: exit 1
+        run: |
+          echo Missing required env variable
+          exit 1
 
       - name: "Check out the repo"
         uses: actions/checkout@v4

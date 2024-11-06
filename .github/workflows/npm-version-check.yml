@@ -20,11 +20,15 @@ jobs:
 
       - name: "Check for package name"
         if: ${{ env.NPM_PACKAGE_NAME == '' }}
-        run: exit 1
+        run: |
+          echo Missing required env variable
+          exit 1
 
       - name: "Check for package dir"
         if: ${{ env.PACKAGE_DIR == '' }}
-        run: exit 1
+        run: |
+          echo Missing required env variable
+          exit 1
 
       - name: "Check if version is published"
         run: |
