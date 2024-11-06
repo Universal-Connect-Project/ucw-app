@@ -6,11 +6,6 @@ jobs:
   push_to_registry:
     name: "NPM Version Check"
     runs-on: ubuntu-latest
-    env:
-      # NOTE: Change this to the directory where your package lives
-      PACKAGE_DIR: "packages/template-adapter"
-      # NOTE: Change this to the name of your package on NPMJS.com
-      NPM_PACKAGE_NAME: "@ucp-npm/template-adapter"
 
     steps:
       - name: "Check out the repo"
@@ -22,6 +17,14 @@ jobs:
           registry-url: "https://registry.npmjs.org"
           node-version: "lts/*"
           check-latest: true
+
+      - name: "Check for package name"
+        if: ${{ env.NPM_PACKAGE_NAME == '' }}
+        run: exit 1
+
+      - name: "Check for package dir"
+        if: ${{ env.PACKAGE_DIR == '' }}
+        run: exit 1
 
       - name: "Check if version is published"
         run: |

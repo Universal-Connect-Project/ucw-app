@@ -9,11 +9,12 @@ jobs:
   push_to_registry:
     name: "Setup, and publish"
     runs-on: ubuntu-latest
-    env:
-      # NOTE: Change this to the directory where your package lives
-      PACKAGE_DIR: "packages/template-adapter"
 
     steps:
+      - name: "Check for package dir"
+        if: ${{ env.PACKAGE_DIR == '' }}
+        run: exit 1
+
       - name: "Check out the repo"
         uses: actions/checkout@v4
 
@@ -36,5 +37,5 @@ jobs:
       - name: "Publish to NPM"
         uses: JS-DevTools/npm-publish@v3
         with:
-          package: "./packages/template-adapter/package.json"
+          package: "./${{ env.PACKAGE_DIR }}/package.json"
           token: ${{ secrets.NPM_TOKEN }}
