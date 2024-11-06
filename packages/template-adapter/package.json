@@ -1,7 +1,7 @@
 {
   "name": "@ucp-npm/template-adapter",
   "version": "0.0.1-alpha",
-  "description": "Finicity Adapter for the Universal Connect Widget",
+  "description": "Template Adapter for the Universal Connect Widget",
   "packageManager": "npm@10.8.2",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",

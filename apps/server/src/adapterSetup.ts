@@ -4,9 +4,9 @@ import { SophtronAdapter } from "./adapters/sophtron";
 
 import { mxIntGetVC, mxProdGetVC } from "./services/vcAggregators/mxVc";
 import getSophtronVc from "./services/vcAggregators/sophtronVc";
-import { gettemplateAdapterMapObject } from "@ucp-npm/template-adapter";
+import { getTemplateAdapterMapObject } from "@ucp-npm/template-adapter";
 
-const templateAdapterMapObject = gettemplateAdapterMapObject();
+const templateAdapterMapObject = getTemplateAdapterMapObject();
 
 const mxAdapterMapObject = {
   mx: {
