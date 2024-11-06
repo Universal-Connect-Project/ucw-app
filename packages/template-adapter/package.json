@@ -39,13 +39,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Universal-Connect-Project/ucw-adapter-finicity.git"
+    "url": "git+https://github.com/Universal-Connect-Project/ucw-adapter-template.git"
   },
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/Universal-Connect-Project/ucw-adapter-finicity/issues"
+    "url": "https://github.com/Universal-Connect-Project/ucw-adapter-template/issues"
   },
-  "homepage": "https://github.com/Universal-Connect-Project/ucw-adapter-finicity#readme",
+  "homepage": "https://github.com/Universal-Connect-Project/ucw-adapter-template#readme",
   "dependencies": {
     "@types/jest": "^29.5.13",
     "@types/node": "^22.7.6"
