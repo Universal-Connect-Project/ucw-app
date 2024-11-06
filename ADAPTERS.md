@@ -22,7 +22,7 @@ The only adapter packages in this repo should be the test adapters. In order to 
 In our opinion the easiest way to create an adapter package is as follows:
 
 1. Fork the [adapter template repository](https://github.com/Universal-Connect-Project/ucw-adapter-template)
-1. Duplicate the [adapter-template](https://github.com/Universal-Connect-Project/ucw-adapter-template/tree/main/packages/template-adapter) folder for your adapter
+1. Duplicate the [adapter-template](https://github.com/Universal-Connect-Project/ucw-adapter-template/tree/main/packages/template-adapter) folder for your adapter into the packages folder
 1. Rename all the adapter-template strings in your duplicated folder to your adapter name
 1. Add a test institution to the [default institution list](./apps/server/cachedDefaults/ucwInstitutionsMapping.json) with aggregator support defined for your institution (See [below](#test-institutions))
 1. Build your adapter
