@@ -185,4 +185,5 @@ export interface WidgetAdapter {
     single_account_select?: boolean,
     userId?: string,
   ) => Promise<Connection | undefined>;
+  RouteHandlers?: Record<string, (req: any, res: any) => Promise<void>>;
 }
