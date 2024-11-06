@@ -1,5 +1,4 @@
 import { searchByText, visitAgg } from "@repo/utils-dev-dependency";
-import {} from "@repo/utils-dev-dependency";
 
 // These tests expect local preferences to match testPreferences.json
 describe("preferences", () => {
