@@ -26,7 +26,7 @@ export const testExampleCredentials = {
 
 export const testExampleJobResponse = {
   job: {
-    guid: "testGuid1",
+    guid: "testAggregatorMemberGuid",
     job_type: WidgetJobTypes.AGGREGATION,
   },
 };
