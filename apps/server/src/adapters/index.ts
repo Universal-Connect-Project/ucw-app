@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/naming-convention */
+// eslint-disable @typescript-eslint/naming-convention
+import { aggregators } from "../adapterSetup";
 import { getAggregatorAdapter } from "../adapterIndex";
 import * as logger from "../infra/logger";
-import aggregatorCredentials from "../aggregatorCredentials";
 import { AnalyticsClient } from "../services/analyticsClient";
 import { resolveInstitutionAggregator } from "../services/institutionResolver";
 import { set } from "../services/storageClient/redis";
@@ -66,11 +66,7 @@ export class AggregatorAdapterBase {
           this.context?.aggregator as Aggregator,
         );
       }
-      this.aggregators = Object.values(aggregatorCredentials)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .filter((v: any) => v.available)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .map((v: any) => v.aggregator);
+      this.aggregators = aggregators;
       return true;
     } catch (err) {
       logger.error("Error parsing auth token", err);

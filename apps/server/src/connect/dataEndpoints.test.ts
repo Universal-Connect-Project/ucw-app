@@ -22,7 +22,6 @@ import { invalidAggregatorString } from "../utils/validators";
 /* eslint-disable @typescript-eslint/unbound-method */
 
 describe("dataEndpoints", () => {
-
   beforeEach(() => {
     jest.restoreAllMocks();
   });

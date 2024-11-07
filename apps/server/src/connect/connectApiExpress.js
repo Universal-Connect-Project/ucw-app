@@ -18,8 +18,7 @@ import {
 import { userDeleteHandler } from "./userEndpoints";
 import { MappedJobTypes } from "../shared/contract";
 import stubs from "./instrumentations.js";
-
-const AGGREGATION_JOB_TYPE = 0;
+import { jobsRouteHandler } from "./jobEndpoints";
 
 const disableAnalytics = true;
 
@@ -113,21 +112,7 @@ export default function (app) {
     getInstitutionHandler,
   );
   app.get(ApiEndpoints.INSTITUTIONS, getInstitutionsHandler);
-  app.get(`${ApiEndpoints.JOBS}/:member_guid`, async (req, res) => {
-    if (
-      Object.hasOwn(req.context.aggregator, "jobRequestHandler") &&
-      typeof req.context.aggregator.jobRequestHandler === "function"
-    ) {
-      await req.context.aggregator.jobRequestHandler(req, res);
-    } else {
-      res.send({
-        job: {
-          guid: req.params.member_guid,
-          job_type: AGGREGATION_JOB_TYPE,
-        },
-      });
-    }
-  });
+  app.get(`${ApiEndpoints.JOBS}/:member_guid`, jobsRouteHandler);
 
   app.get("/oauth_states", async (req, res) => {
     const ret = await req.connectApi.getOauthStates(

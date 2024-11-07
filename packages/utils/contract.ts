@@ -1,6 +1,9 @@
 // Do not remove seemingly unused exports here unless you
 // check all forked Adapter repositories
 // Example: JobTypes is used in the MX Adapter fork
+
+export const AGGREGATION_JOB_TYPE = 0;
+
 export enum VCDataTypes {
   ACCOUNTS = "accounts",
   IDENTITY = "identity",
@@ -18,10 +21,6 @@ export enum JobTypes {
 export type AdapterMap = {
   vcAdapter: Function;
   widgetAdapter: WidgetAdapter;
-  oauthResponseHandler?: Function;
-  requestHandlers?: {
-    jobRequestHandler?: (req: any, res: any) => Promise<void>;
-  };
 };
 
 export interface Credential {

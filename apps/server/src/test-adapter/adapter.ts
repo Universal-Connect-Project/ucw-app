@@ -9,7 +9,11 @@ import type {
 import { ConnectionStatus } from "@repo/utils";
 import { get, set } from "../services/storageClient/redis";
 import { MappedJobTypes } from "../shared/contract";
-import { testExampleCredentials, testExampleInstitution } from "./constants";
+import {
+  testExampleCredentials,
+  testExampleInstitution,
+  testExampleJobResponse,
+} from "./constants";
 
 const createRedisStatusKey = ({
   aggregator,
@@ -22,6 +26,12 @@ const createRedisStatusKey = ({
 export class TestAdapter implements WidgetAdapter {
   labelText: string;
   aggregator: string;
+
+  RouteHandlers = {
+    jobRequestHandler: async (_req: any, res: any) => {
+      res.send(testExampleJobResponse);
+    },
+  };
 
   constructor({
     labelText,
