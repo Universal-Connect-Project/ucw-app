@@ -5,7 +5,7 @@
 Each aggregator that wants to participate in the UCP needs to create their own adapter package. This allows the UCW to interact with the aggregator.
 
 > [!NOTE]  
-> This repository only contains test adapters to allow the UCP to have test paths for aggregator adapters. Real aggregator adapters should be created in a fork of this repository. See [the MX Adapter Package Fork](https://github.com/Universal-Connect-Project/ucw-adapter-mx) for an example of how an adapter package can be created.
+> This repository only contains test adapters to allow the UCP to have test paths for aggregator adapters. Real aggregator adapters should be created in a fork of the [adapter template repository](https://github.com/Universal-Connect-Project/ucw-adapter-template). See [the MX Adapter Package Fork](https://github.com/Universal-Connect-Project/ucw-adapter-mx) is an example of an adapter built from the template.
 
 ## Hosting your own UCW
 
