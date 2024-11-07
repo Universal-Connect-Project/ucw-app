@@ -22,13 +22,13 @@ The only adapter packages in this repo should be the test adapters. In order to 
 In our opinion the easiest way to create an adapter package is as follows:
 
 1. Fork the [adapter template repository](https://github.com/Universal-Connect-Project/ucw-adapter-template)
-1. Duplicate the [adapter-template](https://github.com/Universal-Connect-Project/ucw-adapter-template/tree/main/packages/template-adapter) folder for your adapter into the packages folder
+1. Duplicate the [adapter-template folder](https://github.com/Universal-Connect-Project/ucw-adapter-template/tree/main/packages/template-adapter) for your adapter into the packages folder
 1. Rename all the adapter-template strings in your duplicated folder to your adapter name
 1. Add a test institution to the [default institution list](./apps/server/cachedDefaults/ucwInstitutionsMapping.json) with aggregator support defined for your institution (See [below](#test-institutions))
 1. Build your adapter
 1. Import your adapter in [adapterSetup.ts](./apps/server/src/adapterSetup.ts) on your adapter fork
 1. Write unit, integration, and e2e tests
-1. Bundle and publish your adapter to npm
+1. Bundle and publish your adapter to npm (There are workflows setup to do this in the template adapter)
 1. When your adapter package is ready for production use, then you'll need to gain access to the UCP institution list to update the list of institutions you support (This functionality is in progress by the UCP team)
 
 An example adapter lives [here](./apps/server/src/test-adapter/index.ts). Each adapter needs to export an adapterMapObject. These adapterMapObjects are imported and setup by someone hosting the UCW in [adapterSetup.ts](./apps/server/src/adapterSetup.ts). If the test adapterMapObject doesn't support a property you need to use for your adapter, then you'll need to add it to the test example adapter to ensure it continues to get support.
