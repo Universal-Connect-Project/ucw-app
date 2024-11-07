@@ -18,8 +18,6 @@ describe("jobEndpoints", () => {
       context,
     });
     await connect.init();
-
-    jest.restoreAllMocks();
   });
 
   describe("jobsRouteHandler", () => {
