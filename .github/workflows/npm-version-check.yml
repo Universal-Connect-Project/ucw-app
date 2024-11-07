@@ -18,66 +18,28 @@ jobs:
           node-version: "lts/*"
           check-latest: true
 
-      - name: "Check for package name"
-        if: ${{ vars.NPM_PACKAGE_NAME == '' }}
-        run: |
-          echo Missing required environment variable
-          exit 1
-
       - name: "Check for package dir"
         if: ${{ vars.PACKAGE_DIR == '' }}
         run: |
-          echo Missing required environment variable
+          echo "Missing required environment variable PACKAGE_DIR."
           exit 1
 
       - name: "Check if version is published"
         run: |
           cd ./${{ vars.PACKAGE_DIR }}
 
-          VERSION_FOUND=false
-
           PACKAGE_VERSION=$(npm pkg get version --workspaces=false | tr -d \")
-          echo "VERSION=$PACKAGE_VERSION" >> $GITHUB_ENV
+          PACKAGE_NAME=$(npm pkg get name --workspaces=false | tr -d \")
 
-          NPM_VERSIONS=$(npm view ${{ vars.NPM_PACKAGE_NAME }} versions || exit 0)
-          COMPARE=$PACKAGE_VERSION
+          # Run npm view and capture the exit code (success or failure)
+          npm view "$PACKAGE_NAME@$PACKAGE_VERSION" --json > result.json 2>&1 || true
 
-          # Convert JSON array to string
-          VERSIONS=$(echo "$NPM_VERSIONS" | tr -d '\n' | tr -d ' ' | tr -d '"')
-
-          # Check if COMPARE is present in JSON array
-          if [[ $VERSIONS == *"$COMPARE"* ]]; then
-            # Check if the COMPARE is an exact match
-            if [[ $VERSIONS == *"$COMPARE""']"* || $VERSIONS == *"$COMPARE""',"* ]]; then
-              echo "VERSION_FOUND=true" >> $GITHUB_ENV
-              echo "=========================================================================="
-              echo "Version $COMPARE is already published."
-              echo "Please update 'version' in package.json."
-              echo "=========================================================================="
-            else
-              echo "VERSION_FOUND=false" >> $GITHUB_ENV
-              echo "Version $COMPARE not found in NPM"
-            fi
+          # Check the exit code to determine if the version exists
+          if grep -q "404" result.json; then
+            echo "Version $PACKAGE_VERSION does not exist for $PACKAGE_NAME on npmjs.com. 🎉"
+            exit 0
           else
-            echo "VERSION_FOUND=false" >> $GITHUB_ENV
-            echo "Version $COMPARE not found in NPM"
+            echo "Version $PACKAGE_VERSION already exists for $PACKAGE_NAME on npmjs.com. 😬🫠"
+            echo "Please update the 'version' property in /${{ vars.PACKAGE_DIR }}/package.json and try again."
+            exit 1
           fi
-
-      - name: Update Summary if version not found
-        if: env.VERSION_FOUND == 'false'
-        run: |
-          {
-            echo "### Version Check Results"
-            echo "Version check successful. 🚀🎉"
-            echo "Version $VERSION will be published to npmjs.com on merge to main."
-          } >> $GITHUB_STEP_SUMMARY
-
-      - name: Update Summary if version found
-        if: env.VERSION_FOUND == 'true'
-        run: |
-          {
-            echo "### Version Check Results"
-            echo "Version $VERSION already exists on npmjs.com. 😬🫠"
-            echo "Please update the 'version' property in 'package.json' and try again."
-          } >> $GITHUB_STEP_SUMMARY
-          exit 1
