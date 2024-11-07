@@ -5,8 +5,10 @@ import { SophtronAdapter } from "./adapters/sophtron";
 import { mxIntGetVC, mxProdGetVC } from "./services/vcAggregators/mxVc";
 import getSophtronVc from "./services/vcAggregators/sophtronVc";
 import { getTemplateAdapterMapObject } from "@ucp-npm/template-adapter";
+import { getFinicityAdapterMapObject } from "@ucp-npm/finicity-adapter";
 
 const templateAdapterMapObject = getTemplateAdapterMapObject();
+const finicityAdapterMapyObject = getFinicityAdapterMapObject();
 
 const mxAdapterMapObject = {
   mx: {
@@ -29,6 +31,7 @@ const sophtronAdapterMapObject = {
 
 // This is where you add adapters
 export const adapterMap = {
+  ...finicityAdapterMapyObject,
   ...templateAdapterMapObject,
   ...mxAdapterMapObject,
   ...sophtronAdapterMapObject,
