@@ -1,4 +1,4 @@
-import { AGGREGATION_JOB_TYPE } from "@repo/utils";
+import { WidgetJobTypes } from "@repo/utils";
 
 export const TEST_EXAMPLE_A_AGGREGATOR_STRING = "testExampleA";
 export const TEST_EXAMPLE_B_AGGREGATOR_STRING = "testExampleB";
@@ -27,6 +27,6 @@ export const testExampleCredentials = {
 export const testExampleJobResponse = {
   job: {
     guid: "testGuid1",
-    job_type: AGGREGATION_JOB_TYPE,
+    job_type: WidgetJobTypes.AGGREGATION,
   },
 };

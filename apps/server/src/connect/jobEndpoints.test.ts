@@ -1,4 +1,4 @@
-import { AGGREGATION_JOB_TYPE } from "@repo/utils";
+import { WidgetJobTypes } from "@repo/utils";
 import { ConnectApi } from "./connectApi";
 import { JobsRequest, jobsRouteHandler } from "./jobEndpoints";
 import {
@@ -66,7 +66,7 @@ describe("jobEndpoints", () => {
       expect(res.send).toHaveBeenCalledWith({
         job: {
           guid: req.params.member_guid,
-          job_type: AGGREGATION_JOB_TYPE,
+          job_type: WidgetJobTypes.AGGREGATION,
         },
       });
     });

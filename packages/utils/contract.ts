@@ -2,7 +2,19 @@
 // check all forked Adapter repositories
 // Example: JobTypes is used in the MX Adapter fork
 
-export const AGGREGATION_JOB_TYPE = 0;
+export const WidgetJobTypes = {
+  AGGREGATION: 0,
+  VERIFICATION: 1,
+  IDENTIFICATION: 2,
+  HISTORY: 3,
+  STATEMENT: 4,
+  ORDER: 5,
+  REWARD: 6,
+  BALANCE: 7,
+  MICRO_DEPOSIT: 8,
+  TAX: 9,
+  CREDIT_REPORT: 10,
+};
 
 export enum VCDataTypes {
   ACCOUNTS = "accounts",

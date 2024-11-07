@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { AGGREGATION_JOB_TYPE } from "@repo/utils";
+import { WidgetJobTypes } from "@repo/utils";
 import { ConnectApi } from "./connectApi";
 
 export interface JobsRequest extends Request {
@@ -19,7 +19,7 @@ export const jobsRouteHandler = async (req: JobsRequest, res: Response) => {
     res.send({
       job: {
         guid: req.params.member_guid,
-        job_type: AGGREGATION_JOB_TYPE,
+        job_type: WidgetJobTypes.AGGREGATION,
       },
     });
   }
