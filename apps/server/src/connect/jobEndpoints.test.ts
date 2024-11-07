@@ -39,7 +39,7 @@ describe("jobEndpoints", () => {
       expect(res.send).toHaveBeenCalledWith(testExampleJobResponse);
     });
 
-    it("responds with default response, if a custom jobRequestHandler doesn't exists", async () => {
+    it("responds with default response, if a custom jobRequestHandler doesn't exist", async () => {
       const connect = new ConnectApi({
         context: {
           aggregator: "junk",
