@@ -2,13 +2,11 @@ import type { Member, MemberResponse } from "interfaces/contract";
 import * as logger from "../infra/logger";
 import type {
   CachedInstitution,
-  Challenge,
-  Connection,
-  Institution,
   InstitutionSearchResponseItem,
   MappedJobTypes,
 } from "../shared/contract";
-import { ChallengeType, ConnectionStatus } from "../shared/contract";
+import type { Challenge, Connection, Institution } from "@repo/utils";
+import { ChallengeType, ConnectionStatus } from "@repo/utils";
 
 import { AggregatorAdapterBase } from "../adapters";
 import {

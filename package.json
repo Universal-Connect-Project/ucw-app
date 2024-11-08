@@ -12,13 +12,11 @@
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "playwright": "playwright test --ui",
     "pre-commit": "lint-staged",
     "prepare": "husky",
     "clean": "npx rimraf {apps,packages}/**/{node_modules,dist,.turbo} -g && npx rimraf node_modules"
   },
   "devDependencies": {
-    "@playwright/test": "^1.47.2",
     "husky": "^9.1.6",
     "lint-staged": "^15.2.10",
     "prettier": "^3.3.3",

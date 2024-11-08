@@ -1,6 +1,21 @@
 // Do not remove seemingly unused exports here unless you
 // check all forked Adapter repositories
 // Example: JobTypes is used in the MX Adapter fork
+
+export enum WidgetJobTypes {
+  AGGREGATION = 0,
+  VERIFICATION = 1,
+  IDENTIFICATION = 2,
+  HISTORY = 3,
+  STATEMENT = 4,
+  ORDER = 5,
+  REWARD = 6,
+  BALANCE = 7,
+  MICRO_DEPOSIT = 8,
+  TAX = 9,
+  CREDIT_REPORT = 10,
+}
+
 export enum VCDataTypes {
   ACCOUNTS = "accounts",
   IDENTITY = "identity",
@@ -18,10 +33,6 @@ export enum JobTypes {
 export type AdapterMap = {
   vcAdapter: Function;
   widgetAdapter: WidgetAdapter;
-  oauthResponseHandler?: Function;
-  requestHandlers?: {
-    jobRequestHandler?: (req: any, res: any) => Promise<void>;
-  };
 };
 
 export interface Credential {
@@ -185,4 +196,5 @@ export interface WidgetAdapter {
     single_account_select?: boolean,
     userId?: string,
   ) => Promise<Connection | undefined>;
+  RouteHandlers?: Record<string, (req: any, res: any) => Promise<void>>;
 }

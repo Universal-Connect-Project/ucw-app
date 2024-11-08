@@ -16,7 +16,7 @@
     "target": "esnext",
     "types": ["node", "jest"]
   },
-  "include": ["src/**/*", "playwright/**/*", "jest.config.js"],
+  "include": ["src/**/*", "jest.config.js"],
   "exclude": [
     "dist",
     "node_modules",
