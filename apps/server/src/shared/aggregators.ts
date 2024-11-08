@@ -1,45 +1,45 @@
-import { JobTypeSupports, MappedJobTypes } from './contract'
+import { JobTypeSupports, MappedJobTypes } from "./contract";
 
 import type {
   CachedInstitution,
   InstitutionAggregator,
-  Aggregator
-} from './contract'
+  Aggregator,
+} from "./contract";
 
 type JobMappingType = {
   [key in MappedJobTypes]: JobTypeSupports[];
-}
+};
 
 export const JOB_TYPE_PARTIAL_SUPPORT_MAP: JobMappingType = {
   [MappedJobTypes.AGGREGATE]: [JobTypeSupports.AGGREGATE],
   [MappedJobTypes.ALL]: [
     JobTypeSupports.AGGREGATE,
     JobTypeSupports.VERIFICATION,
-    JobTypeSupports.IDENTIFICATION
+    JobTypeSupports.IDENTIFICATION,
   ],
   [MappedJobTypes.FULLHISTORY]: [JobTypeSupports.AGGREGATE], // same filter as aggregate, because we fall back to aggregate if there is no fullhistory
   [MappedJobTypes.VERIFICATION]: [JobTypeSupports.VERIFICATION],
-  [MappedJobTypes.IDENTITY]: [JobTypeSupports.IDENTIFICATION]
-}
+  [MappedJobTypes.IDENTITY]: [JobTypeSupports.IDENTIFICATION],
+};
 
 export const JOB_TYPE_FULL_SUPPORT_MAP: JobMappingType = {
   ...JOB_TYPE_PARTIAL_SUPPORT_MAP,
   [MappedJobTypes.FULLHISTORY]: [
     JobTypeSupports.AGGREGATE,
-    JobTypeSupports.FULLHISTORY
-  ]
-}
+    JobTypeSupports.FULLHISTORY,
+  ],
+};
 
 export function getAvailableAggregators({
   institution,
   jobType,
   supportedAggregators,
-  shouldRequireFullSupport
+  shouldRequireFullSupport,
 }: {
-  institution: CachedInstitution
-  jobType: MappedJobTypes
-  supportedAggregators?: Aggregator[]
-  shouldRequireFullSupport: boolean
+  institution: CachedInstitution;
+  jobType: MappedJobTypes;
+  supportedAggregators?: Aggregator[];
+  shouldRequireFullSupport: boolean;
 }): Aggregator[] {
   return supportedAggregators?.filter(
     (aggregator) =>
@@ -49,19 +49,19 @@ export function getAvailableAggregators({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         institutionAttributes: (institution as any)[aggregator],
         jobType,
-        shouldRequireFullSupport
-      })
-  )
+        shouldRequireFullSupport,
+      }),
+  );
 }
 
 function aggregatorSupportsJobType({
   institutionAttributes,
   jobType,
-  shouldRequireFullSupport
+  shouldRequireFullSupport,
 }: {
-  institutionAttributes: InstitutionAggregator | undefined
-  jobType: MappedJobTypes
-  shouldRequireFullSupport: boolean
+  institutionAttributes: InstitutionAggregator | undefined;
+  jobType: MappedJobTypes;
+  shouldRequireFullSupport: boolean;
 }): boolean {
   return (
     shouldRequireFullSupport
@@ -72,6 +72,6 @@ function aggregatorSupportsJobType({
       acc &&
       institutionAttributes?.[supportsProp as keyof InstitutionAggregator] ===
         true
-    )
-  }, true)
+    );
+  }, true);
 }

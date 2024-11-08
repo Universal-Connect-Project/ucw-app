@@ -1,13 +1,16 @@
-import { TestAdapter } from './adapter'
+import { TestAdapter } from "./adapter";
 import {
   TEST_EXAMPLE_A_AGGREGATOR_STRING,
   TEST_EXAMPLE_A_LABEL_TEXT,
   TEST_EXAMPLE_B_AGGREGATOR_STRING,
   TEST_EXAMPLE_B_LABEL_TEXT,
   TEST_EXAMPLE_C_LABEL_TEXT,
-  TEST_EXAMPLE_C_AGGREGATOR_STRING
-} from './constants'
-import { getVC } from './vc'
+  TEST_EXAMPLE_C_AGGREGATOR_STRING,
+  testExampleJobResponse,
+  testAggregatorMemberGuid,
+  testExampleInstitution,
+} from "./constants";
+import { getVC } from "./vc";
 
 export const adapterMapObject = {
   [TEST_EXAMPLE_A_AGGREGATOR_STRING]: {
@@ -15,26 +18,26 @@ export const adapterMapObject = {
     vcAdapter: getVC,
     widgetAdapter: new TestAdapter({
       labelText: TEST_EXAMPLE_A_LABEL_TEXT,
-      aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING
-    })
+      aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+    }),
   },
   [TEST_EXAMPLE_B_AGGREGATOR_STRING]: {
     vcAdapter: getVC,
     widgetAdapter: new TestAdapter({
       labelText: TEST_EXAMPLE_B_LABEL_TEXT,
-      aggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING
-    })
+      aggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING,
+    }),
   },
   [TEST_EXAMPLE_C_AGGREGATOR_STRING]: {
     vcAdapter: getVC,
     widgetAdapter: new TestAdapter({
       labelText: TEST_EXAMPLE_C_LABEL_TEXT,
-      aggregator: TEST_EXAMPLE_C_AGGREGATOR_STRING
-    })
-  }
-}
+      aggregator: TEST_EXAMPLE_C_AGGREGATOR_STRING,
+    }),
+  },
+};
 
-export { TestAdapter }
+export { TestAdapter };
 
 export {
   TEST_EXAMPLE_A_LABEL_TEXT,
@@ -42,5 +45,8 @@ export {
   TEST_EXAMPLE_C_LABEL_TEXT,
   TEST_EXAMPLE_A_AGGREGATOR_STRING,
   TEST_EXAMPLE_B_AGGREGATOR_STRING,
-  TEST_EXAMPLE_C_AGGREGATOR_STRING
-}
+  TEST_EXAMPLE_C_AGGREGATOR_STRING,
+  testExampleJobResponse,
+  testAggregatorMemberGuid,
+  testExampleInstitution,
+};
