@@ -72,7 +72,7 @@ services:
     restart: on-failure
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      start_period: 5s
+      start_period: 30s
       interval: 20s
       timeout: 5s
       retries: 3
