@@ -1,6 +1,6 @@
 {
   "name": "@ucp-npm/finicity-adapter",
-  "version": "0.0.1-alpha",
+  "version": "0.0.2-alpha",
   "description": "Finicity Adapter for the Universal Connect Widget",
   "packageManager": "npm@10.8.2",
   "main": "dist/cjs/index.js",

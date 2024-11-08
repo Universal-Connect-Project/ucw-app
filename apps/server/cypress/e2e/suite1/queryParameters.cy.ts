@@ -1,4 +1,4 @@
-import { JobTypes } from "../../../src/shared/contract";
+import { JobTypes } from "@repo/utils";
 import {
   clickContinue,
   expectConnectionSuccess,

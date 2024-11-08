@@ -97,7 +97,7 @@ describe("TestAdapter", () => {
   });
 
   describe("verification flow", () => {
-    it("doesnt return a challenge if the job type isnt verification", async () => {
+    it("doesn't return a challenge if the job type isn't verification", async () => {
       const userId = "testUserId";
 
       const successStatus = {
@@ -117,7 +117,7 @@ describe("TestAdapter", () => {
       ).toEqual(successStatus);
     });
 
-    it("returns success if it hasnt been verified once, returns success if the job type is verification, it has been verified once, and single_account_select is false, returns a challenge if the job type if verification and it has been verified once and single_account_select is true. returns success after a second verification", async () => {
+    it("returns success if it hasn't been verified once, returns success if the job type is verification, it has been verified once, and single_account_select is false, returns a challenge if the job type if verification and it has been verified once and single_account_select is true. returns success after a second verification", async () => {
       const userId = "testUserId";
 
       const successStatus = {
@@ -181,6 +181,23 @@ describe("TestAdapter", () => {
       expect(
         await testAdapter.GetConnectionStatus("test", "test", true, userId),
       ).toEqual(successStatus);
+    });
+  });
+
+  describe("DeleteConnection", () => {
+    it("responds with a ", async () => {
+      expect(
+        await testAdapter.DeleteConnection("testId", "testUserId"),
+      ).toEqual(undefined);
+    });
+  });
+
+  describe("DeleteUser", () => {
+    it("responds with 204 on success", async () => {
+      expect(await testAdapter.DeleteUser("testUserId")).toEqual({
+        status: 204,
+        data: "",
+      });
     });
   });
 
