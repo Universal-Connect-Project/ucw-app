@@ -1,121 +1,116 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import { getAggregatorAdapter } from '../adapterIndex'
-import * as logger from '../infra/logger'
-import aggregatorCredentials from '../aggregatorCredentials'
-import { AnalyticsClient } from '../services/analyticsClient'
-import { resolveInstitutionAggregator } from '../services/institutionResolver'
-import { set } from '../services/storageClient/redis'
+// eslint-disable @typescript-eslint/naming-convention
+import { aggregators } from "../adapterSetup";
+import { getAggregatorAdapter } from "../adapterIndex";
+import * as logger from "../infra/logger";
+import { AnalyticsClient } from "../services/analyticsClient";
+import { resolveInstitutionAggregator } from "../services/institutionResolver";
+import { set } from "../services/storageClient/redis";
+import type { Context, MappedJobTypes, Aggregator } from "../shared/contract";
 import type {
   Challenge,
   Connection,
-  Context,
   CreateConnectionRequest,
   Credential,
   Institution,
-  MappedJobTypes,
-  Aggregator,
   UpdateConnectionRequest,
-  WidgetAdapter
-} from '../shared/contract'
-import { ConnectionStatus, OAuthStatus } from '../shared/contract'
-import { decodeAuthToken, mapJobType } from '../utils'
+  WidgetAdapter,
+} from "@repo/utils";
+
+import { ConnectionStatus, OAuthStatus } from "../shared/contract";
+import { decodeAuthToken, mapJobType } from "../utils";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function instrumentation(context: Context, input: any) {
-  const { user_id } = input
-  context.user_id = user_id
+  const { user_id } = input;
+  context.user_id = user_id;
 
   if (!user_id) {
-    return false
+    return false;
   }
 
   if (Boolean(input.current_member_guid) && Boolean(input.current_aggregator)) {
-    context.aggregator = input.current_aggregator
-    context.connection_id = input.current_member_guid
+    context.aggregator = input.current_aggregator;
+    context.connection_id = input.current_member_guid;
   }
   if (input.auth != null) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    context.auth = decodeAuthToken(input.auth) as any
+    context.auth = decodeAuthToken(input.auth) as any;
   }
-  context.partner = input.current_partner
-  context.job_type = mapJobType(input.job_type)
-  context.scheme = input.scheme ?? 'vcs'
-  context.oauth_referral_source = input.oauth_referral_source ?? 'BROWSER'
-  context.single_account_select = input.single_account_select
-  context.updated = true
-  return true
+  context.partner = input.current_partner;
+  context.job_type = mapJobType(input.job_type);
+  context.scheme = input.scheme ?? "vcs";
+  context.oauth_referral_source = input.oauth_referral_source ?? "BROWSER";
+  context.single_account_select = input.single_account_select;
+  context.updated = true;
+  return true;
 }
 
 export class AggregatorAdapterBase {
-  context: Context
-  aggregatorAdapter: WidgetAdapter
-  analyticsClient: AnalyticsClient
-  aggregators: string[]
+  context: Context;
+  aggregatorAdapter: WidgetAdapter;
+  analyticsClient: AnalyticsClient;
+  aggregators: string[];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(req: any) {
-    this.context = req.context
+    this.context = req.context;
   }
 
   async init() {
-    const token = 'fakeTokenThatWeNeedToRemove'
+    const token = "fakeTokenThatWeNeedToRemove";
 
-    this.analyticsClient = new AnalyticsClient(token)
+    this.analyticsClient = new AnalyticsClient(token);
     try {
       if (this.context?.aggregator) {
         this.aggregatorAdapter = getAggregatorAdapter(
-          this.context?.aggregator as Aggregator
-        )
+          this.context?.aggregator as Aggregator,
+        );
       }
-      this.aggregators = Object.values(aggregatorCredentials)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .filter((v: any) => v.available)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .map((v: any) => v.aggregator)
-      return true
+      this.aggregators = aggregators;
+      return true;
     } catch (err) {
-      logger.error('Error parsing auth token', err)
+      logger.error("Error parsing auth token", err);
     }
 
-    return false
+    return false;
   }
 
   async resolveInstitution(id: string): Promise<Institution> {
     const resolvedInstitution = await resolveInstitutionAggregator(
       id,
-      this.context.job_type as MappedJobTypes
-    )
-    this.context.aggregator = resolvedInstitution.aggregator
-    this.context.updated = true
-    this.context.institution_id = resolvedInstitution.id
-    this.context.resolved_user_id = null
-    await this.init()
-    return resolvedInstitution
+      this.context.job_type as MappedJobTypes,
+    );
+    this.context.aggregator = resolvedInstitution.aggregator;
+    this.context.updated = true;
+    this.context.institution_id = resolvedInstitution.id;
+    this.context.resolved_user_id = null;
+    await this.init();
+    return resolvedInstitution;
   }
 
   async getAggregatorInstitution(ucpId: string): Promise<Institution> {
-    const resolved = await this.resolveInstitution(ucpId)
-    const inst = await this.aggregatorAdapter.GetInstitutionById(resolved.id)
+    const resolved = await this.resolveInstitution(ucpId);
+    const inst = await this.aggregatorAdapter.GetInstitutionById(resolved.id);
     if (inst != null) {
-      inst.name = resolved.name ?? inst.name
-      inst.url = resolved?.url ?? inst.url?.trim()
-      inst.logo_url = resolved?.logo_url ?? inst.logo_url?.trim()
+      inst.name = resolved.name ?? inst.name;
+      inst.url = resolved?.url ?? inst.url?.trim();
+      inst.logo_url = resolved?.logo_url ?? inst.logo_url?.trim();
     }
-    return inst
+    return inst;
   }
 
   async getInstitutionCredentials(guid: string): Promise<Credential[]> {
-    this.context.updated = true
-    this.context.current_job_id = null
+    this.context.updated = true;
+    this.context.current_job_id = null;
     // let id = await this.resolveInstitution(guid)
-    return await this.aggregatorAdapter.ListInstitutionCredentials(guid)
+    return await this.aggregatorAdapter.ListInstitutionCredentials(guid);
   }
 
   async getConnection(connection_id: string): Promise<Connection> {
     return await this.aggregatorAdapter.GetConnectionById(
       connection_id,
-      this.getUserId()
-    )
+      this.getUserId(),
+    );
   }
 
   async getConnectionStatus(connection_id: string): Promise<Connection> {
@@ -123,68 +118,70 @@ export class AggregatorAdapterBase {
       connection_id,
       this.context.current_job_id,
       this.context.single_account_select,
-      this.getUserId()
-    )
+      this.getUserId(),
+    );
   }
 
   async createConnection(
-    connection: CreateConnectionRequest
+    connection: CreateConnectionRequest,
   ): Promise<Connection> {
-    this.context.updated = true
-    this.context.current_job_id = null
+    this.context.updated = true;
+    this.context.current_job_id = null;
     const ret = await this.aggregatorAdapter.CreateConnection(
       connection,
-      this.getUserId()
-    )
-    this.context.current_job_id = ret.cur_job_id
+      this.getUserId(),
+    );
+    this.context.current_job_id = ret.cur_job_id;
     if (ret?.id != null) {
       await set(`context_${ret.id}`, {
         oauth_referral_source: this.context.oauth_referral_source,
-        scheme: this.context.scheme
-      })
+        scheme: this.context.scheme,
+      });
     }
-    return ret
+    return ret;
   }
 
   async updateConnection(
-    connection: UpdateConnectionRequest
+    connection: UpdateConnectionRequest,
   ): Promise<Connection> {
     const ret = await this.aggregatorAdapter.UpdateConnection(
       connection,
-      this.getUserId()
-    )
-    this.context.updated = true
-    this.context.current_job_id = ret.cur_job_id
+      this.getUserId(),
+    );
+    this.context.updated = true;
+    this.context.current_job_id = ret.cur_job_id;
     if (ret?.id != null) {
       await set(`context_${ret.id}`, {
         oauth_referral_source: this.context.oauth_referral_source,
-        scheme: this.context.scheme
-      })
+        scheme: this.context.scheme,
+      });
     }
-    return ret
+    return ret;
   }
 
   async answerChallenge(connection_id: string, challenges: Challenge[]) {
     return await this.aggregatorAdapter.AnswerChallenge(
       {
         id: connection_id ?? this.context.connection_id,
-        challenges
+        challenges,
       },
       this.context.current_job_id,
-      this.getUserId()
-    )
+      this.getUserId(),
+    );
   }
 
   async getOauthWindowUri(memberGuid: string) {
-    const ret = await this.getConnection(memberGuid)
-    return ret?.oauth_window_uri
+    const ret = await this.getConnection(memberGuid);
+    return ret?.oauth_window_uri;
   }
 
   async getOauthState(connection_id: string) {
-    const connection = await this.getConnectionStatus(connection_id)
+    const connection = await this.getConnectionStatus(connection_id);
+
     if (connection == null) {
-      return {}
+      return {};
     }
+
     const ret = {
       guid: connection_id,
       inbound_member_guid: connection_id,
@@ -194,48 +191,52 @@ export class AggregatorAdapterBase {
           ? OAuthStatus.PENDING
           : connection.status === ConnectionStatus.CONNECTED
             ? OAuthStatus.COMPLETE
-            : OAuthStatus.ERROR
+            : OAuthStatus.ERROR,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any
+    } as any;
+
     if (ret.auth_status === OAuthStatus.ERROR) {
-      ret.error_reason = connection.status
+      ret.error_reason = connection.status;
     }
-    return { oauth_state: ret }
+    return { oauth_state: ret };
   }
 
   async getOauthStates(memberGuid: string) {
-    const state = await this.getOauthState(memberGuid)
+    const state = await this.getOauthState(memberGuid);
     return {
-      oauth_states: [state.oauth_state]
-    }
+      oauth_states: [state.oauth_state],
+    };
   }
 
   async deleteConnection(connection_id: string): Promise<void> {
-    await this.aggregatorAdapter.DeleteConnection(connection_id, this.getUserId())
+    await this.aggregatorAdapter.DeleteConnection(
+      connection_id,
+      this.getUserId(),
+    );
   }
 
   async getConnectionCredentials(memberGuid: string): Promise<Credential[]> {
-    this.context.updated = true
-    this.context.current_job_id = null
+    this.context.updated = true;
+    this.context.current_job_id = null;
     return await this.aggregatorAdapter.ListConnectionCredentials(
       memberGuid,
-      this.getUserId()
-    )
+      this.getUserId(),
+    );
   }
 
   async ResolveUserId(id: string, failIfNotFound: boolean = false) {
-    return await this.aggregatorAdapter?.ResolveUserId(id, failIfNotFound)
+    return await this.aggregatorAdapter?.ResolveUserId(id, failIfNotFound);
   }
 
   getUserId(): string {
-    return this.context.resolved_user_id
+    return this.context.resolved_user_id;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async analytics(path: string, content: any) {
     return await this.analyticsClient?.analytics(
-      path.replaceAll('/', ''),
-      content
-    )
+      path.replaceAll("/", ""),
+      content,
+    );
   }
 }
