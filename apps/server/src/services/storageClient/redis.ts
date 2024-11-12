@@ -57,6 +57,14 @@ export const set = async (
   }
 };
 
+export const del = async (key: string) => {
+  try {
+    await redisClient.del(key);
+  } catch {
+    error("Failed to delete value in Redis");
+  }
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const setNoExpiration = async (key: string, value: any) => {
   await set(key, value, {});
