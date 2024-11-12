@@ -11,14 +11,6 @@ import { del, get, set } from "./services/storageClient/redis";
 
 const tokenCookieName = "authorizationToken";
 
-const requireAuth = () =>
-  auth({
-    audience: config.AUTHENTICATION_AUDIENCE,
-    issuerBaseURL: config.AUTHENTICATION_ISSUER_BASE_URL,
-    tokenSigningAlg: config.AUTHENTICATION_TOKEN_SIGNING_ALG,
-  });
-const requireScopes = () => requiredScopes(config.AUTHENTICATION_SCOPES);
-
 const getTokenHandler = async (req: Request, res: Response) => {
   const authorizationHeaderToken = req.headers.authorization?.split(
     " ",
@@ -86,11 +78,17 @@ const useAuthentication = (app: Express) => {
     config.AUTHENTICATION_ISSUER_BASE_URL &&
     config.AUTHENTICATION_TOKEN_SIGNING_ALG
   ) {
-    app.use(requireAuth());
+    app.use(
+      auth({
+        audience: config.AUTHENTICATION_AUDIENCE,
+        issuerBaseURL: config.AUTHENTICATION_ISSUER_BASE_URL,
+        tokenSigningAlg: config.AUTHENTICATION_TOKEN_SIGNING_ALG,
+      }),
+    );
   }
 
   if (config.AUTHENTICATION_SCOPES) {
-    app.use(requireScopes());
+    app.use(requiredScopes(config.AUTHENTICATION_SCOPES));
   }
 
   app.get("/token", getTokenHandler as RequestHandler);
