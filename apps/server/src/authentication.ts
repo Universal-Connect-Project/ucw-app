@@ -48,6 +48,7 @@ const tokenAuthenticationMiddleware = async (
 
     res.cookie(tokenCookieName, authorizationToken, {
       httpOnly: true,
+      sameSite: "strict",
       secure: true,
     });
   }
@@ -91,7 +92,7 @@ const useAuthentication = (app: Express) => {
     app.use(requiredScopes(config.AUTHENTICATION_SCOPES));
   }
 
-  app.get("/token", getTokenHandler as RequestHandler);
+  app.get("/api/token", getTokenHandler as RequestHandler);
 };
 
 export default useAuthentication;
