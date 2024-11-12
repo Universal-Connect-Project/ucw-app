@@ -1,14 +1,15 @@
 import { auth, requiredScopes } from "express-oauth2-jwt-bearer";
 import config from "./config";
-import {
-  type Request,
-  type RequestHandler,
-  type Response,
-  Router,
-  type Express,
-  type NextFunction,
+import type {
+  Request,
+  RequestHandler,
+  Response,
+  Express,
+  NextFunction,
 } from "express";
 import { del, get, set } from "./services/storageClient/redis";
+
+const tokenCookieName = "authorizationToken";
 
 const requireAuth = () =>
   auth({
@@ -52,6 +53,25 @@ const tokenAuthenticationMiddleware = async (
     del(token);
 
     req.headers.authorization = `Bearer ${authorizationToken}`;
+
+    res.cookie(tokenCookieName, authorizationToken, {
+      httpOnly: true,
+      secure: true,
+    });
+  }
+
+  next();
+};
+
+const cookieAuthenticationMiddleware = async (
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+) => {
+  const cookieAuthorizationToken = req.cookies[tokenCookieName];
+
+  if (cookieAuthorizationToken && !req.headers.authorization) {
+    req.headers.authorization = `Bearer ${cookieAuthorizationToken}`;
   }
 
   next();
@@ -59,6 +79,7 @@ const tokenAuthenticationMiddleware = async (
 
 const useAuthentication = (app: Express) => {
   app.use(tokenAuthenticationMiddleware);
+  app.use(cookieAuthenticationMiddleware);
 
   if (
     config.AUTHENTICATION_AUDIENCE &&

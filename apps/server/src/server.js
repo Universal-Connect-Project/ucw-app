@@ -1,4 +1,5 @@
 import ngrok from "@ngrok/ngrok";
+import cookieParser from "cookie-parser";
 import "dotenv/config";
 import express from "express";
 import "express-async-errors";
@@ -28,6 +29,8 @@ const limiter = RateLimit({
   max: 5000, // max average 500 requests per windowMs
 });
 app.use(limiter);
+
+app.use(cookieParser());
 
 initializeElastic()
   .then(() => {

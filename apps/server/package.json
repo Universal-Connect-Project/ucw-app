@@ -38,6 +38,7 @@
     "assert-browserify": "^2.0.0",
     "axios": "^1.6.8",
     "buffer-browserify": "^0.2.5",
+    "cookie-parser": "^1.4.7",
     "crypto-browserify": "^3.12.0",
     "crypto-js": "^4.2.0",
     "dotenv": "^16.3.1",
