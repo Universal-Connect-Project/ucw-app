@@ -11,7 +11,7 @@ import { error as _error, info } from "./infra/logger";
 import { initialize as initializeElastic } from "./services/ElasticSearchClient";
 import { setInstitutionSyncSchedule } from "./services/institutionSyncer";
 import { widgetHandler } from "./widgetEndpoint";
-import { auth, requiredScopes } from "express-oauth2-jwt-bearer";
+import useAuthentication from "./authentication";
 
 process.on("unhandledRejection", (error) => {
   _error(`unhandledRejection: ${error.message}`, error);
@@ -56,25 +56,10 @@ app.get("/health", function (req, res) {
   }
 });
 
-const authenticationEnabled = config.AUTHENTICATION_ENABLE === "true";
+const isAuthenticationEnabled = config.AUTHENTICATION_ENABLE === "true";
 
-if (
-  authenticationEnabled &&
-  config.AUTHENTICATION_AUDIENCE &&
-  config.AUTHENTICATION_ISSUER_BASE_URL &&
-  config.AUTHENTICATION_TOKEN_SIGNING_ALG
-) {
-  app.use(
-    auth({
-      audience: config.AUTHENTICATION_AUDIENCE,
-      issuerBaseURL: config.AUTHENTICATION_ISSUER_BASE_URL,
-      tokenSigningAlg: config.AUTHENTICATION_TOKEN_SIGNING_ALG,
-    }),
-  );
-}
-
-if (authenticationEnabled && config.AUTHENTICATION_SCOPES) {
-  app.use(requiredScopes(config.AUTHENTICATION_SCOPES));
+if (isAuthenticationEnabled) {
+  useAuthentication(app);
 }
 
 useConnect(app);

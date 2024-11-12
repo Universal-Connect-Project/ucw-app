@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Server",
+  "baseUrl": "src",
+  "compilerOptions": {
+    "allowJs": true,
+    "declaration": true,
+    "esModuleInterop": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "resolveJsonModule": true,
+    "outDir": "dist",
+    "strictNullChecks": false, // TODO: change this to true and fix all errors
+    "target": "esnext",
+    "types": ["node", "jest"]
+  },
+  "include": [],
+  "exclude": ["node_modules", "packages", "apps"]
+}
