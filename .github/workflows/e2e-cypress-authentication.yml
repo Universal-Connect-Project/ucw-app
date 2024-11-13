@@ -60,10 +60,9 @@ jobs:
           # Vars
           echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
           echo RESOURCEVERSION="" >> ${ENV_FILE_PATH}
+          echo AUTHENTICATION_ENABLE=true >> ${ENV_FILE_PATH}
 
           # Secrets (can't load these from another job, due to GH security features)
-
-          AUTHENTICATION_ENABLE=true
 
           cat ${ENV_FILE_PATH}
 
