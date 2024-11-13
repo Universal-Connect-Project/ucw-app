@@ -9,7 +9,7 @@ import type {
 } from "express";
 import { del, get, set } from "./services/storageClient/redis";
 
-const tokenCookieName = "authorizationToken";
+export const tokenCookieName = "authorizationToken";
 
 export const getTokenHandler = async (req: Request, res: Response) => {
   const authorizationHeaderToken = req.headers.authorization?.split(
@@ -25,28 +25,28 @@ export const getTokenHandler = async (req: Request, res: Response) => {
   });
 };
 
-const tokenAuthenticationMiddleware = async (
+export const tokenAuthenticationMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   const token = req.query?.token as string;
 
-  if (token && !req.headers.authorization) {
-    const authorizationToken = await get(token);
+  if (token) {
+    const authorizationJWT = await get(token);
 
-    if (!authorizationToken) {
-      res.send("token expired");
+    if (!authorizationJWT) {
+      res.send("token invalid or expired");
       res.status(401);
 
       return;
     }
 
-    del(token);
+    await del(token);
 
-    req.headers.authorization = `Bearer ${authorizationToken}`;
+    req.headers.authorization = `Bearer ${authorizationJWT}`;
 
-    res.cookie(tokenCookieName, authorizationToken, {
+    res.cookie(tokenCookieName, authorizationJWT, {
       httpOnly: true,
       sameSite: "strict",
       secure: true,
