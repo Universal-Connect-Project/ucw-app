@@ -299,6 +299,17 @@
     },
     "/api/token": {
       "get": {
+        "parameters": [
+          {
+            "description": "The id assigned to the user",
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "description": "Get a token to pass into the widget endpoint for authentication. This endpoint only exists if you configure the widget to use the built in authentication.",
         "responses": {
           "200": {
@@ -315,8 +326,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized",
-            "example": "Unauthorized"
+            "description": "Unauthorized"
           }
         },
         "summary": "Widget token"

@@ -1,4 +1,5 @@
 import { auth, requiredScopes } from "express-oauth2-jwt-bearer";
+import he from "he";
 import { getConfig } from "./config";
 import type {
   Request,
@@ -8,17 +9,33 @@ import type {
   NextFunction,
 } from "express";
 import { del, get, set } from "./services/storageClient/redis";
+import Joi from "joi";
 
 export const tokenCookieName = "authorizationToken";
 
 export const getTokenHandler = async (req: Request, res: Response) => {
+  const schema = Joi.object({
+    userId: Joi.string().required(),
+  });
+
+  const { error } = schema.validate(req.query);
+
+  if (error) {
+    res.status(400);
+    res.send(he.encode(error.details[0].message));
+
+    return;
+  }
+
   const authorizationHeaderToken = req.headers.authorization?.split(
     " ",
   )?.[1] as string;
 
   const uuid = crypto.randomUUID();
 
-  await set(uuid, authorizationHeaderToken, { EX: 60 * 5 });
+  const redisKey = `${req.query.userId}-${uuid}`;
+
+  await set(redisKey, authorizationHeaderToken, { EX: 60 * 5 });
 
   res.json({
     token: uuid,
@@ -31,9 +48,12 @@ export const tokenAuthenticationMiddleware = async (
   next: NextFunction,
 ) => {
   const token = req.query?.token as string;
+  const userId = req.query?.user_id as string;
+
+  const redisKey = `${userId}-${token}`;
 
   if (token) {
-    const authorizationJWT = await get(token);
+    const authorizationJWT = await get(redisKey);
 
     if (!authorizationJWT) {
       res.send("token invalid or expired");
@@ -42,7 +62,7 @@ export const tokenAuthenticationMiddleware = async (
       return;
     }
 
-    await del(token);
+    await del(redisKey);
 
     req.headers.authorization = `Bearer ${authorizationJWT}`;
 
