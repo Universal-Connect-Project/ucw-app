@@ -63,18 +63,20 @@ jobs:
 
           # Secrets (can't load these from another job, due to GH security features)
 
+          AUTHENTICATION_ENABLE=true
+
           cat ${ENV_FILE_PATH}
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CYPRESS_auth_username: ${{ secrets.AUTH_USERNAME }}
-          CYPRESS_auth_password: ${{ secrets.AUTH_PASSWORD }}
-          CYPRESS_auth_audience: ${{ vars.AUTH_AUDIENCE }}
-          CYPRESS_auth_scope: ${{ vars.AUTH_SCOPE }}
-          CYPRESS_auth_client_id: ${{ vars.AUTH_CLIENT_ID }}
-          CYPRESS_auth_domain: ${{ vars.AUTH_DOMAIN }}
+          CYPRESS_auth_username: ${{ secrets.AUTHENTICATION_USERNAME }}
+          CYPRESS_auth_password: ${{ secrets.AUTHENTICATION_PASSWORD }}
+          CYPRESS_auth_audience: ${{ vars.AUTHENTICATION_AUDIENCE }}
+          CYPRESS_auth_scope: ${{ vars.AUTHENTICATION_SCOPES }}
+          CYPRESS_auth_client_id: ${{ vars.AUTHENTICATION_CLIENT_ID }}
+          CYPRESS_auth_domain: ${{ vars.AUTHENTICATION_DOMAIN }}
 
         with:
           config-file: cypress.config.authentication.ts
