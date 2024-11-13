@@ -84,4 +84,6 @@ const config: Record<string, any> = keysToPullFromEnv.reduce(
   },
 );
 
+export const getConfig = () => config;
+
 export default config;

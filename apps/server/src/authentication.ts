@@ -1,5 +1,5 @@
 import { auth, requiredScopes } from "express-oauth2-jwt-bearer";
-import config from "./config";
+import { getConfig } from "./config";
 import type {
   Request,
   RequestHandler,
@@ -71,6 +71,8 @@ export const cookieAuthenticationMiddleware = (
 };
 
 const useAuthentication = (app: Express) => {
+  const config = getConfig();
+
   app.use(tokenAuthenticationMiddleware);
   app.use(cookieAuthenticationMiddleware);
 

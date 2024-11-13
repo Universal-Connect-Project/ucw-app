@@ -1,12 +1,17 @@
 import type { Request, Response } from "express";
 import { get as mockGet, set as mockSet } from "./__mocks__/redis";
-import {
+import useAuthentication, {
   cookieAuthenticationMiddleware,
   getTokenHandler,
   tokenAuthenticationMiddleware,
   tokenCookieName,
 } from "./authentication";
 import { get, set } from "./services/storageClient/redis";
+import type { Express } from "express";
+
+import * as config from "./config";
+
+jest.mock("./config");
 
 describe("authentication", () => {
   describe("getTokenHandler", () => {
@@ -166,6 +171,39 @@ describe("authentication", () => {
 
       expect(req.headers.authorization).toEqual("test");
       expect(next).toHaveBeenCalled();
+    });
+  });
+
+  describe("useAuthentication", () => {
+    it("calls app.use with all the middleware if it has all the config variables necessary", () => {
+      const app = {
+        get: jest.fn(),
+        use: jest.fn(),
+      } as unknown as Express;
+
+      jest.spyOn(config, "getConfig").mockReturnValue({
+        AUTHENTICATION_AUDIENCE: "test",
+        AUTHENTICATION_ISSUER_BASE_URL: "test",
+        AUTHENTICATION_TOKEN_SIGNING_ALG: "RS256",
+        AUTHENTICATION_SCOPES: "test",
+      });
+
+      useAuthentication(app);
+
+      expect(app.use).toHaveBeenCalledTimes(4);
+    });
+
+    it("calls app.use with 2 of the middleware if there are missing variables", () => {
+      const app = {
+        get: jest.fn(),
+        use: jest.fn(),
+      } as unknown as Express;
+
+      jest.spyOn(config, "getConfig").mockReturnValue({});
+
+      useAuthentication(app);
+
+      expect(app.use).toHaveBeenCalledTimes(2);
     });
   });
 });
