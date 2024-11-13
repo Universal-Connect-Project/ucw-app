@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { get as mockGet, set as mockSet } from "./__mocks__/redis";
 import {
+  cookieAuthenticationMiddleware,
   getTokenHandler,
   tokenAuthenticationMiddleware,
   tokenCookieName,
@@ -108,6 +109,62 @@ describe("authentication", () => {
 
       expect(req.headers.authorization).toBeUndefined();
       expect(res.cookie).not.toHaveBeenCalled();
+      expect(next).toHaveBeenCalled();
+    });
+  });
+
+  describe("cookieAuthenticationMiddleware", () => {
+    it("puts the authorization token from the cookie into the headers", () => {
+      const cookieToken = "testCookieToken";
+
+      const req = {
+        cookies: {
+          [tokenCookieName]: cookieToken,
+        },
+        headers: {},
+      } as unknown as Request;
+      const res = {} as Response;
+      const next = jest.fn();
+
+      cookieAuthenticationMiddleware(req, res, next);
+
+      expect(req.headers.authorization).toEqual(`Bearer ${cookieToken}`);
+      expect(next).toHaveBeenCalled();
+    });
+
+    it("doesn't change the authorization if there already is one provided and there's also a cookie", () => {
+      const cookieToken = "testCookieToken";
+
+      const req = {
+        cookies: {
+          [tokenCookieName]: cookieToken,
+        },
+        headers: {
+          authorization: "test",
+        },
+      } as unknown as Request;
+      const res = {} as Response;
+      const next = jest.fn();
+
+      cookieAuthenticationMiddleware(req, res, next);
+
+      expect(req.headers.authorization).toEqual("test");
+      expect(next).toHaveBeenCalled();
+    });
+
+    it("doesn't change the authorization if there's no cookie", () => {
+      const req = {
+        cookies: {},
+        headers: {
+          authorization: "test",
+        },
+      } as unknown as Request;
+      const res = {} as Response;
+      const next = jest.fn();
+
+      cookieAuthenticationMiddleware(req, res, next);
+
+      expect(req.headers.authorization).toEqual("test");
       expect(next).toHaveBeenCalled();
     });
   });

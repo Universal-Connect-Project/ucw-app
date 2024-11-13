@@ -56,7 +56,7 @@ export const tokenAuthenticationMiddleware = async (
   next();
 };
 
-const cookieAuthenticationMiddleware = async (
+export const cookieAuthenticationMiddleware = (
   req: Request,
   _res: Response,
   next: NextFunction,
