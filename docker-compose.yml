@@ -22,7 +22,7 @@ services:
       start_period: 30s
       interval: 10s
       timeout: 5s
-      retries: 8
+      retries: 12
     build:
       context: .
       dockerfile: ./docker-server.Dockerfile
