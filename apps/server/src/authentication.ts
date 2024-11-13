@@ -11,14 +11,14 @@ import { del, get, set } from "./services/storageClient/redis";
 
 const tokenCookieName = "authorizationToken";
 
-const getTokenHandler = async (req: Request, res: Response) => {
+export const getTokenHandler = async (req: Request, res: Response) => {
   const authorizationHeaderToken = req.headers.authorization?.split(
     " ",
   )?.[1] as string;
 
   const uuid = crypto.randomUUID();
 
-  set(uuid, authorizationHeaderToken, { EX: 60 * 5 });
+  await set(uuid, authorizationHeaderToken, { EX: 60 * 5 });
 
   res.json({
     token: uuid,
