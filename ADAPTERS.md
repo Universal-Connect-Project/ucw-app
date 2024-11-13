@@ -21,13 +21,14 @@ The only adapter packages in this repo should be the test adapters. In order to 
 
 In our opinion the easiest way to create an adapter package is as follows:
 
-1. Fork this repository
-1. Create a folder in the [packages](./packages) folder for your adapter
+1. Fork the [adapter template repository](https://github.com/Universal-Connect-Project/ucw-adapter-template)
+1. Duplicate the [adapter-template folder](https://github.com/Universal-Connect-Project/ucw-adapter-template/tree/main/packages/template-adapter) for your adapter into the packages folder
+1. Rename all the adapter-template strings in your duplicated folder to your adapter name
 1. Add a test institution to the [default institution list](./apps/server/cachedDefaults/ucwInstitutionsMapping.json) with aggregator support defined for your institution (See [below](#test-institutions))
 1. Build your adapter
-1. Import your adapter in [adapterSetup.ts](./apps/server/src/adapterSetup.ts) on your forked version of this repo
+1. Import your adapter in [adapterSetup.ts](./apps/server/src/adapterSetup.ts) on your adapter fork
 1. Write unit, integration, and e2e tests
-1. Bundle and publish your adapter to npm
+1. Bundle and publish your adapter to npm (There are workflows setup to do this in the template adapter)
 1. When your adapter package is ready for production use, then you'll need to gain access to the UCP institution list to update the list of institutions you support (This functionality is in progress by the UCP team)
 
 An example adapter lives [here](./apps/server/src/test-adapter/index.ts). Each adapter needs to export an adapterMapObject. These adapterMapObjects are imported and setup by someone hosting the UCW in [adapterSetup.ts](./apps/server/src/adapterSetup.ts). If the test adapterMapObject doesn't support a property you need to use for your adapter, then you'll need to add it to the test example adapter to ensure it continues to get support.
@@ -66,7 +67,7 @@ Here is an example of what a test institution should look like:
 
 For now, you should add this manually to the [ucwInstitutionsMapping.json](./apps/server/cachedDefaults/ucwInstitutionsMapping.json) file. In the future, UCP will have a way to manage and sync your aggregator and aggregator/institution mappings via an online service.
 
-## Monorepo 
+## Monorepo
 
 Because this repo is a monorepo, here are some caveats to consider with regard to adapter creation.
 
@@ -87,6 +88,7 @@ When developing an adapter package, you'll need to install it in your monorepo w
 ```bash
 npm install <your_package_name> --workspace apps/server
 ```
+
 _Package name is the `name` property in your adapter package's `package.json`_
 
 Once you run the above command, change the version of the package to a start with `*`. In the context of npm, this means install the latest version of the package. This is also a convention of Turborepo, and is what is recommended when developing package locally.
@@ -98,9 +100,9 @@ After changing the version to `*`, run `npm i` again to update your lock file.
 Here's an example from the [MX Adapter Package Fork](https://github.com/Universal-Connect-Project/ucw-adapter-mx/blob/main/apps/server/package.json)
 
 ```
-{ 
+{
   ...
-  
+
   "dependencies": {
     "@ucp-npm/mx-adapter": "*"
   }
@@ -110,4 +112,4 @@ Here's an example from the [MX Adapter Package Fork](https://github.com/Universa
 
 In this example, `@ucp-npm/mx-adapter` is installed as a dependency in the `apps/server` workspace, but it will use the local files in the adapter package, which also lives in the monorepo, under the [packages](./packages) folder.
 
-Next, it is important that you build your package, which creates a `dist` folder, which is where the `apps/server` project will actually be able to pull the package from. If you don't do this, your code will not run properly. 
+Next, it is important that you build your package, which creates a `dist` folder, which is where the `apps/server` project will actually be able to pull the package from. If you don't do this, your code will not run properly.

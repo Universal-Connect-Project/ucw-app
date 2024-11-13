@@ -1,4 +1,4 @@
-name: E2E Tests Alternate Preferences
+name: E2E Tests (Server) Alternate Preferences
 
 on: pull_request
 
@@ -24,7 +24,7 @@ jobs:
           xpack.security.enabled: false
 
       redis:
-        image: redis
+        image: redis:7.2-alpine
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 20s
@@ -55,16 +55,15 @@ jobs:
         run: |
           ENV_FILE_PATH=./apps/server/.env
           touch ${ENV_FILE_PATH}
+          
           # Vars
           echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
           echo RESOURCEVERSION="" >> ${ENV_FILE_PATH}
+          
           # Secrets (can't load these from another job, due to GH security features)
           echo SOPHTRONAPIUSERID=${{ secrets.SOPHTRON_API_USER_ID }} >> ${ENV_FILE_PATH}
           echo SOPHTRONAPIUSERSECRET=${{ secrets.SOPHTRON_API_USER_SECRET }} >> ${ENV_FILE_PATH}
-          echo MXCLIENTID=${{ secrets.MX_CLIENT_ID }} >> ${ENV_FILE_PATH}
-          echo MXAPISECRET=${{ secrets.MX_API_SECRET }} >> ${ENV_FILE_PATH}
 
-          cat ${ENV_FILE_PATH}
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:

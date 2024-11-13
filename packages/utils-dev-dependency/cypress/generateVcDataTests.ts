@@ -1,4 +1,5 @@
-import { JobTypes } from "../../../src/shared/contract";
+import { JobTypes } from "@repo/utils";
+import { visitWithPostMessageSpy } from "./visit";
 
 const jobTypes = Object.values(JobTypes);
 
@@ -63,14 +64,14 @@ const verifyTransactions = ({ accountId, aggregator, userId }) => {
   });
 };
 
-const generateVcDataTests = ({ makeAConnection }) =>
+export const generateVcDataTests = ({ makeAConnection }) =>
   jobTypes.map((jobType) =>
     it(`makes a connection with jobType: ${jobType}, gets the accounts, identity, and transaction data from the vc endpoints`, () => {
       let memberGuid: string;
       let aggregator: string;
       const userId = Cypress.env("userId");
 
-      cy.visitWithPostMessageSpy(`/?job_type=${jobType}&user_id=${userId}`)
+      visitWithPostMessageSpy(`/?job_type=${jobType}&user_id=${userId}`)
         .then(() => makeAConnection(jobType))
         .then(() => {
           // Capture postmessages into variables
@@ -105,5 +106,3 @@ const generateVcDataTests = ({ makeAConnection }) =>
         });
     }),
   );
-
-export default generateVcDataTests;
