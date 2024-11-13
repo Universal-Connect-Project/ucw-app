@@ -73,6 +73,10 @@ export const cookieAuthenticationMiddleware = (
 const useAuthentication = (app: Express) => {
   const config = getConfig();
 
+  if (config.AUTHENTICATION_ENABLE !== "true") {
+    return;
+  }
+
   app.use(tokenAuthenticationMiddleware);
   app.use(cookieAuthenticationMiddleware);
 

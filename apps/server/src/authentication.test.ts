@@ -182,6 +182,7 @@ describe("authentication", () => {
       } as unknown as Express;
 
       jest.spyOn(config, "getConfig").mockReturnValue({
+        AUTHENTICATION_ENABLE: "true",
         AUTHENTICATION_AUDIENCE: "test",
         AUTHENTICATION_ISSUER_BASE_URL: "test",
         AUTHENTICATION_TOKEN_SIGNING_ALG: "RS256",
@@ -191,9 +192,26 @@ describe("authentication", () => {
       useAuthentication(app);
 
       expect(app.use).toHaveBeenCalledTimes(4);
+      expect(app.get).toHaveBeenCalledTimes(1);
     });
 
     it("calls app.use with 2 of the middleware if there are missing variables", () => {
+      const app = {
+        get: jest.fn(),
+        use: jest.fn(),
+      } as unknown as Express;
+
+      jest.spyOn(config, "getConfig").mockReturnValue({
+        AUTHENTICATION_ENABLE: "true",
+      });
+
+      useAuthentication(app);
+
+      expect(app.use).toHaveBeenCalledTimes(2);
+      expect(app.get).toHaveBeenCalledTimes(1);
+    });
+
+    it("doesn't add any middleware or endpoints if authentication is not enabled", () => {
       const app = {
         get: jest.fn(),
         use: jest.fn(),
@@ -203,7 +221,8 @@ describe("authentication", () => {
 
       useAuthentication(app);
 
-      expect(app.use).toHaveBeenCalledTimes(2);
+      expect(app.use).toHaveBeenCalledTimes(0);
+      expect(app.get).toHaveBeenCalledTimes(0);
     });
   });
 });

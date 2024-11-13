@@ -59,11 +59,7 @@ app.get("/health", function (req, res) {
   }
 });
 
-const isAuthenticationEnabled = config.AUTHENTICATION_ENABLE === "true";
-
-if (isAuthenticationEnabled) {
-  useAuthentication(app);
-}
+useAuthentication(app);
 
 useConnect(app);
 
