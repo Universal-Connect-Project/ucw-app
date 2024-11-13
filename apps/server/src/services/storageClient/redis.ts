@@ -29,8 +29,10 @@ export const getSet = async (key: string) => {
   }
 };
 
-export const get = async (key: string) => {
-  debug(`Redis get: ${key}, ready: ${redisClient.isReady}`);
+export const get = async (key: string, safeToLog?: string) => {
+  if (safeToLog) {
+    debug(`Redis get: ${key}, ready: ${redisClient.isReady}`);
+  }
 
   try {
     const ret = await redisClient.get(key);
@@ -47,8 +49,11 @@ export const set = async (
   params: object = {
     EX: config.RedisCacheTimeSeconds,
   },
+  safeToLog?: string,
 ) => {
-  debug(`Redis set: ${key}, ready: ${redisClient.isReady}`);
+  if (safeToLog) {
+    debug(`Redis set: ${key}, ready: ${redisClient.isReady}`);
+  }
 
   try {
     await redisClient.set(key, JSON.stringify(value), params);
