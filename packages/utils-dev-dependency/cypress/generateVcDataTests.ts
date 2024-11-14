@@ -16,7 +16,7 @@ const verifyAccountsAndReturnAccountId = ({
   return cy
     .request(
       "GET",
-      `/data/aggregator/${aggregator}/user/${userId}/connection/${memberGuid}/accounts`,
+      `/api/vc/data/aggregator/${aggregator}/user/${userId}/connection/${memberGuid}/accounts`,
     )
     .then((response) => {
       expect(response.status).to.equal(200);
@@ -37,7 +37,7 @@ const verifyAccountsAndReturnAccountId = ({
 const verifyIdentity = ({ aggregator, memberGuid, userId }) => {
   cy.request(
     "GET",
-    `/data/aggregator/${aggregator}/user/${userId}/connection/${memberGuid}/identity`,
+    `/api/vc/data/aggregator/${aggregator}/user/${userId}/connection/${memberGuid}/identity`,
   ).should((response) => {
     expect(response.status).to.equal(200);
     expect(response.body).to.haveOwnProperty("jwt");
@@ -52,7 +52,7 @@ const verifyIdentity = ({ aggregator, memberGuid, userId }) => {
 const verifyTransactions = ({ accountId, aggregator, userId }) => {
   cy.request(
     "GET",
-    `/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions${aggregator === "sophtron" ? "?start_time=2021/1/1&end_time=2024/12/31" : ""}`,
+    `/api/vc/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions${aggregator === "sophtron" ? "?start_time=2021/1/1&end_time=2024/12/31" : ""}`,
   ).should((response) => {
     expect(response.status).to.equal(200);
     expect(response.body).to.haveOwnProperty("jwt");
