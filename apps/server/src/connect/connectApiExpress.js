@@ -188,15 +188,15 @@ export default function (app) {
 
   // VC Data Endpoints
   app.get(
-    "/data/aggregator/:aggregator/user/:userId/connection/:connectionId/accounts",
+    "/api/vc/data/aggregator/:aggregator/user/:userId/connection/:connectionId/accounts",
     accountsDataHandler,
   );
   app.get(
-    "/data/aggregator/:aggregator/user/:userId/connection/:connectionId/identity",
+    "/api/vc/data/aggregator/:aggregator/user/:userId/connection/:connectionId/identity",
     identityDataHandler,
   );
   app.get(
-    "/data/aggregator/:aggregator/user/:userId/account/:accountId/transactions",
+    "/api/vc/data/aggregator/:aggregator/user/:userId/account/:accountId/transactions",
     transactionsDataHandler,
   );
 }
