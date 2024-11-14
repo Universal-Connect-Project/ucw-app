@@ -54,6 +54,7 @@ export const widgetHandler = (req: Request, res: Response) => {
     aggregator: Joi.string().valid(...aggregators),
     single_account_select: Joi.bool(),
     user_id: Joi.string().required(),
+    token: Joi.string(),
   }).and("connection_id", "aggregator");
 
   const { error } = schema.validate(req.query);
