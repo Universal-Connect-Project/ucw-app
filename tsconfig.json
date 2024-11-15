@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "baseUrl": "./src",
     "lib": ["ES5", "ESNext"],
@@ -26,5 +27,7 @@
     "allowArbitraryExtensions": true,
 
     "types": ["node", "jest"]
-  }
+  },
+  "include": [],
+  "exclude": ["node_modules", "packages", "apps"]
 }

@@ -8,7 +8,7 @@ module.exports = {
     jest: true,
   },
   parserOptions: {
-    project: "./tsconfig.json",
+    project: true,
   },
   ignorePatterns: [
     ".eslintrc.cjs",

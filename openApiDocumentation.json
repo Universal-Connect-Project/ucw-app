@@ -77,6 +77,15 @@
               "default": true,
               "type": "boolean"
             }
+          },
+          {
+            "description": "A one time use token from the token endpoint. If you're using the built in authentication logic, then you'll need this to be able to put the widget in an iframe.",
+            "name": "token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "description": "Get the widget html to attach to a browser frame",
@@ -88,7 +97,7 @@
         "summary": "Widget webpage"
       }
     },
-    "/data/aggregator/{aggregator}/user/{user_id}/connection/{connection_id}/accounts": {
+    "/api/vc/data/aggregator/{aggregator}/user/{user_id}/connection/{connection_id}/accounts": {
       "get": {
         "parameters": [
           {
@@ -138,7 +147,7 @@
         "summary": "Accounts data"
       }
     },
-    "/data/aggregator/{aggregator}/user/{user_id}/connection/{connection_id}/identity": {
+    "/api/vc/data/aggregator/{aggregator}/user/{user_id}/connection/{connection_id}/identity": {
       "get": {
         "parameters": [
           {
@@ -188,7 +197,7 @@
         "summary": "Identity data"
       }
     },
-    "/data/aggregator/{aggregator}/user/{user_id}/account/{account_id}/transactions": {
+    "/api/vc/data/aggregator/{aggregator}/user/{user_id}/account/{account_id}/transactions": {
       "get": {
         "parameters": [
           {
@@ -286,6 +295,41 @@
           }
         },
         "summary": "Delete user"
+      }
+    },
+    "/api/token": {
+      "get": {
+        "parameters": [
+          {
+            "description": "The id assigned to the user",
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "description": "Get a token to pass into the widget endpoint for authentication. This endpoint only exists if you configure the widget to use the built in authentication.",
+        "responses": {
+          "200": {
+            "description": "A token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "token": "b3555f3e-ef53-4182-bc6b-a7bc0fa3767d"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "summary": "Widget token"
       }
     }
   }
