@@ -13,10 +13,16 @@ export const visitIdentity = () => {
   return cy.wrap(userId);
 };
 
-export const visitAgg = () => {
-  const userId = crypto.randomUUID();
+export const visitAgg = (options) => {
+  const { failOnStatusCode, token, userId: userIdOverride } = options || {};
 
-  cy.visit(`/?job_type=aggregate&user_id=${userId}`);
+  const userId = userIdOverride || crypto.randomUUID();
+
+  const tokenString = token ? `&token=${token}` : "";
+
+  cy.visit(`/?job_type=aggregate&user_id=${userId}${tokenString}`, {
+    failOnStatusCode,
+  });
 
   return cy.wrap(userId);
 };

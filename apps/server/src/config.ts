@@ -64,6 +64,12 @@ const keysToPullFromEnv = [
   "ELASTIC_SEARCH_URL",
   "INSTITUTION_POLLING_INTERVAL",
   "INSTITUTION_CACHE_LIST_URL",
+
+  "AUTHENTICATION_ENABLE",
+  "AUTHENTICATION_AUDIENCE",
+  "AUTHENTICATION_ISSUER_BASE_URL",
+  "AUTHENTICATION_TOKEN_SIGNING_ALG",
+  "AUTHENTICATION_SCOPES",
 ];
 
 const config: Record<string, any> = keysToPullFromEnv.reduce(
@@ -77,5 +83,7 @@ const config: Record<string, any> = keysToPullFromEnv.reduce(
     ...nonSensitiveSharedConfig,
   },
 );
+
+export const getConfig = () => config;
 
 export default config;
