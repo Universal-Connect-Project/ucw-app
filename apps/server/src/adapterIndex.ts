@@ -1,16 +1,16 @@
-import type { VCDataTypes, WidgetAdapter } from '@repo/utils'
-import { info } from './infra/logger'
-import type { Aggregator } from './adapterSetup'
-import { adapterMap } from './adapterSetup'
+import type { VCDataTypes, WidgetAdapter } from "@repo/utils";
+import { info } from "./infra/logger";
+import type { Aggregator } from "./adapterSetup";
+import { adapterMap } from "./adapterSetup";
 
 export function getAggregatorAdapter(aggregator: Aggregator): WidgetAdapter {
-  const widgetAdapter = adapterMap[aggregator]?.widgetAdapter
+  const widgetAdapter = adapterMap[aggregator]?.widgetAdapter;
 
   if (widgetAdapter) {
-    return widgetAdapter
+    return widgetAdapter;
   }
 
-  throw new Error(`Unsupported aggregator ${aggregator}`)
+  throw new Error(`Unsupported aggregator ${aggregator}`);
 }
 
 export async function getVC({
@@ -20,20 +20,20 @@ export async function getVC({
   aggregator,
   startTime,
   type,
-  userId
+  userId,
 }: {
-  accountId?: string
-  connectionId?: string
-  endTime?: string
-  aggregator: Aggregator
-  startTime?: string
-  type: VCDataTypes
-  userId: string
+  accountId?: string;
+  connectionId?: string;
+  endTime?: string;
+  aggregator: Aggregator;
+  startTime?: string;
+  type: VCDataTypes;
+  userId: string;
 }) {
-  const vcAdapter = adapterMap[aggregator]?.vcAdapter
+  const vcAdapter = adapterMap[aggregator]?.vcAdapter;
 
   if (vcAdapter) {
-    info('Getting vc from aggregator', aggregator)
+    info("Getting vc from aggregator", aggregator);
 
     return vcAdapter({
       accountId,
@@ -41,9 +41,9 @@ export async function getVC({
       endTime,
       startTime,
       type,
-      userId
-    })
+      userId,
+    });
   }
 
-  throw new Error(`Unsupported aggregator ${aggregator}`)
+  throw new Error(`Unsupported aggregator ${aggregator}`);
 }
