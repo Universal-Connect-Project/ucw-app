@@ -1,4 +1,5 @@
 import { getMxAdapterMapObject } from "@ucp-npm/mx-adapter";
+import { AdapterMap } from "@repo/utils";
 
 import config from "./config";
 import { get, set } from "./services/storageClient/redis";
@@ -8,14 +9,14 @@ import { SophtronAdapter } from "./adapters/sophtron";
 import getSophtronVc from "./services/vcAggregators/sophtronVc";
 import { adapterMapObject as testAdapterMapObject } from "./test-adapter";
 
-const sophtronAdapterMapObject = {
+const sophtronAdapterMapObject: Record<string, AdapterMap> = {
   sophtron: {
     vcAdapter: getSophtronVc,
     widgetAdapter: new SophtronAdapter(),
   },
 };
 
-const mxAdapterMapObject = getMxAdapterMapObject({
+const mxAdapterMapObject: Record<string, AdapterMap> = getMxAdapterMapObject({
   cacheClient: {
     set: set,
     get: get,
