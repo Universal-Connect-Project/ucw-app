@@ -219,7 +219,7 @@ describe("dataEndpoints", () => {
         const req: TransactionsRequest = {
           params: {
             accountId: "testAccountId",
-            aggregator: Aggregators.SOPHTRON,
+            aggregator: "sophtron" as Aggregator,
             userId: "testUserId",
           },
           query: {
@@ -249,7 +249,7 @@ describe("dataEndpoints", () => {
         const req: TransactionsRequest = {
           params: {
             accountId: "testAccountId",
-            aggregator: Aggregators.SOPHTRON,
+            aggregator: "sophtron" as Aggregator,
             userId: "testUserId",
           },
           query: {

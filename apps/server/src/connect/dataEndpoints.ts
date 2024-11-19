@@ -98,11 +98,11 @@ export const transactionsDataHandler = withValidateAggregatorInPath(
 
     const schema = Joi.object({
       end_time:
-        aggregator === Aggregators.SOPHTRON
+        aggregator === ("sophtron" as Aggregator)
           ? Joi.string().required()
           : Joi.string(),
       start_time:
-        aggregator === Aggregators.SOPHTRON
+        aggregator === ("sophtron" as Aggregator)
           ? Joi.string().required()
           : Joi.string(),
     });
