@@ -106,7 +106,7 @@ const verifyTransactions = ({
 
 export const generateDataTests = ({ makeAConnection, shouldTestVcEndpoint }) =>
   jobTypes.map((jobType) =>
-    it(`makes a connection with jobType: ${jobType}, gets the accounts, identity, and transaction data from the vc endpoints`, () => {
+    it(`makes a connection with jobType: ${jobType}, gets the accounts, identity, and transaction data from the data${shouldTestVcEndpoint ? " and vc" : ""} endpoints`, () => {
       let memberGuid: string;
       let aggregator: string;
       const userId = Cypress.env("userId");
