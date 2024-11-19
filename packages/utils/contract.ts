@@ -166,7 +166,7 @@ export interface VCAdapterInput {
   accountId?: string;
   connectionId?: string;
   endTime?: string;
-  aggregator: Record<string, AdapterMap>;
+  aggregator: string;
   startTime?: string;
   type: VCDataTypes;
   userId: string;
