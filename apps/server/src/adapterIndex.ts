@@ -1,4 +1,4 @@
-import type { VCDataTypes, WidgetAdapter } from "@repo/utils";
+import type { VCAdapterInput, WidgetAdapter } from "@repo/utils";
 import { info } from "./infra/logger";
 import type { Aggregator } from "./adapterSetup";
 import { adapterMap } from "./adapterSetup";
@@ -22,15 +22,7 @@ export async function getVC({
   startTime,
   type,
   userId,
-}: {
-  accountId?: string;
-  connectionId?: string;
-  endTime?: string;
-  aggregator: Aggregator;
-  startTime?: string;
-  type: VCDataTypes;
-  userId: string;
-}) {
+}: VCAdapterInput) {
   const vcAdapter =
     adapterMap[aggregator as keyof typeof adapterMap]?.vcAdapter;
 
