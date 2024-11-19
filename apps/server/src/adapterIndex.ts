@@ -4,7 +4,8 @@ import type { Aggregator } from "./adapterSetup";
 import { adapterMap } from "./adapterSetup";
 
 export function getAggregatorAdapter(aggregator: Aggregator): WidgetAdapter {
-  const widgetAdapter = adapterMap[aggregator]?.widgetAdapter;
+  const widgetAdapter =
+    adapterMap[aggregator as keyof typeof adapterMap]?.widgetAdapter;
 
   if (widgetAdapter) {
     return widgetAdapter;
@@ -30,7 +31,8 @@ export async function getVC({
   type: VCDataTypes;
   userId: string;
 }) {
-  const vcAdapter = adapterMap[aggregator]?.vcAdapter;
+  const vcAdapter =
+    adapterMap[aggregator as keyof typeof adapterMap]?.vcAdapter;
 
   if (vcAdapter) {
     info("Getting vc from aggregator", aggregator);

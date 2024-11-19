@@ -1,107 +1,111 @@
-import { getAvailableAggregators } from '../shared/aggregators'
-import { debug } from '../infra/logger'
-import { getInstitution } from '../services/ElasticSearchClient'
+import { getAvailableAggregators } from "../shared/aggregators";
+import { debug } from "../infra/logger";
+import { getInstitution } from "../services/ElasticSearchClient";
 import type {
   CachedInstitution,
   InstitutionAggregator,
   MappedJobTypes,
   Aggregator,
-  ResolvedInstitution
-} from '../shared/contract'
-import { getPreferences } from '../shared/preferences'
-import { adapterMap } from '../adapterSetup'
+  ResolvedInstitution,
+} from "../shared/contract";
+import { getPreferences } from "../shared/preferences";
+import { adapterMap } from "../adapterSetup";
 
-const getAggregatorByVolume = (volumeMap: Record<string, number>): Aggregator => {
+const getAggregatorByVolume = (
+  volumeMap: Record<string, number>,
+): Aggregator => {
   if (!volumeMap) {
-    return undefined
+    return undefined;
   }
 
-  const randomNumber = Math.random() * 100
-  let randomNumberCutoffTotal = 0
+  const randomNumber = Math.random() * 100;
+  let randomNumberCutoffTotal = 0;
 
   return Object.entries(volumeMap).find(([, volume]) => {
     if (
       randomNumber > randomNumberCutoffTotal &&
       randomNumber <= randomNumberCutoffTotal + volume
     ) {
-      return true
+      return true;
     }
 
-    randomNumberCutoffTotal += volume
+    randomNumberCutoffTotal += volume;
 
-    return false
-  })?.[0] as Aggregator
-}
+    return false;
+  })?.[0] as Aggregator;
+};
 
 export async function resolveInstitutionAggregator(
   institutionId: string,
-  jobType: MappedJobTypes
+  jobType: MappedJobTypes,
 ): Promise<ResolvedInstitution> {
-  const institution = await getInstitution(institutionId)
-  const preferences = await getPreferences()
-  const aggregatorsWithAtLeastPartialSupport: Aggregator[] = getAvailableAggregators({
-    institution,
-    jobType,
-    shouldRequireFullSupport: false,
-    supportedAggregators: preferences.supportedAggregators
-  })
+  const institution = await getInstitution(institutionId);
+  const preferences = await getPreferences();
+  const aggregatorsWithAtLeastPartialSupport: Aggregator[] =
+    getAvailableAggregators({
+      institution,
+      jobType,
+      shouldRequireFullSupport: false,
+      supportedAggregators: preferences.supportedAggregators,
+    });
 
   const aggregatorsWithFullSupport: Aggregator[] = getAvailableAggregators({
     institution,
     jobType,
     shouldRequireFullSupport: true,
-    supportedAggregators: preferences.supportedAggregators
-  })
+    supportedAggregators: preferences.supportedAggregators,
+  });
 
   const aggregators = aggregatorsWithFullSupport.length
     ? aggregatorsWithFullSupport
-    : aggregatorsWithAtLeastPartialSupport
+    : aggregatorsWithAtLeastPartialSupport;
 
-  let aggregator: Aggregator
+  let aggregator: Aggregator;
 
   const potentialResolvers = [
     () =>
       getAggregatorByVolume(
-        preferences?.institutionAggregatorVolumeMap?.[institutionId]
+        preferences?.institutionAggregatorVolumeMap?.[institutionId],
       ),
     () => getAggregatorByVolume(preferences?.defaultAggregatorVolume),
-    () => preferences?.defaultAggregator
-  ]
+    () => preferences?.defaultAggregator,
+  ];
 
   for (const resolver of potentialResolvers) {
-    const possibleAggregator = resolver()
+    const possibleAggregator = resolver();
 
     if (aggregators.includes(possibleAggregator)) {
-      aggregator = possibleAggregator
-      break
+      aggregator = possibleAggregator;
+      break;
     }
   }
 
   if (!aggregator) {
-    aggregator = aggregators[Math.floor(Math.random() * aggregators.length)]
+    aggregator = aggregators[Math.floor(Math.random() * aggregators.length)];
   }
 
   const institutionAggregator = institution[
     aggregator as keyof CachedInstitution
-  ] as InstitutionAggregator
+  ] as InstitutionAggregator;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const testAdapterName = (adapterMap[aggregator] as any)
-    ?.testInstitutionAdapterName
+  const testAdapterName = (
+    adapterMap[aggregator as keyof typeof adapterMap] as any
+  )?.testInstitutionAdapterName;
 
   if (testAdapterName && institution.is_test_bank) {
-    aggregator = testAdapterName
+    aggregator = testAdapterName;
   }
 
   debug(
-    `Resolving institution: ${institutionId} to aggregator: ${aggregator} available aggregators: ${JSON.stringify(aggregators)}`
-  )
+    `Resolving institution: ${institutionId} to aggregator: ${aggregator} available aggregators: ${JSON.stringify(aggregators)}`,
+  );
 
   return {
     id: institutionAggregator?.id,
     url: institution?.url,
     name: institution?.name,
     logo_url: institution?.logo,
-    aggregator: aggregator as Aggregator
-  }
+    aggregator: aggregator as Aggregator,
+  };
 }
