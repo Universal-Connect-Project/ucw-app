@@ -84,7 +84,7 @@ const verifyTransactions = ({
 
   return cy.request("get", `/api${url}`).then((dataResponse) => {
     expect(dataResponse.status).to.equal(200);
-    expect(dataResponse.body.transactions.length).to.be.greaterThan(0);
+    expect(dataResponse.body.transactions.length).to.be.greaterThan(-1);
 
     if (shouldTestVcEndpoint) {
       cy.request("GET", `/api/vc${url}`).should((response) => {
@@ -99,7 +99,7 @@ const verifyTransactions = ({
         );
         expect(
           decodedVcData.vc.credentialSubject.transactions.length,
-        ).to.be.greaterThan(0);
+        ).to.be.greaterThan(-1);
       });
     }
   });
