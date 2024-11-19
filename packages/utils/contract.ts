@@ -2,8 +2,6 @@
 // check all forked Adapter repositories
 // Example: JobTypes is used in the MX Adapter fork
 
-import type { Aggregator } from "server/src/adapterSetup";
-
 export enum WidgetJobTypes {
   AGGREGATION = 0,
   VERIFICATION = 1,
@@ -168,7 +166,7 @@ export interface VCAdapterInput {
   accountId?: string;
   connectionId?: string;
   endTime?: string;
-  aggregator: Aggregator;
+  aggregator: Record<string, AdapterMap>;
   startTime?: string;
   type: VCDataTypes;
   userId: string;
