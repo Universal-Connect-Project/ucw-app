@@ -5,9 +5,9 @@ import { contextHandler } from "../infra/context.ts";
 import { ApiEndpoints } from "../shared/connect/ApiEndpoint";
 import { ConnectApi } from "./connectApi";
 import {
-  accountsDataHandler,
-  identityDataHandler,
-  transactionsDataHandler,
+  createAccountsDataHandler,
+  createIdentityDataHandler,
+  createTransactionsDataHandler,
 } from "./dataEndpoints";
 import {
   favoriteInstitutionsHandler,
@@ -186,17 +186,31 @@ export default function (app) {
 
   app.delete("/api/aggregator/:aggregator/user/:userId", userDeleteHandler);
 
+  // Data Endpoints
+  app.get(
+    "/api/data/aggregator/:aggregator/user/:userId/connection/:connectionId/accounts",
+    createAccountsDataHandler(false),
+  );
+  app.get(
+    "/api/data/aggregator/:aggregator/user/:userId/connection/:connectionId/identity",
+    createIdentityDataHandler(false),
+  );
+  app.get(
+    "/api/data/aggregator/:aggregator/user/:userId/account/:accountId/transactions",
+    createTransactionsDataHandler(false),
+  );
+
   // VC Data Endpoints
   app.get(
     "/api/vc/data/aggregator/:aggregator/user/:userId/connection/:connectionId/accounts",
-    accountsDataHandler,
+    createAccountsDataHandler(true),
   );
   app.get(
     "/api/vc/data/aggregator/:aggregator/user/:userId/connection/:connectionId/identity",
-    identityDataHandler,
+    createIdentityDataHandler(true),
   );
   app.get(
     "/api/vc/data/aggregator/:aggregator/user/:userId/account/:accountId/transactions",
-    transactionsDataHandler,
+    createTransactionsDataHandler(true),
   );
 }

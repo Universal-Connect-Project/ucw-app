@@ -1,15 +1,19 @@
 import { getMxAdapterMapObject } from "@ucp-npm/mx-adapter";
+import type { AdapterMap } from "@repo/utils";
 
 import config from "./config";
 import { get, set } from "./services/storageClient/redis";
 import * as logger from "./infra/logger";
 import { SophtronAdapter } from "./adapters/sophtron";
 
-import getSophtronVc from "./services/vcAggregators/sophtronVc";
+import getSophtronVc, {
+  dataAdapter as sophtronDataAdapter,
+} from "./services/vcAggregators/sophtronVc";
 import { adapterMapObject as testAdapterMapObject } from "./test-adapter";
 
 const sophtronAdapterMapObject = {
   sophtron: {
+    dataAdapter: sophtronDataAdapter,
     vcAdapter: getSophtronVc,
     widgetAdapter: new SophtronAdapter(),
   },
@@ -45,7 +49,7 @@ const mxAdapterMapObject = getMxAdapterMapObject({
 });
 
 // This is where you add adapters
-export const adapterMap = {
+export const adapterMap: Record<string, AdapterMap> = {
   ...mxAdapterMapObject,
   ...sophtronAdapterMapObject,
   ...testAdapterMapObject,
