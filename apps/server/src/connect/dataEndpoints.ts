@@ -114,10 +114,10 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
       const { accountId, aggregator, userId } = req.params;
 
       if (
-        typeof req.connectApi.aggregatorAdapter?.DataValidators
+        typeof req.connectApi?.aggregatorAdapter?.DataValidators
           ?.transactionValidator === "function"
       ) {
-        await req.connectApi.aggregatorAdapter.DataValidators?.transactionValidator(
+        await req.connectApi?.aggregatorAdapter.DataValidators?.transactionValidator(
           req,
           res,
         );
