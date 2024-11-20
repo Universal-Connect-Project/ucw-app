@@ -1,5 +1,14 @@
-import { getVc as getSophtronVc } from '../../aggregatorApiClients/sophtronClient/vc'
-import { VCDataTypes } from '@repo/utils'
+import { getVc as getSophtronVc } from "../../aggregatorApiClients/sophtronClient/vc";
+import { getDataFromVCJwt, VCDataTypes } from "@repo/utils";
+
+interface GetVCParams {
+  connectionId: string;
+  type: VCDataTypes;
+  userId: string;
+  accountId?: string;
+  startTime?: string;
+  endTime?: string;
+}
 
 export default async function getVC({
   accountId,
@@ -7,29 +16,26 @@ export default async function getVC({
   endTime,
   startTime,
   type,
-  userId
-}: {
-  connectionId: string
-  type: VCDataTypes
-  userId: string
-  accountId?: string
-  startTime?: string
-  endTime?: string
-}) {
-  let path = ''
+  userId,
+}: GetVCParams) {
+  let path = "";
   switch (type) {
     case VCDataTypes.IDENTITY:
-      path = `customers/${userId}/members/${connectionId}/identity`
-      break
+      path = `customers/${userId}/members/${connectionId}/identity`;
+      break;
     case VCDataTypes.ACCOUNTS:
-      path = `customers/${userId}/members/${connectionId}/accounts`
-      break
+      path = `customers/${userId}/members/${connectionId}/accounts`;
+      break;
     case VCDataTypes.TRANSACTIONS:
-      path = `customers/${userId}/accounts/${accountId}/transactions?startTime=${startTime}&endTime=${endTime}`
-      break
+      path = `customers/${userId}/accounts/${accountId}/transactions?startTime=${startTime}&endTime=${endTime}`;
+      break;
     default:
-      break
+      break;
   }
 
-  return await getSophtronVc(path)
+  return await getSophtronVc(path);
 }
+
+export const dataAdapter = async (params: GetVCParams) => {
+  return getDataFromVCJwt(await getVC(params));
+};

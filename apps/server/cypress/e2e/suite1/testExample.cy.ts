@@ -2,7 +2,7 @@ import { JobTypes } from "@repo/utils";
 import {
   clickContinue,
   expectConnectionSuccess,
-  generateVcDataTests,
+  generateDataTests,
 } from "@repo/utils-dev-dependency";
 import {
   enterTestExampleACredentials,
@@ -39,6 +39,12 @@ const makeABConnection = async (jobType) => {
 };
 
 describe("testExampleA and B aggregators", () => {
-  generateVcDataTests({ makeAConnection: makeAnAConnection });
-  generateVcDataTests({ makeAConnection: makeABConnection });
+  generateDataTests({
+    makeAConnection: makeAnAConnection,
+    shouldTestVcEndpoint: true,
+  });
+  generateDataTests({
+    makeAConnection: makeABConnection,
+    shouldTestVcEndpoint: true,
+  });
 });
