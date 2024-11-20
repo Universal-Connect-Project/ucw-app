@@ -69,7 +69,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           config-file: cypress.config.ts
-          project: packages/template-adapter
+          project: packages/template-adapter # Use for own package ${{ vars.PACKAGE_DIR }}
           start: npm run dev:e2e
           wait-on: "http://localhost:8080/health, http://localhost:9200"
 
@@ -78,4 +78,4 @@ jobs:
         if: failure()
         with:
           name: cypress-screenshots
-          path: ./packages/template-adapter/cypress/screenshots
+          path: ./packages/template-adapter/cypress/screenshots # Use ${{ vars.PACKAGE_DIR }} in place of "packages/template-adapter" for own package
