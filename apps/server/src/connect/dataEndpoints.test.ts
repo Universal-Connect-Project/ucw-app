@@ -1,4 +1,11 @@
 import type { Response } from "express";
+import { ConnectApi } from "./connectApi";
+import { transactionsResponse } from "../test-adapter/vcResponses";
+import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../test-adapter";
+import {
+  testDataValidatorEndTimeError,
+  testDataValidatorStartTimeError,
+} from "../test-adapter/constants";
 import * as adapterIndex from "../adapterIndex";
 import {
   testVcAccountsData,
@@ -26,9 +33,18 @@ const vcAccountsDataHandler = createAccountsDataHandler(true);
 const vcIdentityDataHandler = createIdentityDataHandler(true);
 const vcTransactionsDataHandler = createTransactionsDataHandler(true);
 
+const context = {
+  aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+};
+let connect: ConnectApi;
+
 describe("dataEndpoints", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.restoreAllMocks();
+    connect = new ConnectApi({
+      context,
+    });
+    await connect.init();
   });
 
   describe("accountsDataHandler", () => {
@@ -396,6 +412,74 @@ describe("dataEndpoints", () => {
 
         expect(res.send).toHaveBeenCalledWith("Something went wrong");
         expect(res.status).toHaveBeenCalledWith(400);
+      });
+
+      it("returns transaction data, if it passes the transactionValidator", async () => {
+        const req = {
+          connectApi: connect,
+          params: {
+            aggregator: Aggregators.TEST_A,
+          },
+          query: {
+            start_time: "testStartTime",
+            end_time: "testEndTime",
+          },
+        } as unknown as TransactionsRequest;
+
+        const res = {
+          send: jest.fn(),
+          status: jest.fn(),
+        } as unknown as any;
+
+        await createTransactionsDataHandler(true)(req, res);
+
+        expect(res.send).toHaveBeenCalledWith({
+          jwt: transactionsResponse,
+        });
+      });
+
+      it("fails aggregator's transactionValidator if start_time is undefined", async () => {
+        const req = {
+          connectApi: connect,
+          params: {
+            aggregator: Aggregators.TEST_A,
+          },
+          query: {
+            start_time: undefined,
+            end_time: "testEndTime",
+          },
+        } as unknown as TransactionsRequest;
+
+        const res = {
+          send: jest.fn(),
+          status: jest.fn(),
+        } as unknown as any;
+
+        await createTransactionsDataHandler(false)(req, res);
+
+        expect(res.send).toHaveBeenCalledWith(testDataValidatorStartTimeError);
+      });
+
+      it("fails aggregator's transactionValidator if end_time is undefined", async () => {
+        const req = {
+          connectApi: connect,
+          params: {
+            aggregator: Aggregators.TEST_A,
+          },
+          query: {
+            start_time: "testStartTime",
+            end_time: undefined,
+          },
+        } as unknown as TransactionsRequest;
+
+        const res = {
+          send: jest.fn(),
+          status: jest.fn(),
+        } as unknown as any;
+
+        await createTransactionsDataHandler(false)(req, res);
+
+        expect(res.send).toHaveBeenCalledWith(testDataValidatorEndTimeError);
       });
     });
   });

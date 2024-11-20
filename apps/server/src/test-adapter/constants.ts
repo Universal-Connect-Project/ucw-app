@@ -10,6 +10,10 @@ export const TEST_EXAMPLE_C_LABEL_TEXT = "TestExampleC Label";
 
 export const testAggregatorMemberGuid = "testAggregatorMemberGuid";
 
+export const testDataValidatorStartTimeError =
+  "&#x22;start_time&#x22; is required";
+export const testDataValidatorEndTimeError = "&#x22;end_time&#x22; is required";
+
 export const testExampleInstitution = {
   logo_url:
     "https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png",
