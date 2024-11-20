@@ -11,15 +11,20 @@ import type {
   TransactionsRequest,
 } from "./dataEndpoints";
 import {
-  accountsDataHandler,
-  identityDataHandler,
-  transactionsDataHandler,
+  createAccountsDataHandler,
+  createIdentityDataHandler,
+  createTransactionsDataHandler,
 } from "./dataEndpoints";
 import type { Aggregator } from "../shared/contract";
 import { Aggregators } from "../shared/contract";
 import { invalidAggregatorString } from "../utils/validators";
+import { getDataFromVCJwt } from "@repo/utils";
 
 /* eslint-disable @typescript-eslint/unbound-method */
+
+const vcAccountsDataHandler = createAccountsDataHandler(true);
+const vcIdentityDataHandler = createIdentityDataHandler(true);
+const vcTransactionsDataHandler = createTransactionsDataHandler(true);
 
 describe("dataEndpoints", () => {
   beforeEach(() => {
@@ -33,7 +38,7 @@ describe("dataEndpoints", () => {
         status: jest.fn(),
       } as unknown as Response;
 
-      await accountsDataHandler(
+      await vcAccountsDataHandler(
         {
           params: {
             connectionId: "testConnectionId",
@@ -61,11 +66,31 @@ describe("dataEndpoints", () => {
         },
       };
 
-      await accountsDataHandler(req, res);
+      await vcAccountsDataHandler(req, res);
 
       expect(res.send).toHaveBeenCalledWith({
         jwt: testVcAccountsData,
       });
+    });
+
+    it("responds with the data on success", async () => {
+      const res = {
+        json: jest.fn(),
+      } as unknown as Response;
+
+      const req: AccountsRequest = {
+        params: {
+          connectionId: "testConnectionId",
+          aggregator: Aggregators.TEST_A,
+          userId: "testUserId",
+        },
+      };
+
+      await createAccountsDataHandler(false)(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(
+        getDataFromVCJwt(testVcAccountsData),
+      );
     });
 
     it("responds with a 400 on failure", async () => {
@@ -86,7 +111,7 @@ describe("dataEndpoints", () => {
         },
       };
 
-      await accountsDataHandler(req, res);
+      await vcAccountsDataHandler(req, res);
 
       expect(res.send).toHaveBeenCalledWith("Something went wrong");
       expect(res.status).toHaveBeenCalledWith(400);
@@ -100,7 +125,7 @@ describe("dataEndpoints", () => {
         status: jest.fn(),
       } as unknown as Response;
 
-      await identityDataHandler(
+      await vcIdentityDataHandler(
         {
           params: {
             connectionId: "testConnectionId",
@@ -129,11 +154,32 @@ describe("dataEndpoints", () => {
         },
       };
 
-      await identityDataHandler(req, res);
+      await vcIdentityDataHandler(req, res);
 
       expect(res.send).toHaveBeenCalledWith({
         jwt: testVcIdentityData,
       });
+    });
+
+    it("responds with the data on success", async () => {
+      const res = {
+        json: jest.fn(),
+        status: jest.fn(),
+      } as unknown as Response;
+
+      const req: IdentityRequest = {
+        params: {
+          connectionId: "testConnectionId",
+          aggregator: Aggregators.TEST_A,
+          userId: "testUserId",
+        },
+      };
+
+      await createIdentityDataHandler(false)(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(
+        getDataFromVCJwt(testVcIdentityData),
+      );
     });
 
     it("responds with a 400 on failure", async () => {
@@ -154,7 +200,7 @@ describe("dataEndpoints", () => {
         },
       };
 
-      await identityDataHandler(req, res);
+      await vcIdentityDataHandler(req, res);
 
       expect(res.send).toHaveBeenCalledWith("Something went wrong");
       expect(res.status).toHaveBeenCalledWith(400);
@@ -181,7 +227,7 @@ describe("dataEndpoints", () => {
           },
         };
 
-        await transactionsDataHandler(req, res);
+        await vcTransactionsDataHandler(req, res);
 
         expect(res.send).toHaveBeenCalledWith(invalidAggregatorString);
         expect(res.status).toHaveBeenCalledWith(400);
@@ -205,7 +251,7 @@ describe("dataEndpoints", () => {
           },
         };
 
-        await transactionsDataHandler(req, res);
+        await vcTransactionsDataHandler(req, res);
 
         expect(res.status).not.toHaveBeenCalledWith(400);
       });
@@ -228,7 +274,7 @@ describe("dataEndpoints", () => {
           },
         };
 
-        await transactionsDataHandler(req, res);
+        await vcTransactionsDataHandler(req, res);
 
         expect(res.send).toHaveBeenCalledWith(
           "&#x22;start_time&#x22; is required",
@@ -258,7 +304,7 @@ describe("dataEndpoints", () => {
           },
         };
 
-        await transactionsDataHandler(req, res);
+        await vcTransactionsDataHandler(req, res);
 
         expect(res.send).toHaveBeenCalledWith(
           "&#x22;end_time&#x22; is required",
@@ -288,11 +334,40 @@ describe("dataEndpoints", () => {
           },
         };
 
-        await transactionsDataHandler(req, res);
+        await vcTransactionsDataHandler(req, res);
 
         expect(res.send).toHaveBeenCalledWith({
           jwt: testVcTranscationsData,
         });
+      });
+
+      it("responds with the data on success", async () => {
+        jest
+          .spyOn(adapterIndex, "getVC")
+          .mockImplementationOnce(async () => testVcTranscationsData);
+
+        const res = {
+          json: jest.fn(),
+          status: jest.fn(),
+        } as unknown as Response;
+
+        const req: TransactionsRequest = {
+          params: {
+            accountId: "testAccountId",
+            aggregator: Aggregators.TEST_A,
+            userId: "testUserId",
+          },
+          query: {
+            start_time: undefined,
+            end_time: undefined,
+          },
+        };
+
+        await createTransactionsDataHandler(false)(req, res);
+
+        expect(res.json).toHaveBeenCalledWith(
+          getDataFromVCJwt(testVcTranscationsData),
+        );
       });
 
       it("responds with a 400 on failure", async () => {
@@ -317,7 +392,7 @@ describe("dataEndpoints", () => {
           },
         };
 
-        await transactionsDataHandler(req, res);
+        await vcTransactionsDataHandler(req, res);
 
         expect(res.send).toHaveBeenCalledWith("Something went wrong");
         expect(res.status).toHaveBeenCalledWith(400);

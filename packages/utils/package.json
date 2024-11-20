@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "main": "index.ts",
   "type": "commonjs",
-  "scripts": {},
+  "scripts": {
+    "test": "jest --no-coverage",
+    "test:watch": "cross-env DEBUG_PRINT_LIMIT=50000 jest --no-coverage --watch"
+  },
   "devDependencies": {
     "typescript": "^5.5.4"
   }
