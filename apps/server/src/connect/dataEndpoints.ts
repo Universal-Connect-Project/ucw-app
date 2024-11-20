@@ -2,11 +2,12 @@
 import type { Response } from "express";
 import he from "he";
 import Joi from "joi";
+
+import { VCDataTypes } from "@repo/utils";
+import { ConnectApi } from "services/connectApi";
 import type { Aggregator } from "../shared/contract";
-import { Aggregators } from "../shared/contract";
 import { withValidateAggregatorInPath } from "../utils/validators";
 import { getAggregatorAdapter, getData, getVC } from "../adapterIndex";
-import { VCDataTypes } from "@repo/utils";
 
 export interface AccountsDataQueryParameters {
   connectionId: string;
@@ -14,17 +15,19 @@ export interface AccountsDataQueryParameters {
   userId: string;
 }
 
-export interface AccountsRequest {
+export interface AccountsRequest extends Partial<Request> {
   params: AccountsDataQueryParameters;
+  connectApi?: ConnectApi;
 }
 
 export interface IdentityRequest {
   params: IdentityDataParameters;
 }
 
-export interface TransactionsRequest {
+export interface TransactionsRequest extends Partial<Request> {
   query: TransactionsDataQueryParameters;
   params: TransactionsDataPathParameters;
+  connectApi?: ConnectApi;
 }
 
 export const createAccountsDataHandler = (isVc: boolean) =>
@@ -110,23 +113,33 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
     async (req: TransactionsRequest, res: Response) => {
       const { accountId, aggregator, userId } = req.params;
 
-    const schema = Joi.object({
-      end_time:
-        aggregator === ("sophtron" as Aggregator)
-          ? Joi.string().required()
-          : Joi.string(),
-      start_time:
-        aggregator === ("sophtron" as Aggregator)
-          ? Joi.string().required()
-          : Joi.string(),
-    });
+      if (
+        typeof req.connectApi.aggregatorAdapter?.DataValidators
+          ?.transactionValidator === "function"
+      ) {
+        await req.connectApi.aggregatorAdapter.DataValidators?.transactionValidator(
+          req,
+          res,
+        );
+      } else {
+        const schema = Joi.object({
+          end_time:
+            aggregator === ("sophtron" as Aggregator)
+              ? Joi.string().required()
+              : Joi.string(),
+          start_time:
+            aggregator === ("sophtron" as Aggregator)
+              ? Joi.string().required()
+              : Joi.string(),
+        });
 
-      const { error } = schema.validate(req.query);
+        const { error } = schema.validate(req.query);
 
-      if (error) {
-        res.status(400);
-        res.send(he.encode(error.details[0].message));
-        return;
+        if (error) {
+          res.status(400);
+          res.send(he.encode(error.details[0].message));
+          return;
+        }
       }
 
       const { start_time, end_time } = req.query;
