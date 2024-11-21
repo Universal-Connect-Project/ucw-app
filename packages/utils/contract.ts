@@ -31,7 +31,8 @@ export enum JobTypes {
 }
 
 export type AdapterMap = {
-  vcAdapter: Function;
+  dataAdapter?: Function;
+  vcAdapter?: Function;
   widgetAdapter: WidgetAdapter;
 };
 
