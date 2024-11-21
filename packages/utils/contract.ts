@@ -208,5 +208,5 @@ export interface WidgetAdapter {
     userId?: string,
   ) => Promise<Connection | undefined>;
   RouteHandlers?: Record<string, (req: any, res: any) => Promise<void>>;
-  DataValidators?: Record<string, (req: any, res: any) => void>;
+  DataRequestValidators?: Record<string, (req: any) => string | undefined>;
 }

@@ -3,8 +3,8 @@ import { ConnectApi } from "./connectApi";
 import { transactionsResponse } from "../test-adapter/vcResponses";
 import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../test-adapter";
 import {
-  testDataValidatorEndTimeError,
-  testDataValidatorStartTimeError,
+  testDataRequestValidatorEndTimeError,
+  testDataRequestValidatorStartTimeError,
 } from "../test-adapter/constants";
 import * as adapterIndex from "../adapterIndex";
 import {
@@ -457,7 +457,9 @@ describe("dataEndpoints", () => {
 
         await createTransactionsDataHandler(false)(req, res);
 
-        expect(res.send).toHaveBeenCalledWith(testDataValidatorStartTimeError);
+        expect(res.send).toHaveBeenCalledWith(
+          testDataRequestValidatorStartTimeError,
+        );
       });
 
       it("fails aggregator's transactionValidator if end_time is undefined", async () => {
@@ -479,7 +481,9 @@ describe("dataEndpoints", () => {
 
         await createTransactionsDataHandler(false)(req, res);
 
-        expect(res.send).toHaveBeenCalledWith(testDataValidatorEndTimeError);
+        expect(res.send).toHaveBeenCalledWith(
+          testDataRequestValidatorEndTimeError,
+        );
       });
     });
   });

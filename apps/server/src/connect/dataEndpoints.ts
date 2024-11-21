@@ -4,7 +4,7 @@ import he from "he";
 import Joi from "joi";
 
 import { VCDataTypes } from "@repo/utils";
-import { ConnectApi } from "services/connectApi";
+import type { ConnectApi } from "./connectApi";
 import type { Aggregator } from "../shared/contract";
 import { withValidateAggregatorInPath } from "../utils/validators";
 import { getAggregatorAdapter, getData, getVC } from "../adapterIndex";
@@ -112,15 +112,16 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
   withValidateAggregatorInPath(
     async (req: TransactionsRequest, res: Response) => {
       const { accountId, aggregator, userId } = req.params;
+      let validationError: string | undefined;
 
       if (
-        typeof req.connectApi?.aggregatorAdapter?.DataValidators
-          ?.transactionValidator === "function"
+        typeof req.connectApi?.aggregatorAdapter?.DataRequestValidators
+          ?.transactions === "function"
       ) {
-        await req.connectApi?.aggregatorAdapter.DataValidators?.transactionValidator(
-          req,
-          res,
-        );
+        validationError =
+          req.connectApi?.aggregatorAdapter.DataRequestValidators?.transactions(
+            req,
+          );
       } else {
         const schema = Joi.object({
           end_time:
@@ -136,10 +137,13 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
         const { error } = schema.validate(req.query);
 
         if (error) {
-          res.status(400);
-          res.send(he.encode(error.details[0].message));
-          return;
+          validationError = error.details[0].message;
         }
+      }
+
+      if (validationError) {
+        res.status(400);
+        res.send(he.encode(validationError));
       }
 
       const { start_time, end_time } = req.query;

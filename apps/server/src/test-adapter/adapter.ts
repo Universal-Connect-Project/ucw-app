@@ -10,8 +10,8 @@ import { ConnectionStatus } from "@repo/utils";
 import { get, set } from "../services/storageClient/redis";
 import { MappedJobTypes } from "../shared/contract";
 import {
-  testDataValidatorStartTimeError,
-  testDataValidatorEndTimeError,
+  testDataRequestValidatorStartTimeError,
+  testDataRequestValidatorEndTimeError,
   testExampleCredentials,
   testExampleInstitution,
   testExampleJobResponse,
@@ -35,16 +35,16 @@ export class TestAdapter implements WidgetAdapter {
     },
   };
 
-  DataValidators = {
-    transactionValidator: async (_req: any, res: any) => {
-      if (!_req.query.start_time || !_req.query.end_time) {
-        res.status(400);
-        res.send(testDataValidatorStartTimeError);
+  DataRequestValidators = {
+    transactions: (req: any) => {
+      if (!req.query.start_time) {
+        return testDataRequestValidatorStartTimeError;
       }
-      if (!_req.query.end_time) {
-        res.status(400);
-        res.send(testDataValidatorEndTimeError);
+      if (!req.query.end_time) {
+        return testDataRequestValidatorEndTimeError;
       }
+
+      return undefined;
     },
   };
 

@@ -10,9 +10,10 @@ export const TEST_EXAMPLE_C_LABEL_TEXT = "TestExampleC Label";
 
 export const testAggregatorMemberGuid = "testAggregatorMemberGuid";
 
-export const testDataValidatorStartTimeError =
+export const testDataRequestValidatorStartTimeError =
   "&#x22;start_time&#x22; is required";
-export const testDataValidatorEndTimeError = "&#x22;end_time&#x22; is required";
+export const testDataRequestValidatorEndTimeError =
+  "&#x22;end_time&#x22; is required";
 
 export const testExampleInstitution = {
   logo_url:
