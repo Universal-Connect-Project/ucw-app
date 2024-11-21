@@ -15,7 +15,7 @@ export interface AccountsDataQueryParameters {
   userId: string;
 }
 
-export interface AccountsRequest extends Partial<Request> {
+export interface AccountsRequest {
   params: AccountsDataQueryParameters;
   connectApi?: ConnectApi;
 }
@@ -24,7 +24,7 @@ export interface IdentityRequest {
   params: IdentityDataParameters;
 }
 
-export interface TransactionsRequest extends Partial<Request> {
+export interface TransactionsRequest {
   query: TransactionsDataQueryParameters;
   params: TransactionsDataPathParameters;
   connectApi?: ConnectApi;
