@@ -14,36 +14,61 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+import "./commands";
 
-import { configure } from '@testing-library/cypress'
+import { configure } from "@testing-library/cypress";
+import { JwtPayload } from "jsonwebtoken";
 
-configure({ testIdAttribute: 'data-test' })
+configure({ testIdAttribute: "data-test" });
 
-Cypress.on('uncaught:exception', () => {
+Cypress.on("uncaught:exception", () => {
   // returning false here prevents Cypress from
   // failing the test
-  return false
-})
+  return false;
+});
+
+before(() => {
+  if (Cypress.env("auth_audience")) {
+    cy.request({
+      method: "POST",
+      url: `https://${Cypress.env("auth_domain")}/oauth/token`,
+      body: {
+        audience: Cypress.env("auth_audience"),
+        client_id: Cypress.env("auth_client_id"),
+        grant_type: "password",
+        password: Cypress.env("auth_password") as string,
+        username: Cypress.env("auth_username") as string,
+        scope: Cypress.env("auth_scope"),
+      },
+    }).then((response: Cypress.Response<JwtPayload>) => {
+      const accessToken = response.body.access_token;
+
+      Cypress.env("accessToken", accessToken);
+    });
+  }
+});
 
 beforeEach(() => {
-  Cypress.env('userId', crypto.randomUUID())
-})
+  Cypress.env("userId", crypto.randomUUID());
+});
 
 afterEach(() => {
-  const testAggregators = ['mx_int', 'sophtron']
-  const userId = Cypress.env('userId')
+  const testAggregators = ["mx_int", "sophtron"];
+  const userId = Cypress.env("userId");
 
   testAggregators.forEach((aggregator) => {
     cy.request({
-      method: 'DELETE',
+      headers: {
+        authorization: `Bearer ${Cypress.env("accessToken")}`,
+      },
+      method: "DELETE",
       url: `/api/aggregator/${aggregator}/user/${userId}`,
-      failOnStatusCode: false
+      failOnStatusCode: false,
     }).should((response) => {
-      expect(response.status).to.be.oneOf([200, 204, 400])
-    })
-  })
-})
+      expect(response.status).to.be.oneOf([200, 204, 400]);
+    });
+  });
+});
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')

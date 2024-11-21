@@ -1,8 +1,9 @@
-import { VCDataTypes } from "@repo/utils";
-import { getAggregatorAdapter, getVC } from "./adapterIndex";
+import { getDataFromVCJwt, VCDataTypes } from "@repo/utils";
+import { getAggregatorAdapter, getData, getVC } from "./adapterIndex";
 import type { Aggregator } from "./adapterSetup";
 import { sophtronVcAccountsData } from "./test/testData/sophtronVcData";
 import { TEST_EXAMPLE_A_AGGREGATOR_STRING, TestAdapter } from "./test-adapter";
+import { testVcAccountsData } from "./test/testData/testVcData";
 
 const connectionId = "testConectionId";
 const type = VCDataTypes.ACCOUNTS;
@@ -25,6 +26,31 @@ describe("adapterSetup", () => {
       await expect(
         async () =>
           await getVC({
+            aggregator: "junk" as Aggregator,
+            connectionId,
+            type,
+            userId,
+          }),
+      ).rejects.toThrow("Unsupported aggregator junk");
+    });
+  });
+
+  describe("getData", () => {
+    it("uses testExample if the aggregator is testExampleA", async () => {
+      const response = await getData({
+        aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+        connectionId,
+        type,
+        userId,
+      });
+
+      expect(response).toEqual(getDataFromVCJwt(testVcAccountsData));
+    });
+
+    it("throws an error if the aggregator doesnt have a handler", async () => {
+      await expect(
+        async () =>
+          await getData({
             aggregator: "junk" as Aggregator,
             connectionId,
             type,

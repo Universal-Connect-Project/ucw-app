@@ -1,18 +1,24 @@
 import { getMxAdapterMapObject } from "@ucp-npm/mx-adapter";
+import { getTemplateAdapterMapObject } from "@ucp-npm/template-adapter";
+import { getFinicityAdapterMapObject } from "@ucp-npm/finicity-adapter";
+
+import type { AdapterMap } from "@repo/utils";
 import config from "./config";
 import { get, set } from "./services/storageClient/redis";
 import * as logger from "./infra/logger";
 import { SophtronAdapter } from "./adapters/sophtron";
-import getSophtronVc from "./services/vcAggregators/sophtronVc";
+
+import getSophtronVc, {
+  dataAdapter as sophtronDataAdapter,
+} from "./services/vcAggregators/sophtronVc";
 import { adapterMapObject as testAdapterMapObject } from "./test-adapter";
-import { getTemplateAdapterMapObject } from "@ucp-npm/template-adapter";
-import { getFinicityAdapterMapObject } from "@ucp-npm/finicity-adapter";
 
 const templateAdapterMapObject = getTemplateAdapterMapObject();
 const finicityAdapterMapyObject = getFinicityAdapterMapObject();
 
 const sophtronAdapterMapObject = {
   sophtron: {
+    dataAdapter: sophtronDataAdapter,
     vcAdapter: getSophtronVc,
     widgetAdapter: new SophtronAdapter(),
   },
@@ -48,7 +54,7 @@ const mxAdapterMapObject = getMxAdapterMapObject({
 });
 
 // This is where you add adapters
-export const adapterMap = {
+export const adapterMap: Record<string, AdapterMap> = {
   ...finicityAdapterMapyObject,
   ...templateAdapterMapObject,
   ...mxAdapterMapObject,

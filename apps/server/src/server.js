@@ -1,4 +1,5 @@
 import ngrok from "@ngrok/ngrok";
+import cookieParser from "cookie-parser";
 import "dotenv/config";
 import express from "express";
 import "express-async-errors";
@@ -11,6 +12,7 @@ import { error as _error, info } from "./infra/logger";
 import { initialize as initializeElastic } from "./services/ElasticSearchClient";
 import { setInstitutionSyncSchedule } from "./services/institutionSyncer";
 import { widgetHandler } from "./widgetEndpoint";
+import useAuthentication from "./authentication";
 
 process.on("unhandledRejection", (error) => {
   _error(`unhandledRejection: ${error.message}`, error);
@@ -27,6 +29,8 @@ const limiter = RateLimit({
   max: 5000, // max average 500 requests per windowMs
 });
 app.use(limiter);
+
+app.use(cookieParser());
 
 initializeElastic()
   .then(() => {
@@ -54,6 +58,8 @@ app.get("/health", function (req, res) {
     res.send("Service Unavailable");
   }
 });
+
+useAuthentication(app);
 
 useConnect(app);
 

@@ -57,4 +57,6 @@ See [PREFERENCES.md](PREFERENCES.md) for details.
 
 ## Authentication
 
-The Express.js endpoints that are exposed in these repositories do not provide any authentication. You will need to fork the repo if you want to add your own authentication.
+We have an optional [authentication](./apps/server/src/authentication.ts) system built in and enabled by .env variables. If AUTHENTICATION_ENABLE=true and the other required variables are provided, then all express endpoints defined after the useAuthentication call will require a Bearer token and optionally a set of scopes. This system assumes that you have an authorization system such as auth0 to point to. If you need more control over your authentication, then you may fork the repository and implement your own.
+
+When authentication is enabled the widget endpoint will require authorization. There is a token endpoint that can be used to retrieve a one time use token that can be passed into the widget url for use in an iframe. When this is used the server will set an authorization cookie that the widget UI will pass to the server for all of its requests.
