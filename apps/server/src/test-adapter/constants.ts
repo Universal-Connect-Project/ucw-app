@@ -1,5 +1,4 @@
 import { WidgetJobTypes } from "@repo/utils";
-import he from "he";
 
 export const TEST_EXAMPLE_A_AGGREGATOR_STRING = "testExampleA";
 export const TEST_EXAMPLE_B_AGGREGATOR_STRING = "testExampleB";
