@@ -1,4 +1,5 @@
 import { WidgetJobTypes } from "@repo/utils";
+import he from "he";
 
 export const TEST_EXAMPLE_A_AGGREGATOR_STRING = "testExampleA";
 export const TEST_EXAMPLE_B_AGGREGATOR_STRING = "testExampleB";
@@ -11,9 +12,8 @@ export const TEST_EXAMPLE_C_LABEL_TEXT = "TestExampleC Label";
 export const testAggregatorMemberGuid = "testAggregatorMemberGuid";
 
 export const testDataRequestValidatorStartTimeError =
-  "&#x22;start_time&#x22; is required";
-export const testDataRequestValidatorEndTimeError =
-  "&#x22;end_time&#x22; is required";
+  '"start_time" is required';
+export const testDataRequestValidatorEndTimeError = '"end_time" is required';
 
 export const testExampleInstitution = {
   logo_url:

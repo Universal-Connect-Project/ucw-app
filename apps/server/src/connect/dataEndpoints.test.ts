@@ -1,4 +1,5 @@
 import type { Response } from "express";
+import he from "he";
 import { ConnectApi } from "./connectApi";
 import { transactionsResponse } from "../test-adapter/vcResponses";
 import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../test-adapter";
@@ -458,7 +459,7 @@ describe("dataEndpoints", () => {
         await createTransactionsDataHandler(false)(req, res);
 
         expect(res.send).toHaveBeenCalledWith(
-          testDataRequestValidatorStartTimeError,
+          he.encode(testDataRequestValidatorStartTimeError),
         );
       });
 
@@ -482,7 +483,7 @@ describe("dataEndpoints", () => {
         await createTransactionsDataHandler(false)(req, res);
 
         expect(res.send).toHaveBeenCalledWith(
-          testDataRequestValidatorEndTimeError,
+          he.encode(testDataRequestValidatorEndTimeError),
         );
       });
     });

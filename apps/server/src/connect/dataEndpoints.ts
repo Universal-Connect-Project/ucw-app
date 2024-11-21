@@ -144,6 +144,7 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
       if (validationError) {
         res.status(400);
         res.send(he.encode(validationError));
+        return;
       }
 
       const { start_time, end_time } = req.query;
