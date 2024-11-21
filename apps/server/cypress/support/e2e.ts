@@ -53,7 +53,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  const testAggregators = ["mx_int", "sophtron"];
+  const testAggregators = ["mx_int"];
   const userId = Cypress.env("userId");
 
   testAggregators.forEach((aggregator) => {

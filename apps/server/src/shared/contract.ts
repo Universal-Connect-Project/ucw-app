@@ -93,7 +93,6 @@ export enum Aggregators {
   TEST_A = "testExampleA",
   TEST_B = "testExampleB",
   TEST_C = "testExampleC",
-  SOPHTRON = "sophtron",
 }
 
 export enum MappedJobTypes {

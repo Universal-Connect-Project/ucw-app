@@ -110,25 +110,6 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
     async (req: TransactionsRequest, res: Response) => {
       const { accountId, aggregator, userId } = req.params;
 
-      const schema = Joi.object({
-        end_time:
-          aggregator === Aggregators.SOPHTRON
-            ? Joi.string().required()
-            : Joi.string(),
-        start_time:
-          aggregator === Aggregators.SOPHTRON
-            ? Joi.string().required()
-            : Joi.string(),
-      });
-
-      const { error } = schema.validate(req.query);
-
-      if (error) {
-        res.status(400);
-        res.send(he.encode(error.details[0].message));
-        return;
-      }
-
       const { start_time, end_time } = req.query;
 
       const aggregatorAdapter = getAggregatorAdapter(aggregator);

@@ -4,32 +4,6 @@ import {
 } from "../../test-adapter";
 import type { CachedInstitution } from "../../shared/contract";
 
-export const institutionData = {
-  institution: {
-    code: "testCode",
-    medium_logo_url: "mediumLogoUrl",
-    name: "testName",
-    small_logo_url: "smallLogoUrl",
-    supports_oauth: true,
-    url: "testUrl",
-  },
-};
-
-export const sophtronInstitutionData = {
-  InstitutionID: "institutionId",
-  Logo: "Logo",
-  InstitutionName: "institutionName",
-  URL: "url",
-};
-
-export const sophtronUserInstitutionAccountsData = [
-  {
-    AccountName: "AccountName",
-    AccountNumber: "AccountNumber",
-    AccountID: "AccountID",
-  },
-];
-
 export const finicityInsitutionData = {
   institution: {
     id: "testId",
@@ -99,14 +73,6 @@ export const elasticSearchInstitutionData: CachedInstitution = {
     supports_oauth: true,
     supports_identification: true,
     supports_verification: true,
-    supports_history: false,
-  },
-  sophtron: {
-    id: null,
-    supports_aggregation: false,
-    supports_oauth: false,
-    supports_identification: false,
-    supports_verification: false,
     supports_history: false,
   },
   [TEST_EXAMPLE_A_AGGREGATOR_STRING]: {
