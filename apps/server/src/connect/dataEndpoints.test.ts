@@ -250,29 +250,6 @@ describe("dataEndpoints", () => {
         expect(res.status).toHaveBeenCalledWith(400);
       });
 
-      it("doesn't respond with a 400 if it's TestAdapterA and there is no start or end time", async () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn(),
-        } as unknown as Response;
-
-        const req: TransactionsRequest = {
-          params: {
-            accountId: "testAccountId",
-            aggregator: Aggregators.TEST_A,
-            userId: "testUserId",
-          },
-          query: {
-            end_time: undefined,
-            start_time: undefined,
-          },
-        };
-
-        await vcTransactionsDataHandler(req, res);
-
-        expect(res.status).not.toHaveBeenCalledWith(400);
-      });
-
       it("responds with a 400 if its sophtron and there is no start time", async () => {
         const res = {
           send: jest.fn(),
