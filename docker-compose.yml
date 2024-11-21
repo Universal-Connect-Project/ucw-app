@@ -16,13 +16,13 @@ services:
           "wget",
           "--no-verbose",
           "--tries=1",
-          "--spider",
+          "--output-document=/dev/null",
           "http://server:${SERVER_PORT}/health",
         ]
       start_period: 30s
       interval: 10s
       timeout: 10s
-      retries: 12
+      retries: 6
     build:
       context: .
       dockerfile: ./docker-server.Dockerfile
