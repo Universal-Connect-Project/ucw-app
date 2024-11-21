@@ -34,3 +34,18 @@ export const testExampleJobResponse = {
     job_type: WidgetJobTypes.AGGREGATION,
   },
 };
+
+export const testRouteHandlers = {
+  jobRequestHandler: (_req: any, res: any) => {
+    res.send(testExampleJobResponse);
+  },
+};
+
+export const testDataRequestValidators = {
+  transactions: (req: any) => {
+    if (!req.query.start_time) {
+      return testDataRequestValidatorStartTimeError;
+    }
+    return undefined;
+  },
+};

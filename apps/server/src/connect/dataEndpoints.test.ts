@@ -2,7 +2,10 @@ import type { Response } from "express";
 import he from "he";
 import { ConnectApi } from "./connectApi";
 import { transactionsResponse } from "../test-adapter/vcResponses";
-import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../test-adapter";
+import {
+  TEST_EXAMPLE_A_AGGREGATOR_STRING,
+  TEST_EXAMPLE_B_AGGREGATOR_STRING,
+} from "../test-adapter";
 import {
   testDataRequestValidatorEndTimeError,
   testDataRequestValidatorStartTimeError,
@@ -34,18 +37,29 @@ const vcAccountsDataHandler = createAccountsDataHandler(true);
 const vcIdentityDataHandler = createIdentityDataHandler(true);
 const vcTransactionsDataHandler = createTransactionsDataHandler(true);
 
-const context = {
+const contextTestA = {
   aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
 };
-let connect: ConnectApi;
+let connectTestA: ConnectApi;
+
+const contextTestB = {
+  aggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING,
+};
+let connectTestB: ConnectApi;
 
 describe("dataEndpoints", () => {
   beforeEach(async () => {
     jest.restoreAllMocks();
-    connect = new ConnectApi({
-      context,
+
+    connectTestA = new ConnectApi({
+      context: contextTestA,
     });
-    await connect.init();
+    await connectTestA.init();
+
+    connectTestB = new ConnectApi({
+      context: contextTestB,
+    });
+    await connectTestB.init();
   });
 
   describe("accountsDataHandler", () => {
@@ -250,6 +264,29 @@ describe("dataEndpoints", () => {
         expect(res.status).toHaveBeenCalledWith(400);
       });
 
+      it("doesn't respond with a 400 if it's TestAdapterA and there is no start time", async () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn(),
+        } as unknown as Response;
+
+        const req: TransactionsRequest = {
+          params: {
+            accountId: "testAccountId",
+            aggregator: Aggregators.TEST_A,
+            userId: "testUserId",
+          },
+          query: {
+            end_time: undefined,
+            start_time: undefined,
+          },
+          connectApi: connectTestA,
+        };
+
+        await vcTransactionsDataHandler(req, res);
+        expect(res.status).not.toHaveBeenCalledWith(400);
+      });
+
       it("responds with a 400 if its sophtron and there is no start time", async () => {
         const res = {
           send: jest.fn(),
@@ -394,7 +431,7 @@ describe("dataEndpoints", () => {
 
       it("returns transaction data, if it passes the transactionValidator", async () => {
         const req = {
-          connectApi: connect,
+          connectApi: connectTestA,
           params: {
             aggregator: Aggregators.TEST_A,
           },
@@ -418,9 +455,9 @@ describe("dataEndpoints", () => {
 
       it("fails aggregator's transactionValidator if start_time is undefined", async () => {
         const req = {
-          connectApi: connect,
+          connectApi: connectTestB,
           params: {
-            aggregator: Aggregators.TEST_A,
+            aggregator: Aggregators.TEST_B,
           },
           query: {
             start_time: undefined,
@@ -437,30 +474,6 @@ describe("dataEndpoints", () => {
 
         expect(res.send).toHaveBeenCalledWith(
           he.encode(testDataRequestValidatorStartTimeError),
-        );
-      });
-
-      it("fails aggregator's transactionValidator if end_time is undefined", async () => {
-        const req = {
-          connectApi: connect,
-          params: {
-            aggregator: Aggregators.TEST_A,
-          },
-          query: {
-            start_time: "testStartTime",
-            end_time: undefined,
-          },
-        } as unknown as TransactionsRequest;
-
-        const res = {
-          send: jest.fn(),
-          status: jest.fn(),
-        } as unknown as any;
-
-        await createTransactionsDataHandler(false)(req, res);
-
-        expect(res.send).toHaveBeenCalledWith(
-          he.encode(testDataRequestValidatorEndTimeError),
         );
       });
     });
