@@ -1,11 +1,6 @@
 import type { Response } from "express";
 import he from "he";
-import { ConnectApi } from "./connectApi";
 import { transactionsResponse } from "../test-adapter/vcResponses";
-import {
-  TEST_EXAMPLE_A_AGGREGATOR_STRING,
-  TEST_EXAMPLE_B_AGGREGATOR_STRING,
-} from "../test-adapter";
 import { testDataRequestValidatorStartTimeError } from "../test-adapter/constants";
 import * as adapterIndex from "../adapterIndex";
 import {
