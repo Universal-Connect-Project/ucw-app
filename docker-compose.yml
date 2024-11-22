@@ -10,19 +10,11 @@ services:
     container_name: ucw-app-server
     restart: on-failure
     healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://server:${SERVER_PORT}/health",
-        ]
-      start_period: 30s
-      interval: 10s
+      test: wget -q -O- http://server:${SERVER_PORT}/health || exit 1
+      start_period: 60s
+      interval: 30s
       timeout: 10s
-      retries: 12
+      retries: 6
     build:
       context: .
       dockerfile: ./docker-server.Dockerfile
