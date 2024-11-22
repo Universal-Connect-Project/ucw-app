@@ -11,7 +11,7 @@ import getSophtronVc, {
 } from "./services/vcAggregators/sophtronVc";
 import { adapterMapObject as testAdapterMapObject } from "./test-adapter";
 
-const sophtronAdapterMapObject = {
+const sophtronAdapterMapObject: Record<string, AdapterMap> = {
   sophtron: {
     dataAdapter: sophtronDataAdapter,
     vcAdapter: getSophtronVc,
@@ -19,7 +19,7 @@ const sophtronAdapterMapObject = {
   },
 };
 
-const mxAdapterMapObject = getMxAdapterMapObject({
+const mxAdapterMapObject: Record<string, AdapterMap> = getMxAdapterMapObject({
   cacheClient: {
     set: set,
     get: get,

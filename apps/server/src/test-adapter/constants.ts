@@ -10,6 +10,9 @@ export const TEST_EXAMPLE_C_LABEL_TEXT = "TestExampleC Label";
 
 export const testAggregatorMemberGuid = "testAggregatorMemberGuid";
 
+export const testDataRequestValidatorStartTimeError =
+  '"start_time" is required';
+
 export const testExampleInstitution = {
   logo_url:
     "https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png",
@@ -28,5 +31,20 @@ export const testExampleJobResponse = {
   job: {
     guid: "testAggregatorMemberGuid",
     job_type: WidgetJobTypes.AGGREGATION,
+  },
+};
+
+export const testRouteHandlers = {
+  jobRequestHandler: (_req: any, res: any) => {
+    res.send(testExampleJobResponse);
+  },
+};
+
+export const testDataRequestValidators = {
+  transactions: (req: any) => {
+    if (!req.query.start_time) {
+      return testDataRequestValidatorStartTimeError;
+    }
+    return undefined;
   },
 };

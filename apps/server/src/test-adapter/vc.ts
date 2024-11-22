@@ -1,17 +1,17 @@
-import { VCDataTypes } from '@repo/utils'
+import { VCAdapterInput, VCDataTypes } from "@repo/utils";
 import {
   accountsResponse,
   identityResponse,
-  transactionsResponse
-} from './vcResponses'
+  transactionsResponse,
+} from "./vcResponses";
 
-export const getVC = ({ type }: { type: VCDataTypes }) => {
+export const getVC = ({ type }: Partial<VCAdapterInput>) => {
   switch (type) {
     case VCDataTypes.ACCOUNTS:
-      return accountsResponse
+      return accountsResponse;
     case VCDataTypes.IDENTITY:
-      return identityResponse
+      return identityResponse;
     case VCDataTypes.TRANSACTIONS:
-      return transactionsResponse
+      return transactionsResponse;
   }
-}
+};
