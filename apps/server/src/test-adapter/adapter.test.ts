@@ -38,7 +38,13 @@ const successConnectionStatus = {
 
 describe("TestAdapter", () => {
   describe("RouteHandlers", () => {
-    it("returns an object of RouteHandlers functions", async () => {
+    it("returns an EMPTY object of RouteHandlers functions for TestAdapterA", async () => {
+      const handlers: Record<string, (req: any, res: any) => void> =
+        testAdapterA.RouteHandlers;
+      expect(Object.keys(handlers)).toHaveLength(0);
+    });
+
+    it("returns an object of RouteHandlers functions for TestAdapterB", async () => {
       const handlers: Record<string, (req: any, res: any) => void> =
         testAdapterB.RouteHandlers;
       expect(Object.keys(handlers)).toHaveLength(1);
@@ -57,14 +63,20 @@ describe("TestAdapter", () => {
   });
 
   describe("DataRequestValidators", () => {
-    it("returns a DataRequestValidators object if the adapter has one", async () => {
+    it("returns an EMPTY object of DataRequestValidators functions for TestAdapterA", async () => {
+      const handlers: Record<string, (req: any, res: any) => void> =
+        testAdapterA.DataRequestValidators;
+      expect(Object.keys(handlers)).toHaveLength(0);
+    });
+
+    it("returns an object of DataRequestValidators functions for TestAdapterB", async () => {
       const handlers: Record<string, (req: any, res: any) => void> =
         testAdapterB.DataRequestValidators;
       expect(Object.keys(handlers)).toHaveLength(1);
     });
 
     describe("dataRequestValidator", () => {
-      it("returns an error if the start_time is missing", async () => {
+      it("returns an error if the adapter is TestAdapterB and start_time is missing", async () => {
         const req = {
           query: {
             start_time: "",
