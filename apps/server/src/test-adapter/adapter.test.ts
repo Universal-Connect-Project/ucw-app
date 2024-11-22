@@ -38,20 +38,20 @@ const successConnectionStatus = {
 
 describe("TestAdapter", () => {
   describe("RouteHandlers", () => {
-    it("returns an EMPTY object of RouteHandlers functions for TestAdapterA", async () => {
+    it("returns an empty object of RouteHandlers functions when there are no handlers", async () => {
       const handlers: Record<string, (req: any, res: any) => void> =
         testAdapterA.RouteHandlers;
       expect(Object.keys(handlers)).toHaveLength(0);
     });
 
-    it("returns an object of RouteHandlers functions for TestAdapterB", async () => {
+    it("returns an object of RouteHandlers functions when there are handlers", async () => {
       const handlers: Record<string, (req: any, res: any) => void> =
         testAdapterB.RouteHandlers;
       expect(Object.keys(handlers)).toHaveLength(1);
     });
 
     describe("jobRequestHandler", () => {
-      it("returns testExampleJobResponse when calling jobRequestHandler", async () => {
+      it("returns data when calling jobRequestHandler", async () => {
         const res = {
           send: jest.fn(),
         };
@@ -63,20 +63,20 @@ describe("TestAdapter", () => {
   });
 
   describe("DataRequestValidators", () => {
-    it("returns an EMPTY object of DataRequestValidators functions for TestAdapterA", async () => {
+    it("returns an empty object when there are no validators", async () => {
       const handlers: Record<string, (req: any, res: any) => void> =
         testAdapterA.DataRequestValidators;
       expect(Object.keys(handlers)).toHaveLength(0);
     });
 
-    it("returns an object of DataRequestValidators functions for TestAdapterB", async () => {
+    it("returns an object of functions when there are validators", async () => {
       const handlers: Record<string, (req: any, res: any) => void> =
         testAdapterB.DataRequestValidators;
       expect(Object.keys(handlers)).toHaveLength(1);
     });
 
     describe("dataRequestValidator", () => {
-      it("returns an error if the adapter is TestAdapterB and start_time is missing", async () => {
+      it("fails if there is a custom validator and start_time is missing", async () => {
         const req = {
           query: {
             start_time: "",

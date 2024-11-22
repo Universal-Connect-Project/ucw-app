@@ -212,7 +212,7 @@ describe("dataEndpoints", () => {
 
   describe("transactionsDataHandler", () => {
     describe("validation", () => {
-      it("responds with a 400 if aggregator is wrong", async () => {
+      it("fails if aggregator is invalid", async () => {
         const res = {
           send: jest.fn(),
           status: jest.fn(),
@@ -236,7 +236,7 @@ describe("dataEndpoints", () => {
         expect(res.status).toHaveBeenCalledWith(400);
       });
 
-      it("responds with a 400 if its sophtron and there is no start time", async () => {
+      it("fails if it's sophtron and there is no start_time", async () => {
         const res = {
           send: jest.fn(),
           status: jest.fn(),
@@ -262,7 +262,7 @@ describe("dataEndpoints", () => {
         expect(res.status).toHaveBeenCalledWith(400);
       });
 
-      it("responds with a 400 if its sophtron and there is no end time", async () => {
+      it("fails if it's sophtron and there is no end_time", async () => {
         jest.spyOn(adapterIndex, "getVC").mockImplementation(() => {
           throw new Error();
         });
@@ -378,7 +378,7 @@ describe("dataEndpoints", () => {
         expect(res.status).toHaveBeenCalledWith(400);
       });
 
-      it("returns transaction data, if it's TestAdapterB and passes the transaction validator", async () => {
+      it("succeeds if there is a custom validator and it passes", async () => {
         const req = {
           params: {
             aggregator: Aggregators.TEST_B,
@@ -401,7 +401,7 @@ describe("dataEndpoints", () => {
         });
       });
 
-      it("does NOT respond with a 400 if it's TestAdapterA and start_time is undefined", async () => {
+      it("succeeds if there isn't a custom validator", async () => {
         const res = {
           send: jest.fn(),
           status: jest.fn(),
@@ -423,7 +423,7 @@ describe("dataEndpoints", () => {
         expect(res.status).not.toHaveBeenCalledWith(400);
       });
 
-      it("fails transaction validator if it's TestAdapterB and start_time is undefined", async () => {
+      it("fails if a custom validator fails", async () => {
         const req = {
           params: {
             aggregator: Aggregators.TEST_B,
