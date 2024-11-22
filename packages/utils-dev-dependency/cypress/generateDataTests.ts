@@ -87,7 +87,6 @@ const verifyTransactions = ({
   userId: string;
   queryString?: string;
 }) => {
-  cy.log("querystring", queryString);
   const url = `/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions${queryString}`;
 
   return cy.request("get", `/api${url}`).then((dataResponse) => {
