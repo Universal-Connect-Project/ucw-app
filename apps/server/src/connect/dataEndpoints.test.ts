@@ -403,11 +403,11 @@ describe("dataEndpoints", () => {
         expect(res.status).toHaveBeenCalledWith(400);
       });
 
-      it("returns transaction data, if it passes the transactionValidator", async () => {
+      it("returns transaction data, if it's TestAdapterB and passes the transaction validator", async () => {
         const req = {
-          connectApi: connectTestA,
+          connectApi: connectTestB,
           params: {
-            aggregator: Aggregators.TEST_A,
+            aggregator: Aggregators.TEST_B,
           },
           query: {
             start_time: "testStartTime",
@@ -450,7 +450,7 @@ describe("dataEndpoints", () => {
         expect(res.status).not.toHaveBeenCalledWith(400);
       });
 
-      it("fails transactionValidator if it's TestAdapterB and start_time is undefined", async () => {
+      it("fails transaction validator if it's TestAdapterB and start_time is undefined", async () => {
         const req = {
           connectApi: connectTestB,
           params: {
