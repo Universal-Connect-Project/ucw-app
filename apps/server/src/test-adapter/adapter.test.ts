@@ -1,8 +1,11 @@
 import { ConnectionStatus } from "@repo/utils";
+import he from "he";
 import { TestAdapter } from "./adapter";
 import {
   testDataRequestValidators,
+  testDataRequestValidatorStartTimeError,
   testExampleInstitution,
+  testExampleJobResponse,
   testRouteHandlers,
 } from "./constants";
 import { MappedJobTypes } from "../shared/contract";
@@ -34,8 +37,48 @@ const successConnectionStatus = {
 } as any;
 
 describe("TestAdapter", () => {
+  describe("RouteHandlers", () => {
+    it("returns an object of RouteHandlers functions", async () => {
+      const handlers: Record<string, (req: any, res: any) => void> =
+        testAdapterB.RouteHandlers;
+      expect(Object.keys(handlers)).toHaveLength(1);
+    });
+
+    describe("jobRequestHandler", () => {
+      it("returns testExampleJobResponse when calling jobRequestHandler", async () => {
+        const res = {
+          send: jest.fn(),
+        };
+
+        testAdapterB.RouteHandlers.jobRequestHandler(undefined, res);
+        expect(res.send).toHaveBeenCalledWith(testExampleJobResponse);
+      });
+    });
+  });
+
   describe("DataRequestValidators", () => {
-    it("returns a DataRequestValidators object when the adapter has one", async () => {});
+    it("returns a DataRequestValidators object if the adapter has one", async () => {
+      const handlers: Record<string, (req: any, res: any) => void> =
+        testAdapterB.DataRequestValidators;
+      expect(Object.keys(handlers)).toHaveLength(1);
+    });
+
+    describe("dataRequestValidator", () => {
+      it("returns an error if the start_time is missing", async () => {
+        const req = {
+          query: {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            start_time: "",
+          },
+        };
+
+        const validationResponse =
+          testAdapterB.DataRequestValidators.transactions(req);
+        expect(validationResponse).toEqual(
+          testDataRequestValidatorStartTimeError,
+        );
+      });
+    });
   });
 
   describe("GetInstitutionById", () => {

@@ -6,10 +6,7 @@ import {
   TEST_EXAMPLE_A_AGGREGATOR_STRING,
   TEST_EXAMPLE_B_AGGREGATOR_STRING,
 } from "../test-adapter";
-import {
-  testDataRequestValidatorEndTimeError,
-  testDataRequestValidatorStartTimeError,
-} from "../test-adapter/constants";
+import { testDataRequestValidatorStartTimeError } from "../test-adapter/constants";
 import * as adapterIndex from "../adapterIndex";
 import {
   testVcAccountsData,
@@ -264,29 +261,6 @@ describe("dataEndpoints", () => {
         expect(res.status).toHaveBeenCalledWith(400);
       });
 
-      it("doesn't respond with a 400 if it's TestAdapterA and there is no start time", async () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn(),
-        } as unknown as Response;
-
-        const req: TransactionsRequest = {
-          params: {
-            accountId: "testAccountId",
-            aggregator: Aggregators.TEST_A,
-            userId: "testUserId",
-          },
-          query: {
-            end_time: undefined,
-            start_time: undefined,
-          },
-          connectApi: connectTestA,
-        };
-
-        await vcTransactionsDataHandler(req, res);
-        expect(res.status).not.toHaveBeenCalledWith(400);
-      });
-
       it("responds with a 400 if its sophtron and there is no start time", async () => {
         const res = {
           send: jest.fn(),
@@ -453,7 +427,30 @@ describe("dataEndpoints", () => {
         });
       });
 
-      it("fails aggregator's transactionValidator if start_time is undefined", async () => {
+      it("does NOT respond with a 400 if it's TestAdapterA and start_time is undefined", async () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn(),
+        } as unknown as Response;
+
+        const req: TransactionsRequest = {
+          params: {
+            accountId: "testAccountId",
+            aggregator: Aggregators.TEST_A,
+            userId: "testUserId",
+          },
+          query: {
+            end_time: undefined,
+            start_time: undefined,
+          },
+          connectApi: connectTestA,
+        };
+
+        await vcTransactionsDataHandler(req, res);
+        expect(res.status).not.toHaveBeenCalledWith(400);
+      });
+
+      it("fails transactionValidator if it's TestAdapterB and start_time is undefined", async () => {
         const req = {
           connectApi: connectTestB,
           params: {

@@ -12,7 +12,6 @@ export const testAggregatorMemberGuid = "testAggregatorMemberGuid";
 
 export const testDataRequestValidatorStartTimeError =
   '"start_time" is required';
-export const testDataRequestValidatorEndTimeError = '"end_time" is required';
 
 export const testExampleInstitution = {
   logo_url:
