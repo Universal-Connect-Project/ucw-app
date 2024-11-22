@@ -67,7 +67,6 @@ describe("TestAdapter", () => {
       it("returns an error if the start_time is missing", async () => {
         const req = {
           query: {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             start_time: "",
           },
         };
