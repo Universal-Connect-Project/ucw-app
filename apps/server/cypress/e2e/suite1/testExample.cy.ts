@@ -88,7 +88,17 @@ const verifyTransactionsValidatorError = ({
     });
 };
 
-export const generateValidatorTests = ({ makeAConnection }) => {
+describe("testExampleA and B aggregators", () => {
+  generateDataTests({
+    makeAConnection: makeAnAConnection,
+    shouldTestVcEndpoint: true,
+  });
+  generateDataTests({
+    makeAConnection: makeABConnection,
+    shouldTestVcEndpoint: true,
+    queryString: "?start_time=2021/1/1",
+  });
+
   const jobType = JobTypes.VERIFICATION;
 
   it(`makes a connection with jobType: ${jobType}, gets the transaction data from the data endpoints, and tests validator`, () => {
@@ -97,7 +107,7 @@ export const generateValidatorTests = ({ makeAConnection }) => {
     const userId = Cypress.env("userId");
 
     visitWithPostMessageSpy(`/?job_type=${jobType}&user_id=${userId}`)
-      .then(() => makeAConnection(jobType))
+      .then(() => makeABConnection(jobType))
       .then(() => {
         cy.get("@postMessage", { timeout: 90000 }).then((mySpy) => {
           const connection = (mySpy as any)
@@ -127,19 +137,5 @@ export const generateValidatorTests = ({ makeAConnection }) => {
           });
         });
       });
-  });
-};
-
-describe("testExampleA and B aggregators", () => {
-  generateDataTests({
-    makeAConnection: makeAnAConnection,
-    shouldTestVcEndpoint: true,
-  });
-  generateDataTests({
-    makeAConnection: makeABConnection,
-    shouldTestVcEndpoint: true,
-  });
-  generateValidatorTests({
-    makeAConnection: makeABConnection,
   });
 });
