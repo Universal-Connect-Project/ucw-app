@@ -80,7 +80,7 @@ const verifyTransactions = ({
   shouldTestVcEndpoint,
   userId,
 }) => {
-  const url = `/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions${aggregator === "sophtron" ? "?start_time=2021/1/1&end_time=2024/12/31" : ""}`;
+  const url = `/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions${aggregator === "testExampleB" || aggregator === "sophtron" ? "?start_time=2021/1/1&end_time=2024/12/31" : ""}`;
 
   return cy.request("get", `/api${url}`).then((dataResponse) => {
     expect(dataResponse.status).to.equal(200);
