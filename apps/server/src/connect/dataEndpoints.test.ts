@@ -34,29 +34,9 @@ const vcAccountsDataHandler = createAccountsDataHandler(true);
 const vcIdentityDataHandler = createIdentityDataHandler(true);
 const vcTransactionsDataHandler = createTransactionsDataHandler(true);
 
-const contextTestA = {
-  aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
-};
-let connectTestA: ConnectApi;
-
-const contextTestB = {
-  aggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING,
-};
-let connectTestB: ConnectApi;
-
 describe("dataEndpoints", () => {
   beforeEach(async () => {
     jest.restoreAllMocks();
-
-    connectTestA = new ConnectApi({
-      context: contextTestA,
-    });
-    await connectTestA.init();
-
-    connectTestB = new ConnectApi({
-      context: contextTestB,
-    });
-    await connectTestB.init();
   });
 
   describe("accountsDataHandler", () => {
@@ -405,7 +385,6 @@ describe("dataEndpoints", () => {
 
       it("returns transaction data, if it's TestAdapterB and passes the transaction validator", async () => {
         const req = {
-          connectApi: connectTestB,
           params: {
             aggregator: Aggregators.TEST_B,
           },
@@ -443,7 +422,6 @@ describe("dataEndpoints", () => {
             end_time: undefined,
             start_time: undefined,
           },
-          connectApi: connectTestA,
         };
 
         await vcTransactionsDataHandler(req, res);
@@ -452,7 +430,6 @@ describe("dataEndpoints", () => {
 
       it("fails transaction validator if it's TestAdapterB and start_time is undefined", async () => {
         const req = {
-          connectApi: connectTestB,
           params: {
             aggregator: Aggregators.TEST_B,
           },

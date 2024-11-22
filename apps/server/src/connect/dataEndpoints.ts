@@ -17,7 +17,6 @@ export interface AccountsDataQueryParameters {
 
 export interface AccountsRequest {
   params: AccountsDataQueryParameters;
-  connectApi?: ConnectApi;
 }
 
 export interface IdentityRequest {
@@ -27,7 +26,6 @@ export interface IdentityRequest {
 export interface TransactionsRequest {
   query: TransactionsDataQueryParameters;
   params: TransactionsDataPathParameters;
-  connectApi?: ConnectApi;
 }
 
 export const createAccountsDataHandler = (isVc: boolean) =>
@@ -112,16 +110,28 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
   withValidateAggregatorInPath(
     async (req: TransactionsRequest, res: Response) => {
       const { accountId, aggregator, userId } = req.params;
+      const { start_time, end_time } = req.query;
+
+      const aggregatorAdapter = getAggregatorAdapter(aggregator);
+      const aggregatorUserId = await aggregatorAdapter.ResolveUserId(userId);
+
+      const dataArgs = {
+        aggregator,
+        type: VCDataTypes.TRANSACTIONS,
+        userId: aggregatorUserId,
+        accountId,
+        startTime: start_time,
+        endTime: end_time,
+      };
+
       let validationError: string | undefined;
 
       if (
-        typeof req.connectApi?.aggregatorAdapter?.DataRequestValidators
-          ?.transactions === "function"
+        typeof aggregatorAdapter?.DataRequestValidators?.transactions ===
+        "function"
       ) {
         validationError =
-          req.connectApi?.aggregatorAdapter.DataRequestValidators?.transactions(
-            req,
-          );
+          aggregatorAdapter.DataRequestValidators?.transactions(req);
       } else {
         const schema = Joi.object({
           end_time:
@@ -146,20 +156,6 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
         res.send(he.encode(validationError));
         return;
       }
-
-      const { start_time, end_time } = req.query;
-
-      const aggregatorAdapter = getAggregatorAdapter(aggregator);
-      const aggregatorUserId = await aggregatorAdapter.ResolveUserId(userId);
-
-      const dataArgs = {
-        aggregator,
-        type: VCDataTypes.TRANSACTIONS,
-        userId: aggregatorUserId,
-        accountId,
-        startTime: start_time,
-        endTime: end_time,
-      };
 
       try {
         if (isVc) {
