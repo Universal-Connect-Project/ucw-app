@@ -30,7 +30,7 @@ const vcIdentityDataHandler = createIdentityDataHandler(true);
 const vcTransactionsDataHandler = createTransactionsDataHandler(true);
 
 describe("dataEndpoints", () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     jest.restoreAllMocks();
   });
 
