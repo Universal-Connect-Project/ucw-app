@@ -5,6 +5,7 @@ import {
   generateDataTests,
   visitWithPostMessageSpy,
 } from "@repo/utils-dev-dependency";
+import { TEST_EXAMPLE_B_AGGREGATOR_STRING } from "../../../src/test-adapter";
 import {
   enterTestExampleACredentials,
   enterTestExampleBCredentials,
@@ -39,8 +40,8 @@ const makeABConnection = async (jobType) => {
   expectConnectionSuccess();
 };
 
-const getAccountId = ({ aggregator, memberGuid, userId }) => {
-  const url = `/data/aggregator/${aggregator}/user/${userId}/connection/${memberGuid}/accounts`;
+const getAccountId = ({ memberGuid, userId }) => {
+  const url = `/data/aggregator/${TEST_EXAMPLE_B_AGGREGATOR_STRING}/user/${userId}/connection/${memberGuid}/accounts`;
 
   return cy.request("get", `/api${url}`).then((dataResponse) => {
     const accountId = dataResponse.body.accounts.find(
@@ -51,12 +52,8 @@ const getAccountId = ({ aggregator, memberGuid, userId }) => {
   });
 };
 
-const verifyTransactionsValidatorSuccess = ({
-  accountId,
-  aggregator,
-  userId,
-}) => {
-  const url = `/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions?start_time=2021/1/1`;
+const verifyTransactionsValidatorSuccess = ({ accountId, userId }) => {
+  const url = `/data/aggregator/${TEST_EXAMPLE_B_AGGREGATOR_STRING}/user/${userId}/account/${accountId}/transactions?start_time=2021/1/1`;
 
   return cy
     .request({
@@ -69,12 +66,8 @@ const verifyTransactionsValidatorSuccess = ({
     });
 };
 
-const verifyTransactionsValidatorError = ({
-  accountId,
-  aggregator,
-  userId,
-}) => {
-  const url = `/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions`;
+const verifyTransactionsValidatorError = ({ accountId, userId }) => {
+  const url = `/data/aggregator/${TEST_EXAMPLE_B_AGGREGATOR_STRING}/user/${userId}/account/${accountId}/transactions`;
 
   return cy
     .request({
@@ -100,7 +93,6 @@ describe("testExampleA and B aggregators", () => {
 
   it(`makes a connection with jobType: ${JobTypes.VERIFICATION}, gets the transaction data from the data endpoints, and tests validator`, () => {
     let memberGuid: string;
-    let aggregator: string;
     const userId = Cypress.env("userId");
 
     visitWithPostMessageSpy(
@@ -116,21 +108,17 @@ describe("testExampleA and B aggregators", () => {
             );
           const { metadata } = connection?.args[0];
           memberGuid = metadata.member_guid;
-          aggregator = metadata.aggregator;
 
           getAccountId({
             memberGuid,
-            aggregator,
             userId,
           }).then((accountId) => {
             verifyTransactionsValidatorSuccess({
               accountId,
-              aggregator,
               userId,
             });
             verifyTransactionsValidatorError({
               accountId,
-              aggregator,
               userId,
             });
           });
