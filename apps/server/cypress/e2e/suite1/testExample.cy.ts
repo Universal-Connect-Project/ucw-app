@@ -56,9 +56,9 @@ const verifyTransactionsValidatorSuccess = ({
   accountId,
   aggregator,
   userId,
-  queryString = "",
+  transactionsQueryString = "",
 }) => {
-  const url = `/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions${queryString}`;
+  const url = `/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions${transactionsQueryString}`;
 
   return cy
     .request({
@@ -97,7 +97,7 @@ describe("testExampleA and B aggregators", () => {
   generateDataTests({
     makeAConnection: makeABConnection,
     shouldTestVcEndpoint: true,
-    queryString: "?start_time=2021/1/1",
+    transactionsQueryString: "?start_time=2021/1/1",
   });
 
   it(`makes a connection with jobType: ${JobTypes.VERIFICATION}, gets the transaction data from the data endpoints, and tests validator`, () => {
@@ -129,7 +129,7 @@ describe("testExampleA and B aggregators", () => {
               accountId,
               aggregator,
               userId,
-              queryString: "?start_time=2021/1/1",
+              transactionsQueryString: "?start_time=2021/1/1",
             });
             verifyTransactionsValidatorError({
               accountId,

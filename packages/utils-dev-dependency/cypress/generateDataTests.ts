@@ -79,15 +79,15 @@ const verifyTransactions = ({
   aggregator,
   shouldTestVcEndpoint,
   userId,
-  queryString = "",
+  transactionsQueryString = "",
 }: {
   accountId: string;
   aggregator: string;
   shouldTestVcEndpoint: boolean;
   userId: string;
-  queryString?: string;
+  transactionsQueryString?: string;
 }) => {
-  const url = `/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions${queryString}`;
+  const url = `/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions${transactionsQueryString}`;
 
   return cy.request("get", `/api${url}`).then((dataResponse) => {
     expect(dataResponse.status).to.equal(200);
@@ -115,11 +115,11 @@ const verifyTransactions = ({
 export const generateDataTests = ({
   makeAConnection,
   shouldTestVcEndpoint,
-  queryString = "",
+  transactionsQueryString = "",
 }: {
   makeAConnection: (jobType: JobTypes) => void;
   shouldTestVcEndpoint: boolean;
-  queryString?: string;
+  transactionsQueryString?: string;
 }) =>
   jobTypes.map((jobType) =>
     it(`makes a connection with jobType: ${jobType}, gets the accounts, identity, and transaction data from the data${shouldTestVcEndpoint ? " and vc" : ""} endpoints`, () => {
@@ -159,7 +159,7 @@ export const generateDataTests = ({
                 aggregator,
                 shouldTestVcEndpoint,
                 userId,
-                queryString,
+                transactionsQueryString,
               });
             });
           });
