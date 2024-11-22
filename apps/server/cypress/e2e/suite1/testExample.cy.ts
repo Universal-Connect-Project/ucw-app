@@ -56,8 +56,9 @@ const verifyTransactionsValidatorSuccess = ({
   accountId,
   aggregator,
   userId,
+  queryString = "",
 }) => {
-  const url = `/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions${aggregator === TEST_EXAMPLE_B_AGGREGATOR_STRING ? "?start_time=2021/1/1" : ""}`;
+  const url = `/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions${queryString}`;
 
   return cy
     .request({
@@ -128,6 +129,7 @@ describe("testExampleA and B aggregators", () => {
               accountId,
               aggregator,
               userId,
+              queryString: "?start_time=2021/1/1",
             });
             verifyTransactionsValidatorError({
               accountId,
