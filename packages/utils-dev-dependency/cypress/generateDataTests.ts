@@ -3,7 +3,7 @@ import { visitWithPostMessageSpy } from "./visit";
 
 const jobTypes = Object.values(JobTypes);
 
-const decodeVcDataFromResponse = (response) => {
+export const decodeVcDataFromResponse = (response) => {
   return decodeVcData(response.body.jwt);
 };
 
