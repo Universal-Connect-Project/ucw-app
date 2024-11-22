@@ -66,6 +66,6 @@ describe("Sophtron aggregator", () => {
   generateDataTests({
     makeAConnection,
     shouldTestVcEndpoint: true,
-    queryString: "?start_time=2021/1/1&end_time=2022/1/1",
+    transactionsQueryString: "?start_time=2021/1/1&end_time=2022/1/1",
   });
 });
