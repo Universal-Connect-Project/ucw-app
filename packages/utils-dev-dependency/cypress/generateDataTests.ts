@@ -79,8 +79,15 @@ const verifyTransactions = ({
   aggregator,
   shouldTestVcEndpoint,
   userId,
+  transactionsQueryString = "",
+}: {
+  accountId: string;
+  aggregator: string;
+  shouldTestVcEndpoint: boolean;
+  userId: string;
+  transactionsQueryString?: string;
 }) => {
-  const url = `/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions${aggregator === "sophtron" ? "?start_time=2021/1/1&end_time=2024/12/31" : ""}`;
+  const url = `/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions${transactionsQueryString}`;
 
   return cy.request("get", `/api${url}`).then((dataResponse) => {
     expect(dataResponse.status).to.equal(200);
@@ -105,7 +112,15 @@ const verifyTransactions = ({
   });
 };
 
-export const generateDataTests = ({ makeAConnection, shouldTestVcEndpoint }) =>
+export const generateDataTests = ({
+  makeAConnection,
+  shouldTestVcEndpoint,
+  transactionsQueryString = "",
+}: {
+  makeAConnection: (jobType: JobTypes) => void;
+  shouldTestVcEndpoint: boolean;
+  transactionsQueryString?: string;
+}) =>
   jobTypes.map((jobType) =>
     it(`makes a connection with jobType: ${jobType}, gets the accounts, identity, and transaction data from the data${shouldTestVcEndpoint ? " and vc" : ""} endpoints`, () => {
       let memberGuid: string;
@@ -144,6 +159,7 @@ export const generateDataTests = ({ makeAConnection, shouldTestVcEndpoint }) =>
                 aggregator,
                 shouldTestVcEndpoint,
                 userId,
+                transactionsQueryString,
               });
             });
           });
