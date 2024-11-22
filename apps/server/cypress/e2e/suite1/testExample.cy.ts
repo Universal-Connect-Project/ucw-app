@@ -5,7 +5,6 @@ import {
   generateDataTests,
   visitWithPostMessageSpy,
 } from "@repo/utils-dev-dependency";
-import { TEST_EXAMPLE_B_AGGREGATOR_STRING } from "../../../src/test-adapter";
 import {
   enterTestExampleACredentials,
   enterTestExampleBCredentials,
@@ -56,9 +55,8 @@ const verifyTransactionsValidatorSuccess = ({
   accountId,
   aggregator,
   userId,
-  transactionsQueryString = "",
 }) => {
-  const url = `/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions${transactionsQueryString}`;
+  const url = `/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions?start_time=2021/1/1`;
 
   return cy
     .request({
@@ -129,7 +127,6 @@ describe("testExampleA and B aggregators", () => {
               accountId,
               aggregator,
               userId,
-              transactionsQueryString: "?start_time=2021/1/1",
             });
             verifyTransactionsValidatorError({
               accountId,
