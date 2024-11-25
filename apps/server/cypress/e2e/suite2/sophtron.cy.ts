@@ -63,5 +63,9 @@ describe("Sophtron aggregator", () => {
     expectConnectionSuccess();
   });
 
-  generateDataTests({ makeAConnection, shouldTestVcEndpoint: true });
+  generateDataTests({
+    makeAConnection,
+    shouldTestVcEndpoint: true,
+    transactionsQueryString: "?start_time=2021/1/1&end_time=2022/1/1",
+  });
 });

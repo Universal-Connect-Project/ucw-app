@@ -1,14 +1,28 @@
 import { ConnectionStatus } from "@repo/utils";
+import he from "he";
 import { TestAdapter } from "./adapter";
-import { testExampleInstitution } from "./constants";
+import {
+  testDataRequestValidators,
+  testDataRequestValidatorStartTimeError,
+  testExampleInstitution,
+  testExampleJobResponse,
+  testRouteHandlers,
+} from "./constants";
 import { MappedJobTypes } from "../shared/contract";
 
 const labelText = "testLabelText";
 const aggregator = "aggregator";
 
-const testAdapter = new TestAdapter({
+const testAdapterA = new TestAdapter({
   labelText,
   aggregator,
+});
+
+const testAdapterB = new TestAdapter({
+  labelText,
+  aggregator,
+  routeHandlers: testRouteHandlers,
+  dataRequestValidators: testDataRequestValidators,
 });
 
 jest.mock("../services/storageClient/redis");
@@ -25,9 +39,64 @@ const successConnectionStatus = {
 } as any;
 
 describe("TestAdapter", () => {
+  describe("RouteHandlers", () => {
+    it("returns an empty object of RouteHandlers functions when there are no handlers", async () => {
+      const handlers: Record<string, (req: any, res: any) => void> =
+        testAdapterA.RouteHandlers;
+      expect(Object.keys(handlers)).toHaveLength(0);
+    });
+
+    it("returns an object of RouteHandlers functions when there are handlers", async () => {
+      const handlers: Record<string, (req: any, res: any) => void> =
+        testAdapterB.RouteHandlers;
+      expect(Object.keys(handlers)).toHaveLength(1);
+    });
+
+    describe("jobRequestHandler", () => {
+      it("returns data when calling jobRequestHandler", async () => {
+        const res = {
+          send: jest.fn(),
+        };
+
+        testAdapterB.RouteHandlers.jobRequestHandler(undefined, res);
+        expect(res.send).toHaveBeenCalledWith(testExampleJobResponse);
+      });
+    });
+  });
+
+  describe("DataRequestValidators", () => {
+    it("returns an empty object when there are no validators", async () => {
+      const handlers: Record<string, (req: any, res: any) => void> =
+        testAdapterA.DataRequestValidators;
+      expect(Object.keys(handlers)).toHaveLength(0);
+    });
+
+    it("returns an object of functions when there are validators", async () => {
+      const handlers: Record<string, (req: any, res: any) => void> =
+        testAdapterB.DataRequestValidators;
+      expect(Object.keys(handlers)).toHaveLength(1);
+    });
+
+    describe("dataRequestValidator", () => {
+      it("fails if there is a custom validator and start_time is missing", async () => {
+        const req = {
+          query: {
+            start_time: "",
+          },
+        };
+
+        const validationResponse =
+          testAdapterB.DataRequestValidators.transactions(req);
+        expect(validationResponse).toEqual(
+          testDataRequestValidatorStartTimeError,
+        );
+      });
+    });
+  });
+
   describe("GetInstitutionById", () => {
     it("returns a response object", async () => {
-      expect(await testAdapter.GetInstitutionById("test")).toEqual({
+      expect(await testAdapterA.GetInstitutionById("test")).toEqual({
         id: "test",
         logo_url: testExampleInstitution.logo_url,
         name: testExampleInstitution.name,
@@ -40,7 +109,7 @@ describe("TestAdapter", () => {
 
   describe("ListInstitutionCredentials", () => {
     it("returns a response object", async () => {
-      expect(await testAdapter.ListInstitutionCredentials("test")).toEqual([
+      expect(await testAdapterA.ListInstitutionCredentials("test")).toEqual([
         {
           field_name: "fieldName",
           field_type: "fieldType",
@@ -53,7 +122,7 @@ describe("TestAdapter", () => {
 
   describe("ListConnections", () => {
     it("returns a response object", async () => {
-      expect(await testAdapter.ListConnections("test")).toEqual([
+      expect(await testAdapterA.ListConnections("test")).toEqual([
         {
           id: "testId",
           cur_job_id: "testJobId",
@@ -70,7 +139,7 @@ describe("TestAdapter", () => {
   describe("ListConnectionCredentials", () => {
     it("returns a response object", async () => {
       expect(
-        await testAdapter.ListConnectionCredentials("test", "test"),
+        await testAdapterA.ListConnectionCredentials("test", "test"),
       ).toEqual([
         {
           id: "testId",
@@ -84,7 +153,7 @@ describe("TestAdapter", () => {
 
   describe("CreateConnection", () => {
     it("returns a response object", async () => {
-      expect(await testAdapter.CreateConnection(undefined, "test")).toEqual({
+      expect(await testAdapterA.CreateConnection(undefined, "test")).toEqual({
         id: "testId",
         cur_job_id: "testJobId",
         institution_code: "testCode",
@@ -105,7 +174,7 @@ describe("TestAdapter", () => {
         user_id: userId,
       };
 
-      await testAdapter.UpdateConnection(
+      await testAdapterA.UpdateConnection(
         {
           job_type: MappedJobTypes.AGGREGATE,
         } as any,
@@ -113,7 +182,7 @@ describe("TestAdapter", () => {
       );
 
       expect(
-        await testAdapter.GetConnectionStatus("test", "test", true, userId),
+        await testAdapterA.GetConnectionStatus("test", "test", true, userId),
       ).toEqual(successStatus);
     });
 
@@ -126,10 +195,10 @@ describe("TestAdapter", () => {
       };
 
       expect(
-        await testAdapter.GetConnectionStatus("test", "test", true, userId),
+        await testAdapterA.GetConnectionStatus("test", "test", true, userId),
       ).toEqual(successStatus);
 
-      await testAdapter.UpdateConnection(
+      await testAdapterA.UpdateConnection(
         {
           job_type: MappedJobTypes.VERIFICATION,
         } as any,
@@ -137,11 +206,11 @@ describe("TestAdapter", () => {
       );
 
       expect(
-        await testAdapter.GetConnectionStatus("test", "test", false, userId),
+        await testAdapterA.GetConnectionStatus("test", "test", false, userId),
       ).toEqual(successStatus);
 
       expect(
-        await testAdapter.GetConnectionStatus("test", "test", true, userId),
+        await testAdapterA.GetConnectionStatus("test", "test", true, userId),
       ).toEqual({
         aggregator,
         id: "testId",
@@ -167,7 +236,7 @@ describe("TestAdapter", () => {
         ],
       });
 
-      await testAdapter.UpdateConnection(
+      await testAdapterA.UpdateConnection(
         {
           job_type: MappedJobTypes.VERIFICATION,
         } as any,
@@ -175,11 +244,11 @@ describe("TestAdapter", () => {
       );
 
       expect(
-        await testAdapter.GetConnectionStatus("test", "test", false, userId),
+        await testAdapterA.GetConnectionStatus("test", "test", false, userId),
       ).toEqual(successStatus);
 
       expect(
-        await testAdapter.GetConnectionStatus("test", "test", true, userId),
+        await testAdapterA.GetConnectionStatus("test", "test", true, userId),
       ).toEqual(successStatus);
     });
   });
@@ -187,14 +256,14 @@ describe("TestAdapter", () => {
   describe("DeleteConnection", () => {
     it("responds with a ", async () => {
       expect(
-        await testAdapter.DeleteConnection("testId", "testUserId"),
+        await testAdapterA.DeleteConnection("testId", "testUserId"),
       ).toEqual(undefined);
     });
   });
 
   describe("DeleteUser", () => {
     it("responds with 204 on success", async () => {
-      expect(await testAdapter.DeleteUser("testUserId")).toEqual({
+      expect(await testAdapterA.DeleteUser("testUserId")).toEqual({
         status: 204,
         data: "",
       });
@@ -204,7 +273,7 @@ describe("TestAdapter", () => {
   describe("UpdateConnection", () => {
     it("returns a response object", async () => {
       expect(
-        await testAdapter.UpdateConnection(
+        await testAdapterA.UpdateConnection(
           {
             job_type: MappedJobTypes.AGGREGATE,
           } as any,
@@ -225,7 +294,7 @@ describe("TestAdapter", () => {
   describe("UpdateConnectionInternal", () => {
     it("returns a response object", async () => {
       expect(
-        await testAdapter.UpdateConnectionInternal(undefined, "test"),
+        await testAdapterA.UpdateConnectionInternal(undefined, "test"),
       ).toEqual({
         id: "testId",
         cur_job_id: "testJobId",
@@ -240,7 +309,7 @@ describe("TestAdapter", () => {
 
   describe("GetConnectionById", () => {
     it("returns a response object", async () => {
-      expect(await testAdapter.GetConnectionById(undefined, "test")).toEqual({
+      expect(await testAdapterA.GetConnectionById(undefined, "test")).toEqual({
         id: "testId",
         institution_code: "testCode",
         is_oauth: false,
@@ -255,7 +324,7 @@ describe("TestAdapter", () => {
   describe("GetConnectionStatus", () => {
     it("returns a response object", async () => {
       expect(
-        await testAdapter.GetConnectionStatus("test", "test", false, "userId"),
+        await testAdapterA.GetConnectionStatus("test", "test", false, "userId"),
       ).toEqual(successConnectionStatus);
     });
   });
@@ -263,14 +332,14 @@ describe("TestAdapter", () => {
   describe("AnswerChallenge", () => {
     it("returns a response object", async () => {
       expect(
-        await testAdapter.AnswerChallenge(undefined, "test", "test"),
+        await testAdapterA.AnswerChallenge(undefined, "test", "test"),
       ).toEqual(true);
     });
   });
 
   describe("ResolveUserId", () => {
     it("returns a response object", async () => {
-      expect(await testAdapter.ResolveUserId("userId", false)).toEqual(
+      expect(await testAdapterA.ResolveUserId("userId", false)).toEqual(
         "userId",
       );
     });

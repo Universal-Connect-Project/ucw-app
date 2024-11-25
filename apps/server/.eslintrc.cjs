@@ -15,6 +15,7 @@ module.exports = {
     "jest.config.js",
     "jestSetup.ts",
     "babel.config.js",
+    "cypress.config.ts",
     "cypress.config.*.ts",
     "cypress/**/*",
     "baseCypressConfig.ts",

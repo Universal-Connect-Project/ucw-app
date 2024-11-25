@@ -1,6 +1,6 @@
 {
   "name": "server",
-  "version": "0.0.14-beta",
+  "version": "0.0.15-beta",
   "packageManager": "npm@10.8.2",
   "scripts": {
     "cypress:open": "cypress open --config-file cypress.config.ts",

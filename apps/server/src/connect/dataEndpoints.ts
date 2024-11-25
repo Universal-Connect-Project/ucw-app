@@ -2,11 +2,12 @@
 import type { Response } from "express";
 import he from "he";
 import Joi from "joi";
+
+import { VCDataTypes } from "@repo/utils";
+import type { ConnectApi } from "./connectApi";
 import type { Aggregator } from "../shared/contract";
-import { Aggregators } from "../shared/contract";
 import { withValidateAggregatorInPath } from "../utils/validators";
 import { getAggregatorAdapter, getData, getVC } from "../adapterIndex";
-import { VCDataTypes } from "@repo/utils";
 
 export interface AccountsDataQueryParameters {
   connectionId: string;
@@ -109,26 +110,6 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
   withValidateAggregatorInPath(
     async (req: TransactionsRequest, res: Response) => {
       const { accountId, aggregator, userId } = req.params;
-
-      const schema = Joi.object({
-        end_time:
-          aggregator === Aggregators.SOPHTRON
-            ? Joi.string().required()
-            : Joi.string(),
-        start_time:
-          aggregator === Aggregators.SOPHTRON
-            ? Joi.string().required()
-            : Joi.string(),
-      });
-
-      const { error } = schema.validate(req.query);
-
-      if (error) {
-        res.status(400);
-        res.send(he.encode(error.details[0].message));
-        return;
-      }
-
       const { start_time, end_time } = req.query;
 
       const aggregatorAdapter = getAggregatorAdapter(aggregator);
@@ -142,6 +123,39 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
         startTime: start_time,
         endTime: end_time,
       };
+
+      let validationError: string | undefined;
+
+      if (
+        typeof aggregatorAdapter?.DataRequestValidators?.transactions ===
+        "function"
+      ) {
+        validationError =
+          aggregatorAdapter.DataRequestValidators?.transactions(req);
+      } else {
+        const schema = Joi.object({
+          end_time:
+            aggregator === ("sophtron" as Aggregator)
+              ? Joi.string().required()
+              : Joi.string(),
+          start_time:
+            aggregator === ("sophtron" as Aggregator)
+              ? Joi.string().required()
+              : Joi.string(),
+        });
+
+        const { error } = schema.validate(req.query);
+
+        if (error) {
+          validationError = error.details[0].message;
+        }
+      }
+
+      if (validationError) {
+        res.status(400);
+        res.send(he.encode(validationError));
+        return;
+      }
 
       try {
         if (isVc) {

@@ -14,7 +14,7 @@ import { getTemplateAdapterMapObject } from "@ucp-npm/template-adapter";
 
 const templateAdapterMapObject = getTemplateAdapterMapObject();
 
-const sophtronAdapterMapObject = {
+const sophtronAdapterMapObject: Record<string, AdapterMap> = {
   sophtron: {
     dataAdapter: sophtronDataAdapter,
     vcAdapter: getSophtronVc,
@@ -22,7 +22,7 @@ const sophtronAdapterMapObject = {
   },
 };
 
-const mxAdapterMapObject = getMxAdapterMapObject({
+const mxAdapterMapObject: Record<string, AdapterMap> = getMxAdapterMapObject({
   cacheClient: {
     set: set,
     get: get,
