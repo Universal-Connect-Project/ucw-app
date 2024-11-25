@@ -35,7 +35,7 @@ jobs:
           npm view "$PACKAGE_NAME@$PACKAGE_VERSION" --json > result.json 2>&1 || true
 
           # Check the exit code to determine if the version exists
-          if grep -q "404" result.json; then
+          if grep -q "No match found for version" result.json; then
             echo "Version $PACKAGE_VERSION does not exist for $PACKAGE_NAME on npmjs.com. 🎉"
             exit 0
           else
