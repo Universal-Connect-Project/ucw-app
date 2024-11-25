@@ -131,23 +131,6 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
       ) {
         validationError =
           aggregatorAdapter.DataRequestValidators?.transactions(req);
-      } else {
-        const schema = Joi.object({
-          end_time:
-            aggregator === ("sophtron" as Aggregator)
-              ? Joi.string().required()
-              : Joi.string(),
-          start_time:
-            aggregator === ("sophtron" as Aggregator)
-              ? Joi.string().required()
-              : Joi.string(),
-        });
-
-        const { error } = schema.validate(req.query);
-
-        if (error) {
-          validationError = error.details[0].message;
-        }
       }
 
       if (validationError) {
