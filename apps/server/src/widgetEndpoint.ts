@@ -2,7 +2,6 @@ import { JobTypes } from "@repo/utils";
 import type { Request, Response } from "express";
 import Joi from "joi";
 import { aggregators } from "./adapterSetup";
-import config from "./config";
 import fs from "node:fs";
 
 import { wget as _wget } from "./infra/http";
@@ -76,7 +75,5 @@ export const widgetHandler = (req: Request, res: Response) => {
     "utf8",
   );
 
-  // void _wget("/static/index.html").then((html) => {
   renderDefaultPage(req, res, html);
-  // });
 };
