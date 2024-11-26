@@ -32,7 +32,6 @@ jobs:
 
       - name: "Create Server env file"
         env:
-          UI_PORT: ${{ vars.RESOURCE_PORT }}
           env_vars: ${{ needs.setup-env.outputs.env_vars }}
           DO_PUBLISH: ${{ env.BRANCH_NAME == 'main' }}
         run: |
@@ -53,7 +52,6 @@ jobs:
           # Vars
           echo REDIS_PORT=${{ vars.REDIS_PORT }} >> ${ENV_FILE_PATH}
           echo SERVER_PORT=${{ vars.PORT }} >> ${ENV_FILE_PATH}
-          echo UI_PORT=${{ vars.RESOURCE_PORT }} >> ${ENV_FILE_PATH}
             
           # Secrets (can't load these from another job, due to GH security features)
           echo DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} >> ${ENV_FILE_PATH}
