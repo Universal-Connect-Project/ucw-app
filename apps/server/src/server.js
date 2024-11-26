@@ -7,12 +7,12 @@ import RateLimit from "express-rate-limit";
 
 import config from "./config";
 import useConnect from "./connect/connectApiExpress";
-import { stream } from "./infra/http";
 import { error as _error, info } from "./infra/logger";
 import { initialize as initializeElastic } from "./services/ElasticSearchClient";
 import { setInstitutionSyncSchedule } from "./services/institutionSyncer";
 import { widgetHandler } from "./widgetEndpoint";
 import useAuthentication from "./authentication";
+import path from "path";
 
 process.on("unhandledRejection", (error) => {
   _error(`unhandledRejection: ${error.message}`, error);
@@ -70,24 +70,19 @@ app.use(function (err, req, res, next) {
   res.send(err.message);
 });
 
-app.get("/", widgetHandler);
+app.use(express.static(path.join(__dirname, "../../ui/dist")));
+
+app.get("/widget", widgetHandler);
 
 app.get("*", (req, res) => {
   req.metricsPath = "/catchall";
-  const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}${req.path}`;
-  if (!req.path.includes("-hmr")) {
-    void stream(resourcePath, null, res);
-  } else {
-    res.sendStatus(404);
-  }
+  res.sendStatus(404);
 });
 
 app.listen(config.PORT, () => {
   const message = `Server is running on port ${config.PORT}, Env: ${config.Env}, LogLevel: ${config.LogLevel}`;
-  const uiMessage = `UI is running on ${config.ResourcePrefix}`;
 
   info(message);
-  info(uiMessage);
 });
 
 // Ngrok is required for Finicity webhooks local and github testing

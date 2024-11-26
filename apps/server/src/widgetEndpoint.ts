@@ -3,9 +3,11 @@ import type { Request, Response } from "express";
 import Joi from "joi";
 import { aggregators } from "./adapterSetup";
 import config from "./config";
+import fs from "node:fs";
 
 import { wget as _wget } from "./infra/http";
 import he from "he";
+import path from "path";
 
 const pageQueryParameters = new RegExp(
   [
@@ -68,8 +70,13 @@ export const widgetHandler = (req: Request, res: Response) => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (req as any).metricsPath = "/catchall";
-  const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}${req.path}`;
-  void _wget(resourcePath).then((html) => {
-    renderDefaultPage(req, res, html);
-  });
+
+  const html = fs.readFileSync(
+    path.join(__dirname, "../../ui/dist/index.html"),
+    "utf8",
+  );
+
+  // void _wget("/static/index.html").then((html) => {
+  renderDefaultPage(req, res, html);
+  // });
 };

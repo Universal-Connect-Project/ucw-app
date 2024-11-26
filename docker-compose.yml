@@ -34,7 +34,6 @@ services:
       - ./apps/server/.env
     environment:
       - ELASTIC_SEARCH_URL=http://ucw-app-elasticsearch:9200
-      - ResourcePrefix=http://ui:5173
       - RedisServer=redis://cache:6379
 
   ui:

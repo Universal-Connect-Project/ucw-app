@@ -38,8 +38,6 @@ const keysToPullFromEnv = [
 
   "RedisServer",
   "RedisCacheTimeSeconds",
-  "ResourcePrefix",
-  "ResourceVersion",
 
   "SophtronApiUserId",
   "SophtronApiUserSecret",
