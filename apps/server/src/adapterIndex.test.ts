@@ -1,7 +1,6 @@
 import { getDataFromVCJwt, VCDataTypes } from "@repo/utils";
 import { getAggregatorAdapter, getData, getVC } from "./adapterIndex";
 import type { Aggregator } from "./adapterSetup";
-import { sophtronVcAccountsData } from "./test/testData/sophtronVcData";
 import { TEST_EXAMPLE_A_AGGREGATOR_STRING, TestAdapter } from "./test-adapter";
 import { testVcAccountsData } from "./test/testData/testVcData";
 
@@ -11,17 +10,6 @@ const userId = "testUserId";
 
 describe("adapterSetup", () => {
   describe("getVC", () => {
-    it("uses sophtron if the aggregator is sophtron", async () => {
-      const response = await getVC({
-        aggregator: "sophtron",
-        connectionId,
-        type,
-        userId,
-      });
-
-      expect(response).toEqual(sophtronVcAccountsData);
-    });
-
     it("throws an error if the aggregator doesnt have a handler", async () => {
       await expect(
         async () =>
