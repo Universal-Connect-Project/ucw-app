@@ -6,8 +6,6 @@ import { createCustomerData } from "./testData/users";
 
 const FINICITY_BASE_PATH = "https://api.finicity.com";
 export const FINICITY_INSTITUTION_BY_ID_PATH = `${FINICITY_BASE_PATH}/institution/v2/institutions/:institutionId`;
-export const DELETE_CUSTOMER_PATH = `${FINICITY_BASE_PATH}/aggregation/v1/customers/:id`;
-export const READ_CUSTOMER_PATH = `${FINICITY_BASE_PATH}/aggregation/v1/customers`;
 export const CREATE_CUSTOMER_PATH = `${FINICITY_BASE_PATH}/aggregation/v2/customers/testing`;
 export const FINICITY_AUTH_PATH = `${FINICITY_BASE_PATH}/aggregation/v2/partners/authentication`;
 export const FINICITY_CONNECT_PATH = `${FINICITY_BASE_PATH}/connect/v2/generate/lite`;
