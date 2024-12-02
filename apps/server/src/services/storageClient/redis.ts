@@ -94,6 +94,8 @@ redisClient
     await setNoExpiration(PREFERENCES_REDIS_KEY, preferencesToSet || {});
   })
   .catch((reason) => {
-    error("Failed to connect to redis server: " + reason);
+    error(
+      `Failed to connect to redis server at ${config.RedisServer}: ` + reason,
+    );
     info("No redis connection");
   });
