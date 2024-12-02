@@ -25,6 +25,10 @@
     "dev:debug": {
       "cache": false,
       "persistent": true
+    },
+    "start:server": {
+      "cache": false,
+      "persistent": true
     }
   }
 }

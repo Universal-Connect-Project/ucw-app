@@ -26,7 +26,6 @@ jobs:
       - name: "Create Server env file"
         env:
           env_vars: ${{ needs.setup-env.outputs.env_vars }}
-          DO_PUBLISH: ${{ env.BRANCH_NAME == 'main' }}
         run: |
           ENV_FILE_PATH=./apps/server/.env
           touch ${ENV_FILE_PATH}
@@ -50,22 +49,6 @@ jobs:
           echo DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} >> ${ENV_FILE_PATH}
           echo DOCKER_TOKEN=${{ secrets.DOCKER_TOKEN }} >> ${ENV_FILE_PATH}
           cat ${ENV_FILE_PATH}
-
-      - name: "Get Server version"
-        run: |
-          DOCKER_IMAGE_SERVER=$(npm pkg get version --prefix ./apps/server | xargs)
-          echo DOCKER_IMAGE_SERVER="${DOCKER_IMAGE_SERVER}" >> ./.env
-          echo DOCKER_IMAGE_SERVER="${DOCKER_IMAGE_SERVER}" >> $GITHUB_ENV
-
-      - name: "Get UI version"
-        run: |
-          DOCKER_IMAGE_UI=$(npm pkg get version --prefix ./apps/ui | xargs)
-          echo DOCKER_IMAGE_UI="${DOCKER_IMAGE_UI}" >> ./.env
-          echo DOCKER_IMAGE_UI="${DOCKER_IMAGE_UI}" >> $GITHUB_ENV
-
-      - name: "Pull docker images"
-        run: |
-          docker compose pull --ignore-buildable --quiet
 
       - name: "Build docker images"
         run: |

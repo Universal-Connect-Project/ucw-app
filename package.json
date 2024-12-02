@@ -9,6 +9,7 @@
     "dev:debug": "turbo dev:debug",
     "dev:e2e": "turbo dev:e2e",
     "lint": "turbo lint",
+    "start:server": "turbo start:server",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",

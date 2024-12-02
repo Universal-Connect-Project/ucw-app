@@ -25,7 +25,7 @@ export const refreshAConnection = ({ enterCredentials, selectInstitution }) => {
 
       //Refresh the connection
       cy.visit(
-        `/?job_type=aggregate&connection_id=${memberGuid}&aggregator=${aggregator}&user_id=${userId}`,
+        `/widget?job_type=aggregate&connection_id=${memberGuid}&aggregator=${aggregator}&user_id=${userId}`,
       );
 
       enterCredentials();
