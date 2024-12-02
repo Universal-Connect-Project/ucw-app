@@ -52,7 +52,13 @@ jobs:
 
       - name: "Build docker images"
         run: |
-          docker compose up --build --detach --attach ucw-app-server
+          docker compose up --build --detach --wait
+        continue-on-error: true
+
+      - name: "Show Docker Compose logs (always runs)"
+        run: |
+          echo "=== Docker Compose Logs ==="
+          docker compose logs || echo "Failed to fetch logs"
 
       - name: "Check if build passed"
         run: |
