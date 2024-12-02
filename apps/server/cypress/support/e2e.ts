@@ -52,23 +52,5 @@ beforeEach(() => {
   Cypress.env("userId", crypto.randomUUID());
 });
 
-afterEach(() => {
-  const testAggregators = ["mx_int", "sophtron"];
-  const userId = Cypress.env("userId");
-
-  testAggregators.forEach((aggregator) => {
-    cy.request({
-      headers: {
-        authorization: `Bearer ${Cypress.env("accessToken")}`,
-      },
-      method: "DELETE",
-      url: `/api/aggregator/${aggregator}/user/${userId}`,
-      failOnStatusCode: false,
-    }).should((response) => {
-      expect(response.status).to.be.oneOf([200, 204, 400]);
-    });
-  });
-});
-
 // Alternatively you can use CommonJS syntax:
 // require('./commands')

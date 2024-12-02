@@ -1,54 +1,46 @@
-import config from './config'
+import config from "./config";
 
 const aggregatorCredentials = {
   mxInt: {
     username: config.MxClientId,
     password: config.MxApiSecret,
-    basePath: 'https://int-api.mx.com',
-    vcEndpoint: 'https://int-api.mx.com/',
-    aggregator: 'mx_int',
-    available: true
+    basePath: "https://int-api.mx.com",
+    vcEndpoint: "https://int-api.mx.com/",
+    aggregator: "mx_int",
+    available: true,
   },
   mxProd: {
     username: config.MxClientIdProd,
     password: config.MxApiSecretProd,
-    basePath: 'https://api.mx.com',
-    vcEndpoint: 'https://api.mx.com/',
-    aggregator: 'mx',
-    available: true
+    basePath: "https://api.mx.com",
+    vcEndpoint: "https://api.mx.com/",
+    aggregator: "mx",
+    available: true,
   },
   akoyaSandbox: {
     clientId: config.AkoyaClientId,
     secret: config.AkoyaApiSecret,
-    basePath: 'sandbox-idp.ddp.akoya.com',
-    productPath: 'sandbox-products.ddp.akoya.com',
-    aggregator: 'akoya_sandbox',
-    available: true
+    basePath: "sandbox-idp.ddp.akoya.com",
+    productPath: "sandbox-products.ddp.akoya.com",
+    aggregator: "akoya_sandbox",
+    available: true,
   },
   akoyaProd: {
     clientId: config.AkoyaClientIdProd,
     secret: config.AkoyaApiSecretProd,
-    basePath: 'idp.ddp.akoya.com',
-    productPath: 'products.ddp.akoya.com',
-    aggregator: 'akoya',
-    available: true
+    basePath: "idp.ddp.akoya.com",
+    productPath: "products.ddp.akoya.com",
+    aggregator: "akoya",
+    available: true,
   },
   finicityProd: {
-    basePath: 'https://api.finicity.com',
+    basePath: "https://api.finicity.com",
     partnerId: config.FinicityPartnerId,
     appKey: config.FinicityAppKey,
     secret: config.FinicitySecret,
-    aggregator: 'finicity',
-    available: true
+    aggregator: "finicity",
+    available: true,
   },
-  sophtron: {
-    clientId: config.SophtronApiUserId,
-    secret: config.SophtronApiUserSecret,
-    endpoint: config.SophtronApiServiceEndpoint,
-    vcEndpoint: config.SophtronVCServiceEndpoint,
-    aggregator: 'sophtron',
-    available: true
-  }
-}
+};
 
-export default aggregatorCredentials
+export default aggregatorCredentials;

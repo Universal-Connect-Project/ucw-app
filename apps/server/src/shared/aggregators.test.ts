@@ -34,21 +34,12 @@ const institutionAggregatorsSupportEverything: CachedInstitution = {
     supports_verification: true,
     supports_history: true,
   },
-  sophtron: {
-    id: "sophtron",
-    supports_aggregation: true,
-    supports_oauth: true,
-    supports_identification: true,
-    supports_verification: true,
-    supports_history: true,
-  },
 };
 
 const allAggregators = [
   Aggregators.TEST_A,
   Aggregators.TEST_B,
   Aggregators.TEST_C,
-  Aggregators.SOPHTRON,
 ];
 
 const filterOutAggregator = (aggregator: Aggregators): Aggregators[] =>
@@ -227,6 +218,5 @@ describe("aggregators", () => {
     generateAggregatorTests(Aggregators.TEST_A);
     generateAggregatorTests(Aggregators.TEST_B);
     generateAggregatorTests(Aggregators.TEST_C);
-    generateAggregatorTests(Aggregators.SOPHTRON);
   });
 });
