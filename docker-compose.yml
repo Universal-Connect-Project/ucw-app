@@ -9,7 +9,7 @@ services:
     restart: on-failure
     healthcheck:
       test: wget -q -O- http://server:${SERVER_PORT}/health || exit 1
-      start_period: 120s
+      start_period: 60s
       interval: 30s
       timeout: 10s
       retries: 10
