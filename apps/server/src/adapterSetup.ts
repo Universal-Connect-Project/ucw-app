@@ -14,8 +14,6 @@ const sophtronAdapterMapObject: Record<string, AdapterMap> =
     aggregatorCredentials: {
       clientId: config.SophtronApiUserId,
       secret: config.SophtronApiUserSecret,
-      endpoint: config.SophtronApiServiceEndpoint,
-      vcEndpoint: config.SophtronVCServiceEndpoint,
     },
     envConfig: {
       HOSTURL: config.HOSTURL,
@@ -32,18 +30,10 @@ const mxAdapterMapObject = getMxAdapterMapObject({
     mxInt: {
       username: config.MxClientId,
       password: config.MxApiSecret,
-      basePath: "https://int-api.mx.com",
-      vcEndpoint: "https://int-api.mx.com/",
-      aggregator: "mx_int",
-      available: true,
     },
     mxProd: {
       username: config.MxClientIdProd,
       password: config.MxApiSecretProd,
-      basePath: "https://api.mx.com",
-      vcEndpoint: "https://api.mx.com/",
-      aggregator: "mx",
-      available: true,
     },
   },
   envConfig: {
