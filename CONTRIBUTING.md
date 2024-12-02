@@ -14,6 +14,18 @@ If a feature is marked "ready to take", then anyone from the community can comme
 
 It's possible that a feature request will be denied if it doesn't match the vision of the project, or postponed if it's not the right time. If a requested feature is denied, then you're welcome to fork the repo to make whatever changes you want.
 
+## Versioning
+
+We use [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Every pull request needs to include an incremental version update following the semantic versioning guidelines:
+
+Given a version number MAJOR.MINOR.PATCH, increment the:
+
+1. MAJOR version when you make incompatible changes
+2. MINOR version when you add functionality in a backward compatible manner
+3. PATCH version when you make backward compatible bug fixes
+
+In addition to updating the version, an update to the [Changelog](CHANGELOG.md) is required. Instructions for updating the changelog are documented in the [CHANGELOG.md](CHANGELOG.md) file.
+
 ## Standard of quality
 
 We strive to maintain a high standard of quality. We want users of our software to have a good and reliable experience. We want people contributing to our code to have a good and reliable experience. You should expect to receive feedback on your pull requests and not blind approvals.
@@ -60,4 +72,3 @@ These variables are used in the `./docker-compose.yml` file when building/pullin
 ## Aggregator Adapter Packages
 
 If you are an aggregator, and would like to create your own adapter package that can be used with the UCW, See [ADAPTERS.md](ADAPTERS.md) for more info.
-
