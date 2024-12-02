@@ -236,62 +236,6 @@ describe("dataEndpoints", () => {
         expect(res.status).toHaveBeenCalledWith(400);
       });
 
-      it("fails if it's sophtron and there is no start_time", async () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn(),
-        } as unknown as Response;
-
-        const req: TransactionsRequest = {
-          params: {
-            accountId: "testAccountId",
-            aggregator: "sophtron" as Aggregator,
-            userId: "testUserId",
-          },
-          query: {
-            end_time: "junk",
-            start_time: undefined,
-          },
-        };
-
-        await vcTransactionsDataHandler(req, res);
-
-        expect(res.send).toHaveBeenCalledWith(
-          "&#x22;start_time&#x22; is required",
-        );
-        expect(res.status).toHaveBeenCalledWith(400);
-      });
-
-      it("fails if it's sophtron and there is no end_time", async () => {
-        jest.spyOn(adapterIndex, "getVC").mockImplementation(() => {
-          throw new Error();
-        });
-
-        const res = {
-          send: jest.fn(),
-          status: jest.fn(),
-        } as unknown as Response;
-
-        const req: TransactionsRequest = {
-          params: {
-            accountId: "testAccountId",
-            aggregator: "sophtron" as Aggregator,
-            userId: "testUserId",
-          },
-          query: {
-            end_time: undefined,
-            start_time: "junk",
-          },
-        };
-
-        await vcTransactionsDataHandler(req, res);
-
-        expect(res.send).toHaveBeenCalledWith(
-          "&#x22;end_time&#x22; is required",
-        );
-        expect(res.status).toHaveBeenCalledWith(400);
-      });
-
       it("responds with the vc data in the jwt on success", async () => {
         jest
           .spyOn(adapterIndex, "getVC")

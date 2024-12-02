@@ -4,7 +4,6 @@ import he from "he";
 import Joi from "joi";
 
 import { VCDataTypes } from "@repo/utils";
-import type { ConnectApi } from "./connectApi";
 import type { Aggregator } from "../shared/contract";
 import { withValidateAggregatorInPath } from "../utils/validators";
 import { getAggregatorAdapter, getData, getVC } from "../adapterIndex";
@@ -132,23 +131,6 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
       ) {
         validationError =
           aggregatorAdapter.DataRequestValidators?.transactions(req);
-      } else {
-        const schema = Joi.object({
-          end_time:
-            aggregator === ("sophtron" as Aggregator)
-              ? Joi.string().required()
-              : Joi.string(),
-          start_time:
-            aggregator === ("sophtron" as Aggregator)
-              ? Joi.string().required()
-              : Joi.string(),
-        });
-
-        const { error } = schema.validate(req.query);
-
-        if (error) {
-          validationError = error.details[0].message;
-        }
       }
 
       if (validationError) {

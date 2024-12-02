@@ -1,28 +1,29 @@
 import { getMxAdapterMapObject } from "@ucp-npm/mx-adapter";
+import { getSophtronAdapterMapObject } from "@ucp-npm/sophtron-adapter";
 import type { AdapterMap } from "@repo/utils";
 
 import config from "./config";
 import { get, set } from "./services/storageClient/redis";
 import * as logger from "./infra/logger";
-import { SophtronAdapter } from "./adapters/sophtron";
 
-import getSophtronVc, {
-  dataAdapter as sophtronDataAdapter,
-} from "./services/vcAggregators/sophtronVc";
 import { adapterMapObject as testAdapterMapObject } from "./test-adapter";
 import { getTemplateAdapterMapObject } from "@ucp-npm/template-adapter";
 
 const templateAdapterMapObject = getTemplateAdapterMapObject();
 
-const sophtronAdapterMapObject: Record<string, AdapterMap> = {
-  sophtron: {
-    dataAdapter: sophtronDataAdapter,
-    vcAdapter: getSophtronVc,
-    widgetAdapter: new SophtronAdapter(),
-  },
-};
+const sophtronAdapterMapObject: Record<string, AdapterMap> =
+  getSophtronAdapterMapObject({
+    logClient: logger,
+    aggregatorCredentials: {
+      clientId: config.SophtronApiUserId,
+      secret: config.SophtronApiUserSecret,
+    },
+    envConfig: {
+      HOSTURL: config.HOSTURL,
+    },
+  });
 
-const mxAdapterMapObject: Record<string, AdapterMap> = getMxAdapterMapObject({
+const mxAdapterMapObject = getMxAdapterMapObject({
   cacheClient: {
     set: set,
     get: get,
@@ -32,18 +33,10 @@ const mxAdapterMapObject: Record<string, AdapterMap> = getMxAdapterMapObject({
     mxInt: {
       username: config.MxClientId,
       password: config.MxApiSecret,
-      basePath: "https://int-api.mx.com",
-      vcEndpoint: "https://int-api.mx.com/",
-      aggregator: "mx_int",
-      available: true,
     },
     mxProd: {
       username: config.MxClientIdProd,
       password: config.MxApiSecretProd,
-      basePath: "https://api.mx.com",
-      vcEndpoint: "https://api.mx.com/",
-      aggregator: "mx",
-      available: true,
     },
   },
   envConfig: {
