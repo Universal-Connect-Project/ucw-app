@@ -34,8 +34,6 @@ jobs:
           echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
           # Override ENV to Env=prod
           echo ENV=prod >> ${ENV_FILE_PATH}
-          echo ELASTIC_SEARCH_URL=http://ucw-app-elasticsearch:9200 >> ${ENV_FILE_PATH}
-          echo RedisServer=redis://cache:6379 >> ${ENV_FILE_PATH}
           cat ${ENV_FILE_PATH}
 
       - name: "Create Root env file"
