@@ -52,11 +52,7 @@ jobs:
 
       - name: "Build docker images"
         run: |
-          docker compose up --build --wait --detach
-
-      - name: "Show logs"
-        run: |
-          docker logs ucw-app-server
+          docker compose up --build --wait --detach --attach ucw-app-server
 
       - name: "Check if build passed"
         run: |
