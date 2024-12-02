@@ -25,9 +25,6 @@ services:
       - ucw
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
-    environment:
-      ELASTIC_SEARCH_URL: "http://ucw-app-elasticsearch:9200"
-      RedisServer: "redis://cache:6379"
 
   cache:
     container_name: ucw-app-cache

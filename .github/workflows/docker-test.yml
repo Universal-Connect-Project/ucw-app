@@ -52,7 +52,7 @@ jobs:
 
       - name: "Build docker images"
         run: |
-          docker compose up
+          cross-env ELASTIC_SEARCH_URL=http://ucw-app-elasticsearch:9200 RedisServer=redis://cache:6379 docker compose up
 
       - name: "Check if build passed"
         run: |
