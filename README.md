@@ -47,7 +47,7 @@ The API documentation for this service lives in [./openApiDocumentation.json](./
 
 It can take a minute or so for the server to initialize and set up elasticsearch.
 
-Once the server is running, and you see a message that says, `"Message":"App initialized successfully"`, you can then navigate to [http://localhost:8080/?job_type=aggregate&user_id=test-user-id](http://localhost:8080/?job_type=aggregate&user_id=test-user-id) in a browser, and you should see the Universal Connect Widget UI load.
+Once the server is running, and you see a message that says, `"Message":"App initialized successfully"`, you can then navigate to [http://localhost:8080/widget?job_type=aggregate&user_id=test-user-id](http://localhost:8080/widget?job_type=aggregate&user_id=test-user-id) in a browser, and you should see the Universal Connect Widget UI load.
 
 ## Preferences and Aggregator Credentials
 
