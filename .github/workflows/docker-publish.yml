@@ -1,0 +1,130 @@
+name: 'Publish Docker images'
+
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  setup-env:
+    name: 'Load ENV Vars'
+    uses: ./.github/workflows/setup-env.yml
+    secrets: inherit
+
+  push_to_registry:
+    name: 'Push Docker image to Docker Hub'
+    runs-on: ubuntu-latest
+    needs: [setup-env]
+    env:
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+
+    steps:
+
+      - name: 'Check out the repo'
+        uses: actions/checkout@v4
+
+      - name: 'Set up Node'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/Iron'
+          check-latest: true
+
+      - name: 'Set up Docker Buildx'
+        uses: docker/setup-buildx-action@v3
+
+      - name: 'Create Server env file'
+        env:
+          UI_PORT: ${{ vars.RESOURCE_PORT }}
+          env_vars: ${{ needs.setup-env.outputs.env_vars }}
+          DO_PUBLISH: ${{ env.BRANCH_NAME == 'main' }}
+        run: |
+          ENV_FILE_PATH=./apps/server/.env
+          touch ${ENV_FILE_PATH}
+          
+          # Vars
+          echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
+          # Override ENV to Env=prod
+          echo ENV=prod >> ${ENV_FILE_PATH}
+          echo RESOURCEPREFIX="http://ui:${UI_PORT}" >> ${ENV_FILE_PATH}
+          cat ${ENV_FILE_PATH}
+
+      - name: 'Create Root env file'
+        run: |
+          ENV_FILE_PATH=.env
+          touch ${ENV_FILE_PATH}
+          
+          # Vars
+          echo REDIS_PORT=${{ vars.REDIS_PORT }} >> ${ENV_FILE_PATH}
+          echo SERVER_PORT=${{ vars.PORT }} >> ${ENV_FILE_PATH}
+          echo UI_PORT=${{ vars.RESOURCE_PORT }} >> ${ENV_FILE_PATH}
+            
+          # Secrets (can't load these from another job, due to GH security features)
+          echo DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} >> ${ENV_FILE_PATH}
+          echo DOCKER_TOKEN=${{ secrets.DOCKER_TOKEN }} >> ${ENV_FILE_PATH}
+          cat ${ENV_FILE_PATH}
+          
+      - name: 'Get Server version'
+        run: |
+          DOCKER_IMAGE_SERVER=$(npm pkg get version --prefix ./apps/server | xargs)
+          echo DOCKER_IMAGE_SERVER="${DOCKER_IMAGE_SERVER}" >> ./.env
+          echo DOCKER_IMAGE_SERVER="${DOCKER_IMAGE_SERVER}" >> $GITHUB_ENV
+
+      - name: 'Get UI version'
+        run: |
+          DOCKER_IMAGE_UI=$(npm pkg get version --prefix ./apps/ui | xargs)
+          echo DOCKER_IMAGE_UI="${DOCKER_IMAGE_UI}" >> ./.env
+          echo DOCKER_IMAGE_UI="${DOCKER_IMAGE_UI}" >> $GITHUB_ENV
+
+      - name: 'Check if version exists on Docker Hub'
+        env:
+          UI_VERSION: ${{ env.DOCKER_IMAGE_UI }}
+          SERVER_VERSION: ${{ env.DOCKER_IMAGE_SERVER }}
+        run: |
+          echo "-----------------"
+          echo "UI: ${{ env.UI_VERSION }}"
+          echo "SERVER: ${{ env.SERVER_VERSION }}"
+          echo "-----------------"
+          
+          UI_DIGEST=$(docker buildx imagetools inspect universalconnectfoundation/ucw-app-ui:v${{ env.UI_VERSION }} --format "{{json .Manifest}}" | jq -r .digest)
+          SERVER_DIGEST=$(docker buildx imagetools inspect universalconnectfoundation/ucw-app-server:v${{ env.SERVER_VERSION }} --format "{{json .Manifest}}" | jq -r .digest)
+          
+          if [ "${UI_DIGEST}" == "" ]; then
+            echo "UI_VERSION_EXISTS=false" >> $GITHUB_ENV
+          else
+            echo "UI_VERSION_EXISTS=true" >> $GITHUB_ENV
+          fi
+
+          if [ "${SERVER_DIGEST}" == "" ]; then
+            echo "SERVER_VERSION_EXISTS=false" >> $GITHUB_ENV
+          else
+            echo "SERVER_VERSION_EXISTS=true" >> $GITHUB_ENV
+          fi
+
+      - name: 'Show warning if UI version exists on Docker Hub'
+        if: env.UI_VERSION_EXISTS == 'true'
+        run: |
+          {
+            echo "### UI Version Check Results"
+            echo "Version $DOCKER_IMAGE_UI of the UI already exists on Docker Hub. 😬🫠"
+            echo "Please update the 'version' property in the ./apps/ui 'package.json' and try again."
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: 'Show warning if SERVER version exists on Docker Hub'
+        if: env.SERVER_VERSION_EXISTS == 'true'
+        run: |
+          {
+            echo "### Server Version Check Results"
+            echo "Version $DOCKER_IMAGE_SERVER of the Server already exists on Docker Hub. 😬🫠"
+            echo "Please update the 'version' property in the ./apps/server 'package.json' and try again."
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: 'Log in to Docker Hub'
+        if: env.UI_VERSION_EXISTS == 'false' && env.SERVER_VERSION_EXISTS == 'false'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: 'Build and Push Docker images'
+        if: env.UI_VERSION_EXISTS == 'false' && env.SERVER_VERSION_EXISTS == 'false'
+        run: |
+          docker buildx bake --file ./docker-compose.yml --push
