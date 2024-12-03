@@ -42,11 +42,15 @@ WORKDIR ${WRKDR}
 RUN npm i -g ts-node  \
     && addgroup --system --gid 1001 nodejs \
     && adduser --system --uid 1001 nodejs
-USER nodejs
 
 COPY --from=pruner --chown=nodejs:nodejs ${WRKDR}/out/full/apps/${APP}/ .
 COPY --from=pruner --chown=nodejs:nodejs ${WRKDR}/out/full/packages/utils/ ./packages/utils
 COPY --from=builder --chown=nodejs:nodejs ${WRKDR}/node_modules/ ./node_modules
+
+RUN rm -rf ${WRKDR}/.env
+RUN rm -rf ${WRKDR}/.env.*
+
+USER nodejs
 
 EXPOSE ${PORT}
 
