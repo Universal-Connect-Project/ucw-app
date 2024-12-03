@@ -13,7 +13,7 @@ const institutionThatIsInFavoritesButDoesntSupportIdentification =
 
 describe("search", () => {
   it("filters recommended institutions by job type", () => {
-    visitAgg();
+    visitAgg({});
 
     const institutionThatIsInFavoriteAndSupportsAll =
       TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME;
@@ -22,7 +22,7 @@ describe("search", () => {
       institutionThatIsInFavoritesButDoesntSupportIdentification,
     ).should("exist");
 
-    cy.visit(`/?job_type=all&user_id=${crypto.randomUUID()}`);
+    cy.visit(`/widget?job_type=all&user_id=${crypto.randomUUID()}`);
 
     cy.findByText(institutionThatIsInFavoriteAndSupportsAll).should("exist");
 
@@ -33,7 +33,7 @@ describe("search", () => {
 
   describe("Fuzzy Search: Should be able to find certain banks with keywords and misspellings", () => {
     it("Finds expected banks", () => {
-      visitAgg();
+      visitAgg({});
 
       searchByText("tex");
       cy.findByText(TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME, {
@@ -47,7 +47,7 @@ describe("search", () => {
     });
 
     it("Ranks search results in the best way", () => {
-      visitAgg();
+      visitAgg({});
 
       cy.findByPlaceholderText("Search").clear().type("TestExample");
       cy.findByText(TEST_EXAMPLE_B_ONLY_INSTITUTION_NAME).should("exist");
@@ -73,7 +73,7 @@ describe("search", () => {
 
   describe("Job type influences the returned institutions", () => {
     it(`shows ${institutionThatIsInFavoritesButDoesntSupportIdentification} for agg job type`, () => {
-      visitAgg();
+      visitAgg({});
 
       searchByText(institutionThatIsInFavoritesButDoesntSupportIdentification);
       cy.findByText(
@@ -97,7 +97,7 @@ describe("search", () => {
 
   describe("Search by routing number", () => {
     it('shows "America First Credit Union" when the routing number is entered into search', () => {
-      visitAgg();
+      visitAgg({});
 
       searchByText("111111111");
       cy.findByText(TEST_EXAMPLE_B_ONLY_INSTITUTION_NAME).should("exist");

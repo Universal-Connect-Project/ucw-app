@@ -96,7 +96,7 @@ describe("testExampleA and B aggregators", () => {
     const userId = Cypress.env("userId");
 
     visitWithPostMessageSpy(
-      `/?job_type=${JobTypes.VERIFICATION}&user_id=${userId}`,
+      `/widget?job_type=${JobTypes.VERIFICATION}&user_id=${userId}`,
     )
       .then(() => makeABConnection(JobTypes.VERIFICATION))
       .then(() => {
