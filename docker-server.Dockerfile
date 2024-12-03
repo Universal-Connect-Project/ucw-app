@@ -15,6 +15,7 @@ COPY . .
  
 RUN npm ci
 RUN npm run build
+RUN npm install ts-node -g
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nodejs
@@ -22,4 +23,4 @@ USER nodejs
 
 EXPOSE ${PORT}
 
-CMD ["npm", "run", "start:server"]
+CMD ["ts-node", "apps/server/src/server.js"]
