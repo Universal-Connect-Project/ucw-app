@@ -12,6 +12,8 @@ cypress/
 
 architectureDecisionRecords/
 
+apps/server/.env
+
 playwright-report/
 
 *.md

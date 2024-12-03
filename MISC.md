@@ -37,13 +37,3 @@ The following files need to be there for the widget service to function
 
 1. Preferences
 1. Institutions
-
-## Troubleshooting
-
-### Docker Login
-
-If you get an error stating anything like `failed to authorize`, or `failed to fetch oauth token`, or a `401 Unauthorized`,
-you may have logged-in previously with a docker login (via cli), and your auth has expired.
-
-You do not need a docker login to pull the UCW docker images, but if you have stale tokens, docker will try to use them, thus
-resulting in the error. To fix this, you will need to run `docker logout` from your terminal, prior to running `docker compose up`

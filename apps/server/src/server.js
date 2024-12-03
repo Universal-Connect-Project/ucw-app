@@ -1,6 +1,6 @@
+import "dotenv/config";
 import ngrok from "@ngrok/ngrok";
 import cookieParser from "cookie-parser";
-import "dotenv/config";
 import express from "express";
 import "express-async-errors";
 import RateLimit from "express-rate-limit";
