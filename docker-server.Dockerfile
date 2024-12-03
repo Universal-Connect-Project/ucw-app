@@ -2,15 +2,23 @@
 # See the DOCKER.md file in the root of the project for more information.
 # Please run `docker compose up` from the root of the project to run the docker environment for
 # the UCW-APP project, which this Dockerfile is part of.
-FROM node:20
+FROM alpine:3.20.3 AS base
+ENV NODE_VERSION 20.15.0
 
 WORKDIR /usr/src/app
+
+RUN apk --update --no-cache --virtual add nodejs npm \
+    && rm -rf /var/cache/apk/*
 
 # Copy app source
 COPY . .
  
-RUN npm install
+RUN npm ci
 RUN npm run build
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nodejs
+USER nodejs
 
 EXPOSE ${PORT}
 
