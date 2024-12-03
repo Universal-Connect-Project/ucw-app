@@ -1,3 +1,4 @@
+# syntax=docker.io/docker/dockerfile:1.7-labs
 # NOTE: This Dockerfile is not meant to be run alone, but can be for development purposes.
 # See the DOCKER.md file in the root of the project for more information.
 # Please run `docker compose up` from the root of the project to run the docker environment for
@@ -43,12 +44,9 @@ RUN npm i -g ts-node  \
     && addgroup --system --gid 1001 nodejs \
     && adduser --system --uid 1001 nodejs
 
-COPY --from=pruner --chown=nodejs:nodejs ${WRKDR}/out/full/apps/${APP}/ .
+COPY --from=pruner --chown=nodejs:nodejs --exclude=.env* --exclude=*.ngrok ${WRKDR}/out/full/apps/${APP}/ .
 COPY --from=pruner --chown=nodejs:nodejs ${WRKDR}/out/full/packages/utils/ ./packages/utils
 COPY --from=builder --chown=nodejs:nodejs ${WRKDR}/node_modules/ ./node_modules
-
-RUN rm -rf ${WRKDR}/.env
-RUN rm -rf ${WRKDR}/.env.*
 
 USER nodejs
 
