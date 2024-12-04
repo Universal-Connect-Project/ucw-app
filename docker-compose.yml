@@ -45,7 +45,7 @@ services:
       - ucw
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
-    command: redis-server --save 20 1 --LOG_LEVEL warning
+    command: redis-server --save 20 1 --loglevel warning
     volumes:
       - cache:/data
 

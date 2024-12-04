@@ -32,14 +32,6 @@ const keysToPullFromEnv = [
   "MX_CLIENT_ID_PROD",
   "MX_API_SECRET_PROD",
 
-  "SophtronClientId",
-  "SophtronClientSecret",
-
-  "AkoyaClientId",
-  "AkoyaApiSecret",
-  "AkoyaClientIdProd",
-  "AkoyaApiSecretProd",
-
   "FINICITY_PARTNER_ID",
   "FINICITY_APP_KEY",
   "FINICITY_SECRET",
