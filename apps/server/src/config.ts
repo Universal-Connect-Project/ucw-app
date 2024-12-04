@@ -72,6 +72,14 @@ const config: Record<string, any> = keysToPullFromEnv.reduce(
   },
 );
 
+if (config.INSTITUTION_POLLING_INTERVAL === undefined) {
+  config.INSTITUTION_POLLING_INTERVAL = 1;
+}
+
+if (config.REDIS_CACHE_TIME_SECONDS === undefined) {
+  config.REDIS_CACHE_TIME_SECONDS = 600;
+}
+
 export const getConfig = () => config;
 
 export default config;

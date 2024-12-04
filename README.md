@@ -10,6 +10,7 @@ into an iframe.
 - [API Documentation](#api-documentation)
 - [Getting Started](#getting-started)
 - [Preferences and Aggregator Credentials](#preferences-and-aggregator-credentials)
+- [Environment Variables](#environment-variables)
 - [Authentication](#authentication)
 
 ## Other Resources
@@ -17,6 +18,7 @@ into an iframe.
 - [Adapters](ADAPTERS.md)
 - [Contributing](CONTRIBUTING.md)
 - [Docker](DOCKER.md)
+- [Environment variables](ENVIRONMENT.md)
 - [Monorepo](MONOREPO.md)
 - [Preference Details](PREFERENCES.md)
 - [Miscellaneous](MISC.md)
@@ -36,7 +38,7 @@ The API documentation for this service lives in [./openApiDocumentation.json](./
    1. `npm ci`
    1. `cp ./.env.example ./.env`
    1. `cp ./apps/server/.env.example ./apps/server/.env`
-      1. See [PREFERENCES.md](PREFERENCES.md) for details on what values you must provide in the `./apps/server/.env` file
+      1. See [ENVIRONMENT.md](ENVIRONMENT.md) for details on what values you must provide in the `./apps/server/.env` file
    1. `cp ./apps/server/cachedDefaults/preferences.example.json ./apps/server/cachedDefaults/preferences.json`
       1. Make sure you then set up your preferences (see [PREFERENCES.md](PREFERENCES.md) for details)
 1. If you are planning to host a UCW, then you'll need to import and configure your [aggregators' adapters](ADAPTERS.md)
@@ -54,6 +56,10 @@ Once the server is running, and you see a message that says, `"Message":"App ini
 For any aggregator you are planning on using, you will need to create your own developer account, and then provide your credentials.
 
 See [PREFERENCES.md](PREFERENCES.md) for details.
+
+## Environment variables
+
+There are several required environment variables and some optional environment variables that are described in [ENVIRONMENT.md](ENVIRONMENT.md)
 
 ## Authentication
 
