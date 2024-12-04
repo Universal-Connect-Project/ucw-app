@@ -1,4 +1,3 @@
-# syntax=docker.io/docker/dockerfile:1.7-labs
 # NOTE: This Dockerfile is not meant to be run alone, but can be for development purposes.
 # See the DOCKER.md file in the root of the project for more information.
 # Please run `docker compose up` from the root of the project to run the docker environment for
@@ -12,7 +11,7 @@ RUN apk --update --no-cache --virtual add nodejs npm \
     && rm -rf /var/cache/apk/*
 
 # Copy app source
-COPY --exclude=.* --exclude=node_modules/ --exclude=dist/ . .
+COPY . .
 
 RUN npm pkg delete scripts.prepare \
     && npm ci --omit=dev \
