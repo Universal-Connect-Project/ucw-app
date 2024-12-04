@@ -27,8 +27,8 @@ These are the environment variables that can be set in apps/server/.env
 
 ## Optional variables
 
-| Variable name                | Description                                                  | Examples    | Default value |
-| ---------------------------- | ------------------------------------------------------------ | ----------- | ------------- |
-| DATA_ENDPOINTS_ENABLE        | Whether or not to add data endpoints to the express server   | true, false | false         |
-| INSTITUTION_POLLING_INTERVAL | How frequently in minutes the institution list should update | 1           | 1             |
-| REDIS_CACHE_TIME_SECONDS     | The default expiration of things stored in redis             | 600         | 600           |
+| Variable name                | Description                                                                                                                                                                                                                                 | Examples    | Default value |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ------------- |
+| DATA_ENDPOINTS_ENABLE        | Whether or not to add data endpoints to the express server. We don't recommend turning these on unless you have special authentication around them. Users could access other users' data without proper security attached to the endpoints. | true, false | false         |
+| INSTITUTION_POLLING_INTERVAL | How frequently in minutes the institution list should update                                                                                                                                                                                | 1           | 1             |
+| REDIS_CACHE_TIME_SECONDS     | The default expiration of things stored in redis                                                                                                                                                                                            | 600         | 600           |
