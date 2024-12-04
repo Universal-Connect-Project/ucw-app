@@ -12,11 +12,11 @@ const sophtronAdapterMapObject: Record<string, AdapterMap> =
   getSophtronAdapterMapObject({
     logClient: logger,
     aggregatorCredentials: {
-      clientId: config.SophtronApiUserId,
-      secret: config.SophtronApiUserSecret,
+      clientId: config.SOPHTRON_API_USER_ID,
+      secret: config.SOPHTRON_API_USER_SECRET,
     },
     envConfig: {
-      HOSTURL: config.HOSTURL,
+      HOSTURL: config.HOST_URL,
     },
   });
 
@@ -28,16 +28,16 @@ const mxAdapterMapObject = getMxAdapterMapObject({
   logClient: logger,
   aggregatorCredentials: {
     mxInt: {
-      username: config.MxClientId,
-      password: config.MxApiSecret,
+      username: config.MX_CLIENT_ID,
+      password: config.MX_API_SECRET,
     },
     mxProd: {
-      username: config.MxClientIdProd,
-      password: config.MxApiSecretProd,
+      username: config.MX_CLIENT_ID_PROD,
+      password: config.MX_API_SECRET_PROD,
     },
   },
   envConfig: {
-    HOSTURL: config.HOSTURL,
+    HOSTURL: config.HOST_URL,
   },
 });
 

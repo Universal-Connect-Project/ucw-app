@@ -83,22 +83,22 @@ app.get("*", (req, res) => {
 });
 
 app.listen(config.PORT, () => {
-  const message = `Server is running on port ${config.PORT}, Env: ${config.Env}, LogLevel: ${config.LogLevel}`;
+  const message = `Server is running on port ${config.PORT}, ENV: ${config.ENV}, LOG_LEVEL: ${config.LOG_LEVEL}`;
 
   info(message);
 });
 
 // Ngrok is required for Finicity webhooks local and github testing
-if (["dev", "test"].includes(config.Env)) {
+if (["dev", "test"].includes(config.ENV)) {
   ngrok.listen(app).then(() => {
-    config.WebhookHostUrl = app.listener.url();
+    config.WEBHOOK_HOST_URL = app.listener.url();
     info("Established listener at: " + app.listener.url());
   });
 }
 
 process.on("SIGINT", () => {
   info("\nGracefully shutting down from SIGINT (Ctrl-C)");
-  if (["dev", "test"].includes(config.Env)) {
+  if (["dev", "test"].includes(config.ENV)) {
     info("Closing Ngrok tunnel");
     void ngrok.kill();
   }

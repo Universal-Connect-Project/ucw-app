@@ -2,16 +2,16 @@ import config from "./config";
 
 const aggregatorCredentials = {
   mxInt: {
-    username: config.MxClientId,
-    password: config.MxApiSecret,
+    username: config.MX_CLIENT_ID,
+    password: config.MX_API_SECRET,
     basePath: "https://int-api.mx.com",
     vcEndpoint: "https://int-api.mx.com/",
     aggregator: "mx_int",
     available: true,
   },
   mxProd: {
-    username: config.MxClientIdProd,
-    password: config.MxApiSecretProd,
+    username: config.MX_CLIENT_ID_PROD,
+    password: config.MX_API_SECRET_PROD,
     basePath: "https://api.mx.com",
     vcEndpoint: "https://api.mx.com/",
     aggregator: "mx",
@@ -35,9 +35,9 @@ const aggregatorCredentials = {
   },
   finicityProd: {
     basePath: "https://api.finicity.com",
-    partnerId: config.FinicityPartnerId,
-    appKey: config.FinicityAppKey,
-    secret: config.FinicitySecret,
+    partnerId: config.FINICITY_PARTNER_ID,
+    appKey: config.FINICITY_APP_KEY,
+    secret: config.FINICITY_SECRET,
     aggregator: "finicity",
     available: true,
   },

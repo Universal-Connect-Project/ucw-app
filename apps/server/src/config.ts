@@ -1,13 +1,3 @@
-const processEnv = {};
-const envs = {
-  ...process.env,
-  ...(process as Record<string, any>).client_envs,
-};
-
-Object.keys(envs).forEach((k) => {
-  (processEnv as Record<string, any>)[k.toUpperCase()] = envs[k];
-});
-
 const nonSensitiveSharedConfig = {
   AuthServiceEndpoint: "https://login.universalconnectproject.org/api",
   SearchEndpoint: "https://search.universalconnectproject.org/api/",
@@ -22,25 +12,25 @@ const nonSensitiveSharedConfig = {
 const keysToPullFromEnv = [
   "PORT",
 
-  "HOSTURL",
-  "WebhookHostUrl",
-  "LogLevel",
+  "HOST_URL",
+  "WEBHOOK_HOST_URL",
+  "LOG_LEVEL",
 
   "UCPClientId",
   "UCPClientSecret",
 
-  "Env",
+  "ENV",
 
-  "RedisServer",
-  "RedisCacheTimeSeconds",
+  "REDIS_SERVER",
+  "REDIS_CACHE_TIME_SECONDS",
 
-  "SophtronApiUserId",
-  "SophtronApiUserSecret",
+  "SOPHTRON_API_USER_ID",
+  "SOPHTRON_API_USER_SECRET",
 
-  "MxClientId",
-  "MxApiSecret",
-  "MxClientIdProd",
-  "MxApiSecretProd",
+  "MX_CLIENT_ID",
+  "MX_API_SECRET",
+  "MX_CLIENT_ID_PROD",
+  "MX_API_SECRET_PROD",
 
   "SophtronClientId",
   "SophtronClientSecret",
@@ -50,12 +40,12 @@ const keysToPullFromEnv = [
   "AkoyaClientIdProd",
   "AkoyaApiSecretProd",
 
-  "FinicityPartnerId",
-  "FinicityAppKey",
-  "FinicitySecret",
-  "FinicityPartnerIdProd",
-  "FinicityAppKeyProd",
-  "FinicitySecretProd",
+  "FINICITY_PARTNER_ID",
+  "FINICITY_APP_KEY",
+  "FINICITY_SECRET",
+  "FINICITY_PARTNER_IDProd",
+  "FINICITY_APP_KEYProd",
+  "FINICITY_SECRETProd",
 
   "ELASTIC_SEARCH_URL",
   "INSTITUTION_POLLING_INTERVAL",
@@ -74,7 +64,7 @@ const config: Record<string, any> = keysToPullFromEnv.reduce(
   (acc, envKey) => {
     return {
       ...acc,
-      [envKey]: (processEnv as Record<string, any>)[envKey.toUpperCase()],
+      [envKey]: process.env[envKey],
     };
   },
   {

@@ -29,7 +29,7 @@ services:
       - ./apps/server/.env
     environment:
       - ELASTIC_SEARCH_URL=http://ucw-app-elasticsearch:9200
-      - RedisServer=redis://cache:6379
+      - REDIS_SERVER=redis://cache:6379
 
   cache:
     container_name: ucw-app-cache
@@ -45,7 +45,7 @@ services:
       - ucw
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
-    command: redis-server --save 20 1 --loglevel warning
+    command: redis-server --save 20 1 --LOG_LEVEL warning
     volumes:
       - cache:/data
 

@@ -50,7 +50,7 @@ export default function (app) {
     }
 
     if (
-      config.Env !== "test" &&
+      config.ENV !== "test" &&
       config.AnalyticsServiceEndpoint !== "" &&
       config.AnalyticsServiceEndpoint != null
     ) {
