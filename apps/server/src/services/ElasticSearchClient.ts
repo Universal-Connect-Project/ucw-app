@@ -274,9 +274,11 @@ export async function getInstitution(id: string): Promise<CachedInstitution> {
   return institutionResponse._source as CachedInstitution;
 }
 
-export async function getRecommendedInstitutions(
-  jobType: MappedJobTypes,
-): Promise<CachedInstitution[]> {
+export async function getRecommendedInstitutions(args: {
+  jobType: MappedJobTypes;
+  filterTestBanks?: boolean;
+}): Promise<CachedInstitution[]> {
+  const { jobType, filterTestBanks = false } = args;
   const preferences = await getPreferences();
 
   const supportedAggregators = preferences.supportedAggregators;
@@ -290,6 +292,17 @@ export async function getRecommendedInstitutions(
     return {
       _index: "institutions",
       _id: recommendedInstitution,
+      must_not: [
+        ...(filterTestBanks
+          ? [
+              {
+                term: {
+                  is_test_bank: true,
+                },
+              },
+            ]
+          : []),
+      ],
     };
   });
 

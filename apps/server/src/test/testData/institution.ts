@@ -93,6 +93,43 @@ export const elasticSearchInstitutionData: CachedInstitution = {
   },
 };
 
+export const elasticSearchInstitutionDataFavs: CachedInstitution[] = [
+  {
+    name: "Fred's Bank",
+    keywords: ["legitimate", "bank", "not test"],
+    logo: "",
+    url: "https://fredsbank.ru",
+    id: "6ec0bd7f-11c0-43a3-94e7-5c7b8a8a2b3c",
+    is_test_bank: false,
+    routing_numbers: ["1234567"],
+    [TEST_EXAMPLE_A_AGGREGATOR_STRING]: {
+      id: "aId",
+      supports_aggregation: true,
+      supports_oauth: true,
+      supports_identification: true,
+      supports_verification: true,
+      supports_history: false,
+    },
+  },
+  {
+    name: "MX Bank (OAuth)",
+    keywords: ["Gringotts", "MX Bank", "not test"],
+    logo: "https://s3.amazonaws.com/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png",
+    url: "https://mx.com",
+    id: "048b9a67-53ac-453c-9bff-baf418282311",
+    is_test_bank: true,
+    routing_numbers: ["1234567"],
+    mx: {
+      id: "INS-68e96dd6-eabd-42d3-9f05-416897f0746c",
+      supports_aggregation: true,
+      supports_oauth: true,
+      supports_identification: true,
+      supports_verification: true,
+      supports_history: false,
+    },
+  },
+];
+
 export const transformedInstitutionList = [
   {
     guid: "048b9a67-53ac-453c-9bff-baf418282311",

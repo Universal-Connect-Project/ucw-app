@@ -1,4 +1,5 @@
 import type { Member, MemberResponse } from "interfaces/contract";
+import config from "../config";
 import * as logger from "../infra/logger";
 import type {
   CachedInstitution,
@@ -279,11 +280,12 @@ export class ConnectApi extends AggregatorAdapterBase {
     this.context.updated = true;
     this.context.aggregator = null;
 
-    const recommendedInstitutions = await getRecommendedInstitutions(
-      this.context.job_type as MappedJobTypes,
-    );
+    const recommendedInstitutions = await getRecommendedInstitutions({
+      jobType: this.context.job_type as MappedJobTypes,
+      filterTestBanks: config.ENV === "prod",
+    });
     return recommendedInstitutions
-      .filter((ins) => ins != null)
+      .filter((ins: CachedInstitution) => ins != null)
       .map(mapCachedInstitution);
   }
 }
