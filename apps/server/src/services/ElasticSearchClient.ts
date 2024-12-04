@@ -292,17 +292,13 @@ export async function getRecommendedInstitutions(args: {
     return {
       _index: "institutions",
       _id: recommendedInstitution,
-      must_not: [
-        ...(filterTestBanks
-          ? [
-              {
-                term: {
-                  is_test_bank: true,
-                },
-              },
-            ]
-          : []),
-      ],
+      must_not: filterTestBanks
+        ? {
+            term: {
+              is_test_bank: true,
+            },
+          }
+        : null,
     };
   });
 
