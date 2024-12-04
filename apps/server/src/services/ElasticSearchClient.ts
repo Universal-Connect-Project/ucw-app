@@ -103,23 +103,21 @@ export async function searchByRoutingNumber(
   const searchResults: estypes.SearchResponseBody =
     await ElasticsearchClient.search({
       index: "institutions",
-      body: {
-        query: {
-          bool: {
-            should: {
-              match: {
-                routing_numbers: {
-                  query: routingNumber,
-                },
+      query: {
+        bool: {
+          should: {
+            match: {
+              routing_numbers: {
+                query: routingNumber,
               },
             },
-            minimum_should_match: 1,
-            must: mustQuery(supportedAggregators, jobType),
-            must_not: buildMustNotQuery(hiddenInstitutions),
           },
+          minimum_should_match: 1,
+          must: mustQuery(supportedAggregators, jobType),
+          must_not: buildMustNotQuery(hiddenInstitutions),
         },
-        size: 20,
       },
+      size: 20,
     });
 
   return searchResults.hits.hits.map(
@@ -139,17 +137,15 @@ export async function search(
   const searchResults: estypes.SearchResponseBody =
     await ElasticsearchClient.search({
       index: "institutions",
-      body: {
-        query: {
-          bool: {
-            should: fuzzySearchTermQuery(searchTerm),
-            minimum_should_match: 1,
-            must: mustQuery(supportedAggregators, jobType),
-            must_not: buildMustNotQuery(hiddenInstitutions),
-          },
+      query: {
+        bool: {
+          should: fuzzySearchTermQuery(searchTerm),
+          minimum_should_match: 1,
+          must: mustQuery(supportedAggregators, jobType),
+          must_not: buildMustNotQuery(hiddenInstitutions),
         },
-        size: 20,
       },
+      size: 20,
     });
 
   return searchResults.hits.hits.map(
