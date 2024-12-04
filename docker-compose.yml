@@ -15,7 +15,7 @@ services:
       retries: 6
     build:
       context: .
-      dockerfile: ./docker-server.Dockerfile
+      dockerfile: ./Dockerfile
       <<:
         x-bake:
           platforms:

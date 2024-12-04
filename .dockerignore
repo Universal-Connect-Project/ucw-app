@@ -1,18 +1,17 @@
-node_modules/
-.ngrok/
+
 .idea/
-.turbo/
 .husky/
 .github/
-apps/server/cypress
-apps/ui/dist
-cypress/
+.git/
+.ngrok/
 
-**/node_modules
+**/dist/
+**/cypress/
+**/node_modules/
 
 architectureDecisionRecords/
 
-apps/server/.env
+**/.env*
 
 playwright-report/
 

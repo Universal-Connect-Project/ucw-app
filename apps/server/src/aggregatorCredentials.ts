@@ -1,22 +1,6 @@
 import config from "./config";
 
 const aggregatorCredentials = {
-  mxInt: {
-    username: config.MX_CLIENT_ID,
-    password: config.MX_API_SECRET,
-    basePath: "https://int-api.mx.com",
-    vcEndpoint: "https://int-api.mx.com/",
-    aggregator: "mx_int",
-    available: true,
-  },
-  mxProd: {
-    username: config.MX_CLIENT_ID_PROD,
-    password: config.MX_API_SECRET_PROD,
-    basePath: "https://api.mx.com",
-    vcEndpoint: "https://api.mx.com/",
-    aggregator: "mx",
-    available: true,
-  },
   akoyaSandbox: {
     clientId: config.AkoyaClientId,
     secret: config.AkoyaApiSecret,
