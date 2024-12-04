@@ -12,13 +12,14 @@ RUN apk --update --no-cache --virtual add nodejs npm \
 
 # Copy app source
 COPY . .
- 
-RUN npm ci
-RUN npm run build
-RUN npm install ts-node -g
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nodejs
+RUN npm pkg delete scripts.prepare \
+    && npm ci --omit=dev \
+    && npm install turbo ts-node -g \
+    && npm run build
+
+RUN addgroup --system --gid 1001 nodejs \
+    && adduser --system --uid 1001 nodejs
 USER nodejs
 
 EXPOSE ${PORT}
