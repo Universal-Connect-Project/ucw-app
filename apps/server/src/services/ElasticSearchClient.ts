@@ -35,14 +35,19 @@ export const ElasticsearchClient = new Client({
 
 export async function initialize() {
   info("Before es loaded");
-  const elasticSearchLoaded = await ElasticsearchClient.indices.exists({
-    index: "institutions",
-  });
-  if (!elasticSearchLoaded) {
-    info("ElasticSearch is indexing");
-    await indexElasticSearch();
-  } else {
-    info("ElasticSearch already indexed");
+  try {
+    const elasticSearchLoaded = await ElasticsearchClient.indices.exists({
+      index: "institutions",
+    });
+    if (!elasticSearchLoaded) {
+      info("ElasticSearch is indexing");
+      await indexElasticSearch();
+    } else {
+      info("ElasticSearch already indexed");
+    }
+  } catch (error) {
+    info("failure");
+    logError(error);
   }
 }
 

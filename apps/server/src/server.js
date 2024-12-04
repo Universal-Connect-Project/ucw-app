@@ -48,7 +48,7 @@ initializeElastic()
       });
   })
   .catch((error) => {
-    _error(`Failed to initialized: ${error}`);
+    _error(`Failed to initialized: ${error} test`);
   });
 
 app.get("/health", function (req, res) {
