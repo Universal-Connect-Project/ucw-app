@@ -27,8 +27,28 @@ These are the environment variables that can be set in apps/server/.env
 
 ## Optional variables
 
-| Variable name                | Description                                                                                                                                                                                                                                 | Examples    | Default value |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ------------- |
-| DATA_ENDPOINTS_ENABLE        | Whether or not to add data endpoints to the express server. We don't recommend turning these on unless you have special authentication around them. Users could access other users' data without proper security attached to the endpoints. | true, false | false         |
-| INSTITUTION_POLLING_INTERVAL | How frequently in minutes the institution list should update                                                                                                                                                                                | 1           | 1             |
-| REDIS_CACHE_TIME_SECONDS     | The default expiration of things stored in redis                                                                                                                                                                                            | 600         | 600           |
+| Variable name                | Description                                                  | Examples | Default value |
+| ---------------------------- | ------------------------------------------------------------ | -------- | ------------- |
+| INSTITUTION_POLLING_INTERVAL | How frequently in minutes the institution list should update | 1        | 1             |
+| REDIS_CACHE_TIME_SECONDS     | The default expiration of things stored in redis             | 600      | 600           |
+
+## Authentication variables
+
+| Variable name                    | Description                                                                                          | Examples    | Default value |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------- | ----------- | ------------- |
+| AUTHENTICATION_ENABLE            | Whether or not to enable our optional authentication on most endpoints other than the data endpoints | true, false | false         |
+| AUTHENTICATION_AUDIENCE          | Authentication variable for our optional authentication                                              |             |               |
+| AUTHENTICATION_ISSUER_BASE_URL   | Authentication variable for our optional authentication                                              |             |               |
+| AUTHENTICATION_TOKEN_SIGNING_ALG | Authentication variable for our optional authentication                                              |             |               |
+| AUTHENTICATION_SCOPES            | Authentication variable for our optional authentication                                              |             |               |
+
+## Data endpoint variables
+
+| Variable name                                  | Description                                                                                                                                                                                                                                 | Examples    | Default value |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ------------- |
+| DATA_ENDPOINTS_ENABLE                          | Whether or not to add data endpoints to the express server. We don't recommend turning these on unless you have special authentication around them. Users could access other users' data without proper security attached to the endpoints. | true, false | false         |
+| DATA_ENDPOINT_AUTHENTICATION_ENABLE            | Whether or not to enable our optional authentication on the data endpoints                                                                                                                                                                  | true, false | false         |
+| DATA_ENDPOINT_AUTHENTICATION_AUDIENCE          | Authentication variable for our optional data endpoint authentication                                                                                                                                                                       |             |               |
+| DATA_ENDPOINT_AUTHENTICATION_ISSUER_BASE_URL   | Authentication variable for our optional data endpoint authentication                                                                                                                                                                       |             |               |
+| DATA_ENDPOINT_AUTHENTICATION_TOKEN_SIGNING_ALG | Authentication variable for our optional data endpoint authentication                                                                                                                                                                       |             |               |
+| DATA_ENDPOINT_AUTHENTICATION_SCOPES            | Authentication variable for our optional data endpoint authentication                                                                                                                                                                       |             |               |
