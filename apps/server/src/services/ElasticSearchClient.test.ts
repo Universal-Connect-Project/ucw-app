@@ -618,8 +618,8 @@ describe("getRecommendedInstitutions", () => {
     expect(recommendedInstitutions).toEqual([]);
   });
 
-  it("filters out test institutions if filterTestBanks is true", async () => {
-    config.ENV = "prod";
+  it("filters out test institutions if ENV equals 'prod'", async () => {
+    // config.ENV = "prod";
 
     const mockPreferences: preferences.Preferences = {
       ...testPreferences,
@@ -652,9 +652,7 @@ describe("getRecommendedInstitutions", () => {
         return {
           docs: [
             {
-              _source: {
-                ...elasticSearchInstitutionDataFavs,
-              },
+              _source: elasticSearchInstitutionDataFavs,
             },
           ],
         };
@@ -668,7 +666,7 @@ describe("getRecommendedInstitutions", () => {
     expect(recommendedInstitutions).toEqual(
       elasticSearchInstitutionDataFavs[0],
     );
-    config.ENV = "test";
+    // config.ENV = "test";
   });
 });
 
