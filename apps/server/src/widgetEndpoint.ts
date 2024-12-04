@@ -4,7 +4,6 @@ import Joi from "joi";
 import { aggregators } from "./adapterSetup";
 import fs from "node:fs";
 
-import { wget as _wget } from "./infra/http";
 import he from "he";
 import path from "path";
 
