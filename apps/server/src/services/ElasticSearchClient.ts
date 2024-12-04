@@ -34,6 +34,7 @@ export const ElasticsearchClient = new Client({
 });
 
 export async function initialize() {
+  info("Before es loaded");
   const elasticSearchLoaded = await ElasticsearchClient.indices.exists({
     index: "institutions",
   });
