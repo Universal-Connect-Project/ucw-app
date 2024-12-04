@@ -19,7 +19,7 @@ These are the environment variables that can be set in apps/server/.env
 | Variable name            | Description                                                                   |
 | ------------------------ | ----------------------------------------------------------------------------- |
 | MX_API_SECRET            | The client secret for MX integration APIs found in the MX dashboard (API Key) |
-| MX_API_SECRET_PROD       | The client secret for MX integration APIs found in the MX dashboard (API Key) |
+| MX_API_SECRET_PROD       | The client secret for MX production APIs found in the MX dashboard (API Key)  |
 | MX_CLIENT_ID             | The client id for MX integration APIs found in the MX dashboard (Client Id)   |
 | MX_CLIENT_ID_PROD        | The client id for MX production APIs found in the MX dashboard (Client Id)    |
 | SOPHTRON_API_USER_ID     | The user id for Sophtron APIs found at sophtron.com/Manage -> UserId          |
