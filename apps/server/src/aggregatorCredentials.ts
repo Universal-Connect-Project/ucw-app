@@ -19,9 +19,9 @@ const aggregatorCredentials = {
   },
   finicityProd: {
     basePath: "https://api.finicity.com",
-    partnerId: config.FinicityPartnerId,
-    appKey: config.FinicityAppKey,
-    secret: config.FinicitySecret,
+    partnerId: config.FINICITY_PARTNER_ID,
+    appKey: config.FINICITY_APP_KEY,
+    secret: config.FINICITY_SECRET,
     aggregator: "finicity",
     available: true,
   },
