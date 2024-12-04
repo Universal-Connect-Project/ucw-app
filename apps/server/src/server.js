@@ -13,6 +13,7 @@ import { setInstitutionSyncSchedule } from "./services/institutionSyncer";
 import { widgetHandler } from "./widgetEndpoint";
 import useAuthentication from "./authentication";
 import path from "path";
+import useDataEndpoints from "./dataEndpoints/useDataEndpoints";
 
 process.on("unhandledRejection", (error) => {
   _error(`unhandledRejection: ${error.message}`, error);
@@ -60,6 +61,8 @@ app.get("/health", function (req, res) {
 });
 
 useAuthentication(app);
+
+useDataEndpoints(app);
 
 useConnect(app);
 
