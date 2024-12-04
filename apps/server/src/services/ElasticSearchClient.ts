@@ -4,16 +4,16 @@ import { readFileSync } from "fs";
 import { resolve } from "path";
 import config from "../config";
 import { info, error as logError } from "../infra/logger";
-import type {
-  CachedInstitution,
-  MappedJobTypes,
-  Aggregator,
-} from "../shared/contract";
-import { getPreferences } from "../shared/preferences";
 import {
   getAvailableAggregators,
   JOB_TYPE_PARTIAL_SUPPORT_MAP,
 } from "../shared/aggregators";
+import type {
+  Aggregator,
+  CachedInstitution,
+  MappedJobTypes,
+} from "../shared/contract";
+import { getPreferences } from "../shared/preferences";
 import { ElasticSearchMock } from "../test/elasticSearchMock";
 import { fetchInstitutions } from "./institutionSyncer";
 import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
@@ -35,6 +35,7 @@ export async function initialize() {
     index: "institutions",
   });
   if (!elasticSearchLoaded) {
+    info("ElasticSearch is indexing");
     await indexElasticSearch();
   } else {
     info("ElasticSearch already indexed");
