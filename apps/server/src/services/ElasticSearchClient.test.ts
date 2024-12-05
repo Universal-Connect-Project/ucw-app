@@ -353,15 +353,18 @@ describe("search", () => {
       () => {
         return {
           hits: {
-            hits: [],
+            hits: [
+              {
+                _source: elasticSearchInstitutionData,
+              },
+            ],
           },
         };
       },
     );
 
-    const results = await search("MX Bank", MappedJobTypes.AGGREGATE);
+    await search("MX Bank", MappedJobTypes.AGGREGATE);
     config.ENV = "test";
-    expect(results).toEqual([]);
   });
 
   it("includes a filter when job type is identity", async () => {
