@@ -39,6 +39,7 @@ export const syncInstitutions = async () => {
       const newInstitutions = await response.json();
       if (newInstitutions.length > 0) {
         info("Updating institution cache list");
+        // breaking below
         await updateElasticSearchDocuments(newInstitutions);
         await setNoExpiration(
           INSTITUTION_ETAG_REDIS_KEY,
