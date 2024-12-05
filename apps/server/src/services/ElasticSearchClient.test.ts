@@ -547,7 +547,7 @@ describe("getRecommendedInstitutions", () => {
             (institutionId: string) => ({
               _index: "institutions",
               _id: institutionId,
-              must_not: null as any,
+              must_not: [] as any,
             }),
           ),
         },
@@ -588,7 +588,7 @@ describe("getRecommendedInstitutions", () => {
             (institutionId: string) => ({
               _index: "institutions",
               _id: institutionId,
-              must_not: null as any,
+              must_not: [] as any,
             }),
           ),
         },
@@ -620,7 +620,7 @@ describe("getRecommendedInstitutions", () => {
     expect(recommendedInstitutions).toEqual([]);
   });
 
-  it("filters out test institutions if ENV equals 'prod'", async () => {
+  it("filters out test institutions if filterTestBanks is true", async () => {
     const mockPreferences: preferences.Preferences = {
       ...testPreferences,
       recommendedInstitutions: [
@@ -639,27 +639,27 @@ describe("getRecommendedInstitutions", () => {
       {
         method: "POST",
         path: "/_mget",
-        // body: {
-        //   docs: mockPreferences.recommendedInstitutions.map(
-        //     (institutionId: string) => ({
-        //       _index: "institutions",
-        //       _id: institutionId,
-        //       must_not: {
-        //         term: {
-        //           is_test_bank: true,
-        //         },
-        //       },
-        //     }),
-        //   ),
-        // },
+        body: {
+          docs: mockPreferences.recommendedInstitutions.map(
+            (institutionId: string) => ({
+              _index: "institutions",
+              _id: institutionId,
+              must_not: [
+                {
+                  term: {
+                    is_test_bank: true,
+                  },
+                },
+              ],
+            }),
+          ),
+        },
       },
       () => {
         return {
           docs: [
             {
-              _source: {
-                ...elasticSearchInstitutionDataFavs,
-              },
+              _source: elasticSearchInstitutionDataFavs,
             },
           ],
         };
@@ -670,9 +670,7 @@ describe("getRecommendedInstitutions", () => {
       jobType: MappedJobTypes.AGGREGATE,
       filterTestBanks: true,
     });
-    expect(recommendedInstitutions).toEqual([
-      elasticSearchInstitutionDataFavs[0],
-    ]);
+    expect(recommendedInstitutions).toEqual([elasticSearchInstitutionDataFavs]);
   });
 });
 

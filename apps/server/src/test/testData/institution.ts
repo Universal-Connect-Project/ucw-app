@@ -93,59 +93,23 @@ export const elasticSearchInstitutionData: CachedInstitution = {
   },
 };
 
-export const elasticSearchInstitutionDataFavs: CachedInstitution[] = [
-  {
-    name: "TestExample Prod",
-    id: "cd27ed3b-f81c-4fa9-94a9-039a9f534c7b",
-    keywords: ["test", "example"],
-    logo: "https://universalconnectproject.org/images/ucp-logo-icon.svg",
-    url: "https://test-example.com",
-    is_test_bank: false,
-    routing_numbers: [],
-    testExampleB: {
-      id: "testExampleB",
-      supports_aggregation: true,
-      supports_history: true,
-      supports_identification: true,
-      supports_oauth: true,
-      supports_verification: true,
-    },
+export const elasticSearchInstitutionDataFavs: CachedInstitution = {
+  name: "TestExample Prod",
+  id: "cd27ed3b-f81c-4fa9-94a9-039a9f534c7b",
+  keywords: ["test", "example"],
+  logo: "https://universalconnectproject.org/images/ucp-logo-icon.svg",
+  url: "https://test-example.com",
+  is_test_bank: false,
+  routing_numbers: [],
+  testExampleA: {
+    id: "testExampleA",
+    supports_aggregation: true,
+    supports_history: true,
+    supports_identification: true,
+    supports_oauth: true,
+    supports_verification: true,
   },
-  {
-    name: "TestExampleA Bank",
-    id: "5e498f60-3496-4299-96ed-f8eb328ae8af",
-    keywords: ["test", "example", "tex"],
-    logo: "https://universalconnectproject.org/images/ucp-logo-icon.svg",
-    url: "https://test-example.com",
-    is_test_bank: true,
-    routing_numbers: [],
-    testExampleA: {
-      id: "testExampleA",
-      supports_aggregation: true,
-      supports_history: true,
-      supports_identification: true,
-      supports_oauth: true,
-      supports_verification: true,
-    },
-  },
-  {
-    name: "TestExample Doesnt Support Identification Bank",
-    id: "4c1b2595-a5aa-41a1-a2c6-f6caa1e226a6",
-    keywords: ["test", "example"],
-    logo: "https://universalconnectproject.org/images/ucp-logo-icon.svg",
-    url: "https://test-example.com",
-    is_test_bank: true,
-    routing_numbers: [],
-    testExampleB: {
-      id: "testExampleB",
-      supports_aggregation: true,
-      supports_history: true,
-      supports_identification: false,
-      supports_oauth: true,
-      supports_verification: true,
-    },
-  },
-];
+};
 
 export const transformedInstitutionList = [
   {
