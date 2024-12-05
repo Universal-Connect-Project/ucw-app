@@ -60,16 +60,16 @@ app.get("/health", function (req, res) {
   }
 });
 
-useAuthentication(app);
-
 useDataEndpoints(app);
+
+useAuthentication(app);
 
 useConnect(app);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use(function (err, req, res, next) {
   _error(`Unhandled error on ${req.method} ${req.path}: `, err);
-  res.status(500);
+  res.status(err.status ? err.status : 500);
   res.send(err.message);
 });
 
