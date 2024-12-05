@@ -335,8 +335,8 @@ describe("search", () => {
     expect(results).toEqual([elasticSearchInstitutionData]);
   });
 
-  it("excludes test banks in ES search when Env is prod", async () => {
-    config.Env = "prod";
+  it("excludes test banks in ES search when ENV is prod", async () => {
+    config.ENV = "prod";
     ElasticSearchMock.add(
       {
         method: ["GET", "POST"],
@@ -360,7 +360,7 @@ describe("search", () => {
     );
 
     await search("MX Bank", MappedJobTypes.AGGREGATE);
-    config.Env = "test";
+    config.ENV = "test";
   });
 
   it("includes a filter when job type is identity", async () => {
