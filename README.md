@@ -12,6 +12,7 @@ into an iframe.
 - [Preferences and Aggregator Credentials](#preferences-and-aggregator-credentials)
 - [Environment Variables](#environment-variables)
 - [Authentication](#authentication)
+- [Data endpoints and their authentication](#data-endpoints-and-their-authentication)
 
 ## Other Resources
 
@@ -55,7 +56,7 @@ Once the server is running, and you see a message that says, `"Message":"App ini
 
 For any aggregator you are planning on using, you will need to create your own developer account, and then provide your credentials.
 
-See [PREFERENCES.md](PREFERENCES.md) for details.
+See [PREFERENCES.md](PREFERENCES.md) and [ENVIRONMENT.md](ENVIRONMENT.md) for details.
 
 ## Environment variables
 
@@ -66,3 +67,11 @@ There are several required environment variables and some optional environment v
 We have an optional [authentication](./apps/server/src/authentication.ts) system built in and enabled by .env variables. If AUTHENTICATION_ENABLE=true and the other required variables are provided, then all express endpoints defined after the useAuthentication call will require a Bearer token and optionally a set of scopes. This system assumes that you have an authorization system such as auth0 to point to. If you need more control over your authentication, then you may fork the repository and implement your own.
 
 When authentication is enabled the widget endpoint will require authorization. There is a token endpoint that can be used to retrieve a one time use token that can be passed into the widget url for use in an iframe. When this is used the server will set an authorization cookie that the widget UI will pass to the server for all of its requests.
+
+Variables for our optional authentication are found [here](ENVIRONMENT.md#authentication-variables)
+
+## Data endpoints and their authentication
+
+We have an optional set of data endpoints that can be used to retrieve data from the aggregators. They are turned off by default. These endpoints need to be well protected. Using these endpoints gets you access to the data for any user that has made a connection. We recommend that users don't have direct access to these endpoints. They should be machine to machine authenticated, and they should have a layer of authentication around them that ensures they are called with user ids that the user should have access to.
+
+Variables for turning these endpoints on and using our optional authentication are found [here](ENVIRONMENT.md#data-endpoint-variables).
