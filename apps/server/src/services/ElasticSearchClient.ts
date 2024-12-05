@@ -19,6 +19,8 @@ import { fetchInstitutions } from "./institutionSyncer";
 import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
 import { getSet, overwriteSet } from "./storageClient/redis";
 
+const BATCH_SIZE = 25;
+
 export function getInstitutionFilePath() {
   return resolve(__dirname, "../../cachedDefaults/ucwInstitutionsMapping.json");
 }
@@ -60,18 +62,23 @@ export async function indexElasticSearch() {
 
   await ElasticsearchClient.indices.create({ index: "institutions" });
 
-  const indexPromises = institutionData.map(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async (institution: { id: any }) => {
-      return await ElasticsearchClient.index({
-        index: "institutions",
-        id: institution.id,
-        document: institution,
-      });
-    },
-  );
+  const totalBatches = institutionData.length / BATCH_SIZE;
+  for (let i = 0; i < institutionData.length; i += BATCH_SIZE) {
+    const batch = institutionData.slice(i, i + BATCH_SIZE);
 
-  await Promise.all(indexPromises);
+    const batchCount = i / BATCH_SIZE;
+
+    info(`Indexing batch ${batchCount} of ${totalBatches}`);
+    await Promise.all(
+      batch.map(async (institution) => {
+        await ElasticsearchClient.index({
+          index: "institutions",
+          id: institution.id,
+          document: institution,
+        });
+      }),
+    );
+  }
 }
 
 async function getInstitutions(): Promise<CachedInstitution[]> {
@@ -342,15 +349,18 @@ export async function deleteRemovedInstitutions(
     return;
   }
   info("deleting institutions", deletedInstitutionsIds);
-  const deletePromises = deletedInstitutionsIds.map(async (ucpId: string) => {
-    return await ElasticsearchClient.delete({
-      index: "institutions",
-      id: ucpId,
-    });
-  });
-
   try {
-    await Promise.all(deletePromises);
+    for (let i = 0; i < deletedInstitutionsIds.length; i += BATCH_SIZE) {
+      const batch = deletedInstitutionsIds.slice(i, i + BATCH_SIZE);
+      await Promise.all(
+        batch.map(async (ucpId: string) => {
+          await ElasticsearchClient.delete({
+            index: "institutions",
+            id: ucpId,
+          });
+        }),
+      );
+    }
     await overwriteSet(INSTITUTION_CURRENT_LIST_IDS, Array.from(newInsIdsSet));
   } catch (error) {
     logError(error);
@@ -358,15 +368,18 @@ export async function deleteRemovedInstitutions(
 }
 
 export async function updateInstitutions(institutions: CachedInstitution[]) {
-  const updatePromises = institutions.map(
-    async (institution: CachedInstitution) => {
-      return await ElasticsearchClient.update({
-        index: "institutions",
-        id: institution.id,
-        doc: institution,
-        doc_as_upsert: true,
-      });
-    },
-  );
-  await Promise.all(updatePromises);
+  for (let i = 0; i < institutions.length; i += BATCH_SIZE) {
+    const batch = institutions.slice(i, i + BATCH_SIZE);
+
+    await Promise.all(
+      batch.map(async (institution: CachedInstitution) => {
+        await ElasticsearchClient.update({
+          index: "institutions",
+          id: institution.id,
+          doc: institution,
+          doc_as_upsert: true,
+        });
+      }),
+    );
+  }
 }

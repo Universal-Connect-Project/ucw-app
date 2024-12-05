@@ -58,6 +58,7 @@ export const syncInstitutions = async () => {
 };
 
 export async function fetchInstitutions(): Promise<Response | null> {
+  info("fetching Institutions");
   const institutionCacheETag = await get(INSTITUTION_ETAG_REDIS_KEY);
   const accessToken = await getAccessToken();
   try {
