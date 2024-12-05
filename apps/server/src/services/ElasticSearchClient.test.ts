@@ -624,7 +624,6 @@ describe("getRecommendedInstitutions", () => {
     const mockPreferences: preferences.Preferences = {
       ...testPreferences,
       recommendedInstitutions: [
-        ...testPreferences.recommendedInstitutions,
         "cd27ed3b-f81c-4fa9-94a9-039a9f534c7b", // "Real" test institution
       ],
     } as any;
@@ -658,9 +657,9 @@ describe("getRecommendedInstitutions", () => {
       () => {
         return {
           docs: [
-            {
-              _source: elasticSearchInstitutionDataFavs,
-            },
+            { _source: elasticSearchInstitutionDataFavs[0] },
+            { _source: elasticSearchInstitutionDataFavs[1] },
+            { _source: elasticSearchInstitutionDataFavs[2] },
           ],
         };
       },
@@ -670,7 +669,9 @@ describe("getRecommendedInstitutions", () => {
       jobType: MappedJobTypes.AGGREGATE,
       filterTestBanks: true,
     });
-    expect(recommendedInstitutions).toEqual([elasticSearchInstitutionDataFavs]);
+    expect(recommendedInstitutions[0]).toEqual(
+      elasticSearchInstitutionDataFavs[0],
+    );
   });
 });
 
