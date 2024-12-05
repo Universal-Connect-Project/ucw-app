@@ -288,21 +288,15 @@ export async function getRecommendedInstitutions(args: {
     return [];
   }
 
+  info(
+    "Getting recommended institutions",
+    JSON.stringify(recommendedInstitutions),
+  );
+
   const esSearch = recommendedInstitutions.map((recommendedInstitution) => {
     return {
       _index: "institutions",
       _id: recommendedInstitution,
-      must_not: [
-        ...(filterTestBanks
-          ? [
-              {
-                term: {
-                  is_test_bank: true,
-                },
-              },
-            ]
-          : []),
-      ],
     };
   });
 
@@ -316,8 +310,11 @@ export async function getRecommendedInstitutions(args: {
     .map(
       (favoriteInstitution) => favoriteInstitution._source as CachedInstitution,
     )
+    .filter((institution: CachedInstitution) =>
+      filterTestBanks ? !institution.is_test_bank : true,
+    )
     .filter(
-      (institution) =>
+      (institution: CachedInstitution) =>
         getAvailableAggregators({
           institution,
           jobType,

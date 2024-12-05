@@ -547,7 +547,6 @@ describe("getRecommendedInstitutions", () => {
             (institutionId: string) => ({
               _index: "institutions",
               _id: institutionId,
-              must_not: [] as any,
             }),
           ),
         },
@@ -588,7 +587,6 @@ describe("getRecommendedInstitutions", () => {
             (institutionId: string) => ({
               _index: "institutions",
               _id: institutionId,
-              must_not: [] as any,
             }),
           ),
         },
@@ -643,20 +641,17 @@ describe("getRecommendedInstitutions", () => {
             (institutionId: string) => ({
               _index: "institutions",
               _id: institutionId,
-              must_not: [
-                {
-                  term: {
-                    is_test_bank: true,
-                  },
-                },
-              ],
             }),
           ),
         },
       },
       () => {
         return {
-          docs: [{ _source: elasticSearchInstitutionDataFavs[0] }],
+          docs: [
+            { _source: elasticSearchInstitutionDataFavs[0] },
+            { _source: elasticSearchInstitutionDataFavs[1] },
+            { _source: elasticSearchInstitutionDataFavs[2] },
+          ],
         };
       },
     );
@@ -695,7 +690,6 @@ describe("getRecommendedInstitutions", () => {
             (institutionId: string) => ({
               _index: "institutions",
               _id: institutionId,
-              must_not: [] as any,
             }),
           ),
         },
