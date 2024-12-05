@@ -26,7 +26,7 @@ export function getInstitutionFilePath() {
 }
 
 export const ElasticsearchClient = new Client({
-  node: config.ELASTIC_SEARCH_URL ?? "http://localhost:9200",
+  node: "http://localhost:9200",
   ...(process.env.NODE_ENV === "test" && {
     Connection: ElasticSearchMock.getConnection(),
   }),
