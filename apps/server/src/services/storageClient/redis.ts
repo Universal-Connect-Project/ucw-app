@@ -7,7 +7,7 @@ import { debug, error, info } from "../../infra/logger";
 import { PREFERENCES_REDIS_KEY } from "./constants";
 
 const redisClient = createClient({
-  url: config.RedisServer,
+  url: config.REDIS_SERVER,
 });
 
 export const overwriteSet = async (key: string, values: string[]) => {
@@ -47,7 +47,7 @@ export const set = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any,
   params: object = {
-    EX: config.RedisCacheTimeSeconds,
+    EX: config.REDIS_CACHE_TIME_SECONDS,
   },
   safeToLog?: string,
 ) => {
@@ -78,7 +78,7 @@ export const setNoExpiration = async (key: string, value: any) => {
 redisClient
   .connect()
   .then(async () => {
-    info("Redis connection established with server: " + config.RedisServer);
+    info("Redis connection established with server: " + config.REDIS_SERVER);
 
     let preferencesToSet;
     try {
@@ -94,6 +94,8 @@ redisClient
     await setNoExpiration(PREFERENCES_REDIS_KEY, preferencesToSet || {});
   })
   .catch((reason) => {
-    error("Failed to connect to redis server: " + reason);
+    error(
+      `Failed to connect to redis server at ${config.REDIS_SERVER}: ` + reason,
+    );
     info("No redis connection");
   });

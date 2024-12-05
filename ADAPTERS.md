@@ -13,6 +13,11 @@ If you are planning on hosting a UCW, then you'll need to import and configure a
 
 You can also look at the [adapterSetup.ts](https://github.com/Universal-Connect-Project/ucw-adapter-mx/blob/main/apps/server/src/adapterSetup.ts) file in [the MX Adapter Package Fork](https://github.com/Universal-Connect-Project/ucw-adapter-mx) to see how the MX Adapter is set up.
 
+### Supported Adapters
+
+- [MX Adapter for UCW](https://github.com/Universal-Connect-Project/ucw-adapter-mx/blob/main/packages/mx-adapter/README.md)
+- [Sophtron Adapter for UCW](https://github.com/Universal-Connect-Project/ucw-adapter-sophtron/blob/main/packages/sophtron-adapter/README.md)
+
 ## Creating an adapter package
 
 In order to make it easier for aggregators to develop their own UCW adapters we are moving to a package architecture. We will be moving all aggregator-specific code to their own packages.

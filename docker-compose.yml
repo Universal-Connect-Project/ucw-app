@@ -5,8 +5,6 @@ services:
         condition: service_healthy
       cache:
         condition: service_healthy
-      ui:
-        condition: service_healthy
     container_name: ucw-app-server
     restart: on-failure
     healthcheck:
@@ -17,15 +15,12 @@ services:
       retries: 6
     build:
       context: .
-      dockerfile: ./docker-server.Dockerfile
-      args:
-        APP: server
+      dockerfile: ./Dockerfile
       <<:
         x-bake:
           platforms:
             - linux/arm64
             - linux/amd64
-    image: universalconnectfoundation/ucw-app-server:v${DOCKER_IMAGE_SERVER}
     networks:
       - ucw
     ports:
@@ -34,44 +29,7 @@ services:
       - ./apps/server/.env
     environment:
       - ELASTIC_SEARCH_URL=http://ucw-app-elasticsearch:9200
-      - ResourcePrefix=http://ui:5173
-      - RedisServer=redis://cache:6379
-
-  ui:
-    container_name: ucw-app-ui
-    restart: on-failure
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://ui:${UI_PORT}",
-        ]
-      start_period: 5s
-      interval: 20s
-      timeout: 5s
-      retries: 3
-    build:
-      context: .
-      dockerfile: ./docker-ui.Dockerfile
-      args:
-        APP: ui
-      <<:
-        x-bake:
-          platforms:
-            - linux/arm64
-            - linux/amd64
-    image: universalconnectfoundation/ucw-app-ui:v${DOCKER_IMAGE_UI}
-    networks:
-      - ucw
-    # Uncomment to expose to host. Currently not needed
-    #    ports:
-    #      - "${UI_PORT}:${UI_PORT}"
-    env_file:
-      - .env
+      - REDIS_SERVER=redis://cache:6379
 
   cache:
     container_name: ucw-app-cache
