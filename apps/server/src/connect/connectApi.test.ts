@@ -24,16 +24,6 @@ const connectApi = new ConnectApi({
   },
 });
 
-const connectApiB = new ConnectApi({
-  context: {
-    aggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING,
-    updated: false,
-    institution_id: "xxx",
-    resolved_user_id: null,
-    job_type: "aggregate",
-  },
-});
-
 describe("connectApi", () => {
   describe("loadInstitutionByAggregatorId", () => {
     it("returns the institution", async () => {
@@ -120,7 +110,7 @@ describe("connectApi", () => {
             [] as unknown as Promise<CachedInstitution[]>,
         );
 
-      void connectApiB.loadPopularInstitutions();
+      void connectApi.loadPopularInstitutions();
 
       expect(infoSpy).toHaveBeenCalledWith({
         jobType: MappedJobTypes.AGGREGATE,
@@ -147,7 +137,7 @@ describe("connectApi", () => {
             [] as unknown as Promise<CachedInstitution[]>,
         );
 
-      void connectApiB.loadPopularInstitutions();
+      void connectApi.loadPopularInstitutions();
 
       expect(infoSpy).toHaveBeenCalledWith({
         jobType: MappedJobTypes.AGGREGATE,
