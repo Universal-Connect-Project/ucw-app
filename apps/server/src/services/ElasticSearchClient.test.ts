@@ -621,9 +621,6 @@ describe("getRecommendedInstitutions", () => {
   it("filters out test institutions if filterTestBanks is true", async () => {
     const mockPreferences: preferences.Preferences = {
       ...testPreferences,
-      recommendedInstitutions: [
-        "cd27ed3b-f81c-4fa9-94a9-039a9f534c7b", // "Real" test institution
-      ],
     } as any;
 
     jest
@@ -670,9 +667,6 @@ describe("getRecommendedInstitutions", () => {
   it("does not filter out test institutions if filterTestBanks is false", async () => {
     const mockPreferences: preferences.Preferences = {
       ...testPreferences,
-      recommendedInstitutions: [
-        "cd27ed3b-f81c-4fa9-94a9-039a9f534c7b", // "Real" test institution
-      ],
     } as any;
 
     jest

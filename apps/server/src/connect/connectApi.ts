@@ -1,5 +1,5 @@
 import type { Member, MemberResponse } from "interfaces/contract";
-import config from "../config";
+import { getConfig } from "../config";
 import * as logger from "../infra/logger";
 import type {
   CachedInstitution,
@@ -277,6 +277,7 @@ export class ConnectApi extends AggregatorAdapterBase {
   }
 
   async loadPopularInstitutions() {
+    const config = getConfig();
     this.context.updated = true;
     this.context.aggregator = null;
 
