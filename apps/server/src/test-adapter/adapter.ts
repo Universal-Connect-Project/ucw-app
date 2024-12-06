@@ -9,11 +9,7 @@ import type {
 import { ConnectionStatus } from "@repo/utils";
 import { get, set } from "../services/storageClient/redis";
 import { MappedJobTypes } from "../shared/contract";
-import {
-  testExampleCredentials,
-  testExampleInstitution,
-  testExampleJobResponse,
-} from "./constants";
+import { testExampleCredentials, testExampleInstitution } from "./constants";
 
 const createRedisStatusKey = ({
   aggregator,
@@ -24,25 +20,27 @@ const createRedisStatusKey = ({
 }) => `${aggregator}-${userId}`;
 
 export class TestAdapter implements WidgetAdapter {
-  labelText: string;
-  aggregator: string;
-
-  RouteHandlers = {
-    jobRequestHandler: async (_req: any, res: any) => {
-      res.send(testExampleJobResponse);
-    },
-  };
-
   constructor({
     labelText,
     aggregator,
+    routeHandlers = {},
+    dataRequestValidators = {},
   }: {
     labelText: string;
     aggregator: string;
+    routeHandlers?: Record<string, (req: any, res: any) => void>;
+    dataRequestValidators?: Record<string, (req: any) => string | undefined>;
   }) {
     this.labelText = labelText;
     this.aggregator = aggregator;
+    this.RouteHandlers = routeHandlers;
+    this.DataRequestValidators = dataRequestValidators;
   }
+
+  labelText: string;
+  aggregator: string;
+  RouteHandlers: Record<string, (req: any, res: any) => void> = {};
+  DataRequestValidators: Record<string, (req: any) => string | undefined> = {};
 
   async GetInstitutionById(id: string): Promise<Institution> {
     return {

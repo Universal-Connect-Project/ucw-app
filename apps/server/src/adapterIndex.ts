@@ -4,7 +4,7 @@ import type { Aggregator } from "./adapterSetup";
 import { adapterMap } from "./adapterSetup";
 
 export function getAggregatorAdapter(aggregator: Aggregator): WidgetAdapter {
-  const widgetAdapter = adapterMap[aggregator]?.widgetAdapter;
+  const widgetAdapter = adapterMap[aggregator as keyof typeof adapterMap]?.widgetAdapter;
 
   if (widgetAdapter) {
     return widgetAdapter;
@@ -32,7 +32,7 @@ export async function getData({
   type,
   userId,
 }: DataParameters) {
-  const dataAdapter = adapterMap[aggregator]?.dataAdapter;
+  const dataAdapter = adapterMap[aggregator as keyof typeof adapterMap]?.dataAdapter;
 
   if (dataAdapter) {
     info("Getting vc from aggregator", aggregator);
@@ -59,7 +59,7 @@ export async function getVC({
   type,
   userId,
 }: DataParameters) {
-  const vcAdapter = adapterMap[aggregator]?.vcAdapter;
+  const vcAdapter = adapterMap[aggregator as keyof typeof adapterMap]?.vcAdapter;
 
   if (vcAdapter) {
     info("Getting vc from aggregator", aggregator);

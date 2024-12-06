@@ -13,6 +13,11 @@ If you are planning on hosting a UCW, then you'll need to import and configure a
 
 You can also look at the [adapterSetup.ts](https://github.com/Universal-Connect-Project/ucw-adapter-mx/blob/main/apps/server/src/adapterSetup.ts) file in [the MX Adapter Package Fork](https://github.com/Universal-Connect-Project/ucw-adapter-mx) to see how the MX Adapter is set up.
 
+### Supported Adapters
+
+- [MX Adapter for UCW](https://github.com/Universal-Connect-Project/ucw-adapter-mx/blob/main/packages/mx-adapter/README.md)
+- [Sophtron Adapter for UCW](https://github.com/Universal-Connect-Project/ucw-adapter-sophtron/blob/main/packages/sophtron-adapter/README.md)
+
 ## Creating an adapter package
 
 In order to make it easier for aggregators to develop their own UCW adapters we are moving to a package architecture. We will be moving all aggregator-specific code to their own packages.
@@ -75,7 +80,7 @@ Because this repo is a monorepo, here are some caveats to consider with regard t
 
 There are two ways to create a shared package within a Turborepo monorepo. You can create Just-in-Time (JIT) packages or compiled packages. Please see [Turborepo's Documentation](https://turbo.build/repo/docs/core-concepts/internal-packages#compiled-packages) for more detailed information.
 
-Adapter Packages are considered compiled packages, and even though end-users will install your adapter package using NPM, the preferred way what we've chosen to create and test an adapter package is to use it as a compiled package.
+Adapter Packages are considered compiled packages, and even though end-users will install your adapter package using NPM, the preferred way that we've chosen to create and test an adapter package is to use it as a compiled package.
 
 Below you'll find some tips on how to successfully run the UCW with a compiled package.
 
@@ -91,7 +96,7 @@ npm install <your_package_name> --workspace apps/server
 
 _Package name is the `name` property in your adapter package's `package.json`_
 
-Once you run the above command, change the version of the package to a start with `*`. In the context of npm, this means install the latest version of the package. This is also a convention of Turborepo, and is what is recommended when developing package locally.
+Once you run the above command, change the version of the package to a star (`"*"`). In the context of npm, this tells npm to install the latest version of the package. This is also a convention of Turborepo, and is what is recommended when developing packages locally.
 
 After changing the version to `*`, run `npm i` again to update your lock file.
 
@@ -113,3 +118,9 @@ Here's an example from the [MX Adapter Package Fork](https://github.com/Universa
 In this example, `@ucp-npm/mx-adapter` is installed as a dependency in the `apps/server` workspace, but it will use the local files in the adapter package, which also lives in the monorepo, under the [packages](./packages) folder.
 
 Next, it is important that you build your package, which creates a `dist` folder, which is where the `apps/server` project will actually be able to pull the package from. If you don't do this, your code will not run properly.
+
+Do this by running the following command:
+
+```bash
+npm run build --workspace packages/<your_package_folder>
+```

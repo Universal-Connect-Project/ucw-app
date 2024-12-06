@@ -1,24 +1,12 @@
 export const listUsersData = {
-  users: [{
-    guid: 'userGuid1',
-    id: 'userId1'
-  }]
-}
-
-export const createUserData = {
-  user: {
-    guid: 'createdUserGuid'
-  }
-}
-
-export const finicityReadCustomerData = {
-  customers: [
+  users: [
     {
-      id: 'finicityTestUser'
-    }
-  ]
-}
+      guid: "userGuid1",
+      id: "userId1",
+    },
+  ],
+};
 
 export const createCustomerData = {
-  id: 'createdFinicityUserId'
-}
+  id: "createdFinicityUserId",
+};

@@ -23,7 +23,7 @@ function makeAkoyaBearerHeaders(token) {
 export default class AkoyaClient {
   constructor(apiConfig) {
     this.apiConfig = apiConfig;
-    this.client_redirect_url = `${config.HOSTURL}/oauth/${this.apiConfig.aggregator}/redirect_from`;
+    this.client_redirect_url = `${config.HOST_URL}/oauth/${this.apiConfig.aggregator}/redirect_from`;
     this.authParams = {
       client_id: apiConfig.clientId,
       client_secret: apiConfig.secret,

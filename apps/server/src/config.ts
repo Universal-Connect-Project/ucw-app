@@ -1,15 +1,3 @@
-const processEnv = {};
-const envs = {
-  ...process.env,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ...(process as Record<string, any>).client_envs,
-};
-
-Object.keys(envs).forEach((k) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (processEnv as Record<string, any>)[k.toUpperCase()] = envs[k];
-});
-
 const nonSensitiveSharedConfig = {
   AuthServiceEndpoint: "https://login.universalconnectproject.org/api",
   SearchEndpoint: "https://search.universalconnectproject.org/api/",
@@ -18,60 +6,56 @@ const nonSensitiveSharedConfig = {
   Component: "UniversalWidget",
   ServiceName: "universal_widget",
   CryptoAlgorithm: "aes-256-cbc",
-  SophtronApiServiceEndpoint: "https://api.sophtron.com/api",
-  SophtronVCServiceEndpoint: "https://vc.sophtron.com/api/",
   Auth0TokenUrl: "https://dev-d23wau8o0uc5hw8n.us.auth0.com/oauth/token",
 };
 
 const keysToPullFromEnv = [
-  "SophtronClientId",
-  "SophtronClientSecret",
-
   "PORT",
 
-  "HOSTURL",
-  "WebhookHostUrl",
-  "LogLevel",
+  "HOST_URL",
+  "WEBHOOK_HOST_URL",
+  "LOG_LEVEL",
 
   "UCPClientId",
   "UCPClientSecret",
 
-  "Env",
+  "ENV",
 
-  "RedisServer",
-  "RedisCacheTimeSeconds",
-  "ResourcePrefix",
-  "ResourceVersion",
+  "REDIS_SERVER",
+  "REDIS_CACHE_TIME_SECONDS",
 
-  "SophtronApiUserId",
-  "SophtronApiUserSecret",
+  "SOPHTRON_API_USER_ID",
+  "SOPHTRON_API_USER_SECRET",
 
-  "MxClientId",
-  "MxApiSecret",
-  "MxClientIdProd",
-  "MxApiSecretProd",
+  "MX_CLIENT_ID",
+  "MX_API_SECRET",
+  "MX_CLIENT_ID_PROD",
+  "MX_API_SECRET_PROD",
 
-  "AkoyaClientId",
-  "AkoyaApiSecret",
-  "AkoyaClientIdProd",
-  "AkoyaApiSecretProd",
-
-  "FinicityPartnerId",
-  "FinicityAppKey",
-  "FinicitySecret",
-  "FinicityPartnerIdProd",
-  "FinicityAppKeyProd",
-  "FinicitySecretProd",
+  "FINICITY_PARTNER_ID",
+  "FINICITY_APP_KEY",
+  "FINICITY_SECRET",
+  "FINICITY_PARTNER_IDProd",
+  "FINICITY_APP_KEYProd",
+  "FINICITY_SECRETProd",
 
   "ELASTIC_SEARCH_URL",
   "INSTITUTION_POLLING_INTERVAL",
   "INSTITUTION_CACHE_LIST_URL",
+
+  "DATA_ENDPOINTS_ENABLE",
 
   "AUTHENTICATION_ENABLE",
   "AUTHENTICATION_AUDIENCE",
   "AUTHENTICATION_ISSUER_BASE_URL",
   "AUTHENTICATION_TOKEN_SIGNING_ALG",
   "AUTHENTICATION_SCOPES",
+
+  "DATA_ENDPOINT_AUTHENTICATION_ENABLE",
+  "DATA_ENDPOINT_AUTHENTICATION_AUDIENCE",
+  "DATA_ENDPOINT_AUTHENTICATION_ISSUER_BASE_URL",
+  "DATA_ENDPOINT_AUTHENTICATION_TOKEN_SIGNING_ALG",
+  "DATA_ENDPOINT_AUTHENTICATION_SCOPES",
 ];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -79,14 +63,21 @@ const config: Record<string, any> = keysToPullFromEnv.reduce(
   (acc, envKey) => {
     return {
       ...acc,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      [envKey]: (processEnv as Record<string, any>)[envKey.toUpperCase()],
+      [envKey]: process.env[envKey],
     };
   },
   {
     ...nonSensitiveSharedConfig,
   },
 );
+
+if (config.INSTITUTION_POLLING_INTERVAL === undefined) {
+  config.INSTITUTION_POLLING_INTERVAL = 1;
+}
+
+if (config.REDIS_CACHE_TIME_SECONDS === undefined) {
+  config.REDIS_CACHE_TIME_SECONDS = 600;
+}
 
 export const getConfig = () => config;
 

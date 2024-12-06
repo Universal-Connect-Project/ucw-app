@@ -254,7 +254,7 @@ function buildMustNotQuery(hiddenInstitutions: string[]): any[] {
     },
   });
 
-  if (!["test", "dev"].includes(config.Env)) {
+  if (!["test", "dev"].includes(config.ENV)) {
     mustNotClauses.push({
       term: {
         is_test_bank: true,
