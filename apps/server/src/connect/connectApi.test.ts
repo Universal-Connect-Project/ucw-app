@@ -1,12 +1,7 @@
 import * as config from "../config";
-import {
-  CachedInstitution,
-  InstitutionSearchResponseItem,
-  MappedJobTypes,
-} from "../shared/contract";
+import { CachedInstitution, MappedJobTypes } from "../shared/contract";
 import {
   elasticSearchInstitutionData,
-  elasticSearchInstitutionDataFavs,
   transformedInstitutionList,
 } from "../test/testData/institution";
 import { ConnectApi } from "./connectApi";
