@@ -50,7 +50,7 @@ jobs:
           check-latest: true
       - run: npm ci
 
-      - run: npm run copyAltTestPreferences
+      - run: npm run copyTestPreferences
 
       - name: "Create env file"
         run: |
