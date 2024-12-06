@@ -19,7 +19,7 @@
     },
     "dev:e2e": {
       "cache": false,
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "ui#build"],
       "persistent": true
     },
     "dev:debug": {
