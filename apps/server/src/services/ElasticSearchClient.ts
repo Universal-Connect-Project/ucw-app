@@ -46,7 +46,7 @@ export async function initialize() {
       info("ElasticSearch already indexed");
     }
   } catch (error) {
-    info("failure");
+    info("failure " + config.ELASTIC_SEARCH_URL);
     logError(error);
   }
 }
