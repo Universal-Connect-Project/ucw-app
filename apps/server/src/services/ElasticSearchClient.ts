@@ -1,5 +1,5 @@
 import type { estypes } from "@elastic/elasticsearch";
-import { Client } from "@elastic/elasticsearch";
+import { Client } from "@opensearch-project/opensearch";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 import config from "../config";
@@ -14,7 +14,6 @@ import type {
   MappedJobTypes,
 } from "../shared/contract";
 import { getPreferences } from "../shared/preferences";
-import { ElasticSearchMock } from "../test/elasticSearchMock";
 import { fetchInstitutions } from "./institutionSyncer";
 import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
 import { getSet, overwriteSet } from "./storageClient/redis";
@@ -26,10 +25,11 @@ export function getInstitutionFilePath() {
 }
 
 export const ElasticsearchClient = new Client({
-  node: config.ELASTIC_SEARCH_URL ?? "http://localhost:9200",
-  ...(process.env.NODE_ENV === "test" && {
-    Connection: ElasticSearchMock.getConnection(),
-  }),
+  // node: config.ELASTIC_SEARCH_URL ?? "http://localhost:9200",
+  node: "https://heroku:dbba634302ac5d4240174c267c07811e@oin-us-east-1.searchly.com",
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 export async function initialize() {

@@ -30,6 +30,7 @@
     "@elastic/elasticsearch": "7.10.0",
     "@elastic/elasticsearch-mock": "^1.0.0",
     "@ngrok/ngrok": "^1.2.0",
+    "@opensearch-project/opensearch": "^2.13.0",
     "@repo/utils": "*",
     "@types/crypto-js": "^4.2.2",
     "@types/express": "^4.17.21",
