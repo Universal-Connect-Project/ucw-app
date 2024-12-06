@@ -7,7 +7,6 @@
   "scripts": {
     "dev": "tsc && vite build --watch",
     "dev:debug": "npm run dev",
-    "dev:e2e": "npm run dev",
     "build": "tsc && vite build",
     "lint": "eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
