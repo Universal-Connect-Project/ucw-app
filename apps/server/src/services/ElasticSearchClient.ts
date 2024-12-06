@@ -30,8 +30,6 @@ export const ElasticsearchClient = new Client({
   ...(process.env.NODE_ENV === "test" && {
     Connection: ElasticSearchMock.getConnection(),
   }),
-  sniffOnStart: false,
-  sniffOnConnectionFault: false,
 });
 
 export async function initialize() {
