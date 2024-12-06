@@ -59,7 +59,6 @@ jobs:
 
           # Vars
           echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
-          echo RESOURCEVERSION="" >> ${ENV_FILE_PATH}
 
           # Secrets (can't load these from another job, due to GH security features)
 
@@ -70,7 +69,7 @@ jobs:
         with:
           config-file: cypress.config.ts
           project: packages/finicity-adapter
-          start: npm run dev:e2e
+          start: npm run start:e2e
           wait-on: "http://localhost:8080/health, http://localhost:9200"
 
       - name: Upload screenshots
