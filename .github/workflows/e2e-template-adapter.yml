@@ -50,7 +50,7 @@ jobs:
           check-latest: true
       - run: npm ci
 
-      - run: npm run copyAltTestPreferences
+      - run: npm run copyTestPreferences
 
       - name: "Create env file"
         run: |
@@ -59,7 +59,6 @@ jobs:
 
           # Vars
           echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
-          echo RESOURCEVERSION="" >> ${ENV_FILE_PATH}
 
           # Secrets (can't load these from another job, due to GH security features)
 
@@ -70,7 +69,7 @@ jobs:
         with:
           config-file: cypress.config.ts
           project: packages/template-adapter # Use for own package ${{ vars.PACKAGE_DIR }}
-          start: npm run dev:e2e
+          start: npm run start:e2e
           wait-on: "http://localhost:8080/health, http://localhost:9200"
 
       - name: Upload screenshots

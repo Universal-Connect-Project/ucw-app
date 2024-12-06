@@ -18,7 +18,7 @@ describe("query parameters", () => {
     const userId = Cypress.env("userId");
 
     visitWithPostMessageSpy(
-      `/?job_type=aggregate&institution_id=${TEST_EXAMPLE_A_INSTITUTION_ID}&user_id=${userId}`,
+      `/widget?job_type=aggregate&institution_id=${TEST_EXAMPLE_A_INSTITUTION_ID}&user_id=${userId}`,
     ).then(() => {
       enterTestExampleACredentials();
 
@@ -38,7 +38,7 @@ describe("query parameters", () => {
   it("shows single account select if no parameter is passed, and skips single account select if single_account_select=false", () => {
     const userId = Cypress.env("userId");
 
-    cy.visit(`/?job_type=${JobTypes.VERIFICATION}&user_id=${userId}`);
+    cy.visit(`/widget?job_type=${JobTypes.VERIFICATION}&user_id=${userId}`);
 
     searchAndSelectTestExampleA();
 
@@ -52,7 +52,7 @@ describe("query parameters", () => {
     expectConnectionSuccess();
 
     cy.visit(
-      `/?job_type=${JobTypes.VERIFICATION}&user_id=${userId}&single_account_select=false`,
+      `/widget?job_type=${JobTypes.VERIFICATION}&user_id=${userId}&single_account_select=false`,
     );
 
     searchAndSelectTestExampleA();

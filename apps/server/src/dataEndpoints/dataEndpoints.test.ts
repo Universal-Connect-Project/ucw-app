@@ -1,4 +1,7 @@
 import type { Response } from "express";
+import he from "he";
+import { transactionsResponse } from "../test-adapter/vcResponses";
+import { testDataRequestValidatorStartTimeError } from "../test-adapter/constants";
 import * as adapterIndex from "../adapterIndex";
 import {
   testVcAccountsData,
@@ -209,7 +212,7 @@ describe("dataEndpoints", () => {
 
   describe("transactionsDataHandler", () => {
     describe("validation", () => {
-      it("responds with a 400 if aggregator is wrong", async () => {
+      it("fails if aggregator is invalid", async () => {
         const res = {
           send: jest.fn(),
           status: jest.fn(),
@@ -230,85 +233,6 @@ describe("dataEndpoints", () => {
         await vcTransactionsDataHandler(req, res);
 
         expect(res.send).toHaveBeenCalledWith(invalidAggregatorString);
-        expect(res.status).toHaveBeenCalledWith(400);
-      });
-
-      it("doesn't respond with a 400 if it's TestAdapterA and there is no start or end time", async () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn(),
-        } as unknown as Response;
-
-        const req: TransactionsRequest = {
-          params: {
-            accountId: "testAccountId",
-            aggregator: Aggregators.TEST_A,
-            userId: "testUserId",
-          },
-          query: {
-            end_time: undefined,
-            start_time: undefined,
-          },
-        };
-
-        await vcTransactionsDataHandler(req, res);
-
-        expect(res.status).not.toHaveBeenCalledWith(400);
-      });
-
-      it("responds with a 400 if its sophtron and there is no start time", async () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn(),
-        } as unknown as Response;
-
-        const req: TransactionsRequest = {
-          params: {
-            accountId: "testAccountId",
-            aggregator: Aggregators.SOPHTRON,
-            userId: "testUserId",
-          },
-          query: {
-            end_time: "junk",
-            start_time: undefined,
-          },
-        };
-
-        await vcTransactionsDataHandler(req, res);
-
-        expect(res.send).toHaveBeenCalledWith(
-          "&#x22;start_time&#x22; is required",
-        );
-        expect(res.status).toHaveBeenCalledWith(400);
-      });
-
-      it("responds with a 400 if its sophtron and there is no end time", async () => {
-        jest.spyOn(adapterIndex, "getVC").mockImplementation(() => {
-          throw new Error();
-        });
-
-        const res = {
-          send: jest.fn(),
-          status: jest.fn(),
-        } as unknown as Response;
-
-        const req: TransactionsRequest = {
-          params: {
-            accountId: "testAccountId",
-            aggregator: Aggregators.SOPHTRON,
-            userId: "testUserId",
-          },
-          query: {
-            end_time: undefined,
-            start_time: "junk",
-          },
-        };
-
-        await vcTransactionsDataHandler(req, res);
-
-        expect(res.send).toHaveBeenCalledWith(
-          "&#x22;end_time&#x22; is required",
-        );
         expect(res.status).toHaveBeenCalledWith(400);
       });
 
@@ -396,6 +320,74 @@ describe("dataEndpoints", () => {
 
         expect(res.send).toHaveBeenCalledWith("Something went wrong");
         expect(res.status).toHaveBeenCalledWith(400);
+      });
+
+      it("succeeds if there is a custom validator and it passes", async () => {
+        const req = {
+          params: {
+            aggregator: Aggregators.TEST_B,
+          },
+          query: {
+            start_time: "testStartTime",
+            end_time: "testEndTime",
+          },
+        } as unknown as TransactionsRequest;
+
+        const res = {
+          send: jest.fn(),
+          status: jest.fn(),
+        } as unknown as any;
+
+        await createTransactionsDataHandler(true)(req, res);
+
+        expect(res.send).toHaveBeenCalledWith({
+          jwt: transactionsResponse,
+        });
+      });
+
+      it("succeeds if there isn't a custom validator", async () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn(),
+        } as unknown as Response;
+
+        const req: TransactionsRequest = {
+          params: {
+            accountId: "testAccountId",
+            aggregator: Aggregators.TEST_A,
+            userId: "testUserId",
+          },
+          query: {
+            end_time: undefined,
+            start_time: undefined,
+          },
+        };
+
+        await vcTransactionsDataHandler(req, res);
+        expect(res.status).not.toHaveBeenCalledWith(400);
+      });
+
+      it("fails if a custom validator fails", async () => {
+        const req = {
+          params: {
+            aggregator: Aggregators.TEST_B,
+          },
+          query: {
+            start_time: undefined,
+            end_time: "testEndTime",
+          },
+        } as unknown as TransactionsRequest;
+
+        const res = {
+          send: jest.fn(),
+          status: jest.fn(),
+        } as unknown as any;
+
+        await createTransactionsDataHandler(false)(req, res);
+
+        expect(res.send).toHaveBeenCalledWith(
+          he.encode(testDataRequestValidatorStartTimeError),
+        );
       });
     });
   });
