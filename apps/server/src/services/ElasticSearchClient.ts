@@ -364,6 +364,7 @@ export async function deleteRemovedInstitutions(
 }
 
 export async function updateInstitutions(institutions: CachedInstitution[]) {
+  info(`updating ${institutions.length} institutions`);
   for (let i = 0; i < institutions.length; i += BATCH_SIZE) {
     const batch = institutions.slice(i, i + BATCH_SIZE);
 

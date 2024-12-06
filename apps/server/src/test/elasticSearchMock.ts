@@ -14,7 +14,7 @@ export function elasticSearchMockError(args: ElasticSearchErrorArgs) {
     body: { errors: { message }, status: statusCode },
     statusCode,
     headers: {},
-    warnings: ["test"],
+    warnings: ["test warning"],
     meta: {
       context: {},
       name: "test",
