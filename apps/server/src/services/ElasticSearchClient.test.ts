@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import { http, HttpResponse } from "msw";
+
 import testPreferences from "../../cachedDefaults/testData/testPreferences.json";
 import config from "../config";
 import * as logger from "../infra/logger";
@@ -21,7 +22,10 @@ import {
   ElasticSearchMock,
   elasticSearchMockError,
 } from "../test/elasticSearchMock";
-import { elasticSearchInstitutionData } from "../test/testData/institution";
+import {
+  elasticSearchInstitutionData,
+  elasticSearchInstitutionDataFavs,
+} from "../test/testData/institution";
 import { server } from "../test/testServer";
 import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
 import { overwriteSet } from "./storageClient/redis";
@@ -531,7 +535,7 @@ describe("getInstitution", () => {
 });
 
 describe("getRecommendedInstitutions", () => {
-  it("makes expected call to ES, gets a list of favorite institutions, and doesnt fail if an institution isnt found", async () => {
+  it("makes expected call to ES, gets a list of favorite institutions, and doesn't fail if an institution isn't found", async () => {
     ElasticSearchMock.clearAll();
 
     ElasticSearchMock.add(
@@ -554,9 +558,9 @@ describe("getRecommendedInstitutions", () => {
       },
     );
 
-    const recommendedInstitutions = await getRecommendedInstitutions(
-      MappedJobTypes.AGGREGATE,
-    );
+    const recommendedInstitutions = await getRecommendedInstitutions({
+      jobType: MappedJobTypes.AGGREGATE,
+    });
 
     expect(recommendedInstitutions).toEqual([elasticSearchInstitutionData]);
   });
@@ -607,11 +611,100 @@ describe("getRecommendedInstitutions", () => {
       },
     );
 
-    const recommendedInstitutions = await getRecommendedInstitutions(
-      MappedJobTypes.AGGREGATE,
-    );
+    const recommendedInstitutions = await getRecommendedInstitutions({
+      jobType: MappedJobTypes.AGGREGATE,
+    });
 
     expect(recommendedInstitutions).toEqual([]);
+  });
+
+  it("filters out test institutions if filterTestBanks is true", async () => {
+    const mockPreferences: preferences.Preferences = {
+      ...testPreferences,
+    } as any;
+
+    jest
+      .spyOn(preferences, "getPreferences")
+      .mockResolvedValue(mockPreferences);
+
+    ElasticSearchMock.clearAll();
+
+    ElasticSearchMock.add(
+      {
+        method: "POST",
+        path: "/_mget",
+        body: {
+          docs: mockPreferences.recommendedInstitutions.map(
+            (institutionId: string) => ({
+              _index: "institutions",
+              _id: institutionId,
+            }),
+          ),
+        },
+      },
+      () => {
+        return {
+          docs: [
+            { _source: elasticSearchInstitutionDataFavs[0] },
+            { _source: elasticSearchInstitutionDataFavs[1] },
+            { _source: elasticSearchInstitutionDataFavs[2] },
+          ],
+        };
+      },
+    );
+
+    const recommendedInstitutions = await getRecommendedInstitutions({
+      jobType: MappedJobTypes.AGGREGATE,
+      filterTestBanks: true,
+    });
+
+    expect(recommendedInstitutions.length).toEqual(1);
+    expect(recommendedInstitutions).toEqual([
+      elasticSearchInstitutionDataFavs[0],
+    ]);
+  });
+
+  it("does not filter out test institutions if filterTestBanks is false", async () => {
+    const mockPreferences: preferences.Preferences = {
+      ...testPreferences,
+    } as any;
+
+    jest
+      .spyOn(preferences, "getPreferences")
+      .mockResolvedValue(mockPreferences);
+
+    ElasticSearchMock.clearAll();
+
+    ElasticSearchMock.add(
+      {
+        method: "POST",
+        path: "/_mget",
+        body: {
+          docs: mockPreferences.recommendedInstitutions.map(
+            (institutionId: string) => ({
+              _index: "institutions",
+              _id: institutionId,
+            }),
+          ),
+        },
+      },
+      () => {
+        return {
+          docs: [
+            { _source: elasticSearchInstitutionDataFavs[0] },
+            { _source: elasticSearchInstitutionDataFavs[1] },
+            { _source: elasticSearchInstitutionDataFavs[2] },
+          ],
+        };
+      },
+    );
+
+    const recommendedInstitutions = await getRecommendedInstitutions({
+      jobType: MappedJobTypes.AGGREGATE,
+    });
+
+    expect(recommendedInstitutions.length).toEqual(3);
+    expect(recommendedInstitutions).toEqual(elasticSearchInstitutionDataFavs);
   });
 });
 
@@ -728,6 +821,7 @@ describe("updateInstitutions", () => {
       // eslint-disable-next-line @typescript-eslint/member-delimiter-style
       doc: { id: string; name: string };
     }
+
     const elasticSearchUpdatesMade: esDocObj[] = [];
     ElasticSearchMock.add(
       {

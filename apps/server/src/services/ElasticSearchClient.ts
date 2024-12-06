@@ -274,9 +274,11 @@ export async function getInstitution(id: string): Promise<CachedInstitution> {
   return institutionResponse._source as CachedInstitution;
 }
 
-export async function getRecommendedInstitutions(
-  jobType: MappedJobTypes,
-): Promise<CachedInstitution[]> {
+export async function getRecommendedInstitutions(args: {
+  jobType: MappedJobTypes;
+  filterTestBanks?: boolean;
+}): Promise<CachedInstitution[]> {
+  const { jobType, filterTestBanks = false } = args;
   const preferences = await getPreferences();
 
   const supportedAggregators = preferences.supportedAggregators;
@@ -285,6 +287,11 @@ export async function getRecommendedInstitutions(
   if (!recommendedInstitutions) {
     return [];
   }
+
+  info(
+    "Getting recommended institutions",
+    JSON.stringify(recommendedInstitutions),
+  );
 
   const esSearch = recommendedInstitutions.map((recommendedInstitution) => {
     return {
@@ -303,8 +310,11 @@ export async function getRecommendedInstitutions(
     .map(
       (favoriteInstitution) => favoriteInstitution._source as CachedInstitution,
     )
+    .filter((institution: CachedInstitution) =>
+      filterTestBanks ? !institution.is_test_bank : true,
+    )
     .filter(
-      (institution) =>
+      (institution: CachedInstitution) =>
         getAvailableAggregators({
           institution,
           jobType,
