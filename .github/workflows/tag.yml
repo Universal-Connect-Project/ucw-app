@@ -1,0 +1,36 @@
+name: Tag based on package.json version
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  tag-package-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set Up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "lts/Iron"
+
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Create tag
+        run: |
+          version=$(jq -r '.version' package.json)
+          tag="v$version"
+          echo "Creating tag: $tag"
+
+          git tag "$tag"
+          git push origin "$tag"

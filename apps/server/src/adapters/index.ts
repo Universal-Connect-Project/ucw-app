@@ -1,6 +1,6 @@
 // eslint-disable @typescript-eslint/naming-convention
 import { aggregators } from "../adapterSetup";
-import { getAggregatorAdapter } from "../adapterIndex";
+import { createAggregatorWidgetAdapter } from "../adapterIndex";
 import * as logger from "../infra/logger";
 import { AnalyticsClient } from "../services/analyticsClient";
 import { resolveInstitutionAggregator } from "../services/institutionResolver";
@@ -62,7 +62,7 @@ export class AggregatorAdapterBase {
     this.analyticsClient = new AnalyticsClient(token);
     try {
       if (this.context?.aggregator) {
-        this.aggregatorAdapter = getAggregatorAdapter(
+        this.aggregatorAdapter = createAggregatorWidgetAdapter(
           this.context?.aggregator as Aggregator,
         );
       }
