@@ -76,6 +76,10 @@ if (process.env.REDISCLOUD_URL) {
   config.REDIS_SERVER = process.env.REDISCLOUD_URL;
 }
 
+if (process.env.REDIS_URL) {
+  config.REDIS_SERVER = process.env.REDIS_URL;
+}
+
 if (process.env.SEARCHBOX_URL) {
   config.ELASTIC_SEARCH_URL = process.env.SEARCHBOX_URL;
 }
