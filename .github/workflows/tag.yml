@@ -1,0 +1,49 @@
+name: Tag based on package.json version
+
+on:
+  pull_request
+  #push:
+  #branches:
+  #- main
+
+jobs:
+  tag-package-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set Up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "lts/Iron"
+
+      - name: Get version
+        id: get-version
+        run: |
+          version=$(jq -r '.version' package.json)
+          echo "Version from package.json: $version"
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Create and Push Tag
+        run: |
+          tag="v${{ steps.get-version.outputs.version }}"
+          echo "Creating tag: $tag"
+
+          # Check if the tag already exists
+          if git rev-parse "$tag" >/dev/null 2>&1; then
+            echo "Tag $tag already exists, skipping."
+            exit 0
+          fi
+
+          git tag "$tag"
+          git push origin "$tag"
+
+      - name: Success Message
+        run: echo "Tag ${{ steps.get-version.outputs.version }} created and pushed successfully!"
