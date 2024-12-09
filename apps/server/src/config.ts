@@ -72,6 +72,14 @@ if (config.REDIS_CACHE_TIME_SECONDS === undefined) {
   config.REDIS_CACHE_TIME_SECONDS = 600;
 }
 
+if (process.env.REDISCLOUD_URL) {
+  config.REDIS_SERVER = process.env.REDISCLOUD_URL;
+}
+
+if (process.env.SEARCHBOX_URL) {
+  config.ELASTIC_SEARCH_URL = process.env.SEARCHBOX_URL;
+}
+
 export const getConfig = () => config;
 
 export default config;
