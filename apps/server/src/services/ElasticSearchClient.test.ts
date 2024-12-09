@@ -1,7 +1,8 @@
 import * as fs from "fs";
 import { http, HttpResponse } from "msw";
+
 import testPreferences from "../../cachedDefaults/testData/testPreferences.json";
-import config from "../config";
+import * as _config from "../config";
 import * as logger from "../infra/logger";
 import {
   deleteRemovedInstitutions,
@@ -21,10 +22,16 @@ import {
   ElasticSearchMock,
   elasticSearchMockError,
 } from "../test/elasticSearchMock";
-import { elasticSearchInstitutionData } from "../test/testData/institution";
+import { generateElasticSearchRecommendedInstitutionTestSetup } from "../test/elasticSearchUtils";
+import {
+  elasticSearchInstitutionData,
+  elasticSearchInstitutionDataFavs,
+} from "../test/testData/institution";
 import { server } from "../test/testServer";
 import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
 import { overwriteSet } from "./storageClient/redis";
+
+const config = _config.getConfig();
 
 jest.mock("fs");
 
@@ -531,7 +538,7 @@ describe("getInstitution", () => {
 });
 
 describe("getRecommendedInstitutions", () => {
-  it("makes expected call to ES, gets a list of favorite institutions, and doesnt fail if an institution isnt found", async () => {
+  it("makes expected call to ES, gets a list of favorite institutions, and doesn't fail if an institution isn't found", async () => {
     ElasticSearchMock.clearAll();
 
     ElasticSearchMock.add(
@@ -554,9 +561,9 @@ describe("getRecommendedInstitutions", () => {
       },
     );
 
-    const recommendedInstitutions = await getRecommendedInstitutions(
-      MappedJobTypes.AGGREGATE,
-    );
+    const recommendedInstitutions = await getRecommendedInstitutions({
+      jobType: MappedJobTypes.AGGREGATE,
+    });
 
     expect(recommendedInstitutions).toEqual([elasticSearchInstitutionData]);
   });
@@ -607,11 +614,34 @@ describe("getRecommendedInstitutions", () => {
       },
     );
 
-    const recommendedInstitutions = await getRecommendedInstitutions(
-      MappedJobTypes.AGGREGATE,
-    );
+    const recommendedInstitutions = await getRecommendedInstitutions({
+      jobType: MappedJobTypes.AGGREGATE,
+    });
 
     expect(recommendedInstitutions).toEqual([]);
+  });
+
+  it("filters out test institutions if ENV is 'prod'", async () => {
+    jest.spyOn(_config, "getConfig").mockReturnValueOnce({
+      ...config,
+      ENV: "prod",
+    });
+
+    const recommendedInstitutions =
+      await generateElasticSearchRecommendedInstitutionTestSetup();
+
+    expect(recommendedInstitutions.length).toEqual(1);
+    expect(recommendedInstitutions).toEqual([
+      elasticSearchInstitutionDataFavs[0],
+    ]);
+  });
+
+  it("does not filter out test institutions if ENV is not 'prod'", async () => {
+    const recommendedInstitutions =
+      await generateElasticSearchRecommendedInstitutionTestSetup();
+
+    expect(recommendedInstitutions.length).toEqual(3);
+    expect(recommendedInstitutions).toEqual(elasticSearchInstitutionDataFavs);
   });
 });
 
@@ -728,6 +758,7 @@ describe("updateInstitutions", () => {
       // eslint-disable-next-line @typescript-eslint/member-delimiter-style
       doc: { id: string; name: string };
     }
+
     const elasticSearchUpdatesMade: esDocObj[] = [];
     ElasticSearchMock.add(
       {
