@@ -6,6 +6,9 @@ on:
   #branches:
   #- main
 
+permissions:
+  contents: write
+
 jobs:
   tag-package-version:
     runs-on: ubuntu-latest
@@ -32,8 +35,8 @@ jobs:
           git config user.email "actions@github.com"
 
       - name: Create tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        #env:
+        #GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag="v${{ steps.get-version.outputs.version }}"
           echo "Creating tag: $tag"
