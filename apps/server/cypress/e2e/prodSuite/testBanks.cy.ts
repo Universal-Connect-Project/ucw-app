@@ -12,4 +12,11 @@ describe("testBanks", () => {
     cy.findAllByText(prodBank).should("exist");
     cy.findByText(TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME).should("not.exist");
   });
+
+  it("filters out test banks from recommended institutions list when prod is the env", () => {
+    visitAgg();
+
+    cy.findAllByText(prodBank).should("exist");
+    cy.findByText(TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME).should("not.exist");
+  });
 });
