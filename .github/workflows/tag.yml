@@ -22,13 +22,6 @@ jobs:
         with:
           node-version: "lts/Iron"
 
-      - name: Get version
-        id: get-version
-        run: |
-          version=$(jq -r '.version' package.json)
-          echo "Version from package.json: $version"
-          echo "version=$version" >> $GITHUB_OUTPUT
-
       - name: Configure Git
         run: |
           git config user.name "GitHub Actions"
@@ -36,7 +29,8 @@ jobs:
 
       - name: Create tag
         run: |
-          tag="v${{ steps.get-version.outputs.version }}"
+          version=$(jq -r '.version' package.json)
+          tag="v$version"
           echo "Creating tag: $tag"
 
           git tag "$tag"
