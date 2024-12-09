@@ -22,6 +22,7 @@ import {
   ElasticSearchMock,
   elasticSearchMockError,
 } from "../test/elasticSearchMock";
+import { generateElasticSearchRecommendedInstitutionTestSetup } from "../test/elasticSearchUtils";
 import {
   elasticSearchInstitutionData,
   elasticSearchInstitutionDataFavs,
@@ -619,39 +620,7 @@ describe("getRecommendedInstitutions", () => {
   });
 
   it("filters out test institutions if filterTestBanks is true", async () => {
-    const mockPreferences: preferences.Preferences = {
-      ...testPreferences,
-    } as any;
-
-    jest
-      .spyOn(preferences, "getPreferences")
-      .mockResolvedValue(mockPreferences);
-
-    ElasticSearchMock.clearAll();
-
-    ElasticSearchMock.add(
-      {
-        method: "POST",
-        path: "/_mget",
-        body: {
-          docs: mockPreferences.recommendedInstitutions.map(
-            (institutionId: string) => ({
-              _index: "institutions",
-              _id: institutionId,
-            }),
-          ),
-        },
-      },
-      () => {
-        return {
-          docs: [
-            { _source: elasticSearchInstitutionDataFavs[0] },
-            { _source: elasticSearchInstitutionDataFavs[1] },
-            { _source: elasticSearchInstitutionDataFavs[2] },
-          ],
-        };
-      },
-    );
+    generateElasticSearchRecommendedInstitutionTestSetup();
 
     const recommendedInstitutions = await getRecommendedInstitutions({
       jobType: MappedJobTypes.AGGREGATE,
@@ -665,39 +634,7 @@ describe("getRecommendedInstitutions", () => {
   });
 
   it("does not filter out test institutions if filterTestBanks is false", async () => {
-    const mockPreferences: preferences.Preferences = {
-      ...testPreferences,
-    } as any;
-
-    jest
-      .spyOn(preferences, "getPreferences")
-      .mockResolvedValue(mockPreferences);
-
-    ElasticSearchMock.clearAll();
-
-    ElasticSearchMock.add(
-      {
-        method: "POST",
-        path: "/_mget",
-        body: {
-          docs: mockPreferences.recommendedInstitutions.map(
-            (institutionId: string) => ({
-              _index: "institutions",
-              _id: institutionId,
-            }),
-          ),
-        },
-      },
-      () => {
-        return {
-          docs: [
-            { _source: elasticSearchInstitutionDataFavs[0] },
-            { _source: elasticSearchInstitutionDataFavs[1] },
-            { _source: elasticSearchInstitutionDataFavs[2] },
-          ],
-        };
-      },
-    );
+    generateElasticSearchRecommendedInstitutionTestSetup();
 
     const recommendedInstitutions = await getRecommendedInstitutions({
       jobType: MappedJobTypes.AGGREGATE,

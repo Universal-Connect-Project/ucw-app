@@ -103,7 +103,7 @@ describe("connectApi", () => {
         defaultAggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING,
       });
 
-      const infoSpy = jest
+      const recommendedInstitutionsSpy = jest
         .spyOn(elasticSearchClient, "getRecommendedInstitutions")
         .mockImplementationOnce(
           (args: { jobType: MappedJobTypes; filterTestBanks?: boolean }) =>
@@ -112,7 +112,7 @@ describe("connectApi", () => {
 
       void connectApi.loadPopularInstitutions();
 
-      expect(infoSpy).toHaveBeenCalledWith({
+      expect(recommendedInstitutionsSpy).toHaveBeenCalledWith({
         jobType: MappedJobTypes.AGGREGATE,
         filterTestBanks: true,
       });
@@ -130,7 +130,7 @@ describe("connectApi", () => {
         defaultAggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING,
       });
 
-      const infoSpy = jest
+      const recommendedInstitutionsSpy = jest
         .spyOn(elasticSearchClient, "getRecommendedInstitutions")
         .mockImplementationOnce(
           (args: { jobType: MappedJobTypes; filterTestBanks?: boolean }) =>
@@ -139,7 +139,7 @@ describe("connectApi", () => {
 
       void connectApi.loadPopularInstitutions();
 
-      expect(infoSpy).toHaveBeenCalledWith({
+      expect(recommendedInstitutionsSpy).toHaveBeenCalledWith({
         jobType: MappedJobTypes.AGGREGATE,
         filterTestBanks: false,
       });
