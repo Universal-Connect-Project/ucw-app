@@ -48,7 +48,7 @@ initializeElastic()
       });
   })
   .catch((error) => {
-    _error(`Failed to initialized: ${error}`);
+    _error(`Failed to initialized: ${error} test`);
   });
 
 app.get("/health", function (req, res) {
@@ -82,8 +82,9 @@ app.get("*", (req, res) => {
   res.sendStatus(404);
 });
 
-app.listen(config.PORT, () => {
-  const message = `Server is running on port ${config.PORT}, ENV: ${config.ENV}, LOG_LEVEL: ${config.LOG_LEVEL}`;
+const port = process.env.PORT || config.PORT
+app.listen(port, () => {
+  const message = `Server is running on port ${port}, ENV: ${config.ENV}, LOG_LEVEL: ${config.LOG_LEVEL}`;
 
   info(message);
 });

@@ -87,8 +87,8 @@ redisClient
           resolve(__dirname, "../../../cachedDefaults/preferences.json"),
         )?.toString(),
       );
-    } catch (error) {
-      error(`Failed to resolve preferences: ${error}`);
+    } catch (reason) {
+      error(`Failed to resolve preferences: ${reason}`);
     }
 
     await setNoExpiration(PREFERENCES_REDIS_KEY, preferencesToSet || {});
