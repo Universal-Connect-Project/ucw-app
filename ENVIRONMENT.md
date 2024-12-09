@@ -52,3 +52,9 @@ These are the environment variables that can be set in apps/server/.env
 | DATA_ENDPOINT_AUTHENTICATION_ISSUER_BASE_URL   | Authentication variable for our optional data endpoint authentication                                                                                                                                                                       |             |               |
 | DATA_ENDPOINT_AUTHENTICATION_TOKEN_SIGNING_ALG | Authentication variable for our optional data endpoint authentication                                                                                                                                                                       |             |               |
 | DATA_ENDPOINT_AUTHENTICATION_SCOPES            | Authentication variable for our optional data endpoint authentication                                                                                                                                                                       |             |               |
+
+## User endpoint variables
+
+| Variable name                                 | Description                                                           | Examples    | Default value |
+|-----------------------------------------------|-----------------------------------------------------------------------| ----------- | ------------- |
+| USER_DELETE_ENDPOINT_ENABLE                   | Whether or not to add the user DELETE endpoint to the express server. | true, false | false         |
