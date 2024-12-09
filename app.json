@@ -1,0 +1,12 @@
+{
+  "name": "Universal Connect Widget",
+  "description": "Universal widget for connecting banks",
+  "addons": [
+    {
+      "plan": "upstash-redis:free"
+    },
+    {
+      "plan": "searchbox:starter"
+    }
+  ]
+}

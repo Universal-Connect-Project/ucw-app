@@ -1,31 +1,31 @@
-import type { DiagnosticResult } from '@elastic/elasticsearch'
-import { errors } from '@elastic/elasticsearch'
-import Mock from '@elastic/elasticsearch-mock'
+import { errors } from "@opensearch-project/opensearch";
+import OpenSearchMock from "@short.io/opensearch-mock";
 
-export const ElasticSearchMock = new Mock()
+export const ElasticSearchMock = new OpenSearchMock();
 
 interface ElasticSearchErrorArgs {
-  message: string
-  statusCode: number
+  message: string;
+  statusCode: number;
 }
 
 export function elasticSearchMockError(args: ElasticSearchErrorArgs) {
-  const { message, statusCode } = args
+  const { message, statusCode } = args;
   return new errors.ResponseError({
     body: { errors: { message }, status: statusCode },
     statusCode,
-    warnings: ['test'],
+    headers: {},
+    warnings: ["test"],
     meta: {
       context: {},
-      name: 'test',
+      name: "test",
       request: {
-        params: { method: 'test', path: 'test' },
+        params: { method: "test", path: "test" },
         options: {},
-        id: 'test'
+        id: "test",
       },
       connection: null,
       attempts: 1,
-      aborted: false
-    }
-  } satisfies DiagnosticResult<unknown, unknown>)
+      aborted: false,
+    },
+  });
 }

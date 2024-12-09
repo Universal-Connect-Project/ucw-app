@@ -1,24 +1,31 @@
-import type { estypes } from "@elastic/elasticsearch";
-import { Client } from "@elastic/elasticsearch";
+import { Client } from "@opensearch-project/opensearch";
+import type {
+  MgetRequest,
+  SearchHit,
+  SearchResponse,
+} from "@opensearch-project/opensearch/api/types";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 
 import config, { getConfig } from "../config";
+import { ElasticSearchMock } from "../test/elasticSearchMock";
+
 import { info, error as logError } from "../infra/logger";
-import type {
-  CachedInstitution,
-  MappedJobTypes,
-  Aggregator,
-} from "../shared/contract";
-import { getPreferences } from "../shared/preferences";
 import {
   getAvailableAggregators,
   JOB_TYPE_PARTIAL_SUPPORT_MAP,
 } from "../shared/aggregators";
-import { ElasticSearchMock } from "../test/elasticSearchMock";
+import type {
+  Aggregator,
+  CachedInstitution,
+  MappedJobTypes,
+} from "../shared/contract";
+import { getPreferences } from "../shared/preferences";
 import { fetchInstitutions } from "./institutionSyncer";
 import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
 import { getSet, overwriteSet } from "./storageClient/redis";
+
+const BATCH_SIZE = 25;
 
 export function getInstitutionFilePath() {
   return resolve(__dirname, "../../cachedDefaults/ucwInstitutionsMapping.json");
@@ -26,19 +33,28 @@ export function getInstitutionFilePath() {
 
 export const ElasticsearchClient = new Client({
   node: config.ELASTIC_SEARCH_URL ?? "http://localhost:9200",
+  ssl: {
+    rejectUnauthorized: false,
+  },
   ...(process.env.NODE_ENV === "test" && {
     Connection: ElasticSearchMock.getConnection(),
   }),
 });
 
 export async function initialize() {
-  const elasticSearchLoaded = await ElasticsearchClient.indices.exists({
-    index: "institutions",
-  });
-  if (!elasticSearchLoaded) {
-    await indexElasticSearch();
-  } else {
-    info("ElasticSearch already indexed");
+  try {
+    const { body: exists } = await ElasticsearchClient.indices.exists({
+      index: "institutions",
+    });
+
+    if (!exists) {
+      info("ElasticSearch is indexing");
+      await indexElasticSearch();
+    } else {
+      info("ElasticSearch already indexed");
+    }
+  } catch (error) {
+    logError(error);
   }
 }
 
@@ -50,18 +66,23 @@ export async function indexElasticSearch() {
 
   await ElasticsearchClient.indices.create({ index: "institutions" });
 
-  const indexPromises = institutionData.map(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async (institution: { id: any }) => {
-      return await ElasticsearchClient.index({
-        index: "institutions",
-        id: institution.id,
-        document: institution,
-      });
-    },
-  );
+  const totalBatches = institutionData.length / BATCH_SIZE;
+  for (let i = 0; i < institutionData.length; i += BATCH_SIZE) {
+    const batch = institutionData.slice(i, i + BATCH_SIZE);
 
-  await Promise.all(indexPromises);
+    const batchCount = i / BATCH_SIZE;
+
+    info(`Indexing batch ${batchCount} of ${totalBatches}`);
+    await Promise.all(
+      batch.map(async (institution) => {
+        await ElasticsearchClient.index({
+          index: "institutions",
+          id: institution.id,
+          body: institution,
+        });
+      }),
+    );
+  }
 }
 
 async function getInstitutions(): Promise<CachedInstitution[]> {
@@ -101,31 +122,28 @@ export async function searchByRoutingNumber(
   const hiddenInstitutions = preferences?.hiddenInstitutions || [];
   const supportedAggregators = preferences?.supportedAggregators || [];
 
-  const searchResults: estypes.SearchResponseBody =
-    await ElasticsearchClient.search({
-      index: "institutions",
-      body: {
-        query: {
-          bool: {
-            should: {
-              match: {
-                routing_numbers: {
-                  query: routingNumber,
-                },
+  const { body }: { body: SearchResponse } = await ElasticsearchClient.search({
+    index: "institutions",
+    body: {
+      query: {
+        bool: {
+          should: {
+            match: {
+              routing_numbers: {
+                query: routingNumber,
               },
             },
-            minimum_should_match: 1,
-            must: mustQuery(supportedAggregators, jobType),
-            must_not: buildMustNotQuery(hiddenInstitutions),
           },
+          minimum_should_match: 1,
+          must: mustQuery(supportedAggregators, jobType),
+          must_not: buildMustNotQuery(hiddenInstitutions),
         },
-        size: 20,
       },
-    });
+      size: 20,
+    },
+  });
 
-  return searchResults.hits.hits.map(
-    (esObject: estypes.SearchHit) => esObject._source,
-  );
+  return body.hits.hits.map((esObject: SearchHit) => esObject._source);
 }
 
 export async function search(
@@ -137,25 +155,22 @@ export async function search(
   const hiddenInstitutions = preferences?.hiddenInstitutions || [];
   const supportedAggregators = preferences?.supportedAggregators || [];
 
-  const searchResults: estypes.SearchResponseBody =
-    await ElasticsearchClient.search({
-      index: "institutions",
-      body: {
-        query: {
-          bool: {
-            should: fuzzySearchTermQuery(searchTerm),
-            minimum_should_match: 1,
-            must: mustQuery(supportedAggregators, jobType),
-            must_not: buildMustNotQuery(hiddenInstitutions),
-          },
+  const { body }: { body: SearchResponse } = await ElasticsearchClient.search({
+    index: "institutions",
+    body: {
+      query: {
+        bool: {
+          should: fuzzySearchTermQuery(searchTerm),
+          minimum_should_match: 1,
+          must: mustQuery(supportedAggregators, jobType),
+          must_not: buildMustNotQuery(hiddenInstitutions),
         },
-        size: 20,
       },
-    });
+      size: 20,
+    },
+  });
 
-  return searchResults.hits.hits.map(
-    (esObject: estypes.SearchHit) => esObject._source,
-  );
+  return body.hits.hits.map((esObject: SearchHit) => esObject._source);
 }
 
 function fuzzySearchTermQuery(searchTerm: string) {
@@ -255,7 +270,7 @@ function buildMustNotQuery(hiddenInstitutions: string[]): any[] {
     },
   });
 
-  if (!["test", "dev"].includes(config.ENV)) {
+  if (!["test", "dev", "staging"].includes(config.ENV)) {
     mustNotClauses.push({
       term: {
         is_test_bank: true,
@@ -267,12 +282,12 @@ function buildMustNotQuery(hiddenInstitutions: string[]): any[] {
 }
 
 export async function getInstitution(id: string): Promise<CachedInstitution> {
-  const institutionResponse = await ElasticsearchClient.get({
+  const { body } = await ElasticsearchClient.get({
     id,
     index: "institutions",
   });
 
-  return institutionResponse._source as CachedInstitution;
+  return body._source as CachedInstitution;
 }
 
 export async function getRecommendedInstitutions(args: {
@@ -301,28 +316,32 @@ export async function getRecommendedInstitutions(args: {
     };
   });
 
-  const recommendedInstitutionsResponse: estypes.MgetRequest =
-    await ElasticsearchClient.mget({
-      docs: esSearch,
+  try {
+    const { body }: MgetRequest = await ElasticsearchClient.mget({
+      body: { docs: esSearch },
     });
 
-  return recommendedInstitutionsResponse.docs
-    .filter(({ _source }) => _source)
-    .map(
-      (favoriteInstitution) => favoriteInstitution._source as CachedInstitution,
-    )
-    .filter((institution: CachedInstitution) =>
-      config.ENV === "prod" ? !institution.is_test_bank : true,
-    )
-    .filter(
-      (institution: CachedInstitution) =>
-        getAvailableAggregators({
-          institution,
-          jobType,
-          shouldRequireFullSupport: false,
-          supportedAggregators: supportedAggregators,
-        }).length,
-    );
+    return body.docs
+      .filter(({ _source }) => _source)
+      .map(
+        (favoriteInstitution) =>
+          favoriteInstitution._source as CachedInstitution,
+      )
+      .filter((institution: CachedInstitution) =>
+        config.ENV === "prod" ? !institution.is_test_bank : true,
+      )
+      .filter(
+        (institution: CachedInstitution) =>
+          getAvailableAggregators({
+            institution,
+            jobType,
+            shouldRequireFullSupport: false,
+            supportedAggregators: supportedAggregators,
+          }).length,
+      );
+  } catch (error) {
+    logError(error);
+  }
 }
 
 export async function deleteRemovedInstitutions(
@@ -342,15 +361,18 @@ export async function deleteRemovedInstitutions(
     return;
   }
   info("deleting institutions", deletedInstitutionsIds);
-  const deletePromises = deletedInstitutionsIds.map(async (ucpId: string) => {
-    return await ElasticsearchClient.delete({
-      index: "institutions",
-      id: ucpId,
-    });
-  });
-
   try {
-    await Promise.all(deletePromises);
+    for (let i = 0; i < deletedInstitutionsIds.length; i += BATCH_SIZE) {
+      const batch = deletedInstitutionsIds.slice(i, i + BATCH_SIZE);
+      await Promise.all(
+        batch.map(async (ucpId: string) => {
+          await ElasticsearchClient.delete({
+            index: "institutions",
+            id: ucpId,
+          });
+        }),
+      );
+    }
     await overwriteSet(INSTITUTION_CURRENT_LIST_IDS, Array.from(newInsIdsSet));
   } catch (error) {
     logError(error);
@@ -358,15 +380,21 @@ export async function deleteRemovedInstitutions(
 }
 
 export async function updateInstitutions(institutions: CachedInstitution[]) {
-  const updatePromises = institutions.map(
-    async (institution: CachedInstitution) => {
-      return await ElasticsearchClient.update({
-        index: "institutions",
-        id: institution.id,
-        doc: institution,
-        doc_as_upsert: true,
-      });
-    },
-  );
-  await Promise.all(updatePromises);
+  info(`updating ${institutions.length} institutions`);
+  for (let i = 0; i < institutions.length; i += BATCH_SIZE) {
+    const batch = institutions.slice(i, i + BATCH_SIZE);
+
+    await Promise.all(
+      batch.map(async (institution: CachedInstitution) => {
+        await ElasticsearchClient.update({
+          index: "institutions",
+          id: institution.id,
+          body: {
+            doc: institution,
+            doc_as_upsert: true,
+          },
+        });
+      }),
+    );
+  }
 }
