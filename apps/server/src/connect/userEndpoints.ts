@@ -1,34 +1,34 @@
-import type { Response } from 'express'
-import { getAggregatorAdapter } from '../adapterIndex'
-import { withValidateAggregatorInPath } from '../utils/validators'
-import type { Aggregator } from '../adapterSetup'
+import type { Response } from "express";
+import { createAggregatorWidgetAdapter } from "../adapterIndex";
+import { withValidateAggregatorInPath } from "../utils/validators";
+import type { Aggregator } from "../adapterSetup";
 
 interface UserDeleteParameters {
-  aggregator: Aggregator
-  userId: string
+  aggregator: Aggregator;
+  userId: string;
 }
 
 export interface UserDeleteRequest {
-  params: UserDeleteParameters
+  params: UserDeleteParameters;
 }
 
 export const userDeleteHandler = withValidateAggregatorInPath(
   async (req: UserDeleteRequest, res: Response) => {
-    const { userId, aggregator } = req.params
+    const { userId, aggregator } = req.params;
 
     try {
-      const aggregatorAdapter = getAggregatorAdapter(aggregator)
-      const failIfUserNotFound = true
+      const aggregatorAdapter = createAggregatorWidgetAdapter(aggregator);
+      const failIfUserNotFound = true;
       const aggregatorUserId = await aggregatorAdapter.ResolveUserId(
         userId,
-        failIfUserNotFound
-      )
-      const ret = await aggregatorAdapter.DeleteUser(aggregatorUserId)
-      res.status(ret.status)
-      res.send(ret.data)
+        failIfUserNotFound,
+      );
+      const ret = await aggregatorAdapter.DeleteUser(aggregatorUserId);
+      res.status(ret.status);
+      res.send(ret.data);
     } catch (error) {
-      res.status(400)
-      res.send('User delete failed')
+      res.status(400);
+      res.send("User delete failed");
     }
-  }
-)
+  },
+);
