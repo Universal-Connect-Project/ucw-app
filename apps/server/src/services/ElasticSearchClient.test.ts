@@ -2,7 +2,7 @@ import * as fs from "fs";
 import { http, HttpResponse } from "msw";
 
 import testPreferences from "../../cachedDefaults/testData/testPreferences.json";
-import config from "../config";
+import * as _config from "../config";
 import * as logger from "../infra/logger";
 import {
   deleteRemovedInstitutions,
@@ -30,6 +30,8 @@ import {
 import { server } from "../test/testServer";
 import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
 import { overwriteSet } from "./storageClient/redis";
+
+const config = _config.getConfig();
 
 jest.mock("fs");
 
@@ -619,13 +621,14 @@ describe("getRecommendedInstitutions", () => {
     expect(recommendedInstitutions).toEqual([]);
   });
 
-  it("filters out test institutions if filterTestBanks is true", async () => {
-    generateElasticSearchRecommendedInstitutionTestSetup();
-
-    const recommendedInstitutions = await getRecommendedInstitutions({
-      jobType: MappedJobTypes.AGGREGATE,
-      filterTestBanks: true,
+  it("filters out test institutions if ENV is 'prod'", async () => {
+    jest.spyOn(_config, "getConfig").mockReturnValueOnce({
+      ...config,
+      ENV: "prod",
     });
+
+    const recommendedInstitutions =
+      await generateElasticSearchRecommendedInstitutionTestSetup();
 
     expect(recommendedInstitutions.length).toEqual(1);
     expect(recommendedInstitutions).toEqual([
@@ -633,12 +636,9 @@ describe("getRecommendedInstitutions", () => {
     ]);
   });
 
-  it("does not filter out test institutions if filterTestBanks is false", async () => {
-    generateElasticSearchRecommendedInstitutionTestSetup();
-
-    const recommendedInstitutions = await getRecommendedInstitutions({
-      jobType: MappedJobTypes.AGGREGATE,
-    });
+  it("does not filter out test institutions if ENV is not 'prod'", async () => {
+    const recommendedInstitutions =
+      await generateElasticSearchRecommendedInstitutionTestSetup();
 
     expect(recommendedInstitutions.length).toEqual(3);
     expect(recommendedInstitutions).toEqual(elasticSearchInstitutionDataFavs);

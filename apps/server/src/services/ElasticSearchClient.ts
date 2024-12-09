@@ -2,7 +2,8 @@ import type { estypes } from "@elastic/elasticsearch";
 import { Client } from "@elastic/elasticsearch";
 import { readFileSync } from "fs";
 import { resolve } from "path";
-import config from "../config";
+
+import config, { getConfig } from "../config";
 import { info, error as logError } from "../infra/logger";
 import type {
   CachedInstitution,
@@ -276,9 +277,9 @@ export async function getInstitution(id: string): Promise<CachedInstitution> {
 
 export async function getRecommendedInstitutions(args: {
   jobType: MappedJobTypes;
-  filterTestBanks?: boolean;
 }): Promise<CachedInstitution[]> {
-  const { jobType, filterTestBanks = false } = args;
+  const config = getConfig();
+  const { jobType } = args;
   const preferences = await getPreferences();
 
   const supportedAggregators = preferences.supportedAggregators;
@@ -311,7 +312,7 @@ export async function getRecommendedInstitutions(args: {
       (favoriteInstitution) => favoriteInstitution._source as CachedInstitution,
     )
     .filter((institution: CachedInstitution) =>
-      filterTestBanks ? !institution.is_test_bank : true,
+      config.ENV === "prod" ? !institution.is_test_bank : true,
     )
     .filter(
       (institution: CachedInstitution) =>
