@@ -178,6 +178,4 @@ export default function (app) {
       members: ret,
     });
   });
-
-  app.delete("/api/aggregator/:aggregator/user/:userId", userDeleteHandler);
 }
