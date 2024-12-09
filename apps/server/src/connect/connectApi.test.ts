@@ -1,5 +1,4 @@
-import * as config from "../config";
-import { CachedInstitution, MappedJobTypes } from "../shared/contract";
+import { MappedJobTypes } from "../shared/contract";
 import {
   elasticSearchInstitutionData,
   transformedInstitutionList,
@@ -12,7 +11,6 @@ import {
 } from "../test-adapter/constants";
 import * as preferences from "../shared/preferences";
 import testPreferences from "../../cachedDefaults/testData/testPreferences.json";
-import * as elasticSearchClient from "../services/ElasticSearchClient";
 
 const connectApi = new ConnectApi({
   context: {
