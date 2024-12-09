@@ -7,14 +7,14 @@ import RateLimit from "express-rate-limit";
 import path from "path";
 
 import config from "./config";
-import useConnect from "./connect/connectApiExpress";
 import { error as _error, info } from "./infra/logger";
+import useConnect from "./connect/connectApiExpress";
+import useUserEndpoints from "./connect/useUserEndpoints";
 import { initialize as initializeElastic } from "./services/ElasticSearchClient";
 import { setInstitutionSyncSchedule } from "./services/institutionSyncer";
 import { widgetHandler } from "./widgetEndpoint";
 import useAuthentication from "./authentication";
 import useDataEndpoints from "./dataEndpoints/useDataEndpoints";
-import useUserEndpoints from "services/useUserEndpoints";
 
 process.on("unhandledRejection", (error) => {
   _error(`unhandledRejection: ${error.message}`, error);
