@@ -5,7 +5,7 @@ import he from "he";
 import { VCDataTypes } from "@repo/utils";
 import type { Aggregator } from "../shared/contract";
 import { withValidateAggregatorInPath } from "../utils/validators";
-import { getAggregatorAdapter, getData, getVC } from "../adapterIndex";
+import { createAggregatorWidgetAdapter, getData, getVC } from "../adapterIndex";
 
 export interface AccountsDataQueryParameters {
   connectionId: string;
@@ -30,7 +30,7 @@ export const createAccountsDataHandler = (isVc: boolean) =>
   withValidateAggregatorInPath(async (req: AccountsRequest, res: Response) => {
     const { aggregator, connectionId, userId } = req.params;
 
-    const aggregatorAdapter = getAggregatorAdapter(aggregator);
+    const aggregatorAdapter = createAggregatorWidgetAdapter(aggregator);
     const aggregatorUserId = await aggregatorAdapter.ResolveUserId(userId);
 
     const dataArgs = {
@@ -67,7 +67,7 @@ export const createIdentityDataHandler = (isVc: boolean) =>
   withValidateAggregatorInPath(async (req: IdentityRequest, res: Response) => {
     const { aggregator, connectionId, userId } = req.params;
 
-    const aggregatorAdapter = getAggregatorAdapter(aggregator);
+    const aggregatorAdapter = createAggregatorWidgetAdapter(aggregator);
     const aggregatorUserId = await aggregatorAdapter.ResolveUserId(userId);
 
     const dataArgs = {
@@ -110,7 +110,7 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
       const { accountId, aggregator, userId } = req.params;
       const { start_time, end_time } = req.query;
 
-      const aggregatorAdapter = getAggregatorAdapter(aggregator);
+      const aggregatorAdapter = createAggregatorWidgetAdapter(aggregator);
       const aggregatorUserId = await aggregatorAdapter.ResolveUserId(userId);
 
       const dataArgs = {

@@ -33,7 +33,7 @@ export enum JobTypes {
 export type AdapterMap = {
   dataAdapter?: Function;
   vcAdapter?: Function;
-  widgetAdapter: WidgetAdapter;
+  createWidgetAdapter: () => WidgetAdapter;
 };
 
 export interface Credential {
