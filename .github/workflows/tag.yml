@@ -35,20 +35,9 @@ jobs:
           git config user.email "actions@github.com"
 
       - name: Create tag
-        #env:
-        #GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag="v${{ steps.get-version.outputs.version }}"
           echo "Creating tag: $tag"
 
-          # Check if the tag already exists
-          if git rev-parse "$tag" >/dev/null 2>&1; then
-            echo "Tag $tag already exists, skipping."
-            exit 0
-          fi
-
           git tag "$tag"
           git push origin "$tag"
-
-      - name: Success Message
-        run: echo "Tag ${{ steps.get-version.outputs.version }} created and pushed successfully!"
