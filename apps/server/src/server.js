@@ -4,15 +4,16 @@ import cookieParser from "cookie-parser";
 import express from "express";
 import "express-async-errors";
 import RateLimit from "express-rate-limit";
+import path from "path";
 
 import config from "./config";
-import useConnect from "./connect/connectApiExpress";
 import { error as _error, info } from "./infra/logger";
+import useConnect from "./connect/connectApiExpress";
+import useUserEndpoints from "./connect/useUserEndpoints";
 import { initialize as initializeElastic } from "./services/ElasticSearchClient";
 import { setInstitutionSyncSchedule } from "./services/institutionSyncer";
 import { widgetHandler } from "./widgetEndpoint";
 import useAuthentication from "./authentication";
-import path from "path";
 import useDataEndpoints from "./dataEndpoints/useDataEndpoints";
 
 process.on("unhandledRejection", (error) => {
@@ -60,10 +61,9 @@ app.get("/health", function (req, res) {
   }
 });
 
+useUserEndpoints(app);
 useDataEndpoints(app);
-
 useAuthentication(app);
-
 useConnect(app);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
