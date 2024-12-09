@@ -13,7 +13,7 @@ export const visitIdentity = () => {
   return cy.wrap(userId);
 };
 
-export const visitAgg = (options) => {
+export const visitAgg = (options?: any) => {
   const { failOnStatusCode, token, userId: userIdOverride } = options || {};
 
   const userId = userIdOverride || crypto.randomUUID();
