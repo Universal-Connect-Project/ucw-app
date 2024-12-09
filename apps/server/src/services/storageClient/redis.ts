@@ -8,6 +8,10 @@ import { PREFERENCES_REDIS_KEY } from "./constants";
 
 const redisClient = createClient({
   url: config.REDIS_SERVER,
+  socket: {
+    tls: true,
+    rejectUnauthorized: false,
+  },
 });
 
 export const overwriteSet = async (key: string, values: string[]) => {
