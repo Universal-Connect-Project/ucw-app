@@ -4,8 +4,8 @@ import {
   transformedInstitutionList,
 } from "../test/testData/institution";
 import { ConnectApi } from "./connectApi";
-import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../test-adapter";
 import {
+  TEST_EXAMPLE_A_AGGREGATOR_STRING,
   TEST_EXAMPLE_B_AGGREGATOR_STRING,
   testExampleInstitution,
 } from "../test-adapter/constants";

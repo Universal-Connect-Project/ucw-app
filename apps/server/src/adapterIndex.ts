@@ -3,11 +3,14 @@ import { info } from "./infra/logger";
 import type { Aggregator } from "./adapterSetup";
 import { adapterMap } from "./adapterSetup";
 
-export function getAggregatorAdapter(aggregator: Aggregator): WidgetAdapter {
-  const widgetAdapter = adapterMap[aggregator as keyof typeof adapterMap]?.widgetAdapter;
+export function createAggregatorWidgetAdapter(
+  aggregator: Aggregator,
+): WidgetAdapter {
+  const createWidgetAdapter =
+    adapterMap[aggregator as keyof typeof adapterMap]?.createWidgetAdapter;
 
-  if (widgetAdapter) {
-    return widgetAdapter;
+  if (createWidgetAdapter) {
+    return createWidgetAdapter();
   }
 
   throw new Error(`Unsupported aggregator ${aggregator}`);
@@ -32,7 +35,8 @@ export async function getData({
   type,
   userId,
 }: DataParameters) {
-  const dataAdapter = adapterMap[aggregator as keyof typeof adapterMap]?.dataAdapter;
+  const dataAdapter =
+    adapterMap[aggregator as keyof typeof adapterMap]?.dataAdapter;
 
   if (dataAdapter) {
     info("Getting vc from aggregator", aggregator);
@@ -59,7 +63,8 @@ export async function getVC({
   type,
   userId,
 }: DataParameters) {
-  const vcAdapter = adapterMap[aggregator as keyof typeof adapterMap]?.vcAdapter;
+  const vcAdapter =
+    adapterMap[aggregator as keyof typeof adapterMap]?.vcAdapter;
 
   if (vcAdapter) {
     info("Getting vc from aggregator", aggregator);

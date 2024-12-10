@@ -1,11 +1,12 @@
 import type { Response } from "express";
-import { getAggregatorAdapter } from "../adapterIndex";
 import type { Aggregator } from "../shared/contract";
 import { Aggregators } from "../shared/contract";
 import { listUsersData } from "../test/testData/users";
 import { invalidAggregatorString } from "../utils/validators";
 import type { UserDeleteRequest } from "./userEndpoints";
 import { userDeleteHandler } from "./userEndpoints";
+import * as adapterIndex from "../adapterIndex";
+import type { WidgetAdapter } from "@repo/utils";
 
 const user = listUsersData.users[0];
 
@@ -54,10 +55,13 @@ describe("userEndpoints", () => {
     it("responds with a failure if TestA deletion fails", async () => {
       // Mock DeleteUser from TestAdapter
       jest
-        .spyOn(getAggregatorAdapter(Aggregators.TEST_A), "DeleteUser")
-        .mockImplementation(() => {
-          throw new Error("User delete failed");
-        });
+        .spyOn(adapterIndex, "createAggregatorWidgetAdapter")
+        .mockReturnValue({
+          DeleteUser: () => {
+            throw new Error("Delete failed");
+          },
+          ResolveUserId: () => "test",
+        } as unknown as WidgetAdapter);
 
       const res = {
         send: jest.fn(),
