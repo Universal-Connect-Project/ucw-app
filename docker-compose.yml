@@ -9,7 +9,7 @@ services:
     restart: on-failure
     healthcheck:
       test: wget -q -O- http://server:${SERVER_PORT}/health || exit 1
-      start_period: 60s
+      start_period: 120s
       interval: 30s
       timeout: 10s
       retries: 6
@@ -51,7 +51,7 @@ services:
 
   elasticsearch:
     container_name: ucw-app-elasticsearch
-    image: elasticsearch:8.13.4
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
     restart: on-failure
     networks:
       - ucw
