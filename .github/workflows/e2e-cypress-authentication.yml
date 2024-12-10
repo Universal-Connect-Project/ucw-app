@@ -61,10 +61,7 @@ jobs:
           echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
           echo AUTHENTICATION_ENABLE=true >> ${ENV_FILE_PATH}
           echo DATA_ENDPOINT_AUTHENTICATION_ENABLE=true >> ${ENV_FILE_PATH}
-
-          # Secrets (can't load these from another job, due to GH security features)
-
-          cat ${ENV_FILE_PATH}
+          echo DELETE_USER_ENDPOINT_AUTHENTICATION_ENABLE=true >> ${ENV_FILE_PATH}
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
