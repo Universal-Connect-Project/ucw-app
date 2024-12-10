@@ -63,6 +63,8 @@ jobs:
           echo DATA_ENDPOINT_AUTHENTICATION_ENABLE=true >> ${ENV_FILE_PATH}
           echo DELETE_USER_ENDPOINT_AUTHENTICATION_ENABLE=true >> ${ENV_FILE_PATH}
 
+          cat ${ENV_FILE_PATH}
+
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
