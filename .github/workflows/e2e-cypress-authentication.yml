@@ -14,7 +14,7 @@ jobs:
 
     services:
       elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
         options: --health-cmd="curl --silent --fail localhost:9200/_cluster/health || exit 1" --health-interval=10s --health-timeout=5s --health-retries=5
         ports:
           - 9200:9200
@@ -85,6 +85,7 @@ jobs:
           project: apps/server
           start: npm run start:e2e
           wait-on: "http://localhost:8080/health, http://localhost:9200"
+          wait-on-timeout: 180
 
       - name: Upload screenshots
         uses: actions/upload-artifact@v4
