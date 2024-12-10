@@ -77,4 +77,34 @@ describe("authentication", () => {
       expectConnectionSuccess();
     });
   });
+
+  it("can't access the delete user endpoints without the right access", () => {
+    cy.request({
+      failOnStatusCode: false,
+      method: "delete",
+      url: "/api/aggregator/testExampleA/user/userId",
+      headers: {
+        authorization: `Bearer null`,
+      },
+    }).then((deleteResponse) => {
+      expect(deleteResponse.status).to.eq(403);
+    });
+  });
+
+  it("can access the delete user endpoints with the right access", () => {
+    const widgetDemoDeleteUserAccessToken = Cypress.env(
+      WIDGET_DEMO_DELETE_USER_ACCESS_TOKEN_ENV,
+    );
+
+    cy.request({
+      failOnStatusCode: false,
+      method: "get",
+      url: "/api/aggregator/testExampleA/user/userId",
+      headers: {
+        authorization: `Bearer ${widgetDemoDeleteUserAccessToken}`,
+      },
+    }).then((deleteResponseWithAccess) => {
+      expect(deleteResponseWithAccess.status).to.eq(200);
+    });
+  });
 });
