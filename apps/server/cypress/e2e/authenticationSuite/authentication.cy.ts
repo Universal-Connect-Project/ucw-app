@@ -10,6 +10,7 @@ import {
 import {
   WIDGET_DEMO_ACCESS_TOKEN_ENV,
   WIDGET_DEMO_DATA_ACCESS_TOKEN_ENV,
+  WIDGET_DEMO_DELETE_USER_ACCESS_TOKEN_ENV,
 } from "../../shared/constants/accessToken";
 
 describe("authentication", () => {
