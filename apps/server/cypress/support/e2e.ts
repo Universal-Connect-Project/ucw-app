@@ -21,6 +21,7 @@ import { JwtPayload } from "jsonwebtoken";
 import {
   WIDGET_DEMO_ACCESS_TOKEN_ENV,
   WIDGET_DEMO_DATA_ACCESS_TOKEN_ENV,
+  WIDGET_DEMO_DELETE_USER_ACCESS_TOKEN_ENV,
 } from "../shared/constants/accessToken";
 
 configure({ testIdAttribute: "data-test" });
@@ -74,6 +75,13 @@ before(() => {
       passwordEnvString: "auth_widget_demo_data_password",
       scopeEnvString: "auth_widget_demo_data_scope",
       usernameEnvString: "auth_widget_demo_data_username",
+    });
+
+    authenticateAndStoreAccessToken({
+      accessTokenEnvString: WIDGET_DEMO_DELETE_USER_ACCESS_TOKEN_ENV,
+      passwordEnvString: "auth_widget_demo_delete_user_password",
+      scopeEnvString: "auth_widget_demo_delete_user_scope",
+      usernameEnvString: "auth_widget_demo_delete_user_username",
     });
   }
 });
