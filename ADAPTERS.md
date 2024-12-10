@@ -7,12 +7,6 @@ Each aggregator that wants to participate in the UCP needs to create their own a
 > [!NOTE]  
 > This repository only contains test adapters to allow the UCP to have test paths for aggregator adapters. Real aggregator adapters should be created in a fork of the [adapter template repository](https://github.com/Universal-Connect-Project/ucw-adapter-template). See [the MX Adapter Package Fork](https://github.com/Universal-Connect-Project/ucw-adapter-mx) is an example of an adapter built from the template.
 
-## Hosting your own UCW
-
-If you are planning on hosting a UCW, then you'll need to import and configure aggregator adapter packages for each of the aggregators you plan to use. Our plan is to make this process as simple as possible. Examples of the integration process are in [adapterSetup.ts](./apps/server/src/adapterSetup.ts).
-
-You can also look at the [adapterSetup.ts](https://github.com/Universal-Connect-Project/ucw-adapter-mx/blob/main/apps/server/src/adapterSetup.ts) file in [the MX Adapter Package Fork](https://github.com/Universal-Connect-Project/ucw-adapter-mx) to see how the MX Adapter is set up.
-
 ### Supported Adapters
 
 - [MX Adapter for UCW](https://github.com/Universal-Connect-Project/ucw-adapter-mx/blob/main/packages/mx-adapter/README.md)
@@ -36,7 +30,7 @@ In our opinion the easiest way to create an adapter package is as follows:
 1. Bundle and publish your adapter to npm (There are workflows setup to do this in the template adapter)
 1. When your adapter package is ready for production use, then you'll need to gain access to the UCP institution list to update the list of institutions you support (This functionality is in progress by the UCP team)
 
-An example adapter lives [here](./apps/server/src/test-adapter/index.ts). Each adapter needs to export an adapterMapObject. These adapterMapObjects are imported and setup by someone hosting the UCW in [adapterSetup.ts](./apps/server/src/adapterSetup.ts). If the test adapterMapObject doesn't support a property you need to use for your adapter, then you'll need to add it to the test example adapter to ensure it continues to get support.
+An example adapter lives [here](./apps/server/src/test-adapter/index.ts). Each adapter needs to export an adapterMapObject. These adapterMapObjects are setup in [adapterSetup.ts](./apps/server/src/adapterSetup.ts). If the test adapterMapObject doesn't support a property you need to use for your adapter, then you'll need to add it to the test example adapter to ensure it continues to get support.
 
 This repo accesses adapter-specific logic in [adapterIndex.ts](./apps/server/src/adapterIndex.ts)
 
