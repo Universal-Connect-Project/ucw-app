@@ -57,4 +57,4 @@ These are the environment variables that can be set in apps/server/.env
 
 | Variable name                                 | Description                                                           | Examples    | Default value |
 |-----------------------------------------------|-----------------------------------------------------------------------| ----------- | ------------- |
-| USER_DELETE_ENDPOINT_ENABLE                   | Whether or not to add the user DELETE endpoint to the express server. | true, false | false         |
+| DELETE_USER_ENDPOINT_ENABLE                   | Whether or not to add the user DELETE endpoint to the express server. | true, false | false         |

@@ -9,7 +9,7 @@ describe("useUserEndpoints", () => {
     } as unknown as Express;
 
     jest.spyOn(config, "getConfig").mockReturnValue({
-      USER_DELETE_ENDPOINT_ENABLE: "true",
+      DELETE_USER_ENDPOINT_ENABLE: "true",
     });
 
     useUserEndpoints(app);
@@ -23,7 +23,7 @@ describe("useUserEndpoints", () => {
     } as unknown as Express;
 
     jest.spyOn(config, "getConfig").mockReturnValue({
-      USER_DELETE_ENDPOINT_ENABLE: "false",
+      DELETE_USER_ENDPOINT_ENABLE: "false",
     });
 
     useUserEndpoints(app);

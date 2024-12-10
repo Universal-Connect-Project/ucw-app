@@ -6,7 +6,7 @@ import { getConfig } from "../config";
 const useUserEndpoints = (app: Express) => {
   const config = getConfig();
 
-  if (config.USER_DELETE_ENDPOINT_ENABLE === "true") {
+  if (config.DELETE_USER_ENDPOINT_ENABLE === "true") {
     app.delete("/api/aggregator/:aggregator/user/:userId", userDeleteHandler);
   }
 };
