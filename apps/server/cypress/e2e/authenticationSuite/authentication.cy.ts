@@ -79,10 +79,12 @@ describe("authentication", () => {
   });
 
   it("can't access the delete user endpoints without the right access", () => {
+    const userId = crypto.randomUUID();
+
     cy.request({
       failOnStatusCode: false,
       method: "DELETE",
-      url: "/api/aggregator/testExampleA/user/userId",
+      url: `/api/aggregator/testExampleA/user/${userId}`,
       headers: {
         authorization: "Bearer fakeToken",
       },
@@ -92,13 +94,15 @@ describe("authentication", () => {
   });
 
   it("can access the delete user endpoints with the right access", () => {
+    const userId = crypto.randomUUID();
+
     const widgetDemoDeleteUserAccessToken = Cypress.env(
       WIDGET_DEMO_DELETE_USER_ACCESS_TOKEN_ENV,
     );
 
     cy.request({
       method: "DELETE",
-      url: "/api/aggregator/testExampleA/user/userId",
+      url: `/api/aggregator/testExampleA/user/${userId}`,
       headers: {
         authorization: `Bearer ${widgetDemoDeleteUserAccessToken}`,
       },
