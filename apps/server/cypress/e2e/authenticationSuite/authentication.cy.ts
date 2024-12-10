@@ -81,13 +81,13 @@ describe("authentication", () => {
   it("can't access the delete user endpoints without the right access", () => {
     cy.request({
       failOnStatusCode: false,
-      method: "delete",
+      method: "DELETE",
       url: "/api/aggregator/testExampleA/user/userId",
       headers: {
-        authorization: `Bearer null`,
+        authorization: "Bearer fakeToken",
       },
     }).then((deleteResponse) => {
-      expect(deleteResponse.status).to.eq(403);
+      expect(deleteResponse.status).to.eq(401);
     });
   });
 
@@ -97,14 +97,13 @@ describe("authentication", () => {
     );
 
     cy.request({
-      failOnStatusCode: false,
-      method: "get",
+      method: "DELETE",
       url: "/api/aggregator/testExampleA/user/userId",
       headers: {
         authorization: `Bearer ${widgetDemoDeleteUserAccessToken}`,
       },
     }).then((deleteResponseWithAccess) => {
-      expect(deleteResponseWithAccess.status).to.eq(200);
+      expect(deleteResponseWithAccess.status).to.eq(204);
     });
   });
 });

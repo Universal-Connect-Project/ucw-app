@@ -1,10 +1,10 @@
-import type { Express, RequestHandler } from "express";
+import type { RequestHandler, Application } from "express";
 import { auth, requiredScopes } from "express-oauth2-jwt-bearer";
 
 import { userDeleteHandler } from "./userEndpoints";
 import { getConfig } from "../config";
 
-const useUserEndpoints = (app: Express) => {
+const useUserEndpoints = (app: Application) => {
   const config = getConfig();
 
   const deleteUserEndpointMiddleware: RequestHandler[] = [];
