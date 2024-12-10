@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
+    "copyDemoPreferences": "cp ./apps/server/cachedDefaults/testData/demoPreferences.json ./apps/server/cachedDefaults/preferences.json",
     "copyTestPreferences": "cp ./apps/server/cachedDefaults/testData/testPreferences.json ./apps/server/cachedDefaults/preferences.json",
     "dev": "turbo dev",
     "dev:debug": "turbo dev:debug",
