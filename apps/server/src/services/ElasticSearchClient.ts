@@ -25,7 +25,7 @@ import { fetchInstitutions } from "./institutionSyncer";
 import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
 import { getSet, overwriteSet } from "./storageClient/redis";
 
-const BATCH_SIZE = config.ENV === "staging" ? 50 : 20000;
+const BATCH_SIZE = config.ENV !== "staging" ? 20000 : 50;
 
 export function getInstitutionFilePath() {
   return resolve(__dirname, "../../cachedDefaults/ucwInstitutionsMapping.json");
