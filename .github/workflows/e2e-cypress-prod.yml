@@ -60,6 +60,9 @@ jobs:
           # Vars
           echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
           echo ENV=prod >> ${ENV_FILE_PATH}
+          echo AUTHENTICATION_ENABLE=false >> ${ENV_FILE_PATH}
+          echo DATA_ENDPOINTS_ENABLE=false >> ${ENV_FILE_PATH}
+          echo DELETE_USER_ENDPOINT_ENABLE=false >> ${ENV_FILE_PATH}
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
