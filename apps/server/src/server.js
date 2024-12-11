@@ -63,7 +63,9 @@ app.get("/health", function (req, res) {
 
 useUserEndpoints(app);
 useDataEndpoints(app);
+
 useAuthentication(app);
+
 useConnect(app);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
