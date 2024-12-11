@@ -95,8 +95,8 @@ if (process.env.UPSTASH_REDIS_URL) {
   config.REDIS_SERVER = process.env.UPSTASH_REDIS_URL;
 }
 
-if (process.env.SEARCHBOX_URL) {
-  config.ELASTIC_SEARCH_URL = process.env.SEARCHBOX_URL;
+if (process.env.BONSAI_URL) {
+  config.ELASTIC_SEARCH_URL = process.env.BONSAI_URL;
 }
 
 export const getConfig = () => config;

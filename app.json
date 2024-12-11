@@ -6,7 +6,10 @@
       "plan": "upstash-redis:free"
     },
     {
-      "plan": "searchbox:starter"
+      "plan": "bonsai:starter",
+      "options": {
+        "version": "7.10"
+      }
     }
   ]
 }
