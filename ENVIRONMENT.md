@@ -55,6 +55,11 @@ These are the environment variables that can be set in apps/server/.env
 
 ## Delete User endpoint variables
 
-| Variable name                                 | Description                                                           | Examples    | Default value |
-|-----------------------------------------------|-----------------------------------------------------------------------| ----------- | ------------- |
-| DELETE_USER_ENDPOINT_ENABLE                   | Whether or not to add the user DELETE endpoint to the express server. | true, false | false         |
+| Variable name                                         | Description                                                                      | Examples    | Default value |
+|-------------------------------------------------------|----------------------------------------------------------------------------------| ----------- | ------------- |
+| DELETE_USER_ENDPOINT_ENABLE                           | Whether or not to add the delete user endpoint to the express server.            | true, false | false         |
+| DELETE_USER_ENDPOINT_AUTHENTICATION_ENABLE            | Whether or not to enable our optional authentication on the delete user endpoint | true, false | false         |
+| DELETE_USER_ENDPOINT_AUTHENTICATION_AUDIENCE          | Authentication variable for our optional delete user endpoint authentication     |             |               |
+| DELETE_USER_ENDPOINT_AUTHENTICATION_ISSUER_BASE_URL   | Authentication variable for our optional delete user endpoint authentication     |             |               |
+| DELETE_USER_ENDPOINT_AUTHENTICATION_TOKEN_SIGNING_ALG | Authentication variable for our optional delete user endpoint authentication     |             |               |
+| DELETE_USER_ENDPOINT_AUTHENTICATION_SCOPES            | Authentication variable for our optional delete user endpoint authentication     |             |               |

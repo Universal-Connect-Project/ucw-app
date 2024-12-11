@@ -83,6 +83,6 @@ Information about the environment variables related to the data endpoints can be
 
 ## "Delete User" Endpoint and Authentication
 
-There is an endpoint for deleting a user associated with a connection. Just as with the data endpoints, mentioned above, the delete user endpoint is turned off by default. This endpoint should be well-protected. This should be machine-to-machine authenticated, and should have a layer of authentication around them that ensures they are called with user ids that the user should have access to.
+There is an endpoint for deleting a user associated with a connection. Just as with the data endpoints, mentioned above, the delete user endpoint is turned off by default. This endpoint should be well-protected. This should be machine-to-machine authenticated, and should have a layer of authentication around it that ensure that it is called with user ids that the user should have access to.
 
 Information about the environment variables related to the delete user endpoint on can be found [here](ENVIRONMENT.md#delete-user-endpoint-variables).
