@@ -90,7 +90,7 @@ describe("authentication", () => {
         authorization: `Bearer ${widgetDemoAccessToken}`,
       },
     }).then((deleteResponse) => {
-      expect(deleteResponse.status).to.eq(401);
+      expect(deleteResponse.status).to.eq(403);
     });
   });
 
