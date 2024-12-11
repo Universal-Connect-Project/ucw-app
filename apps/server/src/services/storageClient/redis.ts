@@ -8,7 +8,7 @@ import { PREFERENCES_REDIS_KEY } from "./constants";
 
 const redisClient = createClient({
   url: config.REDIS_SERVER,
-  ...(!["test", "dev"].includes(config.ENV) && {
+  ...(config.REDIS_ENABLE_TLS && {
     socket: {
       tls: true,
       rejectUnauthorized: false,

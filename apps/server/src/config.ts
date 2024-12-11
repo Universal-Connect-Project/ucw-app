@@ -23,6 +23,7 @@ const keysToPullFromEnv = [
 
   "REDIS_SERVER",
   "REDIS_CACHE_TIME_SECONDS",
+  "REDIS_ENABLE_TLS",
 
   "SOPHTRON_API_USER_ID",
   "SOPHTRON_API_USER_SECRET",
@@ -40,6 +41,7 @@ const keysToPullFromEnv = [
   "FINICITY_SECRETProd",
 
   "ELASTIC_SEARCH_URL",
+  "ELASTIC_SEARCH_BATCH_SIZE",
   "INSTITUTION_POLLING_INTERVAL",
   "INSTITUTION_CACHE_LIST_URL",
 
@@ -79,6 +81,10 @@ const config: Record<string, any> = keysToPullFromEnv.reduce(
 
 if (config.INSTITUTION_POLLING_INTERVAL === undefined) {
   config.INSTITUTION_POLLING_INTERVAL = 1;
+}
+
+if (config.ELASTIC_SEARCH_BATCH_SIZE === undefined) {
+  config.ELASTIC_SEARCH_BATCH_SIZE = 10000;
 }
 
 if (config.REDIS_CACHE_TIME_SECONDS === undefined) {
