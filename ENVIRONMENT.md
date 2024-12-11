@@ -1,6 +1,6 @@
 # Environment variables
 
-This is an explanation of some of the environment variables that can be set in `./apps/server/.env`
+This is an explanation of the environment variables that can be set in `./apps/server/.env`
 
 ## UCP Credentials
 
