@@ -1,6 +1,16 @@
 {
   "name": "Universal Connect Widget",
   "description": "Universal widget for connecting banks",
+  "env": {
+    "ELASTIC_SEARCH_SINGLE_THREAD": {
+      "description": "Whether to enable single-threaded Elasticsearch indexing/updating",
+      "value": "true"
+    },
+    "REDIS_ENABLE_TLS": {
+      "description": "Whether to configure Redis with TLS or not",
+      "value": "true"
+    }
+  },
   "addons": [
     {
       "plan": "upstash-redis:free"
