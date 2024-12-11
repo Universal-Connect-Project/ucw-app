@@ -79,6 +79,7 @@ describe("authentication", () => {
   });
 
   it("can't access the delete user endpoints without the right access", () => {
+    const widgetDemoAccessToken = Cypress.env(WIDGET_DEMO_ACCESS_TOKEN_ENV);
     const userId = crypto.randomUUID();
 
     cy.request({
@@ -86,7 +87,7 @@ describe("authentication", () => {
       method: "DELETE",
       url: `/api/aggregator/testExampleA/user/${userId}`,
       headers: {
-        authorization: "Bearer fakeToken",
+        authorization: `Bearer ${widgetDemoAccessToken}`,
       },
     }).then((deleteResponse) => {
       expect(deleteResponse.status).to.eq(401);
