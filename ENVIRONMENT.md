@@ -4,7 +4,8 @@ This is an explanation of some of the environment variables that can be set in `
 
 ## UCP Credentials
 
-These values are used to interact with the UCP-hosted services, such as the Preferences service and Institutions service
+These values are necessary in order for your instance of the UCW to interact with the UCP-hosted services, such as the
+Preferences service and Institutions service
 
 | Variable name     | Description                                   |
 |-------------------|-----------------------------------------------|
