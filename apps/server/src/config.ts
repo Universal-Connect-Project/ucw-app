@@ -16,8 +16,8 @@ const keysToPullFromEnv = [
   "WEBHOOK_HOST_URL",
   "LOG_LEVEL",
 
-  "UCPClientId",
-  "UCPClientSecret",
+  "UCP_CLIENT_ID",
+  "UCP_CLIENT_SECRET",
 
   "ENV",
 
