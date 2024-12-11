@@ -1,6 +1,13 @@
 # Environment variables
 
-These are the environment variables that can be set in apps/server/.env
+These are the environment variables that can be set in `./apps/server/.env`
+
+## UCP Credentials
+
+| Variable name           | Description                                       |
+|-------------------------|---------------------------------------------------|
+| UCP_CLIENT_ID           | The Client ID, available in the UCP dashboard     |
+| UCP_CLIENT_SECRET       | The Client Secret, available in the UCP dashboard |
 
 ## Suggested variables
 
