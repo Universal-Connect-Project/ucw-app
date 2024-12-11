@@ -94,6 +94,21 @@ describe("authentication", () => {
     });
   });
 
+  it("can't access the delete user endpoints without any access", () => {
+    const userId = crypto.randomUUID();
+
+    cy.request({
+      failOnStatusCode: false,
+      method: "DELETE",
+      url: `/api/aggregator/testExampleA/user/${userId}`,
+      headers: {
+        authorization: `Bearer fakeToken`,
+      },
+    }).then((deleteResponse) => {
+      expect(deleteResponse.status).to.eq(401);
+    });
+  });
+
   it("can access the delete user endpoints with the right access", () => {
     const userId = crypto.randomUUID();
 
