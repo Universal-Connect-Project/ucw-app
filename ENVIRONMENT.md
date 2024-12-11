@@ -4,10 +4,12 @@ This is an explanation of some of the environment variables that can be set in `
 
 ## UCP Credentials
 
-| Variable name     | Description                                       |
-|-------------------|---------------------------------------------------|
-| UCP_CLIENT_ID     | The Client ID, available in the UCP dashboard     |
-| UCP_CLIENT_SECRET | The Client Secret, available in the UCP dashboard |
+These values are used to interact with the UCP-hosted services, such as the Preferences service and Institutions service
+
+| Variable name     | Description                                   |
+|-------------------|-----------------------------------------------|
+| UCP_CLIENT_ID     | Client ID, available in the UCP dashboard     |
+| UCP_CLIENT_SECRET | Client Secret, available in the UCP dashboard |
 
 ## Suggested variables
 
