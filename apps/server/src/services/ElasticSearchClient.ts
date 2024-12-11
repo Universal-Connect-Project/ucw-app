@@ -82,6 +82,7 @@ export async function indexElasticSearch() {
         });
       }),
     );
+    await new Promise((r) => setTimeout(r, 2000));
   }
 }
 
