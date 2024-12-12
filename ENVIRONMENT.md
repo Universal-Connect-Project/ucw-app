@@ -37,12 +37,12 @@ Preferences service and Institutions service.
 
 ## Optional variables
 
-| Variable name                | Description                                                    | Examples | Default value   |
-| ---------------------------- | -------------------------------------------------------------- | -------- | --------------- |
-| INSTITUTION_POLLING_INTERVAL | How frequently in minutes the institution list should update   | 1        | 1               |
-| REDIS_CACHE_TIME_SECONDS     | The default expiration of things stored in redis               | 600      | 600             |
-| REDIS_ENABLE_TLS             | Enables TLS (Useful for some deployment platforms like heroku) | true     | false/undefined |
-| ELASTIC_SEARCH_SINGLE_THREAD | Enables single-threaded Elasticsearch indexing/updating        | true     | undefined       |
+| Variable name                 | Description                                                     | Examples  | Default value    |
+|-------------------------------|-----------------------------------------------------------------|-----------|------------------|
+| INSTITUTION_POLLING_INTERVAL  | How frequently in minutes the institution list should update    | 1         | 1                |
+| REDIS_CACHE_TIME_SECONDS      | The default expiration of things stored in redis                | 600       | 600              |
+| REDIS_ENABLE_TLS              | Enables TLS (Useful for some deployment platforms like heroku)  | true      | false/undefined  |
+| ELASTIC_SEARCH_SINGLE_THREAD  | Enables single-threaded Elasticsearch indexing/updating         | true      | undefined        |
 
 ## Authentication variables
 
