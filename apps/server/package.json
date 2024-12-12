@@ -16,7 +16,7 @@
     "redisserver": "docker run --rm --name ucw_redis -p 6379:6379 redis:7.2-alpine",
     "server": "wait-on http://localhost:9200 && nodemon",
     "server:debug": "wait-on http://localhost:9200 && node --inspect -r ts-node/register ./src/server.js",
-    "start": "npx ts-node src/server.js",
+    "start": "npx ts-node --transpile-only src/server.js",
     "lint": "eslint . --ext .js,.ts",
     "lint:fix": "eslint . --fix --ext .js,.ts",
     "coverage": "npm test -- --verbose --coverage --watchAll",

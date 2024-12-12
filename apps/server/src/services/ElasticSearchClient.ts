@@ -66,29 +66,29 @@ export async function indexElasticSearch() {
 
   info(`Indexing ${institutionData.length} documents`);
 
+  async function indexDocument(
+    institution: CachedInstitution,
+    index: number,
+    total: number,
+  ) {
+    await ElasticsearchClient.index({
+      index: "institutions",
+      id: institution.id,
+      body: institution,
+    });
+    info(`Indexed document ${index + 1} of ${total} (ID: ${institution.id})`);
+  }
+
   if (config.ELASTIC_SEARCH_SINGLE_THREAD) {
     for (let i = 0; i < institutionData.length; i++) {
-      const institution = institutionData[i];
-
-      await ElasticsearchClient.index({
-        index: "institutions",
-        id: institution.id,
-        body: institution,
-      });
-
-      info(
-        `Indexed document ${i + 1} of ${institutionData.length} (ID: ${institution.id})`,
-      );
+      await indexDocument(institutionData[i], i, institutionData.length);
     }
   } else {
-    const indexPromises = institutionData.map(async (institution) => {
-      return await ElasticsearchClient.index({
-        index: "institutions",
-        id: institution.id,
-        body: institution,
-      });
-    });
-    await Promise.all(indexPromises);
+    await Promise.all(
+      institutionData.map((institution, i) =>
+        indexDocument(institution, i, institutionData.length),
+      ),
+    );
   }
 
   info("Indexing complete!");
@@ -279,7 +279,7 @@ function buildMustNotQuery(hiddenInstitutions: string[]): any[] {
     },
   });
 
-  if (!["test", "dev", "staging"].includes(config.ENV)) {
+  if (config.ENV === "prod") {
     mustNotClauses.push({
       term: {
         is_test_bank: true,
@@ -369,27 +369,24 @@ export async function deleteRemovedInstitutions(
   if (deletedInstitutionsIds.length === 0) {
     return;
   }
-  info("deleting institutions", deletedInstitutionsIds);
+
+  info("Deleting institutions", deletedInstitutionsIds);
+
+  async function deleteInstitution(ucpId: string) {
+    await ElasticsearchClient.delete({
+      index: "institutions",
+      id: ucpId,
+    });
+    console.info(`Deleted institution ${ucpId}`);
+  }
 
   try {
     if (config.ELASTIC_SEARCH_SINGLE_THREAD) {
       for (const ucpId of deletedInstitutionsIds) {
-        await ElasticsearchClient.delete({
-          index: "institutions",
-          id: ucpId,
-        });
-        console.info(`Deleted institution ${ucpId}`);
+        await deleteInstitution(ucpId);
       }
     } else {
-      await Promise.all(
-        deletedInstitutionsIds.map(async (ucpId: string) => {
-          await ElasticsearchClient.delete({
-            index: "institutions",
-            id: ucpId,
-          });
-          console.info(`Deleted institution ${ucpId}`);
-        }),
-      );
+      await Promise.all(deletedInstitutionsIds.map(deleteInstitution));
     }
 
     await overwriteSet(INSTITUTION_CURRENT_LIST_IDS, Array.from(newInsIdsSet));
@@ -399,33 +396,24 @@ export async function deleteRemovedInstitutions(
 }
 
 export async function updateInstitutions(institutions: CachedInstitution[]) {
+  async function updateInstitution(institution: CachedInstitution) {
+    await ElasticsearchClient.update({
+      index: "institutions",
+      id: institution.id,
+      body: {
+        doc: institution,
+        doc_as_upsert: true,
+      },
+    });
+    console.info(`Updated institution ${institution.id}`);
+  }
+
   if (config.ELASTIC_SEARCH_SINGLE_THREAD) {
     for (const institution of institutions) {
-      await ElasticsearchClient.update({
-        index: "institutions",
-        id: institution.id,
-        body: {
-          doc: institution,
-          doc_as_upsert: true,
-        },
-      });
-      console.info(`Updated institution ${institution.id}`);
+      await updateInstitution(institution);
     }
   } else {
-    const updatePromises = institutions.map(
-      async (institution: CachedInstitution) => {
-        await ElasticsearchClient.update({
-          index: "institutions",
-          id: institution.id,
-          body: {
-            doc: institution,
-            doc_as_upsert: true,
-          },
-        });
-        console.info(`Updated institution ${institution.id}`);
-      },
-    );
-
+    const updatePromises = institutions.map(updateInstitution);
     await Promise.all(updatePromises);
   }
 }
