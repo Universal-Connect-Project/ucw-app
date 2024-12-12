@@ -27,10 +27,12 @@ These are the environment variables that can be set in apps/server/.env
 
 ## Optional variables
 
-| Variable name                | Description                                                  | Examples | Default value |
-| ---------------------------- | ------------------------------------------------------------ | -------- | ------------- |
-| INSTITUTION_POLLING_INTERVAL | How frequently in minutes the institution list should update | 1        | 1             |
-| REDIS_CACHE_TIME_SECONDS     | The default expiration of things stored in redis             | 600      | 600           |
+| Variable name                | Description                                                    | Examples | Default value   |
+| ---------------------------- | -------------------------------------------------------------- | -------- | --------------- |
+| INSTITUTION_POLLING_INTERVAL | How frequently in minutes the institution list should update   | 1        | 1               |
+| REDIS_CACHE_TIME_SECONDS     | The default expiration of things stored in redis               | 600      | 600             |
+| REDIS_ENABLE_TLS             | Enables TLS (Useful for some deployment platforms like heroku) | true     | false/undefined |
+| ELASTIC_SEARCH_SINGLE_THREAD | Enables single-threaded Elasticsearch indexing/updating        | true     | undefined       |
 
 ## Authentication variables
 
@@ -56,7 +58,7 @@ These are the environment variables that can be set in apps/server/.env
 ## Delete User endpoint variables
 
 | Variable name                                         | Description                                                                      | Examples    | Default value |
-|-------------------------------------------------------|----------------------------------------------------------------------------------| ----------- | ------------- |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------- | ----------- | ------------- |
 | DELETE_USER_ENDPOINT_ENABLE                           | Whether or not to add the delete user endpoint to the express server.            | true, false | false         |
 | DELETE_USER_ENDPOINT_AUTHENTICATION_ENABLE            | Whether or not to enable our optional authentication on the delete user endpoint | true, false | false         |
 | DELETE_USER_ENDPOINT_AUTHENTICATION_AUDIENCE          | Authentication variable for our optional delete user endpoint authentication     |             |               |

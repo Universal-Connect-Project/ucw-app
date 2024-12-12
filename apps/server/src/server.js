@@ -1,20 +1,20 @@
-import "dotenv/config";
 import ngrok from "@ngrok/ngrok";
 import cookieParser from "cookie-parser";
+import "dotenv/config";
 import express from "express";
 import "express-async-errors";
 import RateLimit from "express-rate-limit";
 import path from "path";
 
+import useAuthentication from "./authentication";
 import config from "./config";
-import { error as _error, info } from "./infra/logger";
 import useConnect from "./connect/connectApiExpress";
 import useUserEndpoints from "./connect/useUserEndpoints";
+import useDataEndpoints from "./dataEndpoints/useDataEndpoints";
+import { error as _error, info } from "./infra/logger";
 import { initialize as initializeElastic } from "./services/ElasticSearchClient";
 import { setInstitutionSyncSchedule } from "./services/institutionSyncer";
 import { widgetHandler } from "./widgetEndpoint";
-import useAuthentication from "./authentication";
-import useDataEndpoints from "./dataEndpoints/useDataEndpoints";
 
 process.on("unhandledRejection", (error) => {
   _error(`unhandledRejection: ${error.message}`, error);
