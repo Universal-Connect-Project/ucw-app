@@ -273,7 +273,10 @@ describe("indexElasticSearch", () => {
     { singleThread: false, description: "without single-threading" },
   ])("Index Elasticsearch $description", ({ singleThread }) => {
     it("indexes institutions retrieved from the institution server", async () => {
-      config.ELASTIC_SEARCH_SINGLE_THREAD = singleThread;
+      jest.spyOn(_config, "getConfig").mockReturnValueOnce({
+        ...config,
+        ELASTIC_SEARCH_SINGLE_THREAD: singleThread,
+      });
 
       ElasticSearchMock.clearAll();
 
@@ -663,7 +666,10 @@ describe("deleteRemovedInstitutions", () => {
     { singleThread: false, description: "without single-threading" },
   ])("Delete institutions $description", ({ singleThread }) => {
     it("should delete institutions that are no longer in the new list", async () => {
-      config.ELASTIC_SEARCH_SINGLE_THREAD = singleThread;
+      jest.spyOn(_config, "getConfig").mockReturnValueOnce({
+        ...config,
+        ELASTIC_SEARCH_SINGLE_THREAD: singleThread,
+      });
 
       const newInstitutions = [{ id: "new1" }, { id: "new2" }];
       const oldInstitutions = [{ id: "old1" }, { id: "old2" }, { id: "new1" }];
@@ -771,7 +777,10 @@ describe("updateInstitutions", () => {
     { singleThread: false, description: "without single-threading" },
   ])("Update institutions $description", ({ singleThread }) => {
     it("calls ES update for each institution in the list", async () => {
-      config.ELASTIC_SEARCH_SINGLE_THREAD = singleThread;
+      jest.spyOn(_config, "getConfig").mockReturnValueOnce({
+        ...config,
+        ELASTIC_SEARCH_SINGLE_THREAD: singleThread,
+      });
 
       const mockInstitutions = [
         { id: "123", name: "Institution A" },
