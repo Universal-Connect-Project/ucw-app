@@ -1,11 +1,21 @@
 # Environment variables
 
-These are the environment variables that can be set in apps/server/.env
+This is an outline of the environment variables that can be set in `./apps/server/.env`.
+
+## UCP Credentials
+
+These values are necessary if you want your instance of the UCW to interact with the UCP-hosted services, such as the
+Preferences service and Institutions service.
+
+| Variable name     | Description                                   |
+|-------------------|-----------------------------------------------|
+| UCP_CLIENT_ID     | Client ID, available in the UCP dashboard     |
+| UCP_CLIENT_SECRET | Client Secret, available in the UCP dashboard |
 
 ## Suggested variables
 
 | Variable name              | Description                                                                                                                  | Examples                                     |
-| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+|----------------------------|------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------|
 | ELASTIC_SEARCH_URL         | The url of the elastic search server                                                                                         | http://localhost:9200                        |
 | ENV                        | The server will behave differently depending on this variable. For instance test institutions won't show up when env is prod | dev, test, prod                              |
 | HOST_URL                   | The base url of the server                                                                                                   | http://localhost:8080                        |
@@ -17,7 +27,7 @@ These are the environment variables that can be set in apps/server/.env
 ## Aggregator specific variables
 
 | Variable name            | Description                                                                   |
-| ------------------------ | ----------------------------------------------------------------------------- |
+|--------------------------|-------------------------------------------------------------------------------|
 | MX_API_SECRET            | The client secret for MX integration APIs found in the MX dashboard (API Key) |
 | MX_API_SECRET_PROD       | The client secret for MX production APIs found in the MX dashboard (API Key)  |
 | MX_CLIENT_ID             | The client id for MX integration APIs found in the MX dashboard (Client Id)   |
@@ -27,17 +37,17 @@ These are the environment variables that can be set in apps/server/.env
 
 ## Optional variables
 
-| Variable name                | Description                                                    | Examples | Default value   |
-| ---------------------------- | -------------------------------------------------------------- | -------- | --------------- |
-| INSTITUTION_POLLING_INTERVAL | How frequently in minutes the institution list should update   | 1        | 1               |
-| REDIS_CACHE_TIME_SECONDS     | The default expiration of things stored in redis               | 600      | 600             |
-| REDIS_ENABLE_TLS             | Enables TLS (Useful for some deployment platforms like heroku) | true     | false/undefined |
-| ELASTIC_SEARCH_SINGLE_THREAD | Enables single-threaded Elasticsearch indexing/updating        | true     | undefined       |
+| Variable name                 | Description                                                     | Examples  | Default value    |
+|-------------------------------|-----------------------------------------------------------------|-----------|------------------|
+| INSTITUTION_POLLING_INTERVAL  | How frequently in minutes the institution list should update    | 1         | 1                |
+| REDIS_CACHE_TIME_SECONDS      | The default expiration of things stored in redis                | 600       | 600              |
+| REDIS_ENABLE_TLS              | Enables TLS (Useful for some deployment platforms like heroku)  | true      | false/undefined  |
+| ELASTIC_SEARCH_SINGLE_THREAD  | Enables single-threaded Elasticsearch indexing/updating         | true      | undefined        |
 
 ## Authentication variables
 
 | Variable name                    | Description                                                                                          | Examples    | Default value |
-| -------------------------------- | ---------------------------------------------------------------------------------------------------- | ----------- | ------------- |
+|----------------------------------|------------------------------------------------------------------------------------------------------|-------------|---------------|
 | AUTHENTICATION_ENABLE            | Whether or not to enable our optional authentication on most endpoints other than the data endpoints | true, false | false         |
 | AUTHENTICATION_AUDIENCE          | Authentication variable for our optional authentication                                              |             |               |
 | AUTHENTICATION_ISSUER_BASE_URL   | Authentication variable for our optional authentication                                              |             |               |
@@ -47,7 +57,7 @@ These are the environment variables that can be set in apps/server/.env
 ## Data endpoint variables
 
 | Variable name                                  | Description                                                                                                                                                                                                                                 | Examples    | Default value |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ------------- |
+|------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|---------------|
 | DATA_ENDPOINTS_ENABLE                          | Whether or not to add data endpoints to the express server. We don't recommend turning these on unless you have special authentication around them. Users could access other users' data without proper security attached to the endpoints. | true, false | false         |
 | DATA_ENDPOINT_AUTHENTICATION_ENABLE            | Whether or not to enable our optional authentication on the data endpoints                                                                                                                                                                  | true, false | false         |
 | DATA_ENDPOINT_AUTHENTICATION_AUDIENCE          | Authentication variable for our optional data endpoint authentication                                                                                                                                                                       |             |               |
