@@ -84,8 +84,8 @@ app.get("*", (req, res) => {
   res.sendStatus(404);
 });
 
-app.listen(process.env.PORT, () => {
-  const message = `Server is running on port ${process.env.PORT}, ENV: ${config.ENV}, LOG_LEVEL: ${config.LOG_LEVEL}`;
+app.listen(config.PORT, () => {
+  const message = `Server is running on port ${config.PORT}, ENV: ${config.ENV}, LOG_LEVEL: ${config.LOG_LEVEL}`;
 
   info(message);
 });
