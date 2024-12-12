@@ -23,6 +23,7 @@ const keysToPullFromEnv = [
 
   "REDIS_SERVER",
   "REDIS_CACHE_TIME_SECONDS",
+  "REDIS_ENABLE_TLS",
 
   "SOPHTRON_API_USER_ID",
   "SOPHTRON_API_USER_SECRET",
@@ -40,6 +41,7 @@ const keysToPullFromEnv = [
   "FINICITY_SECRETProd",
 
   "ELASTIC_SEARCH_URL",
+  "ELASTIC_SEARCH_SINGLE_THREAD",
   "INSTITUTION_POLLING_INTERVAL",
   "INSTITUTION_CACHE_LIST_URL",
 
@@ -83,6 +85,14 @@ if (config.INSTITUTION_POLLING_INTERVAL === undefined) {
 
 if (config.REDIS_CACHE_TIME_SECONDS === undefined) {
   config.REDIS_CACHE_TIME_SECONDS = 600;
+}
+
+if (process.env.UPSTASH_REDIS_URL) {
+  config.REDIS_SERVER = process.env.UPSTASH_REDIS_URL;
+}
+
+if (process.env.BONSAI_URL) {
+  config.ELASTIC_SEARCH_URL = process.env.BONSAI_URL;
 }
 
 export const getConfig = () => config;
