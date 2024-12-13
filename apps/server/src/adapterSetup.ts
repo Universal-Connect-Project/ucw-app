@@ -1,10 +1,10 @@
 import type { AdapterMap } from "@repo/utils";
-import { adapterMapObject as testAdapterMapObject } from "./test-adapter";
-import * as logger from "./infra/logger";
-import config from "./config";
 import { getMxAdapterMapObject } from "@ucp-npm/mx-adapter";
 import { getSophtronAdapterMapObject } from "@ucp-npm/sophtron-adapter";
+import config from "./config";
+import * as logger from "./infra/logger";
 import { get, set } from "./services/storageClient/redis";
+import { adapterMapObject as testAdapterMapObject } from "./test-adapter";
 
 const mxAdapterMapObject = getMxAdapterMapObject({
   cacheClient: {
@@ -24,6 +24,10 @@ const mxAdapterMapObject = getMxAdapterMapObject({
   },
   envConfig: {
     HOSTURL: config.HOST_URL,
+    PROXY_HOST: config.PROXY_HOST,
+    PROXY_PORT: config.PROXY_PORT,
+    PROXY_USERNAME: config.PROXY_USERNAME,
+    PROXY_PASSWORD: config.PROXY_PASSWORD,
   },
 });
 
