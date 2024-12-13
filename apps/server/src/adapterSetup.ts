@@ -1,6 +1,6 @@
 import type { AdapterMap } from "@repo/utils";
-import { adapterMapObject as testAdapterMapObject } from "./test-adapter";
 import { getTemplateAdapterMapObject } from "@ucp-npm/template-adapter";
+import { adapterMapObject as testAdapterMapObject } from "./test-adapter";
 
 const templateAdapterMapObject = getTemplateAdapterMapObject();
 
@@ -9,6 +9,5 @@ export const adapterMap: Record<string, AdapterMap> = {
   ...templateAdapterMapObject,
   ...testAdapterMapObject,
 };
-
 export type Aggregator = keyof typeof adapterMap;
 export const aggregators = Object.keys(adapterMap);

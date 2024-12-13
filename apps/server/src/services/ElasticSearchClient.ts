@@ -1,21 +1,26 @@
-import type { estypes } from "@elastic/elasticsearch";
-import { Client } from "@elastic/elasticsearch";
+import { Client } from "@opensearch-project/opensearch";
+import type {
+  MgetRequest,
+  SearchHit,
+  SearchResponse,
+} from "@opensearch-project/opensearch/api/types";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 
 import config, { getConfig } from "../config";
+import { ElasticSearchMock } from "../test/elasticSearchMock";
+
 import { info, error as logError } from "../infra/logger";
-import type {
-  CachedInstitution,
-  MappedJobTypes,
-  Aggregator,
-} from "../shared/contract";
-import { getPreferences } from "../shared/preferences";
 import {
   getAvailableAggregators,
   JOB_TYPE_PARTIAL_SUPPORT_MAP,
 } from "../shared/aggregators";
-import { ElasticSearchMock } from "../test/elasticSearchMock";
+import type {
+  Aggregator,
+  CachedInstitution,
+  MappedJobTypes,
+} from "../shared/contract";
+import { getPreferences } from "../shared/preferences";
 import { fetchInstitutions } from "./institutionSyncer";
 import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
 import { getSet, overwriteSet } from "./storageClient/redis";
@@ -26,19 +31,28 @@ export function getInstitutionFilePath() {
 
 export const ElasticsearchClient = new Client({
   node: config.ELASTIC_SEARCH_URL ?? "http://localhost:9200",
+  ssl: {
+    rejectUnauthorized: false,
+  },
   ...(process.env.NODE_ENV === "test" && {
     Connection: ElasticSearchMock.getConnection(),
   }),
 });
 
 export async function initialize() {
-  const elasticSearchLoaded = await ElasticsearchClient.indices.exists({
-    index: "institutions",
-  });
-  if (!elasticSearchLoaded) {
-    await indexElasticSearch();
-  } else {
-    info("ElasticSearch already indexed");
+  try {
+    const { body: exists } = await ElasticsearchClient.indices.exists({
+      index: "institutions",
+    });
+
+    if (!exists) {
+      info("ElasticSearch is indexing");
+      await indexElasticSearch();
+    } else {
+      info("ElasticSearch already indexed");
+    }
+  } catch (error) {
+    logError(error);
   }
 }
 
@@ -50,18 +64,34 @@ export async function indexElasticSearch() {
 
   await ElasticsearchClient.indices.create({ index: "institutions" });
 
-  const indexPromises = institutionData.map(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async (institution: { id: any }) => {
-      return await ElasticsearchClient.index({
-        index: "institutions",
-        id: institution.id,
-        document: institution,
-      });
-    },
-  );
+  info(`Indexing ${institutionData.length} documents`);
 
-  await Promise.all(indexPromises);
+  async function indexDocument(
+    institution: CachedInstitution,
+    index: number,
+    total: number,
+  ) {
+    await ElasticsearchClient.index({
+      index: "institutions",
+      id: institution.id,
+      body: institution,
+    });
+    info(`Indexed document ${index + 1} of ${total} (ID: ${institution.id})`);
+  }
+
+  if (config.ELASTIC_SEARCH_SINGLE_THREAD) {
+    for (let i = 0; i < institutionData.length; i++) {
+      await indexDocument(institutionData[i], i, institutionData.length);
+    }
+  } else {
+    await Promise.all(
+      institutionData.map((institution, i) =>
+        indexDocument(institution, i, institutionData.length),
+      ),
+    );
+  }
+
+  info("Indexing complete!");
 }
 
 async function getInstitutions(): Promise<CachedInstitution[]> {
@@ -101,31 +131,28 @@ export async function searchByRoutingNumber(
   const hiddenInstitutions = preferences?.hiddenInstitutions || [];
   const supportedAggregators = preferences?.supportedAggregators || [];
 
-  const searchResults: estypes.SearchResponseBody =
-    await ElasticsearchClient.search({
-      index: "institutions",
-      body: {
-        query: {
-          bool: {
-            should: {
-              match: {
-                routing_numbers: {
-                  query: routingNumber,
-                },
+  const { body }: { body: SearchResponse } = await ElasticsearchClient.search({
+    index: "institutions",
+    body: {
+      query: {
+        bool: {
+          should: {
+            match: {
+              routing_numbers: {
+                query: routingNumber,
               },
             },
-            minimum_should_match: 1,
-            must: mustQuery(supportedAggregators, jobType),
-            must_not: buildMustNotQuery(hiddenInstitutions),
           },
+          minimum_should_match: 1,
+          must: mustQuery(supportedAggregators, jobType),
+          must_not: buildMustNotQuery(hiddenInstitutions),
         },
-        size: 20,
       },
-    });
+      size: 20,
+    },
+  });
 
-  return searchResults.hits.hits.map(
-    (esObject: estypes.SearchHit) => esObject._source,
-  );
+  return body.hits.hits.map((esObject: SearchHit) => esObject._source);
 }
 
 export async function search(
@@ -137,25 +164,22 @@ export async function search(
   const hiddenInstitutions = preferences?.hiddenInstitutions || [];
   const supportedAggregators = preferences?.supportedAggregators || [];
 
-  const searchResults: estypes.SearchResponseBody =
-    await ElasticsearchClient.search({
-      index: "institutions",
-      body: {
-        query: {
-          bool: {
-            should: fuzzySearchTermQuery(searchTerm),
-            minimum_should_match: 1,
-            must: mustQuery(supportedAggregators, jobType),
-            must_not: buildMustNotQuery(hiddenInstitutions),
-          },
+  const { body }: { body: SearchResponse } = await ElasticsearchClient.search({
+    index: "institutions",
+    body: {
+      query: {
+        bool: {
+          should: fuzzySearchTermQuery(searchTerm),
+          minimum_should_match: 1,
+          must: mustQuery(supportedAggregators, jobType),
+          must_not: buildMustNotQuery(hiddenInstitutions),
         },
-        size: 20,
       },
-    });
+      size: 20,
+    },
+  });
 
-  return searchResults.hits.hits.map(
-    (esObject: estypes.SearchHit) => esObject._source,
-  );
+  return body.hits.hits.map((esObject: SearchHit) => esObject._source);
 }
 
 function fuzzySearchTermQuery(searchTerm: string) {
@@ -255,7 +279,7 @@ function buildMustNotQuery(hiddenInstitutions: string[]): any[] {
     },
   });
 
-  if (!["test", "dev"].includes(config.ENV)) {
+  if (config.ENV === "prod") {
     mustNotClauses.push({
       term: {
         is_test_bank: true,
@@ -267,12 +291,12 @@ function buildMustNotQuery(hiddenInstitutions: string[]): any[] {
 }
 
 export async function getInstitution(id: string): Promise<CachedInstitution> {
-  const institutionResponse = await ElasticsearchClient.get({
+  const { body } = await ElasticsearchClient.get({
     id,
     index: "institutions",
   });
 
-  return institutionResponse._source as CachedInstitution;
+  return body._source as CachedInstitution;
 }
 
 export async function getRecommendedInstitutions(args: {
@@ -301,28 +325,32 @@ export async function getRecommendedInstitutions(args: {
     };
   });
 
-  const recommendedInstitutionsResponse: estypes.MgetRequest =
-    await ElasticsearchClient.mget({
-      docs: esSearch,
+  try {
+    const { body }: MgetRequest = await ElasticsearchClient.mget({
+      body: { docs: esSearch },
     });
 
-  return recommendedInstitutionsResponse.docs
-    .filter(({ _source }) => _source)
-    .map(
-      (favoriteInstitution) => favoriteInstitution._source as CachedInstitution,
-    )
-    .filter((institution: CachedInstitution) =>
-      config.ENV === "prod" ? !institution.is_test_bank : true,
-    )
-    .filter(
-      (institution: CachedInstitution) =>
-        getAvailableAggregators({
-          institution,
-          jobType,
-          shouldRequireFullSupport: false,
-          supportedAggregators: supportedAggregators,
-        }).length,
-    );
+    return body.docs
+      .filter(({ _source }) => _source)
+      .map(
+        (favoriteInstitution) =>
+          favoriteInstitution._source as CachedInstitution,
+      )
+      .filter((institution: CachedInstitution) =>
+        config.ENV === "prod" ? !institution.is_test_bank : true,
+      )
+      .filter(
+        (institution: CachedInstitution) =>
+          getAvailableAggregators({
+            institution,
+            jobType,
+            shouldRequireFullSupport: false,
+            supportedAggregators: supportedAggregators,
+          }).length,
+      );
+  } catch (error) {
+    logError(error);
+  }
 }
 
 export async function deleteRemovedInstitutions(
@@ -341,16 +369,26 @@ export async function deleteRemovedInstitutions(
   if (deletedInstitutionsIds.length === 0) {
     return;
   }
-  info("deleting institutions", deletedInstitutionsIds);
-  const deletePromises = deletedInstitutionsIds.map(async (ucpId: string) => {
-    return await ElasticsearchClient.delete({
+
+  info("Deleting institutions", deletedInstitutionsIds);
+
+  async function deleteInstitution(ucpId: string) {
+    await ElasticsearchClient.delete({
       index: "institutions",
       id: ucpId,
     });
-  });
+    console.info(`Deleted institution ${ucpId}`);
+  }
 
   try {
-    await Promise.all(deletePromises);
+    if (config.ELASTIC_SEARCH_SINGLE_THREAD) {
+      for (const ucpId of deletedInstitutionsIds) {
+        await deleteInstitution(ucpId);
+      }
+    } else {
+      await Promise.all(deletedInstitutionsIds.map(deleteInstitution));
+    }
+
     await overwriteSet(INSTITUTION_CURRENT_LIST_IDS, Array.from(newInsIdsSet));
   } catch (error) {
     logError(error);
@@ -358,15 +396,24 @@ export async function deleteRemovedInstitutions(
 }
 
 export async function updateInstitutions(institutions: CachedInstitution[]) {
-  const updatePromises = institutions.map(
-    async (institution: CachedInstitution) => {
-      return await ElasticsearchClient.update({
-        index: "institutions",
-        id: institution.id,
+  async function updateInstitution(institution: CachedInstitution) {
+    await ElasticsearchClient.update({
+      index: "institutions",
+      id: institution.id,
+      body: {
         doc: institution,
         doc_as_upsert: true,
-      });
-    },
-  );
-  await Promise.all(updatePromises);
+      },
+    });
+    console.info(`Updated institution ${institution.id}`);
+  }
+
+  if (config.ELASTIC_SEARCH_SINGLE_THREAD) {
+    for (const institution of institutions) {
+      await updateInstitution(institution);
+    }
+  } else {
+    const updatePromises = institutions.map(updateInstitution);
+    await Promise.all(updatePromises);
+  }
 }

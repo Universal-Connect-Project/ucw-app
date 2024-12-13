@@ -14,7 +14,7 @@ jobs:
 
     services:
       elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
         options: --health-cmd="curl --silent --fail localhost:9200/_cluster/health || exit 1" --health-interval=10s --health-timeout=5s --health-retries=5
         ports:
           - 9200:9200
@@ -59,10 +59,6 @@ jobs:
 
           # Vars
           echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
-
-          # Secrets (can't load these from another job, due to GH security features)
-
-          cat ${ENV_FILE_PATH}
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
