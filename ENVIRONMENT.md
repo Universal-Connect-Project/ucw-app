@@ -65,3 +65,12 @@ These are the environment variables that can be set in apps/server/.env
 | DELETE_USER_ENDPOINT_AUTHENTICATION_ISSUER_BASE_URL   | Authentication variable for our optional delete user endpoint authentication     |             |               |
 | DELETE_USER_ENDPOINT_AUTHENTICATION_TOKEN_SIGNING_ALG | Authentication variable for our optional delete user endpoint authentication     |             |               |
 | DELETE_USER_ENDPOINT_AUTHENTICATION_SCOPES            | Authentication variable for our optional delete user endpoint authentication     |             |               |
+
+## Proxy server network variables (Optional)
+
+| Variable name  | Description                                            | Examples               | Default value |
+| -------------- | ------------------------------------------------------ | ---------------------- | ------------- |
+| PROXY_HOST     | The host of your proxy server                          | velodrome.usefixie.com | undefined     |
+| PROXY_PORT     | The port of your proxy server                          | 80                     | undefined     |
+| PROXY_USERNAME | The username for authentication into your proxy server | userName               | undefined     |
+| PROXY_PASSWORD | The password for authentication into your proxy server | Xdfew643               | undefined     |
