@@ -12,6 +12,5 @@ export const adapterMap: Record<string, AdapterMap> = {
   ...templateAdapterMapObject,
   ...testAdapterMapObject,
 };
-
 export type Aggregator = keyof typeof adapterMap;
 export const aggregators = Object.keys(adapterMap);

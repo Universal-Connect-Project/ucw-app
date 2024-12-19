@@ -22,7 +22,6 @@ describe("getAccessToken", () => {
       expires_in: 3600,
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let createAccessTokenPayload: any = null;
 
     server.use(
@@ -38,8 +37,8 @@ describe("getAccessToken", () => {
     expect(createAccessTokenPayload).toEqual({
       grant_type: "client_credentials",
       audience: "ucp-widget-interactions",
-      client_id: config.UCPClientId,
-      client_secret: config.UCPClientSecret,
+      client_id: config.UCP_CLIENT_ID,
+      client_secret: config.UCP_CLIENT_SECRET,
     });
 
     expect(token).toBe(mockAccessToken);

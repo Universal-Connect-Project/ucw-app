@@ -8,6 +8,12 @@ import { PREFERENCES_REDIS_KEY } from "./constants";
 
 const redisClient = createClient({
   url: config.REDIS_SERVER,
+  ...(config.REDIS_ENABLE_TLS && {
+    socket: {
+      tls: true,
+      rejectUnauthorized: false,
+    },
+  }),
 });
 
 export const overwriteSet = async (key: string, values: string[]) => {
@@ -87,8 +93,8 @@ redisClient
           resolve(__dirname, "../../../cachedDefaults/preferences.json"),
         )?.toString(),
       );
-    } catch (error) {
-      error(`Failed to resolve preferences: ${error}`);
+    } catch (reason) {
+      error(`Failed to resolve preferences: ${reason}`);
     }
 
     await setNoExpiration(PREFERENCES_REDIS_KEY, preferencesToSet || {});

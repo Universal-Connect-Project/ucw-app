@@ -14,7 +14,7 @@ jobs:
 
     services:
       elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
         options: --health-cmd="curl --silent --fail localhost:9200/_cluster/health || exit 1" --health-interval=10s --health-timeout=5s --health-retries=5
         ports:
           - 9200:9200
@@ -24,7 +24,7 @@ jobs:
           xpack.security.enabled: false
 
       redis:
-        image: redis
+        image: redis:7.2-alpine
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 20s
