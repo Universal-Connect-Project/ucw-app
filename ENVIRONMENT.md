@@ -5,7 +5,7 @@ This is an outline of the environment variables that can be set in `./apps/serve
 ## UCP Credentials
 
 These values are necessary if you want your instance of the UCW to interact with the UCP-hosted services, such as the
-Preferences service and Institutions service.
+Performance service, Preferences service and Institutions service.
 
 | Variable name     | Description                                   |
 |-------------------|-----------------------------------------------|
