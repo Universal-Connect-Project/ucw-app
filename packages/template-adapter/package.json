@@ -1,6 +1,6 @@
 {
   "name": "@ucp-npm/template-adapter",
-  "version": "0.0.16-alpha",
+  "version": "0.0.17-alpha",
   "description": "Template Adapter for the Universal Connect Widget",
   "packageManager": "npm@10.8.2",
   "main": "dist/cjs/index.js",
