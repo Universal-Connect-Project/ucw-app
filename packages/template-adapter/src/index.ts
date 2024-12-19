@@ -1,6 +1,7 @@
 export const getTemplateAdapterMapObject = () => ({
   template: {
+    dataAdapter: undefined,
     vcAdapter: undefined,
-    widgetAdapter: undefined,
+    createWidgetAdapter: () => undefined,
   },
 });

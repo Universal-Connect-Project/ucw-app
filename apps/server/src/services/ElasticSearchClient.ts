@@ -2,7 +2,8 @@ import type { estypes } from "@elastic/elasticsearch";
 import { Client } from "@elastic/elasticsearch";
 import { readFileSync } from "fs";
 import { resolve } from "path";
-import config from "../config";
+
+import config, { getConfig } from "../config";
 import { info, error as logError } from "../infra/logger";
 import type {
   CachedInstitution,
@@ -274,9 +275,11 @@ export async function getInstitution(id: string): Promise<CachedInstitution> {
   return institutionResponse._source as CachedInstitution;
 }
 
-export async function getRecommendedInstitutions(
-  jobType: MappedJobTypes,
-): Promise<CachedInstitution[]> {
+export async function getRecommendedInstitutions(args: {
+  jobType: MappedJobTypes;
+}): Promise<CachedInstitution[]> {
+  const config = getConfig();
+  const { jobType } = args;
   const preferences = await getPreferences();
 
   const supportedAggregators = preferences.supportedAggregators;
@@ -285,6 +288,11 @@ export async function getRecommendedInstitutions(
   if (!recommendedInstitutions) {
     return [];
   }
+
+  info(
+    "Getting recommended institutions",
+    JSON.stringify(recommendedInstitutions),
+  );
 
   const esSearch = recommendedInstitutions.map((recommendedInstitution) => {
     return {
@@ -303,8 +311,11 @@ export async function getRecommendedInstitutions(
     .map(
       (favoriteInstitution) => favoriteInstitution._source as CachedInstitution,
     )
+    .filter((institution: CachedInstitution) =>
+      config.ENV === "prod" ? !institution.is_test_bank : true,
+    )
     .filter(
-      (institution) =>
+      (institution: CachedInstitution) =>
         getAvailableAggregators({
           institution,
           jobType,
