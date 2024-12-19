@@ -54,8 +54,7 @@ const verifyIdentity = ({
 
   return cy.request("get", `/api${url}`).then((dataResponse) => {
     expect(dataResponse.status).to.equal(200);
-    // UNCOMMENT THESE WHEN WE STANDARDIZE ON WHAT THIS OBJECT SHOULD LOOK LIKE
-    // expect(dataResponse.body.customers.length).to.be.greaterThan(0);
+    expect(dataResponse.body.customers.length).to.be.greaterThan(0);
 
     if (shouldTestVcEndpoint) {
       cy.request("GET", `/api/vc${url}`).should((response) => {
@@ -66,9 +65,9 @@ const verifyIdentity = ({
         const decodedVcData = decodeVcDataFromResponse(response);
         // Verify the proper VC came back
         expect(decodedVcData.vc.type).to.include("FinancialIdentityCredential");
-        // expect(
-        //   decodedVcData.vc.credentialSubject.customers.length,
-        // ).to.be.greaterThan(0);
+        expect(
+          decodedVcData.vc.credentialSubject.customers.length,
+        ).to.be.greaterThan(0);
       });
     }
   });
