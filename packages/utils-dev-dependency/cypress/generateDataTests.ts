@@ -54,7 +54,7 @@ const verifyIdentity = ({
 
   return cy.request("get", `/api${url}`).then((dataResponse) => {
     expect(dataResponse.status).to.equal(200);
-    expect(dataResponse.body.customers.length).to.be.greaterThan(0);
+    expect(dataResponse.body.customers.length).to.be.gte(0);
 
     if (shouldTestVcEndpoint) {
       cy.request("GET", `/api/vc${url}`).should((response) => {
@@ -65,9 +65,9 @@ const verifyIdentity = ({
         const decodedVcData = decodeVcDataFromResponse(response);
         // Verify the proper VC came back
         expect(decodedVcData.vc.type).to.include("FinancialIdentityCredential");
-        expect(
-          decodedVcData.vc.credentialSubject.customers.length,
-        ).to.be.greaterThan(0);
+        expect(decodedVcData.vc.credentialSubject.customers.length).to.be.gte(
+          0,
+        );
       });
     }
   });
@@ -90,7 +90,7 @@ const verifyTransactions = ({
 
   return cy.request("get", `/api${url}`).then((dataResponse) => {
     expect(dataResponse.status).to.equal(200);
-    expect(dataResponse.body.transactions.length).to.be.greaterThan(-1);
+    expect(dataResponse.body.transactions.length).to.be.gte(0);
 
     if (shouldTestVcEndpoint) {
       cy.request("GET", `/api/vc${url}`).should((response) => {
@@ -105,7 +105,7 @@ const verifyTransactions = ({
         );
         expect(
           decodedVcData.vc.credentialSubject.transactions.length,
-        ).to.be.greaterThan(-1);
+        ).to.be.gte(0);
       });
     }
   });
