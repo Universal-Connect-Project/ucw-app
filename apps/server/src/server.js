@@ -1,13 +1,11 @@
+import config from "./config";
 import ngrok from "@ngrok/ngrok";
 import cookieParser from "cookie-parser";
-import "dotenv/config";
 import express from "express";
 import "express-async-errors";
 import RateLimit from "express-rate-limit";
 import path from "path";
-
 import useAuthentication from "./authentication";
-import config from "./config";
 import useConnect from "./connect/connectApiExpress";
 import useUserEndpoints from "./connect/useUserEndpoints";
 import useDataEndpoints from "./dataEndpoints/useDataEndpoints";

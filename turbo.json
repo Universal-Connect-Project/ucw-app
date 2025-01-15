@@ -17,6 +17,10 @@
       "cache": false,
       "persistent": true
     },
+    "prod": {
+      "cache": false,
+      "persistent": true
+    },
     "start:e2e": {
       "cache": false,
       "dependsOn": ["^build", "ui#build"],

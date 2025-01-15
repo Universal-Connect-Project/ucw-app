@@ -3,9 +3,10 @@
 
 test.js
 test.ts
+staging.env
+production.env
+
 .env
-.env.*
-!.env.example
 
 # Logs
 logs
