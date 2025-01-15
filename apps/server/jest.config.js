@@ -5,7 +5,7 @@ module.exports = {
   collectCoverageFrom: ["src/**/*.{js,jsx,ts,tsx}", "!src/config/*.js"],
   coverageDirectory: "coverage",
   coverageReporters: ["json", "lcov", "text", "json-summary"],
-  setupFiles: ["./src/dotEnv"],
+  setupFiles: ["./src/dotEnv.ts"],
   setupFilesAfterEnv: ["./jestSetup.ts"],
   testPathIgnorePatterns: [
     "<rootDir>/node_modules/",

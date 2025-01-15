@@ -27,7 +27,7 @@ jobs:
         env:
           env_vars: ${{ needs.setup-env.outputs.env_vars }}
         run: |
-          ENV_FILE_PATH=./apps/server/env/staging.env
+          ENV_FILE_PATH=./apps/server/env/production.env
           touch ${ENV_FILE_PATH}
 
           # Vars
