@@ -8,7 +8,8 @@
     "dev": "tsc && vite build --watch",
     "dev:debug": "npm run dev",
     "build": "tsc && vite build",
-    "lint": "eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "prod": "npm run dev"
   },
   "dependencies": {
     "@types/node": "^20.11.16",
