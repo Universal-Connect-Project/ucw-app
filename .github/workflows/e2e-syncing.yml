@@ -69,6 +69,10 @@ jobs:
           # Vars
           echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
 
+          # Secrets (can't load these from another job, due to GH security features)
+          echo UCP_CLIENT_SECRET=${{ secrets.UCP_CLIENT_SECRET }} >> ${ENV_FILE_PATH}
+          echo UCP_CLIENT_ID=${{ secrets.UCP_CLIENT_ID }} >> ${ENV_FILE_PATH}
+
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
