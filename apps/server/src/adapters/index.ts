@@ -42,6 +42,11 @@ export async function instrumentation(context: Context, input: any) {
   context.oauth_referral_source = input.oauth_referral_source ?? "BROWSER";
   context.single_account_select = input.single_account_select;
   context.updated = true;
+
+  console.log("contextAfterInstrumentation", {
+    jobType: input.job_type,
+    mapped: mapJobType(input.job_type),
+  });
   return true;
 }
 

@@ -9,63 +9,63 @@
   <body>
     <div id="root"></div>
     <script type="text/javascript">
-      const exports = {}
+      const exports = {};
       const params = {
-        job_type: '$job_type',
-        oauth_referral_source: '$oauth_referral_source',
-        update_credentials: '$update_credentials',
-        is_mobile_webview: '$is_mobile_webview',
-        scheme: '$scheme',
-        single_account_select: '$single_account_select',
-        include_identity: '$include_identity',
-        institution_id: '$institution_id',
-        connection_id: '$connection_id',
-        user_id: '$user_id',
-        aggregator: '$aggregator'
-      }
+        job_type: "$job_type",
+        oauth_referral_source: "$oauth_referral_source",
+        update_credentials: "$update_credentials",
+        is_mobile_webview: "$is_mobile_webview",
+        scheme: "$scheme",
+        single_account_select: "$single_account_select",
+        include_identity: "$include_identity",
+        institution_id: "$institution_id",
+        connection_id: "$connection_id",
+        user_id: "$user_id",
+        aggregator: "$aggregator",
+      };
 
       window.app = {
         options: {
-          type: 'connect_widget',
-          server: '$server',
-          brokaw_websocket_url: '',
+          type: "connect_widget",
+          server: "$server",
+          brokaw_websocket_url: "",
           brokaw_auth: {
-            url: ''
-          }
+            url: "",
+          },
         },
         clientConfig: {
-          is_mobile_webview: params.is_mobile_webview === 'true',
+          is_mobile_webview: params.is_mobile_webview === "true",
           target_origin_referrer: null,
-          ui_message_protocol: 'post_message',
+          ui_message_protocol: "post_message",
           ui_message_version: 4,
-          ui_message_webview_url_scheme: params.scheme || 'vcs',
-          color_scheme: 'light',
+          ui_message_webview_url_scheme: params.scheme || "vcs",
+          color_scheme: "light",
           connect: {
-            auth: '$auth',
-            mode: params.job_type || 'agg', // 'verify'
-            job_type: params.job_type || 'agg', // 'verify'
+            auth: "$auth",
+            mode: params.job_type || "agg", // 'verify'
+            job_type: params.job_type || "agg", // 'verify'
             current_institution_code: params.institution_id,
             current_institution_guid: null,
             current_member_guid: params.connection_id,
             current_aggregator: params.aggregator,
-            current_partner: '$partner',
+            current_partner: "$partner",
             user_id: params.user_id,
             current_microdeposit_guid: null,
             disable_background_agg: null,
             disable_institution_search: !!(
               params.institution_id || params.connection_id
             ),
-            include_identity: params.include_identity === 'true',
+            include_identity: params.include_identity === "true",
             include_transactions: null, // true
-            oauth_referral_source: params.oauth_referral_source || 'BROWSER',
-            update_credentials: params.update_credentials === 'true',
+            oauth_referral_source: params.oauth_referral_source || "BROWSER",
+            update_credentials: params.update_credentials === "true",
             wait_for_full_aggregation: false,
-            single_account_select: params.single_account_select !== 'false',
-            scheme: params.scheme || 'vcs'
-          }
+            single_account_select: params.single_account_select !== "false",
+            scheme: params.scheme || "vcs",
+          },
         },
         config: {
-          client_guid: '$client_guid',
+          client_guid: "$client_guid",
           default_selected_widget_type_in_master: 0,
           display_account_actions_in_connection_details: true,
           display_account_number_in_accounts: false,
@@ -118,13 +118,13 @@
           show_transactions_widget_in_master: true,
           show_trends_widget_in_master: true,
           use_iav_when_shared_routing_number_in_connect: false,
-          widgets_display_name: 'UCP',
+          widgets_display_name: "UCP",
           websocket: {
-            url: ''
-          }
-        }
-      }
+            url: "",
+          },
+        },
+      };
     </script>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
