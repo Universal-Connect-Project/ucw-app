@@ -8,16 +8,17 @@
     "dev": "tsc && vite build --watch",
     "dev:debug": "npm run dev",
     "build": "tsc && vite build",
-    "lint": "eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint . --ext js,jsx,ts,tsx",
     "prod": "npm run dev"
   },
   "dependencies": {
+    "@mxenabled/connect-widget": "^0.0.21",
     "@types/node": "^20.11.16",
-    "@ucp-npm/components": "^0.0.19-beta",
     "@vitejs/plugin-react": "^4.2.1",
     "@vitejs/plugin-react-swc": "^3.6.0",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "axios": "^1.7.9",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
