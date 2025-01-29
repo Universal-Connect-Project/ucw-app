@@ -3,10 +3,15 @@ import { instrumentation, INSTRUMENTATION_URL } from "./api";
 import server from "../shared/test/testServer";
 import { http, HttpResponse } from "msw";
 
+const instrumentationProps = {
+  job_type: "test",
+  user_id: "test",
+};
+
 describe("api", () => {
   describe("instrumentation", () => {
     it("resolves", async () => {
-      await instrumentation({});
+      await instrumentation(instrumentationProps);
     });
 
     it("throws an error on failure", async () => {
@@ -17,7 +22,7 @@ describe("api", () => {
         ),
       );
 
-      await expect(instrumentation({})).rejects.toThrow();
+      await expect(instrumentation(instrumentationProps)).rejects.toThrow();
     });
   });
 });
