@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 // @ts-expect-error import doesn't work
 import { ApiProvider, ConnectWidget } from "@mxenabled/connect-widget";
-import { ReactElement } from "react";
 import { instrumentation } from "./connect/api";
 import "./App.css";
 import connectWidgetApiService from "./connect/connectWidgetApiService";
+import { useErrorBoundary, withErrorBoundary } from "react-error-boundary";
 
-function App(): ReactElement | string | null {
+// eslint-disable-next-line react-refresh/only-export-components
+const App = () => {
   const [instrumentationFinished, setInstrumentationFinished] = useState(false);
-  const [instrumentationError, setInstrumentationError] = useState(false);
 
   const queryParams = new URLSearchParams(window.location.search);
 
@@ -42,19 +42,17 @@ function App(): ReactElement | string | null {
     },
   };
 
+  const { showBoundary } = useErrorBoundary();
+
   useEffect(() => {
     instrumentation(clientConfig.connect)
       .then(() => {
         setInstrumentationFinished(true);
       })
-      .catch(() => {
-        setInstrumentationError(true);
+      .catch((error) => {
+        showBoundary(error);
       });
   });
-
-  if (instrumentationError) {
-    return "Something went wrong";
-  }
 
   if (!instrumentationFinished) {
     return null;
@@ -72,6 +70,9 @@ function App(): ReactElement | string | null {
       />
     </ApiProvider>
   );
-}
+};
 
-export default App;
+// eslint-disable-next-line react-refresh/only-export-components
+export default withErrorBoundary(App, {
+  fallback: <div>Something went wrong</div>,
+});
