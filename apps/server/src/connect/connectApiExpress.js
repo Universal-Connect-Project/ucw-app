@@ -100,7 +100,10 @@ export default function (app) {
     getInstitutionCredentialsHandler,
   );
 
-  app.get(`${ApiEndpoints.INSTITUTIONS}/favorite`, favoriteInstitutionsHandler);
+  app.get(
+    `${ApiEndpoints.INSTITUTIONS}/recommended`,
+    favoriteInstitutionsHandler,
+  );
 
   app.get(
     `${ApiEndpoints.INSTITUTIONS}/:institution_guid`,

@@ -6,8 +6,9 @@ import { instrumentation } from "./connect/api";
 import "./App.css";
 import connectWidgetApiService from "./connect/connectWidgetApiService";
 
-function App(): ReactElement | null {
+function App(): ReactElement | string | null {
   const [instrumentationFinished, setInstrumentationFinished] = useState(false);
+  const [instrumentationError, setInstrumentationError] = useState(false);
 
   const queryParams = new URLSearchParams(window.location.search);
 
@@ -19,8 +20,6 @@ function App(): ReactElement | null {
   const singleAccountSelect = queryParams.get("single_account_select");
 
   const clientConfig = {
-    // is_mobile_webview: params.is_mobile_webview === "true",
-    // target_origin_referrer: null,
     ui_message_protocol: "post_message",
     ui_message_version: 4,
     ui_message_webview_url_scheme: "vcs",
@@ -32,15 +31,11 @@ function App(): ReactElement | null {
       current_institution_guid: null,
       current_member_guid: connectionId,
       current_aggregator: aggregator,
-      // current_partner: "$partner",
       user_id: userId,
       current_microdeposit_guid: null,
       disable_background_agg: null,
       disable_institution_search: !!(institutionId || connectionId),
-      // include_identity: params.include_identity === "true",
-      // include_transactions: null, // true
       oauth_referral_source: "BROWSER",
-      // update_credentials: params.update_credentials === "true",
       wait_for_full_aggregation: false,
       single_account_select: singleAccountSelect !== "false",
       scheme: "vcs",
@@ -48,10 +43,18 @@ function App(): ReactElement | null {
   };
 
   useEffect(() => {
-    instrumentation(clientConfig.connect).then(() => {
-      setInstrumentationFinished(true);
-    });
+    instrumentation(clientConfig.connect)
+      .then(() => {
+        setInstrumentationFinished(true);
+      })
+      .catch(() => {
+        setInstrumentationError(true);
+      });
   });
+
+  if (instrumentationError) {
+    return "Something went wrong";
+  }
 
   if (!instrumentationFinished) {
     return null;

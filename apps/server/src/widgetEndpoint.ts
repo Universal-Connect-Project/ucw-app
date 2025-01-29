@@ -19,10 +19,8 @@ const pageQueryParameters = new RegExp(
     "partner",
     "oauth_referral_source",
     "single_account_select",
-    "update_credentials",
     "server",
     "is_mobile_webview",
-    "include_identity",
   ]
     .map((r) => `\\$${r}`)
     .join("|"),
