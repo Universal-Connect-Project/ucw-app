@@ -5,7 +5,7 @@ import { contextHandler } from "../infra/context.ts";
 import { ApiEndpoints } from "../shared/connect/ApiEndpoint";
 import { ConnectApi } from "./connectApi";
 import {
-  favoriteInstitutionsHandler,
+  recommendedInstitutionsHandler,
   getInstitutionCredentialsHandler,
   getInstitutionHandler,
   getInstitutionsHandler,
@@ -102,7 +102,7 @@ export default function (app) {
 
   app.get(
     `${ApiEndpoints.INSTITUTIONS}/recommended`,
-    favoriteInstitutionsHandler,
+    recommendedInstitutionsHandler,
   );
 
   app.get(
