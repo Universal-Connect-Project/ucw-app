@@ -17,7 +17,7 @@ import type {
 } from "@repo/utils";
 
 import { ConnectionStatus, OAuthStatus } from "../shared/contract";
-import { decodeAuthToken, mapJobType } from "../utils";
+import { mapJobType } from "../utils";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function instrumentation(context: Context, input: any) {
@@ -32,14 +32,10 @@ export async function instrumentation(context: Context, input: any) {
     context.aggregator = input.current_aggregator;
     context.connection_id = input.current_member_guid;
   }
-  if (input.auth != null) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    context.auth = decodeAuthToken(input.auth) as any;
-  }
-  context.partner = input.current_partner;
+
   context.job_type = mapJobType(input.job_type);
-  context.scheme = input.scheme ?? "vcs";
-  context.oauth_referral_source = input.oauth_referral_source ?? "BROWSER";
+  context.scheme = "vcs";
+  context.oauth_referral_source = "BROWSER";
   context.single_account_select = input.single_account_select;
   context.updated = true;
   return true;

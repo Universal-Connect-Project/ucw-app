@@ -59,7 +59,7 @@ export const getInstitutionsHandler = async (
   res.send(institutionHits.map(mapCachedInstitution));
 };
 
-export const favoriteInstitutionsHandler = async (
+export const recommendedInstitutionsHandler = async (
   req: InstitutionRequest,
   res: Response,
 ) => {

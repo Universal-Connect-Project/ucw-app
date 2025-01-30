@@ -5,12 +5,11 @@ import { contextHandler } from "../infra/context.ts";
 import { ApiEndpoints } from "../shared/connect/ApiEndpoint";
 import { ConnectApi } from "./connectApi";
 import {
-  favoriteInstitutionsHandler,
+  recommendedInstitutionsHandler,
   getInstitutionCredentialsHandler,
   getInstitutionHandler,
   getInstitutionsHandler,
 } from "./institutionEndpoints";
-import { userDeleteHandler } from "./userEndpoints";
 import { MappedJobTypes } from "../shared/contract";
 import stubs from "./instrumentations.js";
 import { jobsRouteHandler } from "./jobEndpoints";
@@ -100,7 +99,10 @@ export default function (app) {
     getInstitutionCredentialsHandler,
   );
 
-  app.get(`${ApiEndpoints.INSTITUTIONS}/favorite`, favoriteInstitutionsHandler);
+  app.get(
+    `${ApiEndpoints.INSTITUTIONS}/recommended`,
+    recommendedInstitutionsHandler,
+  );
 
   app.get(
     `${ApiEndpoints.INSTITUTIONS}/:institution_guid`,
@@ -162,7 +164,7 @@ export default function (app) {
   });
 
   app.post(ApiEndpoints.INSTRUMENTATION, async (req, res) => {
-    if (await instrumentation(req.context, req.body.instrumentation)) {
+    if (await instrumentation(req.context, req.body)) {
       res.sendStatus(200);
       return;
     }
