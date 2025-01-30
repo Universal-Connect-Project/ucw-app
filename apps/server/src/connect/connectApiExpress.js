@@ -1,5 +1,4 @@
 import * as path from "path";
-import { instrumentation } from "../adapters";
 import config from "../config";
 import { contextHandler } from "../infra/context.ts";
 import { ApiEndpoints } from "../shared/connect/ApiEndpoint";
@@ -13,6 +12,7 @@ import {
 import { MappedJobTypes } from "../shared/contract";
 import stubs from "./instrumentations.js";
 import { jobsRouteHandler } from "./jobEndpoints";
+import { instrumentation } from "./instrumentation";
 
 const disableAnalytics = true;
 
