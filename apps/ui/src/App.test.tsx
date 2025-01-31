@@ -9,7 +9,7 @@ vi.mock("./Widget", () => ({
 
 import App from "./App";
 import { http, HttpResponse } from "msw";
-import { INSTRUMENTATION_URL } from "./connect/api";
+import { INSTRUMENTATION_URL } from "./api/api";
 
 describe("<App />", () => {
   it("doesn't render the widget until instrumentation succeeds", async () => {

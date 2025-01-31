@@ -119,7 +119,7 @@ describe("institutionEndpoints", () => {
         connectApi: new ConnectApi({ context }),
         context,
         query: {
-          search_name: "MX",
+          search: "MX",
         },
       } as unknown as GetInstitutionsRequest;
 
@@ -141,7 +141,7 @@ describe("institutionEndpoints", () => {
         connectApi: new ConnectApi({ context }),
         context,
         query: {
-          routing_number: "1234567",
+          routingNumber: "1234567",
         },
       } as unknown as GetInstitutionsRequest;
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { instrumentation } from "./connect/api";
+import { instrumentation } from "./api/api";
 import "./App.css";
 import { useErrorBoundary, withErrorBoundary } from "react-error-boundary";
 import Widget from "./Widget";

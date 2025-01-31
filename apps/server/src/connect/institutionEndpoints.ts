@@ -34,8 +34,8 @@ export interface GetInstitutionsRequest extends InstitutionRequest {
     job_type: MappedJobTypes;
   };
   query: {
-    routing_number?: string;
-    search_name?: string;
+    routingNumber?: string;
+    search?: string;
   };
 }
 
@@ -44,16 +44,13 @@ export const getInstitutionsHandler = async (
   res: Response,
 ) => {
   let institutionHits;
-  if (req.query.routing_number) {
+  if (req.query.routingNumber) {
     institutionHits = await searchByRoutingNumber(
-      req.query.routing_number,
+      req.query.routingNumber,
       req.context?.job_type,
     );
   } else {
-    institutionHits = await search(
-      req.query.search_name,
-      req.context?.job_type,
-    );
+    institutionHits = await search(req.query.search, req.context?.job_type);
   }
 
   res.send(institutionHits.map(mapCachedInstitution));
