@@ -12,7 +12,7 @@ import {
 import { MappedJobTypes } from "../shared/contract";
 import stubs from "./instrumentations.js";
 import { jobsRouteHandler } from "./jobEndpoints";
-import { instrumentation } from "./instrumentation";
+import { instrumentationHandler } from "./instrumentationEndpoints";
 
 const disableAnalytics = true;
 
@@ -163,13 +163,7 @@ export default function (app) {
     });
   });
 
-  app.post(ApiEndpoints.INSTRUMENTATION, async (req, res) => {
-    if (await instrumentation(req.context, req.body)) {
-      res.sendStatus(200);
-      return;
-    }
-    res.sendStatus(400);
-  });
+  app.post(ApiEndpoints.INSTRUMENTATION, instrumentationHandler);
 
   app.post("/members/:member_guid/unthrottled_aggregate", async (req, res) => {
     const ret = await req.connectApi.updateConnection(
