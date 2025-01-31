@@ -46,17 +46,6 @@ describe("connectApi", () => {
     });
   });
 
-  describe("loadInstitutions", () => {
-    it("loads formatted institutions", async () => {
-      const institutions = await connectApi.loadInstitutions(
-        "MX",
-        MappedJobTypes.AGGREGATE,
-      );
-
-      expect(institutions).toEqual(transformedInstitutionList);
-    });
-  });
-
   describe("loadInstitutionByUcpId", () => {
     const expectedInstitutionResponse = {
       institution: {

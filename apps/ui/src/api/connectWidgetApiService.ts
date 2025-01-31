@@ -3,6 +3,8 @@ import configuredAxios from "./axios";
 export const RECOMMENDED_INSTITUTIONS_URL = "/institutions/recommended";
 
 interface LoadInstitutionsParams {
+  page?: number;
+  per_page?: number;
   routing_number?: number;
   search_name?: string;
 }
@@ -14,12 +16,19 @@ const connectWidgetApiService = {
       .then((response) => response.data);
   },
   loadInstitutions: async ({
+    page,
+    per_page,
     routing_number,
     search_name,
   }: LoadInstitutionsParams) => {
     return configuredAxios
       .get("/institutions", {
-        params: { routingNumber: routing_number, search: search_name },
+        params: {
+          page,
+          pageSize: per_page,
+          routingNumber: routing_number,
+          search: search_name,
+        },
       })
       .then((response) => response.data);
   },

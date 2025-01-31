@@ -248,14 +248,6 @@ export class ConnectApi extends AggregatorAdapterBase {
     };
   }
 
-  async loadInstitutions(
-    query: string,
-    jobType: MappedJobTypes,
-  ): Promise<InstitutionSearchResponseItem[]> {
-    const institutionHits = await search(query, jobType);
-    return institutionHits.map(mapCachedInstitution);
-  }
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async loadInstitutionByUcpId(ucpId: string): Promise<any> {
     const inst = await this.getAggregatorInstitution(ucpId);

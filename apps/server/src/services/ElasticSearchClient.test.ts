@@ -324,6 +324,11 @@ describe("search", () => {
     ElasticSearchMock.clearAll();
   });
 
+  const pageProps = {
+    from: 0,
+    size: 25,
+  };
+
   it("makes the expected ES call and maps the data", async () => {
     ElasticSearchMock.add(
       {
@@ -347,7 +352,11 @@ describe("search", () => {
       },
     );
 
-    const results = await search("MX Bank", MappedJobTypes.AGGREGATE);
+    const results = await search({
+      ...pageProps,
+      searchTerm: "MX Bank",
+      jobType: MappedJobTypes.AGGREGATE,
+    });
 
     expect(results).toEqual([elasticSearchInstitutionData]);
   });
@@ -376,7 +385,11 @@ describe("search", () => {
       },
     );
 
-    await search("MX Bank", MappedJobTypes.AGGREGATE);
+    await search({
+      ...pageProps,
+      searchTerm: "MX Bank",
+      jobType: MappedJobTypes.AGGREGATE,
+    });
     config.ENV = "test";
   });
 
@@ -417,7 +430,11 @@ describe("search", () => {
       },
     );
 
-    const results = await search("MX Bank", MappedJobTypes.IDENTITY);
+    const results = await search({
+      ...pageProps,
+      searchTerm: "MX Bank",
+      jobType: MappedJobTypes.IDENTITY,
+    });
 
     expect(results).toEqual([elasticSearchInstitutionData]);
   });
@@ -463,7 +480,11 @@ describe("search", () => {
       },
     );
 
-    const results = await search("MX Bank", MappedJobTypes.ALL);
+    const results = await search({
+      ...pageProps,
+      searchTerm: "MX Bank",
+      jobType: MappedJobTypes.ALL,
+    });
 
     expect(results).toEqual([elasticSearchInstitutionData]);
   });
@@ -481,7 +502,11 @@ describe("search", () => {
       },
     );
 
-    const results = await search("nothing", MappedJobTypes.AGGREGATE);
+    const results = await search({
+      ...pageProps,
+      searchTerm: "nothing",
+      jobType: MappedJobTypes.AGGREGATE,
+    });
 
     expect(results).toEqual([]);
   });
@@ -517,10 +542,11 @@ describe("searchByRoutingNumber", () => {
       },
     );
 
-    const results = await searchByRoutingNumber(
+    const results = await searchByRoutingNumber({
+      ...pageProps,
       routingNumber,
-      MappedJobTypes.AGGREGATE,
-    );
+      jobType: MappedJobTypes.AGGREGATE,
+    });
 
     expect(results).toEqual([elasticSearchInstitutionData]);
   });

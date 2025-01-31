@@ -123,8 +123,17 @@ function getInstitutionDataFromFile(): CachedInstitution[] {
 }
 
 export async function searchByRoutingNumber(
-  routingNumber: string,
-  jobType: MappedJobTypes,
+  {
+    from,
+    jobType,
+    routingNumber,
+    size,
+  }: {
+    from: number;
+    jobType: MappedJobTypes;
+    routingNumber: string;
+    size: number;
+  },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any[]> {
   const preferences = await getPreferences();
@@ -148,7 +157,8 @@ export async function searchByRoutingNumber(
           must_not: buildMustNotQuery(hiddenInstitutions),
         },
       },
-      size: 20,
+      from,
+      size,
     },
   });
 
@@ -156,8 +166,17 @@ export async function searchByRoutingNumber(
 }
 
 export async function search(
-  searchTerm: string,
-  jobType: MappedJobTypes,
+  {
+    from,
+    jobType,
+    searchTerm,
+    size,
+  }: {
+    from: number;
+    jobType: MappedJobTypes;
+    searchTerm: string;
+    size: number;
+  },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any[]> {
   const preferences = await getPreferences();
@@ -175,7 +194,8 @@ export async function search(
           must_not: buildMustNotQuery(hiddenInstitutions),
         },
       },
-      size: 20,
+      from,
+      size,
     },
   });
 
