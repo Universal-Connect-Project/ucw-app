@@ -251,4 +251,14 @@ export class TestAdapter implements WidgetAdapter {
   ): Promise<string> {
     return userId;
   }
+
+  async HandleOauthResponse(request: any): Promise<Connection>{
+    return {
+      aggregator: this.aggregator,
+      id: "testId",
+      cur_job_id: "testJobId",
+      status: ConnectionStatus.CONNECTED,
+      challenges: [],
+    };
+  }
 }
