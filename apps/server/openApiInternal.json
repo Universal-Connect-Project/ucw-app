@@ -123,6 +123,77 @@
           }
         }
       }
+    },
+    "/institutions": {
+      "get": {
+        "description": "List of institution search results",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "meta",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "example": {
+                "job_type": "aggregate"
+              }
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "description": "Text to be searched. Can't be used with a routingNumber query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "routingNumber",
+            "description": "9 digit institution routing number. Can't be used with a search query",
+            "schema": {
+              "type": "number",
+              "example": 111111111
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pageSize",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "example": [
+                    {
+                      "guid": "5e498f60-3496-4299-96ed-f8eb328ae8af",
+                      "name": "TestExampleA Bank",
+                      "url": "https://test-example.com",
+                      "logo_url": "https://universalconnectproject.org/images/ucp-logo-icon.svg"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
