@@ -23,11 +23,6 @@
   "paths": {
     "/instrumentation/userId/{userId}/jobType/{jobType}": {
       "post": {
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
         "description": "This endpoint is called by the connect widget frontend and returns response headers that are saved for future requests from the connect widget",
         "parameters": [
           {
@@ -48,6 +43,27 @@
             }
           }
         ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "current_aggregator": {
+                    "type": "string"
+                  },
+                  "current_member_guid": {
+                    "type": "string"
+                  },
+                  "single_account_select": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Success",
