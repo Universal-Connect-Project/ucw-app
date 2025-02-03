@@ -9,11 +9,12 @@ import {
   getInstitutionHandler,
   getInstitutionsHandler,
 } from "./institutionEndpoints";
-import { MappedJobTypes } from "../shared/contract";
 import stubs from "./instrumentations.js";
 import { jobsRouteHandler } from "./jobEndpoints";
 import { instrumentationHandler } from "./instrumentationEndpoints";
 import {
+  MappedJobTypes,
+  INSTRUMENTATION_URL,
   RECOMMENDED_INSTITUTIONS_URL,
   SEARCH_INSTITUTIONS_URL,
 } from "@repo/utils";
@@ -164,7 +165,7 @@ export default function (app) {
     });
   });
 
-  app.post(ApiEndpoints.INSTRUMENTATION, instrumentationHandler);
+  app.post(INSTRUMENTATION_URL, instrumentationHandler);
 
   app.post("/members/:member_guid/unthrottled_aggregate", async (req, res) => {
     const ret = await req.connectApi.updateConnection(

@@ -1,5 +1,4 @@
-import { JobTypes } from "@repo/utils";
-import { MappedJobTypes } from "../shared/contract";
+import { JobTypes, MappedJobTypes } from "@repo/utils";
 
 export function mapJobType(input: JobTypes) {
   const inputLowerCase = input.toLowerCase();

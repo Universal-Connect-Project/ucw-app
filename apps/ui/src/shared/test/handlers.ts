@@ -1,7 +1,7 @@
 import { http, HttpResponse } from "msw";
-import { INSTRUMENTATION_URL } from "../../api/api";
 import { recommendedInstitutions } from "./testData/recommendedInstitutions";
 import {
+  INSTRUMENTATION_URL,
   RECOMMENDED_INSTITUTIONS_URL,
   SEARCH_INSTITUTIONS_URL,
 } from "@repo/utils";

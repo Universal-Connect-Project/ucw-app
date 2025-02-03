@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 
-import type { MappedJobTypes } from "../shared/contract";
+import type { MappedJobTypes } from "@repo/utils";
 import { mapCachedInstitution } from "./connectApi";
 import { search, searchByRoutingNumber } from "../services/ElasticSearchClient";
 import type { ConnectApi } from "./connectApi";

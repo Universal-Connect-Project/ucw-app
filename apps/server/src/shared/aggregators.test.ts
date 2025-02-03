@@ -1,6 +1,7 @@
 import { getAvailableAggregators } from "../shared/aggregators";
 import type { Aggregator, CachedInstitution } from "./contract";
-import { Aggregators, JobTypeSupports, MappedJobTypes } from "./contract";
+import { Aggregators, JobTypeSupports } from "./contract";
+import { MappedJobTypes } from "@repo/utils";
 
 const institutionAggregatorsSupportEverything: CachedInstitution = {
   url: "testUrl",

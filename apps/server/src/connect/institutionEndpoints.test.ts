@@ -1,5 +1,5 @@
 import type { Response } from "express";
-import { MappedJobTypes } from "../shared/contract";
+import { MappedJobTypes } from "@repo/utils";
 import {
   elasticSearchInstitutionData,
   transformedInstitutionList,

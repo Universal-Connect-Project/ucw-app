@@ -3,9 +3,13 @@ import * as logger from "../infra/logger";
 import type {
   CachedInstitution,
   InstitutionSearchResponseItem,
-  MappedJobTypes,
 } from "../shared/contract";
-import type { Challenge, Connection, Institution } from "@repo/utils";
+import type {
+  Challenge,
+  Connection,
+  Institution,
+  MappedJobTypes,
+} from "@repo/utils";
 import { ChallengeType, ConnectionStatus } from "@repo/utils";
 
 import { AggregatorAdapterBase } from "../adapters";

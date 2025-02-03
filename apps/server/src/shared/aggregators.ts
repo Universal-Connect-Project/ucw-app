@@ -1,4 +1,5 @@
-import { JobTypeSupports, MappedJobTypes } from "./contract";
+import { JobTypeSupports } from "./contract";
+import { MappedJobTypes } from "@repo/utils";
 
 import type {
   CachedInstitution,

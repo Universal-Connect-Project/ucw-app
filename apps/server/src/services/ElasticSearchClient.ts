@@ -1,4 +1,5 @@
 import { Client } from "@opensearch-project/opensearch";
+import type { MappedJobTypes } from "@repo/utils";
 import type {
   MgetRequest,
   SearchHit,
@@ -15,11 +16,7 @@ import {
   getAvailableAggregators,
   JOB_TYPE_PARTIAL_SUPPORT_MAP,
 } from "../shared/aggregators";
-import type {
-  Aggregator,
-  CachedInstitution,
-  MappedJobTypes,
-} from "../shared/contract";
+import type { Aggregator, CachedInstitution } from "../shared/contract";
 import { getPreferences } from "../shared/preferences";
 import { fetchInstitutions } from "./institutionSyncer";
 import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";

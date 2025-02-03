@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { instrumentation, INSTRUMENTATION_URL } from "./api";
+import { instrumentation } from "./api";
 import server from "../shared/test/testServer";
 import { http, HttpResponse } from "msw";
+import { INSTRUMENTATION_URL } from "@repo/utils";
 
 const instrumentationProps = {
   job_type: "test",

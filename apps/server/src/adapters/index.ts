@@ -5,7 +5,8 @@ import * as logger from "../infra/logger";
 import { AnalyticsClient } from "../services/analyticsClient";
 import { resolveInstitutionAggregator } from "../services/institutionResolver";
 import { set } from "../services/storageClient/redis";
-import type { Context, MappedJobTypes, Aggregator } from "../shared/contract";
+import type { MappedJobTypes } from "@repo/utils";
+import type { Context, Aggregator } from "../shared/contract";
 import type {
   Challenge,
   Connection,

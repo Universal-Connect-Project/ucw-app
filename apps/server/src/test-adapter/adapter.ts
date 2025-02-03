@@ -6,9 +6,8 @@ import type {
   UpdateConnectionRequest,
   WidgetAdapter,
 } from "@repo/utils";
-import { ConnectionStatus } from "@repo/utils";
+import { ConnectionStatus, MappedJobTypes } from "@repo/utils";
 import { get, set } from "../services/storageClient/redis";
-import { MappedJobTypes } from "../shared/contract";
 import { testExampleCredentials, testExampleInstitution } from "./constants";
 
 const createRedisStatusKey = ({

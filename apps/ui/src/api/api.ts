@@ -1,3 +1,4 @@
+import { INSTRUMENTATION_URL } from "@repo/utils";
 import configuredAxios from "./axios";
 
 interface InstrumentationParameters {
@@ -7,8 +8,6 @@ interface InstrumentationParameters {
   job_type: string;
   single_account_select?: boolean;
 }
-
-export const INSTRUMENTATION_URL = "/instrumentation";
 
 export const instrumentation = async (
   parameters: InstrumentationParameters,
