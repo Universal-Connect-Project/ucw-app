@@ -119,6 +119,8 @@ describe("institutionEndpoints", () => {
         connectApi: new ConnectApi({ context }),
         context,
         query: {
+          page: "1",
+          pageSize: "25",
           search: "MX",
         },
       } as unknown as GetInstitutionsRequest;
@@ -141,6 +143,8 @@ describe("institutionEndpoints", () => {
         connectApi: new ConnectApi({ context }),
         context,
         query: {
+          page: "1",
+          pageSize: "25",
           routingNumber: "1234567",
         },
       } as unknown as GetInstitutionsRequest;
