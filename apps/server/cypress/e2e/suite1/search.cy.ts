@@ -66,14 +66,16 @@ describe("search", () => {
     it("Ranks search results in the best way", () => {
       visitAgg();
 
+      const needMoreThanResultNumber = 4;
+
       cy.findByPlaceholderText("Search").clear().type("TestExample");
       cy.findByText(TEST_EXAMPLE_B_ONLY_INSTITUTION_NAME).should("exist");
       cy.findAllByTestId(new RegExp("-row")).then((institutions) => {
-        expect(institutions.length).to.be.greaterThan(2);
+        expect(institutions.length).to.be.greaterThan(needMoreThanResultNumber);
 
         let noIdentificationBankFound = false;
 
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < needMoreThanResultNumber; i++) {
           const ariaLabel = institutions.eq(i).attr("aria-label");
 
           if (
