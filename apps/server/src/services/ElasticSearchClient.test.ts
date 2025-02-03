@@ -31,6 +31,11 @@ import { server } from "../test/testServer";
 import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
 import { overwriteSet } from "./storageClient/redis";
 
+const pageProps = {
+  from: 0,
+  size: 25,
+};
+
 const config = _config.getConfig();
 
 jest.mock("fs");
@@ -324,11 +329,6 @@ describe("search", () => {
     ElasticSearchMock.clearAll();
   });
 
-  const pageProps = {
-    from: 0,
-    size: 25,
-  };
-
   it("makes the expected ES call and maps the data", async () => {
     ElasticSearchMock.add(
       {
@@ -336,7 +336,7 @@ describe("search", () => {
         path: ["/_search", "/institutions/_search"],
         body: {
           query: searchQuery(),
-          size: 20,
+          ...pageProps,
         },
       },
       () => {
@@ -369,7 +369,7 @@ describe("search", () => {
         path: ["/_search", "/institutions/_search"],
         body: {
           query: searchQuery({ filterTestBanks: true }),
-          size: 20,
+          ...pageProps,
         },
       },
       () => {
@@ -414,7 +414,7 @@ describe("search", () => {
               }),
             ),
           }),
-          size: 20,
+          ...pageProps,
         },
       },
       () => {
@@ -464,7 +464,7 @@ describe("search", () => {
               }),
             ),
           }),
-          size: 20,
+          ...pageProps,
         },
       },
       () => {
@@ -526,7 +526,7 @@ describe("searchByRoutingNumber", () => {
         path: ["/_search", "/institutions/_search"],
         body: {
           query: searchQuery({ routingNumber }),
-          size: 20,
+          ...pageProps,
         },
       },
       () => {
