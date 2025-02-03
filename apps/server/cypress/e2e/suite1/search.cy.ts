@@ -12,6 +12,8 @@ const institutionThatIsInFavoritesButDoesntSupportIdentification =
   "TestExample Doesnt Support Identification Bank";
 
 describe("search", () => {
+  it("loads more institutions", () => {});
+
   it("filters recommended institutions by job type", () => {
     visitAgg();
 

@@ -1,6 +1,7 @@
 import configuredAxios from "./axios";
 
 export const RECOMMENDED_INSTITUTIONS_URL = "/institutions/recommended";
+export const SEARCH_INSTITUTIONS_URL = "/institutions";
 
 interface LoadInstitutionsParams {
   page?: number;
