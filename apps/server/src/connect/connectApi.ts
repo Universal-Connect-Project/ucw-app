@@ -9,10 +9,7 @@ import type { Challenge, Connection, Institution } from "@repo/utils";
 import { ChallengeType, ConnectionStatus } from "@repo/utils";
 
 import { AggregatorAdapterBase } from "../adapters";
-import {
-  getRecommendedInstitutions,
-  search,
-} from "../services/ElasticSearchClient";
+import { getRecommendedInstitutions } from "../services/ElasticSearchClient";
 
 function mapResolvedInstitution(ins: Institution) {
   return {

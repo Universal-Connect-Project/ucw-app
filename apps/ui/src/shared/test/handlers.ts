@@ -4,7 +4,7 @@ import { recommendedInstitutions } from "./testData/recommendedInstitutions";
 import {
   RECOMMENDED_INSTITUTIONS_URL,
   SEARCH_INSTITUTIONS_URL,
-} from "../../api/connectWidgetApiService";
+} from "@repo/utils";
 import { searchedInstitutions } from "./testData/searchedInstitutions";
 
 const handlers = [

@@ -13,6 +13,10 @@ import { MappedJobTypes } from "../shared/contract";
 import stubs from "./instrumentations.js";
 import { jobsRouteHandler } from "./jobEndpoints";
 import { instrumentationHandler } from "./instrumentationEndpoints";
+import {
+  RECOMMENDED_INSTITUTIONS_URL,
+  SEARCH_INSTITUTIONS_URL,
+} from "@repo/utils";
 
 const disableAnalytics = true;
 
@@ -99,16 +103,13 @@ export default function (app) {
     getInstitutionCredentialsHandler,
   );
 
-  app.get(
-    `${ApiEndpoints.INSTITUTIONS}/recommended`,
-    recommendedInstitutionsHandler,
-  );
+  app.get(RECOMMENDED_INSTITUTIONS_URL, recommendedInstitutionsHandler);
 
   app.get(
     `${ApiEndpoints.INSTITUTIONS}/:institution_guid`,
     getInstitutionHandler,
   );
-  app.get(ApiEndpoints.INSTITUTIONS, getInstitutionsHandler);
+  app.get(SEARCH_INSTITUTIONS_URL, getInstitutionsHandler);
   app.get(`${ApiEndpoints.JOBS}/:member_guid`, jobsRouteHandler);
 
   app.get("/oauth_states", async (req, res) => {

@@ -1,7 +1,8 @@
 import configuredAxios from "./axios";
-
-export const RECOMMENDED_INSTITUTIONS_URL = "/institutions/recommended";
-export const SEARCH_INSTITUTIONS_URL = "/institutions";
+import {
+  RECOMMENDED_INSTITUTIONS_URL,
+  SEARCH_INSTITUTIONS_URL,
+} from "@repo/utils";
 
 interface LoadInstitutionsParams {
   page?: number;
@@ -23,7 +24,7 @@ const connectWidgetApiService = {
     search_name,
   }: LoadInstitutionsParams) => {
     return configuredAxios
-      .get("/institutions", {
+      .get(SEARCH_INSTITUTIONS_URL, {
         params: {
           page,
           pageSize: per_page,

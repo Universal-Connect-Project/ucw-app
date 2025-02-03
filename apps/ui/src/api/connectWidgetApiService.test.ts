@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
-import connectWidgetApiService, {
+import connectWidgetApiService from "./connectWidgetApiService";
+import {
   RECOMMENDED_INSTITUTIONS_URL,
   SEARCH_INSTITUTIONS_URL,
-} from "./connectWidgetApiService";
+} from "@repo/utils";
 import { recommendedInstitutions } from "../shared/test/testData/recommendedInstitutions";
 import server from "../shared/test/testServer";
 import { http, HttpResponse } from "msw";
