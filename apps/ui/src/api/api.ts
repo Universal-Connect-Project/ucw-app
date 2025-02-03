@@ -12,5 +12,10 @@ interface InstrumentationParameters {
 export const instrumentation = async (
   parameters: InstrumentationParameters,
 ) => {
-  return configuredAxios.post(INSTRUMENTATION_URL, parameters);
+  const { job_type, user_id, ...rest } = parameters;
+
+  return configuredAxios.post(
+    `${INSTRUMENTATION_URL}/userId/${user_id}/jobType/${job_type}`,
+    rest,
+  );
 };

@@ -5,12 +5,8 @@ describe("instrumentation endpoint", () => {
     const testUserId = "test";
 
     cy.request({
-      body: {
-        job_type: JobTypes.AGGREGATE,
-        user_id: testUserId,
-      },
       method: "POST",
-      url: INSTRUMENTATION_URL,
+      url: `${INSTRUMENTATION_URL}/userId/${testUserId}/jobType/${JobTypes.AGGREGATE}`,
     }).then((response) => {
       expect(response.status).to.eq(200);
 

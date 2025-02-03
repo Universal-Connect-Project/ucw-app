@@ -7,9 +7,12 @@ describe("instrumentationEndpoints", () => {
     const correctBody = {
       current_aggregator: "testAggregator",
       current_member_guid: "currentMemberGuid",
-      job_type: JobTypes.FULLHISTORY,
       single_account_select: false,
-      user_id: "userId",
+    };
+
+    const correctParams = {
+      jobType: JobTypes.FULLHISTORY,
+      userId: "userId",
     };
 
     it("doesn't return aggregator or connection_id if current_member_guid isn't present", async () => {
@@ -17,6 +20,7 @@ describe("instrumentationEndpoints", () => {
       delete body.current_member_guid;
       const req = {
         body,
+        params: correctParams,
         context: {},
       } as unknown as Request;
 
@@ -33,7 +37,7 @@ describe("instrumentationEndpoints", () => {
         scheme: "vcs",
         single_account_select: req.body.single_account_select,
         updated: true,
-        user_id: req.body.user_id,
+        user_id: req.params.userId,
       });
     });
 
@@ -42,6 +46,7 @@ describe("instrumentationEndpoints", () => {
       delete body.current_aggregator;
       const req = {
         body,
+        params: correctParams,
         context: {},
       } as unknown as Request;
 
@@ -58,13 +63,14 @@ describe("instrumentationEndpoints", () => {
         scheme: "vcs",
         single_account_select: req.body.single_account_select,
         updated: true,
-        user_id: req.body.user_id,
+        user_id: req.params.userId,
       });
     });
 
     it("attaches properties to the request context and responds with success on success", async () => {
       const req = {
         body: correctBody,
+        params: correctParams,
         context: {},
       } as unknown as Request;
 
@@ -83,26 +89,8 @@ describe("instrumentationEndpoints", () => {
         scheme: "vcs",
         single_account_select: req.body.single_account_select,
         updated: true,
-        user_id: req.body.user_id,
+        user_id: req.params.userId,
       });
-    });
-
-    it("throws an error if there's no user_id", async () => {
-      const req = {
-        body: {
-          ...correctBody,
-          user_id: undefined,
-        },
-        context: {},
-      } as unknown as Request;
-
-      const res = {
-        sendStatus: jest.fn(),
-      } as unknown as Response;
-
-      await instrumentationHandler(req, res);
-
-      expect(res.sendStatus).toHaveBeenCalledWith(400);
     });
   });
 });
