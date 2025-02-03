@@ -85,6 +85,44 @@
           }
         }
       }
+    },
+    "/institutions/recommended": {
+      "get": {
+        "description": "List of recommended institutions",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "meta",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "example": {
+                "job_type": "aggregate"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "example": [
+                    {
+                      "guid": "5e498f60-3496-4299-96ed-f8eb328ae8af",
+                      "name": "TestExampleA Bank",
+                      "url": "https://test-example.com",
+                      "logo_url": "https://universalconnectproject.org/images/ucp-logo-icon.svg"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
