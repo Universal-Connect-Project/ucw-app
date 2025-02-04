@@ -1,5 +1,4 @@
 import * as path from "path";
-import { instrumentation } from "../adapters";
 import config from "../config";
 import { contextHandler } from "../infra/context.ts";
 import { ApiEndpoints } from "../shared/connect/ApiEndpoint";
@@ -10,9 +9,15 @@ import {
   getInstitutionHandler,
   getInstitutionsHandler,
 } from "./institutionEndpoints";
-import { MappedJobTypes } from "../shared/contract";
 import stubs from "./instrumentations.js";
 import { jobsRouteHandler } from "./jobEndpoints";
+import { instrumentationHandler } from "./instrumentationEndpoints";
+import {
+  MappedJobTypes,
+  INSTRUMENTATION_URL,
+  RECOMMENDED_INSTITUTIONS_URL,
+  SEARCH_INSTITUTIONS_URL,
+} from "@repo/utils";
 
 const disableAnalytics = true;
 
@@ -99,16 +104,13 @@ export default function (app) {
     getInstitutionCredentialsHandler,
   );
 
-  app.get(
-    `${ApiEndpoints.INSTITUTIONS}/recommended`,
-    recommendedInstitutionsHandler,
-  );
+  app.get(RECOMMENDED_INSTITUTIONS_URL, recommendedInstitutionsHandler);
 
   app.get(
     `${ApiEndpoints.INSTITUTIONS}/:institution_guid`,
     getInstitutionHandler,
   );
-  app.get(ApiEndpoints.INSTITUTIONS, getInstitutionsHandler);
+  app.get(SEARCH_INSTITUTIONS_URL, getInstitutionsHandler);
   app.get(`${ApiEndpoints.JOBS}/:member_guid`, jobsRouteHandler);
 
   app.get("/oauth_states", async (req, res) => {
@@ -163,13 +165,10 @@ export default function (app) {
     });
   });
 
-  app.post(ApiEndpoints.INSTRUMENTATION, async (req, res) => {
-    if (await instrumentation(req.context, req.body)) {
-      res.sendStatus(200);
-      return;
-    }
-    res.sendStatus(400);
-  });
+  app.post(
+    `${INSTRUMENTATION_URL}/userId/:userId/jobType/:jobType`,
+    instrumentationHandler,
+  );
 
   app.post("/members/:member_guid/unthrottled_aggregate", async (req, res) => {
     const ret = await req.connectApi.updateConnection(

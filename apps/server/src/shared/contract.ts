@@ -94,14 +94,6 @@ export enum Aggregators {
   TEST_C = "testExampleC",
 }
 
-export enum MappedJobTypes {
-  AGGREGATE = "aggregate",
-  ALL = "aggregate_identity_verification",
-  FULLHISTORY = "aggregate_extendedhistory",
-  VERIFICATION = "verification",
-  IDENTITY = "aggregate_identity",
-}
-
 export enum JobTypeSupports {
   AGGREGATE = "supports_aggregation",
   VERIFICATION = "supports_verification",

@@ -1,5 +1,4 @@
-import { ConnectionStatus } from "@repo/utils";
-import he from "he";
+import { ConnectionStatus, MappedJobTypes } from "@repo/utils";
 import { TestAdapter } from "./adapter";
 import {
   testDataRequestValidators,
@@ -8,7 +7,6 @@ import {
   testExampleJobResponse,
   testRouteHandlers,
 } from "./constants";
-import { MappedJobTypes } from "../shared/contract";
 
 const labelText = "testLabelText";
 const aggregator = "aggregator";

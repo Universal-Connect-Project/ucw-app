@@ -1,4 +1,5 @@
 import { Client } from "@opensearch-project/opensearch";
+import type { MappedJobTypes } from "@repo/utils";
 import type {
   MgetRequest,
   SearchHit,
@@ -15,11 +16,7 @@ import {
   getAvailableAggregators,
   JOB_TYPE_PARTIAL_SUPPORT_MAP,
 } from "../shared/aggregators";
-import type {
-  Aggregator,
-  CachedInstitution,
-  MappedJobTypes,
-} from "../shared/contract";
+import type { Aggregator, CachedInstitution } from "../shared/contract";
 import { getPreferences } from "../shared/preferences";
 import { fetchInstitutions } from "./institutionSyncer";
 import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
@@ -123,8 +120,17 @@ function getInstitutionDataFromFile(): CachedInstitution[] {
 }
 
 export async function searchByRoutingNumber(
-  routingNumber: string,
-  jobType: MappedJobTypes,
+  {
+    from,
+    jobType,
+    routingNumber,
+    size,
+  }: {
+    from: number;
+    jobType: MappedJobTypes;
+    routingNumber: string;
+    size: number;
+  },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any[]> {
   const preferences = await getPreferences();
@@ -148,7 +154,8 @@ export async function searchByRoutingNumber(
           must_not: buildMustNotQuery(hiddenInstitutions),
         },
       },
-      size: 20,
+      from,
+      size,
     },
   });
 
@@ -156,8 +163,17 @@ export async function searchByRoutingNumber(
 }
 
 export async function search(
-  searchTerm: string,
-  jobType: MappedJobTypes,
+  {
+    from,
+    jobType,
+    searchTerm,
+    size,
+  }: {
+    from: number;
+    jobType: MappedJobTypes;
+    searchTerm: string;
+    size: number;
+  },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any[]> {
   const preferences = await getPreferences();
@@ -175,7 +191,8 @@ export async function search(
           must_not: buildMustNotQuery(hiddenInstitutions),
         },
       },
-      size: 20,
+      from,
+      size,
     },
   });
 

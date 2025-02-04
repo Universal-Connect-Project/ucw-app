@@ -1,7 +1,7 @@
 // @ts-expect-error import doesn't work
 import { ApiProvider, ConnectWidget } from "@mxenabled/connect-widget";
 import "./App.css";
-import connectWidgetApiService from "./connect/connectWidgetApiService";
+import connectWidgetApiService from "./api/connectWidgetApiService";
 
 const Widget = ({
   connectionId,

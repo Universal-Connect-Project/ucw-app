@@ -3,16 +3,17 @@ import * as logger from "../infra/logger";
 import type {
   CachedInstitution,
   InstitutionSearchResponseItem,
-  MappedJobTypes,
 } from "../shared/contract";
-import type { Challenge, Connection, Institution } from "@repo/utils";
+import type {
+  Challenge,
+  Connection,
+  Institution,
+  MappedJobTypes,
+} from "@repo/utils";
 import { ChallengeType, ConnectionStatus } from "@repo/utils";
 
 import { AggregatorAdapterBase } from "../adapters";
-import {
-  getRecommendedInstitutions,
-  search,
-} from "../services/ElasticSearchClient";
+import { getRecommendedInstitutions } from "../services/ElasticSearchClient";
 
 function mapResolvedInstitution(ins: Institution) {
   return {
@@ -246,14 +247,6 @@ export class ConnectApi extends AggregatorAdapterBase {
         field_type: c.field_type === "PASSWORD" ? 1 : 3,
       })),
     };
-  }
-
-  async loadInstitutions(
-    query: string,
-    jobType: MappedJobTypes,
-  ): Promise<InstitutionSearchResponseItem[]> {
-    const institutionHits = await search(query, jobType);
-    return institutionHits.map(mapCachedInstitution);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

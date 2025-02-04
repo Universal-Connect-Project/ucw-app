@@ -1,10 +1,10 @@
 import { getAvailableAggregators } from "../shared/aggregators";
 import { debug } from "../infra/logger";
 import { getInstitution } from "../services/ElasticSearchClient";
+import type { MappedJobTypes } from "@repo/utils";
 import type {
   CachedInstitution,
   InstitutionAggregator,
-  MappedJobTypes,
   Aggregator,
   ResolvedInstitution,
 } from "../shared/contract";

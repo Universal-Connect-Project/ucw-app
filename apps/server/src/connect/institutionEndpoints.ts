@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 
-import type { MappedJobTypes } from "../shared/contract";
+import type { MappedJobTypes } from "@repo/utils";
 import { mapCachedInstitution } from "./connectApi";
 import { search, searchByRoutingNumber } from "../services/ElasticSearchClient";
 import type { ConnectApi } from "./connectApi";
@@ -34,8 +34,10 @@ export interface GetInstitutionsRequest extends InstitutionRequest {
     job_type: MappedJobTypes;
   };
   query: {
-    routing_number?: string;
-    search_name?: string;
+    page?: string;
+    pageSize?: string;
+    routingNumber?: string;
+    search?: string;
   };
 }
 
@@ -44,16 +46,27 @@ export const getInstitutionsHandler = async (
   res: Response,
 ) => {
   let institutionHits;
-  if (req.query.routing_number) {
-    institutionHits = await searchByRoutingNumber(
-      req.query.routing_number,
-      req.context?.job_type,
-    );
+
+  const jobType = req.context?.job_type;
+  const { routingNumber, search: searchTerm } = req.query;
+
+  const size = parseInt(req.query.pageSize);
+  const from = (parseInt(req.query.page) - 1) * size;
+
+  if (req.query.routingNumber) {
+    institutionHits = await searchByRoutingNumber({
+      from,
+      jobType,
+      routingNumber,
+      size,
+    });
   } else {
-    institutionHits = await search(
-      req.query.search_name,
-      req.context?.job_type,
-    );
+    institutionHits = await search({
+      from,
+      jobType,
+      searchTerm,
+      size,
+    });
   }
 
   res.send(institutionHits.map(mapCachedInstitution));

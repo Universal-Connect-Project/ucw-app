@@ -12,6 +12,23 @@ const institutionThatIsInFavoritesButDoesntSupportIdentification =
   "TestExample Doesnt Support Identification Bank";
 
 describe("search", () => {
+  it("loads more institutions", () => {
+    visitAgg();
+
+    searchByText(TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME);
+
+    cy.findByText("25 search results");
+
+    cy.findByText("Load more institutions").click();
+
+    cy.findByText("50 search results");
+
+    cy.findAllByText(TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME).should(
+      "have.length",
+      1,
+    );
+  });
+
   it("filters recommended institutions by job type", () => {
     visitAgg();
 
@@ -49,15 +66,18 @@ describe("search", () => {
     it("Ranks search results in the best way", () => {
       visitAgg();
 
+      const needMoreThanResultNumber = 4;
+
       cy.findByPlaceholderText("Search").clear().type("TestExample");
       cy.findByText(TEST_EXAMPLE_B_ONLY_INSTITUTION_NAME).should("exist");
-      cy.get('[data-test="institution-tile"]').then((institutions) => {
-        expect(institutions.length).to.be.at.least(3);
+      cy.findAllByTestId(new RegExp("-row")).then((institutions) => {
+        expect(institutions.length).to.be.greaterThan(needMoreThanResultNumber);
 
         let noIdentificationBankFound = false;
 
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < needMoreThanResultNumber; i++) {
           const ariaLabel = institutions.eq(i).attr("aria-label");
+
           if (
             ariaLabel ===
             `Add account with ${institutionThatIsInFavoritesButDoesntSupportIdentification}`

@@ -1,5 +1,5 @@
 import type { Response } from "express";
-import { MappedJobTypes } from "../shared/contract";
+import { MappedJobTypes } from "@repo/utils";
 import {
   elasticSearchInstitutionData,
   transformedInstitutionList,
@@ -119,7 +119,9 @@ describe("institutionEndpoints", () => {
         connectApi: new ConnectApi({ context }),
         context,
         query: {
-          search_name: "MX",
+          page: "1",
+          pageSize: "25",
+          search: "MX",
         },
       } as unknown as GetInstitutionsRequest;
 
@@ -141,7 +143,9 @@ describe("institutionEndpoints", () => {
         connectApi: new ConnectApi({ context }),
         context,
         query: {
-          routing_number: "1234567",
+          page: "1",
+          pageSize: "25",
+          routingNumber: "1234567",
         },
       } as unknown as GetInstitutionsRequest;
 

@@ -1,8 +1,4 @@
-import { MappedJobTypes } from "../shared/contract";
-import {
-  elasticSearchInstitutionData,
-  transformedInstitutionList,
-} from "../test/testData/institution";
+import { elasticSearchInstitutionData } from "../test/testData/institution";
 import { ConnectApi } from "./connectApi";
 import {
   TEST_EXAMPLE_A_AGGREGATOR_STRING,
@@ -43,17 +39,6 @@ describe("connectApi", () => {
           url: testExampleInstitution.url,
         },
       });
-    });
-  });
-
-  describe("loadInstitutions", () => {
-    it("loads formatted institutions", async () => {
-      const institutions = await connectApi.loadInstitutions(
-        "MX",
-        MappedJobTypes.AGGREGATE,
-      );
-
-      expect(institutions).toEqual(transformedInstitutionList);
     });
   });
 
