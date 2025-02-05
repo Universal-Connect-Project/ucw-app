@@ -49,18 +49,16 @@ describe("institutionEndpoints", () => {
       await getInstitutionHandler(req, res);
 
       expect(res.send).toHaveBeenCalledWith({
-        institution: {
-          code: "testAggregatorInstitutionGuid",
-          credentials: [],
-          guid: "testAggregatorInstitutionGuid",
-          instructional_data: {},
-          logo_url: testExampleInstitution.logo_url,
-          name: testExampleInstitution.name,
-          aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
-          aggregators: undefined,
-          supports_oauth: testExampleInstitution.oauth,
-          url: testExampleInstitution.url,
-        },
+        code: "testAggregatorInstitutionGuid",
+        credentials: [],
+        guid: "testAggregatorInstitutionGuid",
+        instructional_data: {},
+        logo_url: testExampleInstitution.logo_url,
+        name: testExampleInstitution.name,
+        aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+        aggregators: undefined,
+        supports_oauth: testExampleInstitution.oauth,
+        url: testExampleInstitution.url,
       });
     });
 
@@ -93,18 +91,16 @@ describe("institutionEndpoints", () => {
         ucpInstitution[TEST_EXAMPLE_B_AGGREGATOR_STRING];
 
       expect(res.send).toHaveBeenCalledWith({
-        institution: {
-          code: ucpTestExampleInstitution.id,
-          credentials: [],
-          guid: ucpTestExampleInstitution.id,
-          instructional_data: {},
-          logo_url: ucpInstitution.logo,
-          name: ucpInstitution.name,
-          aggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING,
-          aggregators: undefined,
-          supports_oauth: testExampleInstitution.oauth,
-          url: ucpInstitution.url,
-        },
+        code: ucpTestExampleInstitution.id,
+        credentials: [],
+        guid: ucpTestExampleInstitution.id,
+        instructional_data: {},
+        logo_url: ucpInstitution.logo,
+        name: ucpInstitution.name,
+        aggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING,
+        aggregators: undefined,
+        supports_oauth: testExampleInstitution.oauth,
+        url: ucpInstitution.url,
       });
     });
   });
@@ -205,17 +201,15 @@ describe("institutionEndpoints", () => {
 
       await getInstitutionCredentialsHandler(req, res);
 
-      expect(res.send).toHaveBeenCalledWith({
-        credentials: [
-          {
-            field_name: testExampleCredentials.field_name,
-            field_type: 3,
-            guid: testExampleCredentials.id,
-            id: testExampleCredentials.id,
-            label: TEST_EXAMPLE_A_LABEL_TEXT,
-          },
-        ],
-      });
+      expect(res.send).toHaveBeenCalledWith([
+        {
+          field_name: testExampleCredentials.field_name,
+          field_type: 3,
+          guid: testExampleCredentials.id,
+          id: testExampleCredentials.id,
+          label: TEST_EXAMPLE_A_LABEL_TEXT,
+        },
+      ]);
     });
   });
 });
