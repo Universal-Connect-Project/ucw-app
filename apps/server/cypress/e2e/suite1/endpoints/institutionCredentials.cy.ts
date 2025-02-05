@@ -1,4 +1,3 @@
-import { MappedJobTypes } from "@repo/utils";
 import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../../../../src/test-adapter/constants";
 
 describe("institution credentials", () => {
@@ -21,11 +20,17 @@ describe("institution credentials", () => {
 
       const [firstResult] = body;
 
-      expect(firstResult.id).to.exist;
-      expect(firstResult.label).to.exist;
-      expect(firstResult.guid).to.exist;
-      expect(firstResult.field_name).to.exist;
-      expect(firstResult.field_type).to.exist;
+      const expectedProperties = [
+        "id",
+        "label",
+        "guid",
+        "field_name",
+        "field_type",
+      ];
+
+      expectedProperties.forEach((property) => {
+        expect(firstResult[property]).to.exist;
+      });
     });
   });
 });

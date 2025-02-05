@@ -86,6 +86,67 @@
         }
       }
     },
+    "/institutions/{institutionGuid}": {
+      "get": {
+        "description": "Get an institution by its aggregator's ID or by the ucp id",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "meta",
+            "required": true,
+            "schema": {
+              "type": "object"
+            },
+            "examples": {
+              "byAggregatorInstitutionId": {
+                "description": "aggregator is required if sending an aggregator's institution id",
+                "value": {
+                  "aggregator": "mx"
+                }
+              },
+              "byUCPInstitutionId": {
+                "description": "job_type is required if sending an UCP institution id",
+                "value": {
+                  "job_type": "aggregate"
+                }
+              }
+            }
+          },
+          {
+            "description": "Aggregator's institution id or UCP institution id",
+            "in": "path",
+            "name": "institutionGuid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "guid": "testExampleA",
+                    "code": "testExampleA",
+                    "name": "TestExampleA Bank",
+                    "url": "https://test-example.com",
+                    "logo_url": "https://universalconnectproject.org/images/ucp-logo-icon.svg",
+                    "instructional_data": {},
+                    "credentials": [],
+                    "supports_oauth": false,
+                    "aggregator": "testExampleC"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/institutions/{institutionGuid}/credentials": {
       "get": {
         "description": "List of credential objects for the institution. These are used to render authentication inputs",
