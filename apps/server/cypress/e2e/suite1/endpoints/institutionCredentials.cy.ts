@@ -9,7 +9,6 @@ describe("institution credentials", () => {
       headers: {
         meta: JSON.stringify({
           aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
-          job_type: MappedJobTypes.AGGREGATE,
         }),
       },
       url: `/institutions/${testExampleAGuid}/credentials`,

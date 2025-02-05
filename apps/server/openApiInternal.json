@@ -97,7 +97,6 @@
             "schema": {
               "type": "object",
               "example": {
-                "job_type": "aggregate",
                 "aggregator": "mx"
               }
             }
