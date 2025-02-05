@@ -86,6 +86,54 @@
         }
       }
     },
+    "/institutions/{institutionGuid}/credentials": {
+      "get": {
+        "description": "List of credential objects for the institution. These are used to render authentication inputs",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "meta",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "example": {
+                "job_type": "aggregate",
+                "aggregator": "mx"
+              }
+            }
+          },
+          {
+            "in": "path",
+            "name": "institutionGuid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "example": [
+                    {
+                      "id": "testId",
+                      "field_name": "fieldName",
+                      "field_type": 3,
+                      "label": "TestExampleC Label",
+                      "guid": "testId"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/institutions/recommended": {
       "get": {
         "description": "List of recommended institutions",
