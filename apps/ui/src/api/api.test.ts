@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { instrumentation } from "./api";
 import server from "../shared/test/testServer";
 import { http, HttpResponse } from "msw";
-import { INSTRUMENTATION_URL } from "@repo/utils";
+import { INSTRUMENTATION_MOCK_URL } from "@repo/utils";
 
 const instrumentationProps = {
   job_type: "test",
@@ -18,7 +18,7 @@ describe("api", () => {
     it("throws an error on failure", async () => {
       server.use(
         http.post(
-          INSTRUMENTATION_URL,
+          INSTRUMENTATION_MOCK_URL,
           () => new HttpResponse(null, { status: 400 }),
         ),
       );

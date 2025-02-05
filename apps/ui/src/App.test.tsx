@@ -9,7 +9,7 @@ vi.mock("./Widget", () => ({
 
 import App from "./App";
 import { http, HttpResponse } from "msw";
-import { INSTRUMENTATION_URL } from "@repo/utils";
+import { INSTRUMENTATION_MOCK_URL } from "@repo/utils";
 
 describe("<App />", () => {
   it("doesn't render the widget until instrumentation succeeds", async () => {
@@ -23,7 +23,7 @@ describe("<App />", () => {
   it("shows the error boundary if instrumentation fails", async () => {
     server.use(
       http.post(
-        INSTRUMENTATION_URL,
+        INSTRUMENTATION_MOCK_URL,
         () => new HttpResponse(null, { status: 400 }),
       ),
     );
