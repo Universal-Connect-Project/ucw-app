@@ -240,19 +240,17 @@ export class ConnectApi extends AggregatorAdapterBase {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async getInstitutionCredentials(guid: string): Promise<any> {
     const crs = await super.getInstitutionCredentials(guid);
-    return {
-      credentials: crs.map((c) => ({
-        ...c,
-        guid: c.id,
-        field_type: c.field_type === "PASSWORD" ? 1 : 3,
-      })),
-    };
+    return crs.map((c) => ({
+      ...c,
+      guid: c.id,
+      field_type: c.field_type === "PASSWORD" ? 1 : 3,
+    }));
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async loadInstitutionByUcpId(ucpId: string): Promise<any> {
     const inst = await this.getAggregatorInstitution(ucpId);
-    return { institution: mapResolvedInstitution(inst) };
+    return mapResolvedInstitution(inst);
   }
 
   async loadInstitutionByAggregatorId(
@@ -265,7 +263,7 @@ export class ConnectApi extends AggregatorAdapterBase {
       aggregatorInstitutionId,
     );
 
-    return { institution: mapResolvedInstitution(institution) };
+    return mapResolvedInstitution(institution);
   }
 
   async loadPopularInstitutions() {

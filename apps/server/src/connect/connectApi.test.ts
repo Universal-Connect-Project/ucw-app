@@ -26,38 +26,34 @@ describe("connectApi", () => {
       const response = await connectApi.loadInstitutionByAggregatorId(testId);
 
       expect(response).toEqual({
-        institution: {
-          code: testId,
-          credentials: [],
-          guid: testId,
-          instructional_data: {},
-          logo_url: testExampleInstitution.logo_url,
-          name: testExampleInstitution.name,
-          aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
-          aggregators: undefined,
-          supports_oauth: testExampleInstitution.oauth,
-          url: testExampleInstitution.url,
-        },
+        code: testId,
+        credentials: [],
+        guid: testId,
+        instructional_data: {},
+        logo_url: testExampleInstitution.logo_url,
+        name: testExampleInstitution.name,
+        aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+        aggregators: undefined,
+        supports_oauth: testExampleInstitution.oauth,
+        url: testExampleInstitution.url,
       });
     });
   });
 
   describe("loadInstitutionByUcpId", () => {
     const expectedInstitutionResponse = {
-      institution: {
-        guid: elasticSearchInstitutionData[TEST_EXAMPLE_B_AGGREGATOR_STRING].id,
-        code: elasticSearchInstitutionData[TEST_EXAMPLE_B_AGGREGATOR_STRING].id,
-        name: elasticSearchInstitutionData.name,
-        url: elasticSearchInstitutionData.url,
-        logo_url: elasticSearchInstitutionData.logo,
-        instructional_data: {},
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        credentials: [] as any[],
-        supports_oauth: false,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        aggregators: undefined as any,
-        aggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING,
-      },
+      guid: elasticSearchInstitutionData[TEST_EXAMPLE_B_AGGREGATOR_STRING].id,
+      code: elasticSearchInstitutionData[TEST_EXAMPLE_B_AGGREGATOR_STRING].id,
+      name: elasticSearchInstitutionData.name,
+      url: elasticSearchInstitutionData.url,
+      logo_url: elasticSearchInstitutionData.logo,
+      instructional_data: {},
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      credentials: [] as any[],
+      supports_oauth: false,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      aggregators: undefined as any,
+      aggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING,
     };
 
     it("finds the institution", async () => {

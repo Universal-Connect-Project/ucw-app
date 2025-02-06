@@ -12,9 +12,14 @@ interface LoadInstitutionsParams {
 }
 
 const connectWidgetApiService = {
-  loadPopularInstitutions: async () => {
+  getInstitutionCredentials: async (guid: string) => {
     return configuredAxios
-      .get(RECOMMENDED_INSTITUTIONS_URL)
+      .get(`/institutions/${guid}/credentials`)
+      .then((response) => response.data);
+  },
+  loadInstitutionByGuid: async (guid: string) => {
+    return configuredAxios
+      .get(`/institutions/${guid}`)
       .then((response) => response.data);
   },
   loadInstitutions: async ({
@@ -32,6 +37,11 @@ const connectWidgetApiService = {
           search: search_name,
         },
       })
+      .then((response) => response.data);
+  },
+  loadPopularInstitutions: async () => {
+    return configuredAxios
+      .get(RECOMMENDED_INSTITUTIONS_URL)
       .then((response) => response.data);
   },
 };
