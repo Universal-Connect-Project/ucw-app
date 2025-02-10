@@ -207,18 +207,18 @@ export class ConnectApi extends AggregatorAdapterBase {
     return [];
   }
 
-  async loadMemberByGuid(memberGuid: string): Promise<MemberResponse> {
+  async loadMemberByGuid(memberGuid: string): Promise<Member> {
     const mfa = await this.getConnectionStatus(memberGuid);
     if (mfa?.institution_code == null) {
       const connection = await this.getConnection(memberGuid);
-      return { member: mapConnection({ ...mfa, ...connection }) };
+      return mapConnection({ ...mfa, ...connection });
     }
-    return { member: mapConnection({ ...mfa }) };
+    return mapConnection({ ...mfa });
   }
 
   async getOauthWindowUri(memberGuid: string) {
     const ret = await this.loadMemberByGuid(memberGuid);
-    return ret?.member?.oauth_window_uri;
+    return ret?.oauth_window_uri;
   }
 
   async deleteMember(member: Member): Promise<void> {

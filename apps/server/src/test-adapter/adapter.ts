@@ -226,6 +226,7 @@ export class TestAdapter implements WidgetAdapter {
       aggregator: this.aggregator,
       id: "testId",
       cur_job_id: "testJobId",
+      most_recent_job_guid: "mostRecentJobId",
       user_id: userId,
       status: ConnectionStatus.CONNECTED,
       challenges: [],

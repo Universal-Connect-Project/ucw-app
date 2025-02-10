@@ -136,6 +136,7 @@ export interface Connection {
   is_being_aggregated?: boolean | null;
   is_oauth?: boolean | null;
   name?: string | null;
+  most_recent_job_guid?: string | null;
   aggregator?: string | null;
   user_id?: string | null;
   challenges?: Challenge[];
