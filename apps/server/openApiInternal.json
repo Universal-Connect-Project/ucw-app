@@ -21,7 +21,7 @@
     }
   ],
   "paths": {
-    "/instrumentation/userId/{userId}/jobType/{jobType}": {
+    "/instrumentation/userId/{userId}": {
       "post": {
         "description": "This endpoint is called by the connect widget frontend and returns response headers that are saved for future requests from the connect widget",
         "parameters": [
@@ -32,19 +32,10 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "in": "path",
-            "name": "jobType",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "example": "aggregate"
-            }
           }
         ],
         "requestBody": {
-          "required": false,
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
@@ -55,6 +46,18 @@
                   },
                   "current_member_guid": {
                     "type": "string"
+                  },
+                  "jobTypes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "account_verification",
+                        "identity_verification",
+                        "transactions",
+                        "transaction_history"
+                      ]
+                    }
                   },
                   "single_account_select": {
                     "type": "boolean"
