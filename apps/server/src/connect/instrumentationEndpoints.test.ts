@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { instrumentationHandler } from "./instrumentationEndpoints";
-import { ComboJobTypes, JobTypes, MappedJobTypes } from "@repo/utils";
+import { ComboJobTypes } from "@repo/utils";
 
 describe("instrumentationEndpoints", () => {
   describe("instrumentationHandler", () => {
