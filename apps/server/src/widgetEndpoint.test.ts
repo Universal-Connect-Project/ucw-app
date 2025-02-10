@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import he from "he";
 import { widgetHandler } from "./widgetEndpoint";
-import { JobTypes } from "@repo/utils";
+import { ComboJobTypes, JobTypes } from "@repo/utils";
 import { Aggregators } from "./shared/contract";
 import { invalidAggregatorString } from "./utils/validators";
 
@@ -10,7 +10,7 @@ import { invalidAggregatorString } from "./utils/validators";
 describe("server", () => {
   describe("widgetHandler", () => {
     describe("validation", () => {
-      it("responds with a 400 if job_type is missing", () => {
+      it("responds with a 400 if jobTypes is missing", () => {
         const res = {
           send: jest.fn(),
           status: jest.fn(),
@@ -27,7 +27,7 @@ describe("server", () => {
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith(
-          "&#x22;job_type&#x22; is required",
+          "&#x22;jobTypes&#x22; is required",
         );
       });
 
@@ -40,7 +40,7 @@ describe("server", () => {
         widgetHandler(
           {
             query: {
-              job_type: "junk",
+              jobTypes: "junk",
               user_id: "testUserId",
             },
           } as unknown as Request,
@@ -49,7 +49,7 @@ describe("server", () => {
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith(
-          `&#x22;job_type&#x22; must be one of [${Object.values(JobTypes).join(", ")}]`,
+          `&#x22;jobTypes&#x22; contains an invalid value`,
         );
       });
 
@@ -62,7 +62,7 @@ describe("server", () => {
         widgetHandler(
           {
             query: {
-              job_type: JobTypes.AGGREGATE,
+              jobTypes: ComboJobTypes.TRANSACTIONS,
             },
           } as unknown as Request,
           res,
@@ -83,7 +83,7 @@ describe("server", () => {
         widgetHandler(
           {
             query: {
-              job_type: JobTypes.AGGREGATE,
+              jobTypes: ComboJobTypes.TRANSACTIONS,
               aggregator: "junk",
               user_id: "testUserId",
             },
@@ -104,7 +104,7 @@ describe("server", () => {
         widgetHandler(
           {
             query: {
-              job_type: JobTypes.AGGREGATE,
+              jobTypes: ComboJobTypes.TRANSACTIONS,
               aggregator: Aggregators.TEST_A,
               user_id: "testUserId",
             },
@@ -128,7 +128,7 @@ describe("server", () => {
           {
             query: {
               connection_id: "testConnectionId",
-              job_type: JobTypes.AGGREGATE,
+              jobTypes: ComboJobTypes.TRANSACTIONS,
               user_id: "testUserId",
             },
           } as unknown as Request,
@@ -150,7 +150,7 @@ describe("server", () => {
         widgetHandler(
           {
             query: {
-              job_type: JobTypes.AGGREGATE,
+              jobTypes: ComboJobTypes.TRANSACTIONS,
               single_account_select: "junk",
               user_id: "testUserId",
             },

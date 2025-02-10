@@ -1,7 +1,7 @@
 import { getAvailableAggregators } from "../shared/aggregators";
 import { debug } from "../infra/logger";
 import { getInstitution } from "../services/ElasticSearchClient";
-import type { MappedJobTypes } from "@repo/utils";
+import type { ComboJobTypes, MappedJobTypes } from "@repo/utils";
 import type {
   CachedInstitution,
   InstitutionAggregator,
@@ -37,21 +37,21 @@ const getAggregatorByVolume = (
 
 export async function resolveInstitutionAggregator(
   institutionId: string,
-  jobType: MappedJobTypes,
+  jobTypes: ComboJobTypes[],
 ): Promise<ResolvedInstitution> {
   const institution = await getInstitution(institutionId);
   const preferences = await getPreferences();
   const aggregatorsWithAtLeastPartialSupport: Aggregator[] =
     getAvailableAggregators({
       institution,
-      jobType,
+      jobTypes,
       shouldRequireFullSupport: false,
       supportedAggregators: preferences.supportedAggregators,
     });
 
   const aggregatorsWithFullSupport: Aggregator[] = getAvailableAggregators({
     institution,
-    jobType,
+    jobTypes,
     shouldRequireFullSupport: true,
     supportedAggregators: preferences.supportedAggregators,
   });

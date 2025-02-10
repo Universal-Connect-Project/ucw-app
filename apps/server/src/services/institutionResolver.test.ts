@@ -3,7 +3,7 @@ import {
   JobTypeSupports,
   type InstitutionAggregator,
 } from "../shared/contract";
-import { MappedJobTypes } from "@repo/utils";
+import { ComboJobTypes, MappedJobTypes } from "@repo/utils";
 import * as preferences from "../shared/preferences";
 import { ElasticSearchMock } from "../test/elasticSearchMock";
 import { elasticSearchInstitutionData } from "../test/testData/institution";
@@ -108,10 +108,9 @@ describe("institutionResolver", () => {
         is_test_bank: true,
       });
 
-      const institution = await resolveInstitutionAggregator(
-        "test",
-        MappedJobTypes.AGGREGATE,
-      );
+      const institution = await resolveInstitutionAggregator("test", [
+        ComboJobTypes.TRANSACTIONS,
+      ]);
       expect(institution.aggregator).toEqual(TEST_EXAMPLE_C_AGGREGATOR_STRING);
     });
 
@@ -137,20 +136,18 @@ describe("institutionResolver", () => {
         },
       );
 
-      const institution = await resolveInstitutionAggregator(
-        "test",
-        MappedJobTypes.AGGREGATE,
-      );
+      const institution = await resolveInstitutionAggregator("test", [
+        ComboJobTypes.TRANSACTIONS,
+      ]);
       expect(institution.aggregator).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
     });
 
     it(`resolves to ${TEST_EXAMPLE_A_AGGREGATOR_STRING} if its the only option`, async () => {
       mockInstitutionWithA("test");
 
-      const institution = await resolveInstitutionAggregator(
-        "test",
-        MappedJobTypes.AGGREGATE,
-      );
+      const institution = await resolveInstitutionAggregator("test", [
+        ComboJobTypes.TRANSACTIONS,
+      ]);
       expect(institution.aggregator).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
     });
 
@@ -178,10 +175,9 @@ describe("institutionResolver", () => {
         },
       );
 
-      const institution = await resolveInstitutionAggregator(
-        "test",
-        MappedJobTypes.FULLHISTORY,
-      );
+      const institution = await resolveInstitutionAggregator("test", [
+        ComboJobTypes.TRANSACTION_HISTORY,
+      ]);
       expect(institution.aggregator).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
     });
 
@@ -207,10 +203,9 @@ describe("institutionResolver", () => {
         },
       );
 
-      const institution = await resolveInstitutionAggregator(
-        "test",
-        MappedJobTypes.FULLHISTORY,
-      );
+      const institution = await resolveInstitutionAggregator("test", [
+        ComboJobTypes.TRANSACTION_HISTORY,
+      ]);
       expect(institution.aggregator).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
     });
 
@@ -232,10 +227,9 @@ describe("institutionResolver", () => {
 
       expect(
         (
-          await resolveInstitutionAggregator(
-            institutionId,
-            MappedJobTypes.AGGREGATE,
-          )
+          await resolveInstitutionAggregator(institutionId, [
+            ComboJobTypes.TRANSACTIONS,
+          ])
         ).aggregator,
       ).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
 
@@ -243,10 +237,9 @@ describe("institutionResolver", () => {
 
       expect(
         (
-          await resolveInstitutionAggregator(
-            institutionId,
-            MappedJobTypes.AGGREGATE,
-          )
+          await resolveInstitutionAggregator(institutionId, [
+            ComboJobTypes.TRANSACTIONS,
+          ])
         ).aggregator,
       ).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
     });
@@ -262,15 +255,21 @@ describe("institutionResolver", () => {
       jest.spyOn(global.Math, "random").mockReturnValueOnce(0.5);
 
       expect(
-        (await resolveInstitutionAggregator("test", MappedJobTypes.AGGREGATE))
-          .aggregator,
+        (
+          await resolveInstitutionAggregator("test", [
+            ComboJobTypes.TRANSACTIONS,
+          ])
+        ).aggregator,
       ).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
 
       jest.spyOn(global.Math, "random").mockReturnValueOnce(0.51);
 
       expect(
-        (await resolveInstitutionAggregator("test", MappedJobTypes.AGGREGATE))
-          .aggregator,
+        (
+          await resolveInstitutionAggregator("test", [
+            ComboJobTypes.TRANSACTIONS,
+          ])
+        ).aggregator,
       ).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
     });
 
@@ -285,8 +284,11 @@ describe("institutionResolver", () => {
       });
 
       expect(
-        (await resolveInstitutionAggregator("test", MappedJobTypes.AGGREGATE))
-          .aggregator,
+        (
+          await resolveInstitutionAggregator("test", [
+            ComboJobTypes.TRANSACTIONS,
+          ])
+        ).aggregator,
       ).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
 
       jest.spyOn(preferences, "getPreferences").mockResolvedValue({
@@ -297,8 +299,11 @@ describe("institutionResolver", () => {
       });
 
       expect(
-        (await resolveInstitutionAggregator("test", MappedJobTypes.AGGREGATE))
-          .aggregator,
+        (
+          await resolveInstitutionAggregator("test", [
+            ComboJobTypes.TRANSACTIONS,
+          ])
+        ).aggregator,
       ).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
     });
 
@@ -319,8 +324,11 @@ describe("institutionResolver", () => {
       mockInstitutionWithA();
 
       expect(
-        (await resolveInstitutionAggregator("test", MappedJobTypes.AGGREGATE))
-          .aggregator,
+        (
+          await resolveInstitutionAggregator("test", [
+            ComboJobTypes.TRANSACTIONS,
+          ])
+        ).aggregator,
       ).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
     });
 
@@ -341,8 +349,11 @@ describe("institutionResolver", () => {
       mockInstitutionWithA();
 
       expect(
-        (await resolveInstitutionAggregator("test", MappedJobTypes.AGGREGATE))
-          .aggregator,
+        (
+          await resolveInstitutionAggregator("test", [
+            ComboJobTypes.TRANSACTIONS,
+          ])
+        ).aggregator,
       ).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
     });
 
@@ -359,15 +370,21 @@ describe("institutionResolver", () => {
       jest.spyOn(global.Math, "random").mockReturnValueOnce(0.49);
 
       expect(
-        (await resolveInstitutionAggregator("test", MappedJobTypes.AGGREGATE))
-          .aggregator,
+        (
+          await resolveInstitutionAggregator("test", [
+            ComboJobTypes.TRANSACTIONS,
+          ])
+        ).aggregator,
       ).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
 
       jest.spyOn(global.Math, "random").mockReturnValueOnce(0.5);
 
       expect(
-        (await resolveInstitutionAggregator("test", MappedJobTypes.AGGREGATE))
-          .aggregator,
+        (
+          await resolveInstitutionAggregator("test", [
+            ComboJobTypes.TRANSACTIONS,
+          ])
+        ).aggregator,
       ).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
     });
 
@@ -379,10 +396,9 @@ describe("institutionResolver", () => {
 
       mockInstitutionWithA();
 
-      const institution = await resolveInstitutionAggregator(
-        "test",
-        MappedJobTypes.AGGREGATE,
-      );
+      const institution = await resolveInstitutionAggregator("test", [
+        ComboJobTypes.TRANSACTIONS,
+      ]);
       expect(institution.aggregator).toEqual(undefined);
     });
 
@@ -394,10 +410,9 @@ describe("institutionResolver", () => {
 
       mockInstitutionWithAAndB();
 
-      const institution = await resolveInstitutionAggregator(
-        "test",
-        MappedJobTypes.AGGREGATE,
-      );
+      const institution = await resolveInstitutionAggregator("test", [
+        ComboJobTypes.TRANSACTIONS,
+      ]);
       expect(institution.aggregator).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
 
       jest.spyOn(preferences, "getPreferences").mockResolvedValue({
@@ -405,10 +420,9 @@ describe("institutionResolver", () => {
         supportedAggregators: [TEST_EXAMPLE_B_AGGREGATOR_STRING],
       });
 
-      const institution2 = await resolveInstitutionAggregator(
-        "test",
-        MappedJobTypes.AGGREGATE,
-      );
+      const institution2 = await resolveInstitutionAggregator("test", [
+        ComboJobTypes.TRANSACTIONS,
+      ]);
       expect(institution2.aggregator).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
     });
 
@@ -433,22 +447,21 @@ describe("institutionResolver", () => {
         },
       );
 
-      const institution = await resolveInstitutionAggregator(
-        "test",
-        MappedJobTypes.IDENTITY,
-      );
+      const institution = await resolveInstitutionAggregator("test", [
+        ComboJobTypes.ACCOUNT_OWNER,
+      ]);
       expect(institution.aggregator).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
 
-      const institution2 = await resolveInstitutionAggregator(
-        "test",
-        MappedJobTypes.VERIFICATION,
-      );
+      const institution2 = await resolveInstitutionAggregator("test", [
+        ComboJobTypes.ACCOUNT_NUMBER,
+      ]);
       expect(institution2.aggregator).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
 
-      const institution3 = await resolveInstitutionAggregator(
-        "test",
-        MappedJobTypes.ALL,
-      );
+      const institution3 = await resolveInstitutionAggregator("test", [
+        ComboJobTypes.TRANSACTIONS,
+        ComboJobTypes.ACCOUNT_NUMBER,
+        ComboJobTypes.ACCOUNT_OWNER,
+      ]);
       expect(institution3.aggregator).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
     });
 
@@ -473,22 +486,21 @@ describe("institutionResolver", () => {
         },
       );
 
-      const institution = await resolveInstitutionAggregator(
-        "test",
-        MappedJobTypes.IDENTITY,
-      );
+      const institution = await resolveInstitutionAggregator("test", [
+        ComboJobTypes.ACCOUNT_OWNER,
+      ]);
       expect(institution.aggregator).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
 
-      const institution2 = await resolveInstitutionAggregator(
-        "test",
-        MappedJobTypes.VERIFICATION,
-      );
+      const institution2 = await resolveInstitutionAggregator("test", [
+        ComboJobTypes.ACCOUNT_NUMBER,
+      ]);
       expect(institution2.aggregator).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
 
-      const institution3 = await resolveInstitutionAggregator(
-        "test",
-        MappedJobTypes.ALL,
-      );
+      const institution3 = await resolveInstitutionAggregator("test", [
+        ComboJobTypes.TRANSACTIONS,
+        ComboJobTypes.ACCOUNT_NUMBER,
+        ComboJobTypes.ACCOUNT_OWNER,
+      ]);
       expect(institution3.aggregator).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
     });
   });

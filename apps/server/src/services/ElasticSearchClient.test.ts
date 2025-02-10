@@ -15,7 +15,7 @@ import {
   updateInstitutions,
 } from "../services/ElasticSearchClient";
 import type { CachedInstitution } from "../shared/contract";
-import { MappedJobTypes } from "@repo/utils";
+import { ComboJobTypes, MappedJobTypes } from "@repo/utils";
 import * as preferences from "../shared/preferences";
 import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../test-adapter";
 import {
@@ -598,7 +598,7 @@ describe("getRecommendedInstitutions", () => {
     );
 
     const recommendedInstitutions = await getRecommendedInstitutions({
-      jobType: MappedJobTypes.AGGREGATE,
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
     });
 
     expect(recommendedInstitutions).toEqual([elasticSearchInstitutionData]);
@@ -651,7 +651,7 @@ describe("getRecommendedInstitutions", () => {
     );
 
     const recommendedInstitutions = await getRecommendedInstitutions({
-      jobType: MappedJobTypes.AGGREGATE,
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
     });
 
     expect(recommendedInstitutions).toEqual([]);

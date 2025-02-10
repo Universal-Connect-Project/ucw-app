@@ -1,4 +1,4 @@
-import { JobTypes } from "@repo/utils";
+import { ComboJobTypes } from "@repo/utils";
 import type { Request, Response } from "express";
 import Joi from "joi";
 import { aggregators } from "./adapterSetup";
@@ -46,8 +46,17 @@ export const widgetHandler = (req: Request, res: Response) => {
   const schema = Joi.object({
     connection_id: Joi.string(),
     institution_id: Joi.string(),
-    job_type: Joi.string()
-      .valid(...Object.values(JobTypes))
+    jobTypes: Joi.string()
+      .custom((value, helpers) => {
+        const items = value.split(",") as ComboJobTypes[];
+        const invalidItems = items.filter(
+          (item) => !Object.values(ComboJobTypes).includes(item),
+        );
+        if (invalidItems.length > 0) {
+          return helpers.error("any.invalid", { invalid: invalidItems });
+        }
+        return value;
+      })
       .required(),
     aggregator: Joi.string().valid(...aggregators),
     single_account_select: Joi.bool(),

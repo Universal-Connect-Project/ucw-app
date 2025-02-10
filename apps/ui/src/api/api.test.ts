@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 import { instrumentation } from "./api";
 import server from "../shared/test/testServer";
 import { http, HttpResponse } from "msw";
-import { INSTRUMENTATION_MOCK_URL } from "@repo/utils";
+import { ComboJobTypes, INSTRUMENTATION_MOCK_URL } from "@repo/utils";
 
 const instrumentationProps = {
-  job_type: "test",
+  jobTypes: [ComboJobTypes.TRANSACTIONS],
   user_id: "test",
 };
 

@@ -1,5 +1,5 @@
 import type { Response } from "express";
-import { MappedJobTypes } from "@repo/utils";
+import { ComboJobTypes, MappedJobTypes } from "@repo/utils";
 import {
   elasticSearchInstitutionData,
   transformedInstitutionList,
@@ -70,7 +70,7 @@ describe("institutionEndpoints", () => {
       } as any);
 
       const context = {
-        job_type: "aggregate",
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
       };
       const req = {
         connectApi: new ConnectApi({ context }),
@@ -158,7 +158,7 @@ describe("institutionEndpoints", () => {
   describe("recommendedInstitutionsHandler", () => {
     it("returns a list of favorite institutions", async () => {
       const context = {
-        job_type: MappedJobTypes.AGGREGATE,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
       };
 
       const req = {

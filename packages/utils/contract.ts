@@ -2,6 +2,13 @@
 // check all forked Adapter repositories
 // Example: JobTypes is used in the MX Adapter fork
 
+export enum ComboJobTypes {
+  ACCOUNT_NUMBER = "account_verification",
+  ACCOUNT_OWNER = "identity_verification",
+  TRANSACTIONS = "transactions",
+  TRANSACTION_HISTORY = "transaction_history",
+}
+
 export enum WidgetJobTypes {
   AGGREGATION = 0,
   VERIFICATION = 1,
