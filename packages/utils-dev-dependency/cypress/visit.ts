@@ -1,3 +1,5 @@
+import { ComboJobTypes } from "@repo/utils/contract";
+
 export const visitWithPostMessageSpy = (url: string) =>
   cy.visit(url, {
     onBeforeLoad(window) {
@@ -20,9 +22,12 @@ export const visitAgg = (options?: any) => {
 
   const tokenString = token ? `&token=${token}` : "";
 
-  cy.visit(`/widget?job_type=aggregate&user_id=${userId}${tokenString}`, {
-    failOnStatusCode,
-  });
+  cy.visit(
+    `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&user_id=${userId}${tokenString}`,
+    {
+      failOnStatusCode,
+    },
+  );
 
   return cy.wrap(userId);
 };

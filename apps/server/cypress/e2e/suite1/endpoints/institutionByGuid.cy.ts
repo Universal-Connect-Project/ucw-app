@@ -1,4 +1,4 @@
-import { MappedJobTypes } from "@repo/utils";
+import { ComboJobTypes, MappedJobTypes } from "@repo/utils";
 import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../../../../src/test-adapter/constants";
 
 describe("institution by guid", () => {
@@ -40,7 +40,7 @@ describe("institution by guid", () => {
     cy.request({
       headers: {
         meta: JSON.stringify({
-          job_type: MappedJobTypes.AGGREGATE,
+          jobTypes: [ComboJobTypes.TRANSACTIONS],
         }),
       },
       url: `/institutions/${testExampleAUCPId}`,
