@@ -18,7 +18,7 @@ describe("query parameters", () => {
     const userId = Cypress.env("userId");
 
     visitWithPostMessageSpy(
-      `/widget?jobTypes=transactions&institution_id=${TEST_EXAMPLE_A_INSTITUTION_ID}&user_id=${userId}`,
+      `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&institution_id=${TEST_EXAMPLE_A_INSTITUTION_ID}&user_id=${userId}`,
     ).then(() => {
       enterTestExampleACredentials();
 
