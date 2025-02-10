@@ -7,6 +7,7 @@ import {
   TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME,
   TEST_EXAMPLE_B_ONLY_INSTITUTION_NAME,
 } from "../../shared/constants/testExample";
+import { ComboJobTypes } from "@repo/utils";
 
 const institutionThatIsInFavoritesButDoesntSupportIdentification =
   "TestExample Doesnt Support Identification Bank";
@@ -39,7 +40,9 @@ describe("search", () => {
       institutionThatIsInFavoritesButDoesntSupportIdentification,
     ).should("exist");
 
-    cy.visit(`/widget?job_type=all&user_id=${crypto.randomUUID()}`);
+    cy.visit(
+      `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS},${ComboJobTypes.ACCOUNT_NUMBER},${ComboJobTypes.ACCOUNT_OWNER}&user_id=${crypto.randomUUID()}`,
+    );
 
     cy.findByText(institutionThatIsInFavoriteAndSupportsAll).should("exist");
 

@@ -1,4 +1,4 @@
-import { ComboJobTypes, MappedJobTypes } from "@repo/utils";
+import { ComboJobTypes } from "@repo/utils";
 import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../../../../src/test-adapter/constants";
 
 describe("institution by guid", () => {

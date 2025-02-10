@@ -10,7 +10,7 @@ export const visitWithPostMessageSpy = (url: string) =>
 export const visitIdentity = () => {
   const userId = crypto.randomUUID();
 
-  cy.visit(`/widget?job_type=identity&user_id=${userId}`);
+  cy.visit(`/widget?jobTypes=${ComboJobTypes.ACCOUNT_OWNER}&user_id=${userId}`);
 
   return cy.wrap(userId);
 };

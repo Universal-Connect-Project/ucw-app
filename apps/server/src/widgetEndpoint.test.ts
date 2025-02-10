@@ -31,7 +31,7 @@ describe("server", () => {
         );
       });
 
-      it("responds with a 400 if job_type is invalid", () => {
+      it("responds with a 400 if jobTypes is invalid", () => {
         const res = {
           send: jest.fn(),
           status: jest.fn(),

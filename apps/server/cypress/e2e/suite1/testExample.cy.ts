@@ -1,4 +1,4 @@
-import { JobTypes } from "@repo/utils";
+import { ComboJobTypes, JobTypes } from "@repo/utils";
 import {
   clickContinue,
   expectConnectionSuccess,
@@ -96,7 +96,7 @@ describe("testExampleA and B aggregators", () => {
     const userId = Cypress.env("userId");
 
     visitWithPostMessageSpy(
-      `/widget?job_type=${JobTypes.VERIFICATION}&user_id=${userId}`,
+      `/widget?jobTypes=${ComboJobTypes.ACCOUNT_NUMBER}&user_id=${userId}`,
     )
       .then(() => makeABConnection(JobTypes.VERIFICATION))
       .then(() => {

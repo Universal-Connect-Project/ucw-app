@@ -76,7 +76,7 @@
                   "type": "object",
                   "example": {
                     "user_id": "testUserId",
-                    "job_type": "aggregate",
+                    "jobTypes": ["transactions"],
                     "scheme": "vcs",
                     "oauth_referral_source": "BROWSER",
                     "single_account_select": true,
@@ -108,9 +108,9 @@
                 }
               },
               "byUCPInstitutionId": {
-                "description": "job_type is required if sending an UCP institution id",
+                "description": "jobTypes is required if sending an UCP institution id",
                 "value": {
-                  "job_type": "aggregate"
+                  "jobTypes": ["transactions"]
                 }
               }
             }
@@ -208,7 +208,7 @@
             "schema": {
               "type": "object",
               "example": {
-                "job_type": "aggregate"
+                "jobTypes": ["transactions"]
               }
             }
           }
@@ -246,7 +246,7 @@
             "schema": {
               "type": "object",
               "example": {
-                "job_type": "aggregate"
+                "jobTypes": ["transactions"]
               }
             }
           },

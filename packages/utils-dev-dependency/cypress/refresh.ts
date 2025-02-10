@@ -1,5 +1,6 @@
 import { clickContinue, expectConnectionSuccess } from "./widget";
 import { visitWithPostMessageSpy } from "./visit";
+import { ComboJobTypes } from "@repo/utils/contract";
 
 export const refreshAConnection = ({ enterCredentials, selectInstitution }) => {
   const userId = Cypress.env("userId");
@@ -26,7 +27,7 @@ export const refreshAConnection = ({ enterCredentials, selectInstitution }) => {
 
         //Refresh the connection
         cy.visit(
-          `/widget?job_type=aggregate&connection_id=${memberGuid}&aggregator=${aggregator}&user_id=${userId}`,
+          `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&connection_id=${memberGuid}&aggregator=${aggregator}&user_id=${userId}`,
         );
 
         enterCredentials();

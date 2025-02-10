@@ -7,41 +7,6 @@ import fs from "node:fs";
 import he from "he";
 import path from "path";
 
-const pageQueryParameters = new RegExp(
-  [
-    "institution_id",
-    "job_type",
-    "scheme",
-    "user_id",
-    "client_guid",
-    "connection_id",
-    "aggregator",
-    "partner",
-    "oauth_referral_source",
-    "single_account_select",
-    "server",
-    "is_mobile_webview",
-  ]
-    .map((r) => `\\$${r}`)
-    .join("|"),
-  "g",
-);
-
-function renderDefaultPage(req: Request, res: Response, html: string) {
-  if (
-    req.query.connection_id != null &&
-    (req.query.aggregator == null || req.query.aggregator === "")
-  ) {
-    delete req.query.connection_id;
-  }
-  res.send(
-    html.replaceAll(pageQueryParameters, (q: string) =>
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      encodeURIComponent((req.query as any)[q.substring(1)] ?? ""),
-    ),
-  );
-}
-
 export const widgetHandler = (req: Request, res: Response) => {
   const schema = Joi.object({
     connection_id: Joi.string(),
@@ -81,5 +46,5 @@ export const widgetHandler = (req: Request, res: Response) => {
     "utf8",
   );
 
-  renderDefaultPage(req, res, html);
+  res.send(html);
 };
