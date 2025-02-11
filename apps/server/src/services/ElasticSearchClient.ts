@@ -14,7 +14,7 @@ import { ElasticSearchMock } from "../test/elasticSearchMock";
 import { info, error as logError } from "../infra/logger";
 import {
   getAvailableAggregators,
-  JOB_TYPE_PARTIAL_SUPPORT_MAP,
+  JobTypesPartialSupportsMap,
 } from "../shared/aggregators";
 import type { Aggregator, CachedInstitution } from "../shared/contract";
 import { getPreferences } from "../shared/preferences";
@@ -122,12 +122,12 @@ function getInstitutionDataFromFile(): CachedInstitution[] {
 export async function searchByRoutingNumber(
   {
     from,
-    jobType,
+    jobTypes,
     routingNumber,
     size,
   }: {
     from: number;
-    jobType: MappedJobTypes;
+    jobTypes: ComboJobTypes[];
     routingNumber: string;
     size: number;
   },
@@ -150,7 +150,7 @@ export async function searchByRoutingNumber(
             },
           },
           minimum_should_match: 1,
-          must: mustQuery(supportedAggregators, jobType),
+          must: mustQuery(supportedAggregators, jobTypes),
           must_not: buildMustNotQuery(hiddenInstitutions),
         },
       },
@@ -165,12 +165,12 @@ export async function searchByRoutingNumber(
 export async function search(
   {
     from,
-    jobType,
+    jobTypes,
     searchTerm,
     size,
   }: {
     from: number;
-    jobType: MappedJobTypes;
+    jobTypes: ComboJobTypes[];
     searchTerm: string;
     size: number;
   },
@@ -187,7 +187,7 @@ export async function search(
         bool: {
           should: fuzzySearchTermQuery(searchTerm),
           minimum_should_match: 1,
-          must: mustQuery(supportedAggregators, jobType),
+          must: mustQuery(supportedAggregators, jobTypes),
           must_not: buildMustNotQuery(hiddenInstitutions),
         },
       },
@@ -240,7 +240,7 @@ function fuzzySearchTermQuery(searchTerm: string) {
 
 function mustQuery(
   supportedAggregators: Aggregator[],
-  jobType: MappedJobTypes,
+  jobTypes: ComboJobTypes[],
 ) {
   const aggregatorQueryTerms = supportedAggregators.map((aggregator) => {
     return {
@@ -250,7 +250,9 @@ function mustQuery(
     };
   });
 
-  const institutionJobTypeFilter = JOB_TYPE_PARTIAL_SUPPORT_MAP[jobType];
+  const institutionJobTypeFilter = jobTypes.map(
+    (jobType) => JobTypesPartialSupportsMap[jobType],
+  );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let jobTypeSupported = [] as any;
