@@ -14,10 +14,8 @@ export const jobsRouteHandler = async (req: JobsRequest, res: Response) => {
     req.connectApi.aggregatorAdapter.RouteHandlers.jobRequestHandler(req, res);
   } else {
     res.send({
-      job: {
-        guid: req.params.member_guid,
-        job_type: WidgetJobTypes.AGGREGATION,
-      },
+      guid: req.params.member_guid,
+      job_type: WidgetJobTypes.COMBINATION,
     });
   }
 };

@@ -28,10 +28,8 @@ export const testExampleCredentials = {
 };
 
 export const testExampleJobResponse = {
-  job: {
-    guid: "testAggregatorMemberGuid",
-    job_type: WidgetJobTypes.AGGREGATION,
-  },
+  guid: "testAggregatorMemberGuid",
+  job_type: WidgetJobTypes.AGGREGATION,
 };
 
 export const testRouteHandlers = {

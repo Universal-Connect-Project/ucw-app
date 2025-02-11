@@ -21,6 +21,7 @@ export enum WidgetJobTypes {
   MICRO_DEPOSIT = 8,
   TAX = 9,
   CREDIT_REPORT = 10,
+  COMBINATION = 11,
 }
 
 export enum VCDataTypes {

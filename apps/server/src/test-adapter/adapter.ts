@@ -10,6 +10,8 @@ import { ConnectionStatus, MappedJobTypes } from "@repo/utils";
 import { get, set } from "../services/storageClient/redis";
 import { testExampleCredentials, testExampleInstitution } from "./constants";
 
+const testJobId = "testJobId";
+
 const createRedisStatusKey = ({
   aggregator,
   userId,
@@ -66,7 +68,7 @@ export class TestAdapter implements WidgetAdapter {
     return [
       {
         id: "testId",
-        cur_job_id: "testJobId",
+        cur_job_id: testJobId,
         institution_code: "testCode",
         is_being_aggregated: false,
         is_oauth: false,
@@ -100,7 +102,7 @@ export class TestAdapter implements WidgetAdapter {
   ): Promise<Connection> {
     return {
       id: "testId",
-      cur_job_id: "testJobId",
+      cur_job_id: testJobId,
       institution_code: "testCode",
       is_being_aggregated: false,
       is_oauth: false,
@@ -144,7 +146,7 @@ export class TestAdapter implements WidgetAdapter {
 
     return {
       id: "testId",
-      cur_job_id: "testJobId",
+      cur_job_id: testJobId,
       institution_code: "testCode",
       is_being_aggregated: false,
       is_oauth: false,
@@ -161,7 +163,7 @@ export class TestAdapter implements WidgetAdapter {
   ): Promise<Connection> {
     return {
       id: "testId",
-      cur_job_id: "testJobId",
+      cur_job_id: testJobId,
       institution_code: "testCode",
       is_being_aggregated: false,
       is_oauth: false,
@@ -199,7 +201,7 @@ export class TestAdapter implements WidgetAdapter {
       return {
         aggregator: this.aggregator,
         id: "testId",
-        cur_job_id: "testJobId",
+        cur_job_id: testJobId,
         user_id: "testUserId",
         status: ConnectionStatus.CHALLENGED,
         challenges: [
@@ -225,7 +227,7 @@ export class TestAdapter implements WidgetAdapter {
     return {
       aggregator: this.aggregator,
       id: "testId",
-      cur_job_id: "testJobId",
+      cur_job_id: testJobId,
       user_id: userId,
       status: ConnectionStatus.CONNECTED,
       challenges: [],

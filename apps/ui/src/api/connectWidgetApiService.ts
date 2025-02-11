@@ -12,6 +12,12 @@ interface LoadInstitutionsParams {
 }
 
 const connectWidgetApiService = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  addMember: async (memberData: any) => {
+    return configuredAxios
+      .post(`members`, memberData)
+      .then((response) => response.data);
+  },
   getInstitutionCredentials: async (guid: string) => {
     return configuredAxios
       .get(`/institutions/${guid}/credentials`)
@@ -37,6 +43,16 @@ const connectWidgetApiService = {
           search: search_name,
         },
       })
+      .then((response) => response.data);
+  },
+  loadJob: async (jobGuid: string) => {
+    return configuredAxios
+      .get(`/jobs/${jobGuid}`)
+      .then((response) => response.data);
+  },
+  loadMemberByGuid: async (memberGuid: string) => {
+    return configuredAxios
+      .get(`/members/${memberGuid}`)
       .then((response) => response.data);
   },
   loadPopularInstitutions: async () => {
