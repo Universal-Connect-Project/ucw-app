@@ -8,6 +8,8 @@ export const expectConnectionSuccess = () => {
 
 export const searchByText = (text) => {
   cy.findByPlaceholderText("Search").type(text);
+
+  cy.findAllByText(/result/).should("exist");
 };
 
 export const selectInstitutionByName = (name) => {

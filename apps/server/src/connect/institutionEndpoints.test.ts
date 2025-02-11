@@ -108,7 +108,7 @@ describe("institutionEndpoints", () => {
   describe("getInstitutionsHandler", () => {
     it("returns a list of institutions", async () => {
       const context = {
-        job_type: MappedJobTypes.AGGREGATE,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
       };
 
       const req = {
@@ -132,7 +132,7 @@ describe("institutionEndpoints", () => {
 
     it("returns institutions when searching by routing number", async () => {
       const context = {
-        job_type: MappedJobTypes.AGGREGATE,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
       };
 
       const req = {
@@ -179,7 +179,7 @@ describe("institutionEndpoints", () => {
   describe("getInstitutionCredentialsHandler", () => {
     it("returns with the institution credentials", async () => {
       const context = {
-        job_type: MappedJobTypes.AGGREGATE,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
         aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
       };
 

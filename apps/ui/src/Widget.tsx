@@ -2,6 +2,7 @@
 import { ApiProvider, ConnectWidget } from "@mxenabled/connect-widget";
 import "./App.css";
 import connectWidgetApiService from "./api/connectWidgetApiService";
+import { ComboJobTypes } from "@repo/utils";
 
 const Widget = ({
   connectionId,
@@ -10,7 +11,7 @@ const Widget = ({
 }: {
   connectionId: string;
   institutionId: string;
-  jobTypes: string;
+  jobTypes: ComboJobTypes[];
 }) => {
   const clientConfig = {
     current_institution_code: institutionId,
