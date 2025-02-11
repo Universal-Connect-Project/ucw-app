@@ -1,11 +1,11 @@
-import { MappedJobTypes, SEARCH_INSTITUTIONS_URL } from "@repo/utils";
+import { ComboJobTypes, SEARCH_INSTITUTIONS_URL } from "@repo/utils";
 
 describe("institutions endpoint", () => {
   it("returns a list of paginated institutions and paginates", () => {
     const requestOptions = {
       headers: {
         meta: JSON.stringify({
-          job_type: MappedJobTypes.AGGREGATE,
+          jobTypes: [ComboJobTypes.TRANSACTIONS],
         }),
       },
       qs: {

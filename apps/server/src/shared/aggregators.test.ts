@@ -1,7 +1,7 @@
 import { getAvailableAggregators } from "../shared/aggregators";
 import type { Aggregator, CachedInstitution } from "./contract";
 import { Aggregators, JobTypeSupports } from "./contract";
-import { MappedJobTypes } from "@repo/utils";
+import { ComboJobTypes } from "@repo/utils";
 
 const institutionAggregatorsSupportEverything: CachedInstitution = {
   url: "testUrl",
@@ -58,7 +58,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
       expect(
         getAvailableAggregators({
           institution: institutionAggregatorsSupportEverything,
-          jobType: MappedJobTypes.AGGREGATE,
+          jobTypes: [ComboJobTypes.TRANSACTIONS],
           shouldRequireFullSupport: false,
           supportedAggregators:
             aggregatorsWithoutCurrentAggregator as Aggregator[],
@@ -74,14 +74,14 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
             [aggregator]: {},
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any,
-          jobType: MappedJobTypes.AGGREGATE,
+          jobTypes: [ComboJobTypes.TRANSACTIONS],
           shouldRequireFullSupport: false,
           supportedAggregators: allAggregators as Aggregator[],
         }),
       ).toEqual(filterOutAggregator(aggregator));
     });
 
-    it(`doesnt return ${aggregator} if job type is all and supports_verification is falsy`, () => {
+    it(`doesnt return ${aggregator} if job type has multiple and includes ${ComboJobTypes.ACCOUNT_NUMBER} and supports_verification is falsy`, () => {
       expect(
         getAvailableAggregators({
           institution: {
@@ -91,24 +91,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
               supports_verification: false,
             },
           },
-          jobType: MappedJobTypes.ALL,
-          shouldRequireFullSupport: false,
-          supportedAggregators: allAggregators as Aggregator[],
-        }),
-      ).toEqual(filterOutAggregator(aggregator));
-    });
-
-    it(`doesnt return ${aggregator} if job type is all and supports_identification is falsy`, () => {
-      expect(
-        getAvailableAggregators({
-          institution: {
-            ...institutionAggregatorsSupportEverything,
-            [aggregator]: {
-              ...institutionAggregatorsSupportEverything[aggregator],
-              supports_identification: false,
-            },
-          },
-          jobType: MappedJobTypes.ALL,
+          jobTypes: [ComboJobTypes.TRANSACTIONS, ComboJobTypes.ACCOUNT_NUMBER],
           shouldRequireFullSupport: false,
           supportedAggregators: allAggregators as Aggregator[],
         }),
@@ -125,7 +108,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
               supports_verification: false,
             },
           },
-          jobType: MappedJobTypes.VERIFICATION,
+          jobTypes: [ComboJobTypes.ACCOUNT_NUMBER],
           shouldRequireFullSupport: false,
           supportedAggregators: allAggregators as Aggregator[],
         }),
@@ -142,7 +125,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
               supports_identification: false,
             },
           },
-          jobType: MappedJobTypes.IDENTITY,
+          jobTypes: [ComboJobTypes.ACCOUNT_OWNER],
           shouldRequireFullSupport: false,
           supportedAggregators: allAggregators as Aggregator[],
         }),
@@ -159,7 +142,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
               [JobTypeSupports.FULLHISTORY]: false,
             },
           },
-          jobType: MappedJobTypes.FULLHISTORY,
+          jobTypes: [ComboJobTypes.TRANSACTION_HISTORY],
           shouldRequireFullSupport: false,
           supportedAggregators: allAggregators as Aggregator[],
         }),
@@ -176,7 +159,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
               [JobTypeSupports.FULLHISTORY]: true,
             },
           },
-          jobType: MappedJobTypes.FULLHISTORY,
+          jobTypes: [ComboJobTypes.TRANSACTION_HISTORY],
           shouldRequireFullSupport: true,
           supportedAggregators: allAggregators as Aggregator[],
         }),
@@ -193,7 +176,7 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
               [JobTypeSupports.FULLHISTORY]: false,
             },
           },
-          jobType: MappedJobTypes.FULLHISTORY,
+          jobTypes: [ComboJobTypes.TRANSACTION_HISTORY],
           shouldRequireFullSupport: true,
           supportedAggregators: allAggregators as Aggregator[],
         }),
@@ -204,11 +187,11 @@ const generateAggregatorTests = (aggregator: Aggregators) =>
 describe("aggregators", () => {
   describe("getAvailableAggregators", () => {
     it("returns all the aggregators if they support each of the job types", () => {
-      Object.values(MappedJobTypes).forEach((mappedJobType) => {
+      Object.values(ComboJobTypes).forEach((comboJobType) => {
         expect(
           getAvailableAggregators({
             institution: institutionAggregatorsSupportEverything,
-            jobType: mappedJobType,
+            jobTypes: [comboJobType],
             shouldRequireFullSupport: true,
             supportedAggregators: allAggregators as Aggregator[],
           }),

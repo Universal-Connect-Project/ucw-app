@@ -1,6 +1,6 @@
 export const INSTRUMENTATION_URL = "/instrumentation";
 
-export const INSTRUMENTATION_MOCK_URL = `${INSTRUMENTATION_URL}/userId/:userId/jobType/:jobType`;
+export const INSTRUMENTATION_MOCK_URL = `${INSTRUMENTATION_URL}/userId/:userId`;
 
 export const SEARCH_INSTITUTIONS_URL = "/institutions";
 export const RECOMMENDED_INSTITUTIONS_URL = "/institutions/recommended";

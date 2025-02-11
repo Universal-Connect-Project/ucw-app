@@ -271,7 +271,7 @@ export class ConnectApi extends AggregatorAdapterBase {
     this.context.aggregator = null;
 
     const recommendedInstitutions = await getRecommendedInstitutions({
-      jobType: this.context.job_type as MappedJobTypes,
+      jobTypes: this.context.jobTypes,
     });
     return recommendedInstitutions
       .filter((ins: CachedInstitution) => ins != null)

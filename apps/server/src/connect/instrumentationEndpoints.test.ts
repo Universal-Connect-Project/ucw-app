@@ -1,17 +1,17 @@
 import type { Request, Response } from "express";
 import { instrumentationHandler } from "./instrumentationEndpoints";
-import { JobTypes, MappedJobTypes } from "@repo/utils";
+import { ComboJobTypes } from "@repo/utils";
 
 describe("instrumentationEndpoints", () => {
   describe("instrumentationHandler", () => {
     const correctBody = {
       current_aggregator: "testAggregator",
       current_member_guid: "currentMemberGuid",
+      jobTypes: [ComboJobTypes.TRANSACTION_HISTORY],
       single_account_select: false,
     };
 
     const correctParams = {
-      jobType: JobTypes.FULLHISTORY,
       userId: "userId",
     };
 
@@ -32,7 +32,7 @@ describe("instrumentationEndpoints", () => {
 
       expect(res.sendStatus).toHaveBeenCalledWith(200);
       expect(req.context).toEqual({
-        job_type: MappedJobTypes.FULLHISTORY,
+        jobTypes: req.body.jobTypes,
         oauth_referral_source: "BROWSER",
         scheme: "vcs",
         single_account_select: req.body.single_account_select,
@@ -58,7 +58,7 @@ describe("instrumentationEndpoints", () => {
 
       expect(res.sendStatus).toHaveBeenCalledWith(200);
       expect(req.context).toEqual({
-        job_type: MappedJobTypes.FULLHISTORY,
+        jobTypes: req.body.jobTypes,
         oauth_referral_source: "BROWSER",
         scheme: "vcs",
         single_account_select: req.body.single_account_select,
@@ -84,7 +84,7 @@ describe("instrumentationEndpoints", () => {
       expect(req.context).toEqual({
         aggregator: req.body.current_aggregator,
         connection_id: req.body.current_member_guid,
-        job_type: MappedJobTypes.FULLHISTORY,
+        jobTypes: req.body.jobTypes,
         oauth_referral_source: "BROWSER",
         scheme: "vcs",
         single_account_select: req.body.single_account_select,

@@ -1,18 +1,27 @@
-import { INSTRUMENTATION_URL, JobTypes, MappedJobTypes } from "@repo/utils";
+import { ComboJobTypes, INSTRUMENTATION_URL } from "@repo/utils";
 
 describe("instrumentation endpoint", () => {
   it("attaches some properties to the meta header", () => {
     const testUserId = "test";
 
     cy.request({
+      body: {
+        jobTypes: [
+          ComboJobTypes.TRANSACTIONS,
+          ComboJobTypes.TRANSACTION_HISTORY,
+        ],
+      },
       method: "POST",
-      url: `${INSTRUMENTATION_URL}/userId/${testUserId}/jobType/${JobTypes.AGGREGATE}`,
+      url: `${INSTRUMENTATION_URL}/userId/${testUserId}?jobTypes=`,
     }).then((response) => {
       expect(response.status).to.eq(200);
 
-      const { job_type, user_id } = JSON.parse(response.headers.meta as string);
+      const { jobTypes, user_id } = JSON.parse(response.headers.meta as string);
 
-      expect(job_type).to.eq(MappedJobTypes.AGGREGATE);
+      expect(jobTypes).to.deep.eq([
+        ComboJobTypes.TRANSACTIONS,
+        ComboJobTypes.TRANSACTION_HISTORY,
+      ]);
       expect(user_id).to.eq(testUserId);
     });
   });

@@ -7,6 +7,7 @@ import {
 } from "../test-adapter/constants";
 import * as preferences from "../shared/preferences";
 import testPreferences from "../../cachedDefaults/testData/testPreferences.json";
+import { ComboJobTypes } from "@repo/utils";
 
 const connectApi = new ConnectApi({
   context: {
@@ -14,7 +15,7 @@ const connectApi = new ConnectApi({
     updated: false,
     institution_id: "xxx",
     resolved_user_id: null,
-    job_type: "aggregate",
+    jobTypes: [ComboJobTypes.TRANSACTIONS],
   },
 });
 

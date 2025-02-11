@@ -52,7 +52,7 @@ export class AggregatorAdapterBase {
   async resolveInstitution(id: string): Promise<Institution> {
     const resolvedInstitution = await resolveInstitutionAggregator(
       id,
-      this.context.job_type as MappedJobTypes,
+      this.context.jobTypes,
     );
     this.context.aggregator = resolvedInstitution.aggregator;
     this.context.updated = true;

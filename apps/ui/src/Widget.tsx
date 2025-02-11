@@ -6,17 +6,19 @@ import connectWidgetApiService from "./api/connectWidgetApiService";
 const Widget = ({
   connectionId,
   institutionId,
-  jobType,
+  jobTypes,
 }: {
   connectionId: string;
   institutionId: string;
-  jobType: string;
+  jobTypes: string;
 }) => {
   const clientConfig = {
     current_institution_code: institutionId,
     current_member_guid: connectionId,
+    data_request: {
+      products: jobTypes,
+    },
     disable_institution_search: !!(institutionId || connectionId),
-    mode: jobType,
     ui_message_protocol: "post_message",
     ui_message_version: 4,
     ui_message_webview_url_scheme: "vcs",
@@ -31,7 +33,14 @@ const Widget = ({
         onAnalyticEvent={() => {}}
         onAnalyticPageview={() => {}}
         onPostMessage={() => {}}
-        profiles={{}}
+        profiles={{
+          clientProfile: {
+            account_verification_is_enabled: true,
+          },
+        }}
+        userFeatures={[
+          { feature_name: "CONNECT_COMBO_JOBS", is_enabled: true },
+        ]}
       />
     </ApiProvider>
   );

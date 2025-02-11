@@ -165,10 +165,7 @@ export default function (app) {
     });
   });
 
-  app.post(
-    `${INSTRUMENTATION_URL}/userId/:userId/jobType/:jobType`,
-    instrumentationHandler,
-  );
+  app.post(`${INSTRUMENTATION_URL}/userId/:userId`, instrumentationHandler);
 
   app.post("/members/:member_guid/unthrottled_aggregate", async (req, res) => {
     const ret = await req.connectApi.updateConnection(

@@ -1,11 +1,11 @@
-import { MappedJobTypes, RECOMMENDED_INSTITUTIONS_URL } from "@repo/utils";
+import { ComboJobTypes, RECOMMENDED_INSTITUTIONS_URL } from "@repo/utils";
 
 describe("recommended institutions endpoint", () => {
   it("returns a list of recommended institutions", () => {
     cy.request({
       headers: {
         meta: JSON.stringify({
-          job_type: MappedJobTypes.AGGREGATE,
+          jobTypes: [ComboJobTypes.TRANSACTIONS],
         }),
       },
       url: RECOMMENDED_INSTITUTIONS_URL,

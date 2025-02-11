@@ -1,5 +1,5 @@
 import { Client } from "@opensearch-project/opensearch";
-import type { MappedJobTypes } from "@repo/utils";
+import type { ComboJobTypes, MappedJobTypes } from "@repo/utils";
 import type {
   MgetRequest,
   SearchHit,
@@ -316,11 +316,12 @@ export async function getInstitution(id: string): Promise<CachedInstitution> {
   return body._source as CachedInstitution;
 }
 
-export async function getRecommendedInstitutions(args: {
-  jobType: MappedJobTypes;
+export async function getRecommendedInstitutions({
+  jobTypes,
+}: {
+  jobTypes: ComboJobTypes[];
 }): Promise<CachedInstitution[]> {
   const config = getConfig();
-  const { jobType } = args;
   const preferences = await getPreferences();
 
   const supportedAggregators = preferences.supportedAggregators;
@@ -360,7 +361,7 @@ export async function getRecommendedInstitutions(args: {
         (institution: CachedInstitution) =>
           getAvailableAggregators({
             institution,
-            jobType,
+            jobTypes,
             shouldRequireFullSupport: false,
             supportedAggregators: supportedAggregators,
           }).length,

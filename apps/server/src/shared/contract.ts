@@ -1,3 +1,4 @@
+import type { ComboJobTypes } from "@repo/utils";
 import type { Aggregator } from "../adapterSetup";
 
 export type { Aggregator };
@@ -17,7 +18,8 @@ export interface Context {
   user_id?: string;
   resolved_user_id?: string;
   aggregator?: string | null;
-  job_type?: string;
+  jobTypes?: ComboJobTypes[];
+  job_type?: string; // Remove this
   partner?: string;
   single_account_select?: boolean;
   auth?: AuthRequest;
