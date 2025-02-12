@@ -60,6 +60,10 @@ const connectWidgetApiService = {
       .get(RECOMMENDED_INSTITUTIONS_URL)
       .then((response) => response.data);
   },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  updateMFA: async (memberData: any) => {
+    return configuredAxios.put(`/members/${memberData.id}`);
+  },
 };
 
 export default connectWidgetApiService;

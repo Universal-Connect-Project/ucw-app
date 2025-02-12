@@ -6,7 +6,7 @@ import type {
   UpdateConnectionRequest,
   WidgetAdapter,
 } from "@repo/utils";
-import { ConnectionStatus, MappedJobTypes } from "@repo/utils";
+import { ComboJobTypes, ConnectionStatus } from "@repo/utils";
 import { get, set } from "../services/storageClient/redis";
 import { testExampleCredentials, testExampleInstitution } from "./constants";
 
@@ -100,6 +100,17 @@ export class TestAdapter implements WidgetAdapter {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     userId: string,
   ): Promise<Connection> {
+    if (request.jobTypes?.includes(ComboJobTypes.ACCOUNT_NUMBER)) {
+      const redisStatusKey = createRedisStatusKey({
+        aggregator: this.aggregator,
+        userId,
+      });
+
+      await set(redisStatusKey, {
+        verifiedOnce: true,
+      });
+    }
+
     return {
       id: "testId",
       cur_job_id: testJobId,
@@ -131,18 +142,7 @@ export class TestAdapter implements WidgetAdapter {
       userId,
     });
 
-    const connectionInfo = await get(redisStatusKey);
-
-    if (
-      !connectionInfo?.verifiedOnce &&
-      request.job_type === MappedJobTypes.VERIFICATION
-    ) {
-      await set(redisStatusKey, {
-        verifiedOnce: true,
-      });
-    } else {
-      await set(redisStatusKey, null);
-    }
+    await set(redisStatusKey, null);
 
     return {
       id: "testId",

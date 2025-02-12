@@ -130,10 +130,11 @@ export class ConnectApi extends AggregatorAdapterBase {
     const connection = await this.createConnection({
       institution_id: memberData.institution_guid,
       is_oauth: memberData.is_oauth ?? false,
+      // Do we need skip_aggregation?
       skip_aggregation:
         (memberData.skip_aggregation ?? false) &&
         (memberData.is_oauth ?? false),
-      initial_job_type: this.context.job_type ?? "aggregate",
+      jobTypes: this.context.jobTypes,
       credentials:
         memberData.credentials?.map((c) => ({
           id: c.guid,
