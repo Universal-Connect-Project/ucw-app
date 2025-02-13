@@ -1,4 +1,4 @@
-import { ConnectionStatus, MappedJobTypes } from "@repo/utils";
+import { ComboJobTypes, ConnectionStatus, MappedJobTypes } from "@repo/utils";
 import { TestAdapter } from "./adapter";
 import {
   testDataRequestValidators,
@@ -149,7 +149,16 @@ describe("TestAdapter", () => {
 
   describe("CreateConnection", () => {
     it("returns a response object", async () => {
-      expect(await testAdapterA.CreateConnection(undefined, "test")).toEqual({
+      expect(
+        await testAdapterA.CreateConnection(
+          {
+            credentials: [],
+            institution_id: "test",
+            jobTypes: [ComboJobTypes.TRANSACTIONS],
+          },
+          "test",
+        ),
+      ).toEqual({
         id: "testId",
         cur_job_id: "testJobId",
         institution_code: "testCode",
@@ -182,7 +191,7 @@ describe("TestAdapter", () => {
       ).toEqual(successStatus);
     });
 
-    it("returns success if it hasn't been verified once, returns success if the job type is verification, it has been verified once, and single_account_select is false, returns a challenge if the job type if verification and it has been verified once and single_account_select is true. returns success after a second verification", async () => {
+    it(`returns success if it hasn't been verified once, returns success if the job type is ${ComboJobTypes.ACCOUNT_NUMBER}, it has been verified once, and single_account_select is false, returns a challenge if the job type if verification and it has been verified once and single_account_select is true. returns success after a second ${ComboJobTypes.ACCOUNT_NUMBER}`, async () => {
       const userId = "testUserId";
 
       const successStatus = {
@@ -196,7 +205,7 @@ describe("TestAdapter", () => {
 
       await testAdapterA.UpdateConnection(
         {
-          job_type: MappedJobTypes.VERIFICATION,
+          jobTypes: [ComboJobTypes.ACCOUNT_NUMBER],
         } as any,
         userId,
       );
@@ -204,6 +213,15 @@ describe("TestAdapter", () => {
       expect(
         await testAdapterA.GetConnectionStatus("test", "test", false, userId),
       ).toEqual(successStatus);
+
+      await testAdapterA.CreateConnection(
+        {
+          credentials: [],
+          institution_id: "test",
+          jobTypes: [ComboJobTypes.ACCOUNT_NUMBER],
+        },
+        userId,
+      );
 
       expect(
         await testAdapterA.GetConnectionStatus("test", "test", true, userId),
@@ -275,22 +293,6 @@ describe("TestAdapter", () => {
           } as any,
           "test",
         ),
-      ).toEqual({
-        id: "testId",
-        cur_job_id: "testJobId",
-        institution_code: "testCode",
-        is_being_aggregated: false,
-        is_oauth: false,
-        oauth_window_uri: undefined,
-        aggregator,
-      });
-    });
-  });
-
-  describe("UpdateConnectionInternal", () => {
-    it("returns a response object", async () => {
-      expect(
-        await testAdapterA.UpdateConnectionInternal(undefined, "test"),
       ).toEqual({
         id: "testId",
         cur_job_id: "testJobId",

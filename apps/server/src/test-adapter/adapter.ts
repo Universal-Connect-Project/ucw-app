@@ -155,23 +155,6 @@ export class TestAdapter implements WidgetAdapter {
     };
   }
 
-  async UpdateConnectionInternal(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    request: UpdateConnectionRequest,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    userId: string,
-  ): Promise<Connection> {
-    return {
-      id: "testId",
-      cur_job_id: testJobId,
-      institution_code: "testCode",
-      is_being_aggregated: false,
-      is_oauth: false,
-      oauth_window_uri: undefined,
-      aggregator: this.aggregator,
-    };
-  }
-
   async GetConnectionById(
     connectionId: string,
     userId: string,

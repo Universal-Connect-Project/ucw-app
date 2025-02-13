@@ -63,7 +63,7 @@ describe("jobEndpoints", () => {
 
       expect(res.send).toHaveBeenCalledWith({
         guid: req.params.member_guid,
-        job_type: WidgetJobTypes.AGGREGATION,
+        job_type: WidgetJobTypes.COMBINATION,
       });
     });
   });
