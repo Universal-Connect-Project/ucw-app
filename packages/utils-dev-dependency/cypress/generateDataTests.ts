@@ -1,7 +1,19 @@
-import { decodeVcData, JobTypes } from "@repo/utils";
+import { ComboJobTypes, decodeVcData } from "@repo/utils";
 import { visitWithPostMessageSpy } from "./visit";
+import { MEMBER_CONNECTED_EVENT_TYPE } from "./postMessageEvents";
 
-const jobTypes = Object.values(JobTypes);
+const jobTypesToTest = [
+  [ComboJobTypes.ACCOUNT_NUMBER],
+  [ComboJobTypes.ACCOUNT_OWNER],
+  [ComboJobTypes.TRANSACTIONS],
+  [ComboJobTypes.TRANSACTION_HISTORY],
+  [
+    ComboJobTypes.ACCOUNT_NUMBER,
+    ComboJobTypes.ACCOUNT_OWNER,
+    ComboJobTypes.TRANSACTIONS,
+    ComboJobTypes.TRANSACTION_HISTORY,
+  ],
+];
 
 const decodeVcDataFromResponse = (response) => {
   return decodeVcData(response.body.jwt);
@@ -116,25 +128,25 @@ export const generateDataTests = ({
   shouldTestVcEndpoint,
   transactionsQueryString = "",
 }: {
-  makeAConnection: (jobType: JobTypes) => void;
+  makeAConnection: (jobTypes: ComboJobTypes[]) => void;
   shouldTestVcEndpoint: boolean;
   transactionsQueryString?: string;
 }) =>
-  jobTypes.map((jobType) =>
-    it(`makes a connection with jobType: ${jobType}, gets the accounts, identity, and transaction data from the data${shouldTestVcEndpoint ? " and vc" : ""} endpoints`, () => {
+  jobTypesToTest.map((jobTypes) =>
+    it(`makes a connection with jobTypes: ${jobTypes}, gets the accounts, identity, and transaction data from the data${shouldTestVcEndpoint ? " and vc" : ""} endpoints`, () => {
       let memberGuid: string;
       let aggregator: string;
       const userId = Cypress.env("userId");
 
-      visitWithPostMessageSpy(`/widget?job_type=${jobType}&user_id=${userId}`)
-        .then(() => makeAConnection(jobType))
+      visitWithPostMessageSpy(`/widget?jobTypes=${jobTypes}&user_id=${userId}`)
+        .then(() => makeAConnection(jobTypes))
         .then(() => {
           // Capture postmessages into variables
           cy.get("@postMessage", { timeout: 90000 }).then((mySpy) => {
             const connection = (mySpy as any)
               .getCalls()
               .find(
-                (call) => call.args[0].type === "vcs/connect/memberConnected",
+                (call) => call.args[0].type === MEMBER_CONNECTED_EVENT_TYPE,
               );
             const { metadata } = connection?.args[0];
             memberGuid = metadata.member_guid;

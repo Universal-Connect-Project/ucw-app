@@ -23,6 +23,11 @@ const connectWidgetApiService = {
       .get(`/institutions/${guid}/credentials`)
       .then((response) => response.data);
   },
+  getMemberCredentials: async (guid: string) => {
+    return configuredAxios
+      .get(`/members/${guid}/credentials`)
+      .then((response) => response.data);
+  },
   loadInstitutionByGuid: async (guid: string) => {
     return configuredAxios
       .get(`/institutions/${guid}`)
@@ -54,6 +59,9 @@ const connectWidgetApiService = {
     return configuredAxios
       .get(`/members/${memberGuid}`)
       .then((response) => response.data);
+  },
+  loadMembers: async () => {
+    return configuredAxios.get(`/members`).then((response) => response.data);
   },
   loadPopularInstitutions: async () => {
     return configuredAxios

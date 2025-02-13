@@ -45,6 +45,7 @@ const App = () => {
 
   return (
     <Widget
+      aggregator={aggregator}
       connectionId={connectionId}
       institutionId={institutionId}
       jobTypes={jobTypes}

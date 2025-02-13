@@ -127,9 +127,7 @@ export default function (app) {
 
   app.get(ApiEndpoints.MEMBERS, async (req, res) => {
     const ret = await req.connectApi.loadMembers();
-    res.send({
-      members: ret,
-    });
+    res.send(ret);
   });
 
   app.post(

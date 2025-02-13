@@ -4,12 +4,7 @@ import type {
   CachedInstitution,
   InstitutionSearchResponseItem,
 } from "../shared/contract";
-import type {
-  Challenge,
-  Connection,
-  Institution,
-  MappedJobTypes,
-} from "@repo/utils";
+import type { Challenge, Connection, Institution } from "@repo/utils";
 import { ChallengeType, ConnectionStatus } from "@repo/utils";
 
 import { AggregatorAdapterBase } from "../adapters";
@@ -231,13 +226,11 @@ export class ConnectApi extends AggregatorAdapterBase {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async getMemberCredentials(memberGuid: string): Promise<any> {
     const crs = await this.getConnectionCredentials(memberGuid);
-    return {
-      credentials: crs.map((c) => ({
-        ...c,
-        guid: c.id,
-        field_type: c.field_type === "PASSWORD" ? 1 : 3,
-      })),
-    };
+    return crs.map((c) => ({
+      ...c,
+      guid: c.id,
+      field_type: c.field_type === "PASSWORD" ? 1 : 3,
+    }));
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
