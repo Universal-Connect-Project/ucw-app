@@ -1,5 +1,5 @@
 import { ComboJobTypes, ConnectionStatus, MappedJobTypes } from "@repo/utils";
-import { TestAdapter } from "./adapter";
+import { TestAdapter, testConnectionId, testInstitutionCode } from "./adapter";
 import {
   testDataRequestValidators,
   testDataRequestValidatorStartTimeError,
@@ -27,7 +27,7 @@ jest.mock("../services/storageClient/redis");
 
 const successConnectionStatus = {
   aggregator,
-  id: "testId",
+  id: testConnectionId,
   cur_job_id: "testJobId",
   user_id: "userId",
   status: ConnectionStatus.CONNECTED,
@@ -120,9 +120,9 @@ describe("TestAdapter", () => {
     it("returns a response object", async () => {
       expect(await testAdapterA.ListConnections("test")).toEqual([
         {
-          id: "testId",
+          id: testConnectionId,
           cur_job_id: "testJobId",
-          institution_code: "testCode",
+          institution_code: testInstitutionCode,
           is_being_aggregated: false,
           is_oauth: false,
           oauth_window_uri: undefined,
@@ -138,7 +138,7 @@ describe("TestAdapter", () => {
         await testAdapterA.ListConnectionCredentials("test", "test"),
       ).toEqual([
         {
-          id: "testId",
+          id: testConnectionId,
           field_name: "testFieldName",
           field_type: "testFieldType",
           label: labelText,
@@ -159,9 +159,9 @@ describe("TestAdapter", () => {
           "test",
         ),
       ).toEqual({
-        id: "testId",
+        id: testConnectionId,
         cur_job_id: "testJobId",
-        institution_code: "testCode",
+        institution_code: testInstitutionCode,
         is_being_aggregated: false,
         is_oauth: false,
         oauth_window_uri: undefined,
@@ -227,7 +227,7 @@ describe("TestAdapter", () => {
         await testAdapterA.GetConnectionStatus("test", "test", true, userId),
       ).toEqual({
         aggregator,
-        id: "testId",
+        id: testConnectionId,
         cur_job_id: "testJobId",
         user_id: "testUserId",
         status: ConnectionStatus.CHALLENGED,
@@ -294,9 +294,9 @@ describe("TestAdapter", () => {
           "test",
         ),
       ).toEqual({
-        id: "testId",
+        id: testConnectionId,
         cur_job_id: "testJobId",
-        institution_code: "testCode",
+        institution_code: testInstitutionCode,
         is_being_aggregated: false,
         is_oauth: false,
         oauth_window_uri: undefined,
@@ -308,8 +308,8 @@ describe("TestAdapter", () => {
   describe("GetConnectionById", () => {
     it("returns a response object", async () => {
       expect(await testAdapterA.GetConnectionById(undefined, "test")).toEqual({
-        id: "testId",
-        institution_code: "testCode",
+        id: testConnectionId,
+        institution_code: testInstitutionCode,
         is_oauth: false,
         is_being_aggregated: false,
         oauth_window_uri: undefined,

@@ -43,16 +43,13 @@ export function mapCachedInstitution(
 
 function mapConnection(connection: Connection): Member {
   return {
-    // ...connection,
     institution_guid: connection.institution_code,
     guid: connection.id,
     connection_status: connection.status ?? ConnectionStatus.CREATED, // ?
     most_recent_job_guid:
       connection.status === ConnectionStatus.CONNECTED
-        ? // ? null
-          // : connection.cur_job_id,
-          connection.cur_job_id
-        : null, //Do we need to do this? Without this is tries to load a job of null
+        ? connection.cur_job_id
+        : null,
     is_oauth: connection.is_oauth,
     oauth_window_uri: connection.oauth_window_uri,
     aggregator: connection.aggregator,
@@ -125,7 +122,6 @@ export class ConnectApi extends AggregatorAdapterBase {
     const connection = await this.createConnection({
       institution_id: memberData.institution_guid,
       is_oauth: memberData.is_oauth ?? false,
-      // Do we need skip_aggregation?
       skip_aggregation:
         (memberData.skip_aggregation ?? false) &&
         (memberData.is_oauth ?? false),

@@ -10,7 +10,9 @@ import { ComboJobTypes, ConnectionStatus } from "@repo/utils";
 import { get, set } from "../services/storageClient/redis";
 import { testExampleCredentials, testExampleInstitution } from "./constants";
 
-const testJobId = "testJobId";
+export const testJobId = "testJobId";
+export const testInstitutionCode = "institutionCode";
+export const testConnectionId = "testConnectionId";
 
 const createRedisStatusKey = ({
   aggregator,
@@ -67,9 +69,9 @@ export class TestAdapter implements WidgetAdapter {
   async ListConnections(userId: string): Promise<Connection[]> {
     return [
       {
-        id: "testId",
+        id: testConnectionId,
         cur_job_id: testJobId,
-        institution_code: "testCode",
+        institution_code: testInstitutionCode,
         is_being_aggregated: false,
         is_oauth: false,
         oauth_window_uri: undefined,
@@ -86,7 +88,7 @@ export class TestAdapter implements WidgetAdapter {
   ): Promise<Credential[]> {
     return [
       {
-        id: "testId",
+        id: testConnectionId,
         field_name: "testFieldName",
         field_type: "testFieldType",
         label: this.labelText,
@@ -112,9 +114,9 @@ export class TestAdapter implements WidgetAdapter {
     }
 
     return {
-      id: "testId",
+      id: testConnectionId,
       cur_job_id: testJobId,
-      institution_code: "testCode",
+      institution_code: testInstitutionCode,
       is_being_aggregated: false,
       is_oauth: false,
       oauth_window_uri: undefined,
@@ -145,9 +147,9 @@ export class TestAdapter implements WidgetAdapter {
     await set(redisStatusKey, null);
 
     return {
-      id: "testId",
+      id: testConnectionId,
       cur_job_id: testJobId,
-      institution_code: "testCode",
+      institution_code: testInstitutionCode,
       is_being_aggregated: false,
       is_oauth: false,
       oauth_window_uri: undefined,
@@ -160,8 +162,8 @@ export class TestAdapter implements WidgetAdapter {
     userId: string,
   ): Promise<Connection> {
     return {
-      id: "testId",
-      institution_code: "testCode",
+      id: testConnectionId,
+      institution_code: testInstitutionCode,
       is_oauth: false,
       is_being_aggregated: false,
       oauth_window_uri: undefined,
@@ -183,7 +185,7 @@ export class TestAdapter implements WidgetAdapter {
     if (connectionInfo?.verifiedOnce && singleAccountSelect) {
       return {
         aggregator: this.aggregator,
-        id: "testId",
+        id: testConnectionId,
         cur_job_id: testJobId,
         user_id: "testUserId",
         status: ConnectionStatus.CHALLENGED,
@@ -209,7 +211,7 @@ export class TestAdapter implements WidgetAdapter {
 
     return {
       aggregator: this.aggregator,
-      id: "testId",
+      id: testConnectionId,
       cur_job_id: testJobId,
       user_id: userId,
       status: ConnectionStatus.CONNECTED,
