@@ -15,7 +15,7 @@ import {
   updateInstitutions,
 } from "../services/ElasticSearchClient";
 import type { CachedInstitution } from "../shared/contract";
-import { ComboJobTypes, MappedJobTypes } from "@repo/utils";
+import { ComboJobTypes } from "@repo/utils";
 import * as preferences from "../shared/preferences";
 import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../test-adapter";
 import {

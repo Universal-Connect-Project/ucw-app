@@ -1,4 +1,4 @@
-import { ComboJobTypes, ConnectionStatus, MappedJobTypes } from "@repo/utils";
+import { ComboJobTypes, ConnectionStatus } from "@repo/utils";
 import { TestAdapter, testConnectionId, testInstitutionCode } from "./adapter";
 import {
   testDataRequestValidators,
@@ -171,26 +171,6 @@ describe("TestAdapter", () => {
   });
 
   describe("verification flow", () => {
-    it("doesn't return a challenge if the job type isn't verification", async () => {
-      const userId = "testUserId";
-
-      const successStatus = {
-        ...successConnectionStatus,
-        user_id: userId,
-      };
-
-      await testAdapterA.UpdateConnection(
-        {
-          job_type: MappedJobTypes.AGGREGATE,
-        } as any,
-        userId,
-      );
-
-      expect(
-        await testAdapterA.GetConnectionStatus("test", "test", true, userId),
-      ).toEqual(successStatus);
-    });
-
     it(`returns success if it hasn't been verified once, returns success if the job type is ${ComboJobTypes.ACCOUNT_NUMBER}, it has been verified once, and single_account_select is false, returns a challenge if the job type if verification and it has been verified once and single_account_select is true. returns success after a second ${ComboJobTypes.ACCOUNT_NUMBER}`, async () => {
       const userId = "testUserId";
 
@@ -252,7 +232,7 @@ describe("TestAdapter", () => {
 
       await testAdapterA.UpdateConnection(
         {
-          job_type: MappedJobTypes.VERIFICATION,
+          jobTypes: [ComboJobTypes.ACCOUNT_NUMBER],
         } as any,
         userId,
       );
@@ -289,7 +269,7 @@ describe("TestAdapter", () => {
       expect(
         await testAdapterA.UpdateConnection(
           {
-            job_type: MappedJobTypes.AGGREGATE,
+            jobTypes: [ComboJobTypes.TRANSACTIONS],
           } as any,
           "test",
         ),

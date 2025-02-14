@@ -1,5 +1,5 @@
 import type { Response } from "express";
-import { ComboJobTypes, MappedJobTypes } from "@repo/utils";
+import { ComboJobTypes } from "@repo/utils";
 import {
   elasticSearchInstitutionData,
   transformedInstitutionList,
