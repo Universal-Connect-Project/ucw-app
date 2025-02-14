@@ -48,10 +48,10 @@ cypress.env.json
 cypress/screenshots/
 cypress/videos/
 apps/server/cypress/screenshots
-/test-results/
-/playwright-report/
+test-results/
+playwright-report/
 /blob-report/
-/playwright/.cache/
+playwright/.cache/
 
 apps/server/cachedDefaults/preferences.json
 apps/server/cypress.env.json
