@@ -7,3 +7,5 @@ export const RECOMMENDED_INSTITUTIONS_URL = "/institutions/recommended";
 
 export const INSTITUTION_CREDENTIALS_MOCK_URL = `/institutions/:guid/credentials`;
 export const INSTITUTION_BY_GUID_MOCK_URL = `/institutions/:guid`;
+
+export const CREATE_MEMBER_URL = "/members";

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import connectWidgetApiService from "./connectWidgetApiService";
 import {
+  CREATE_MEMBER_URL,
   INSTITUTION_BY_GUID_MOCK_URL,
   INSTITUTION_CREDENTIALS_MOCK_URL,
   RECOMMENDED_INSTITUTIONS_URL,
@@ -12,8 +13,28 @@ import { http, HttpResponse } from "msw";
 import { searchedInstitutions } from "../shared/test/testData/searchedInstitutions";
 import { credentials } from "../shared/test/testData/credentials";
 import { institutionByGuid } from "../shared/test/testData/institutionByGuid";
+import { createMemberResponse } from "../shared/test/testData/member";
 
 describe("connectWidgetApiService", () => {
+  describe("addMember", () => {
+    it("resolves with a member", async () => {
+      expect(await connectWidgetApiService.addMember("test")).toEqual(
+        createMemberResponse,
+      );
+    });
+
+    it("throws an error on failure", async () => {
+      server.use(
+        http.post(
+          CREATE_MEMBER_URL,
+          () => new HttpResponse(null, { status: 400 }),
+        ),
+      );
+
+      await expect(connectWidgetApiService.addMember("test")).rejects.toThrow();
+    });
+  });
+
   describe("getInstitutionCredentials", () => {
     it("resolves with credentials", async () => {
       expect(

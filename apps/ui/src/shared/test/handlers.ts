@@ -1,6 +1,7 @@
 import { http, HttpResponse } from "msw";
 import { recommendedInstitutions } from "./testData/recommendedInstitutions";
 import {
+  CREATE_MEMBER_URL,
   INSTITUTION_BY_GUID_MOCK_URL,
   INSTITUTION_CREDENTIALS_MOCK_URL,
   INSTRUMENTATION_MOCK_URL,
@@ -10,6 +11,7 @@ import {
 import { searchedInstitutions } from "./testData/searchedInstitutions";
 import { institutionByGuid } from "./testData/institutionByGuid";
 import { credentials } from "./testData/credentials";
+import { createMemberResponse } from "./testData/member";
 
 const handlers = [
   http.post(INSTRUMENTATION_MOCK_URL, () => HttpResponse.json({})),
@@ -25,6 +27,7 @@ const handlers = [
   http.get(INSTITUTION_CREDENTIALS_MOCK_URL, () =>
     HttpResponse.json(credentials),
   ),
+  http.post(CREATE_MEMBER_URL, () => HttpResponse.json(createMemberResponse)),
 ];
 
 export default handlers;

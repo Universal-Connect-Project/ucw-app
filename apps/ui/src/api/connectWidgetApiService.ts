@@ -1,5 +1,6 @@
 import configuredAxios from "./axios";
 import {
+  CREATE_MEMBER_URL,
   RECOMMENDED_INSTITUTIONS_URL,
   SEARCH_INSTITUTIONS_URL,
 } from "@repo/utils";
@@ -15,7 +16,7 @@ const connectWidgetApiService = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   addMember: async (memberData: any) => {
     return configuredAxios
-      .post(`members`, memberData)
+      .post(CREATE_MEMBER_URL, memberData)
       .then((response) => response.data);
   },
   getInstitutionCredentials: async (guid: string) => {
