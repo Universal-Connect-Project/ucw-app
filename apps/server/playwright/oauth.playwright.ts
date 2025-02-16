@@ -17,8 +17,6 @@ test("displays error page with failed oAuth", async ({ page }, testInfo) => {
   await page.getByRole("link", { name: "Continue" }).click();
 
   const authorizeTab = await popupPromise;
-  const url = await authorizeTab.url()
-  console.log('popup => ' + url);
   await expect(
     authorizeTab.getByText("Something went wrong"),
   ).toBeVisible();
@@ -42,8 +40,6 @@ test("connects to example bank with oAuth", async ({ page }, testInfo) => {
   await page.getByRole("link", { name: "Continue" }).click();
 
   const authorizeTab = await popupPromise;
-  const url = await authorizeTab.url()
-  console.log('popup => ' + url);
 
   await expect(
     authorizeTab.getByText("Thank you for completing OAuth."),

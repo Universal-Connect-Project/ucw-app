@@ -18,6 +18,7 @@ import type {
 
 import { ConnectionStatus, OAuthStatus } from "../shared/contract";
 import { decodeAuthToken, mapJobType } from "../utils";
+import { v4 as uuidV4 } from "uuid";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function instrumentation(context: Context, input: any) {
@@ -41,6 +42,7 @@ export async function instrumentation(context: Context, input: any) {
   context.scheme = input.scheme ?? "vcs";
   context.oauth_referral_source = input.oauth_referral_source ?? "BROWSER";
   context.single_account_select = input.single_account_select;
+  context.session_id = input.session_id?.replace('undefined', '') || uuidV4();
   context.updated = true;
   return true;
 }
@@ -57,14 +59,13 @@ export class AggregatorAdapterBase {
   }
 
   async init() {
-    const authToken = this.context?.auth?.token || 'default_token';
-    this.analyticsClient = new AnalyticsClient(authToken);
+    this.analyticsClient = new AnalyticsClient('temp_fake_authToken');
     try {
       if (this.context?.aggregator) {
         this.aggregatorAdapter = createAggregatorWidgetAdapter(
           {
             aggregator: this.context?.aggregator as Aggregator,
-            sessionId: authToken //use the auth token as sessionId, 
+            sessionId: this.context.session_id
           }
         );
       }
