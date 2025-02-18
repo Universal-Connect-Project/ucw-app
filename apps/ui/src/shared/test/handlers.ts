@@ -8,6 +8,7 @@ import {
   JOB_BY_GUID_MOCK_URL,
   MEMBER_BY_GUID_MOCK_URL,
   MEMBER_CREDENTIALS_MOCK_URL,
+  MEMBERS_URL,
   RECOMMENDED_INSTITUTIONS_URL,
   SEARCH_INSTITUTIONS_URL,
 } from "@repo/utils";
@@ -17,6 +18,7 @@ import { credentials, memberCredentials } from "./testData/credentials";
 import { createMemberResponse } from "./testData/member";
 import { jobResponse } from "./testData/job";
 import { memberByGuidRespose } from "./testData/memberByGuid";
+import { membersResponse } from "./testData/members";
 
 const handlers = [
   http.post(INSTRUMENTATION_MOCK_URL, () => HttpResponse.json({})),
@@ -36,6 +38,7 @@ const handlers = [
   http.get(MEMBER_BY_GUID_MOCK_URL, () =>
     HttpResponse.json(memberByGuidRespose),
   ),
+  http.get(MEMBERS_URL, () => HttpResponse.json(membersResponse)),
   http.get(MEMBER_CREDENTIALS_MOCK_URL, () =>
     HttpResponse.json(memberCredentials),
   ),
