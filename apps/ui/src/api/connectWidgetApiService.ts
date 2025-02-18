@@ -71,7 +71,7 @@ const connectWidgetApiService = {
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   updateMFA: async (memberData: any) => {
-    return configuredAxios.put(`/members/${memberData.id}`);
+    return configuredAxios.put(`/members/${memberData.id}`, memberData);
   },
 };
 

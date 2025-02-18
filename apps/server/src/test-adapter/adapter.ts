@@ -227,6 +227,13 @@ export class TestAdapter implements WidgetAdapter {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     userId: string,
   ): Promise<boolean> {
+    const redisStatusKey = createRedisStatusKey({
+      aggregator: this.aggregator,
+      userId,
+    });
+
+    await set(redisStatusKey, null);
+
     return true;
   }
 
