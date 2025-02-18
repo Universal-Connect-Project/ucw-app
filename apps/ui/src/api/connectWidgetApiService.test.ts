@@ -5,6 +5,7 @@ import {
   INSTITUTION_BY_GUID_MOCK_URL,
   INSTITUTION_CREDENTIALS_MOCK_URL,
   JOB_BY_GUID_MOCK_URL,
+  MEMBER_BY_GUID_MOCK_URL,
   MEMBER_CREDENTIALS_MOCK_URL,
   RECOMMENDED_INSTITUTIONS_URL,
   SEARCH_INSTITUTIONS_URL,
@@ -20,6 +21,7 @@ import {
 import { institutionByGuid } from "../shared/test/testData/institutionByGuid";
 import { createMemberResponse } from "../shared/test/testData/member";
 import { jobResponse } from "../shared/test/testData/job";
+import { memberByGuidRespose } from "../shared/test/testData/memberByGuid";
 
 describe("connectWidgetApiService", () => {
   describe("addMember", () => {
@@ -119,6 +121,27 @@ describe("connectWidgetApiService", () => {
 
       await expect(
         connectWidgetApiService.loadInstitutionByGuid("test"),
+      ).rejects.toThrow();
+    });
+  });
+
+  describe("loadMemberByGuid", () => {
+    it("resolves with an institution", async () => {
+      expect(await connectWidgetApiService.loadMemberByGuid("test")).toEqual(
+        memberByGuidRespose,
+      );
+    });
+
+    it("throws an error on failure", async () => {
+      server.use(
+        http.get(
+          MEMBER_BY_GUID_MOCK_URL,
+          () => new HttpResponse(null, { status: 400 }),
+        ),
+      );
+
+      await expect(
+        connectWidgetApiService.loadMemberByGuid("test"),
       ).rejects.toThrow();
     });
   });

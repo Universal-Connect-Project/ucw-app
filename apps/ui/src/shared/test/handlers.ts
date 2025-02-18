@@ -6,6 +6,7 @@ import {
   INSTITUTION_CREDENTIALS_MOCK_URL,
   INSTRUMENTATION_MOCK_URL,
   JOB_BY_GUID_MOCK_URL,
+  MEMBER_BY_GUID_MOCK_URL,
   MEMBER_CREDENTIALS_MOCK_URL,
   RECOMMENDED_INSTITUTIONS_URL,
   SEARCH_INSTITUTIONS_URL,
@@ -15,6 +16,7 @@ import { institutionByGuid } from "./testData/institutionByGuid";
 import { credentials, memberCredentials } from "./testData/credentials";
 import { createMemberResponse } from "./testData/member";
 import { jobResponse } from "./testData/job";
+import { memberByGuidRespose } from "./testData/memberByGuid";
 
 const handlers = [
   http.post(INSTRUMENTATION_MOCK_URL, () => HttpResponse.json({})),
@@ -30,6 +32,9 @@ const handlers = [
   ),
   http.get(INSTITUTION_CREDENTIALS_MOCK_URL, () =>
     HttpResponse.json(credentials),
+  ),
+  http.get(MEMBER_BY_GUID_MOCK_URL, () =>
+    HttpResponse.json(memberByGuidRespose),
   ),
   http.get(MEMBER_CREDENTIALS_MOCK_URL, () =>
     HttpResponse.json(memberCredentials),
