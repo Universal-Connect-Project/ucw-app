@@ -17,6 +17,7 @@ import {
   INSTRUMENTATION_URL,
   RECOMMENDED_INSTITUTIONS_URL,
   SEARCH_INSTITUTIONS_URL,
+  MEMBERS_URL,
 } from "@repo/utils";
 
 const disableAnalytics = true;
@@ -66,7 +67,7 @@ export default function (app) {
     }
   });
 
-  app.post(ApiEndpoints.MEMBERS, async (req, res) => {
+  app.post(MEMBERS_URL, async (req, res) => {
     const ret = await req.connectApi.addMember(req.body);
     res.send(ret);
   });
@@ -125,7 +126,7 @@ export default function (app) {
     res.send(ret);
   });
 
-  app.get(ApiEndpoints.MEMBERS, async (req, res) => {
+  app.get(MEMBERS_URL, async (req, res) => {
     const ret = await req.connectApi.loadMembers();
     res.send(ret);
   });

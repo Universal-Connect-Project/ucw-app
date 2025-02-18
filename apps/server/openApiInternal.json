@@ -305,6 +305,74 @@
           }
         }
       }
+    },
+    "/members": {
+      "post": {
+        "description": "Create a connection with an aggregator",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "meta",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "example": {
+                "aggregator": "testExampleA",
+                "jobTypes": ["transactions"]
+              }
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "credentials": {
+                    "type": "array",
+                    "example": [{ "guid": "testGuid", "value": "test" }]
+                  },
+                  "institution_guid": {
+                    "type": "string"
+                  },
+                  "is_oauth": {
+                    "type": "boolean"
+                  },
+                  "skip_aggregation": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "member": {
+                      "institution_guid": "institutionCode",
+                      "guid": "testConnectionId",
+                      "connection_status": 0,
+                      "most_recent_job_guid": null,
+                      "is_oauth": false,
+                      "aggregator": "testExampleC",
+                      "is_being_aggregated": false,
+                      "mfa": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
