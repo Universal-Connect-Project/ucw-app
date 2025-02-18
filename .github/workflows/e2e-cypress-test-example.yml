@@ -1,0 +1,78 @@
+name: E2E Tests (Server) TestExample
+
+on: pull_request
+
+jobs:
+  setup-env:
+    name: "Load ENV Vars"
+    uses: ./.github/workflows/setup-env.yml
+    secrets: inherit
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    needs: [setup-env]
+
+    services:
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
+        options: --health-cmd="curl --silent --fail localhost:9200/_cluster/health || exit 1" --health-interval=10s --health-timeout=5s --health-retries=5
+        ports:
+          - 9200:9200
+          - 9300:9300
+        env:
+          discovery.type: single-node
+          xpack.security.enabled: false
+
+      redis:
+        image: redis:7.2-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 20s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - "${{vars.REDIS_PORT}}:${{vars.REDIS_PORT}}"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure sysctl limits
+        run: |
+          sudo swapoff -a
+          sudo sysctl -w vm.swappiness=1
+          sudo sysctl -w fs.file-max=262144
+          sudo sysctl -w vm.max_map_count=262144
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "lts/Iron"
+          check-latest: true
+      - run: npm ci
+
+      - run: npm run testPreferences
+
+      - name: "Create env file"
+        run: |
+          ENV_FILE_PATH=./apps/server/env/staging.env
+          touch ${ENV_FILE_PATH}
+
+          # Vars
+          echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
+
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          config-file: cypress.config.testExample.config.ts
+          project: apps/server
+          start: npm run start:e2e
+          wait-on: "http://localhost:8080/health, http://localhost:9200"
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: ./apps/server/cypress/screenshots
