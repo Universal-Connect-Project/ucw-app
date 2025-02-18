@@ -21,6 +21,7 @@ export enum WidgetJobTypes {
   MICRO_DEPOSIT = 8,
   TAX = 9,
   CREDIT_REPORT = 10,
+  COMBINATION = 11,
 }
 
 export enum VCDataTypes {
@@ -123,6 +124,7 @@ export enum ConnectionStatus {
 export interface CreateConnectionRequest {
   id?: string;
   initial_job_type?: string;
+  jobTypes?: ComboJobTypes[];
   background_aggregation_is_disabled?: boolean;
   credentials: Credential[];
   institution_id: string;

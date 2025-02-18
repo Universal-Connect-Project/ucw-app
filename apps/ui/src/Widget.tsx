@@ -5,21 +5,24 @@ import connectWidgetApiService from "./api/connectWidgetApiService";
 import { ComboJobTypes } from "@repo/utils";
 
 const Widget = ({
+  aggregator,
   connectionId,
   institutionId,
   jobTypes,
 }: {
+  aggregator: string;
   connectionId: string;
   institutionId: string;
   jobTypes: ComboJobTypes[];
 }) => {
   const clientConfig = {
-    current_institution_code: institutionId,
+    current_institution_guid: institutionId,
     current_member_guid: connectionId,
     data_request: {
       products: jobTypes,
     },
     disable_institution_search: !!(institutionId || connectionId),
+    update_credentials: connectionId && aggregator,
     ui_message_protocol: "post_message",
     ui_message_version: 4,
     ui_message_webview_url_scheme: "vcs",
@@ -33,7 +36,19 @@ const Widget = ({
         language={{ locale: "en" }}
         onAnalyticEvent={() => {}}
         onAnalyticPageview={() => {}}
-        onPostMessage={() => {}}
+        onPostMessage={(type: string, metadata?: object) => {
+          const payload = {
+            metadata,
+            type,
+          };
+
+          if (window.parent) {
+            window.parent.postMessage(payload);
+          }
+          if (window.opener) {
+            window.opener.postMessage(payload);
+          }
+        }}
         profiles={{
           clientProfile: {
             account_verification_is_enabled: true,

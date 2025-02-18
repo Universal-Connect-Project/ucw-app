@@ -3,7 +3,7 @@ import {
   JobTypeSupports,
   type InstitutionAggregator,
 } from "../shared/contract";
-import { ComboJobTypes, MappedJobTypes } from "@repo/utils";
+import { ComboJobTypes } from "@repo/utils";
 import * as preferences from "../shared/preferences";
 import { ElasticSearchMock } from "../test/elasticSearchMock";
 import { elasticSearchInstitutionData } from "../test/testData/institution";

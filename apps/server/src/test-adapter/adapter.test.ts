@@ -1,5 +1,5 @@
-import { ConnectionStatus, MappedJobTypes } from "@repo/utils";
-import { TestAdapter } from "./adapter";
+import { ComboJobTypes, ConnectionStatus } from "@repo/utils";
+import { TestAdapter, testConnectionId, testInstitutionCode } from "./adapter";
 import {
   testDataRequestValidators,
   testDataRequestValidatorStartTimeError,
@@ -27,7 +27,7 @@ jest.mock("../services/storageClient/redis");
 
 const successConnectionStatus = {
   aggregator,
-  id: "testId",
+  id: testConnectionId,
   cur_job_id: "testJobId",
   user_id: "userId",
   status: ConnectionStatus.CONNECTED,
@@ -120,9 +120,9 @@ describe("TestAdapter", () => {
     it("returns a response object", async () => {
       expect(await testAdapterA.ListConnections("test")).toEqual([
         {
-          id: "testId",
+          id: testConnectionId,
           cur_job_id: "testJobId",
-          institution_code: "testCode",
+          institution_code: testInstitutionCode,
           is_being_aggregated: false,
           is_oauth: false,
           oauth_window_uri: undefined,
@@ -138,7 +138,7 @@ describe("TestAdapter", () => {
         await testAdapterA.ListConnectionCredentials("test", "test"),
       ).toEqual([
         {
-          id: "testId",
+          id: testConnectionId,
           field_name: "testFieldName",
           field_type: "testFieldType",
           label: labelText,
@@ -149,10 +149,19 @@ describe("TestAdapter", () => {
 
   describe("CreateConnection", () => {
     it("returns a response object", async () => {
-      expect(await testAdapterA.CreateConnection(undefined, "test")).toEqual({
-        id: "testId",
+      expect(
+        await testAdapterA.CreateConnection(
+          {
+            credentials: [],
+            institution_id: "test",
+            jobTypes: [ComboJobTypes.TRANSACTIONS],
+          },
+          "test",
+        ),
+      ).toEqual({
+        id: testConnectionId,
         cur_job_id: "testJobId",
-        institution_code: "testCode",
+        institution_code: testInstitutionCode,
         is_being_aggregated: false,
         is_oauth: false,
         oauth_window_uri: undefined,
@@ -162,27 +171,7 @@ describe("TestAdapter", () => {
   });
 
   describe("verification flow", () => {
-    it("doesn't return a challenge if the job type isn't verification", async () => {
-      const userId = "testUserId";
-
-      const successStatus = {
-        ...successConnectionStatus,
-        user_id: userId,
-      };
-
-      await testAdapterA.UpdateConnection(
-        {
-          job_type: MappedJobTypes.AGGREGATE,
-        } as any,
-        userId,
-      );
-
-      expect(
-        await testAdapterA.GetConnectionStatus("test", "test", true, userId),
-      ).toEqual(successStatus);
-    });
-
-    it("returns success if it hasn't been verified once, returns success if the job type is verification, it has been verified once, and single_account_select is false, returns a challenge if the job type if verification and it has been verified once and single_account_select is true. returns success after a second verification", async () => {
+    it(`returns success if it hasn't been verified once, returns success if the job type is ${ComboJobTypes.ACCOUNT_NUMBER}, it has been verified once, and single_account_select is false, returns a challenge if the job type if verification and it has been verified once and single_account_select is true. returns success after a second ${ComboJobTypes.ACCOUNT_NUMBER}`, async () => {
       const userId = "testUserId";
 
       const successStatus = {
@@ -196,7 +185,7 @@ describe("TestAdapter", () => {
 
       await testAdapterA.UpdateConnection(
         {
-          job_type: MappedJobTypes.VERIFICATION,
+          jobTypes: [ComboJobTypes.ACCOUNT_NUMBER],
         } as any,
         userId,
       );
@@ -205,11 +194,20 @@ describe("TestAdapter", () => {
         await testAdapterA.GetConnectionStatus("test", "test", false, userId),
       ).toEqual(successStatus);
 
+      await testAdapterA.CreateConnection(
+        {
+          credentials: [],
+          institution_id: "test",
+          jobTypes: [ComboJobTypes.ACCOUNT_NUMBER],
+        },
+        userId,
+      );
+
       expect(
         await testAdapterA.GetConnectionStatus("test", "test", true, userId),
       ).toEqual({
         aggregator,
-        id: "testId",
+        id: testConnectionId,
         cur_job_id: "testJobId",
         user_id: "testUserId",
         status: ConnectionStatus.CHALLENGED,
@@ -234,7 +232,7 @@ describe("TestAdapter", () => {
 
       await testAdapterA.UpdateConnection(
         {
-          job_type: MappedJobTypes.VERIFICATION,
+          jobTypes: [ComboJobTypes.ACCOUNT_NUMBER],
         } as any,
         userId,
       );
@@ -271,30 +269,14 @@ describe("TestAdapter", () => {
       expect(
         await testAdapterA.UpdateConnection(
           {
-            job_type: MappedJobTypes.AGGREGATE,
+            jobTypes: [ComboJobTypes.TRANSACTIONS],
           } as any,
           "test",
         ),
       ).toEqual({
-        id: "testId",
+        id: testConnectionId,
         cur_job_id: "testJobId",
-        institution_code: "testCode",
-        is_being_aggregated: false,
-        is_oauth: false,
-        oauth_window_uri: undefined,
-        aggregator,
-      });
-    });
-  });
-
-  describe("UpdateConnectionInternal", () => {
-    it("returns a response object", async () => {
-      expect(
-        await testAdapterA.UpdateConnectionInternal(undefined, "test"),
-      ).toEqual({
-        id: "testId",
-        cur_job_id: "testJobId",
-        institution_code: "testCode",
+        institution_code: testInstitutionCode,
         is_being_aggregated: false,
         is_oauth: false,
         oauth_window_uri: undefined,
@@ -306,8 +288,8 @@ describe("TestAdapter", () => {
   describe("GetConnectionById", () => {
     it("returns a response object", async () => {
       expect(await testAdapterA.GetConnectionById(undefined, "test")).toEqual({
-        id: "testId",
-        institution_code: "testCode",
+        id: testConnectionId,
+        institution_code: testInstitutionCode,
         is_oauth: false,
         is_being_aggregated: false,
         oauth_window_uri: undefined,

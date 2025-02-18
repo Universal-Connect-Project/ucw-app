@@ -1,19 +1,51 @@
 import { describe, expect, it } from "vitest";
 import connectWidgetApiService from "./connectWidgetApiService";
 import {
+  CREATE_MEMBER_URL,
   INSTITUTION_BY_GUID_MOCK_URL,
   INSTITUTION_CREDENTIALS_MOCK_URL,
+  JOB_BY_GUID_MOCK_URL,
+  MEMBER_BY_GUID_MOCK_URL,
+  MEMBER_CREDENTIALS_MOCK_URL,
+  MEMBERS_URL,
   RECOMMENDED_INSTITUTIONS_URL,
   SEARCH_INSTITUTIONS_URL,
+  UPDATE_MFA_MOCK_URL,
 } from "@repo/utils";
 import { recommendedInstitutions } from "../shared/test/testData/recommendedInstitutions";
 import server from "../shared/test/testServer";
 import { http, HttpResponse } from "msw";
 import { searchedInstitutions } from "../shared/test/testData/searchedInstitutions";
-import { credentials } from "../shared/test/testData/credentials";
+import {
+  credentials,
+  memberCredentials,
+} from "../shared/test/testData/credentials";
 import { institutionByGuid } from "../shared/test/testData/institutionByGuid";
+import { createMemberResponse } from "../shared/test/testData/member";
+import { jobResponse } from "../shared/test/testData/job";
+import { memberByGuidRespose } from "../shared/test/testData/memberByGuid";
+import { membersResponse } from "../shared/test/testData/members";
 
 describe("connectWidgetApiService", () => {
+  describe("addMember", () => {
+    it("resolves with a member", async () => {
+      expect(await connectWidgetApiService.addMember("test")).toEqual(
+        createMemberResponse,
+      );
+    });
+
+    it("throws an error on failure", async () => {
+      server.use(
+        http.post(
+          CREATE_MEMBER_URL,
+          () => new HttpResponse(null, { status: 400 }),
+        ),
+      );
+
+      await expect(connectWidgetApiService.addMember("test")).rejects.toThrow();
+    });
+  });
+
   describe("getInstitutionCredentials", () => {
     it("resolves with credentials", async () => {
       expect(
@@ -35,6 +67,46 @@ describe("connectWidgetApiService", () => {
     });
   });
 
+  describe("getMemberCredentials", () => {
+    it("resolves with credentials", async () => {
+      expect(
+        await connectWidgetApiService.getMemberCredentials("test"),
+      ).toEqual(memberCredentials);
+    });
+
+    it("throws an error on failure", async () => {
+      server.use(
+        http.get(
+          MEMBER_CREDENTIALS_MOCK_URL,
+          () => new HttpResponse(null, { status: 400 }),
+        ),
+      );
+
+      await expect(
+        connectWidgetApiService.getMemberCredentials("test"),
+      ).rejects.toThrow();
+    });
+  });
+
+  describe("loadJob", () => {
+    it("resolves with a job", async () => {
+      expect(await connectWidgetApiService.loadJob("test")).toEqual(
+        jobResponse,
+      );
+    });
+
+    it("throws an error on failure", async () => {
+      server.use(
+        http.get(
+          JOB_BY_GUID_MOCK_URL,
+          () => new HttpResponse(null, { status: 400 }),
+        ),
+      );
+
+      await expect(connectWidgetApiService.loadJob("test")).rejects.toThrow();
+    });
+  });
+
   describe("loadInstitutionByGuid", () => {
     it("resolves with an institution", async () => {
       expect(
@@ -53,6 +125,43 @@ describe("connectWidgetApiService", () => {
       await expect(
         connectWidgetApiService.loadInstitutionByGuid("test"),
       ).rejects.toThrow();
+    });
+  });
+
+  describe("loadMemberByGuid", () => {
+    it("resolves with a member", async () => {
+      expect(await connectWidgetApiService.loadMemberByGuid("test")).toEqual(
+        memberByGuidRespose,
+      );
+    });
+
+    it("throws an error on failure", async () => {
+      server.use(
+        http.get(
+          MEMBER_BY_GUID_MOCK_URL,
+          () => new HttpResponse(null, { status: 400 }),
+        ),
+      );
+
+      await expect(
+        connectWidgetApiService.loadMemberByGuid("test"),
+      ).rejects.toThrow();
+    });
+  });
+
+  describe("loadMembers", () => {
+    it("resolves with members", async () => {
+      expect(await connectWidgetApiService.loadMembers()).toEqual(
+        membersResponse,
+      );
+    });
+
+    it("throws an error on failure", async () => {
+      server.use(
+        http.get(MEMBERS_URL, () => new HttpResponse(null, { status: 400 })),
+      );
+
+      await expect(connectWidgetApiService.loadMembers()).rejects.toThrow();
     });
   });
 
@@ -101,6 +210,23 @@ describe("connectWidgetApiService", () => {
       await expect(
         connectWidgetApiService.loadInstitutions(loadParams),
       ).rejects.toThrow();
+    });
+  });
+
+  describe("updateMFA", () => {
+    it("resolves", async () => {
+      expect(connectWidgetApiService.updateMFA("test")).resolves.not.toThrow();
+    });
+
+    it("throws an error on failure", async () => {
+      server.use(
+        http.put(
+          UPDATE_MFA_MOCK_URL,
+          () => new HttpResponse(null, { status: 400 }),
+        ),
+      );
+
+      await expect(connectWidgetApiService.updateMFA("test")).rejects.toThrow();
     });
   });
 });

@@ -3,7 +3,7 @@ export const clickContinue = () => {
 };
 
 export const expectConnectionSuccess = () => {
-  cy.findByText("Connected", { timeout: 240000 }).should("exist");
+  cy.findByText("Done", { timeout: 240000 }).should("exist");
 };
 
 export const searchByText = (text) => {

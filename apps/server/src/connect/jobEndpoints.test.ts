@@ -62,10 +62,8 @@ describe("jobEndpoints", () => {
       await jobsRouteHandler(req, res);
 
       expect(res.send).toHaveBeenCalledWith({
-        job: {
-          guid: req.params.member_guid,
-          job_type: WidgetJobTypes.AGGREGATION,
-        },
+        guid: req.params.member_guid,
+        job_type: WidgetJobTypes.COMBINATION,
       });
     });
   });

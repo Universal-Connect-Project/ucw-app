@@ -1,4 +1,4 @@
-name: E2E Tests (Server) Prod
+name: E2E Tests (Server) TestExample
 
 on: pull_request
 
@@ -50,7 +50,7 @@ jobs:
           check-latest: true
       - run: npm ci
 
-      - run: npm run copyE2EPreferences
+      - run: npm run copyTestPreferences
 
       - name: "Create env file"
         run: |
@@ -59,14 +59,13 @@ jobs:
 
           # Vars
           echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
-          echo ENV=prod >> ${ENV_FILE_PATH}
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          config-file: cypress.config.prod.ts
+          config-file: cypress.config.testExample.ts
           project: apps/server
           start: npm run start:e2e
           wait-on: "http://localhost:8080/health, http://localhost:9200"

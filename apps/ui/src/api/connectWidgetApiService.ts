@@ -1,5 +1,6 @@
 import configuredAxios from "./axios";
 import {
+  CREATE_MEMBER_URL,
   RECOMMENDED_INSTITUTIONS_URL,
   SEARCH_INSTITUTIONS_URL,
 } from "@repo/utils";
@@ -12,9 +13,20 @@ interface LoadInstitutionsParams {
 }
 
 const connectWidgetApiService = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  addMember: async (memberData: any) => {
+    return configuredAxios
+      .post(CREATE_MEMBER_URL, memberData)
+      .then((response) => response.data);
+  },
   getInstitutionCredentials: async (guid: string) => {
     return configuredAxios
       .get(`/institutions/${guid}/credentials`)
+      .then((response) => response.data);
+  },
+  getMemberCredentials: async (guid: string) => {
+    return configuredAxios
+      .get(`/members/${guid}/credentials`)
       .then((response) => response.data);
   },
   loadInstitutionByGuid: async (guid: string) => {
@@ -39,10 +51,27 @@ const connectWidgetApiService = {
       })
       .then((response) => response.data);
   },
+  loadJob: async (jobGuid: string) => {
+    return configuredAxios
+      .get(`/jobs/${jobGuid}`)
+      .then((response) => response.data);
+  },
+  loadMemberByGuid: async (memberGuid: string) => {
+    return configuredAxios
+      .get(`/members/${memberGuid}`)
+      .then((response) => response.data);
+  },
+  loadMembers: async () => {
+    return configuredAxios.get(`/members`).then((response) => response.data);
+  },
   loadPopularInstitutions: async () => {
     return configuredAxios
       .get(RECOMMENDED_INSTITUTIONS_URL)
       .then((response) => response.data);
+  },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  updateMFA: async (memberData: any) => {
+    return configuredAxios.put(`/members/${memberData.id}`, memberData);
   },
 };
 

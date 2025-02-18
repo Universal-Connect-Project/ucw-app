@@ -6,9 +6,13 @@ import type {
   UpdateConnectionRequest,
   WidgetAdapter,
 } from "@repo/utils";
-import { ConnectionStatus, MappedJobTypes } from "@repo/utils";
+import { ComboJobTypes, ConnectionStatus } from "@repo/utils";
 import { get, set } from "../services/storageClient/redis";
 import { testExampleCredentials, testExampleInstitution } from "./constants";
+
+export const testJobId = "testJobId";
+export const testInstitutionCode = "institutionCode";
+export const testConnectionId = "testConnectionId";
 
 const createRedisStatusKey = ({
   aggregator,
@@ -65,9 +69,9 @@ export class TestAdapter implements WidgetAdapter {
   async ListConnections(userId: string): Promise<Connection[]> {
     return [
       {
-        id: "testId",
-        cur_job_id: "testJobId",
-        institution_code: "testCode",
+        id: testConnectionId,
+        cur_job_id: testJobId,
+        institution_code: testInstitutionCode,
         is_being_aggregated: false,
         is_oauth: false,
         oauth_window_uri: undefined,
@@ -84,7 +88,7 @@ export class TestAdapter implements WidgetAdapter {
   ): Promise<Credential[]> {
     return [
       {
-        id: "testId",
+        id: testConnectionId,
         field_name: "testFieldName",
         field_type: "testFieldType",
         label: this.labelText,
@@ -98,10 +102,21 @@ export class TestAdapter implements WidgetAdapter {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     userId: string,
   ): Promise<Connection> {
+    if (request.jobTypes?.includes(ComboJobTypes.ACCOUNT_NUMBER)) {
+      const redisStatusKey = createRedisStatusKey({
+        aggregator: this.aggregator,
+        userId,
+      });
+
+      await set(redisStatusKey, {
+        verifiedOnce: true,
+      });
+    }
+
     return {
-      id: "testId",
-      cur_job_id: "testJobId",
-      institution_code: "testCode",
+      id: testConnectionId,
+      cur_job_id: testJobId,
+      institution_code: testInstitutionCode,
       is_being_aggregated: false,
       is_oauth: false,
       oauth_window_uri: undefined,
@@ -129,40 +144,12 @@ export class TestAdapter implements WidgetAdapter {
       userId,
     });
 
-    const connectionInfo = await get(redisStatusKey);
-
-    if (
-      !connectionInfo?.verifiedOnce &&
-      request.job_type === MappedJobTypes.VERIFICATION
-    ) {
-      await set(redisStatusKey, {
-        verifiedOnce: true,
-      });
-    } else {
-      await set(redisStatusKey, null);
-    }
+    await set(redisStatusKey, null);
 
     return {
-      id: "testId",
-      cur_job_id: "testJobId",
-      institution_code: "testCode",
-      is_being_aggregated: false,
-      is_oauth: false,
-      oauth_window_uri: undefined,
-      aggregator: this.aggregator,
-    };
-  }
-
-  async UpdateConnectionInternal(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    request: UpdateConnectionRequest,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    userId: string,
-  ): Promise<Connection> {
-    return {
-      id: "testId",
-      cur_job_id: "testJobId",
-      institution_code: "testCode",
+      id: testConnectionId,
+      cur_job_id: testJobId,
+      institution_code: testInstitutionCode,
       is_being_aggregated: false,
       is_oauth: false,
       oauth_window_uri: undefined,
@@ -175,8 +162,8 @@ export class TestAdapter implements WidgetAdapter {
     userId: string,
   ): Promise<Connection> {
     return {
-      id: "testId",
-      institution_code: "testCode",
+      id: testConnectionId,
+      institution_code: testInstitutionCode,
       is_oauth: false,
       is_being_aggregated: false,
       oauth_window_uri: undefined,
@@ -198,8 +185,8 @@ export class TestAdapter implements WidgetAdapter {
     if (connectionInfo?.verifiedOnce && singleAccountSelect) {
       return {
         aggregator: this.aggregator,
-        id: "testId",
-        cur_job_id: "testJobId",
+        id: testConnectionId,
+        cur_job_id: testJobId,
         user_id: "testUserId",
         status: ConnectionStatus.CHALLENGED,
         challenges: [
@@ -224,8 +211,8 @@ export class TestAdapter implements WidgetAdapter {
 
     return {
       aggregator: this.aggregator,
-      id: "testId",
-      cur_job_id: "testJobId",
+      id: testConnectionId,
+      cur_job_id: testJobId,
       user_id: userId,
       status: ConnectionStatus.CONNECTED,
       challenges: [],
@@ -240,6 +227,13 @@ export class TestAdapter implements WidgetAdapter {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     userId: string,
   ): Promise<boolean> {
+    const redisStatusKey = createRedisStatusKey({
+      aggregator: this.aggregator,
+      userId,
+    });
+
+    await set(redisStatusKey, null);
+
     return true;
   }
 

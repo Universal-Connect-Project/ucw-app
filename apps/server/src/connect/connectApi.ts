@@ -4,12 +4,7 @@ import type {
   CachedInstitution,
   InstitutionSearchResponseItem,
 } from "../shared/contract";
-import type {
-  Challenge,
-  Connection,
-  Institution,
-  MappedJobTypes,
-} from "@repo/utils";
+import type { Challenge, Connection, Institution } from "@repo/utils";
 import { ChallengeType, ConnectionStatus } from "@repo/utils";
 
 import { AggregatorAdapterBase } from "../adapters";
@@ -48,14 +43,13 @@ export function mapCachedInstitution(
 
 function mapConnection(connection: Connection): Member {
   return {
-    // ...connection,
     institution_guid: connection.institution_code,
     guid: connection.id,
     connection_status: connection.status ?? ConnectionStatus.CREATED, // ?
     most_recent_job_guid:
       connection.status === ConnectionStatus.CONNECTED
-        ? null
-        : connection.cur_job_id,
+        ? connection.cur_job_id
+        : null,
     is_oauth: connection.is_oauth,
     oauth_window_uri: connection.oauth_window_uri,
     aggregator: connection.aggregator,
@@ -131,7 +125,7 @@ export class ConnectApi extends AggregatorAdapterBase {
       skip_aggregation:
         (memberData.skip_aggregation ?? false) &&
         (memberData.is_oauth ?? false),
-      initial_job_type: this.context.job_type ?? "aggregate",
+      jobTypes: this.context.jobTypes,
       credentials:
         memberData.credentials?.map((c) => ({
           id: c.guid,
@@ -207,18 +201,18 @@ export class ConnectApi extends AggregatorAdapterBase {
     return [];
   }
 
-  async loadMemberByGuid(memberGuid: string): Promise<MemberResponse> {
+  async loadMemberByGuid(memberGuid: string): Promise<Member> {
     const mfa = await this.getConnectionStatus(memberGuid);
     if (mfa?.institution_code == null) {
       const connection = await this.getConnection(memberGuid);
-      return { member: mapConnection({ ...mfa, ...connection }) };
+      return mapConnection({ ...mfa, ...connection });
     }
-    return { member: mapConnection({ ...mfa }) };
+    return mapConnection({ ...mfa });
   }
 
   async getOauthWindowUri(memberGuid: string) {
     const ret = await this.loadMemberByGuid(memberGuid);
-    return ret?.member?.oauth_window_uri;
+    return ret?.oauth_window_uri;
   }
 
   async deleteMember(member: Member): Promise<void> {
@@ -228,13 +222,11 @@ export class ConnectApi extends AggregatorAdapterBase {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async getMemberCredentials(memberGuid: string): Promise<any> {
     const crs = await this.getConnectionCredentials(memberGuid);
-    return {
-      credentials: crs.map((c) => ({
-        ...c,
-        guid: c.id,
-        field_type: c.field_type === "PASSWORD" ? 1 : 3,
-      })),
-    };
+    return crs.map((c) => ({
+      ...c,
+      guid: c.id,
+      field_type: c.field_type === "PASSWORD" ? 1 : 3,
+    }));
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

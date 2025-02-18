@@ -1,5 +1,5 @@
 import { Client } from "@opensearch-project/opensearch";
-import type { ComboJobTypes, MappedJobTypes } from "@repo/utils";
+import type { ComboJobTypes } from "@repo/utils";
 import type {
   MgetRequest,
   SearchHit,
