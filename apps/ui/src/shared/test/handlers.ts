@@ -11,6 +11,7 @@ import {
   MEMBERS_URL,
   RECOMMENDED_INSTITUTIONS_URL,
   SEARCH_INSTITUTIONS_URL,
+  UPDATE_MFA_MOCK_URL,
 } from "@repo/utils";
 import { searchedInstitutions } from "./testData/searchedInstitutions";
 import { institutionByGuid } from "./testData/institutionByGuid";
@@ -19,6 +20,7 @@ import { createMemberResponse } from "./testData/member";
 import { jobResponse } from "./testData/job";
 import { memberByGuidRespose } from "./testData/memberByGuid";
 import { membersResponse } from "./testData/members";
+import { updateMFAResponse } from "./testData/updateMFA";
 
 const handlers = [
   http.post(INSTRUMENTATION_MOCK_URL, () => HttpResponse.json({})),
@@ -43,6 +45,7 @@ const handlers = [
     HttpResponse.json(memberCredentials),
   ),
   http.post(CREATE_MEMBER_URL, () => HttpResponse.json(createMemberResponse)),
+  http.put(UPDATE_MFA_MOCK_URL, () => HttpResponse.json(updateMFAResponse)),
 ];
 
 export default handlers;

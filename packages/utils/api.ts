@@ -13,6 +13,8 @@ export const MEMBER_CREDENTIALS_MOCK_URL = "/members/:guid/credentials";
 
 export const MEMBER_BY_GUID_MOCK_URL = "/members/:guid";
 
+export const UPDATE_MFA_MOCK_URL = "/members/:guid";
+
 export const JOB_BY_GUID_MOCK_URL = `/jobs/:guid`;
 
 export const CREATE_MEMBER_URL = "/members";

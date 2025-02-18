@@ -10,6 +10,7 @@ import {
   MEMBERS_URL,
   RECOMMENDED_INSTITUTIONS_URL,
   SEARCH_INSTITUTIONS_URL,
+  UPDATE_MFA_MOCK_URL,
 } from "@repo/utils";
 import { recommendedInstitutions } from "../shared/test/testData/recommendedInstitutions";
 import server from "../shared/test/testServer";
@@ -88,7 +89,7 @@ describe("connectWidgetApiService", () => {
   });
 
   describe("loadJob", () => {
-    it("resolves with an institution", async () => {
+    it("resolves with a job", async () => {
       expect(await connectWidgetApiService.loadJob("test")).toEqual(
         jobResponse,
       );
@@ -128,7 +129,7 @@ describe("connectWidgetApiService", () => {
   });
 
   describe("loadMemberByGuid", () => {
-    it("resolves with an institution", async () => {
+    it("resolves with a member", async () => {
       expect(await connectWidgetApiService.loadMemberByGuid("test")).toEqual(
         memberByGuidRespose,
       );
@@ -149,7 +150,7 @@ describe("connectWidgetApiService", () => {
   });
 
   describe("loadMembers", () => {
-    it("resolves with an institution", async () => {
+    it("resolves with members", async () => {
       expect(await connectWidgetApiService.loadMembers()).toEqual(
         membersResponse,
       );
@@ -209,6 +210,23 @@ describe("connectWidgetApiService", () => {
       await expect(
         connectWidgetApiService.loadInstitutions(loadParams),
       ).rejects.toThrow();
+    });
+  });
+
+  describe("updateMFA", () => {
+    it("resolves", async () => {
+      expect(connectWidgetApiService.updateMFA("test")).resolves.not.toThrow();
+    });
+
+    it("throws an error on failure", async () => {
+      server.use(
+        http.put(
+          UPDATE_MFA_MOCK_URL,
+          () => new HttpResponse(null, { status: 400 }),
+        ),
+      );
+
+      await expect(connectWidgetApiService.updateMFA("test")).rejects.toThrow();
     });
   });
 });
