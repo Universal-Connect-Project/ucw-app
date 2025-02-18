@@ -306,6 +306,44 @@
         }
       }
     },
+    "/jobs/{jobId}": {
+      "get": {
+        "description": "Returns a job",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "meta",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "example": {
+                "aggregator": "testExampleA"
+              }
+            }
+          },
+          {
+            "in": "path",
+            "name": "jobId",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": { "guid": "testGuid", "job_type": 11 }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/members": {
       "post": {
         "description": "Create a connection with an aggregator",
