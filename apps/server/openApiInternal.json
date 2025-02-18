@@ -373,6 +373,54 @@
           }
         }
       }
+    },
+    "/members/{connectionId}/credentials": {
+      "get": {
+        "description": "Get the credentials for a connection",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "connectionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "meta",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "example": {
+                "aggregator": "testExampleA",
+                "jobTypes": ["transactions"]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "example": [
+                    {
+                      "id": "testConnectionId",
+                      "field_name": "testFieldName",
+                      "field_type": 3,
+                      "label": "TestExampleA Label",
+                      "guid": "testConnectionId"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
