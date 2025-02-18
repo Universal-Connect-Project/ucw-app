@@ -346,6 +346,48 @@
       }
     },
     "/members": {
+      "get": {
+        "description": "Get a member by their connection id and aggregator",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "meta",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "example": {
+                "aggregator": "testExampleA",
+                "connection_id": "test"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "example": [
+                    {
+                      "institution_guid": "institutionCode",
+                      "guid": "testConnectionId",
+                      "connection_status": 0,
+                      "most_recent_job_guid": null,
+                      "is_oauth": false,
+                      "aggregator": "testExampleA",
+                      "is_being_aggregated": false,
+                      "user_guid": "e07115cc-bbf9-466a-b7db-cdbc9c7cd31b",
+                      "mfa": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "description": "Create a connection with an aggregator",
         "parameters": [
