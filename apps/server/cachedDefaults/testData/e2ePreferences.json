@@ -1,7 +1,7 @@
 {
   "defaultAggregator": "testExampleB",
 
-  "supportedAggregators": ["testExampleA", "testExampleB"],
+  "supportedAggregators": ["testExampleA", "testExampleB", "mx", "sophtron"],
 
   "defaultAggregatorVolume": {
     "testExampleA": 50,
