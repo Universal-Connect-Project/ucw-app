@@ -170,14 +170,12 @@ export class AggregatorAdapterBase {
     if (ret.auth_status === OAuthStatus.ERROR) {
       ret.error_reason = connection.status;
     }
-    return { oauth_state: ret };
+    return ret;
   }
 
   async getOauthStates(memberGuid: string) {
     const state = await this.getOauthState(memberGuid);
-    return {
-      oauth_states: [state.oauth_state],
-    };
+    return [state];
   }
 
   async deleteConnection(connection_id: string): Promise<void> {

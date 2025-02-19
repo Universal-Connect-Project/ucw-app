@@ -64,6 +64,22 @@ const connectWidgetApiService = {
   loadMembers: async () => {
     return configuredAxios.get(`/members`).then((response) => response.data);
   },
+  loadOAuthState: async (connectionGuid: string) => {
+    return configuredAxios
+      .get(`/oauth_states/${connectionGuid}`)
+      .then((response) => response.data);
+  },
+  loadOAuthStates: async ({
+    outbound_member_guid,
+  }: {
+    outbound_member_guid: string;
+  }) => {
+    return configuredAxios
+      .get(`/oauth_states`, {
+        params: { outboundMemberGuid: outbound_member_guid },
+      })
+      .then((response) => response.data);
+  },
   loadPopularInstitutions: async () => {
     return configuredAxios
       .get(RECOMMENDED_INSTITUTIONS_URL)

@@ -117,7 +117,7 @@ export default function (app) {
 
   app.get("/oauth_states", async (req, res) => {
     const ret = await req.connectApi.getOauthStates(
-      req.query.outbound_member_guid,
+      req.query.outboundMemberGuid,
     );
     res.send(ret);
   });
