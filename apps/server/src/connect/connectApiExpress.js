@@ -10,6 +10,10 @@ import {
   getInstitutionHandler,
   getInstitutionsHandler,
 } from "./institutionEndpoints";
+import {
+  webhookHandler,
+  oauthRedirectHandler,
+} from "./oauthEndpoints";
 import { userDeleteHandler } from "./userEndpoints";
 import { MappedJobTypes } from "../shared/contract";
 import stubs from "./instrumentations.js";
@@ -178,4 +182,12 @@ export default function (app) {
       members: ret,
     });
   });
+  
+  app.all('/webhook/:aggregator/*', webhookHandler)
+
+  app.get('/oauth/:aggregator/redirect_from/', oauthRedirectHandler)
+  
+  app.get('/oauth/oauth.js', (req, res) => {
+    res.sendFile(path.join(__dirname, "../infra/http/oauth/oauth.js"))
+  })
 }

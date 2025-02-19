@@ -23,6 +23,7 @@ const pageQueryParameters = new RegExp(
     "server",
     "is_mobile_webview",
     "include_identity",
+    "session_id"
   ]
     .map((r) => `\\$${r}`)
     .join("|"),

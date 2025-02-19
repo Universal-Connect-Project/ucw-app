@@ -4,13 +4,19 @@ import type { Aggregator } from "./adapterSetup";
 import { adapterMap } from "./adapterSetup";
 
 export function createAggregatorWidgetAdapter(
-  aggregator: Aggregator,
+  {
+    aggregator, 
+    sessionId
+  } : {
+    aggregator: Aggregator, 
+    sessionId?: string | undefined
+  }
 ): WidgetAdapter {
   const createWidgetAdapter =
     adapterMap[aggregator as keyof typeof adapterMap]?.createWidgetAdapter;
 
   if (createWidgetAdapter) {
-    return createWidgetAdapter();
+    return createWidgetAdapter({sessionId});
   }
 
   throw new Error(`Unsupported aggregator ${aggregator}`);

@@ -21,6 +21,7 @@
         institution_id: '$institution_id',
         connection_id: '$connection_id',
         user_id: '$user_id',
+        seesion_id: '$seesion_id',
         aggregator: '$aggregator'
       }
 
@@ -50,6 +51,7 @@
             current_aggregator: params.aggregator,
             current_partner: '$partner',
             user_id: params.user_id,
+            session_id: params.session_id,
             current_microdeposit_guid: null,
             disable_background_agg: null,
             disable_institution_search: !!(
