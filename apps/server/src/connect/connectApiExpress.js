@@ -9,11 +9,12 @@ import {
   getInstitutionHandler,
   getInstitutionsHandler,
 } from "./institutionEndpoints";
+import { webhookHandler, oauthRedirectHandler } from "./oauthEndpoints";
+import { MappedJobTypes } from "../shared/contract";
 import stubs from "./instrumentations.js";
 import { jobsRouteHandler } from "./jobEndpoints";
 import { instrumentationHandler } from "./instrumentationEndpoints";
 import {
-  MappedJobTypes,
   INSTRUMENTATION_URL,
   RECOMMENDED_INSTITUTIONS_URL,
   SEARCH_INSTITUTIONS_URL,
@@ -174,5 +175,13 @@ export default function (app) {
     res.send({
       members: ret,
     });
+  });
+
+  app.all("/webhook/:aggregator/*", webhookHandler);
+
+  app.get("/oauth/:aggregator/redirect_from/", oauthRedirectHandler);
+
+  app.get("/oauth/oauth.js", (req, res) => {
+    res.sendFile(path.join(__dirname, "../infra/http/oauth/oauth.js"));
   });
 }

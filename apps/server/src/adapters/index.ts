@@ -30,14 +30,13 @@ export class AggregatorAdapterBase {
   }
 
   async init() {
-    const token = "fakeTokenThatWeNeedToRemove";
-
-    this.analyticsClient = new AnalyticsClient(token);
+    this.analyticsClient = new AnalyticsClient("temp_fake_authToken");
     try {
       if (this.context?.aggregator) {
-        this.aggregatorAdapter = createAggregatorWidgetAdapter(
-          this.context?.aggregator as Aggregator,
-        );
+        this.aggregatorAdapter = createAggregatorWidgetAdapter({
+          aggregator: this.context?.aggregator as Aggregator,
+          sessionId: this.context.session_id,
+        });
       }
       this.aggregators = aggregators;
       return true;
