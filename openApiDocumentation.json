@@ -26,6 +26,16 @@
             }
           },
           {
+            "description": "The id for the session",
+            "name": "sessionId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "testSessionId"
+            }
+          },
+          {
             "description": "The user id to make or refresh a connection with.",
             "name": "user_id",
             "in": "query",

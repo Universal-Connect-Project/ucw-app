@@ -124,7 +124,8 @@ export class TestAdapter implements WidgetAdapter {
   ): Promise<Connection> {
     const oauth = request.institution_id.toLowerCase().indexOf("oauth") >= 0;
     const failed = request.institution_id.toLowerCase().indexOf("failed") >= 0;
-    const oauth_windows_url = `http://localhost:8080/oauth/testExampleA/redirect_from/?code=${failed ? "error" : "success"}&state=test_oauth_connection`;
+    const oauth_windows_url = `http://localhost:8080/oauth/testExampleA/redirect_from/?code=${failed ? "error" : "success"}&state=${testConnectionId}`;
+
     if (request.jobTypes?.includes(ComboJobTypes.ACCOUNT_NUMBER)) {
       const redisStatusKey = createRedisStatusKey({
         aggregator: this.aggregator,
@@ -282,7 +283,7 @@ export class TestAdapter implements WidgetAdapter {
         error: code,
       } as any;
     }
-    const connection = await get(request_id);
+    const connection = await get(`context_${request_id}`);
     if (!connection) {
       return null;
     }

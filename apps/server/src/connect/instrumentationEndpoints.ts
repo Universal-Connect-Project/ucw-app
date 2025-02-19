@@ -10,6 +10,7 @@ export const instrumentationHandler = async (req: Request, res: Response) => {
       current_aggregator,
       current_member_guid,
       jobTypes,
+      sessionId,
       single_account_select,
     } = body;
 
@@ -20,6 +21,7 @@ export const instrumentationHandler = async (req: Request, res: Response) => {
       req.context.connection_id = current_member_guid;
     }
 
+    req.context.sessionId = sessionId;
     req.context.jobTypes = jobTypes;
     req.context.scheme = "vcs";
     req.context.oauth_referral_source = "BROWSER";

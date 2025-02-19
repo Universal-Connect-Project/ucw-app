@@ -52,6 +52,7 @@ const Widget = ({
         profiles={{
           clientProfile: {
             account_verification_is_enabled: true,
+            uses_oauth: true,
           },
         }}
         userFeatures={[
