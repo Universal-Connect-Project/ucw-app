@@ -1,4 +1,4 @@
-name: E2E Tests (Server) Authentication
+name: E2E Tests (Template Adapter)
 
 on: pull_request
 
@@ -8,7 +8,7 @@ jobs:
     uses: ./.github/workflows/setup-env.yml
     secrets: inherit
 
-  e2e-tests:
+  e2e-tests-template-adapter:
     runs-on: ubuntu-latest
     needs: [setup-env]
 
@@ -46,7 +46,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "lts/Iron"
+          node-version: "lts/*"
           check-latest: true
       - run: npm ci
 
@@ -59,30 +59,16 @@ jobs:
 
           # Vars
           echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
-          echo AUTHENTICATION_ENABLE=true >> ${ENV_FILE_PATH}
-          echo DATA_ENDPOINT_AUTHENTICATION_ENABLE=true >> ${ENV_FILE_PATH}
-          echo DELETE_USER_ENDPOINT_AUTHENTICATION_ENABLE=true >> ${ENV_FILE_PATH}
+
+          # Secrets (can't load these from another job, due to GH security features)
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CYPRESS_auth_widget_demo_username: ${{ secrets.AUTHENTICATION_USERNAME }}
-          CYPRESS_auth_widget_demo_password: ${{ secrets.AUTHENTICATION_PASSWORD }}
-          CYPRESS_auth_widget_demo_data_username: ${{ secrets.DATA_ENDPOINT_AUTHENTICATION_USERNAME }}
-          CYPRESS_auth_widget_demo_data_password: ${{ secrets.DATA_ENDPOINT_AUTHENTICATION_PASSWORD }}
-          CYPRESS_auth_widget_demo_delete_user_username: ${{ secrets.DELETE_USER_ENDPOINT_AUTHENTICATION_USERNAME }}
-          CYPRESS_auth_widget_demo_delete_user_password: ${{ secrets.DELETE_USER_ENDPOINT_AUTHENTICATION_PASSWORD }}
-          CYPRESS_auth_audience: ${{ vars.AUTHENTICATION_AUDIENCE }}
-          CYPRESS_auth_widget_demo_scope: ${{ vars.AUTHENTICATION_SCOPES }}
-          CYPRESS_auth_widget_demo_data_scope: ${{ vars.DATA_ENDPOINT_AUTHENTICATION_SCOPES }}
-          CYPRESS_auth_widget_demo_delete_user_scope: ${{ vars.DELETE_USER_ENDPOINT_AUTHENTICATION_SCOPES }}
-          CYPRESS_auth_client_id: ${{ vars.AUTHENTICATION_CLIENT_ID }}
-          CYPRESS_auth_domain: ${{ vars.AUTHENTICATION_DOMAIN }}
-
         with:
-          config-file: cypress.config.authentication.ts
-          project: apps/server
+          config-file: cypress.config.ts
+          project: packages/template-adapter # Use for own package ${{ vars.PACKAGE_DIR }}
           start: npm run start:e2e
           wait-on: "http://localhost:8080/health, http://localhost:9200"
 
@@ -91,4 +77,4 @@ jobs:
         if: failure()
         with:
           name: cypress-screenshots
-          path: ./apps/server/cypress/screenshots
+          path: ./packages/template-adapter/cypress/screenshots # Use ${{ vars.PACKAGE_DIR }} in place of "packages/template-adapter" for own package

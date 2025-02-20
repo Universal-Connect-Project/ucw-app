@@ -1,17 +1,31 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Server",
   "compilerOptions": {
+    "baseUrl": "./src",
+    "lib": ["ES5", "ESNext"],
+
+    "module": "ES2015",
+    "moduleResolution": "Node",
+
     "allowJs": true,
+    "checkJs": false,
+
     "declaration": true,
+    "declarationMap": true,
+    "declarationDir": "./dist/types",
+
+    "strict": false,
+    "noImplicitThis": false,
+    "alwaysStrict": false,
+
+    "isolatedModules": true,
+
     "esModuleInterop": true,
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "noImplicitAny": true,
-    "resolveJsonModule": true,
-    "outDir": "dist",
-    "strictNullChecks": false, // TODO: change this to true and fix all errors
-    "target": "esnext",
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "allowArbitraryExtensions": true,
+
     "types": ["node", "jest"]
   },
   "include": [],
