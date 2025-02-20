@@ -1,5 +1,5 @@
-describe("Finicity aggregator", () => {
-  it("does something fake remove this when there's a real test", () => {
+describe("finicity aggregator", () => {
+  it("Finicity only uses oauth flow, cypress tests are not used", () => {
     expect(true).to.eq(true);
   });
 });

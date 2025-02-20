@@ -1,0 +1,31 @@
+{
+  "defaultAggregator": "sophtron",
+
+  "supportedAggregators": [
+    "mx_int",
+    "finicity_sandbox",
+    "finicity",
+    "mx",
+    "sophtron"
+  ],
+
+  "defaultAggregatorVolume": {
+    "aggregator1": 70,
+    "aggregator2": 30
+  },
+
+  "institutionAggregatorVolumeMap": {
+    "institutionId1": {
+      "aggregator1": 33.33,
+      "aggregator2": 33.33,
+      "aggregator3": 33.34
+    },
+    "institutionId2": {
+      "aggregator1": 100
+    }
+  },
+
+  "hiddenInstitutions": ["institutionId"],
+
+  "recommendedInstitutions": ["2deb6fca-557e-4d45-b2f8-354351675ad4"]
+}
