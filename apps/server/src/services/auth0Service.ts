@@ -12,7 +12,7 @@ export async function getAccessToken() {
     return cachedAccessToken;
   }
 
-  const response = await fetch(config.Auth0TokenUrl, {
+  const response = await fetch(config.AUTH0_TOKEN_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

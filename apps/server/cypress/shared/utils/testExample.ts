@@ -5,7 +5,7 @@ import {
 import {
   TEST_EXAMPLE_B_LABEL_TEXT,
   TEST_EXAMPLE_C_LABEL_TEXT,
-} from "../../../src/test-adapter";
+} from "../../../src/test-adapter/constants";
 import {
   TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME,
   TEST_EXAMPLE_B_ONLY_INSTITUTION_NAME,

@@ -5,7 +5,7 @@ import {
   generateDataTests,
   visitWithPostMessageSpy,
 } from "@repo/utils-dev-dependency";
-import { TEST_EXAMPLE_B_AGGREGATOR_STRING } from "../../../src/test-adapter";
+import { TEST_EXAMPLE_B_AGGREGATOR_STRING } from "../../../src/test-adapter/constants";
 import {
   enterTestExampleACredentials,
   enterTestExampleBCredentials,

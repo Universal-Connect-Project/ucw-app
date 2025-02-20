@@ -25,7 +25,7 @@ describe("getAccessToken", () => {
     let createAccessTokenPayload: any = null;
 
     server.use(
-      http.post(config.Auth0TokenUrl, async ({ request }) => {
+      http.post(config.AUTH0_TOKEN_URL, async ({ request }) => {
         createAccessTokenPayload = await request.json();
 
         return HttpResponse.json(mockResponseJson);
@@ -48,7 +48,7 @@ describe("getAccessToken", () => {
     const warningLogSpy = jest.spyOn(logger, "warning");
 
     server.use(
-      http.post(config.Auth0TokenUrl, async () => {
+      http.post(config.AUTH0_TOKEN_URL, async ({ request }) => {
         return new HttpResponse(null, {
           status: 401,
           statusText: "Unauthorized",
@@ -66,7 +66,7 @@ describe("getAccessToken", () => {
 
   it("should handle 500 errors gracefully", async () => {
     server.use(
-      http.post(config.Auth0TokenUrl, async () => {
+      http.post(config.AUTH0_TOKEN_URL, async ({ request }) => {
         return new HttpResponse(null, {
           status: 500,
           statusText: "Server Error",
@@ -81,7 +81,7 @@ describe("getAccessToken", () => {
 
   it("should handle Bad Request errors gracefully", async () => {
     server.use(
-      http.post(config.Auth0TokenUrl, async () => {
+      http.post(config.AUTH0_TOKEN_URL, async ({ request }) => {
         return new HttpResponse(null, {
           status: 400,
           statusText: "Bad Request",

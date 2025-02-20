@@ -1,7 +1,7 @@
 import { ConnectionStatus, OAuthStatus } from "../shared/contract";
-import { AggregatorAdapterBase } from "./index";
-
+import { AggregatorAdapterBase, instrumentation } from "./index";
 const testConnectionId = "test_connection_id";
+jest.mock('uuid', () => ({ v4: () => 'adfd01fb-309b-4e1c-9117-44d003f5d7fc' }));
 
 const aggregatorAdapterBase = new AggregatorAdapterBase({
   context: {
@@ -81,4 +81,63 @@ describe("AggregatorAdapterBase", () => {
       });
     });
   });
+});
+
+
+describe("instrumentation", () => {
+
+    it("it takes input paramters", async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const context = {}
+      const input = {
+        user_id: 'test_user_id',
+        current_aggregator: 'test_aggregator',
+        current_member_guid: 'test_member_guid',
+        current_partner: 'test_partner',
+        job_type: 'aggregate',
+        session_id: 'test_seesion_id'
+      }
+
+      instrumentation(context, input)
+
+      expect(context).toEqual({
+        aggregator: "test_aggregator",
+        connection_id: "test_member_guid",
+        job_type: "aggregate",
+        oauth_referral_source: "BROWSER",
+        partner: "test_partner",
+        scheme: "vcs",
+        session_id: "test_seesion_id",
+        single_account_select: undefined,
+        updated: true,
+        user_id: "test_user_id",
+      });
+    });
+
+    it("it generates a seesion_id", async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      
+      const context = {}
+      const input = {
+        user_id: 'test_user_id',
+        current_aggregator: 'test_aggregator',
+        current_member_guid: 'test_member_guid',
+        current_partner: 'test_partner',
+        job_type: 'aggregate',
+      }
+      instrumentation(context, input)
+
+      expect(context).toEqual({
+        aggregator: "test_aggregator",
+        connection_id: "test_member_guid",
+        job_type: "aggregate",
+        oauth_referral_source: "BROWSER",
+        partner: "test_partner",
+        scheme: "vcs",
+        session_id: "adfd01fb-309b-4e1c-9117-44d003f5d7fc",
+        single_account_select: undefined,
+        updated: true,
+        user_id: "test_user_id",
+      });
+    });
 });

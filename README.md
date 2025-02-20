@@ -38,14 +38,14 @@ The API documentation for this service lives in [./openApiDocumentation.json](./
 1. From the root directory, run:
    1. `npm ci`
    1. `cp ./.env.example ./.env`
-   1. `cp ./apps/server/.env.example ./apps/server/.env`
-      1. See [ENVIRONMENT.md](ENVIRONMENT.md) for details on what values you must provide in the `./apps/server/.env` file
+   1. `npm run copyServerEnv`
+      1. See [ENVIRONMENT.md](ENVIRONMENT.md) for details on what values you must provide in the `./apps/server/env/(staging|production).env` file
    1. `cp ./apps/server/cachedDefaults/preferences.example.json ./apps/server/cachedDefaults/preferences.json`
       1. Make sure you then set up your preferences (see [PREFERENCES.md](PREFERENCES.md) for details)
 1. Make sure you have Docker installed (or another compatible container runtime), which is a required dependency for the institution search feature to function, even when running via Node.js (more info in [DOCKER.md](DOCKER.md))
 1. Finally, you can run the docker containers, or simply run from the cli, via node.
    1. For docker: `docker compose up`
-   1. For node: `npm run dev`
+   1. For node: `npm run dev` or `npm run prod`
 
 It can take a minute or so for the server to initialize and set up elasticsearch.
 
@@ -61,17 +61,17 @@ See [PREFERENCES.md](PREFERENCES.md) and [ENVIRONMENT.md](ENVIRONMENT.md) for de
 
 There are several required environment variables and some optional environment variables that are described in [ENVIRONMENT.md](ENVIRONMENT.md)
 
-## Authentication 
+## Authentication
 
 We have an optional [authentication](./apps/server/src/authentication.ts) system built-in and enabled by .env variables. If `AUTHENTICATION_ENABLE=true` and the [other required variables are provided](ENVIRONMENT.md#authentication-variables), then all express endpoints defined after the `useAuthentication` call will require a `Bearer` token and optionally a set of scopes. This system assumes that you have an authorization system, such as auth0, to point to. If you need more control over your authentication, then you may fork the repository and implement your own.
 
-When authentication is enabled, the `/widget` endpoint will require authorization. 
+When authentication is enabled, the `/widget` endpoint will require authorization.
 
 There is a token endpoint (`/api/token`) that can be used to retrieve a one-time-use token that can then be passed into the widget url for use in an iframe. When this is used the server will set an authorization cookie that the widget UI will pass to the server for all of its requests.
 
 Variables for our optional authentication are found [here](ENVIRONMENT.md#authentication-variables)
 
-___
+---
 
 The following sections describe the UCW Server endpoints that are not associated with a connection, and should be authenticated separately from the connection endpoints.
 

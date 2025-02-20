@@ -1,6 +1,6 @@
 # Environment variables
 
-These are the environment variables that can be set in apps/server/.env
+These are the environment variables that can be set in apps/server/env/(staging|production).env
 
 ## Suggested variables
 

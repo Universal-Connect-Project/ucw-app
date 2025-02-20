@@ -26,7 +26,7 @@ services:
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
     env_file:
-      - ./apps/server/.env
+      - ./apps/server/env/production.env
     environment:
       - ELASTIC_SEARCH_URL=http://ucw-app-elasticsearch:9200
       - REDIS_SERVER=redis://cache:6379

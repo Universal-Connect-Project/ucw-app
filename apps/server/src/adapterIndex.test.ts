@@ -50,14 +50,14 @@ describe("adapterSetup", () => {
 
   describe("createAggregatorWidgetAdapter", () => {
     it("throws an error if its an unsupported aggregator", async () => {
-      expect(() => createAggregatorWidgetAdapter("junk" as Aggregator)).toThrow(
+      expect(() => createAggregatorWidgetAdapter({aggregator: "junk" as Aggregator})).toThrow(
         "Unsupported aggregator junk",
       );
     });
 
     it("returns the testExample widget adapter", () => {
       const adapter = createAggregatorWidgetAdapter(
-        TEST_EXAMPLE_A_AGGREGATOR_STRING,
+        {aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING},
       );
 
       expect(adapter).toBeInstanceOf(TestAdapter);
