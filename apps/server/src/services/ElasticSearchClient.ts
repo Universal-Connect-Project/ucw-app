@@ -76,7 +76,6 @@ export async function indexElasticSearch() {
       id: institution.id,
       body: institution,
     });
-    info(`Indexed document ${index + 1} of ${total} (ID: ${institution.id})`);
   }
 
   if (config.ELASTIC_SEARCH_SINGLE_THREAD) {
@@ -163,7 +162,6 @@ export async function search(
   const preferences = await getPreferences();
   const hiddenInstitutions = preferences?.hiddenInstitutions || [];
   const supportedAggregators = preferences?.supportedAggregators || [];
-
   const { body }: { body: SearchResponse } = await ElasticsearchClient.search({
     index: "institutions",
     body: {

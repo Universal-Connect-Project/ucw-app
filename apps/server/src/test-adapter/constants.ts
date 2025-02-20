@@ -13,6 +13,15 @@ export const testAggregatorMemberGuid = "testAggregatorMemberGuid";
 export const testDataRequestValidatorStartTimeError =
   '"start_time" is required';
 
+export const testExampleOauthInstitution = {
+  guid: "test bank_oauth",
+  code: "test bank_oauth",
+  name: "test Bank (Oauth)",
+  url: "www.test.com",
+  logo_url: `http://localhost:8080/oauth/testExampleA/redirect_from/?code=examplecode&state=test_oauth_connection`,
+  supports_oauth: true
+}
+
 export const testExampleInstitution = {
   logo_url:
     "https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png",

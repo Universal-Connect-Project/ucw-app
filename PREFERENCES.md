@@ -11,15 +11,15 @@ _See [testPreferences.json](./apps/server/cachedDefaults/testData/testPreference
 
 ## Aggregator Credentials
 
-**NOTE:** For any aggregators listed in the section labeled `supportedAggregators`, you must provide your own credentials for each of these aggregators in the `./apps/server/.env` file. You need to have credentials for a minimum of one aggregator in order for the UCW to function correctly.
+**NOTE:** For any aggregators listed in the section labeled `supportedAggregators`, you must provide your own credentials for each of these aggregators in the `./apps/server/env/(staging|production).env` file. You need to have credentials for a minimum of one aggregator in order for the UCW to function correctly.
 
 Follow these links to sign-up for credentials for each aggregator that the UCW currently supports:
 
 - MX - [Register for a developer account](https://dashboard.mx.com/sign_up)
-  - Once you have created an account, go to [https://dashboard.mx.com/home](https://dashboard.mx.com/home), and look for your `API Key` and `Client ID`. Put those values in `./apps/server/.env`
+  - Once you have created an account, go to [https://dashboard.mx.com/home](https://dashboard.mx.com/home), and look for your `API Key` and `Client ID`. Put those values in ` ./apps/server/env/(staging|production).env`
   - Note that MX requires that your IP address(es) be approved and added to their allow-list, prior to being able to connect. This can be done in their dashboard.
 - Sophtron - [Register for a developer account](https://sophtron.com/Account/Register)
-  - Once you have created an account, go to [https://sophtron.com/Manage](https://sophtron.com/Manage), and look for your `UserId` and `AccessKey`. Put those values in `./apps/server/.env`
+  - Once you have created an account, go to [https://sophtron.com/Manage](https://sophtron.com/Manage), and look for your `UserId` and `AccessKey`. Put those values in `./apps/server/env/(staging|production).env`
 
 _Note: Aggregators require a contract to access their production APIs._
 

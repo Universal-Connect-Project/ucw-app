@@ -22,7 +22,9 @@ const handlers = [
     HttpResponse.json({ link: FINICITY_CONNECT_LITE_URL }),
   ),
   http.post(CREATE_CUSTOMER_PATH, () => HttpResponse.json(createCustomerData)),
-  http.post(config.Auth0TokenUrl, () => HttpResponse.json(accessTokenResponse)),
+  http.post(config.AUTH0_TOKEN_URL, () =>
+    HttpResponse.json(accessTokenResponse),
+  ),
 ];
 
 export default handlers;

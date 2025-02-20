@@ -21,7 +21,7 @@ they are working as expected, or to debug issues. This allows you to do so.
 
 ```shell
 docker build -f ./docker-server.Dockerfile -t ucw-app-server-cli --build-arg APP=server .
-docker run --name ucw-app-server-cli --rm -p 8080:8080 --env-file ./apps/server/.env -t ucw-app-server-cli
+docker run --name ucw-app-server-cli --rm -p 8080:8080 --env-file ./apps/server/env/production.env -t ucw-app-server-cli
 ```
 
 ## Testing with Docker Compose

@@ -1,15 +1,8 @@
-const nonSensitiveSharedConfig = {
-  AuthServiceEndpoint: "https://login.universalconnectproject.org/api",
-  SearchEndpoint: "https://search.universalconnectproject.org/api/",
-  AnalyticsServiceEndpoint:
-    "https://analytics.universalconnectproject.org/api/",
-  Component: "UniversalWidget",
-  ServiceName: "universal_widget",
-  CryptoAlgorithm: "aes-256-cbc",
-  Auth0TokenUrl: "https://dev-d23wau8o0uc5hw8n.us.auth0.com/oauth/token",
-};
+import "./dotEnv";
 
 const keysToPullFromEnv = [
+  "AUTH0_TOKEN_URL",
+
   "PORT",
 
   "HOST_URL",
@@ -39,6 +32,11 @@ const keysToPullFromEnv = [
   "FINICITY_PARTNER_IDProd",
   "FINICITY_APP_KEYProd",
   "FINICITY_SECRETProd",
+
+  "AKOYA_CLIENT_ID",
+  "AKOYA_CLIENT_ID_PROD",
+  "AKOYA_SECRET",
+  "AKOYA_SECRET_PROD",
 
   "ELASTIC_SEARCH_URL",
   "ELASTIC_SEARCH_SINGLE_THREAD",
@@ -72,18 +70,12 @@ const keysToPullFromEnv = [
   "PROXY_PASSWORD",
 ];
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const config: Record<string, any> = keysToPullFromEnv.reduce(
-  (acc, envKey) => {
-    return {
-      ...acc,
-      [envKey]: process.env[envKey],
-    };
-  },
-  {
-    ...nonSensitiveSharedConfig,
-  },
-);
+const config: Record<string, any> = keysToPullFromEnv.reduce((acc, envKey) => {
+  return {
+    ...acc,
+    [envKey]: process.env[envKey],
+  };
+}, {});
 
 if (config.INSTITUTION_POLLING_INTERVAL === undefined) {
   config.INSTITUTION_POLLING_INTERVAL = 1;

@@ -1,13 +1,12 @@
+import "dotenv/config";
+import config from "./config";
 import ngrok from "@ngrok/ngrok";
 import cookieParser from "cookie-parser";
-import "dotenv/config";
 import express from "express";
 import "express-async-errors";
 import RateLimit from "express-rate-limit";
 import path from "path";
-
 import useAuthentication from "./authentication";
-import config from "./config";
 import useConnect from "./connect/connectApiExpress";
 import useUserEndpoints from "./connect/useUserEndpoints";
 import useDataEndpoints from "./dataEndpoints/useDataEndpoints";
@@ -83,6 +82,10 @@ app.get("*", (req, res) => {
   req.metricsPath = "/catchall";
   res.sendStatus(404);
 });
+
+if(!config.PORT){
+  throw new Error('Invalid config, unable to start server')
+}
 
 app.listen(config.PORT, () => {
   const message = `Server is running on port ${config.PORT}, ENV: ${config.ENV}, LOG_LEVEL: ${config.LOG_LEVEL}`;
