@@ -52,6 +52,11 @@ const useDataEndpoints = (app: Express) => {
       dataEndpointMiddleware,
       createTransactionsDataHandler(false),
     );
+    app.get(
+      "/api/data/aggregator/:aggregator/user/:userId/connection/:connectionId/account/:accountId/transactions",
+      dataEndpointMiddleware,
+      createTransactionsDataHandler(false),
+    );
 
     // VC Data Endpoints
     app.get(
@@ -66,6 +71,11 @@ const useDataEndpoints = (app: Express) => {
     );
     app.get(
       "/api/vc/data/aggregator/:aggregator/user/:userId/account/:accountId/transactions",
+      dataEndpointMiddleware,
+      createTransactionsDataHandler(true),
+    );
+    app.get(
+      "/api/vc/data/aggregator/:aggregator/user/:userId/connection/:connectionId/account/:accountId/transactions",
       dataEndpointMiddleware,
       createTransactionsDataHandler(true),
     );

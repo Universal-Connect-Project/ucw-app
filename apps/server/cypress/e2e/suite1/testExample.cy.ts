@@ -80,6 +80,36 @@ const verifyTransactionsValidatorError = ({ accountId, userId }) => {
     });
 };
 
+
+const verifyTransactionsWithConnectionIdSuccess = ({ accountId, connectionId, userId }) => {
+  const url = `/data/aggregator/${TEST_EXAMPLE_B_AGGREGATOR_STRING}/user/${userId}/connection/${connectionId}/account/${accountId}/transactions?start_time=2021/1/1`;
+
+  return cy
+    .request({
+      method: "GET",
+      url: `/api${url}`,
+    })
+    .then((dataResponse) => {
+      expect(dataResponse.status).to.equal(200);
+      expect(dataResponse.body.transactions.length).to.be.greaterThan(-1);
+    });
+};
+
+const verifyTransactionsWithConnectionIdValidatorError = ({ accountId, connectionId, userId }) => {
+  const url = `/data/aggregator/${TEST_EXAMPLE_B_AGGREGATOR_STRING}/user/${userId}/connection/${connectionId}/account/${accountId}/transactions`;
+
+  return cy
+    .request({
+      method: "GET",
+      url: `/api${url}`,
+      failOnStatusCode: false,
+    })
+    .then((dataResponse) => {
+      expect(dataResponse.status).to.equal(400);
+    });
+};
+
+
 describe("testExampleA and B aggregators", () => {
   generateDataTests({
     makeAConnection: makeAnAConnection,
@@ -119,6 +149,16 @@ describe("testExampleA and B aggregators", () => {
             });
             verifyTransactionsValidatorError({
               accountId,
+              userId,
+            });
+            verifyTransactionsWithConnectionIdSuccess({
+              accountId,
+              connectionId: memberGuid,
+              userId,
+            });
+            verifyTransactionsWithConnectionIdValidatorError({
+              accountId,
+              connectionId: memberGuid,
               userId,
             });
           });

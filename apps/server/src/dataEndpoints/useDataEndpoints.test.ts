@@ -14,7 +14,7 @@ describe("useDataEndpoints", () => {
 
     useDataEndpoints(app);
 
-    expect(app.get).toHaveBeenCalledTimes(6);
+    expect(app.get).toHaveBeenCalledTimes(8);
   });
 
   it("doesn't attach anything if data endpoints aren't enabled", () => {
