@@ -100,6 +100,7 @@ export interface TransactionsDataQueryParameters {
 
 export interface TransactionsDataPathParameters {
   accountId: string;
+  connectionId?: string;
   aggregator: Aggregator;
   userId: string;
 }
@@ -107,7 +108,7 @@ export interface TransactionsDataPathParameters {
 export const createTransactionsDataHandler = (isVc: boolean) =>
   withValidateAggregatorInPath(
     async (req: TransactionsRequest, res: Response) => {
-      const { accountId, aggregator, userId } = req.params;
+      const { accountId, aggregator, userId, connectionId } = req.params;
       const { start_time, end_time } = req.query;
 
       const aggregatorAdapter = createAggregatorWidgetAdapter({aggregator});
@@ -118,6 +119,7 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
         type: VCDataTypes.TRANSACTIONS,
         userId: aggregatorUserId,
         accountId,
+        connectionId,
         startTime: start_time,
         endTime: end_time,
       };
