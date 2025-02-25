@@ -6,6 +6,7 @@ interface InstrumentationParameters {
   current_member_guid?: string;
   current_aggregator?: string;
   jobTypes: ComboJobTypes[];
+  sessionId?: string;
   single_account_select?: boolean;
 }
 

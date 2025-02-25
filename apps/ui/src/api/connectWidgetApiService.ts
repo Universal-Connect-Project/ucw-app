@@ -1,6 +1,7 @@
 import configuredAxios from "./axios";
 import {
   CREATE_MEMBER_URL,
+  OAUTH_STATES_URL,
   RECOMMENDED_INSTITUTIONS_URL,
   SEARCH_INSTITUTIONS_URL,
 } from "@repo/utils";
@@ -63,6 +64,22 @@ const connectWidgetApiService = {
   },
   loadMembers: async () => {
     return configuredAxios.get(`/members`).then((response) => response.data);
+  },
+  loadOAuthState: async (connectionGuid: string) => {
+    return configuredAxios
+      .get(`${OAUTH_STATES_URL}/${connectionGuid}`)
+      .then((response) => response.data);
+  },
+  loadOAuthStates: async ({
+    outbound_member_guid,
+  }: {
+    outbound_member_guid: string;
+  }) => {
+    return configuredAxios
+      .get(OAUTH_STATES_URL, {
+        params: { outboundMemberGuid: outbound_member_guid },
+      })
+      .then((response) => response.data);
   },
   loadPopularInstitutions: async () => {
     return configuredAxios

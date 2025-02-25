@@ -30,7 +30,7 @@ export const createAccountsDataHandler = (isVc: boolean) =>
   withValidateAggregatorInPath(async (req: AccountsRequest, res: Response) => {
     const { aggregator, connectionId, userId } = req.params;
 
-    const aggregatorAdapter = createAggregatorWidgetAdapter(aggregator);
+    const aggregatorAdapter = createAggregatorWidgetAdapter({aggregator});
     const aggregatorUserId = await aggregatorAdapter.ResolveUserId(userId);
 
     const dataArgs = {
@@ -67,7 +67,7 @@ export const createIdentityDataHandler = (isVc: boolean) =>
   withValidateAggregatorInPath(async (req: IdentityRequest, res: Response) => {
     const { aggregator, connectionId, userId } = req.params;
 
-    const aggregatorAdapter = createAggregatorWidgetAdapter(aggregator);
+    const aggregatorAdapter = createAggregatorWidgetAdapter({aggregator});
     const aggregatorUserId = await aggregatorAdapter.ResolveUserId(userId);
 
     const dataArgs = {
@@ -110,7 +110,7 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
       const { accountId, aggregator, userId } = req.params;
       const { start_time, end_time } = req.query;
 
-      const aggregatorAdapter = createAggregatorWidgetAdapter(aggregator);
+      const aggregatorAdapter = createAggregatorWidgetAdapter({aggregator});
       const aggregatorUserId = await aggregatorAdapter.ResolveUserId(userId);
 
       const dataArgs = {

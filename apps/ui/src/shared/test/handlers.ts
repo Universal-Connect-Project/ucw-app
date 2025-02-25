@@ -9,6 +9,8 @@ import {
   MEMBER_BY_GUID_MOCK_URL,
   MEMBER_CREDENTIALS_MOCK_URL,
   MEMBERS_URL,
+  OAUTH_STATE_MOCK_URL,
+  OAUTH_STATES_URL,
   RECOMMENDED_INSTITUTIONS_URL,
   SEARCH_INSTITUTIONS_URL,
   UPDATE_MFA_MOCK_URL,
@@ -21,6 +23,8 @@ import { jobResponse } from "./testData/job";
 import { memberByGuidRespose } from "./testData/memberByGuid";
 import { membersResponse } from "./testData/members";
 import { updateMFAResponse } from "./testData/updateMFA";
+import { oauthStatesResponse } from "./testData/oauthStates";
+import { oauthStateResponse } from "./testData/oauthState";
 
 const handlers = [
   http.post(INSTRUMENTATION_MOCK_URL, () => HttpResponse.json({})),
@@ -46,6 +50,8 @@ const handlers = [
   ),
   http.post(CREATE_MEMBER_URL, () => HttpResponse.json(createMemberResponse)),
   http.put(UPDATE_MFA_MOCK_URL, () => HttpResponse.json(updateMFAResponse)),
+  http.get(OAUTH_STATES_URL, () => HttpResponse.json(oauthStatesResponse)),
+  http.get(OAUTH_STATE_MOCK_URL, () => HttpResponse.json(oauthStateResponse)),
 ];
 
 export default handlers;

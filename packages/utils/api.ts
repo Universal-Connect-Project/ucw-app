@@ -15,6 +15,9 @@ export const MEMBER_BY_GUID_MOCK_URL = "/members/:guid";
 
 export const UPDATE_MFA_MOCK_URL = "/members/:guid";
 
+export const OAUTH_STATES_URL = "/oauthStates";
+export const OAUTH_STATE_MOCK_URL = `${OAUTH_STATES_URL}/:connectionId`;
+
 export const JOB_BY_GUID_MOCK_URL = `/jobs/:guid`;
 
 export const CREATE_MEMBER_URL = "/members";

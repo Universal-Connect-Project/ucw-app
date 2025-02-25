@@ -8,6 +8,8 @@ import {
   MEMBER_BY_GUID_MOCK_URL,
   MEMBER_CREDENTIALS_MOCK_URL,
   MEMBERS_URL,
+  OAUTH_STATE_MOCK_URL,
+  OAUTH_STATES_URL,
   RECOMMENDED_INSTITUTIONS_URL,
   SEARCH_INSTITUTIONS_URL,
   UPDATE_MFA_MOCK_URL,
@@ -25,6 +27,8 @@ import { createMemberResponse } from "../shared/test/testData/member";
 import { jobResponse } from "../shared/test/testData/job";
 import { memberByGuidRespose } from "../shared/test/testData/memberByGuid";
 import { membersResponse } from "../shared/test/testData/members";
+import { oauthStateResponse } from "../shared/test/testData/oauthState";
+import { oauthStatesResponse } from "../shared/test/testData/oauthStates";
 
 describe("connectWidgetApiService", () => {
   describe("addMember", () => {
@@ -43,6 +47,52 @@ describe("connectWidgetApiService", () => {
       );
 
       await expect(connectWidgetApiService.addMember("test")).rejects.toThrow();
+    });
+  });
+
+  describe("loadOauthState", () => {
+    it("resolves with credentials", async () => {
+      expect(await connectWidgetApiService.loadOAuthState("test")).toEqual(
+        oauthStateResponse,
+      );
+    });
+
+    it("throws an error on failure", async () => {
+      server.use(
+        http.get(
+          OAUTH_STATE_MOCK_URL,
+          () => new HttpResponse(null, { status: 400 }),
+        ),
+      );
+
+      await expect(
+        connectWidgetApiService.loadOAuthState("test"),
+      ).rejects.toThrow();
+    });
+  });
+
+  describe("loadOauthStates", () => {
+    it("resolves with credentials", async () => {
+      expect(
+        await connectWidgetApiService.loadOAuthStates({
+          outbound_member_guid: "test",
+        }),
+      ).toEqual(oauthStatesResponse);
+    });
+
+    it("throws an error on failure", async () => {
+      server.use(
+        http.get(
+          OAUTH_STATES_URL,
+          () => new HttpResponse(null, { status: 400 }),
+        ),
+      );
+
+      await expect(
+        connectWidgetApiService.loadOAuthStates({
+          outbound_member_guid: "test",
+        }),
+      ).rejects.toThrow();
     });
   });
 

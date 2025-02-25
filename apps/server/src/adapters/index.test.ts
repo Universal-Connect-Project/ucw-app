@@ -1,7 +1,7 @@
 import { ConnectionStatus, OAuthStatus } from "../shared/contract";
 import { AggregatorAdapterBase } from "./index";
-
 const testConnectionId = "test_connection_id";
+jest.mock("uuid", () => ({ v4: () => "adfd01fb-309b-4e1c-9117-44d003f5d7fc" }));
 
 const aggregatorAdapterBase = new AggregatorAdapterBase({
   context: {
@@ -15,6 +15,30 @@ const aggregatorAdapterBase = new AggregatorAdapterBase({
 });
 
 describe("AggregatorAdapterBase", () => {
+  describe("getOauthStates", () => {
+    it("returns a connected state", async () => {
+      await aggregatorAdapterBase.init();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (aggregatorAdapterBase as any).aggregatorAdapter = {
+        GetConnectionStatus: jest.fn().mockResolvedValue({
+          status: ConnectionStatus.CONNECTED,
+        }),
+      };
+
+      expect(
+        await aggregatorAdapterBase.getOauthStates(testConnectionId),
+      ).toEqual([
+        {
+          guid: "test_connection_id",
+          inbound_member_guid: "test_connection_id",
+          outbound_member_guid: "test_connection_id",
+          auth_status: OAuthStatus.COMPLETE,
+        },
+      ]);
+    });
+  });
+
   describe("getOauthState", () => {
     beforeAll(async () => {
       await aggregatorAdapterBase.init();
@@ -31,12 +55,10 @@ describe("AggregatorAdapterBase", () => {
       expect(
         await aggregatorAdapterBase.getOauthState(testConnectionId),
       ).toEqual({
-        oauth_state: {
-          guid: "test_connection_id",
-          inbound_member_guid: "test_connection_id",
-          outbound_member_guid: "test_connection_id",
-          auth_status: OAuthStatus.PENDING,
-        },
+        guid: "test_connection_id",
+        inbound_member_guid: "test_connection_id",
+        outbound_member_guid: "test_connection_id",
+        auth_status: OAuthStatus.PENDING,
       });
     });
 
@@ -51,12 +73,10 @@ describe("AggregatorAdapterBase", () => {
       expect(
         await aggregatorAdapterBase.getOauthState(testConnectionId),
       ).toEqual({
-        oauth_state: {
-          guid: "test_connection_id",
-          inbound_member_guid: "test_connection_id",
-          outbound_member_guid: "test_connection_id",
-          auth_status: OAuthStatus.COMPLETE,
-        },
+        guid: "test_connection_id",
+        inbound_member_guid: "test_connection_id",
+        outbound_member_guid: "test_connection_id",
+        auth_status: OAuthStatus.COMPLETE,
       });
     });
 
@@ -71,13 +91,11 @@ describe("AggregatorAdapterBase", () => {
       expect(
         await aggregatorAdapterBase.getOauthState(testConnectionId),
       ).toEqual({
-        oauth_state: {
-          guid: "test_connection_id",
-          inbound_member_guid: "test_connection_id",
-          outbound_member_guid: "test_connection_id",
-          auth_status: OAuthStatus.ERROR,
-          error_reason: ConnectionStatus.DENIED,
-        },
+        guid: "test_connection_id",
+        inbound_member_guid: "test_connection_id",
+        outbound_member_guid: "test_connection_id",
+        auth_status: OAuthStatus.ERROR,
+        error_reason: ConnectionStatus.DENIED,
       });
     });
   });

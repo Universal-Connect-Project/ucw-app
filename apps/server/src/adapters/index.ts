@@ -30,14 +30,13 @@ export class AggregatorAdapterBase {
   }
 
   async init() {
-    const token = "fakeTokenThatWeNeedToRemove";
-
-    this.analyticsClient = new AnalyticsClient(token);
+    this.analyticsClient = new AnalyticsClient("temp_fake_authToken");
     try {
       if (this.context?.aggregator) {
-        this.aggregatorAdapter = createAggregatorWidgetAdapter(
-          this.context?.aggregator as Aggregator,
-        );
+        this.aggregatorAdapter = createAggregatorWidgetAdapter({
+          aggregator: this.context?.aggregator as Aggregator,
+          sessionId: this.context.sessionId,
+        });
       }
       this.aggregators = aggregators;
       return true;
@@ -171,14 +170,12 @@ export class AggregatorAdapterBase {
     if (ret.auth_status === OAuthStatus.ERROR) {
       ret.error_reason = connection.status;
     }
-    return { oauth_state: ret };
+    return ret;
   }
 
   async getOauthStates(memberGuid: string) {
     const state = await this.getOauthState(memberGuid);
-    return {
-      oauth_states: [state.oauth_state],
-    };
+    return [state];
   }
 
   async deleteConnection(connection_id: string): Promise<void> {
