@@ -21,10 +21,6 @@ describe("oauthHandler", () => {
   });
 
   it("responds success from oauthRedirectHandler", async () => {
-    jest.mock("../services/storageClient/redis", () =>
-      jest.requireActual("../__mocks__/redis"),
-    );
-
     const req = {
       connectApi: connect,
       params: {
@@ -108,9 +104,6 @@ describe("webhookHandler", () => {
   });
 
   it("responds success from webhookHandler", async () => {
-    jest.mock("../services/storageClient/redis", () =>
-      jest.requireActual("../__mocks__/redis"),
-    );
     const req = {
       connectApi: connect,
       params: {
