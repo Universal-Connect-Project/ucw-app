@@ -15,6 +15,30 @@ const aggregatorAdapterBase = new AggregatorAdapterBase({
 });
 
 describe("AggregatorAdapterBase", () => {
+  describe("getOauthStates", () => {
+    it("returns a connected state", async () => {
+      await aggregatorAdapterBase.init();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (aggregatorAdapterBase as any).aggregatorAdapter = {
+        GetConnectionStatus: jest.fn().mockResolvedValue({
+          status: ConnectionStatus.CONNECTED,
+        }),
+      };
+
+      expect(
+        await aggregatorAdapterBase.getOauthStates(testConnectionId),
+      ).toEqual([
+        {
+          guid: "test_connection_id",
+          inbound_member_guid: "test_connection_id",
+          outbound_member_guid: "test_connection_id",
+          auth_status: OAuthStatus.COMPLETE,
+        },
+      ]);
+    });
+  });
+
   describe("getOauthState", () => {
     beforeAll(async () => {
       await aggregatorAdapterBase.init();

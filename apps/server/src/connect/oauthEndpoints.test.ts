@@ -5,6 +5,7 @@ import { webhookHandler, oauthRedirectHandler } from "./oauthEndpoints";
 import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../test-adapter";
 import { oauthSuccessResponse } from "./testData/oauth";
 import { format } from "prettier";
+import { ConnectionStatus } from "@repo/utils";
 
 const context = {
   aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
@@ -146,7 +147,7 @@ describe("webhookHandler", () => {
       request_id: "request_id",
       guid: "test_guid",
       user_id: "test_code",
-      status: 6,
+      status: ConnectionStatus.CONNECTED,
     });
   });
 
