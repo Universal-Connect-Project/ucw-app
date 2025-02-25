@@ -12,7 +12,7 @@ const context = {
 };
 let connect: ConnectApi;
 
-describe("oauthtHandler", () => {
+describe("oauthHandler", () => {
   beforeEach(async () => {
     connect = new ConnectApi({
       context,
