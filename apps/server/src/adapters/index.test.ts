@@ -31,12 +31,10 @@ describe("AggregatorAdapterBase", () => {
       expect(
         await aggregatorAdapterBase.getOauthState(testConnectionId),
       ).toEqual({
-        oauth_state: {
-          guid: "test_connection_id",
-          inbound_member_guid: "test_connection_id",
-          outbound_member_guid: "test_connection_id",
-          auth_status: OAuthStatus.PENDING,
-        },
+        guid: "test_connection_id",
+        inbound_member_guid: "test_connection_id",
+        outbound_member_guid: "test_connection_id",
+        auth_status: OAuthStatus.PENDING,
       });
     });
 
@@ -51,12 +49,10 @@ describe("AggregatorAdapterBase", () => {
       expect(
         await aggregatorAdapterBase.getOauthState(testConnectionId),
       ).toEqual({
-        oauth_state: {
-          guid: "test_connection_id",
-          inbound_member_guid: "test_connection_id",
-          outbound_member_guid: "test_connection_id",
-          auth_status: OAuthStatus.COMPLETE,
-        },
+        guid: "test_connection_id",
+        inbound_member_guid: "test_connection_id",
+        outbound_member_guid: "test_connection_id",
+        auth_status: OAuthStatus.COMPLETE,
       });
     });
 
@@ -71,13 +67,11 @@ describe("AggregatorAdapterBase", () => {
       expect(
         await aggregatorAdapterBase.getOauthState(testConnectionId),
       ).toEqual({
-        oauth_state: {
-          guid: "test_connection_id",
-          inbound_member_guid: "test_connection_id",
-          outbound_member_guid: "test_connection_id",
-          auth_status: OAuthStatus.ERROR,
-          error_reason: ConnectionStatus.DENIED,
-        },
+        guid: "test_connection_id",
+        inbound_member_guid: "test_connection_id",
+        outbound_member_guid: "test_connection_id",
+        auth_status: OAuthStatus.ERROR,
+        error_reason: ConnectionStatus.DENIED,
       });
     });
   });

@@ -283,20 +283,19 @@ export class TestAdapter implements WidgetAdapter {
         error: code,
       } as any;
     }
-    return null;
 
-    const connection = await get(`context_${request_id}`);
+    const connection = await get(request_id);
     if (!connection) {
       return null;
     }
-    // if (code) {
-    //   connection.status = ConnectionStatus.CONNECTED;
-    //   connection.user_id = code;
-    //   connection.request_id = request_id;
-    // }
-    // // console.log(connection)
-    // await set(request_id, connection);
+    if (code) {
+      connection.status = ConnectionStatus.CONNECTED;
+      connection.user_id = code;
+      connection.request_id = request_id;
+    }
 
-    // return connection;
+    await set(request_id, connection);
+
+    return connection;
   }
 }

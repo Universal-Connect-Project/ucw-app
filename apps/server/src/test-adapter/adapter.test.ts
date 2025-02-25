@@ -157,7 +157,7 @@ describe("TestAdapter", () => {
           "test",
         ),
       ).toEqual({
-        id: "testId",
+        id: testConnectionId,
         cur_job_id: "testJobId",
         institution_code: testInstitutionCode,
         is_being_aggregated: false,

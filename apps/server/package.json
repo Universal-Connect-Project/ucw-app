@@ -24,7 +24,7 @@
     "lint:fix": "eslint . --fix --ext .js,.ts",
     "coverage": "npm test -- --verbose --coverage --watchAll",
     "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --no-coverage",
-    "test:watch": "cross-env DEBUG_PRINT_LIMIT=50000 jest --no-coverage --watch",
+    "test:watch": "cross-env DEBUG_PRINT_LIMIT=50000 npm run test -- --watch",
     "test-clear": "npm test -- --clearCache",
     "playwright:test": "npx playwright test"
   },
