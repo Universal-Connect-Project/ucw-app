@@ -16,6 +16,7 @@ COPY . .
 RUN npm pkg delete scripts.prepare \
     && npm ci --omit=dev \
     && npm install turbo ts-node -g \
+    && npm install @testing-library/jest-dom \
     && npm run build
 
 RUN addgroup --system --gid 1001 nodejs \
