@@ -13,7 +13,7 @@ export const oauthRedirectHandler = async (req: Request, res: Response) => {
   try {
     const aggregatorAdapter = createAggregatorWidgetAdapter({ aggregator });
     const oauth_res: any =
-      (await aggregatorAdapter.HandleOauthResponse({
+      (await aggregatorAdapter?.HandleOauthResponse({
         query: req.query,
         params: req.params,
         body: req.body,
@@ -84,7 +84,7 @@ export const webhookHandler = async (req: Request, res: Response) => {
   try {
     const aggregatorAdapter = createAggregatorWidgetAdapter({ aggregator });
     logger.info(`received web hook at: ${req.path}`, req.query);
-    const ret = await aggregatorAdapter.HandleOauthResponse({
+    const ret = await aggregatorAdapter?.HandleOauthResponse({
       query: req.query,
       params: req.params,
       body: req.body,

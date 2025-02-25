@@ -49,7 +49,11 @@ export enum MappedJobTypes {
 export type AdapterMap = {
   dataAdapter?: Function;
   vcAdapter?: Function;
-  createWidgetAdapter: ( { sessionId } : {sessionId?: string | undefined} ) => WidgetAdapter;
+  createWidgetAdapter: ({
+    sessionId,
+  }: {
+    sessionId?: string | undefined;
+  }) => WidgetAdapter;
 };
 
 export interface Credential {
@@ -226,7 +230,5 @@ export interface WidgetAdapter {
   ) => Promise<Connection | undefined>;
   RouteHandlers?: Record<string, (req: any, res: any) => void>;
   DataRequestValidators?: Record<string, (req: any) => string | undefined>;
-  HandleOauthResponse: (
-    request: any
-  ) => Promise<Connection>;
+  HandleOauthResponse?: (request: any) => Promise<Connection>;
 }
