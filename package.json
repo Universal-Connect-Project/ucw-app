@@ -7,6 +7,7 @@
     "copyDemoPreferences": "cp ./apps/server/cachedDefaults/testData/demoPreferences.json ./apps/server/cachedDefaults/preferences.json",
     "copyTestPreferences": "cp ./apps/server/cachedDefaults/testData/testPreferences.json ./apps/server/cachedDefaults/preferences.json",
     "copyServerEnv": "tee ./apps/server/env/staging.env ./apps/server/env/production.env < ./apps/server/env/.env.example",
+    "copyFinictyTestPreferences": "cp ./apps/server/cachedDefaults/testData/finicityTestPreferences.json ./apps/server/cachedDefaults/preferences.json",
     "dev": "turbo dev",
     "dev:debug": "turbo dev:debug",
     "prod": "turbo prod",

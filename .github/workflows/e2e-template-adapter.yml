@@ -1,4 +1,4 @@
-name: E2E Tests (Server) Syncing
+name: E2E Tests (Template Adapter)
 
 on: pull_request
 
@@ -8,7 +8,7 @@ jobs:
     uses: ./.github/workflows/setup-env.yml
     secrets: inherit
 
-  e2e-tests:
+  e2e-tests-template-adapter:
     runs-on: ubuntu-latest
     needs: [setup-env]
 
@@ -46,20 +46,11 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "lts/Iron"
+          node-version: "lts/*"
           check-latest: true
       - run: npm ci
 
       - run: npm run copyTestPreferences
-
-      - name: "Remove institutions cache"
-        run: |
-          INSTITUTIONS_FILE_PATH=./apps/server/cachedDefaults/ucwInstitutionsMapping.json
-          rm ${INSTITUTIONS_FILE_PATH}
-
-          touch ${INSTITUTIONS_FILE_PATH}
-
-          echo [] >> ${INSTITUTIONS_FILE_PATH}
 
       - name: "Create env file"
         run: |
@@ -70,16 +61,14 @@ jobs:
           echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
 
           # Secrets (can't load these from another job, due to GH security features)
-          echo UCP_CLIENT_SECRET=${{ secrets.UCP_CLIENT_SECRET }} >> ${ENV_FILE_PATH}
-          echo UCP_CLIENT_ID=${{ secrets.UCP_CLIENT_ID }} >> ${ENV_FILE_PATH}
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          config-file: cypress.config.syncing.ts
-          project: apps/server
+          config-file: cypress.config.ts
+          project: packages/template-adapter # Use for own package ${{ vars.PACKAGE_DIR }}
           start: npm run start:e2e
           wait-on: "http://localhost:8080/health, http://localhost:9200"
 
@@ -88,4 +77,4 @@ jobs:
         if: failure()
         with:
           name: cypress-screenshots
-          path: ./apps/server/cypress/screenshots
+          path: ./packages/template-adapter/cypress/screenshots # Use ${{ vars.PACKAGE_DIR }} in place of "packages/template-adapter" for own package

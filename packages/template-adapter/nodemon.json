@@ -1,0 +1,6 @@
+{
+  "watch": ["./src"],
+  "ext": "ts",
+  "ignore": ["./cypress/**", "./scripts/**"],
+  "exec": "npm run build"
+}

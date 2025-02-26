@@ -57,4 +57,7 @@ apps/server/cachedDefaults/preferences.json
 apps/server/cypress.env.json
 *.rdb
 
+.github/workflows/docker-publish.yml
+.github/workflows/docker-test.yml
+
 *-test.sh
