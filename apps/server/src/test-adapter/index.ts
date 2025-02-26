@@ -9,7 +9,6 @@ import {
   testExampleJobResponse,
   testAggregatorMemberGuid,
   testExampleInstitution,
-  testRouteHandlers,
   testDataRequestValidators,
 } from "./constants";
 import { dataAdapter } from "./dataAdapter";
@@ -33,7 +32,6 @@ export const adapterMapObject = {
       new TestAdapter({
         labelText: TEST_EXAMPLE_B_LABEL_TEXT,
         aggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING,
-        routeHandlers: testRouteHandlers,
         dataRequestValidators: testDataRequestValidators,
       }),
   },

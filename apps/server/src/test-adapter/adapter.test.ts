@@ -5,7 +5,6 @@ import {
   testDataRequestValidatorStartTimeError,
   testExampleInstitution,
   testExampleJobResponse,
-  testRouteHandlers,
 } from "./constants";
 import { set } from "../services/storageClient/redis";
 
@@ -20,7 +19,6 @@ const testAdapterA = new TestAdapter({
 const testAdapterB = new TestAdapter({
   labelText,
   aggregator,
-  routeHandlers: testRouteHandlers,
   dataRequestValidators: testDataRequestValidators,
 });
 
@@ -34,31 +32,6 @@ const successConnectionStatus = {
 } as any;
 
 describe("TestAdapter", () => {
-  describe("RouteHandlers", () => {
-    it("returns an empty object of RouteHandlers functions when there are no handlers", async () => {
-      const handlers: Record<string, (req: any, res: any) => void> =
-        testAdapterA.RouteHandlers;
-      expect(Object.keys(handlers)).toHaveLength(0);
-    });
-
-    it("returns an object of RouteHandlers functions when there are handlers", async () => {
-      const handlers: Record<string, (req: any, res: any) => void> =
-        testAdapterB.RouteHandlers;
-      expect(Object.keys(handlers)).toHaveLength(1);
-    });
-
-    describe("jobRequestHandler", () => {
-      it("returns data when calling jobRequestHandler", async () => {
-        const res = {
-          send: jest.fn(),
-        };
-
-        testAdapterB.RouteHandlers.jobRequestHandler(undefined, res);
-        expect(res.send).toHaveBeenCalledWith(testExampleJobResponse);
-      });
-    });
-  });
-
   describe("DataRequestValidators", () => {
     it("returns an empty object when there are no validators", async () => {
       const handlers: Record<string, (req: any, res: any) => void> =
