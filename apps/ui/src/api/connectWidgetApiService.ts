@@ -87,8 +87,16 @@ const connectWidgetApiService = {
       .then((response) => response.data);
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  updateMember: async (memberData: any) => {
+    return configuredAxios
+      .put(`/members/${memberData.guid}`, memberData)
+      .then((response) => response.data);
+  },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   updateMFA: async (memberData: any) => {
-    return configuredAxios.put(`/members/${memberData.id}`, memberData);
+    return configuredAxios
+      .put(`/members/${memberData.id}`, memberData)
+      .then((response) => response.data);
   },
 };
 

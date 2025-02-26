@@ -180,6 +180,7 @@ export interface Institutions {
 export interface UpdateConnectionRequest {
   id: string | undefined;
   job_type?: string;
+  jobTypes?: ComboJobTypes[];
   credentials?: Credential[];
   challenges?: Challenge[];
 }
