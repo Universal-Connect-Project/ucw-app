@@ -3,15 +3,16 @@ import {
   accountsResponse,
   identityResponse,
   transactionsResponse,
+  transcationsByConnectionData,
 } from "./vcResponses";
 
-export const getVC = ({ type }: Partial<VCAdapterInput>) => {
+export const getVC = ({ type, connectionId }: Partial<VCAdapterInput>) => {
   switch (type) {
     case VCDataTypes.ACCOUNTS:
       return accountsResponse;
     case VCDataTypes.IDENTITY:
       return identityResponse;
     case VCDataTypes.TRANSACTIONS:
-      return transactionsResponse;
+      return connectionId ? transcationsByConnectionData : transactionsResponse;
   }
 };

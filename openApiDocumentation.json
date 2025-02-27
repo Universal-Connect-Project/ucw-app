@@ -648,6 +648,15 @@
             }
           },
           {
+            "description": "The connection id, returns accounts of specific connection_id if provided, depends on adapter implementation",
+            "name": "connection_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "description": "Period end of the transactions to return. This is only used for Sophtron, and it is required for Sophtron. ex: 1/1/2024",
             "name": "end_time",
             "in": "query",
