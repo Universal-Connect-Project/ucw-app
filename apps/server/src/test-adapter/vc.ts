@@ -1,4 +1,4 @@
-import { VCAdapterInput, VCDataTypes } from "@repo/utils";
+import { type VCAdapterInput, VCDataTypes } from "@repo/utils";
 import {
   accountsResponse,
   identityResponse,

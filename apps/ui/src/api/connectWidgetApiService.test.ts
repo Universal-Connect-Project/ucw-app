@@ -29,6 +29,7 @@ import { memberByGuidRespose } from "../shared/test/testData/memberByGuid";
 import { membersResponse } from "../shared/test/testData/members";
 import { oauthStateResponse } from "../shared/test/testData/oauthState";
 import { oauthStatesResponse } from "../shared/test/testData/oauthStates";
+import { updateMFAResponse } from "../shared/test/testData/updateMFA";
 
 describe("connectWidgetApiService", () => {
   describe("addMember", () => {
@@ -263,9 +264,32 @@ describe("connectWidgetApiService", () => {
     });
   });
 
+  describe("updateMember", () => {
+    it("resolves with a member", async () => {
+      expect(await connectWidgetApiService.updateMember("test")).toEqual(
+        updateMFAResponse,
+      );
+    });
+
+    it("throws an error on failure", async () => {
+      server.use(
+        http.put(
+          UPDATE_MFA_MOCK_URL,
+          () => new HttpResponse(null, { status: 400 }),
+        ),
+      );
+
+      await expect(
+        connectWidgetApiService.updateMember("test"),
+      ).rejects.toThrow();
+    });
+  });
+
   describe("updateMFA", () => {
-    it("resolves", async () => {
-      expect(connectWidgetApiService.updateMFA("test")).resolves.not.toThrow();
+    it("resolves with a member", async () => {
+      expect(await connectWidgetApiService.updateMFA("test")).toEqual(
+        updateMFAResponse,
+      );
     });
 
     it("throws an error on failure", async () => {

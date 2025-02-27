@@ -50,24 +50,20 @@ describe("updates a member", () => {
           jobTypes: [ComboJobTypes.TRANSACTIONS],
         }),
       },
-      method: "POST",
-      url: MEMBERS_URL,
+      method: "PUT",
+      url: `${MEMBERS_URL}/test`,
     }).then(
       (
         response: Cypress.Response<{
-          member: {
-            institution_guid: string;
-          };
+          institution_guid: string;
         }>,
       ) => {
         expect(response.status).to.eq(200);
         const { body } = response;
 
-        const { member } = body;
+        expect(body).to.exist;
 
-        expect(member).to.exist;
-
-        expect(member.institution_guid).to.exist;
+        expect(body.institution_guid).to.exist;
       },
     );
   });

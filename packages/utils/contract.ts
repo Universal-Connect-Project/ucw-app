@@ -30,14 +30,6 @@ export enum VCDataTypes {
   TRANSACTIONS = "transactions",
 }
 
-export enum JobTypes {
-  AGGREGATE = "aggregate",
-  ALL = "all",
-  FULLHISTORY = "fullhistory",
-  VERIFICATION = "verification",
-  IDENTITY = "identity",
-}
-
 export enum MappedJobTypes {
   AGGREGATE = "aggregate",
   ALL = "aggregate_identity_verification",
@@ -180,6 +172,7 @@ export interface Institutions {
 export interface UpdateConnectionRequest {
   id: string | undefined;
   job_type?: string;
+  jobTypes?: ComboJobTypes[];
   credentials?: Credential[];
   challenges?: Challenge[];
 }
@@ -228,7 +221,6 @@ export interface WidgetAdapter {
     single_account_select?: boolean,
     userId?: string,
   ) => Promise<Connection | undefined>;
-  RouteHandlers?: Record<string, (req: any, res: any) => void>;
   DataRequestValidators?: Record<string, (req: any) => string | undefined>;
   HandleOauthResponse?: (request: any) => Promise<Connection>;
 }

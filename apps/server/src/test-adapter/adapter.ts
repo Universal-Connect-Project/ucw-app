@@ -30,23 +30,19 @@ export class TestAdapter implements WidgetAdapter {
   constructor({
     labelText,
     aggregator,
-    routeHandlers = {},
     dataRequestValidators = {},
   }: {
     labelText: string;
     aggregator: string;
-    routeHandlers?: Record<string, (req: any, res: any) => void>;
     dataRequestValidators?: Record<string, (req: any) => string | undefined>;
   }) {
     this.labelText = labelText;
     this.aggregator = aggregator;
-    this.RouteHandlers = routeHandlers;
     this.DataRequestValidators = dataRequestValidators;
   }
 
   labelText: string;
   aggregator: string;
-  RouteHandlers: Record<string, (req: any, res: any) => void> = {};
   DataRequestValidators: Record<string, (req: any) => string | undefined> = {};
 
   async GetInstitutionById(id: string): Promise<Institution> {

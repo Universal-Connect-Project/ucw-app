@@ -6,10 +6,8 @@ import {
   TEST_EXAMPLE_B_LABEL_TEXT,
   TEST_EXAMPLE_C_LABEL_TEXT,
   TEST_EXAMPLE_C_AGGREGATOR_STRING,
-  testExampleJobResponse,
   testAggregatorMemberGuid,
   testExampleInstitution,
-  testRouteHandlers,
   testDataRequestValidators,
 } from "./constants";
 import { dataAdapter } from "./dataAdapter";
@@ -33,7 +31,6 @@ export const adapterMapObject = {
       new TestAdapter({
         labelText: TEST_EXAMPLE_B_LABEL_TEXT,
         aggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING,
-        routeHandlers: testRouteHandlers,
         dataRequestValidators: testDataRequestValidators,
       }),
   },
@@ -57,7 +54,6 @@ export {
   TEST_EXAMPLE_A_AGGREGATOR_STRING,
   TEST_EXAMPLE_B_AGGREGATOR_STRING,
   TEST_EXAMPLE_C_AGGREGATOR_STRING,
-  testExampleJobResponse,
   testAggregatorMemberGuid,
   testExampleInstitution,
 };
