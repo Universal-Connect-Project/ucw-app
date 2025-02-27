@@ -30,14 +30,6 @@ export enum VCDataTypes {
   TRANSACTIONS = "transactions",
 }
 
-export enum JobTypes {
-  AGGREGATE = "aggregate",
-  ALL = "all",
-  FULLHISTORY = "fullhistory",
-  VERIFICATION = "verification",
-  IDENTITY = "identity",
-}
-
 export enum MappedJobTypes {
   AGGREGATE = "aggregate",
   ALL = "aggregate_identity_verification",

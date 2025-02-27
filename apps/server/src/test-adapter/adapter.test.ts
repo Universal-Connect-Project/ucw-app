@@ -4,7 +4,6 @@ import {
   testDataRequestValidators,
   testDataRequestValidatorStartTimeError,
   testExampleInstitution,
-  testExampleJobResponse,
 } from "./constants";
 import { set } from "../services/storageClient/redis";
 

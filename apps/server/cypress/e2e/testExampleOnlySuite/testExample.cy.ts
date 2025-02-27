@@ -1,4 +1,4 @@
-import { ComboJobTypes, JobTypes } from "@repo/utils";
+import { ComboJobTypes } from "@repo/utils";
 import {
   clickContinue,
   expectConnectionSuccess,
@@ -92,7 +92,7 @@ describe("testExampleA and B aggregators", () => {
     transactionsQueryString: "?start_time=2021/1/1",
   });
 
-  it(`makes a connection with jobType: ${JobTypes.VERIFICATION}, gets the transaction data from the data endpoints, and tests validator`, () => {
+  it(`makes a connection with jobType: ${ComboJobTypes.ACCOUNT_NUMBER}, gets the transaction data from the data endpoints, and tests validator`, () => {
     let memberGuid: string;
     const userId = Cypress.env("userId");
 

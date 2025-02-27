@@ -1,7 +1,6 @@
 import type { Request, Response } from "express";
-import he from "he";
 import { widgetHandler } from "./widgetEndpoint";
-import { ComboJobTypes, JobTypes } from "@repo/utils";
+import { ComboJobTypes } from "@repo/utils";
 import { Aggregators } from "./shared/contract";
 import { invalidAggregatorString } from "./utils/validators";
 

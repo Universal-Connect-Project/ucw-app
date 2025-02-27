@@ -1,5 +1,3 @@
-import { WidgetJobTypes } from "@repo/utils";
-
 export const TEST_EXAMPLE_A_AGGREGATOR_STRING = "testExampleA";
 export const TEST_EXAMPLE_B_AGGREGATOR_STRING = "testExampleB";
 export const TEST_EXAMPLE_C_AGGREGATOR_STRING = "testExampleC";
@@ -33,11 +31,6 @@ export const testExampleCredentials = {
   id: "testId",
   field_name: "fieldName",
   field_type: "fieldType",
-};
-
-export const testExampleJobResponse = {
-  guid: "testAggregatorMemberGuid",
-  job_type: WidgetJobTypes.COMBINATION,
 };
 
 export const testDataRequestValidators = {
