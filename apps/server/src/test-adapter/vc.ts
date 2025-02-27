@@ -3,7 +3,7 @@ import {
   accountsResponse,
   identityResponse,
   transactionsResponse,
-  transcationsByConnectionData
+  transcationsByConnectionData,
 } from "./vcResponses";
 
 export const getVC = ({ type, connectionId }: Partial<VCAdapterInput>) => {
@@ -13,6 +13,6 @@ export const getVC = ({ type, connectionId }: Partial<VCAdapterInput>) => {
     case VCDataTypes.IDENTITY:
       return identityResponse;
     case VCDataTypes.TRANSACTIONS:
-      return connectionId === 'testId' ? transcationsByConnectionData : transactionsResponse;
+      return connectionId ? transcationsByConnectionData : transactionsResponse;
   }
 };

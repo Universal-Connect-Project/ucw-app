@@ -81,7 +81,11 @@ const verifyTransactionsValidatorError = ({ accountId, userId }) => {
     });
 };
 
-const verifyTransactionsWithConnectionIdSuccess = ({ accountId, connectionId, userId }) => {
+const verifyTransactionsWithConnectionIdSuccess = ({
+  accountId,
+  connectionId,
+  userId,
+}) => {
   const url = `/data/aggregator/${TEST_EXAMPLE_B_AGGREGATOR_STRING}/user/${userId}/account/${accountId}/transactions?connection_id=${connectionId}&start_time=2021/1/1`;
 
   return cy
