@@ -177,7 +177,7 @@ export class ConnectApi extends AggregatorAdapterBase {
       return member;
     } else {
       const connection = await this.updateConnection({
-        job_type: this.context.job_type,
+        jobTypes: this.context.jobTypes,
         id: member.guid,
         credentials: member.credentials?.map((c) => ({
           id: c.guid,
