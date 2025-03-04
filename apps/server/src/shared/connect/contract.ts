@@ -55,6 +55,7 @@ export interface Member {
   last_job_status?: string //
   last_update_time?: string //
 
+  selected_account_id?: string | null;
   most_recent_job_guid?: string // JOB-asdf
   needs_updated_credentials?: boolean
   revision?: number // 13
@@ -63,6 +64,7 @@ export interface Member {
   aggregated_at?: string | null
   background_aggregation_is_disabled?: boolean
   connection_status?: string | null | number //
+  raw_status?: string | null //
   guid: string
   id?: string | null
   institution_code?: string | null
