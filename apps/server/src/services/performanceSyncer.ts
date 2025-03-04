@@ -46,7 +46,7 @@ export const syncPerformanceData = async () => {
   }
 };
 
-export async function fetchPerformanceData(): Promise<Response | null> {
+export async function fetchPerformanceData(): Promise<Response> {
   const performanceCacheETag = await get(PERFORMANCE_ETAG_REDIS_KEY);
   const accessToken = await getAccessToken();
   return await fetch(config.PERFORMANCE_ROUTING_DATA_URL, {
