@@ -1,0 +1,3 @@
+export const RESPONSE_NOT_MODIFIED = 304;
+export const SUCCESS_RESPONSE = 200;
+export const UNAUTHORIZED_RESPONSE = 401;
