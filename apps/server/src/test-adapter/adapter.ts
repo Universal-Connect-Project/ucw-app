@@ -222,6 +222,7 @@ export class TestAdapter implements WidgetAdapter {
         cur_job_id: "testJobId",
         user_id: "testUserId",
         status: ConnectionStatus.CHALLENGED,
+        raw_status: 'raw_status',
         challenges: [
           {
             id: "CRD-a81b35db-28dd-41ea-aed3-6ec8ef682011",
@@ -248,6 +249,7 @@ export class TestAdapter implements WidgetAdapter {
       cur_job_id: "testJobId",
       user_id: userId,
       status: ConnectionStatus.CONNECTED,
+      raw_status: 'raw_status',
       challenges: [],
     };
   }
@@ -281,6 +283,7 @@ export class TestAdapter implements WidgetAdapter {
     if(code === 'error'){
       return {
         status: ConnectionStatus.FAILED,
+        raw_status: 'raw_status',
         request_id: request_id,
         error: code,
       } as any
@@ -291,6 +294,7 @@ export class TestAdapter implements WidgetAdapter {
     }
     if (code) {
       connection.status = ConnectionStatus.CONNECTED;
+      connection.raw_status = 'raw_status',
       connection.user_id = code;
       connection.request_id = request_id;
     }
