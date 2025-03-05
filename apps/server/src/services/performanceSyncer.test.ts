@@ -16,7 +16,7 @@ import * as logger from "../infra/logger";
 import {
   RESPONSE_NOT_MODIFIED,
   UNAUTHORIZED_RESPONSE,
-} from "src/infra/http/constants";
+} from "../infra/http/constants";
 
 describe("setPerformanceSyncSchedule", () => {
   it("should call sync over the given interval", async () => {
