@@ -6,17 +6,18 @@ import { AnalyticsClient } from "../services/analyticsClient";
 import { resolveInstitutionAggregator } from "../services/institutionResolver";
 import { set } from "../services/storageClient/redis";
 import type { Context, Aggregator } from "../shared/contract";
-import type {
-  Challenge,
-  Connection,
-  CreateConnectionRequest,
-  Credential,
-  Institution,
-  UpdateConnectionRequest,
-  WidgetAdapter,
+import {
+  OAuthStatus,
+  type Challenge,
+  type Connection,
+  type CreateConnectionRequest,
+  type Credential,
+  type Institution,
+  type UpdateConnectionRequest,
+  type WidgetAdapter,
 } from "@repo/utils";
 
-import { ConnectionStatus, OAuthStatus } from "../shared/contract";
+import { ConnectionStatus } from "../shared/contract";
 
 export class AggregatorAdapterBase {
   context: Context;

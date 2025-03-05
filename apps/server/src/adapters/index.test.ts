@@ -1,4 +1,5 @@
-import { ConnectionStatus, OAuthStatus } from "../shared/contract";
+import { OAuthStatus } from "@repo/utils";
+import { ConnectionStatus } from "../shared/contract";
 import { AggregatorAdapterBase } from "./index";
 const testConnectionId = "testConnectionId";
 jest.mock("uuid", () => ({ v4: () => "adfd01fb-309b-4e1c-9117-44d003f5d7fc" }));

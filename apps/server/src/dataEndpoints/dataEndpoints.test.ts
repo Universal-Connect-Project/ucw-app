@@ -6,7 +6,7 @@ import * as adapterIndex from "../adapterIndex";
 import {
   testVcAccountsData,
   testVcIdentityData,
-  testVcTranscationsData,
+  testVcTransactionsData,
 } from "../test/testData/testVcData";
 import type {
   AccountsRequest,
@@ -239,7 +239,7 @@ describe("dataEndpoints", () => {
       it("responds with the vc data in the jwt on success", async () => {
         jest
           .spyOn(adapterIndex, "getVC")
-          .mockImplementationOnce(async () => testVcTranscationsData);
+          .mockImplementationOnce(async () => testVcTransactionsData);
 
         const res = {
           send: jest.fn(),
@@ -261,14 +261,14 @@ describe("dataEndpoints", () => {
         await vcTransactionsDataHandler(req, res);
 
         expect(res.send).toHaveBeenCalledWith({
-          jwt: testVcTranscationsData,
+          jwt: testVcTransactionsData,
         });
       });
 
       it("responds with the data on success", async () => {
         jest
           .spyOn(adapterIndex, "getVC")
-          .mockImplementationOnce(async () => testVcTranscationsData);
+          .mockImplementationOnce(async () => testVcTransactionsData);
 
         const res = {
           json: jest.fn(),
@@ -290,7 +290,7 @@ describe("dataEndpoints", () => {
         await createTransactionsDataHandler(false)(req, res);
 
         expect(res.json).toHaveBeenCalledWith(
-          getDataFromVCJwt(testVcTranscationsData),
+          getDataFromVCJwt(testVcTransactionsData),
         );
       });
 

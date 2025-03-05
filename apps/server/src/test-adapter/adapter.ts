@@ -118,8 +118,8 @@ export class TestAdapter implements WidgetAdapter {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     userId: string,
   ): Promise<Connection> {
-    const oauth = request.institutionId?.toLowerCase().indexOf("oauth") >= 0;
-    const failed = request.institutionId?.toLowerCase().indexOf("failed") >= 0;
+    const oauth = request.institutionId?.toLowerCase().includes("oauth");
+    const failed = request.institutionId?.toLowerCase().includes("failed");
     const oauth_windows_url = `http://localhost:8080/oauth/testExampleA/redirect_from/?code=${failed ? "error" : "success"}&state=${testConnectionId}`;
 
     if (request.jobTypes?.includes(ComboJobTypes.ACCOUNT_NUMBER)) {
