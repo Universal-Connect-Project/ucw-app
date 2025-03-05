@@ -189,13 +189,8 @@ export class ConnectApi extends AggregatorAdapterBase {
   }
 
   async loadMembers(): Promise<Member[]> {
-    if (
-      this.context.connection_id != null &&
-      this.context.connection_id !== ""
-    ) {
-      const focusedMember = await this.getConnection(
-        this.context.connection_id,
-      );
+    if (this.context.connectionId != null && this.context.connectionId !== "") {
+      const focusedMember = await this.getConnection(this.context.connectionId);
       return [mapConnection(focusedMember)];
     }
     return [];

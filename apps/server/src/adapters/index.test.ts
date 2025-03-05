@@ -1,6 +1,6 @@
 import { ConnectionStatus, OAuthStatus } from "../shared/contract";
 import { AggregatorAdapterBase } from "./index";
-const testConnectionId = "test_connection_id";
+const testConnectionId = "testConnectionId";
 jest.mock("uuid", () => ({ v4: () => "adfd01fb-309b-4e1c-9117-44d003f5d7fc" }));
 
 const aggregatorAdapterBase = new AggregatorAdapterBase({
@@ -30,9 +30,9 @@ describe("AggregatorAdapterBase", () => {
         await aggregatorAdapterBase.getOauthStates(testConnectionId),
       ).toEqual([
         {
-          guid: "test_connection_id",
-          inbound_member_guid: "test_connection_id",
-          outbound_member_guid: "test_connection_id",
+          guid: "testConnectionId",
+          inbound_member_guid: "testConnectionId",
+          outbound_member_guid: "testConnectionId",
           auth_status: OAuthStatus.COMPLETE,
         },
       ]);
@@ -55,9 +55,9 @@ describe("AggregatorAdapterBase", () => {
       expect(
         await aggregatorAdapterBase.getOauthState(testConnectionId),
       ).toEqual({
-        guid: "test_connection_id",
-        inbound_member_guid: "test_connection_id",
-        outbound_member_guid: "test_connection_id",
+        guid: "testConnectionId",
+        inbound_member_guid: "testConnectionId",
+        outbound_member_guid: "testConnectionId",
         auth_status: OAuthStatus.PENDING,
       });
     });
@@ -73,9 +73,9 @@ describe("AggregatorAdapterBase", () => {
       expect(
         await aggregatorAdapterBase.getOauthState(testConnectionId),
       ).toEqual({
-        guid: "test_connection_id",
-        inbound_member_guid: "test_connection_id",
-        outbound_member_guid: "test_connection_id",
+        guid: "testConnectionId",
+        inbound_member_guid: "testConnectionId",
+        outbound_member_guid: "testConnectionId",
         auth_status: OAuthStatus.COMPLETE,
       });
     });
@@ -91,9 +91,9 @@ describe("AggregatorAdapterBase", () => {
       expect(
         await aggregatorAdapterBase.getOauthState(testConnectionId),
       ).toEqual({
-        guid: "test_connection_id",
-        inbound_member_guid: "test_connection_id",
-        outbound_member_guid: "test_connection_id",
+        guid: "testConnectionId",
+        inbound_member_guid: "testConnectionId",
+        outbound_member_guid: "testConnectionId",
         auth_status: OAuthStatus.ERROR,
         error_reason: ConnectionStatus.DENIED,
       });

@@ -13,7 +13,7 @@ export interface AuthRequest {
 export interface Context {
   institutionId?: string;
   institution_uid?: string;
-  connection_id?: string;
+  connectionId?: string;
   current_job_id?: string;
   userId?: string;
   resolvedUserId?: string;

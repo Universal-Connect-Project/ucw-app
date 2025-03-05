@@ -92,7 +92,7 @@ describe("server", () => {
         expect(res.send).toHaveBeenCalledWith(invalidAggregatorString);
       });
 
-      it("responds with a 400 if aggregator is provided without a connection_id", () => {
+      it("responds with a 400 if aggregator is provided without a connectionId", () => {
         const res = {
           send: jest.fn(),
           status: jest.fn(),
@@ -111,11 +111,11 @@ describe("server", () => {
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith(
-          "&#x22;value&#x22; contains [aggregator] without its required peers [connection_id]",
+          "&#x22;value&#x22; contains [aggregator] without its required peers [connectionId]",
         );
       });
 
-      it("responds with a 400 if connection_id is provided without a aggregator", () => {
+      it("responds with a 400 if connectionId is provided without a aggregator", () => {
         const res = {
           send: jest.fn(),
           status: jest.fn(),
@@ -124,7 +124,7 @@ describe("server", () => {
         widgetHandler(
           {
             query: {
-              connection_id: "testConnectionId",
+              connectionId: "testConnectionId",
               jobTypes: ComboJobTypes.TRANSACTIONS,
               userId: "testUserId",
             },
@@ -134,7 +134,7 @@ describe("server", () => {
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith(
-          "&#x22;value&#x22; contains [connection_id] without its required peers [aggregator]",
+          "&#x22;value&#x22; contains [connectionId] without its required peers [aggregator]",
         );
       });
 

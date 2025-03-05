@@ -30,7 +30,7 @@ export const refreshAConnection = ({ enterCredentials, selectInstitution }) => {
 
       //Refresh the connection
       cy.visit(
-        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&connection_id=${memberGuid}&aggregator=${aggregator}&userId=${userId}`,
+        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&connectionId=${memberGuid}&aggregator=${aggregator}&userId=${userId}`,
       );
 
       enterCredentials();

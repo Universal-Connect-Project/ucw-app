@@ -15,7 +15,7 @@ describe("instrumentationEndpoints", () => {
       userId: "userId",
     };
 
-    it("doesn't return aggregator or connection_id if current_member_guid isn't present", async () => {
+    it("doesn't return aggregator or connectionId if current_member_guid isn't present", async () => {
       const body = { ...correctBody };
       delete body.current_member_guid;
       const req = {
@@ -41,7 +41,7 @@ describe("instrumentationEndpoints", () => {
       });
     });
 
-    it("doesn't return aggregator or connection_id if current_aggregator isn't present", async () => {
+    it("doesn't return aggregator or connectionId if current_aggregator isn't present", async () => {
       const body = { ...correctBody };
       delete body.current_aggregator;
       const req = {
@@ -83,7 +83,7 @@ describe("instrumentationEndpoints", () => {
       expect(res.sendStatus).toHaveBeenCalledWith(200);
       expect(req.context).toEqual({
         aggregator: req.body.current_aggregator,
-        connection_id: req.body.current_member_guid,
+        connectionId: req.body.current_member_guid,
         jobTypes: req.body.jobTypes,
         oauth_referral_source: "BROWSER",
         scheme: "vcs",

@@ -55,7 +55,7 @@
           },
           {
             "description": "The connection id of the connection to be refreshed. A aggregator is required when this is used. Providing these will skip search, go directly to the authorization step for the institution, and hide the back button.",
-            "name": "connection_id",
+            "name": "connectionId",
             "in": "query",
             "required": false,
             "schema": {
@@ -63,7 +63,7 @@
             }
           },
           {
-            "description": "The aggregator of the connection to be refreshed. A connection_id is required when this is used. Providing these will skip search, go directly to the authorization step for the institution, and hide the back button.",
+            "description": "The aggregator of the connection to be refreshed. A connectionId is required when this is used. Providing these will skip search, go directly to the authorization step for the institution, and hide the back button.",
             "name": "aggregator",
             "in": "query",
             "required": false,
@@ -101,12 +101,12 @@
         "summary": "Widget webpage"
       }
     },
-    "/api/data/aggregator/{aggregator}/user/{userId}/connection/{connection_id}/accounts": {
+    "/api/data/aggregator/{aggregator}/user/{userId}/connection/{connectionId}/accounts": {
       "get": {
         "parameters": [
           {
             "description": "The connection id",
-            "name": "connection_id",
+            "name": "connectionId",
             "in": "path",
             "required": true,
             "schema": {
@@ -427,12 +427,12 @@
         "summary": "Accounts data"
       }
     },
-    "/api/data/aggregator/{aggregator}/user/{userId}/connection/{connection_id}/identity": {
+    "/api/data/aggregator/{aggregator}/user/{userId}/connection/{connectionId}/identity": {
       "get": {
         "parameters": [
           {
             "description": "The connection id",
-            "name": "connection_id",
+            "name": "connectionId",
             "in": "path",
             "required": true,
             "schema": {
@@ -648,8 +648,8 @@
             }
           },
           {
-            "description": "The connection id, returns accounts of specific connection_id if provided, depends on adapter implementation",
-            "name": "connection_id",
+            "description": "The connection id, returns accounts of specific connectionId if provided, depends on adapter implementation",
+            "name": "connectionId",
             "in": "query",
             "required": false,
             "schema": {
@@ -6718,12 +6718,12 @@
         "summary": "Transactions data"
       }
     },
-    "/api/vc/data/aggregator/{aggregator}/user/{userId}/connection/{connection_id}/accounts": {
+    "/api/vc/data/aggregator/{aggregator}/user/{userId}/connection/{connectionId}/accounts": {
       "get": {
         "parameters": [
           {
             "description": "The connection id",
-            "name": "connection_id",
+            "name": "connectionId",
             "in": "path",
             "required": true,
             "schema": {
@@ -6768,12 +6768,12 @@
         "summary": "Accounts data"
       }
     },
-    "/api/vc/data/aggregator/{aggregator}/user/{userId}/connection/{connection_id}/identity": {
+    "/api/vc/data/aggregator/{aggregator}/user/{userId}/connection/{connectionId}/identity": {
       "get": {
         "parameters": [
           {
             "description": "The connection id",
-            "name": "connection_id",
+            "name": "connectionId",
             "in": "path",
             "required": true,
             "schema": {

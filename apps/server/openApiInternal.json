@@ -357,7 +357,7 @@
               "type": "object",
               "example": {
                 "aggregator": "testExampleA",
-                "connection_id": "test"
+                "connectionId": "test"
               }
             }
           }
