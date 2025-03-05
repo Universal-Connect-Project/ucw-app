@@ -635,12 +635,12 @@
         "summary": "Identity data"
       }
     },
-    "/api/data/aggregator/{aggregator}/user/{userId}/account/{account_id}/transactions": {
+    "/api/data/aggregator/{aggregator}/user/{userId}/account/{accountId}/transactions": {
       "get": {
         "parameters": [
           {
             "description": "The account id",
-            "name": "account_id",
+            "name": "accountId",
             "in": "path",
             "required": true,
             "schema": {
@@ -6818,12 +6818,12 @@
         "summary": "Identity data"
       }
     },
-    "/api/vc/data/aggregator/{aggregator}/user/{userId}/account/{account_id}/transactions": {
+    "/api/vc/data/aggregator/{aggregator}/user/{userId}/account/{accountId}/transactions": {
       "get": {
         "parameters": [
           {
             "description": "The account id",
-            "name": "account_id",
+            "name": "accountId",
             "in": "path",
             "required": true,
             "schema": {
