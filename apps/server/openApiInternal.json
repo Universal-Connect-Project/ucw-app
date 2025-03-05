@@ -55,7 +55,7 @@
                         "accountVerification",
                         "identityVerification",
                         "transactions",
-                        "transaction_history"
+                        "transactionHistory"
                       ]
                     }
                   },

@@ -6,7 +6,7 @@ export enum ComboJobTypes {
   ACCOUNT_NUMBER = "accountVerification",
   ACCOUNT_OWNER = "identityVerification",
   TRANSACTIONS = "transactions",
-  TRANSACTION_HISTORY = "transaction_history",
+  TRANSACTION_HISTORY = "transactionHistory",
 }
 
 export enum WidgetJobTypes {
