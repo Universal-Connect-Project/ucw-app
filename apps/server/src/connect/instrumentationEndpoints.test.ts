@@ -8,7 +8,7 @@ describe("instrumentationEndpoints", () => {
       current_aggregator: "testAggregator",
       current_member_guid: "currentMemberGuid",
       jobTypes: [ComboJobTypes.TRANSACTION_HISTORY],
-      single_account_select: false,
+      singleAccountSelect: false,
     };
 
     const correctParams = {
@@ -35,7 +35,7 @@ describe("instrumentationEndpoints", () => {
         jobTypes: req.body.jobTypes,
         oauth_referral_source: "BROWSER",
         scheme: "vcs",
-        single_account_select: req.body.single_account_select,
+        singleAccountSelect: req.body.singleAccountSelect,
         updated: true,
         userId: req.params.userId,
       });
@@ -61,7 +61,7 @@ describe("instrumentationEndpoints", () => {
         jobTypes: req.body.jobTypes,
         oauth_referral_source: "BROWSER",
         scheme: "vcs",
-        single_account_select: req.body.single_account_select,
+        singleAccountSelect: req.body.singleAccountSelect,
         updated: true,
         userId: req.params.userId,
       });
@@ -87,7 +87,7 @@ describe("instrumentationEndpoints", () => {
         jobTypes: req.body.jobTypes,
         oauth_referral_source: "BROWSER",
         scheme: "vcs",
-        single_account_select: req.body.single_account_select,
+        singleAccountSelect: req.body.singleAccountSelect,
         updated: true,
         userId: req.params.userId,
       });

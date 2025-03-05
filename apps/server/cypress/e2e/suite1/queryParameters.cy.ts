@@ -35,7 +35,7 @@ describe("query parameters", () => {
     });
   });
 
-  it("shows single account select if no parameter is passed, and skips single account select if single_account_select=false", () => {
+  it("shows single account select if no parameter is passed, and skips single account select if singleAccountSelect=false", () => {
     const userId = Cypress.env("userId");
 
     cy.visit(
@@ -54,7 +54,7 @@ describe("query parameters", () => {
     expectConnectionSuccess();
 
     cy.visit(
-      `/widget?jobTypes=${ComboJobTypes.ACCOUNT_NUMBER}&userId=${userId}&single_account_select=false`,
+      `/widget?jobTypes=${ComboJobTypes.ACCOUNT_NUMBER}&userId=${userId}&singleAccountSelect=false`,
     );
 
     searchAndSelectTestExampleA();
