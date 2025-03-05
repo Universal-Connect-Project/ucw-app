@@ -24,7 +24,7 @@ describe("oauthHandler", () => {
     const req = {
       connectApi: connect,
       params: {
-        userId: "user_id",
+        userId: "userId",
         aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
       },
       query: {
@@ -42,7 +42,7 @@ describe("oauthHandler", () => {
       scheme: "scheme",
       oauth_referral_source: "oauth_referral_source",
       sessionId: "session_id",
-      user_id: "user_id",
+      userId: "userId",
     });
 
     const res = {
@@ -69,7 +69,7 @@ describe("oauthHandler", () => {
     const req = {
       connectApi: connect,
       params: {
-        userId: "user_id",
+        userId: "userId",
         aggregator: "junk",
       },
       query: {
@@ -81,7 +81,7 @@ describe("oauthHandler", () => {
       scheme: "scheme",
       oauth_referral_source: "oauth_referral_source",
       sessionId: "session_id",
-      user_id: "user_id",
+      userId: "userId",
     });
 
     const res = {
@@ -107,7 +107,7 @@ describe("webhookHandler", () => {
     const req = {
       connectApi: connect,
       params: {
-        userId: "user_id",
+        userId: "userId",
         aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
       },
       query: {
@@ -120,7 +120,7 @@ describe("webhookHandler", () => {
       scheme: "scheme",
       oauth_referral_source: "oauth_referral_source",
       sessionId: "session_id",
-      user_id: "user_id",
+      userId: "userId",
     });
 
     await set(`request_id`, {
@@ -139,7 +139,7 @@ describe("webhookHandler", () => {
       id: "request_id",
       request_id: "request_id",
       guid: "test_guid",
-      user_id: "test_code",
+      userId: "test_code",
       status: ConnectionStatus.CONNECTED,
     });
   });
@@ -156,7 +156,7 @@ describe("webhookHandler", () => {
     const req = {
       connectApi: connect,
       params: {
-        userId: "user_id",
+        userId: "userId",
         aggregator: "junk",
       },
       query: {
@@ -168,7 +168,7 @@ describe("webhookHandler", () => {
       scheme: "scheme",
       oauth_referral_source: "oauth_referral_source",
       sessionId: "session_id",
-      user_id: "user_id",
+      userId: "userId",
     });
 
     const res = {

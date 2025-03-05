@@ -18,7 +18,7 @@ describe("query parameters", () => {
     const userId = Cypress.env("userId");
 
     visitWithPostMessageSpy(
-      `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&institution_id=${TEST_EXAMPLE_A_INSTITUTION_ID}&user_id=${userId}`,
+      `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&institution_id=${TEST_EXAMPLE_A_INSTITUTION_ID}&userId=${userId}`,
     ).then(() => {
       enterTestExampleACredentials();
 
@@ -39,7 +39,7 @@ describe("query parameters", () => {
     const userId = Cypress.env("userId");
 
     cy.visit(
-      `/widget?jobTypes=${ComboJobTypes.ACCOUNT_NUMBER}&user_id=${userId}`,
+      `/widget?jobTypes=${ComboJobTypes.ACCOUNT_NUMBER}&userId=${userId}`,
     );
 
     searchAndSelectTestExampleA();
@@ -54,7 +54,7 @@ describe("query parameters", () => {
     expectConnectionSuccess();
 
     cy.visit(
-      `/widget?jobTypes=${ComboJobTypes.ACCOUNT_NUMBER}&user_id=${userId}&single_account_select=false`,
+      `/widget?jobTypes=${ComboJobTypes.ACCOUNT_NUMBER}&userId=${userId}&single_account_select=false`,
     );
 
     searchAndSelectTestExampleA();

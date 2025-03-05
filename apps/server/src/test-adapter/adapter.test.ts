@@ -25,7 +25,7 @@ const successConnectionStatus = {
   aggregator,
   id: testConnectionId,
   cur_job_id: "testJobId",
-  user_id: "userId",
+  userId: "userId",
   status: ConnectionStatus.CONNECTED,
   challenges: [],
 } as any;
@@ -146,7 +146,7 @@ describe("TestAdapter", () => {
 
       const successStatus = {
         ...successConnectionStatus,
-        user_id: userId,
+        userId: userId,
       };
 
       expect(
@@ -179,7 +179,7 @@ describe("TestAdapter", () => {
         aggregator,
         id: testConnectionId,
         cur_job_id: "testJobId",
-        user_id: "testUserId",
+        userId: "testUserId",
         status: ConnectionStatus.CHALLENGED,
         challenges: [
           {
@@ -264,7 +264,7 @@ describe("TestAdapter", () => {
         is_being_aggregated: false,
         oauth_window_uri: undefined,
         aggregator,
-        user_id: "test",
+        userId: "test",
       });
     });
   });
@@ -310,7 +310,7 @@ describe("TestAdapter", () => {
         id: "request_id",
         request_id: "request_id",
         guid: "test_guid",
-        user_id: "test_code",
+        userId: "test_code",
         status: 6,
       });
     });

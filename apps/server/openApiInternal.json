@@ -75,7 +75,7 @@
                 "schema": {
                   "type": "object",
                   "example": {
-                    "user_id": "testUserId",
+                    "userId": "testUserId",
                     "jobTypes": ["transactions"],
                     "scheme": "vcs",
                     "oauth_referral_source": "BROWSER",

@@ -115,7 +115,7 @@ describe("testExampleA and B aggregators", () => {
     const userId = Cypress.env("userId");
 
     visitWithPostMessageSpy(
-      `/widget?jobTypes=${ComboJobTypes.ACCOUNT_NUMBER}&user_id=${userId}`,
+      `/widget?jobTypes=${ComboJobTypes.ACCOUNT_NUMBER}&userId=${userId}`,
     )
       .then(() => makeABConnection([ComboJobTypes.ACCOUNT_NUMBER]))
       .then(() => {

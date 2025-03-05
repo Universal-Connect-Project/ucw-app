@@ -76,7 +76,7 @@ describe("authentication", () => {
         headers: {},
         query: {
           token,
-          user_id: userId,
+          userId: userId,
         },
       } as unknown as Request;
 

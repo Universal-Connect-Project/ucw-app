@@ -26,7 +26,7 @@ export const widgetHandler = (req: Request, res: Response) => {
     aggregator: Joi.string().valid(...aggregators),
     sessionId: Joi.string(),
     single_account_select: Joi.bool(),
-    user_id: Joi.string().required(),
+    userId: Joi.string().required(),
     token: Joi.string(),
   }).and("connection_id", "aggregator");
 

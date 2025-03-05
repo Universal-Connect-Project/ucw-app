@@ -37,9 +37,9 @@ export default function (app) {
     }
     req.connectApi = new ConnectApi(req);
     if ((await req.connectApi.init()) != null) {
-      if (!req.context.resolved_user_id) {
-        req.context.resolved_user_id = await req.connectApi.ResolveUserId(
-          req.context.user_id,
+      if (!req.context.resolvedUserId) {
+        req.context.resolvedUserId = await req.connectApi.ResolveUserId(
+          req.context.userId,
         );
       }
     }
@@ -138,7 +138,7 @@ export default function (app) {
     async (req, res) => {
       const ret = await req.connectApi.updateConnection(
         { id: req.params.member_guid, job_type: "aggregate_identity" },
-        req.context.resolved_user_id,
+        req.context.resolvedUserId,
       );
       res.send({
         members: ret,
@@ -149,7 +149,7 @@ export default function (app) {
   app.post(`${ApiEndpoints.MEMBERS}/:member_guid/verify`, async (req, res) => {
     const ret = await req.connectApi.updateConnection(
       { id: req.params.member_guid, job_type: MappedJobTypes.VERIFICATION },
-      req.context.resolved_user_id,
+      req.context.resolvedUserId,
     );
     res.send({
       members: ret,
@@ -159,7 +159,7 @@ export default function (app) {
   app.post(`${ApiEndpoints.MEMBERS}/:member_guid/history`, async (req, res) => {
     const ret = await req.connectApi.updateConnection(
       { id: req.params.member_guid, job_type: "aggregate_extendedhistory" },
-      req.context.resolved_user_id,
+      req.context.resolvedUserId,
     );
     res.send({
       members: ret,
@@ -171,7 +171,7 @@ export default function (app) {
   app.post("/members/:member_guid/unthrottled_aggregate", async (req, res) => {
     const ret = await req.connectApi.updateConnection(
       { id: req.params.member_guid, job_type: "aggregate" },
-      req.context.resolved_user_id,
+      req.context.resolvedUserId,
     );
     res.send({
       members: ret,

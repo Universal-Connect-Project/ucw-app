@@ -7,7 +7,7 @@ test("displays error page with failed oAuth", async ({ page }, testInfo) => {
   const userId = crypto.randomUUID();
 
   await page.goto(
-    `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&user_id=${userId}`,
+    `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
   );
 
   await page.getByPlaceholder("Search").fill("TestExampleFailedOauth Bank");
@@ -27,7 +27,7 @@ test("connects to example bank with oAuth", async ({ page }, testInfo) => {
   const userId = crypto.randomUUID();
 
   await page.goto(
-    `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&user_id=${userId}`,
+    `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
   );
 
   await page.getByPlaceholder("Search").fill("TestExampleOauth Bank"); //TestExampleOauth Bank

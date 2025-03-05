@@ -16,14 +16,14 @@ const App = () => {
   const aggregator = queryParams.get("aggregator") as string;
   const jobTypes = queryParams.get("jobTypes")?.split(",") as ComboJobTypes[];
   const institutionId = queryParams.get("institution_id") as string;
-  const userId = queryParams.get("user_id") as string;
+  const userId = queryParams.get("userId") as string;
   const singleAccountSelect =
     queryParams.get("single_account_select") !== "false";
 
   const [sessionId] = useState(queryParams.get("sessionId") || uuidV4());
 
   const instrumentationProps = {
-    user_id: userId,
+    userId: userId,
     current_member_guid: connectionId,
     current_aggregator: aggregator,
     jobTypes,

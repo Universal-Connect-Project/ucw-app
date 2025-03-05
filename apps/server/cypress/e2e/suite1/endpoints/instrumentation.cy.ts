@@ -16,13 +16,13 @@ describe("instrumentation endpoint", () => {
     }).then((response) => {
       expect(response.status).to.eq(200);
 
-      const { jobTypes, user_id } = JSON.parse(response.headers.meta as string);
+      const { jobTypes, userId } = JSON.parse(response.headers.meta as string);
 
       expect(jobTypes).to.deep.eq([
         ComboJobTypes.TRANSACTIONS,
         ComboJobTypes.TRANSACTION_HISTORY,
       ]);
-      expect(user_id).to.eq(testUserId);
+      expect(userId).to.eq(testUserId);
     });
   });
 });

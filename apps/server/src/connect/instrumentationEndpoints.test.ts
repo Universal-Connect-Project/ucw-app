@@ -37,7 +37,7 @@ describe("instrumentationEndpoints", () => {
         scheme: "vcs",
         single_account_select: req.body.single_account_select,
         updated: true,
-        user_id: req.params.userId,
+        userId: req.params.userId,
       });
     });
 
@@ -63,7 +63,7 @@ describe("instrumentationEndpoints", () => {
         scheme: "vcs",
         single_account_select: req.body.single_account_select,
         updated: true,
-        user_id: req.params.userId,
+        userId: req.params.userId,
       });
     });
 
@@ -89,7 +89,7 @@ describe("instrumentationEndpoints", () => {
         scheme: "vcs",
         single_account_select: req.body.single_account_select,
         updated: true,
-        user_id: req.params.userId,
+        userId: req.params.userId,
       });
     });
   });
