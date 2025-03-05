@@ -52,10 +52,10 @@
                     "items": {
                       "type": "string",
                       "enum": [
-                        "account_verification",
-                        "identity_verification",
+                        "accountVerification",
+                        "identityVerification",
                         "transactions",
-                        "transaction_history"
+                        "transactionHistory"
                       ]
                     }
                   },
