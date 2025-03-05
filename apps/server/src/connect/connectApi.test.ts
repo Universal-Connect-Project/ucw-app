@@ -19,7 +19,7 @@ const testContext = {
   aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
   updated: false,
   institution_id: "xxx",
-  resolved_user_id: null,
+  resolvedUserId: null,
   jobTypes: [ComboJobTypes.TRANSACTIONS],
 } as Context;
 

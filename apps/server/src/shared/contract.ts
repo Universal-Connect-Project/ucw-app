@@ -15,8 +15,8 @@ export interface Context {
   institution_uid?: string;
   connection_id?: string;
   current_job_id?: string;
-  user_id?: string;
-  resolved_user_id?: string;
+  userId?: string;
+  resolvedUserId?: string;
   aggregator?: string | null;
   jobTypes?: ComboJobTypes[];
   job_type?: string; // Remove this

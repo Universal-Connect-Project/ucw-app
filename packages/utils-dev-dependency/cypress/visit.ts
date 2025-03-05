@@ -10,7 +10,7 @@ export const visitWithPostMessageSpy = (url: string) =>
 export const visitIdentity = () => {
   const userId = crypto.randomUUID();
 
-  cy.visit(`/widget?jobTypes=${ComboJobTypes.ACCOUNT_OWNER}&user_id=${userId}`);
+  cy.visit(`/widget?jobTypes=${ComboJobTypes.ACCOUNT_OWNER}&userId=${userId}`);
 
   return cy.wrap(userId);
 };
@@ -23,7 +23,7 @@ export const visitAgg = (options?: any) => {
   const tokenString = token ? `&token=${token}` : "";
 
   cy.visit(
-    `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&user_id=${userId}${tokenString}`,
+    `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}${tokenString}`,
     {
       failOnStatusCode,
     },

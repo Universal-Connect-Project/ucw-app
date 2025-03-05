@@ -7,7 +7,7 @@ export const refreshAConnection = ({ enterCredentials, selectInstitution }) => {
   const userId = Cypress.env("userId");
 
   visitWithPostMessageSpy(
-    `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&user_id=${userId}`,
+    `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
   ).then(() => {
     // Make the initial connection
     selectInstitution();
@@ -30,7 +30,7 @@ export const refreshAConnection = ({ enterCredentials, selectInstitution }) => {
 
       //Refresh the connection
       cy.visit(
-        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&connection_id=${memberGuid}&aggregator=${aggregator}&user_id=${userId}`,
+        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&connection_id=${memberGuid}&aggregator=${aggregator}&userId=${userId}`,
       );
 
       enterCredentials();

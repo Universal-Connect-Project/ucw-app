@@ -54,7 +54,7 @@ function mapConnection(connection: Connection): Member {
     oauth_window_uri: connection.oauth_window_uri,
     aggregator: connection.aggregator,
     is_being_aggregated: connection.is_being_aggregated,
-    user_guid: connection.user_id,
+    user_guid: connection.userId,
     mfa: {
       credentials: connection.challenges?.map((c) => {
         const ret = {

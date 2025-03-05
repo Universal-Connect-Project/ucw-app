@@ -18,7 +18,7 @@ describe("server", () => {
         widgetHandler(
           {
             query: {
-              user_id: "testUserId",
+              userId: "testUserId",
             },
           } as unknown as Request,
           res,
@@ -40,7 +40,7 @@ describe("server", () => {
           {
             query: {
               jobTypes: "junk",
-              user_id: "testUserId",
+              userId: "testUserId",
             },
           } as unknown as Request,
           res,
@@ -52,7 +52,7 @@ describe("server", () => {
         );
       });
 
-      it("responds with a 400 if user_id is missing", () => {
+      it("responds with a 400 if userId is missing", () => {
         const res = {
           send: jest.fn(),
           status: jest.fn(),
@@ -68,9 +68,7 @@ describe("server", () => {
         );
 
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith(
-          "&#x22;user_id&#x22; is required",
-        );
+        expect(res.send).toHaveBeenCalledWith("&#x22;userId&#x22; is required");
       });
 
       it("responds with a 400 if aggregator is invalid", () => {
@@ -84,7 +82,7 @@ describe("server", () => {
             query: {
               jobTypes: ComboJobTypes.TRANSACTIONS,
               aggregator: "junk",
-              user_id: "testUserId",
+              userId: "testUserId",
             },
           } as unknown as Request,
           res,
@@ -105,7 +103,7 @@ describe("server", () => {
             query: {
               jobTypes: ComboJobTypes.TRANSACTIONS,
               aggregator: Aggregators.TEST_A,
-              user_id: "testUserId",
+              userId: "testUserId",
             },
           } as unknown as Request,
           res,
@@ -128,7 +126,7 @@ describe("server", () => {
             query: {
               connection_id: "testConnectionId",
               jobTypes: ComboJobTypes.TRANSACTIONS,
-              user_id: "testUserId",
+              userId: "testUserId",
             },
           } as unknown as Request,
           res,
@@ -151,7 +149,7 @@ describe("server", () => {
             query: {
               jobTypes: ComboJobTypes.TRANSACTIONS,
               single_account_select: "junk",
-              user_id: "testUserId",
+              userId: "testUserId",
             },
           } as unknown as Request,
           res,

@@ -142,7 +142,7 @@ export interface Connection {
   is_oauth?: boolean | null;
   name?: string | null;
   aggregator?: string | null;
-  user_id?: string | null;
+  userId?: string | null;
   challenges?: Challenge[];
   has_accounts?: boolean | null;
   has_transactions?: boolean | null;

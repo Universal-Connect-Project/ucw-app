@@ -55,7 +55,7 @@ export class AggregatorAdapterBase {
     this.context.aggregator = resolvedInstitution.aggregator;
     this.context.updated = true;
     this.context.institution_id = resolvedInstitution.id;
-    this.context.resolved_user_id = null;
+    this.context.resolvedUserId = null;
     await this.init();
     return resolvedInstitution;
   }
@@ -199,7 +199,7 @@ export class AggregatorAdapterBase {
   }
 
   getUserId(): string {
-    return this.context.resolved_user_id;
+    return this.context.resolvedUserId;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

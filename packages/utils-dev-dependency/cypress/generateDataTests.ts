@@ -138,7 +138,7 @@ export const generateDataTests = ({
       let aggregator: string;
       const userId = Cypress.env("userId");
 
-      visitWithPostMessageSpy(`/widget?jobTypes=${jobTypes}&user_id=${userId}`)
+      visitWithPostMessageSpy(`/widget?jobTypes=${jobTypes}&userId=${userId}`)
         .then(() => makeAConnection(jobTypes))
         .then(() => {
           // Capture postmessages into variables

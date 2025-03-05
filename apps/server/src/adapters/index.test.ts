@@ -10,7 +10,7 @@ const aggregatorAdapterBase = new AggregatorAdapterBase({
       token: "test_token",
       iv: "test_iv",
     },
-    resolved_user_id: "test_user_id",
+    resolvedUserId: "test_user_id",
   },
 });
 

@@ -6,7 +6,7 @@ import { ComboJobTypes, INSTRUMENTATION_MOCK_URL } from "@repo/utils";
 
 const instrumentationProps = {
   jobTypes: [ComboJobTypes.TRANSACTIONS],
-  user_id: "test",
+  userId: "test",
 };
 
 describe("api", () => {

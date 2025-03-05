@@ -41,7 +41,7 @@ describe("search", () => {
     ).should("exist");
 
     cy.visit(
-      `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS},${ComboJobTypes.ACCOUNT_NUMBER},${ComboJobTypes.ACCOUNT_OWNER}&user_id=${crypto.randomUUID()}`,
+      `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS},${ComboJobTypes.ACCOUNT_NUMBER},${ComboJobTypes.ACCOUNT_OWNER}&userId=${crypto.randomUUID()}`,
     );
 
     cy.findByText(institutionThatIsInFavoriteAndSupportsAll).should("exist");

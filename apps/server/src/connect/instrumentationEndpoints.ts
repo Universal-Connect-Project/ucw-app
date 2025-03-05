@@ -14,7 +14,7 @@ export const instrumentationHandler = async (req: Request, res: Response) => {
       single_account_select,
     } = body;
 
-    req.context.user_id = userId;
+    req.context.userId = userId;
 
     if (Boolean(current_member_guid) && Boolean(current_aggregator)) {
       req.context.aggregator = current_aggregator;

@@ -188,7 +188,7 @@ export class TestAdapter implements WidgetAdapter {
       is_being_aggregated: false,
       oauth_window_uri: undefined,
       aggregator: this.aggregator,
-      user_id: userId,
+      userId: userId,
     };
   }
 
@@ -207,7 +207,7 @@ export class TestAdapter implements WidgetAdapter {
         aggregator: this.aggregator,
         id: testConnectionId,
         cur_job_id: testJobId,
-        user_id: "testUserId",
+        userId: "testUserId",
         status: ConnectionStatus.CHALLENGED,
         challenges: [
           {
@@ -233,7 +233,7 @@ export class TestAdapter implements WidgetAdapter {
       aggregator: this.aggregator,
       id: testConnectionId,
       cur_job_id: testJobId,
-      user_id: userId,
+      userId: userId,
       status: ConnectionStatus.CONNECTED,
       challenges: [],
     };
@@ -286,7 +286,7 @@ export class TestAdapter implements WidgetAdapter {
     }
     if (code) {
       connection.status = ConnectionStatus.CONNECTED;
-      connection.user_id = code;
+      connection.userId = code;
       connection.request_id = request_id;
     }
 

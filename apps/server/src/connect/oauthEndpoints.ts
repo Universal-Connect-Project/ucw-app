@@ -1,15 +1,14 @@
 import type { Response, Request } from "express";
 import { createAggregatorWidgetAdapter } from "../adapterIndex";
-import { get, set } from "../services/storageClient/redis";
+import { get } from "../services/storageClient/redis";
 import { ConnectionStatus } from "../shared/contract";
 import * as path from "path";
 import * as fs from "fs";
-import config from "../config";
 import * as logger from "../infra/logger";
 
 //GET '/oauth/:aggregator/redirect_from/'
 export const oauthRedirectHandler = async (req: Request, res: Response) => {
-  const { userId, aggregator } = req.params;
+  const { aggregator } = req.params;
   try {
     const aggregatorAdapter = createAggregatorWidgetAdapter({ aggregator });
     const oauth_res: any =
@@ -26,13 +25,13 @@ export const oauthRedirectHandler = async (req: Request, res: Response) => {
       oauth_res.scheme = context?.scheme;
       oauth_res.oauth_referral_source = context?.oauth_referral_source;
       oauth_res.sessionId = context?.sessionId;
-      oauth_res.user_id = context?.user_id;
+      oauth_res.userId = context?.userId;
 
       const metadata = JSON.stringify({
         aggregator,
         id: oauth_res.id,
         member_guid: oauth_res.id,
-        user_guid: oauth_res.user_id,
+        user_guid: oauth_res.userId,
         error_reason: oauth_res.error,
         session_guid: oauth_res.sessionId,
       });
