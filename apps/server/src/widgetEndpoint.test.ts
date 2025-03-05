@@ -138,7 +138,7 @@ describe("server", () => {
         );
       });
 
-      it("responds with a 400 if single_account_select isn't a bool", () => {
+      it("responds with a 400 if singleAccountSelect isn't a bool", () => {
         const res = {
           send: jest.fn(),
           status: jest.fn(),
@@ -148,7 +148,7 @@ describe("server", () => {
           {
             query: {
               jobTypes: ComboJobTypes.TRANSACTIONS,
-              single_account_select: "junk",
+              singleAccountSelect: "junk",
               userId: "testUserId",
             },
           } as unknown as Request,
@@ -157,7 +157,7 @@ describe("server", () => {
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith(
-          "&#x22;single_account_select&#x22; must be a boolean",
+          "&#x22;singleAccountSelect&#x22; must be a boolean",
         );
       });
     });

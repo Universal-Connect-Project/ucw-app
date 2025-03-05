@@ -59,7 +59,7 @@
                       ]
                     }
                   },
-                  "single_account_select": {
+                  "singleAccountSelect": {
                     "type": "boolean"
                   }
                 }
@@ -79,7 +79,7 @@
                     "jobTypes": ["transactions"],
                     "scheme": "vcs",
                     "oauth_referral_source": "BROWSER",
-                    "single_account_select": true,
+                    "singleAccountSelect": true,
                     "updated": true
                   }
                 }

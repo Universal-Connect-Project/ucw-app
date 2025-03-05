@@ -18,7 +18,7 @@ const App = () => {
   const institutionId = queryParams.get("institutionId") as string;
   const userId = queryParams.get("userId") as string;
   const singleAccountSelect =
-    queryParams.get("single_account_select") !== "false";
+    queryParams.get("singleAccountSelect") !== "false";
 
   const [sessionId] = useState(queryParams.get("sessionId") || uuidV4());
 
@@ -27,7 +27,7 @@ const App = () => {
     current_member_guid: connectionId,
     current_aggregator: aggregator,
     jobTypes,
-    single_account_select: singleAccountSelect,
+    singleAccountSelect,
     sessionId,
   };
 

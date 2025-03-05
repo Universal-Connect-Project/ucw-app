@@ -21,7 +21,7 @@ export interface Context {
   jobTypes?: ComboJobTypes[];
   job_type?: string; // Remove this
   partner?: string;
-  single_account_select?: boolean;
+  singleAccountSelect?: boolean;
   auth?: AuthRequest;
   oauth_referral_source?: string;
   scheme?: string;

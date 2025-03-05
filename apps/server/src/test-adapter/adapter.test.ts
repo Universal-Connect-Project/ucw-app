@@ -141,7 +141,7 @@ describe("TestAdapter", () => {
   });
 
   describe("verification flow", () => {
-    it(`returns success if it hasn't been verified once, returns success if the job type is ${ComboJobTypes.ACCOUNT_NUMBER}, it has been verified once, and single_account_select is false, returns a challenge if the job type if verification and it has been verified once and single_account_select is true. returns success after a second ${ComboJobTypes.ACCOUNT_NUMBER}`, async () => {
+    it(`returns success if it hasn't been verified once, returns success if the job type is ${ComboJobTypes.ACCOUNT_NUMBER}, it has been verified once, and singleAccountSelect is false, returns a challenge if the job type if verification and it has been verified once and singleAccountSelect is true. returns success after a second ${ComboJobTypes.ACCOUNT_NUMBER}`, async () => {
       const userId = "testUserId";
 
       const successStatus = {

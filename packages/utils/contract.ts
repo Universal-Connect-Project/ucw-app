@@ -218,7 +218,7 @@ export interface WidgetAdapter {
   GetConnectionStatus: (
     connectionId: string,
     jobId: string,
-    single_account_select?: boolean,
+    singleAccountSelect?: boolean,
     userId?: string,
   ) => Promise<Connection | undefined>;
   DataRequestValidators?: Record<string, (req: any) => string | undefined>;

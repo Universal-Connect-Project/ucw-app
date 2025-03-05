@@ -89,7 +89,7 @@ export class AggregatorAdapterBase {
     return await this.aggregatorAdapter.GetConnectionStatus(
       connectionId,
       this.context.current_job_id,
-      this.context.single_account_select,
+      this.context.singleAccountSelect,
       this.getUserId(),
     );
   }

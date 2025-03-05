@@ -7,7 +7,7 @@ interface InstrumentationParameters {
   current_aggregator?: string;
   jobTypes: ComboJobTypes[];
   sessionId?: string;
-  single_account_select?: boolean;
+  singleAccountSelect?: boolean;
 }
 
 export const instrumentation = async (

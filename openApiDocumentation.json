@@ -74,7 +74,7 @@
           },
           {
             "description": "This parameter is only supported by Sophtron. When doing a verification job you can pass this parameter as false if you'd like to skip the step that selects an account. For this same behavior using MX you'll need to reach out to MX support to change a setting.",
-            "name": "single_account_select",
+            "name": "singleAccountSelect",
             "in": "query",
             "required": false,
             "schema": {
