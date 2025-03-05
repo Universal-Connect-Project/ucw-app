@@ -15,7 +15,7 @@ const App = () => {
   const connectionId = queryParams.get("connection_id") as string;
   const aggregator = queryParams.get("aggregator") as string;
   const jobTypes = queryParams.get("jobTypes")?.split(",") as ComboJobTypes[];
-  const institutionId = queryParams.get("institution_id") as string;
+  const institutionId = queryParams.get("institutionId") as string;
   const userId = queryParams.get("userId") as string;
   const singleAccountSelect =
     queryParams.get("single_account_select") !== "false";

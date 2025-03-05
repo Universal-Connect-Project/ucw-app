@@ -10,7 +10,7 @@ import path from "path";
 export const widgetHandler = (req: Request, res: Response) => {
   const schema = Joi.object({
     connection_id: Joi.string(),
-    institution_id: Joi.string(),
+    institutionId: Joi.string(),
     jobTypes: Joi.string()
       .custom((value, helpers) => {
         const items = value.split(",") as ComboJobTypes[];

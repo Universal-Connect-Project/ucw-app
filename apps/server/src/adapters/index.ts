@@ -54,7 +54,7 @@ export class AggregatorAdapterBase {
     );
     this.context.aggregator = resolvedInstitution.aggregator;
     this.context.updated = true;
-    this.context.institution_id = resolvedInstitution.id;
+    this.context.institutionId = resolvedInstitution.id;
     this.context.resolvedUserId = null;
     await this.init();
     return resolvedInstitution;

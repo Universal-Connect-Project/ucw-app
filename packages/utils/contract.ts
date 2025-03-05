@@ -123,7 +123,7 @@ export interface CreateConnectionRequest {
   jobTypes?: ComboJobTypes[];
   background_aggregation_is_disabled?: boolean;
   credentials: Credential[];
-  institution_id: string;
+  institutionId: string;
   is_oauth?: boolean;
   skip_aggregation?: boolean;
   metadata?: string;
