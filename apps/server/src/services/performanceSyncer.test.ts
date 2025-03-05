@@ -11,8 +11,12 @@ import {
   PERFORMANCE_DATA_REDIS_KEY,
   PERFORMANCE_ETAG_REDIS_KEY,
 } from "./storageClient/constants";
-import { get } from "./storageClient/redis";
+import { get, set } from "./storageClient/redis";
 import * as logger from "../infra/logger";
+import {
+  RESPONSE_NOT_MODIFIED,
+  UNAUTHORIZED_RESPONSE,
+} from "src/infra/http/constants";
 
 describe("setPerformanceSyncSchedule", () => {
   it("should call sync over the given interval", async () => {
@@ -41,24 +45,33 @@ describe("setPerformanceSyncSchedule", () => {
 
 describe("syncPerformanceData", () => {
   it("should skip update if response status is 304 (not modified)", async () => {
-    const infoLogSpy = jest.spyOn(logger, "info");
+    const performanceData = {
+      test: {
+        things: "test",
+      },
+    };
+
+    await set(PERFORMANCE_DATA_REDIS_KEY, performanceData);
 
     server.use(
       http.get(
         config.PERFORMANCE_ROUTING_DATA_URL,
         () =>
-          new HttpResponse(null, { status: 304, statusText: "Not Modified" }),
+          new HttpResponse(null, {
+            status: RESPONSE_NOT_MODIFIED,
+            statusText: "Not Modified",
+          }),
       ),
     );
 
     await syncPerformanceData();
 
-    expect(infoLogSpy).toHaveBeenCalledWith(
-      "Performance data unchanged. Skipping Update",
+    expect(await get(PERFORMANCE_DATA_REDIS_KEY)).toStrictEqual(
+      performanceData,
     );
   });
 
-  it("should call update methods if response is 200", async () => {
+  it("should set the etag and store performance data if response is 200", async () => {
     const performanceRoutingData = {
       "1234-32432": {
         transactions: {
@@ -69,13 +82,13 @@ describe("syncPerformanceData", () => {
       },
     };
 
-    const mockEtag = "12345abcde";
+    const fakeEtag = "12345abcde";
 
     server.use(
       http.get(config.PERFORMANCE_ROUTING_DATA_URL, () =>
         HttpResponse.json(performanceRoutingData, {
           headers: {
-            etag: mockEtag,
+            etag: fakeEtag,
           },
         }),
       ),
@@ -83,7 +96,7 @@ describe("syncPerformanceData", () => {
 
     await syncPerformanceData();
 
-    expect(await get(PERFORMANCE_ETAG_REDIS_KEY)).toBe(mockEtag);
+    expect(await get(PERFORMANCE_ETAG_REDIS_KEY)).toBe(fakeEtag);
     expect(await get(PERFORMANCE_DATA_REDIS_KEY)).toStrictEqual(
       performanceRoutingData,
     );
@@ -94,7 +107,10 @@ describe("syncPerformanceData", () => {
 
     server.use(
       http.get(config.PERFORMANCE_ROUTING_DATA_URL, () =>
-        HttpResponse.json(null, { status: 401, statusText: "Forbidden" }),
+        HttpResponse.json(null, {
+          status: UNAUTHORIZED_RESPONSE,
+          statusText: "Forbidden",
+        }),
       ),
     );
 
@@ -126,7 +142,10 @@ describe("fetchPerformanceData", () => {
       http.get(
         config.PERFORMANCE_ROUTING_DATA_URL,
         () =>
-          new HttpResponse(null, { status: 304, statusText: "Not Modified" }),
+          new HttpResponse(null, {
+            status: UNAUTHORIZED_RESPONSE,
+            statusText: "Not Modified",
+          }),
       ),
     );
 
