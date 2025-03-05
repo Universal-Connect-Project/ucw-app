@@ -12,7 +12,7 @@ const App = () => {
 
   const queryParams = new URLSearchParams(window.location.search);
 
-  const connectionId = queryParams.get("connection_id") as string;
+  const connectionId = queryParams.get("connectionId") as string;
   const aggregator = queryParams.get("aggregator") as string;
   const jobTypes = queryParams.get("jobTypes")?.split(",") as ComboJobTypes[];
   const institutionId = queryParams.get("institutionId") as string;

@@ -9,7 +9,7 @@ import path from "path";
 
 export const widgetHandler = (req: Request, res: Response) => {
   const schema = Joi.object({
-    connection_id: Joi.string(),
+    connectionId: Joi.string(),
     institutionId: Joi.string(),
     jobTypes: Joi.string()
       .custom((value, helpers) => {
@@ -28,7 +28,7 @@ export const widgetHandler = (req: Request, res: Response) => {
     single_account_select: Joi.bool(),
     userId: Joi.string().required(),
     token: Joi.string(),
-  }).and("connection_id", "aggregator");
+  }).and("connectionId", "aggregator");
 
   const { error } = schema.validate(req.query);
 

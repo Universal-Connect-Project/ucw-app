@@ -7,7 +7,7 @@ describe("get members", () => {
       headers: {
         meta: JSON.stringify({
           aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
-          connection_id: "test",
+          connectionId: "test",
         }),
       },
       url: MEMBERS_URL,

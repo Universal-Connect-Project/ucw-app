@@ -78,16 +78,16 @@ export class AggregatorAdapterBase {
     return await this.aggregatorAdapter.ListInstitutionCredentials(guid);
   }
 
-  async getConnection(connection_id: string): Promise<Connection> {
+  async getConnection(connectionId: string): Promise<Connection> {
     return await this.aggregatorAdapter.GetConnectionById(
-      connection_id,
+      connectionId,
       this.getUserId(),
     );
   }
 
-  async getConnectionStatus(connection_id: string): Promise<Connection> {
+  async getConnectionStatus(connectionId: string): Promise<Connection> {
     return await this.aggregatorAdapter.GetConnectionStatus(
-      connection_id,
+      connectionId,
       this.context.current_job_id,
       this.context.single_account_select,
       this.getUserId(),
@@ -131,10 +131,10 @@ export class AggregatorAdapterBase {
     return ret;
   }
 
-  async answerChallenge(connection_id: string, challenges: Challenge[]) {
+  async answerChallenge(connectionId: string, challenges: Challenge[]) {
     return await this.aggregatorAdapter.AnswerChallenge(
       {
-        id: connection_id ?? this.context.connection_id,
+        id: connectionId ?? this.context.connectionId,
         challenges,
       },
       this.context.current_job_id,
@@ -147,17 +147,17 @@ export class AggregatorAdapterBase {
     return ret?.oauth_window_uri;
   }
 
-  async getOauthState(connection_id: string) {
-    const connection = await this.getConnectionStatus(connection_id);
+  async getOauthState(connectionId: string) {
+    const connection = await this.getConnectionStatus(connectionId);
 
     if (connection == null) {
       return {};
     }
 
     const ret = {
-      guid: connection_id,
-      inbound_member_guid: connection_id,
-      outbound_member_guid: connection_id,
+      guid: connectionId,
+      inbound_member_guid: connectionId,
+      outbound_member_guid: connectionId,
       auth_status:
         connection.status === ConnectionStatus.PENDING
           ? OAuthStatus.PENDING
@@ -178,9 +178,9 @@ export class AggregatorAdapterBase {
     return [state];
   }
 
-  async deleteConnection(connection_id: string): Promise<void> {
+  async deleteConnection(connectionId: string): Promise<void> {
     await this.aggregatorAdapter.DeleteConnection(
-      connection_id,
+      connectionId,
       this.getUserId(),
     );
   }

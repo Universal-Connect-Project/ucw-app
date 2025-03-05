@@ -18,7 +18,7 @@ export const instrumentationHandler = async (req: Request, res: Response) => {
 
     if (Boolean(current_member_guid) && Boolean(current_aggregator)) {
       req.context.aggregator = current_aggregator;
-      req.context.connection_id = current_member_guid;
+      req.context.connectionId = current_member_guid;
     }
 
     req.context.sessionId = sessionId;
