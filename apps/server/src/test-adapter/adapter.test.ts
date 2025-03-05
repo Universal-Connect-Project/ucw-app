@@ -123,7 +123,7 @@ describe("TestAdapter", () => {
       expect(
         await testAdapterA.CreateConnection(
           {
-            institution_id: "institution_id",
+            institutionId: "institutionId",
             credentials: [],
           },
           "test",
@@ -167,7 +167,7 @@ describe("TestAdapter", () => {
       await testAdapterA.CreateConnection(
         {
           credentials: [],
-          institution_id: "test",
+          institutionId: "test",
           jobTypes: [ComboJobTypes.ACCOUNT_NUMBER],
         },
         userId,

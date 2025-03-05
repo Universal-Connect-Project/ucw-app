@@ -18,7 +18,7 @@ import {
 const testContext = {
   aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
   updated: false,
-  institution_id: "xxx",
+  institutionId: "xxx",
   resolvedUserId: null,
   jobTypes: [ComboJobTypes.TRANSACTIONS],
 } as Context;
