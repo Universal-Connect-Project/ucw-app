@@ -24,6 +24,13 @@ export enum WidgetJobTypes {
   COMBINATION = 11,
 }
 
+export enum OAuthStatus {
+  _,
+  PENDING,
+  COMPLETE,
+  ERROR,
+}
+
 export enum VCDataTypes {
   ACCOUNTS = "accounts",
   IDENTITY = "identity",

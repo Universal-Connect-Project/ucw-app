@@ -54,13 +54,6 @@ export enum ConnectionStatus {
   PENDING,
 }
 
-export enum OAuthStatus {
-  _,
-  PENDING,
-  COMPLETE,
-  ERROR,
-}
-
 export enum VcType {
   IDENTITY,
   ACCOUNTS,
