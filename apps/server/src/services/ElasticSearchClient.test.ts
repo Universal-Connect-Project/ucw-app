@@ -439,7 +439,7 @@ describe("search", () => {
     expect(results).toEqual([elasticSearchInstitutionData]);
   });
 
-  it("includes identity and verification filter when job type is aggregate_identity_verification", async () => {
+  it(`includes identity and verification filter when job types are ${ComboJobTypes.TRANSACTIONS}, ${ComboJobTypes.ACCOUNT_NUMBER} and ${ComboJobTypes.ACCOUNT_OWNER}`, async () => {
     const supportsArray = [
       "supports_aggregation",
       "supports_verification",

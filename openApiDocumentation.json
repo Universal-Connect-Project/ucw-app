@@ -22,7 +22,7 @@
             "required": true,
             "schema": {
               "type": "string",
-              "example": "account_verification,identity_verification,transactions,transaction_history"
+              "example": "accountVerification,identityVerification,transactions,transaction_history"
             }
           },
           {

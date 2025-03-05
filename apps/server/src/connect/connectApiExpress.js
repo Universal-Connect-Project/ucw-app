@@ -10,7 +10,6 @@ import {
   getInstitutionsHandler,
 } from "./institutionEndpoints";
 import { webhookHandler, oauthRedirectHandler } from "./oauthEndpoints";
-import { MappedJobTypes } from "../shared/contract";
 import stubs from "./instrumentations.js";
 import { jobsRouteHandler } from "./jobEndpoints";
 import { instrumentationHandler } from "./instrumentationEndpoints";
@@ -131,39 +130,6 @@ export default function (app) {
   app.get(MEMBERS_URL, async (req, res) => {
     const ret = await req.connectApi.loadMembers();
     res.send(ret);
-  });
-
-  app.post(
-    `${ApiEndpoints.MEMBERS}/:member_guid/identify`,
-    async (req, res) => {
-      const ret = await req.connectApi.updateConnection(
-        { id: req.params.member_guid, job_type: "aggregate_identity" },
-        req.context.resolvedUserId,
-      );
-      res.send({
-        members: ret,
-      });
-    },
-  );
-
-  app.post(`${ApiEndpoints.MEMBERS}/:member_guid/verify`, async (req, res) => {
-    const ret = await req.connectApi.updateConnection(
-      { id: req.params.member_guid, job_type: MappedJobTypes.VERIFICATION },
-      req.context.resolvedUserId,
-    );
-    res.send({
-      members: ret,
-    });
-  });
-
-  app.post(`${ApiEndpoints.MEMBERS}/:member_guid/history`, async (req, res) => {
-    const ret = await req.connectApi.updateConnection(
-      { id: req.params.member_guid, job_type: "aggregate_extendedhistory" },
-      req.context.resolvedUserId,
-    );
-    res.send({
-      members: ret,
-    });
   });
 
   app.post(`${INSTRUMENTATION_URL}/userId/:userId`, instrumentationHandler);
