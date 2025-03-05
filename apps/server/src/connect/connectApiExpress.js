@@ -134,16 +134,6 @@ export default function (app) {
 
   app.post(`${INSTRUMENTATION_URL}/userId/:userId`, instrumentationHandler);
 
-  app.post("/members/:member_guid/unthrottled_aggregate", async (req, res) => {
-    const ret = await req.connectApi.updateConnection(
-      { id: req.params.member_guid, job_type: "aggregate" },
-      req.context.resolvedUserId,
-    );
-    res.send({
-      members: ret,
-    });
-  });
-
   app.all("/webhook/:aggregator/*", webhookHandler);
 
   app.get("/oauth/:aggregator/redirect_from/", oauthRedirectHandler);
