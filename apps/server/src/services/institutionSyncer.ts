@@ -9,10 +9,11 @@ import type { CachedInstitution } from '../shared/contract'
 import { getAccessToken } from './auth0Service'
 import { INSTITUTION_ETAG_REDIS_KEY } from './storageClient/constants'
 import { get, setNoExpiration } from './storageClient/redis'
-
-const RESPONSE_NOT_MODIFIED = 304
-const SUCCESS_RESPONSE = 200
-const UNAUTHORIZED_RESPONSE = 401
+import {
+  RESPONSE_NOT_MODIFIED,
+  SUCCESS_RESPONSE,
+  UNAUTHORIZED_RESPONSE,
+} from "../infra/http/constants";
 
 export async function setInstitutionSyncSchedule(minutes: number = 1) {
   return setIntervalAsync(

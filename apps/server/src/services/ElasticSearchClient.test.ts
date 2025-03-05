@@ -1,7 +1,8 @@
 import * as fs from "fs";
 import { http, HttpResponse } from "msw";
+
 import testPreferences from "../../cachedDefaults/testData/testPreferences.json";
-import config from "../config";
+import * as _config from "../config";
 import * as logger from "../infra/logger";
 import {
   deleteRemovedInstitutions,
@@ -21,10 +22,16 @@ import {
   ElasticSearchMock,
   elasticSearchMockError,
 } from "../test/elasticSearchMock";
-import { elasticSearchInstitutionData } from "../test/testData/institution";
+import { generateElasticSearchRecommendedInstitutionTestSetup } from "../test/elasticSearchUtils";
+import {
+  elasticSearchInstitutionData,
+  elasticSearchInstitutionDataFavs,
+} from "../test/testData/institution";
 import { server } from "../test/testServer";
 import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
 import { overwriteSet } from "./storageClient/redis";
+
+const config = _config.getConfig();
 
 jest.mock("fs");
 
@@ -261,44 +268,54 @@ describe("indexElasticSearch", () => {
     expect(institutionsIndexedCount).toEqual(3);
   });
 
-  it("it indexes institutions retrieved from the institution server", async () => {
-    ElasticSearchMock.clearAll();
+  describe.each([
+    { singleThread: true, description: "with single-threading" },
+    { singleThread: false, description: "without single-threading" },
+  ])("Index Elasticsearch $description", ({ singleThread }) => {
+    it("indexes institutions retrieved from the institution server", async () => {
+      jest.spyOn(_config, "getConfig").mockReturnValueOnce({
+        ...config,
+        ELASTIC_SEARCH_SINGLE_THREAD: singleThread,
+      });
 
-    server.use(
-      http.get(config.INSTITUTION_CACHE_LIST_URL, () => {
-        return HttpResponse.json([
-          elasticSearchInstitutionData,
-          elasticSearchInstitutionData,
-        ]);
-      }),
-    );
+      ElasticSearchMock.clearAll();
 
-    institutionsIndexedCount = 0;
-    ElasticSearchMock.add(
-      {
-        method: "PUT",
-        path: "/institutions",
-      },
-      () => {
-        indexCreated = true;
-        return "";
-      },
-    );
+      server.use(
+        http.get(config.INSTITUTION_CACHE_LIST_URL, () => {
+          return HttpResponse.json([
+            elasticSearchInstitutionData,
+            elasticSearchInstitutionData,
+          ]);
+        }),
+      );
 
-    ElasticSearchMock.add(
-      {
-        method: "PUT",
-        path: "/institutions/_doc/*",
-      },
-      () => {
-        institutionsIndexedCount += 1;
-        return "";
-      },
-    );
+      institutionsIndexedCount = 0;
+      ElasticSearchMock.add(
+        {
+          method: "PUT",
+          path: "/institutions",
+        },
+        () => {
+          indexCreated = true;
+          return "";
+        },
+      );
 
-    await indexElasticSearch();
-    expect(indexCreated).toBeTruthy();
-    expect(institutionsIndexedCount).toEqual(2);
+      ElasticSearchMock.add(
+        {
+          method: "PUT",
+          path: "/institutions/_doc/*",
+        },
+        () => {
+          institutionsIndexedCount += 1;
+          return "";
+        },
+      );
+
+      await indexElasticSearch();
+      expect(indexCreated).toBeTruthy();
+      expect(institutionsIndexedCount).toEqual(2);
+    });
   });
 });
 
@@ -335,8 +352,8 @@ describe("search", () => {
     expect(results).toEqual([elasticSearchInstitutionData]);
   });
 
-  it("excludes test banks in ES search when Env is prod", async () => {
-    config.Env = "prod";
+  it("excludes test banks in ES search when ENV is prod", async () => {
+    config.ENV = "prod";
     ElasticSearchMock.add(
       {
         method: ["GET", "POST"],
@@ -360,7 +377,7 @@ describe("search", () => {
     );
 
     await search("MX Bank", MappedJobTypes.AGGREGATE);
-    config.Env = "test";
+    config.ENV = "test";
   });
 
   it("includes a filter when job type is identity", async () => {
@@ -531,7 +548,7 @@ describe("getInstitution", () => {
 });
 
 describe("getRecommendedInstitutions", () => {
-  it("makes expected call to ES, gets a list of favorite institutions, and doesnt fail if an institution isnt found", async () => {
+  it("makes expected call to ES, gets a list of favorite institutions, and doesn't fail if an institution isn't found", async () => {
     ElasticSearchMock.clearAll();
 
     ElasticSearchMock.add(
@@ -554,9 +571,9 @@ describe("getRecommendedInstitutions", () => {
       },
     );
 
-    const recommendedInstitutions = await getRecommendedInstitutions(
-      MappedJobTypes.AGGREGATE,
-    );
+    const recommendedInstitutions = await getRecommendedInstitutions({
+      jobType: MappedJobTypes.AGGREGATE,
+    });
 
     expect(recommendedInstitutions).toEqual([elasticSearchInstitutionData]);
   });
@@ -607,50 +624,87 @@ describe("getRecommendedInstitutions", () => {
       },
     );
 
-    const recommendedInstitutions = await getRecommendedInstitutions(
-      MappedJobTypes.AGGREGATE,
-    );
+    const recommendedInstitutions = await getRecommendedInstitutions({
+      jobType: MappedJobTypes.AGGREGATE,
+    });
 
     expect(recommendedInstitutions).toEqual([]);
+  });
+
+  it("filters out test institutions if ENV is 'prod'", async () => {
+    jest.spyOn(_config, "getConfig").mockReturnValueOnce({
+      ...config,
+      ENV: "prod",
+    });
+
+    const recommendedInstitutions =
+      await generateElasticSearchRecommendedInstitutionTestSetup();
+
+    expect(recommendedInstitutions.length).toEqual(1);
+    expect(recommendedInstitutions).toEqual([
+      elasticSearchInstitutionDataFavs[0],
+    ]);
+  });
+
+  it("does not filter out test institutions if ENV is not 'prod'", async () => {
+    jest.spyOn(_config, "getConfig").mockReturnValueOnce({
+      ...config,
+      ENV: "test",
+    });
+
+    const recommendedInstitutions =
+      await generateElasticSearchRecommendedInstitutionTestSetup();
+
+    expect(recommendedInstitutions.length).toEqual(3);
+    expect(recommendedInstitutions).toEqual(elasticSearchInstitutionDataFavs);
   });
 });
 
 describe("deleteRemovedInstitutions", () => {
-  it("should delete institutions that are no longer in the new list", async () => {
-    const newInstitutions = [{ id: "new1" }, { id: "new2" }];
+  describe.each([
+    { singleThread: true, description: "with single-threading" },
+    { singleThread: false, description: "without single-threading" },
+  ])("Delete institutions $description", ({ singleThread }) => {
+    it("should delete institutions that are no longer in the new list", async () => {
+      jest.spyOn(_config, "getConfig").mockReturnValueOnce({
+        ...config,
+        ELASTIC_SEARCH_SINGLE_THREAD: singleThread,
+      });
 
-    const oldInstitutions = [{ id: "old1" }, { id: "old2" }, { id: "new1" }];
+      const newInstitutions = [{ id: "new1" }, { id: "new2" }];
+      const oldInstitutions = [{ id: "old1" }, { id: "old2" }, { id: "new1" }];
 
-    const infoSpy = jest.spyOn(logger, "info").mockImplementation(() => {});
-    const shouldBeDeleted = ["old1", "old2"];
-    const deletedIds: string[] = [];
+      const infoSpy = jest.spyOn(logger, "info").mockImplementation(() => {});
+      const shouldBeDeleted = ["old1", "old2"];
+      const deletedIds: string[] = [];
 
-    await overwriteSet(
-      INSTITUTION_CURRENT_LIST_IDS,
-      oldInstitutions.map((ins) => ins.id),
-    );
+      await overwriteSet(
+        INSTITUTION_CURRENT_LIST_IDS,
+        oldInstitutions.map((ins) => ins.id),
+      );
 
-    ElasticSearchMock.add(
-      {
-        method: "DELETE",
-        path: "/institutions/_doc/:id",
-      },
-      (params) => {
-        const pathStr = params.path as string;
-        const id = pathStr.split("/").pop();
-        deletedIds.push(id);
-        return {};
-      },
-    );
+      ElasticSearchMock.add(
+        {
+          method: "DELETE",
+          path: "/institutions/_doc/:id",
+        },
+        (params) => {
+          const pathStr = params.path as string;
+          const id = pathStr.split("/").pop();
+          deletedIds.push(id);
+          return {};
+        },
+      );
 
-    await deleteRemovedInstitutions(newInstitutions as CachedInstitution[]);
+      await deleteRemovedInstitutions(newInstitutions as CachedInstitution[]);
 
-    expect(infoSpy).toHaveBeenCalledWith(
-      "deleting institutions",
-      shouldBeDeleted,
-    );
+      expect(infoSpy).toHaveBeenCalledWith(
+        "Deleting institutions",
+        shouldBeDeleted,
+      );
 
-    expect(deletedIds).toEqual(shouldBeDeleted);
+      expect(deletedIds).toEqual(shouldBeDeleted);
+    });
   });
 
   it("should not try to delete anything if no institutions were removed", async () => {
@@ -718,33 +772,44 @@ describe("deleteRemovedInstitutions", () => {
 });
 
 describe("updateInstitutions", () => {
-  it("calls ES update for each institution in the list", async () => {
-    const mockInstitutions = [
-      { id: "123", name: "Institution A" },
-      { id: "456", name: "Institution B" },
-    ] as CachedInstitution[];
+  describe.each([
+    { singleThread: true, description: "with single-threading" },
+    { singleThread: false, description: "without single-threading" },
+  ])("Update institutions $description", ({ singleThread }) => {
+    it("calls ES update for each institution in the list", async () => {
+      jest.spyOn(_config, "getConfig").mockReturnValueOnce({
+        ...config,
+        ELASTIC_SEARCH_SINGLE_THREAD: singleThread,
+      });
 
-    interface esDocObj {
-      // eslint-disable-next-line @typescript-eslint/member-delimiter-style
-      doc: { id: string; name: string };
-    }
-    const elasticSearchUpdatesMade: esDocObj[] = [];
-    ElasticSearchMock.add(
-      {
-        method: ["PUT", "POST"],
-        path: "/institutions/_update/:id",
-      },
-      (params) => {
-        elasticSearchUpdatesMade.push(params.body as esDocObj);
-        return {};
-      },
-    );
+      const mockInstitutions = [
+        { id: "123", name: "Institution A" },
+        { id: "456", name: "Institution B" },
+      ] as CachedInstitution[];
 
-    await updateInstitutions(mockInstitutions);
+      interface esDocObj {
+        doc: { id: string; name: string };
+      }
 
-    const updatedInstitutions = elasticSearchUpdatesMade.map(
-      (body) => body.doc,
-    );
-    expect(updatedInstitutions).toEqual(mockInstitutions);
+      const elasticSearchUpdatesMade: esDocObj[] = [];
+      ElasticSearchMock.add(
+        {
+          method: ["PUT", "POST"],
+          path: "/institutions/_update/:id",
+        },
+        (params) => {
+          elasticSearchUpdatesMade.push(params.body as esDocObj);
+          return {};
+        },
+      );
+
+      await updateInstitutions(mockInstitutions);
+
+      const updatedInstitutions = elasticSearchUpdatesMade.map(
+        (body) => body.doc,
+      );
+
+      expect(updatedInstitutions).toEqual(mockInstitutions);
+    });
   });
 });

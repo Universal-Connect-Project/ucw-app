@@ -1,24 +1,10 @@
+import type { AdapterMap } from "@repo/utils";
 import { getMxAdapterMapObject } from "@ucp-npm/mx-adapter";
 import { getSophtronAdapterMapObject } from "@ucp-npm/sophtron-adapter";
-import type { AdapterMap } from "@repo/utils";
-
 import config from "./config";
-import { get, set } from "./services/storageClient/redis";
 import * as logger from "./infra/logger";
-
+import { get, set } from "./services/storageClient/redis";
 import { adapterMapObject as testAdapterMapObject } from "./test-adapter";
-
-const sophtronAdapterMapObject: Record<string, AdapterMap> =
-  getSophtronAdapterMapObject({
-    logClient: logger,
-    aggregatorCredentials: {
-      clientId: config.SophtronApiUserId,
-      secret: config.SophtronApiUserSecret,
-    },
-    envConfig: {
-      HOSTURL: config.HOSTURL,
-    },
-  });
 
 const mxAdapterMapObject = getMxAdapterMapObject({
   cacheClient: {
@@ -28,20 +14,35 @@ const mxAdapterMapObject = getMxAdapterMapObject({
   logClient: logger,
   aggregatorCredentials: {
     mxInt: {
-      username: config.MxClientId,
-      password: config.MxApiSecret,
+      username: config.MX_CLIENT_ID,
+      password: config.MX_API_SECRET,
     },
     mxProd: {
-      username: config.MxClientIdProd,
-      password: config.MxApiSecretProd,
+      username: config.MX_CLIENT_ID_PROD,
+      password: config.MX_API_SECRET_PROD,
     },
   },
   envConfig: {
-    HOSTURL: config.HOSTURL,
+    HOSTURL: config.HOST_URL,
+    PROXY_HOST: config.PROXY_HOST,
+    PROXY_PORT: config.PROXY_PORT,
+    PROXY_USERNAME: config.PROXY_USERNAME,
+    PROXY_PASSWORD: config.PROXY_PASSWORD,
   },
 });
 
-// This is where you add adapters
+const sophtronAdapterMapObject: Record<string, AdapterMap> =
+  getSophtronAdapterMapObject({
+    logClient: logger,
+    aggregatorCredentials: {
+      clientId: config.SOPHTRON_API_USER_ID,
+      secret: config.SOPHTRON_API_USER_SECRET,
+    },
+    envConfig: {
+      HOSTURL: config.HOST_URL,
+    },
+  });
+
 export const adapterMap: Record<string, AdapterMap> = {
   ...mxAdapterMapObject,
   ...sophtronAdapterMapObject,

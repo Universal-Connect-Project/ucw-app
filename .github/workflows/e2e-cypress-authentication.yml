@@ -14,7 +14,7 @@ jobs:
 
     services:
       elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
         options: --health-cmd="curl --silent --fail localhost:9200/_cluster/health || exit 1" --health-interval=10s --health-timeout=5s --health-retries=5
         ports:
           - 9200:9200
@@ -54,33 +54,36 @@ jobs:
 
       - name: "Create env file"
         run: |
-          ENV_FILE_PATH=./apps/server/.env
+          ENV_FILE_PATH=./apps/server/env/staging.env
           touch ${ENV_FILE_PATH}
 
           # Vars
           echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
-          echo RESOURCEVERSION="" >> ${ENV_FILE_PATH}
           echo AUTHENTICATION_ENABLE=true >> ${ENV_FILE_PATH}
-
-          # Secrets (can't load these from another job, due to GH security features)
-
-          cat ${ENV_FILE_PATH}
+          echo DATA_ENDPOINT_AUTHENTICATION_ENABLE=true >> ${ENV_FILE_PATH}
+          echo DELETE_USER_ENDPOINT_AUTHENTICATION_ENABLE=true >> ${ENV_FILE_PATH}
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CYPRESS_auth_username: ${{ secrets.AUTHENTICATION_USERNAME }}
-          CYPRESS_auth_password: ${{ secrets.AUTHENTICATION_PASSWORD }}
+          CYPRESS_auth_widget_demo_username: ${{ secrets.AUTHENTICATION_USERNAME }}
+          CYPRESS_auth_widget_demo_password: ${{ secrets.AUTHENTICATION_PASSWORD }}
+          CYPRESS_auth_widget_demo_data_username: ${{ secrets.DATA_ENDPOINT_AUTHENTICATION_USERNAME }}
+          CYPRESS_auth_widget_demo_data_password: ${{ secrets.DATA_ENDPOINT_AUTHENTICATION_PASSWORD }}
+          CYPRESS_auth_widget_demo_delete_user_username: ${{ secrets.DELETE_USER_ENDPOINT_AUTHENTICATION_USERNAME }}
+          CYPRESS_auth_widget_demo_delete_user_password: ${{ secrets.DELETE_USER_ENDPOINT_AUTHENTICATION_PASSWORD }}
           CYPRESS_auth_audience: ${{ vars.AUTHENTICATION_AUDIENCE }}
-          CYPRESS_auth_scope: ${{ vars.AUTHENTICATION_SCOPES }}
+          CYPRESS_auth_widget_demo_scope: ${{ vars.AUTHENTICATION_SCOPES }}
+          CYPRESS_auth_widget_demo_data_scope: ${{ vars.DATA_ENDPOINT_AUTHENTICATION_SCOPES }}
+          CYPRESS_auth_widget_demo_delete_user_scope: ${{ vars.DELETE_USER_ENDPOINT_AUTHENTICATION_SCOPES }}
           CYPRESS_auth_client_id: ${{ vars.AUTHENTICATION_CLIENT_ID }}
           CYPRESS_auth_domain: ${{ vars.AUTHENTICATION_DOMAIN }}
 
         with:
           config-file: cypress.config.authentication.ts
           project: apps/server
-          start: npm run dev:e2e
+          start: npm run start:e2e
           wait-on: "http://localhost:8080/health, http://localhost:9200"
 
       - name: Upload screenshots

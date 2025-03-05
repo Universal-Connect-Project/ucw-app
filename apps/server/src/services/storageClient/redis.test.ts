@@ -38,7 +38,7 @@ describe("redis", () => {
       await set("test", "test");
 
       expect(mockSet).toHaveBeenCalledWith("test", JSON.stringify("test"), {
-        EX: config.RedisCacheTimeSeconds,
+        EX: config.REDIS_CACHE_TIME_SECONDS,
       });
     });
 

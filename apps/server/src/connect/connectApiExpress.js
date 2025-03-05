@@ -5,16 +5,15 @@ import { contextHandler } from "../infra/context.ts";
 import { ApiEndpoints } from "../shared/connect/ApiEndpoint";
 import { ConnectApi } from "./connectApi";
 import {
-  createAccountsDataHandler,
-  createIdentityDataHandler,
-  createTransactionsDataHandler,
-} from "./dataEndpoints";
-import {
   favoriteInstitutionsHandler,
   getInstitutionCredentialsHandler,
   getInstitutionHandler,
   getInstitutionsHandler,
 } from "./institutionEndpoints";
+import {
+  webhookHandler,
+  oauthRedirectHandler,
+} from "./oauthEndpoints";
 import { userDeleteHandler } from "./userEndpoints";
 import { MappedJobTypes } from "../shared/contract";
 import stubs from "./instrumentations.js";
@@ -55,7 +54,7 @@ export default function (app) {
     }
 
     if (
-      config.Env !== "test" &&
+      config.ENV !== "test" &&
       config.AnalyticsServiceEndpoint !== "" &&
       config.AnalyticsServiceEndpoint != null
     ) {
@@ -183,34 +182,12 @@ export default function (app) {
       members: ret,
     });
   });
+  
+  app.all('/webhook/:aggregator/*', webhookHandler)
 
-  app.delete("/api/aggregator/:aggregator/user/:userId", userDeleteHandler);
-
-  // Data Endpoints
-  app.get(
-    "/api/data/aggregator/:aggregator/user/:userId/connection/:connectionId/accounts",
-    createAccountsDataHandler(false),
-  );
-  app.get(
-    "/api/data/aggregator/:aggregator/user/:userId/connection/:connectionId/identity",
-    createIdentityDataHandler(false),
-  );
-  app.get(
-    "/api/data/aggregator/:aggregator/user/:userId/account/:accountId/transactions",
-    createTransactionsDataHandler(false),
-  );
-
-  // VC Data Endpoints
-  app.get(
-    "/api/vc/data/aggregator/:aggregator/user/:userId/connection/:connectionId/accounts",
-    createAccountsDataHandler(true),
-  );
-  app.get(
-    "/api/vc/data/aggregator/:aggregator/user/:userId/connection/:connectionId/identity",
-    createIdentityDataHandler(true),
-  );
-  app.get(
-    "/api/vc/data/aggregator/:aggregator/user/:userId/account/:accountId/transactions",
-    createTransactionsDataHandler(true),
-  );
+  app.get('/oauth/:aggregator/redirect_from/', oauthRedirectHandler)
+  
+  app.get('/oauth/oauth.js', (req, res) => {
+    res.sendFile(path.join(__dirname, "../infra/http/oauth/oauth.js"))
+  })
 }

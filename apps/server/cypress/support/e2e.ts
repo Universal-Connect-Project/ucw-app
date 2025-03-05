@@ -18,6 +18,11 @@ import "./commands";
 
 import { configure } from "@testing-library/cypress";
 import { JwtPayload } from "jsonwebtoken";
+import {
+  WIDGET_DEMO_ACCESS_TOKEN_ENV,
+  WIDGET_DEMO_DATA_ACCESS_TOKEN_ENV,
+  WIDGET_DEMO_DELETE_USER_ACCESS_TOKEN_ENV,
+} from "../shared/constants/accessToken";
 
 configure({ testIdAttribute: "data-test" });
 
@@ -27,23 +32,56 @@ Cypress.on("uncaught:exception", () => {
   return false;
 });
 
+const authenticateAndStoreAccessToken = ({
+  accessTokenEnvString,
+  passwordEnvString,
+  scopeEnvString,
+  usernameEnvString,
+}: {
+  accessTokenEnvString: string;
+  passwordEnvString: string;
+  scopeEnvString: string;
+  usernameEnvString: string;
+}) => {
+  cy.request({
+    method: "POST",
+    url: `https://${Cypress.env("auth_domain")}/oauth/token`,
+    body: {
+      audience: Cypress.env("auth_audience"),
+      client_id: Cypress.env("auth_client_id"),
+      grant_type: "password",
+      password: Cypress.env(passwordEnvString) as string,
+      username: Cypress.env(usernameEnvString) as string,
+      scope: Cypress.env(scopeEnvString),
+    },
+  }).then((response: Cypress.Response<JwtPayload>) => {
+    const accessToken = response.body.access_token;
+
+    Cypress.env(accessTokenEnvString, accessToken);
+  });
+};
+
 before(() => {
   if (Cypress.env("auth_audience")) {
-    cy.request({
-      method: "POST",
-      url: `https://${Cypress.env("auth_domain")}/oauth/token`,
-      body: {
-        audience: Cypress.env("auth_audience"),
-        client_id: Cypress.env("auth_client_id"),
-        grant_type: "password",
-        password: Cypress.env("auth_password") as string,
-        username: Cypress.env("auth_username") as string,
-        scope: Cypress.env("auth_scope"),
-      },
-    }).then((response: Cypress.Response<JwtPayload>) => {
-      const accessToken = response.body.access_token;
+    authenticateAndStoreAccessToken({
+      accessTokenEnvString: WIDGET_DEMO_ACCESS_TOKEN_ENV,
+      passwordEnvString: "auth_widget_demo_password",
+      scopeEnvString: "auth_widget_demo_scope",
+      usernameEnvString: "auth_widget_demo_username",
+    });
 
-      Cypress.env("accessToken", accessToken);
+    authenticateAndStoreAccessToken({
+      accessTokenEnvString: WIDGET_DEMO_DATA_ACCESS_TOKEN_ENV,
+      passwordEnvString: "auth_widget_demo_data_password",
+      scopeEnvString: "auth_widget_demo_data_scope",
+      usernameEnvString: "auth_widget_demo_data_username",
+    });
+
+    authenticateAndStoreAccessToken({
+      accessTokenEnvString: WIDGET_DEMO_DELETE_USER_ACCESS_TOKEN_ENV,
+      passwordEnvString: "auth_widget_demo_delete_user_password",
+      scopeEnvString: "auth_widget_demo_delete_user_scope",
+      usernameEnvString: "auth_widget_demo_delete_user_username",
     });
   }
 });

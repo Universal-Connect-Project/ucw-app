@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "services/*": ["./src/connect/*"],
-      "interfaces/*": ["./src/shared/connect/*"]
-    }
-  }
-}

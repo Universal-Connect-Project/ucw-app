@@ -25,18 +25,17 @@ jobs:
 
       - name: "Create Server env file"
         env:
-          UI_PORT: ${{ vars.RESOURCE_PORT }}
           env_vars: ${{ needs.setup-env.outputs.env_vars }}
-          DO_PUBLISH: ${{ env.BRANCH_NAME == 'main' }}
         run: |
-          ENV_FILE_PATH=./apps/server/.env
+          ENV_FILE_PATH=./apps/server/env/production.env
           touch ${ENV_FILE_PATH}
 
           # Vars
           echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
           # Override ENV to Env=prod
           echo ENV=prod >> ${ENV_FILE_PATH}
-          echo RESOURCEPREFIX="http://ui:${UI_PORT}" >> ${ENV_FILE_PATH}
+          echo ELASTIC_SEARCH_URL=http://ucw-app-elasticsearch:9200 >> ${ENV_FILE_PATH}
+          echo REDIS_SERVER=redis://cache:6379 >> ${ENV_FILE_PATH}
           cat ${ENV_FILE_PATH}
 
       - name: "Create Root env file"
@@ -47,28 +46,11 @@ jobs:
           # Vars
           echo REDIS_PORT=${{ vars.REDIS_PORT }} >> ${ENV_FILE_PATH}
           echo SERVER_PORT=${{ vars.PORT }} >> ${ENV_FILE_PATH}
-          echo UI_PORT=${{ vars.RESOURCE_PORT }} >> ${ENV_FILE_PATH}
             
           # Secrets (can't load these from another job, due to GH security features)
           echo DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} >> ${ENV_FILE_PATH}
           echo DOCKER_TOKEN=${{ secrets.DOCKER_TOKEN }} >> ${ENV_FILE_PATH}
           cat ${ENV_FILE_PATH}
-
-      - name: "Get Server version"
-        run: |
-          DOCKER_IMAGE_SERVER=$(npm pkg get version --prefix ./apps/server | xargs)
-          echo DOCKER_IMAGE_SERVER="${DOCKER_IMAGE_SERVER}" >> ./.env
-          echo DOCKER_IMAGE_SERVER="${DOCKER_IMAGE_SERVER}" >> $GITHUB_ENV
-
-      - name: "Get UI version"
-        run: |
-          DOCKER_IMAGE_UI=$(npm pkg get version --prefix ./apps/ui | xargs)
-          echo DOCKER_IMAGE_UI="${DOCKER_IMAGE_UI}" >> ./.env
-          echo DOCKER_IMAGE_UI="${DOCKER_IMAGE_UI}" >> $GITHUB_ENV
-
-      - name: "Pull docker images"
-        run: |
-          docker compose pull --ignore-buildable --quiet
 
       - name: "Build docker images"
         run: |

@@ -33,17 +33,13 @@ jobs:
         env:
           env_vars: ${{ needs.setup-env.outputs.env_vars }}
         run: |
-          ENV_FILE_PATH=./apps/server/.env
+          ENV_FILE_PATH=./apps/server/env/staging.env
           touch ${ENV_FILE_PATH}
 
           # Vars
           echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
-          echo RESOURCEVERSION="" >> ${ENV_FILE_PATH}
 
-          echo SOPHTRONAPIUSERID=testUserId >> ${ENV_FILE_PATH}
-          echo SOPHTRONAPIUSERSECRET=testUserSecret >> ${ENV_FILE_PATH}
-
-          # Secrets (can't load these from another job, due to GH security features)          
+          # Secrets (can't load these from another job, due to GH security features)
 
       - name: Run Jest Tests
         run: |

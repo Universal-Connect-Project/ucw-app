@@ -1,18 +1,20 @@
+import "dotenv/config";
+import config from "./config";
 import ngrok from "@ngrok/ngrok";
 import cookieParser from "cookie-parser";
-import "dotenv/config";
 import express from "express";
 import "express-async-errors";
 import RateLimit from "express-rate-limit";
-
-import config from "./config";
+import path from "path";
+import useAuthentication from "./authentication";
 import useConnect from "./connect/connectApiExpress";
-import { stream } from "./infra/http";
+import useUserEndpoints from "./connect/useUserEndpoints";
+import useDataEndpoints from "./dataEndpoints/useDataEndpoints";
 import { error as _error, info } from "./infra/logger";
 import { initialize as initializeElastic } from "./services/ElasticSearchClient";
 import { setInstitutionSyncSchedule } from "./services/institutionSyncer";
+import { setPerformanceSyncSchedule, syncPerformanceData } from "./services/performanceSyncer";
 import { widgetHandler } from "./widgetEndpoint";
-import useAuthentication from "./authentication";
 
 process.on("unhandledRejection", (error) => {
   _error(`unhandledRejection: ${error.message}`, error);
@@ -50,6 +52,12 @@ initializeElastic()
     _error(`Failed to initialized: ${error}`);
   });
 
+syncPerformanceData().then(() => {
+  setPerformanceSyncSchedule().then(() => {
+    info("Performance based routing data is scheduled to sync")
+  })
+})
+
 app.get("/health", function (req, res) {
   if (isReady) {
     res.send("healthy");
@@ -59,6 +67,9 @@ app.get("/health", function (req, res) {
   }
 });
 
+useUserEndpoints(app);
+useDataEndpoints(app);
+
 useAuthentication(app);
 
 useConnect(app);
@@ -66,41 +77,40 @@ useConnect(app);
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use(function (err, req, res, next) {
   _error(`Unhandled error on ${req.method} ${req.path}: `, err);
-  res.status(500);
+  res.status(err.status ? err.status : 500);
   res.send(err.message);
 });
 
-app.get("/", widgetHandler);
+app.use(express.static(path.join(__dirname, "../../ui/dist")));
+
+app.get("/widget", widgetHandler);
 
 app.get("*", (req, res) => {
   req.metricsPath = "/catchall";
-  const resourcePath = `${config.ResourcePrefix}${config.ResourceVersion}${req.path}`;
-  if (!req.path.includes("-hmr")) {
-    void stream(resourcePath, null, res);
-  } else {
-    res.sendStatus(404);
-  }
+  res.sendStatus(404);
 });
 
+if(!config.PORT){
+  throw new Error('Invalid config, unable to start server')
+}
+
 app.listen(config.PORT, () => {
-  const message = `Server is running on port ${config.PORT}, Env: ${config.Env}, LogLevel: ${config.LogLevel}`;
-  const uiMessage = `UI is running on ${config.ResourcePrefix}`;
+  const message = `Server is running on port ${config.PORT}, ENV: ${config.ENV}, LOG_LEVEL: ${config.LOG_LEVEL}`;
 
   info(message);
-  info(uiMessage);
 });
 
 // Ngrok is required for Finicity webhooks local and github testing
-if (["dev", "test"].includes(config.Env)) {
+if (["dev", "test"].includes(config.ENV)) {
   ngrok.listen(app).then(() => {
-    config.WebhookHostUrl = app.listener.url();
+    config.WEBHOOK_HOST_URL = app.listener.url();
     info("Established listener at: " + app.listener.url());
   });
 }
 
 process.on("SIGINT", () => {
   info("\nGracefully shutting down from SIGINT (Ctrl-C)");
-  if (["dev", "test"].includes(config.Env)) {
+  if (["dev", "test"].includes(config.ENV)) {
     info("Closing Ngrok tunnel");
     void ngrok.kill();
   }

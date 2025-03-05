@@ -1,45 +1,45 @@
-import config from '../config'
-import { warning as logWarning } from '../infra/logger'
-import { get, set } from './storageClient/redis'
+import config from "../config";
+import { warning as logWarning } from "../infra/logger";
+import { get, set } from "./storageClient/redis";
 
-export const REDIS_AUTH_ACCESS_KEY = 'auth0AccessToken'
+export const REDIS_AUTH_ACCESS_KEY = "auth0AccessToken";
 
 export async function getAccessToken() {
-  const { UCPClientId, UCPClientSecret } = config
+  const { UCP_CLIENT_ID, UCP_CLIENT_SECRET } = config;
 
-  const cachedAccessToken = await get(REDIS_AUTH_ACCESS_KEY)
+  const cachedAccessToken = await get(REDIS_AUTH_ACCESS_KEY);
   if (cachedAccessToken) {
-    return cachedAccessToken
+    return cachedAccessToken;
   }
 
-  const response = await fetch(config.Auth0TokenUrl, {
-    method: 'POST',
+  const response = await fetch(config.AUTH0_TOKEN_URL, {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      grant_type: 'client_credentials',
-      audience: 'ucp-widget-interactions',
-      client_id: UCPClientId,
-      client_secret: UCPClientSecret
-    })
-  })
+      grant_type: "client_credentials",
+      audience: "ucp-widget-interactions",
+      client_id: UCP_CLIENT_ID,
+      client_secret: UCP_CLIENT_SECRET,
+    }),
+  });
   if (response.status === 401) {
-    logWarning('Unauthorized to retrieve UCP access token')
-    return null
+    logWarning("Unauthorized to retrieve UCP access token");
+    return null;
   }
   try {
     if (response.ok) {
-      const responseJson = await response.json()
+      const responseJson = await response.json();
       await set(REDIS_AUTH_ACCESS_KEY, responseJson.access_token, {
-        EX: responseJson.expires_in
-      })
+        EX: responseJson.expires_in,
+      });
 
-      return responseJson.access_token
+      return responseJson.access_token;
     } else {
-      throw new Error('Response not ok')
+      throw new Error("Response not ok");
     }
   } catch (error) {
-    throw new Error(`Could not get UCP access token: ${error.message}`)
+    throw new Error(`Could not get UCP access token: ${error.message}`);
   }
 }

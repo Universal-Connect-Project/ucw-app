@@ -22,7 +22,7 @@ describe("search", () => {
       institutionThatIsInFavoritesButDoesntSupportIdentification,
     ).should("exist");
 
-    cy.visit(`/?job_type=all&user_id=${crypto.randomUUID()}`);
+    cy.visit(`/widget?job_type=all&user_id=${crypto.randomUUID()}`);
 
     cy.findByText(institutionThatIsInFavoriteAndSupportsAll).should("exist");
 

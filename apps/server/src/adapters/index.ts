@@ -1,6 +1,6 @@
 // eslint-disable @typescript-eslint/naming-convention
 import { aggregators } from "../adapterSetup";
-import { getAggregatorAdapter } from "../adapterIndex";
+import { createAggregatorWidgetAdapter } from "../adapterIndex";
 import * as logger from "../infra/logger";
 import { AnalyticsClient } from "../services/analyticsClient";
 import { resolveInstitutionAggregator } from "../services/institutionResolver";
@@ -18,6 +18,7 @@ import type {
 
 import { ConnectionStatus, OAuthStatus } from "../shared/contract";
 import { decodeAuthToken, mapJobType } from "../utils";
+import { v4 as uuidV4 } from "uuid";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function instrumentation(context: Context, input: any) {
@@ -41,6 +42,7 @@ export async function instrumentation(context: Context, input: any) {
   context.scheme = input.scheme ?? "vcs";
   context.oauth_referral_source = input.oauth_referral_source ?? "BROWSER";
   context.single_account_select = input.single_account_select;
+  context.session_id = input.session_id?.replace('undefined', '') || uuidV4();
   context.updated = true;
   return true;
 }
@@ -57,13 +59,14 @@ export class AggregatorAdapterBase {
   }
 
   async init() {
-    const token = "fakeTokenThatWeNeedToRemove";
-
-    this.analyticsClient = new AnalyticsClient(token);
+    this.analyticsClient = new AnalyticsClient('temp_fake_authToken');
     try {
       if (this.context?.aggregator) {
-        this.aggregatorAdapter = getAggregatorAdapter(
-          this.context?.aggregator as Aggregator,
+        this.aggregatorAdapter = createAggregatorWidgetAdapter(
+          {
+            aggregator: this.context?.aggregator as Aggregator,
+            sessionId: this.context.session_id
+          }
         );
       }
       this.aggregators = aggregators;

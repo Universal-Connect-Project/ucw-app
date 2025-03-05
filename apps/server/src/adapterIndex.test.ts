@@ -1,5 +1,5 @@
 import { getDataFromVCJwt, VCDataTypes } from "@repo/utils";
-import { getAggregatorAdapter, getData, getVC } from "./adapterIndex";
+import { createAggregatorWidgetAdapter, getData, getVC } from "./adapterIndex";
 import type { Aggregator } from "./adapterSetup";
 import { TEST_EXAMPLE_A_AGGREGATOR_STRING, TestAdapter } from "./test-adapter";
 import { testVcAccountsData } from "./test/testData/testVcData";
@@ -48,15 +48,17 @@ describe("adapterSetup", () => {
     });
   });
 
-  describe("getAggregatorAdapter", () => {
+  describe("createAggregatorWidgetAdapter", () => {
     it("throws an error if its an unsupported aggregator", async () => {
-      expect(() => getAggregatorAdapter("junk" as Aggregator)).toThrow(
+      expect(() => createAggregatorWidgetAdapter({aggregator: "junk" as Aggregator})).toThrow(
         "Unsupported aggregator junk",
       );
     });
 
     it("returns the testExample widget adapter", () => {
-      const adapter = getAggregatorAdapter(TEST_EXAMPLE_A_AGGREGATOR_STRING);
+      const adapter = createAggregatorWidgetAdapter(
+        {aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING},
+      );
 
       expect(adapter).toBeInstanceOf(TestAdapter);
     });

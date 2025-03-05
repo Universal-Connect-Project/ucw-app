@@ -1,8 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "Server",
-  "baseUrl": "src",
-  "extends": "./tsconfig.paths.json",
   "compilerOptions": {
     "allowJs": true,
     "declaration": true,

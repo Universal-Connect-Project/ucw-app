@@ -8,19 +8,19 @@ export const visitWithPostMessageSpy = (url: string) =>
 export const visitIdentity = () => {
   const userId = crypto.randomUUID();
 
-  cy.visit(`/?job_type=identity&user_id=${userId}`);
+  cy.visit(`/widget?job_type=identity&user_id=${userId}`);
 
   return cy.wrap(userId);
 };
 
-export const visitAgg = (options) => {
+export const visitAgg = (options?: any) => {
   const { failOnStatusCode, token, userId: userIdOverride } = options || {};
 
   const userId = userIdOverride || crypto.randomUUID();
 
   const tokenString = token ? `&token=${token}` : "";
 
-  cy.visit(`/?job_type=aggregate&user_id=${userId}${tokenString}`, {
+  cy.visit(`/widget?job_type=aggregate&user_id=${userId}${tokenString}`, {
     failOnStatusCode,
   });
 
