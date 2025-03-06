@@ -8,7 +8,7 @@ import {
 import * as preferences from "../shared/preferences";
 import testPreferences from "../../cachedDefaults/testData/testPreferences.json";
 import { ComboJobTypes, ConnectionStatus } from "@repo/utils";
-import type { Context } from "src/shared/contract";
+import type { Context } from "../shared/contract";
 import {
   testConnectionId,
   testInstitutionCode,
