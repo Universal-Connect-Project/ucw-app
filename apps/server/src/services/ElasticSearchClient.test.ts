@@ -15,7 +15,7 @@ import {
   updateInstitutions,
 } from "../services/ElasticSearchClient";
 import type { CachedInstitution } from "../shared/contract";
-import { MappedJobTypes } from "../shared/contract";
+import { ComboJobTypes } from "@repo/utils";
 import * as preferences from "../shared/preferences";
 import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../test-adapter";
 import {
@@ -30,6 +30,11 @@ import {
 import { server } from "../test/testServer";
 import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
 import { overwriteSet } from "./storageClient/redis";
+
+const pageProps = {
+  from: 0,
+  size: 25,
+};
 
 const config = _config.getConfig();
 
@@ -331,7 +336,7 @@ describe("search", () => {
         path: ["/_search", "/institutions/_search"],
         body: {
           query: searchQuery(),
-          size: 20,
+          ...pageProps,
         },
       },
       () => {
@@ -347,7 +352,11 @@ describe("search", () => {
       },
     );
 
-    const results = await search("MX Bank", MappedJobTypes.AGGREGATE);
+    const results = await search({
+      ...pageProps,
+      searchTerm: "MX Bank",
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
+    });
 
     expect(results).toEqual([elasticSearchInstitutionData]);
   });
@@ -360,7 +369,7 @@ describe("search", () => {
         path: ["/_search", "/institutions/_search"],
         body: {
           query: searchQuery({ filterTestBanks: true }),
-          size: 20,
+          ...pageProps,
         },
       },
       () => {
@@ -376,7 +385,11 @@ describe("search", () => {
       },
     );
 
-    await search("MX Bank", MappedJobTypes.AGGREGATE);
+    await search({
+      ...pageProps,
+      searchTerm: "MX Bank",
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
+    });
     config.ENV = "test";
   });
 
@@ -401,7 +414,7 @@ describe("search", () => {
               }),
             ),
           }),
-          size: 20,
+          ...pageProps,
         },
       },
       () => {
@@ -417,12 +430,16 @@ describe("search", () => {
       },
     );
 
-    const results = await search("MX Bank", MappedJobTypes.IDENTITY);
+    const results = await search({
+      ...pageProps,
+      searchTerm: "MX Bank",
+      jobTypes: [ComboJobTypes.ACCOUNT_OWNER],
+    });
 
     expect(results).toEqual([elasticSearchInstitutionData]);
   });
 
-  it("includes identity and verification filter when job type is aggregate_identity_verification", async () => {
+  it(`includes identity and verification filter when job types are ${ComboJobTypes.TRANSACTIONS}, ${ComboJobTypes.ACCOUNT_NUMBER} and ${ComboJobTypes.ACCOUNT_OWNER}`, async () => {
     const supportsArray = [
       "supports_aggregation",
       "supports_verification",
@@ -447,7 +464,7 @@ describe("search", () => {
               }),
             ),
           }),
-          size: 20,
+          ...pageProps,
         },
       },
       () => {
@@ -463,7 +480,15 @@ describe("search", () => {
       },
     );
 
-    const results = await search("MX Bank", MappedJobTypes.ALL);
+    const results = await search({
+      ...pageProps,
+      searchTerm: "MX Bank",
+      jobTypes: [
+        ComboJobTypes.TRANSACTIONS,
+        ComboJobTypes.ACCOUNT_NUMBER,
+        ComboJobTypes.ACCOUNT_OWNER,
+      ],
+    });
 
     expect(results).toEqual([elasticSearchInstitutionData]);
   });
@@ -481,7 +506,11 @@ describe("search", () => {
       },
     );
 
-    const results = await search("nothing", MappedJobTypes.AGGREGATE);
+    const results = await search({
+      ...pageProps,
+      searchTerm: "nothing",
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
+    });
 
     expect(results).toEqual([]);
   });
@@ -501,7 +530,7 @@ describe("searchByRoutingNumber", () => {
         path: ["/_search", "/institutions/_search"],
         body: {
           query: searchQuery({ routingNumber }),
-          size: 20,
+          ...pageProps,
         },
       },
       () => {
@@ -517,10 +546,11 @@ describe("searchByRoutingNumber", () => {
       },
     );
 
-    const results = await searchByRoutingNumber(
+    const results = await searchByRoutingNumber({
+      ...pageProps,
       routingNumber,
-      MappedJobTypes.AGGREGATE,
-    );
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
+    });
 
     expect(results).toEqual([elasticSearchInstitutionData]);
   });
@@ -572,7 +602,7 @@ describe("getRecommendedInstitutions", () => {
     );
 
     const recommendedInstitutions = await getRecommendedInstitutions({
-      jobType: MappedJobTypes.AGGREGATE,
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
     });
 
     expect(recommendedInstitutions).toEqual([elasticSearchInstitutionData]);
@@ -625,7 +655,7 @@ describe("getRecommendedInstitutions", () => {
     );
 
     const recommendedInstitutions = await getRecommendedInstitutions({
-      jobType: MappedJobTypes.AGGREGATE,
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
     });
 
     expect(recommendedInstitutions).toEqual([]);

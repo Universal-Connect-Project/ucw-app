@@ -1,4 +1,5 @@
-import { JobTypeSupports, MappedJobTypes } from "./contract";
+import { JobTypeSupports } from "./contract";
+import { ComboJobTypes } from "@repo/utils";
 
 import type {
   CachedInstitution,
@@ -6,38 +7,28 @@ import type {
   Aggregator,
 } from "./contract";
 
-type JobMappingType = {
-  [key in MappedJobTypes]: JobTypeSupports[];
+export const JobTypesPartialSupportsMap = {
+  [ComboJobTypes.ACCOUNT_NUMBER]: JobTypeSupports.VERIFICATION,
+  [ComboJobTypes.ACCOUNT_OWNER]: JobTypeSupports.IDENTIFICATION,
+  [ComboJobTypes.TRANSACTIONS]: JobTypeSupports.AGGREGATE,
+  [ComboJobTypes.TRANSACTION_HISTORY]: JobTypeSupports.AGGREGATE,
 };
 
-export const JOB_TYPE_PARTIAL_SUPPORT_MAP: JobMappingType = {
-  [MappedJobTypes.AGGREGATE]: [JobTypeSupports.AGGREGATE],
-  [MappedJobTypes.ALL]: [
-    JobTypeSupports.AGGREGATE,
-    JobTypeSupports.VERIFICATION,
-    JobTypeSupports.IDENTIFICATION,
-  ],
-  [MappedJobTypes.FULLHISTORY]: [JobTypeSupports.AGGREGATE], // same filter as aggregate, because we fall back to aggregate if there is no fullhistory
-  [MappedJobTypes.VERIFICATION]: [JobTypeSupports.VERIFICATION],
-  [MappedJobTypes.IDENTITY]: [JobTypeSupports.IDENTIFICATION],
-};
-
-export const JOB_TYPE_FULL_SUPPORT_MAP: JobMappingType = {
-  ...JOB_TYPE_PARTIAL_SUPPORT_MAP,
-  [MappedJobTypes.FULLHISTORY]: [
-    JobTypeSupports.AGGREGATE,
-    JobTypeSupports.FULLHISTORY,
-  ],
+const JobTypesFullSupportsMap = {
+  [ComboJobTypes.ACCOUNT_NUMBER]: JobTypeSupports.VERIFICATION,
+  [ComboJobTypes.ACCOUNT_OWNER]: JobTypeSupports.IDENTIFICATION,
+  [ComboJobTypes.TRANSACTIONS]: JobTypeSupports.AGGREGATE,
+  [ComboJobTypes.TRANSACTION_HISTORY]: JobTypeSupports.FULLHISTORY,
 };
 
 export function getAvailableAggregators({
   institution,
-  jobType,
+  jobTypes,
   supportedAggregators,
   shouldRequireFullSupport,
 }: {
   institution: CachedInstitution;
-  jobType: MappedJobTypes;
+  jobTypes: ComboJobTypes[];
   supportedAggregators?: Aggregator[];
   shouldRequireFullSupport: boolean;
 }): Aggregator[] {
@@ -45,33 +36,29 @@ export function getAvailableAggregators({
     (aggregator) =>
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (institution as any)[aggregator]?.id != null &&
-      aggregatorSupportsJobType({
+      aggregatorSupportsJobTypes({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         institutionAttributes: (institution as any)[aggregator],
-        jobType,
+        jobTypes,
         shouldRequireFullSupport,
       }),
   );
 }
 
-function aggregatorSupportsJobType({
+function aggregatorSupportsJobTypes({
   institutionAttributes,
-  jobType,
+  jobTypes,
   shouldRequireFullSupport,
 }: {
   institutionAttributes: InstitutionAggregator | undefined;
-  jobType: MappedJobTypes;
+  jobTypes: ComboJobTypes[];
   shouldRequireFullSupport: boolean;
 }): boolean {
-  return (
-    shouldRequireFullSupport
-      ? JOB_TYPE_FULL_SUPPORT_MAP
-      : JOB_TYPE_PARTIAL_SUPPORT_MAP
-  )[jobType].reduce((acc, supportsProp) => {
-    return (
-      acc &&
-      institutionAttributes?.[supportsProp as keyof InstitutionAggregator] ===
-        true
-    );
-  }, true);
+  const supportsMap = shouldRequireFullSupport
+    ? JobTypesFullSupportsMap
+    : JobTypesPartialSupportsMap;
+
+  return !jobTypes.some(
+    (comboJobType) => !institutionAttributes?.[supportsMap[comboJobType]],
+  );
 }

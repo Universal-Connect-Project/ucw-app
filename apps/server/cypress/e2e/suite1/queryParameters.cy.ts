@@ -1,4 +1,4 @@
-import { JobTypes } from "@repo/utils";
+import { ComboJobTypes } from "@repo/utils";
 import {
   clickContinue,
   expectConnectionSuccess,
@@ -14,11 +14,11 @@ import {
 const TEST_EXAMPLE_A_INSTITUTION_ID = "5e498f60-3496-4299-96ed-f8eb328ae8af";
 
 describe("query parameters", () => {
-  it("skips straight to the institution if an institution_id is provided in the query parameters, hides the back button, and completes the connection", () => {
+  it("skips straight to the institution if an institutionId is provided in the query parameters, hides the back button, and completes the connection", () => {
     const userId = Cypress.env("userId");
 
     visitWithPostMessageSpy(
-      `/widget?job_type=aggregate&institution_id=${TEST_EXAMPLE_A_INSTITUTION_ID}&user_id=${userId}`,
+      `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&institutionId=${TEST_EXAMPLE_A_INSTITUTION_ID}&userId=${userId}`,
     ).then(() => {
       enterTestExampleACredentials();
 
@@ -35,10 +35,12 @@ describe("query parameters", () => {
     });
   });
 
-  it("shows single account select if no parameter is passed, and skips single account select if single_account_select=false", () => {
+  it("shows single account select if no parameter is passed, and skips single account select if singleAccountSelect=false", () => {
     const userId = Cypress.env("userId");
 
-    cy.visit(`/widget?job_type=${JobTypes.VERIFICATION}&user_id=${userId}`);
+    cy.visit(
+      `/widget?jobTypes=${ComboJobTypes.ACCOUNT_NUMBER}&userId=${userId}`,
+    );
 
     searchAndSelectTestExampleA();
 
@@ -52,7 +54,7 @@ describe("query parameters", () => {
     expectConnectionSuccess();
 
     cy.visit(
-      `/widget?job_type=${JobTypes.VERIFICATION}&user_id=${userId}&single_account_select=false`,
+      `/widget?jobTypes=${ComboJobTypes.ACCOUNT_NUMBER}&userId=${userId}&singleAccountSelect=false`,
     );
 
     searchAndSelectTestExampleA();

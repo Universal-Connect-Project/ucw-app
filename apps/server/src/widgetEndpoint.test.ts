@@ -1,7 +1,6 @@
 import type { Request, Response } from "express";
-import he from "he";
 import { widgetHandler } from "./widgetEndpoint";
-import { JobTypes } from "@repo/utils";
+import { ComboJobTypes } from "@repo/utils";
 import { Aggregators } from "./shared/contract";
 import { invalidAggregatorString } from "./utils/validators";
 
@@ -10,7 +9,7 @@ import { invalidAggregatorString } from "./utils/validators";
 describe("server", () => {
   describe("widgetHandler", () => {
     describe("validation", () => {
-      it("responds with a 400 if job_type is missing", () => {
+      it("responds with a 400 if jobTypes is missing", () => {
         const res = {
           send: jest.fn(),
           status: jest.fn(),
@@ -19,7 +18,7 @@ describe("server", () => {
         widgetHandler(
           {
             query: {
-              user_id: "testUserId",
+              userId: "testUserId",
             },
           } as unknown as Request,
           res,
@@ -27,11 +26,11 @@ describe("server", () => {
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith(
-          "&#x22;job_type&#x22; is required",
+          "&#x22;jobTypes&#x22; is required",
         );
       });
 
-      it("responds with a 400 if job_type is invalid", () => {
+      it("responds with a 400 if jobTypes is invalid", () => {
         const res = {
           send: jest.fn(),
           status: jest.fn(),
@@ -40,8 +39,8 @@ describe("server", () => {
         widgetHandler(
           {
             query: {
-              job_type: "junk",
-              user_id: "testUserId",
+              jobTypes: "junk",
+              userId: "testUserId",
             },
           } as unknown as Request,
           res,
@@ -49,11 +48,11 @@ describe("server", () => {
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith(
-          `&#x22;job_type&#x22; must be one of [${Object.values(JobTypes).join(", ")}]`,
+          `&#x22;jobTypes&#x22; contains an invalid value`,
         );
       });
 
-      it("responds with a 400 if user_id is missing", () => {
+      it("responds with a 400 if userId is missing", () => {
         const res = {
           send: jest.fn(),
           status: jest.fn(),
@@ -62,16 +61,14 @@ describe("server", () => {
         widgetHandler(
           {
             query: {
-              job_type: JobTypes.AGGREGATE,
+              jobTypes: ComboJobTypes.TRANSACTIONS,
             },
           } as unknown as Request,
           res,
         );
 
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith(
-          "&#x22;user_id&#x22; is required",
-        );
+        expect(res.send).toHaveBeenCalledWith("&#x22;userId&#x22; is required");
       });
 
       it("responds with a 400 if aggregator is invalid", () => {
@@ -83,9 +80,9 @@ describe("server", () => {
         widgetHandler(
           {
             query: {
-              job_type: JobTypes.AGGREGATE,
+              jobTypes: ComboJobTypes.TRANSACTIONS,
               aggregator: "junk",
-              user_id: "testUserId",
+              userId: "testUserId",
             },
           } as unknown as Request,
           res,
@@ -95,7 +92,7 @@ describe("server", () => {
         expect(res.send).toHaveBeenCalledWith(invalidAggregatorString);
       });
 
-      it("responds with a 400 if aggregator is provided without a connection_id", () => {
+      it("responds with a 400 if aggregator is provided without a connectionId", () => {
         const res = {
           send: jest.fn(),
           status: jest.fn(),
@@ -104,9 +101,9 @@ describe("server", () => {
         widgetHandler(
           {
             query: {
-              job_type: JobTypes.AGGREGATE,
+              jobTypes: ComboJobTypes.TRANSACTIONS,
               aggregator: Aggregators.TEST_A,
-              user_id: "testUserId",
+              userId: "testUserId",
             },
           } as unknown as Request,
           res,
@@ -114,11 +111,11 @@ describe("server", () => {
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith(
-          "&#x22;value&#x22; contains [aggregator] without its required peers [connection_id]",
+          "&#x22;value&#x22; contains [aggregator] without its required peers [connectionId]",
         );
       });
 
-      it("responds with a 400 if connection_id is provided without a aggregator", () => {
+      it("responds with a 400 if connectionId is provided without a aggregator", () => {
         const res = {
           send: jest.fn(),
           status: jest.fn(),
@@ -127,9 +124,9 @@ describe("server", () => {
         widgetHandler(
           {
             query: {
-              connection_id: "testConnectionId",
-              job_type: JobTypes.AGGREGATE,
-              user_id: "testUserId",
+              connectionId: "testConnectionId",
+              jobTypes: ComboJobTypes.TRANSACTIONS,
+              userId: "testUserId",
             },
           } as unknown as Request,
           res,
@@ -137,11 +134,11 @@ describe("server", () => {
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith(
-          "&#x22;value&#x22; contains [connection_id] without its required peers [aggregator]",
+          "&#x22;value&#x22; contains [connectionId] without its required peers [aggregator]",
         );
       });
 
-      it("responds with a 400 if single_account_select isn't a bool", () => {
+      it("responds with a 400 if singleAccountSelect isn't a bool", () => {
         const res = {
           send: jest.fn(),
           status: jest.fn(),
@@ -150,9 +147,9 @@ describe("server", () => {
         widgetHandler(
           {
             query: {
-              job_type: JobTypes.AGGREGATE,
-              single_account_select: "junk",
-              user_id: "testUserId",
+              jobTypes: ComboJobTypes.TRANSACTIONS,
+              singleAccountSelect: "junk",
+              userId: "testUserId",
             },
           } as unknown as Request,
           res,
@@ -160,7 +157,7 @@ describe("server", () => {
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith(
-          "&#x22;single_account_select&#x22; must be a boolean",
+          "&#x22;singleAccountSelect&#x22; must be a boolean",
         );
       });
     });

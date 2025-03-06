@@ -40,7 +40,7 @@ export const oauthSuccessResponse = `
         <button id="oauth-close-window">Go back to app</button>
     </div>
     <script type="text/javascript">
-      var app_url = 'scheme://oauth_complete?metadata=%7B%22aggregator%22%3A%22testExampleA%22%2C%22id%22%3A%22request_id%22%2C%22member_guid%22%3A%22request_id%22%2C%22user_guid%22%3A%22user_id%22%2C%22session_guid%22%3A%22session_id%22%7D'
+      var app_url = 'scheme://oauth_complete?metadata=%7B%22aggregator%22%3A%22testExampleA%22%2C%22id%22%3A%22request_id%22%2C%22member_guid%22%3A%22request_id%22%2C%22user_guid%22%3A%22userId%22%2C%22session_guid%22%3A%22session_id%22%7D'
       var post_message = 'oauthComplete/success'
       var member_guid = 'request_id'
       var redirect = true
@@ -51,4 +51,4 @@ export const oauthSuccessResponse = `
     </script>
 </body>
 </html>
-`
+`;

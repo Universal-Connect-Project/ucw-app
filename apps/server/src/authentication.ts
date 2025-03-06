@@ -48,7 +48,7 @@ export const tokenAuthenticationMiddleware = async (
   next: NextFunction,
 ) => {
   const token = req.query?.token as string;
-  const userId = req.query?.user_id as string;
+  const userId = req.query?.userId as string;
 
   const redisKey = `${userId}-${token}`;
 

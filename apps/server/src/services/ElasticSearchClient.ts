@@ -1,4 +1,5 @@
 import { Client } from "@opensearch-project/opensearch";
+import type { ComboJobTypes } from "@repo/utils";
 import type {
   MgetRequest,
   SearchHit,
@@ -13,13 +14,9 @@ import { ElasticSearchMock } from "../test/elasticSearchMock";
 import { info, error as logError } from "../infra/logger";
 import {
   getAvailableAggregators,
-  JOB_TYPE_PARTIAL_SUPPORT_MAP,
+  JobTypesPartialSupportsMap,
 } from "../shared/aggregators";
-import type {
-  Aggregator,
-  CachedInstitution,
-  MappedJobTypes,
-} from "../shared/contract";
+import type { Aggregator, CachedInstitution } from "../shared/contract";
 import { getPreferences } from "../shared/preferences";
 import { fetchInstitutions } from "./institutionSyncer";
 import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
@@ -122,8 +119,17 @@ function getInstitutionDataFromFile(): CachedInstitution[] {
 }
 
 export async function searchByRoutingNumber(
-  routingNumber: string,
-  jobType: MappedJobTypes,
+  {
+    from,
+    jobTypes,
+    routingNumber,
+    size,
+  }: {
+    from: number;
+    jobTypes: ComboJobTypes[];
+    routingNumber: string;
+    size: number;
+  },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any[]> {
   const preferences = await getPreferences();
@@ -143,11 +149,12 @@ export async function searchByRoutingNumber(
             },
           },
           minimum_should_match: 1,
-          must: mustQuery(supportedAggregators, jobType),
+          must: mustQuery(supportedAggregators, jobTypes),
           must_not: buildMustNotQuery(hiddenInstitutions),
         },
       },
-      size: 20,
+      from,
+      size,
     },
   });
 
@@ -155,8 +162,17 @@ export async function searchByRoutingNumber(
 }
 
 export async function search(
-  searchTerm: string,
-  jobType: MappedJobTypes,
+  {
+    from,
+    jobTypes,
+    searchTerm,
+    size,
+  }: {
+    from: number;
+    jobTypes: ComboJobTypes[];
+    searchTerm: string;
+    size: number;
+  },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any[]> {
   const preferences = await getPreferences();
@@ -169,11 +185,12 @@ export async function search(
         bool: {
           should: fuzzySearchTermQuery(searchTerm),
           minimum_should_match: 1,
-          must: mustQuery(supportedAggregators, jobType),
+          must: mustQuery(supportedAggregators, jobTypes),
           must_not: buildMustNotQuery(hiddenInstitutions),
         },
       },
-      size: 20,
+      from,
+      size,
     },
   });
 
@@ -221,7 +238,7 @@ function fuzzySearchTermQuery(searchTerm: string) {
 
 function mustQuery(
   supportedAggregators: Aggregator[],
-  jobType: MappedJobTypes,
+  jobTypes: ComboJobTypes[],
 ) {
   const aggregatorQueryTerms = supportedAggregators.map((aggregator) => {
     return {
@@ -231,7 +248,9 @@ function mustQuery(
     };
   });
 
-  const institutionJobTypeFilter = JOB_TYPE_PARTIAL_SUPPORT_MAP[jobType];
+  const institutionJobTypeFilter = jobTypes.map(
+    (jobType) => JobTypesPartialSupportsMap[jobType],
+  );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let jobTypeSupported = [] as any;
@@ -297,11 +316,12 @@ export async function getInstitution(id: string): Promise<CachedInstitution> {
   return body._source as CachedInstitution;
 }
 
-export async function getRecommendedInstitutions(args: {
-  jobType: MappedJobTypes;
+export async function getRecommendedInstitutions({
+  jobTypes,
+}: {
+  jobTypes: ComboJobTypes[];
 }): Promise<CachedInstitution[]> {
   const config = getConfig();
-  const { jobType } = args;
   const preferences = await getPreferences();
 
   const supportedAggregators = preferences.supportedAggregators;
@@ -341,7 +361,7 @@ export async function getRecommendedInstitutions(args: {
         (institution: CachedInstitution) =>
           getAvailableAggregators({
             institution,
-            jobType,
+            jobTypes,
             shouldRequireFullSupport: false,
             supportedAggregators: supportedAggregators,
           }).length,

@@ -1,10 +1,11 @@
 {
   "name": "ucw-app",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "build": "turbo build",
     "copyDemoPreferences": "cp ./apps/server/cachedDefaults/testData/demoPreferences.json ./apps/server/cachedDefaults/preferences.json",
+    "copyE2EPreferences": "cp ./apps/server/cachedDefaults/testData/e2ePreferences.json ./apps/server/cachedDefaults/preferences.json",
     "copyTestPreferences": "cp ./apps/server/cachedDefaults/testData/testPreferences.json ./apps/server/cachedDefaults/preferences.json",
     "copyServerEnv": "tee ./apps/server/env/staging.env ./apps/server/env/production.env < ./apps/server/env/.env.example",
     "dev": "turbo dev",
@@ -15,13 +16,11 @@
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "pre-commit": "lint-staged",
     "prepare": "husky",
     "clean": "npx rimraf {apps,packages}/**/{node_modules,dist,.turbo} -g && npx rimraf node_modules"
   },
   "devDependencies": {
     "husky": "^9.1.6",
-    "lint-staged": "^15.2.10",
     "prettier": "^3.3.3",
     "turbo": "^2.1.3"
   },

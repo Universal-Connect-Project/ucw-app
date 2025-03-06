@@ -1,23 +1,25 @@
 import * as path from "path";
-import { instrumentation } from "../adapters";
 import config from "../config";
 import { contextHandler } from "../infra/context.ts";
 import { ApiEndpoints } from "../shared/connect/ApiEndpoint";
 import { ConnectApi } from "./connectApi";
 import {
-  favoriteInstitutionsHandler,
+  recommendedInstitutionsHandler,
   getInstitutionCredentialsHandler,
   getInstitutionHandler,
   getInstitutionsHandler,
 } from "./institutionEndpoints";
-import {
-  webhookHandler,
-  oauthRedirectHandler,
-} from "./oauthEndpoints";
-import { userDeleteHandler } from "./userEndpoints";
-import { MappedJobTypes } from "../shared/contract";
+import { webhookHandler, oauthRedirectHandler } from "./oauthEndpoints";
 import stubs from "./instrumentations.js";
 import { jobsRouteHandler } from "./jobEndpoints";
+import { instrumentationHandler } from "./instrumentationEndpoints";
+import {
+  INSTRUMENTATION_URL,
+  RECOMMENDED_INSTITUTIONS_URL,
+  SEARCH_INSTITUTIONS_URL,
+  MEMBERS_URL,
+  OAUTH_STATES_URL,
+} from "@repo/utils";
 
 const disableAnalytics = true;
 
@@ -34,9 +36,9 @@ export default function (app) {
     }
     req.connectApi = new ConnectApi(req);
     if ((await req.connectApi.init()) != null) {
-      if (!req.context.resolved_user_id) {
-        req.context.resolved_user_id = await req.connectApi.ResolveUserId(
-          req.context.user_id,
+      if (!req.context.resolvedUserId) {
+        req.context.resolvedUserId = await req.connectApi.ResolveUserId(
+          req.context.userId,
         );
       }
     }
@@ -66,7 +68,7 @@ export default function (app) {
     }
   });
 
-  app.post(ApiEndpoints.MEMBERS, async (req, res) => {
+  app.post(MEMBERS_URL, async (req, res) => {
     const ret = await req.connectApi.addMember(req.body);
     res.send(ret);
   });
@@ -104,90 +106,39 @@ export default function (app) {
     getInstitutionCredentialsHandler,
   );
 
-  app.get(`${ApiEndpoints.INSTITUTIONS}/favorite`, favoriteInstitutionsHandler);
+  app.get(RECOMMENDED_INSTITUTIONS_URL, recommendedInstitutionsHandler);
 
   app.get(
     `${ApiEndpoints.INSTITUTIONS}/:institution_guid`,
     getInstitutionHandler,
   );
-  app.get(ApiEndpoints.INSTITUTIONS, getInstitutionsHandler);
+  app.get(SEARCH_INSTITUTIONS_URL, getInstitutionsHandler);
   app.get(`${ApiEndpoints.JOBS}/:member_guid`, jobsRouteHandler);
 
-  app.get("/oauth_states", async (req, res) => {
+  app.get(OAUTH_STATES_URL, async (req, res) => {
     const ret = await req.connectApi.getOauthStates(
-      req.query.outbound_member_guid,
+      req.query.outboundMemberGuid,
     );
     res.send(ret);
   });
 
-  app.get("/oauth_states/:guid", async (req, res) => {
+  app.get(`${OAUTH_STATES_URL}/:guid`, async (req, res) => {
     const ret = await req.connectApi.getOauthState(req.params.guid);
     res.send(ret);
   });
 
-  app.get(ApiEndpoints.MEMBERS, async (req, res) => {
+  app.get(MEMBERS_URL, async (req, res) => {
     const ret = await req.connectApi.loadMembers();
-    res.send({
-      members: ret,
-    });
+    res.send(ret);
   });
 
-  app.post(
-    `${ApiEndpoints.MEMBERS}/:member_guid/identify`,
-    async (req, res) => {
-      const ret = await req.connectApi.updateConnection(
-        { id: req.params.member_guid, job_type: "aggregate_identity" },
-        req.context.resolved_user_id,
-      );
-      res.send({
-        members: ret,
-      });
-    },
-  );
+  app.post(`${INSTRUMENTATION_URL}/userId/:userId`, instrumentationHandler);
 
-  app.post(`${ApiEndpoints.MEMBERS}/:member_guid/verify`, async (req, res) => {
-    const ret = await req.connectApi.updateConnection(
-      { id: req.params.member_guid, job_type: MappedJobTypes.VERIFICATION },
-      req.context.resolved_user_id,
-    );
-    res.send({
-      members: ret,
-    });
+  app.all("/webhook/:aggregator/*", webhookHandler);
+
+  app.get("/oauth/:aggregator/redirect_from/", oauthRedirectHandler);
+
+  app.get("/oauth/oauth.js", (req, res) => {
+    res.sendFile(path.join(__dirname, "../infra/http/oauth/oauth.js"));
   });
-
-  app.post(`${ApiEndpoints.MEMBERS}/:member_guid/history`, async (req, res) => {
-    const ret = await req.connectApi.updateConnection(
-      { id: req.params.member_guid, job_type: "aggregate_extendedhistory" },
-      req.context.resolved_user_id,
-    );
-    res.send({
-      members: ret,
-    });
-  });
-
-  app.post(ApiEndpoints.INSTRUMENTATION, async (req, res) => {
-    if (await instrumentation(req.context, req.body.instrumentation)) {
-      res.sendStatus(200);
-      return;
-    }
-    res.sendStatus(400);
-  });
-
-  app.post("/members/:member_guid/unthrottled_aggregate", async (req, res) => {
-    const ret = await req.connectApi.updateConnection(
-      { id: req.params.member_guid, job_type: "aggregate" },
-      req.context.resolved_user_id,
-    );
-    res.send({
-      members: ret,
-    });
-  });
-  
-  app.all('/webhook/:aggregator/*', webhookHandler)
-
-  app.get('/oauth/:aggregator/redirect_from/', oauthRedirectHandler)
-  
-  app.get('/oauth/oauth.js', (req, res) => {
-    res.sendFile(path.join(__dirname, "../infra/http/oauth/oauth.js"))
-  })
 }

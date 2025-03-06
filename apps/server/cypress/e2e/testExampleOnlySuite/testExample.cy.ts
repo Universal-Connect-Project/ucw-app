@@ -1,8 +1,9 @@
-import { JobTypes } from "@repo/utils";
+import { ComboJobTypes } from "@repo/utils";
 import {
   clickContinue,
   expectConnectionSuccess,
   generateDataTests,
+  MEMBER_CONNECTED_EVENT_TYPE,
   visitWithPostMessageSpy,
 } from "@repo/utils-dev-dependency";
 import { TEST_EXAMPLE_B_AGGREGATOR_STRING } from "../../../src/test-adapter/constants";
@@ -14,12 +15,12 @@ import {
   selectTestExampleAAccount,
 } from "../../shared/utils/testExample";
 
-const makeAnAConnection = async (jobType) => {
+const makeAnAConnection = async (jobTypes: ComboJobTypes[]) => {
   searchAndSelectTestExampleA();
   enterTestExampleACredentials();
   clickContinue();
 
-  if ([JobTypes.VERIFICATION, JobTypes.ALL].includes(jobType)) {
+  if (jobTypes.includes(ComboJobTypes.ACCOUNT_NUMBER)) {
     selectTestExampleAAccount();
     clickContinue();
   }
@@ -27,12 +28,12 @@ const makeAnAConnection = async (jobType) => {
   expectConnectionSuccess();
 };
 
-const makeABConnection = async (jobType) => {
+const makeABConnection = async (jobTypes: ComboJobTypes[]) => {
   searchAndSelectTestExampleB();
   enterTestExampleBCredentials();
   clickContinue();
 
-  if ([JobTypes.VERIFICATION, JobTypes.ALL].includes(jobType)) {
+  if (jobTypes.includes(ComboJobTypes.ACCOUNT_NUMBER)) {
     selectTestExampleAAccount();
     clickContinue();
   }
@@ -80,8 +81,12 @@ const verifyTransactionsValidatorError = ({ accountId, userId }) => {
     });
 };
 
-const verifyTransactionsWithConnectionIdSuccess = ({ accountId, connectionId, userId }) => {
-  const url = `/data/aggregator/${TEST_EXAMPLE_B_AGGREGATOR_STRING}/user/${userId}/account/${accountId}/transactions?connection_id=${connectionId}&start_time=2021/1/1`;
+const verifyTransactionsWithConnectionIdSuccess = ({
+  accountId,
+  connectionId,
+  userId,
+}) => {
+  const url = `/data/aggregator/${TEST_EXAMPLE_B_AGGREGATOR_STRING}/user/${userId}/account/${accountId}/transactions?connectionId=${connectionId}&start_time=2021/1/1`;
 
   return cy
     .request({
@@ -105,21 +110,19 @@ describe("testExampleA and B aggregators", () => {
     transactionsQueryString: "?start_time=2021/1/1",
   });
 
-  it(`makes a connection with jobType: ${JobTypes.VERIFICATION}, gets the transaction data from the data endpoints, and tests validator`, () => {
+  it(`makes a connection with jobType: ${ComboJobTypes.ACCOUNT_NUMBER}, gets the transaction data from the data endpoints, and tests validator`, () => {
     let memberGuid: string;
     const userId = Cypress.env("userId");
 
     visitWithPostMessageSpy(
-      `/widget?job_type=${JobTypes.VERIFICATION}&user_id=${userId}`,
+      `/widget?jobTypes=${ComboJobTypes.ACCOUNT_NUMBER}&userId=${userId}`,
     )
-      .then(() => makeABConnection(JobTypes.VERIFICATION))
+      .then(() => makeABConnection([ComboJobTypes.ACCOUNT_NUMBER]))
       .then(() => {
         cy.get("@postMessage", { timeout: 90000 }).then((mySpy) => {
           const connection = (mySpy as any)
             .getCalls()
-            .find(
-              (call) => call.args[0].type === "vcs/connect/memberConnected",
-            );
+            .find((call) => call.args[0].type === MEMBER_CONNECTED_EVENT_TYPE);
           const { metadata } = connection?.args[0];
           memberGuid = metadata.member_guid;
 

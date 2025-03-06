@@ -1,6 +1,7 @@
 import { getRecommendedInstitutions } from "../services/ElasticSearchClient";
 import testPreferences from "../../cachedDefaults/testData/testPreferences.json";
-import { CachedInstitution, MappedJobTypes } from "../shared/contract";
+import type { CachedInstitution } from "../shared/contract";
+import { ComboJobTypes } from "@repo/utils";
 import * as preferences from "../shared/preferences";
 import { ElasticSearchMock } from "./elasticSearchMock";
 import { elasticSearchInstitutionDataFavs } from "./testData/institution";
@@ -42,6 +43,6 @@ export const generateElasticSearchRecommendedInstitutionTestSetup =
     );
 
     return await getRecommendedInstitutions({
-      jobType: MappedJobTypes.AGGREGATE,
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
     });
   };

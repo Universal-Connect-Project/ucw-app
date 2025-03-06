@@ -2,16 +2,12 @@ import * as logger from "../infra/logger";
 import type {
   CachedInstitution,
   InstitutionSearchResponseItem,
-  MappedJobTypes,
 } from "../shared/contract";
 import type { Challenge, Connection, Institution } from "@repo/utils";
 import { ChallengeType, ConnectionStatus } from "@repo/utils";
 
 import { AggregatorAdapterBase } from "../adapters";
-import {
-  getRecommendedInstitutions,
-  search,
-} from "../services/ElasticSearchClient";
+import { getRecommendedInstitutions } from "../services/ElasticSearchClient";
 import type { Member, MemberResponse } from "../shared/connect/contract";
 
 function mapResolvedInstitution(ins: Institution) {
@@ -47,19 +43,18 @@ export function mapCachedInstitution(
 
 function mapConnection(connection: Connection): Member {
   return {
-    // ...connection,
     institution_guid: connection.institution_code,
     guid: connection.id,
     connection_status: connection.status ?? ConnectionStatus.CREATED, // ?
     most_recent_job_guid:
       connection.status === ConnectionStatus.CONNECTED
-        ? null
-        : connection.cur_job_id,
+        ? connection.cur_job_id
+        : null,
     is_oauth: connection.is_oauth,
     oauth_window_uri: connection.oauth_window_uri,
     aggregator: connection.aggregator,
     is_being_aggregated: connection.is_being_aggregated,
-    user_guid: connection.user_id,
+    user_guid: connection.userId,
     mfa: {
       credentials: connection.challenges?.map((c) => {
         const ret = {
@@ -125,12 +120,12 @@ export class ConnectApi extends AggregatorAdapterBase {
 
   async addMember(memberData: Member): Promise<MemberResponse> {
     const connection = await this.createConnection({
-      institution_id: memberData.institution_guid,
+      institutionId: memberData.institution_guid,
       is_oauth: memberData.is_oauth ?? false,
       skip_aggregation:
         (memberData.skip_aggregation ?? false) &&
         (memberData.is_oauth ?? false),
-      initial_job_type: this.context.job_type ?? "aggregate",
+      jobTypes: this.context.jobTypes,
       credentials:
         memberData.credentials?.map((c) => ({
           id: c.guid,
@@ -140,7 +135,7 @@ export class ConnectApi extends AggregatorAdapterBase {
     return { member: mapConnection(connection) };
   }
 
-  async updateMember(member: Member): Promise<MemberResponse> {
+  async updateMember(member: Member): Promise<Member> {
     if (this.context.current_job_id && member.credentials !== undefined) {
       await this.answerChallenge(
         member.guid,
@@ -179,45 +174,40 @@ export class ConnectApi extends AggregatorAdapterBase {
           return ret;
         }),
       );
-      return { member };
+      return member;
     } else {
       const connection = await this.updateConnection({
-        job_type: this.context.job_type,
+        jobTypes: this.context.jobTypes,
         id: member.guid,
         credentials: member.credentials?.map((c) => ({
           id: c.guid,
           value: c.value,
         })),
       });
-      return { member: mapConnection(connection) };
+      return mapConnection(connection);
     }
   }
 
   async loadMembers(): Promise<Member[]> {
-    if (
-      this.context.connection_id != null &&
-      this.context.connection_id !== ""
-    ) {
-      const focusedMember = await this.getConnection(
-        this.context.connection_id,
-      );
+    if (this.context.connectionId != null && this.context.connectionId !== "") {
+      const focusedMember = await this.getConnection(this.context.connectionId);
       return [mapConnection(focusedMember)];
     }
     return [];
   }
 
-  async loadMemberByGuid(memberGuid: string): Promise<MemberResponse> {
+  async loadMemberByGuid(memberGuid: string): Promise<Member> {
     const mfa = await this.getConnectionStatus(memberGuid);
     if (mfa?.institution_code == null) {
       const connection = await this.getConnection(memberGuid);
-      return { member: mapConnection({ ...mfa, ...connection }) };
+      return mapConnection({ ...mfa, ...connection });
     }
-    return { member: mapConnection({ ...mfa }) };
+    return mapConnection({ ...mfa });
   }
 
   async getOauthWindowUri(memberGuid: string) {
     const ret = await this.loadMemberByGuid(memberGuid);
-    return ret?.member?.oauth_window_uri;
+    return ret?.oauth_window_uri;
   }
 
   async deleteMember(member: Member): Promise<void> {
@@ -227,39 +217,27 @@ export class ConnectApi extends AggregatorAdapterBase {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async getMemberCredentials(memberGuid: string): Promise<any> {
     const crs = await this.getConnectionCredentials(memberGuid);
-    return {
-      credentials: crs.map((c) => ({
-        ...c,
-        guid: c.id,
-        field_type: c.field_type === "PASSWORD" ? 1 : 3,
-      })),
-    };
+    return crs.map((c) => ({
+      ...c,
+      guid: c.id,
+      field_type: c.field_type === "PASSWORD" ? 1 : 3,
+    }));
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async getInstitutionCredentials(guid: string): Promise<any> {
     const crs = await super.getInstitutionCredentials(guid);
-    return {
-      credentials: crs.map((c) => ({
-        ...c,
-        guid: c.id,
-        field_type: c.field_type === "PASSWORD" ? 1 : 3,
-      })),
-    };
-  }
-
-  async loadInstitutions(
-    query: string,
-    jobType: MappedJobTypes,
-  ): Promise<InstitutionSearchResponseItem[]> {
-    const institutionHits = await search(query, jobType);
-    return institutionHits.map(mapCachedInstitution);
+    return crs.map((c) => ({
+      ...c,
+      guid: c.id,
+      field_type: c.field_type === "PASSWORD" ? 1 : 3,
+    }));
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async loadInstitutionByUcpId(ucpId: string): Promise<any> {
     const inst = await this.getAggregatorInstitution(ucpId);
-    return { institution: mapResolvedInstitution(inst) };
+    return mapResolvedInstitution(inst);
   }
 
   async loadInstitutionByAggregatorId(
@@ -272,7 +250,7 @@ export class ConnectApi extends AggregatorAdapterBase {
       aggregatorInstitutionId,
     );
 
-    return { institution: mapResolvedInstitution(institution) };
+    return mapResolvedInstitution(institution);
   }
 
   async loadPopularInstitutions() {
@@ -280,7 +258,7 @@ export class ConnectApi extends AggregatorAdapterBase {
     this.context.aggregator = null;
 
     const recommendedInstitutions = await getRecommendedInstitutions({
-      jobType: this.context.job_type as MappedJobTypes,
+      jobTypes: this.context.jobTypes,
     });
     return recommendedInstitutions
       .filter((ins: CachedInstitution) => ins != null)

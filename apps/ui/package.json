@@ -8,27 +8,37 @@
     "dev": "tsc && vite build --watch",
     "dev:debug": "npm run dev",
     "build": "tsc && vite build",
-    "lint": "eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "prod": "npm run dev"
+    "lint": "eslint . --ext js,jsx,ts,tsx",
+    "prod": "npm run dev",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
+    "@mxenabled/connect-widget": "^0.5.1",
     "@types/node": "^20.11.16",
-    "@ucp-npm/components": "^0.0.19-beta",
     "@vitejs/plugin-react": "^4.2.1",
     "@vitejs/plugin-react-swc": "^3.6.0",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "axios": "^1.7.9",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-error-boundary": "^4.1.2",
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
-    "@types/react": "^18.2.43",
-    "@types/react-dom": "^18.2.17",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
     "@typescript-eslint/parser": "^6.14.0",
     "eslint": "^8.55.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
+    "jsdom": "^26.0.0",
+    "msw": "^2.7.0",
     "prettier": "^3.2.5",
     "typescript": "^5.2.2",
-    "vite": "^5.2.6"
+    "vite": "^5.2.6",
+    "vitest": "^3.0.4"
   }
 }

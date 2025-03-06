@@ -1,4 +1,4 @@
-import { JobTypes } from "@repo/utils";
+import { ComboJobTypes } from "@repo/utils";
 import type { Request, Response } from "express";
 import Joi from "joi";
 import { aggregators } from "./adapterSetup";
@@ -7,56 +7,28 @@ import fs from "node:fs";
 import he from "he";
 import path from "path";
 
-const pageQueryParameters = new RegExp(
-  [
-    "institution_id",
-    "job_type",
-    "scheme",
-    "user_id",
-    "client_guid",
-    "connection_id",
-    "aggregator",
-    "partner",
-    "oauth_referral_source",
-    "single_account_select",
-    "update_credentials",
-    "server",
-    "is_mobile_webview",
-    "include_identity",
-    "session_id"
-  ]
-    .map((r) => `\\$${r}`)
-    .join("|"),
-  "g",
-);
-
-function renderDefaultPage(req: Request, res: Response, html: string) {
-  if (
-    req.query.connection_id != null &&
-    (req.query.aggregator == null || req.query.aggregator === "")
-  ) {
-    delete req.query.connection_id;
-  }
-  res.send(
-    html.replaceAll(pageQueryParameters, (q: string) =>
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      encodeURIComponent((req.query as any)[q.substring(1)] ?? ""),
-    ),
-  );
-}
-
 export const widgetHandler = (req: Request, res: Response) => {
   const schema = Joi.object({
-    connection_id: Joi.string(),
-    institution_id: Joi.string(),
-    job_type: Joi.string()
-      .valid(...Object.values(JobTypes))
+    connectionId: Joi.string(),
+    institutionId: Joi.string(),
+    jobTypes: Joi.string()
+      .custom((value, helpers) => {
+        const items = value.split(",") as ComboJobTypes[];
+        const invalidItems = items.filter(
+          (item) => !Object.values(ComboJobTypes).includes(item),
+        );
+        if (invalidItems.length > 0) {
+          return helpers.error("any.invalid", { invalid: invalidItems });
+        }
+        return value;
+      })
       .required(),
     aggregator: Joi.string().valid(...aggregators),
-    single_account_select: Joi.bool(),
-    user_id: Joi.string().required(),
+    sessionId: Joi.string(),
+    singleAccountSelect: Joi.bool(),
+    userId: Joi.string().required(),
     token: Joi.string(),
-  }).and("connection_id", "aggregator");
+  }).and("connectionId", "aggregator");
 
   const { error } = schema.validate(req.query);
 
@@ -75,5 +47,5 @@ export const widgetHandler = (req: Request, res: Response) => {
     "utf8",
   );
 
-  renderDefaultPage(req, res, html);
+  res.send(html);
 };

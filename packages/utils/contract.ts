@@ -2,6 +2,13 @@
 // check all forked Adapter repositories
 // Example: JobTypes is used in the MX Adapter fork
 
+export enum ComboJobTypes {
+  ACCOUNT_NUMBER = "accountNumber",
+  ACCOUNT_OWNER = "accountOwner",
+  TRANSACTIONS = "transactions",
+  TRANSACTION_HISTORY = "transactionHistory",
+}
+
 export enum WidgetJobTypes {
   AGGREGATION = 0,
   VERIFICATION = 1,
@@ -14,6 +21,14 @@ export enum WidgetJobTypes {
   MICRO_DEPOSIT = 8,
   TAX = 9,
   CREDIT_REPORT = 10,
+  COMBINATION = 11,
+}
+
+export enum OAuthStatus {
+  _,
+  PENDING,
+  COMPLETE,
+  ERROR,
 }
 
 export enum VCDataTypes {
@@ -22,18 +37,14 @@ export enum VCDataTypes {
   TRANSACTIONS = "transactions",
 }
 
-export enum JobTypes {
-  AGGREGATE = "aggregate",
-  ALL = "all",
-  FULLHISTORY = "fullhistory",
-  VERIFICATION = "verification",
-  IDENTITY = "identity",
-}
-
 export type AdapterMap = {
   dataAdapter?: Function;
   vcAdapter?: Function;
-  createWidgetAdapter: ( { sessionId } : {sessionId?: string | undefined} ) => WidgetAdapter;
+  createWidgetAdapter: ({
+    sessionId,
+  }: {
+    sessionId?: string | undefined;
+  }) => WidgetAdapter;
 };
 
 export interface Credential {
@@ -108,9 +119,10 @@ export enum ConnectionStatus {
 export interface CreateConnectionRequest {
   id?: string;
   initial_job_type?: string;
+  jobTypes?: ComboJobTypes[];
   background_aggregation_is_disabled?: boolean;
   credentials: Credential[];
-  institution_id: string;
+  institutionId: string;
   is_oauth?: boolean;
   skip_aggregation?: boolean;
   metadata?: string;
@@ -129,7 +141,7 @@ export interface Connection {
   is_oauth?: boolean | null;
   name?: string | null;
   aggregator?: string | null;
-  user_id?: string | null;
+  userId?: string | null;
   challenges?: Challenge[];
   has_accounts?: boolean | null;
   has_transactions?: boolean | null;
@@ -159,6 +171,7 @@ export interface Institutions {
 export interface UpdateConnectionRequest {
   id: string | undefined;
   job_type?: string;
+  jobTypes?: ComboJobTypes[];
   credentials?: Credential[];
   challenges?: Challenge[];
 }
@@ -204,12 +217,9 @@ export interface WidgetAdapter {
   GetConnectionStatus: (
     connectionId: string,
     jobId: string,
-    single_account_select?: boolean,
+    singleAccountSelect?: boolean,
     userId?: string,
   ) => Promise<Connection | undefined>;
-  RouteHandlers?: Record<string, (req: any, res: any) => void>;
   DataRequestValidators?: Record<string, (req: any) => string | undefined>;
-  HandleOauthResponse: (
-    request: any
-  ) => Promise<Connection>;
+  HandleOauthResponse?: (request: any) => Promise<Connection>;
 }

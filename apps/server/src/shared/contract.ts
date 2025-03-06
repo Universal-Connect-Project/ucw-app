@@ -1,3 +1,4 @@
+import type { ComboJobTypes } from "@repo/utils";
 import type { Aggregator } from "../adapterSetup";
 
 export type { Aggregator };
@@ -10,22 +11,22 @@ export interface AuthRequest {
 }
 
 export interface Context {
-  institution_id?: string;
+  institutionId?: string;
   institution_uid?: string;
-  include_identity?: boolean;
-  connection_id?: string;
+  connectionId?: string;
   current_job_id?: string;
-  user_id?: string;
-  resolved_user_id?: string;
+  userId?: string;
+  resolvedUserId?: string;
   aggregator?: string | null;
-  job_type?: string;
+  jobTypes?: ComboJobTypes[];
+  job_type?: string; // Remove this
   partner?: string;
-  single_account_select?: boolean;
+  singleAccountSelect?: boolean;
   auth?: AuthRequest;
   oauth_referral_source?: string;
   scheme?: string;
   updated?: boolean;
-  session_id?: string;
+  sessionId?: string;
 }
 
 export enum ConnectionStatus {
@@ -51,13 +52,6 @@ export enum ConnectionStatus {
   EXPIRED,
   IMPAIRED,
   PENDING,
-}
-
-export enum OAuthStatus {
-  _,
-  PENDING,
-  COMPLETE,
-  ERROR,
 }
 
 export enum VcType {
@@ -94,14 +88,6 @@ export enum Aggregators {
   TEST_A = "testExampleA",
   TEST_B = "testExampleB",
   TEST_C = "testExampleC",
-}
-
-export enum MappedJobTypes {
-  AGGREGATE = "aggregate",
-  ALL = "aggregate_identity_verification",
-  FULLHISTORY = "aggregate_extendedhistory",
-  VERIFICATION = "verification",
-  IDENTITY = "aggregate_identity",
 }
 
 export enum JobTypeSupports {
