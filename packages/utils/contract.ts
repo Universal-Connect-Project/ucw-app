@@ -3,8 +3,8 @@
 // Example: JobTypes is used in the MX Adapter fork
 
 export enum ComboJobTypes {
-  ACCOUNT_NUMBER = "accountVerification",
-  ACCOUNT_OWNER = "identityVerification",
+  ACCOUNT_NUMBER = "accountNumber",
+  ACCOUNT_OWNER = "accountOwner",
   TRANSACTIONS = "transactions",
   TRANSACTION_HISTORY = "transactionHistory",
 }
