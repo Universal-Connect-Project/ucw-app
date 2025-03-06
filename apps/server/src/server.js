@@ -13,6 +13,7 @@ import useDataEndpoints from "./dataEndpoints/useDataEndpoints";
 import { error as _error, info } from "./infra/logger";
 import { initialize as initializeElastic } from "./services/ElasticSearchClient";
 import { setInstitutionSyncSchedule } from "./services/institutionSyncer";
+import { setPerformanceSyncSchedule, syncPerformanceData } from "./services/performanceSyncer";
 import { widgetHandler } from "./widgetEndpoint";
 
 process.on("unhandledRejection", (error) => {
@@ -50,6 +51,12 @@ initializeElastic()
   .catch((error) => {
     _error(`Failed to initialized: ${error}`);
   });
+
+syncPerformanceData().then(() => {
+  setPerformanceSyncSchedule().then(() => {
+    info("Performance based routing data is scheduled to sync")
+  })
+})
 
 app.get("/health", function (req, res) {
   if (isReady) {

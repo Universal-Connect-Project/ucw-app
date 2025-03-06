@@ -13,7 +13,7 @@
     "cypress:run:prod": "cypress run --config-file cypress.config.prod.ts",
     "cypress:run:syncing": "cypress run --config-file cypress.config.syncing.ts",
     "cypress:run:testExample": "cypress run --config-file cypress.config.testExample.ts",
-    "elasticsearch": "docker run --rm --name elasticsearch_container -p 9200:9200 -p 9300:9300 -e \"discovery.type=single-node\" -e \"xpack.security.enabled=false\" docker.elastic.co/elasticsearch/elasticsearch:7.10.2",
+    "elasticsearch": "docker volume create esdata && docker run --rm --name elasticsearch_container -p 9200:9200 -p 9300:9300 -v esdata:/usr/share/elasticsearch/data -e \"discovery.type=single-node\" -e \"xpack.security.enabled=false\" docker.elastic.co/elasticsearch/elasticsearch:7.10.2",
     "dev": "concurrently --kill-others \"npm run elasticsearch\" \"npm run server\" \"npm run redisserver\"",
     "dev:debug": "concurrently --kill-others \"npm run elasticsearch\" \"npm run server:debug\" \"npm run redisserver\"",
     "start:e2e": "nodemon",

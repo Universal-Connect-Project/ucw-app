@@ -1,4 +1,3 @@
-import type { Member, MemberResponse } from "interfaces/contract";
 import * as logger from "../infra/logger";
 import type {
   CachedInstitution,
@@ -9,6 +8,7 @@ import { ChallengeType, ConnectionStatus } from "@repo/utils";
 
 import { AggregatorAdapterBase } from "../adapters";
 import { getRecommendedInstitutions } from "../services/ElasticSearchClient";
+import type { Member, MemberResponse } from "../shared/connect/contract";
 
 function mapResolvedInstitution(ins: Institution) {
   return {

@@ -1,0 +1,48 @@
+name: Changelog and version updated
+
+on: pull_request
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch main branch
+        run: |
+          git fetch origin main:main
+
+      - name: Install jq for JSON processing
+        run: sudo apt-get install -y jq
+
+      - name: Compare versions
+        run: |
+          MAIN_VERSION=$(git show main:package.json | jq -r .version)
+
+          CURRENT_VERSION=$(jq -r .version package.json)
+
+          echo "Main branch version: $MAIN_VERSION"
+          echo "Current branch version: $CURRENT_VERSION"
+
+          SEMVER_REGEX="^[0-9]+\.[0-9]+\.[0-9]+$"
+          if ! [[ $CURRENT_VERSION =~ $SEMVER_REGEX ]]; then
+            echo "Error: Version '$CURRENT_VERSION' is not a valid semantic version!"
+            exit 1
+          fi
+          echo "Semantic versioning check passed: $VERSION"
+
+          if [ "$MAIN_VERSION" = "$CURRENT_VERSION" ]; then
+            echo "Error: Version in package.json has not been updated!"
+            exit 1
+          fi
+
+          echo "Version updated: $MAIN_VERSION -> $CURRENT_VERSION"
+
+      - name: Check that changelog is updated
+        run: |
+          if ! git diff --name-only main | grep -q '^CHANGELOG.md$'; then
+            echo "Error: CHANGELOG.md has not been updated."
+            exit 1
+          fi
