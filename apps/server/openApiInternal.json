@@ -52,8 +52,8 @@
                     "items": {
                       "type": "string",
                       "enum": [
-                        "accountVerification",
-                        "identityVerification",
+                        "accountNumber",
+                        "accountOwner",
                         "transactions",
                         "transactionHistory"
                       ]
