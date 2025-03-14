@@ -9,6 +9,7 @@ import { ChallengeType, ConnectionStatus } from "@repo/utils";
 import { AggregatorAdapterBase } from "../adapters";
 import { getRecommendedInstitutions } from "../services/ElasticSearchClient";
 import type { Member, MemberResponse } from "../shared/connect/contract";
+import { recordStartEvent } from "../services/performanceTracking";
 
 function mapResolvedInstitution(ins: Institution) {
   return {
@@ -119,19 +120,27 @@ export class ConnectApi extends AggregatorAdapterBase {
   }
 
   async addMember(memberData: Member): Promise<MemberResponse> {
+    const isOauth = memberData.is_oauth;
+    const { jobTypes } = this.context;
+
     const connection = await this.createConnection({
       institutionId: memberData.institution_guid,
-      is_oauth: memberData.is_oauth ?? false,
-      skip_aggregation:
-        (memberData.skip_aggregation ?? false) &&
-        (memberData.is_oauth ?? false),
-      jobTypes: this.context.jobTypes,
+      is_oauth: isOauth,
+      skip_aggregation: (memberData.skip_aggregation ?? false) && isOauth,
+      jobTypes,
       credentials:
         memberData.credentials?.map((c) => ({
           id: c.guid,
           value: c.value,
         })) ?? [],
     });
+
+    const connectionId = connection?.id;
+
+    if (!isOauth && connectionId) {
+      recordStartEvent({ connectionId, jobTypes });
+    }
+
     return { member: mapConnection(connection) };
   }
 
