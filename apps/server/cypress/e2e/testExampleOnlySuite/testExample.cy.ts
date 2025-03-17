@@ -107,6 +107,10 @@ describe("testExampleA and B aggregators", () => {
   generateDataTests({
     makeAConnection: makeABConnection,
     shouldTestVcEndpoint: true,
+    transactionsAccountSelector: (accounts) =>
+      accounts.find(
+        ({ depositAccount }) => depositAccount.accountType === "CHECKING",
+      ),
     transactionsQueryString: "?start_time=2021/1/1",
   });
 
