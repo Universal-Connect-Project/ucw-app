@@ -30,7 +30,7 @@ In addition to updating the version, an update to the [Changelog](CHANGELOG.md) 
 
 We strive to maintain a high standard of quality. We want users of our software to have a good and reliable experience. We want people contributing to our code to have a good and reliable experience. You should expect to receive feedback on your pull requests and not blind approvals.
 
-We use [architecture decision records](https://adr.github.io/) to make, document, and enforce our decisions. You'll need to read our ADRs before contributing. We maintain [Organization-level ADRs](https://github.com/Universal-Connect-Project/ucw-app/tree/main/architectureDecisionRecords), and [Repository-level ADRs](./architectureDecisionRecords).
+We use [architecture decision records](https://adr.github.io/) to make, document, and enforce our decisions. You'll need to read our ADRs before contributing. We maintain [Organization-level ADRs](https://github.com/Universal-Connect-Project/architecture-decision-record/tree/main/architectureDecisionRecords), and [Repository-level ADRs](./architectureDecisionRecords).
 
 For a PR to be considered ready to merge it must adhere to the ADRs.
 
