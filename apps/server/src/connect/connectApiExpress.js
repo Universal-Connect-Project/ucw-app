@@ -89,15 +89,6 @@ export default function (app) {
       res.send(ret);
     },
   );
-  app.get(
-    `${ApiEndpoints.MEMBERS}/:member_guid/oauth_window_uri`,
-    async (req, res) => {
-      const ret = await req.connectApi.getOauthWindowUri(
-        req.params.member_guid,
-      );
-      res.send({ oauth_window_uri: ret });
-    },
-  );
   app.delete(`${ApiEndpoints.MEMBERS}/:member_guid`, async (req, res) => {
     res.sendFile(path.join(__dirname, "/stubs/member.json"));
   });

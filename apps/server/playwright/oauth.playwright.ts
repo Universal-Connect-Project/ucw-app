@@ -19,6 +19,9 @@ test("displays error page with failed oAuth", async ({ page }, testInfo) => {
 
   const authorizeTab = await popupPromise;
   await expect(authorizeTab.getByText("Something went wrong")).toBeVisible();
+
+  await expect(page.getByText("Something went wrong")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
 });
 
 test("connects to example bank with oAuth", async ({ page }, testInfo) => {
@@ -40,6 +43,10 @@ test("connects to example bank with oAuth", async ({ page }, testInfo) => {
   const authorizeTab = await popupPromise;
 
   await expect(
-    authorizeTab.getByText("Thank you for completing OAuth."),
+    authorizeTab.getByText("Thank you for completing OAuth"),
   ).toBeVisible();
+
+  await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
+    timeout: 15000,
+  });
 });

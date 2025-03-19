@@ -143,11 +143,6 @@ export class AggregatorAdapterBase {
     );
   }
 
-  async getOauthWindowUri(memberGuid: string) {
-    const ret = await this.getConnection(memberGuid);
-    return ret?.oauth_window_uri;
-  }
-
   async getOauthState(connectionId: string) {
     const connection = await this.getConnectionStatus(connectionId);
 
