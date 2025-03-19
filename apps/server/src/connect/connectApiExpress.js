@@ -1,5 +1,4 @@
 import * as path from "path";
-import config from "../config";
 import { contextHandler } from "../infra/context.ts";
 import { ApiEndpoints } from "../shared/connect/ApiEndpoint";
 import { ConnectApi } from "./connectApi";
@@ -9,7 +8,6 @@ import {
   getInstitutionHandler,
   getInstitutionsHandler,
 } from "./institutionEndpoints";
-import { webhookHandler, oauthRedirectHandler } from "./oauthEndpoints";
 import stubs from "./instrumentations.js";
 import { jobsRouteHandler } from "./jobEndpoints";
 import { instrumentationHandler } from "./instrumentationEndpoints";
@@ -21,19 +19,10 @@ import {
   OAUTH_STATES_URL,
 } from "@repo/utils";
 
-const disableAnalytics = true;
-
 export default function (app) {
   stubs(app);
   app.use(contextHandler);
   app.use(async (req, res, next) => {
-    if (
-      req.path === "/" ||
-      req.path.startsWith("/example") === true ||
-      req.path.startsWith("/static") === true
-    ) {
-      return next();
-    }
     req.connectApi = new ConnectApi(req);
     if ((await req.connectApi.init()) != null) {
       if (!req.context.resolvedUserId) {
@@ -43,29 +32,6 @@ export default function (app) {
       }
     }
     next();
-  });
-
-  app.get("/oauth_redirect", (req, res) => {
-    res.sendFile(path.join(__dirname, "../infra/http/oauth.html"));
-  });
-
-  app.post("/analytics*", async (req, res) => {
-    if (disableAnalytics) {
-      res.sendStatus(200);
-      return;
-    }
-
-    if (
-      config.ENV !== "test" &&
-      config.AnalyticsServiceEndpoint !== "" &&
-      config.AnalyticsServiceEndpoint != null
-    ) {
-      const ret = await req.connectApi.analytics(req.path, req.body);
-      res.send(ret);
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      res.send(require("./stubs/analytics_sessions.js"));
-    }
   });
 
   app.post(MEMBERS_URL, async (req, res) => {
@@ -124,12 +90,4 @@ export default function (app) {
   });
 
   app.post(`${INSTRUMENTATION_URL}/userId/:userId`, instrumentationHandler);
-
-  app.all("/webhook/:aggregator/*", webhookHandler);
-
-  app.get("/oauth/:aggregator/redirect_from/", oauthRedirectHandler);
-
-  app.get("/oauth/oauth.js", (req, res) => {
-    res.sendFile(path.join(__dirname, "../infra/http/oauth/oauth.js"));
-  });
 }

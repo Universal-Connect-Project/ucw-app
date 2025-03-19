@@ -13,8 +13,12 @@ import useDataEndpoints from "./dataEndpoints/useDataEndpoints";
 import { error as _error, info } from "./infra/logger";
 import { initialize as initializeElastic } from "./services/ElasticSearchClient";
 import { setInstitutionSyncSchedule } from "./services/institutionSyncer";
-import { setPerformanceSyncSchedule, syncPerformanceData } from "./services/performanceSyncer";
+import {
+  setPerformanceSyncSchedule,
+  syncPerformanceData,
+} from "./services/performanceSyncer";
 import { widgetHandler } from "./widgetEndpoint";
+import { oauthRedirectHandler, webhookHandler } from "./connect/oauthEndpoints";
 
 process.on("unhandledRejection", (error) => {
   _error(`unhandledRejection: ${error.message}`, error);
@@ -54,9 +58,9 @@ initializeElastic()
 
 syncPerformanceData().then(() => {
   setPerformanceSyncSchedule().then(() => {
-    info("Performance based routing data is scheduled to sync")
-  })
-})
+    info("Performance based routing data is scheduled to sync");
+  });
+});
 
 app.get("/health", function (req, res) {
   if (isReady) {
@@ -70,7 +74,14 @@ app.get("/health", function (req, res) {
 useUserEndpoints(app);
 useDataEndpoints(app);
 
+app.all("/webhook/:aggregator/*", webhookHandler);
+app.get("/oauth/:aggregator/redirect_from/", oauthRedirectHandler);
+
 useAuthentication(app);
+
+app.use(express.static(path.join(__dirname, "../../ui/dist")));
+
+app.get("/widget", widgetHandler);
 
 useConnect(app);
 
@@ -81,17 +92,13 @@ app.use(function (err, req, res, next) {
   res.send(err.message);
 });
 
-app.use(express.static(path.join(__dirname, "../../ui/dist")));
-
-app.get("/widget", widgetHandler);
-
 app.get("*", (req, res) => {
   req.metricsPath = "/catchall";
   res.sendStatus(404);
 });
 
-if(!config.PORT){
-  throw new Error('Invalid config, unable to start server')
+if (!config.PORT) {
+  throw new Error("Invalid config, unable to start server");
 }
 
 app.listen(config.PORT, () => {

@@ -2,7 +2,6 @@
 import { aggregators } from "../adapterSetup";
 import { createAggregatorWidgetAdapter } from "../adapterIndex";
 import * as logger from "../infra/logger";
-import { AnalyticsClient } from "../services/analyticsClient";
 import { resolveInstitutionAggregator } from "../services/institutionResolver";
 import { set } from "../services/storageClient/redis";
 import type { Context, Aggregator } from "../shared/contract";
@@ -22,7 +21,6 @@ import { ConnectionStatus } from "../shared/contract";
 export class AggregatorAdapterBase {
   context: Context;
   aggregatorAdapter: WidgetAdapter;
-  analyticsClient: AnalyticsClient;
   aggregators: string[];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,7 +29,6 @@ export class AggregatorAdapterBase {
   }
 
   async init() {
-    this.analyticsClient = new AnalyticsClient("temp_fake_authToken");
     try {
       if (this.context?.aggregator) {
         this.aggregatorAdapter = createAggregatorWidgetAdapter({
@@ -196,13 +193,5 @@ export class AggregatorAdapterBase {
 
   getUserId(): string {
     return this.context.resolvedUserId;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async analytics(path: string, content: any) {
-    return await this.analyticsClient?.analytics(
-      path.replaceAll("/", ""),
-      content,
-    );
   }
 }
