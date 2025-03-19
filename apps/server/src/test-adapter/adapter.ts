@@ -13,6 +13,7 @@ import {
   testExampleOauthInstitution,
   testExampleInstitution,
 } from "./constants";
+import config from "../config";
 
 export const testJobId = "testJobId";
 export const testInstitutionCode = "institutionCode";
@@ -120,14 +121,25 @@ export class TestAdapter implements WidgetAdapter {
   ): Promise<Connection> {
     const oauth = request.institutionId?.toLowerCase().includes("oauth");
     const failed = request.institutionId?.toLowerCase().includes("failed");
-    const oauth_windows_url = `http://localhost:8080/oauth/testExampleA/redirect_from/?code=${failed ? "error" : "success"}&state=${testConnectionId}`;
+    const oauth_windows_url = `${config.HOST_URL}/oauth/${this.aggregator}/redirect_from/?code=${failed ? "error" : "success"}`;
 
-    if (request.jobTypes?.includes(ComboJobTypes.ACCOUNT_NUMBER)) {
-      const redisStatusKey = createRedisStatusKey({
-        aggregator: this.aggregator,
-        userId,
+    const redisStatusKey = createRedisStatusKey({
+      aggregator: this.aggregator,
+      userId,
+    });
+
+    await set(redisStatusKey, null);
+
+    if (failed) {
+      await set(redisStatusKey, {
+        shouldReturnError: true,
       });
+    }
 
+    if (
+      request.jobTypes?.includes(ComboJobTypes.ACCOUNT_NUMBER) &&
+      !request.is_oauth
+    ) {
       await set(redisStatusKey, {
         verifiedOnce: true,
       });
@@ -202,6 +214,17 @@ export class TestAdapter implements WidgetAdapter {
       createRedisStatusKey({ aggregator: this.aggregator, userId }),
     );
 
+    if (connectionInfo?.shouldReturnError) {
+      return {
+        aggregator: this.aggregator,
+        id: testConnectionId,
+        cur_job_id: testJobId,
+        userId: userId,
+        status: ConnectionStatus.DENIED,
+        challenges: [],
+      };
+    }
+
     if (connectionInfo?.verifiedOnce && singleAccountSelect) {
       return {
         aggregator: this.aggregator,
@@ -267,31 +290,16 @@ export class TestAdapter implements WidgetAdapter {
 
   async HandleOauthResponse(request: any): Promise<Connection> {
     const { query } = request;
-    if (!query) {
-      return null;
-    }
-    const { state: request_id, code } = query;
+    const { code } = query;
 
     if (code === "error") {
       return {
         status: ConnectionStatus.FAILED,
-        request_id: request_id,
-        error: code,
       } as any;
     }
 
-    const connection = await get(request_id);
-    if (!connection) {
-      return null;
-    }
-    if (code) {
-      connection.status = ConnectionStatus.CONNECTED;
-      connection.userId = code;
-      connection.request_id = request_id;
-    }
-
-    await set(request_id, connection);
-
-    return connection;
+    return {
+      status: ConnectionStatus.CONNECTED,
+    } as any;
   }
 }
