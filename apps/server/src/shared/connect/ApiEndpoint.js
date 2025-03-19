@@ -3,9 +3,6 @@ export const ApiEndpoints = {
   AGREEMENT: "/agreement",
   AGGREGATORS: "/aggregators",
   APPDATA: "/raja/data?type=master", // have
-  ANALYTICS_EVENTS: "/analytics_events",
-  ANALYTICS_PAGEVIEW: "/analytics_pageviews",
-  ANALYTICS_SESSION: "/analytics_sessions", // have
   BLOCKED_ROUTING_NUMBERS: "/blocked_routing_numbers",
   BUDGETS: "/budgets",
   CATEGORIES: "/categories",
