@@ -5,7 +5,6 @@ import {
   testDataRequestValidatorStartTimeError,
   testExampleInstitution,
 } from "./constants";
-import { set } from "../services/storageClient/redis";
 
 const labelText = "testLabelText";
 const aggregator = "aggregator";
@@ -137,6 +136,29 @@ describe("TestAdapter", () => {
         oauth_window_uri: undefined,
         aggregator,
       });
+    });
+  });
+
+  describe("failed oauth flow", () => {
+    it("returns a DENIED connection if it's using the failed institution", async () => {
+      const userId = "testId";
+
+      await testAdapterA.CreateConnection(
+        {
+          credentials: [],
+          institutionId: "failed",
+        },
+        userId,
+      );
+
+      const getStatusResult = await testAdapterA.GetConnectionStatus(
+        null,
+        null,
+        false,
+        userId,
+      );
+
+      expect(getStatusResult.status).toEqual(ConnectionStatus.DENIED);
     });
   });
 
