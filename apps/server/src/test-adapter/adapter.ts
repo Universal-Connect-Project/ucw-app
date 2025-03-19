@@ -288,18 +288,21 @@ export class TestAdapter implements WidgetAdapter {
     return userId;
   }
 
-  async HandleOauthResponse(request: any): Promise<Connection> {
-    const { query } = request;
+  async HandleOauthResponse({
+    query,
+  }: {
+    query: Record<string, string>;
+  }): Promise<Connection> {
     const { code } = query;
 
     if (code === "error") {
       return {
-        status: ConnectionStatus.FAILED,
-      } as any;
+        status: ConnectionStatus.DENIED,
+      } as Connection;
     }
 
     return {
       status: ConnectionStatus.CONNECTED,
-    } as any;
+    } as Connection;
   }
 }

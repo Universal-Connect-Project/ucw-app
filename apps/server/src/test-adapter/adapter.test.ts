@@ -292,44 +292,27 @@ describe("TestAdapter", () => {
       );
     });
   });
-  describe("HandleOauthResponse", () => {
-    it("responds success from HandleOauthResponse", async () => {
-      await set(`request_id`, {
-        guid: "test_guid",
-        id: "request_id",
-      });
 
+  describe("HandleOauthResponse", () => {
+    it("responds with success if the code isn't error", async () => {
       const ret = await testAdapterA.HandleOauthResponse({
-        query: {
-          state: "request_id",
-          code: "test_code",
-        },
+        query: {},
       });
 
       expect(ret).toEqual({
-        id: "request_id",
-        request_id: "request_id",
-        guid: "test_guid",
-        userId: "test_code",
-        status: 6,
+        status: ConnectionStatus.CONNECTED,
       });
     });
 
-    it("returns null with no query", async () => {
-      const ret = await testAdapterA.HandleOauthResponse({
-        query: null,
-      });
-      expect(ret).toEqual(null);
-    });
-
-    it("returns null with no data", async () => {
+    it("returns with denied if the code is error", async () => {
       const ret = await testAdapterA.HandleOauthResponse({
         query: {
-          state: "request_id",
-          code: "test_code",
+          code: "error",
         },
       });
-      expect(ret).toEqual(null);
+      expect(ret).toEqual({
+        status: ConnectionStatus.DENIED,
+      });
     });
   });
 });
