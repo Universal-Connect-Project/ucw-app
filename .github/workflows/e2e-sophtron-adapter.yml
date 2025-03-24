@@ -70,7 +70,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           config-file: cypress.config.ts
-          project: ${{ vars.PACKAGE_DIR }}
+          project: packages/sophtron-adapter
           start: npm run start:e2e
           wait-on: "http://localhost:8080/health, http://localhost:9200"
 
@@ -79,4 +79,4 @@ jobs:
         if: failure()
         with:
           name: cypress-screenshots
-          path: ./${{ vars.PACKAGE_DIR }}/cypress/screenshots
+          path: ./packages/sophtron-adapter/cypress/screenshots
