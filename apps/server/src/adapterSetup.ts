@@ -1,6 +1,6 @@
 import type { AdapterMap } from "@repo/utils";
 import { getMxAdapterMapObject } from "@repo/mx-adapter";
-import { getSophtronAdapterMapObject } from "@ucp-npm/sophtron-adapter";
+import { getSophtronAdapterMapObject } from "@repo/sophtron-adapter";
 import config from "./config";
 import * as logger from "./infra/logger";
 import { get, set } from "./services/storageClient/redis";
