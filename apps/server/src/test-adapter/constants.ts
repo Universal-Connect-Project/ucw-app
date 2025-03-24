@@ -34,6 +34,7 @@ export const testExampleCredentials = {
 };
 
 export const testDataRequestValidators = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   transactions: (req: any) => {
     if (!req.query.start_time) {
       return testDataRequestValidatorStartTimeError;

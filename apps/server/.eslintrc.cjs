@@ -1,15 +1,16 @@
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
-  extends: ["../../packages/eslint-config/node.json"],
   env: {
     browser: true,
     node: true,
     es6: true,
     jest: true,
   },
-  parserOptions: {
-    project: true,
-  },
+  extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
+  ],
   ignorePatterns: [
     ".eslintrc.cjs",
     "jest.config.js",
@@ -19,6 +20,7 @@ module.exports = {
     "cypress.config.*.ts",
     "cypress/**/*",
     "baseCypressConfig.ts",
+    "playwright*",
   ],
   rules: {
     "@typescript-eslint/no-namespace": "off", // TODO: remove and fix later

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { set } from "../services/storageClient/redis";
 import type { Request } from "express";
 import { ConnectApi } from "./connectApi";
