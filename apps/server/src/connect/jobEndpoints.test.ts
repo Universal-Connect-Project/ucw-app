@@ -38,6 +38,7 @@ describe("jobEndpoints", () => {
       const res = {
         send: jest.fn(),
         status: jest.fn(),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as unknown as any;
 
       await jobsRouteHandler(req, res);

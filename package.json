@@ -1,11 +1,13 @@
 {
   "name": "ucw-app",
-  "version": "1.0.4",
+  "version": "1.0.7",
   "private": true,
   "scripts": {
     "build": "turbo build",
     "copyDemoPreferences": "cp ./apps/server/cachedDefaults/testData/demoPreferences.json ./apps/server/cachedDefaults/preferences.json",
     "copyE2EPreferences": "cp ./apps/server/cachedDefaults/testData/e2ePreferences.json ./apps/server/cachedDefaults/preferences.json",
+    "copyMXTestPreferences": "cp ./apps/server/cachedDefaults/testData/mxTestPreferences.json ./apps/server/cachedDefaults/preferences.json",
+    "copySophtronTestPreferences": "cp ./apps/server/cachedDefaults/testData/sophtronTestPreferences.json ./apps/server/cachedDefaults/preferences.json",
     "copyTestPreferences": "cp ./apps/server/cachedDefaults/testData/testPreferences.json ./apps/server/cachedDefaults/preferences.json",
     "copyServerEnv": "tee ./apps/server/env/staging.env ./apps/server/env/production.env < ./apps/server/env/.env.example",
     "dev": "turbo dev",

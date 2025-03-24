@@ -88,10 +88,10 @@ export async function resolveInstitutionAggregator(
     aggregator as keyof CachedInstitution
   ] as InstitutionAggregator;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const testAdapterName = (
-    adapterMap[aggregator as keyof typeof adapterMap] as any
-  )?.testInstitutionAdapterName;
+  const testAdapterName =
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (adapterMap[aggregator as keyof typeof adapterMap] as any)
+      ?.testInstitutionAdapterName;
 
   if (testAdapterName && institution.is_test_bank) {
     aggregator = testAdapterName;

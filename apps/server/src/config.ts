@@ -73,12 +73,17 @@ const keysToPullFromEnv = [
   "PROXY_PASSWORD",
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const config: Record<string, any> = keysToPullFromEnv.reduce((acc, envKey) => {
   return {
     ...acc,
     [envKey]: process.env[envKey],
   };
 }, {});
+
+if (process.env.HEROKU_APP_NAME) {
+  config.HOST_URL = `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`;
+}
 
 if (config.INSTITUTION_POLLING_INTERVAL === undefined) {
   config.INSTITUTION_POLLING_INTERVAL = 1;

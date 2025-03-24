@@ -63,11 +63,7 @@ export async function indexElasticSearch() {
 
   info(`Indexing ${institutionData.length} documents`);
 
-  async function indexDocument(
-    institution: CachedInstitution,
-    index: number,
-    total: number,
-  ) {
+  async function indexDocument(institution: CachedInstitution) {
     await ElasticsearchClient.index({
       index: "institutions",
       id: institution.id,
@@ -77,13 +73,11 @@ export async function indexElasticSearch() {
 
   if (config.ELASTIC_SEARCH_SINGLE_THREAD) {
     for (let i = 0; i < institutionData.length; i++) {
-      await indexDocument(institutionData[i], i, institutionData.length);
+      await indexDocument(institutionData[i]);
     }
   } else {
     await Promise.all(
-      institutionData.map((institution, i) =>
-        indexDocument(institution, i, institutionData.length),
-      ),
+      institutionData.map((institution) => indexDocument(institution)),
     );
   }
 

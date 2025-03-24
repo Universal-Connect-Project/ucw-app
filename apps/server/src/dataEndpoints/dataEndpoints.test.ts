@@ -336,6 +336,7 @@ describe("dataEndpoints", () => {
         const res = {
           send: jest.fn(),
           status: jest.fn(),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as unknown as any;
 
         await createTransactionsDataHandler(true)(req, res);
@@ -381,6 +382,7 @@ describe("dataEndpoints", () => {
         const res = {
           send: jest.fn(),
           status: jest.fn(),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as unknown as any;
 
         await createTransactionsDataHandler(false)(req, res);

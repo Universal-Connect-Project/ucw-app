@@ -22,6 +22,7 @@ describe("getAccessToken", () => {
       expires_in: 3600,
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let createAccessTokenPayload: any = null;
 
     server.use(
@@ -48,7 +49,7 @@ describe("getAccessToken", () => {
     const warningLogSpy = jest.spyOn(logger, "warning");
 
     server.use(
-      http.post(config.AUTH0_TOKEN_URL, async ({ request }) => {
+      http.post(config.AUTH0_TOKEN_URL, async () => {
         return new HttpResponse(null, {
           status: 401,
           statusText: "Unauthorized",
@@ -66,7 +67,7 @@ describe("getAccessToken", () => {
 
   it("should handle 500 errors gracefully", async () => {
     server.use(
-      http.post(config.AUTH0_TOKEN_URL, async ({ request }) => {
+      http.post(config.AUTH0_TOKEN_URL, async () => {
         return new HttpResponse(null, {
           status: 500,
           statusText: "Server Error",
@@ -81,7 +82,7 @@ describe("getAccessToken", () => {
 
   it("should handle Bad Request errors gracefully", async () => {
     server.use(
-      http.post(config.AUTH0_TOKEN_URL, async ({ request }) => {
+      http.post(config.AUTH0_TOKEN_URL, async () => {
         return new HttpResponse(null, {
           status: 400,
           statusText: "Bad Request",

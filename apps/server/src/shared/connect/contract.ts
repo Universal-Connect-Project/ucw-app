@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface Credential {
   guid: string; //
   value?: string;
@@ -34,6 +35,7 @@ export interface Credential {
   job_guid?: string; // JOB-asdf
   options?: any; // Array // []
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 export interface Member {
   // aggregation_status: number //
