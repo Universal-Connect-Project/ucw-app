@@ -33,6 +33,7 @@ describe("mx aggregator using axios proxy", () => {
             memberGuid,
             aggregator,
             shouldTestVcEndpoint,
+            transactionsAccountSelector: undefined,
             userId,
           });
         });
