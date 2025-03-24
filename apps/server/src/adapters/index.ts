@@ -5,16 +5,17 @@ import * as logger from "../infra/logger";
 import { resolveInstitutionAggregator } from "../services/institutionResolver";
 import { set } from "../services/storageClient/redis";
 import type { Context, Aggregator } from "../shared/contract";
-import {
-  OAuthStatus,
-  type Challenge,
-  type Connection,
-  type CreateConnectionRequest,
-  type Credential,
-  type Institution,
-  type UpdateConnectionRequest,
-  type WidgetAdapter,
+import type {
+  AggregatorInstitution,
+  Challenge,
+  Connection,
+  CreateConnectionRequest,
+  Credential,
+  Institution,
+  UpdateConnectionRequest,
+  WidgetAdapter,
 } from "@repo/utils";
+import { OAuthStatus } from "@repo/utils";
 
 import { ConnectionStatus } from "../shared/contract";
 
@@ -58,13 +59,16 @@ export class AggregatorAdapterBase {
     return resolvedInstitution;
   }
 
-  async getAggregatorInstitution(ucpId: string): Promise<Institution> {
+  async getAggregatorInstitution(
+    ucpId: string,
+  ): Promise<AggregatorInstitution> {
     const resolved = await this.resolveInstitution(ucpId);
     const inst = await this.aggregatorAdapter.GetInstitutionById(resolved.id);
     if (inst != null) {
       inst.name = resolved.name ?? inst.name;
       inst.url = resolved?.url ?? inst.url?.trim();
       inst.logo_url = resolved?.logo_url ?? inst.logo_url?.trim();
+      inst.ucpId = ucpId;
     }
     return inst;
   }

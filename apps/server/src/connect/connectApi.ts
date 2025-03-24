@@ -123,8 +123,10 @@ export class ConnectApi extends AggregatorAdapterBase {
     const isOauth = memberData.is_oauth;
     const { jobTypes } = this.context;
 
+    const institutionId = memberData.institution_guid;
+
     const connection = await this.createConnection({
-      institutionId: memberData.institution_guid,
+      institutionId,
       is_oauth: isOauth,
       skip_aggregation: (memberData.skip_aggregation ?? false) && isOauth,
       jobTypes,
