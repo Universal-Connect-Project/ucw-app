@@ -1,5 +1,5 @@
 import type { AdapterMap } from "@repo/utils";
-import { getMxAdapterMapObject } from "@ucp-npm/mx-adapter";
+import { getMxAdapterMapObject } from "@repo/mx-adapter";
 import { getSophtronAdapterMapObject } from "@ucp-npm/sophtron-adapter";
 import config from "./config";
 import * as logger from "./infra/logger";

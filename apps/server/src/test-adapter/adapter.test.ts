@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComboJobTypes, ConnectionStatus } from "@repo/utils";
 import { TestAdapter, testConnectionId, testInstitutionCode } from "./adapter";
 import {

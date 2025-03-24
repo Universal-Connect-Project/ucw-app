@@ -72,6 +72,7 @@ const keysToPullFromEnv = [
   "PROXY_PASSWORD",
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const config: Record<string, any> = keysToPullFromEnv.reduce((acc, envKey) => {
   return {
     ...acc,

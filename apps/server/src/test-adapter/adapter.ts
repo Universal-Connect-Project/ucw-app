@@ -35,6 +35,7 @@ export class TestAdapter implements WidgetAdapter {
   }: {
     labelText: string;
     aggregator: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     dataRequestValidators?: Record<string, (req: any) => string | undefined>;
   }) {
     this.labelText = labelText;
@@ -44,6 +45,7 @@ export class TestAdapter implements WidgetAdapter {
 
   labelText: string;
   aggregator: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   DataRequestValidators: Record<string, (req: any) => string | undefined> = {};
 
   async GetInstitutionById(id: string): Promise<Institution> {

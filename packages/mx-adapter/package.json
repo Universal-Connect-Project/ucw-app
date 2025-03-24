@@ -1,0 +1,40 @@
+{
+  "name": "@repo/mx-adapter",
+  "version": "0.0.1",
+  "description": "MX Adapter for the Universal Connect Widget",
+  "main": "src/index.ts",
+  "scripts": {
+    "cypress:open": "cypress open --config-file cypress.config.ts",
+    "cypress:open:proxy": "cypress open --config-file cypress.config.proxy.ts",
+    "cypress:run": "cypress run --config-file cypress.config.ts",
+    "lint": "eslint . --ext .js,.ts",
+    "lint:fix": "eslint . --fix --ext .js,.ts",
+    "playwright": "playwright test --ui",
+    "playwright:test": "playwright test",
+    "test": "jest --no-coverage",
+    "test:watch": "npx -y cross-env DEBUG_PRINT_LIMIT=50000 jest --no-coverage --watch"
+  },
+  "dependencies": {
+    "@repo/utils": "*",
+    "@types/jest": "^29.5.13",
+    "@types/node": "^22.7.6",
+    "axios": "^1.7.7",
+    "eslint-config-prettier": "^10.1.1",
+    "mx-platform-node": "^0.43.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.47.2",
+    "@repo/utils-dev-dependency": "*",
+    "@testing-library/cypress": "^10.0.2",
+    "@typescript-eslint/eslint-plugin": "^6.20.0",
+    "cypress": "^13.15.0",
+    "dotenv": "^16.4.5",
+    "eslint": "^8.57.1",
+    "eslint-plugin-cypress": "^2.15.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jest": "^27.6.3",
+    "msw": "^2.4.9",
+    "ts-jest": "^29.2.5",
+    "tslib": "^2.7.0"
+  }
+}

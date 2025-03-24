@@ -29,7 +29,7 @@ const decodeVcDataFromResponse = (response) => {
   return decodeVcData(response.body.jwt);
 };
 
-const verifyAccountsAndReturnAccountId = ({
+export const verifyAccountsAndReturnAccountId = ({
   aggregator,
   memberGuid,
   shouldTestVcEndpoint,

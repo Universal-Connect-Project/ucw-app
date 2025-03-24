@@ -10,6 +10,7 @@ export const generateElasticSearchRecommendedInstitutionTestSetup =
   async () => {
     const mockPreferences: preferences.Preferences = {
       ...testPreferences,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
     jest
