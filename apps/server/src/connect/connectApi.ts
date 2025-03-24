@@ -3,7 +3,7 @@ import type {
   CachedInstitution,
   InstitutionSearchResponseItem,
 } from "../shared/contract";
-import type { Challenge, Connection, Institution } from "@repo/utils";
+import type { AggregatorInstitution, Challenge, Connection } from "@repo/utils";
 import { ChallengeType, ConnectionStatus } from "@repo/utils";
 
 import { AggregatorAdapterBase } from "../adapters";
@@ -11,7 +11,7 @@ import { getRecommendedInstitutions } from "../services/ElasticSearchClient";
 import type { Member, MemberResponse } from "../shared/connect/contract";
 import { recordStartEvent } from "../services/performanceTracking";
 
-function mapResolvedInstitution(ins: Institution) {
+function mapResolvedInstitution(ins: AggregatorInstitution) {
   return {
     guid: ins.id,
     code: ins.id,
@@ -22,8 +22,8 @@ function mapResolvedInstitution(ins: Institution) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     credentials: [] as any[],
     supports_oauth: ins.oauth ?? ins.name?.includes("Oauth"),
-    aggregators: ins.aggregators,
     aggregator: ins.aggregator,
+    ucpId: ins.ucpId,
   };
 }
 
@@ -140,7 +140,7 @@ export class ConnectApi extends AggregatorAdapterBase {
     const connectionId = connection?.id;
 
     if (!isOauth && connectionId) {
-      recordStartEvent({ connectionId, jobTypes });
+      recordStartEvent({ aggregatorId: , connectionId, jobTypes });
     }
 
     return { member: mapConnection(connection) };

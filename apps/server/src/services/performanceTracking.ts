@@ -4,10 +4,14 @@ import { debug } from "../infra/logger";
 import { getAccessToken } from "./auth0Service";
 
 export const recordStartEvent = async ({
+  aggregatorId,
   connectionId,
+  institutionId,
   jobTypes,
 }: {
+  aggregatorId: string;
   connectionId: string;
+  institutionId: string;
   jobTypes: ComboJobTypes[];
 }) => {
   try {
@@ -17,6 +21,8 @@ export const recordStartEvent = async ({
       `${config.PERFORMANCE_TRACKING_URL}/${connectionId}/connectionStart`,
       {
         body: JSON.stringify({
+          aggregatorId,
+          institutionId,
           jobTypes,
         }),
         headers: {
