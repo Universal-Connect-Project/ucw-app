@@ -3,7 +3,6 @@ import type {
   Connection,
   CreateConnectionRequest,
   Credential,
-  Institution,
   UpdateConnectionRequest,
   WidgetAdapter,
 } from "@repo/utils";

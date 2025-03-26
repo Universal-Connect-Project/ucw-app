@@ -1,8 +1,5 @@
 import { ConnectApi } from "./connectApi";
-import {
-  TEST_EXAMPLE_A_AGGREGATOR_STRING,
-  testExampleInstitution,
-} from "../test-adapter/constants";
+import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../test-adapter/constants";
 import { ComboJobTypes, ConnectionStatus } from "@repo/utils";
 import type { Context } from "../shared/contract";
 import {
