@@ -170,7 +170,7 @@ export const generateDataTests = ({
 }: {
   makeAConnection: (jobTypes: ComboJobTypes[]) => void;
   shouldTestVcEndpoint: boolean;
-  transactionsAccountSelector: (accounts: any) => any;
+  transactionsAccountSelector?: (accounts: any) => any;
   transactionsQueryString?: string;
 }) =>
   jobTypesTestMap.map(

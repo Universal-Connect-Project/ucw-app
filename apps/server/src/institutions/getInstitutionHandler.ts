@@ -35,11 +35,6 @@ const getAggregatorInstitutionByUCPId = async (req: Request) => {
   const widgetAdapter = getAggregatorWidgetAdapter(req);
 
   const inst = await widgetAdapter.GetInstitutionById(aggregatorInstitution.id);
-  if (inst != null) {
-    inst.name = aggregatorInstitution.name ?? inst.name;
-    inst.url = aggregatorInstitution?.url ?? inst.url?.trim();
-    inst.logo_url = aggregatorInstitution?.logo_url ?? inst.logo_url?.trim();
-  }
 
   return mapResolvedInstitution(inst);
 };
