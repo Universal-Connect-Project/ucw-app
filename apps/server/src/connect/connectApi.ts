@@ -1,30 +1,10 @@
 import * as logger from "../infra/logger";
-import type {
-  AggregatorInstitution,
-  Challenge,
-  ComboJobTypes,
-  Connection,
-} from "@repo/utils";
+import type { Challenge, ComboJobTypes, Connection } from "@repo/utils";
 import { ChallengeType, ConnectionStatus } from "@repo/utils";
 
 import { AggregatorAdapterBase } from "../adapters";
 import type { Member, MemberResponse } from "../shared/connect/contract";
 import { recordStartEvent } from "../services/performanceTracking";
-
-export function mapResolvedInstitution(ins: AggregatorInstitution) {
-  return {
-    guid: ins.id,
-    code: ins.id,
-    name: ins.name,
-    url: ins.url,
-    logo_url: ins.logo_url,
-    instructional_data: {},
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    credentials: [] as any[],
-    supports_oauth: ins.oauth ?? ins.name?.includes("Oauth"),
-    aggregator: ins.aggregator,
-  };
-}
 
 function mapConnection(connection: Connection): Member {
   return {
@@ -226,28 +206,5 @@ export class ConnectApi extends AggregatorAdapterBase {
       guid: c.id,
       field_type: c.field_type === "PASSWORD" ? 1 : 3,
     }));
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async getInstitutionCredentials(guid: string): Promise<any> {
-    const crs = await super.getInstitutionCredentials(guid);
-    return crs.map((c) => ({
-      ...c,
-      guid: c.id,
-      field_type: c.field_type === "PASSWORD" ? 1 : 3,
-    }));
-  }
-
-  async loadInstitutionByAggregatorId(
-    aggregatorInstitutionId: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<any> {
-    await this.init();
-
-    const institution = await this.aggregatorAdapter.GetInstitutionById(
-      aggregatorInstitutionId,
-    );
-
-    return mapResolvedInstitution(institution);
   }
 }

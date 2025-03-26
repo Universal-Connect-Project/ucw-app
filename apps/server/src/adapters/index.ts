@@ -38,11 +38,6 @@ export class AggregatorAdapterBase {
     return false;
   }
 
-  async getInstitutionCredentials(guid: string): Promise<Credential[]> {
-    this.context.current_job_id = null;
-    return await this.aggregatorAdapter.ListInstitutionCredentials(guid);
-  }
-
   async getConnection(connectionId: string): Promise<Connection> {
     return await this.aggregatorAdapter.GetConnectionById(
       connectionId,
