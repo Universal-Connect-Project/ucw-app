@@ -21,20 +21,25 @@ const mapResolvedInstitution = (ins: AggregatorInstitution) => {
 const getAggregatorInstitutionByUCPId = async (req: Request) => {
   const ucpInstitutionId = req.params.institution_guid;
 
-  const aggregatorInstitution = await resolveInstitutionAggregator(
+  const resolvedInstitution = await resolveInstitutionAggregator(
     ucpInstitutionId,
     req.context.jobTypes,
   );
 
-  req.context.aggregator = aggregatorInstitution.aggregator;
-  req.context.institutionId = aggregatorInstitution.id;
+  req.context.aggregator = resolvedInstitution.aggregator;
+  req.context.institutionId = resolvedInstitution.id;
   req.context.resolvedUserId = null;
 
   const widgetAdapter = getAggregatorWidgetAdapter(req);
 
-  const inst = await widgetAdapter.GetInstitutionById(aggregatorInstitution.id);
+  const inst = await widgetAdapter.GetInstitutionById(resolvedInstitution.id);
 
-  return mapResolvedInstitution(inst);
+  return mapResolvedInstitution({
+    ...inst,
+    name: resolvedInstitution.name,
+    url: resolvedInstitution.url,
+    logo_url: resolvedInstitution.logo_url,
+  });
 };
 
 const getInstitutionByAggregatorId = async (

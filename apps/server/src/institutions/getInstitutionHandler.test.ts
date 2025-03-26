@@ -37,7 +37,6 @@ describe("getInstitutionHandler", () => {
       logo_url: testExampleInstitution.logo_url,
       name: testExampleInstitution.name,
       aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
-      aggregators: undefined,
       supports_oauth: testExampleInstitution.oauth,
       url: testExampleInstitution.url,
     });
@@ -78,7 +77,6 @@ describe("getInstitutionHandler", () => {
       logo_url: ucpInstitution.logo,
       name: ucpInstitution.name,
       aggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING,
-      aggregators: undefined,
       supports_oauth: testExampleInstitution.oauth,
       url: ucpInstitution.url,
     });

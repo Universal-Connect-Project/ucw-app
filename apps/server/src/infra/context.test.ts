@@ -15,7 +15,7 @@ describe("context", () => {
       expect(res.context).toEqual({});
     });
 
-    it("sets the req and res context to the meta headers, sets updated to false, and doesn't set the res meta if there are headers", () => {
+    it("sets the req and res context to the meta headers and doesn't set the res meta if there are headers", () => {
       const testMetaObject = {
         test: "test",
       };
@@ -31,7 +31,6 @@ describe("context", () => {
 
       const contextObject = {
         ...testMetaObject,
-        updated: false,
       };
 
       expect(req.context).toEqual(contextObject);

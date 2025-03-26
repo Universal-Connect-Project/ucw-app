@@ -36,7 +36,6 @@ describe("instrumentationEndpoints", () => {
         oauth_referral_source: "BROWSER",
         scheme: "vcs",
         singleAccountSelect: req.body.singleAccountSelect,
-        updated: true,
         userId: req.params.userId,
       });
     });
@@ -62,7 +61,6 @@ describe("instrumentationEndpoints", () => {
         oauth_referral_source: "BROWSER",
         scheme: "vcs",
         singleAccountSelect: req.body.singleAccountSelect,
-        updated: true,
         userId: req.params.userId,
       });
     });
@@ -88,7 +86,6 @@ describe("instrumentationEndpoints", () => {
         oauth_referral_source: "BROWSER",
         scheme: "vcs",
         singleAccountSelect: req.body.singleAccountSelect,
-        updated: true,
         userId: req.params.userId,
       });
     });
