@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { getAggregatorWidgetAdapter } from "../adapters/getAggregatorWidgetAdapter";
 import type { AggregatorInstitution } from "@repo/utils";
-import { resolveInstitutionAggregator } from "../services/institutionResolver";
+import { resolveInstitutionAggregator } from "./institutionResolver";
 
 const mapResolvedInstitution = (ins: AggregatorInstitution) => {
   return {
