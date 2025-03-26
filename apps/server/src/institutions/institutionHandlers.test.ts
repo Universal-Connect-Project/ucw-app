@@ -5,18 +5,18 @@ import {
   transformedInstitutionList,
   transformedPopularInstitutionsList,
 } from "../test/testData/institution";
-import { ConnectApi } from "./connectApi";
+import { ConnectApi } from "../connect/connectApi";
 import type {
   GetInstitutionCredentialsRequest,
   GetInstitutionsRequest,
   InstitutionRequest,
-} from "./institutionEndpoints";
+} from "./institutionHandlers";
 import {
   recommendedInstitutionsHandler,
   getInstitutionCredentialsHandler,
   getInstitutionHandler,
   getInstitutionsHandler,
-} from "./institutionEndpoints";
+} from "./institutionHandlers";
 import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../test-adapter";
 import {
   TEST_EXAMPLE_A_LABEL_TEXT,

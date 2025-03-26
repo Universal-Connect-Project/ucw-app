@@ -1,9 +1,5 @@
 import * as logger from "../infra/logger";
 import type {
-  CachedInstitution,
-  InstitutionSearchResponseItem,
-} from "../shared/contract";
-import type {
   AggregatorInstitution,
   Challenge,
   ComboJobTypes,
@@ -12,7 +8,6 @@ import type {
 import { ChallengeType, ConnectionStatus } from "@repo/utils";
 
 import { AggregatorAdapterBase } from "../adapters";
-import { getRecommendedInstitutions } from "../services/ElasticSearchClient";
 import type { Member, MemberResponse } from "../shared/connect/contract";
 import { recordStartEvent } from "../services/performanceTracking";
 
@@ -28,21 +23,6 @@ export function mapResolvedInstitution(ins: AggregatorInstitution) {
     credentials: [] as any[],
     supports_oauth: ins.oauth ?? ins.name?.includes("Oauth"),
     aggregator: ins.aggregator,
-  };
-}
-
-export function mapCachedInstitution(
-  ins: CachedInstitution,
-): InstitutionSearchResponseItem {
-  const supportsOauth =
-    ins?.mx?.supports_oauth || ins?.sophtron?.supports_oauth;
-  // || ins.finicity.supports_oauth || ins.akoya.supports_oauth
-  return {
-    guid: ins.id,
-    name: ins.name,
-    url: ins.url,
-    logo_url: ins.logo,
-    supports_oauth: supportsOauth,
   };
 }
 
@@ -269,16 +249,5 @@ export class ConnectApi extends AggregatorAdapterBase {
     );
 
     return mapResolvedInstitution(institution);
-  }
-
-  async loadPopularInstitutions() {
-    this.context.aggregator = null;
-
-    const recommendedInstitutions = await getRecommendedInstitutions({
-      jobTypes: this.context.jobTypes,
-    });
-    return recommendedInstitutions
-      .filter((ins: CachedInstitution) => ins != null)
-      .map(mapCachedInstitution);
   }
 }
