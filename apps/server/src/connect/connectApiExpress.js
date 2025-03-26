@@ -35,7 +35,12 @@ export default function (app) {
   });
 
   app.post(MEMBERS_URL, async (req, res) => {
-    const ret = await req.connectApi.addMember(req.body);
+    const ret = await req.connectApi.addMember({
+      aggregatorId: req.context.aggregatorId,
+      jobTypes: req.context.jobTypes,
+      memberData: req.body,
+      ucpInstitutionId: req.context.ucpInstitutionId,
+    });
     res.send(ret);
   });
   app.put(`${ApiEndpoints.MEMBERS}/:member_guid`, async (req, res) => {

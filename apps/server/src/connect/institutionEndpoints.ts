@@ -4,6 +4,7 @@ import type { ComboJobTypes } from "@repo/utils";
 import { mapCachedInstitution } from "./connectApi";
 import { search, searchByRoutingNumber } from "../services/ElasticSearchClient";
 import type { ConnectApi } from "./connectApi";
+import { getAggregatorInstitutionByUCPId } from "../adapters/getAggregatorInstitutionByUCPId";
 
 export interface InstitutionRequest extends Request {
   connectApi: ConnectApi;
@@ -23,9 +24,7 @@ export const getInstitutionHandler = async (
     return;
   }
 
-  const ret = await req.connectApi.loadInstitutionByUcpId(
-    req.params.institution_guid,
-  );
+  const ret = await getAggregatorInstitutionByUCPId(req);
   res.send(ret);
 };
 

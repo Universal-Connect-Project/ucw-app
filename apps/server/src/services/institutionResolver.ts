@@ -84,6 +84,8 @@ export async function resolveInstitutionAggregator(
     aggregator = aggregators[Math.floor(Math.random() * aggregators.length)];
   }
 
+  const aggregatorId = aggregator;
+
   const institutionAggregator = institution[
     aggregator as keyof CachedInstitution
   ] as InstitutionAggregator;
@@ -107,5 +109,6 @@ export async function resolveInstitutionAggregator(
     name: institution?.name,
     logo_url: institution?.logo,
     aggregator: aggregator as Aggregator,
+    aggregatorId,
   };
 }

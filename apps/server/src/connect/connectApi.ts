@@ -3,7 +3,12 @@ import type {
   CachedInstitution,
   InstitutionSearchResponseItem,
 } from "../shared/contract";
-import type { AggregatorInstitution, Challenge, Connection } from "@repo/utils";
+import type {
+  AggregatorInstitution,
+  Challenge,
+  ComboJobTypes,
+  Connection,
+} from "@repo/utils";
 import { ChallengeType, ConnectionStatus } from "@repo/utils";
 
 import { AggregatorAdapterBase } from "../adapters";
@@ -11,7 +16,7 @@ import { getRecommendedInstitutions } from "../services/ElasticSearchClient";
 import type { Member, MemberResponse } from "../shared/connect/contract";
 import { recordStartEvent } from "../services/performanceTracking";
 
-function mapResolvedInstitution(ins: AggregatorInstitution) {
+export function mapResolvedInstitution(ins: AggregatorInstitution) {
   return {
     guid: ins.id,
     code: ins.id,
@@ -23,7 +28,6 @@ function mapResolvedInstitution(ins: AggregatorInstitution) {
     credentials: [] as any[],
     supports_oauth: ins.oauth ?? ins.name?.includes("Oauth"),
     aggregator: ins.aggregator,
-    ucpId: ins.ucpId,
   };
 }
 
@@ -119,9 +123,18 @@ export class ConnectApi extends AggregatorAdapterBase {
     super(req);
   }
 
-  async addMember(memberData: Member): Promise<MemberResponse> {
+  async addMember({
+    aggregatorId,
+    jobTypes,
+    memberData,
+    ucpInstitutionId,
+  }: {
+    aggregatorId: string;
+    jobTypes: ComboJobTypes[];
+    memberData: Member;
+    ucpInstitutionId: string;
+  }): Promise<MemberResponse> {
     const isOauth = memberData.is_oauth;
-    const { jobTypes } = this.context;
 
     const institutionId = memberData.institution_guid;
 
@@ -140,7 +153,12 @@ export class ConnectApi extends AggregatorAdapterBase {
     const connectionId = connection?.id;
 
     if (!isOauth && connectionId) {
-      recordStartEvent({ aggregatorId: , connectionId, jobTypes });
+      recordStartEvent({
+        aggregatorId,
+        connectionId,
+        institutionId: ucpInstitutionId,
+        jobTypes,
+      });
     }
 
     return { member: mapConnection(connection) };
@@ -240,12 +258,6 @@ export class ConnectApi extends AggregatorAdapterBase {
     }));
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async loadInstitutionByUcpId(ucpId: string): Promise<any> {
-    const inst = await this.getAggregatorInstitution(ucpId);
-    return mapResolvedInstitution(inst);
-  }
-
   async loadInstitutionByAggregatorId(
     aggregatorInstitutionId: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -260,7 +272,6 @@ export class ConnectApi extends AggregatorAdapterBase {
   }
 
   async loadPopularInstitutions() {
-    this.context.updated = true;
     this.context.aggregator = null;
 
     const recommendedInstitutions = await getRecommendedInstitutions({

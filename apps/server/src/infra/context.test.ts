@@ -53,8 +53,6 @@ describe("context", () => {
 
       expect(res.context).toEqual({});
 
-      res.context.updated = true;
-
       res.send("1", "2");
 
       expect(res.set).toHaveBeenCalledWith("meta", JSON.stringify(res.context));

@@ -75,7 +75,6 @@ export interface AggregatorInstitution {
   logo_url: string;
   name: string;
   oauth: boolean;
-  ucpId?: string;
   url: string;
 }
 
