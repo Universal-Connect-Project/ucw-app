@@ -1,12 +1,8 @@
-import { elasticSearchInstitutionData } from "../test/testData/institution";
 import { ConnectApi } from "./connectApi";
 import {
   TEST_EXAMPLE_A_AGGREGATOR_STRING,
-  TEST_EXAMPLE_B_AGGREGATOR_STRING,
   testExampleInstitution,
 } from "../test-adapter/constants";
-import * as preferences from "../shared/preferences";
-import testPreferences from "../../cachedDefaults/testData/testPreferences.json";
 import { ComboJobTypes, ConnectionStatus } from "@repo/utils";
 import type { Context } from "../shared/contract";
 import {
@@ -83,27 +79,6 @@ describe("connectApi", () => {
         most_recent_job_guid: testJobId,
         oauth_window_uri: undefined,
         user_guid: null,
-      });
-    });
-  });
-
-  describe("loadInstitutionByAggregatorId", () => {
-    it("returns the institution", async () => {
-      const testId = "testId";
-
-      const response = await connectApi.loadInstitutionByAggregatorId(testId);
-
-      expect(response).toEqual({
-        code: testId,
-        credentials: [],
-        guid: testId,
-        instructional_data: {},
-        logo_url: testExampleInstitution.logo_url,
-        name: testExampleInstitution.name,
-        aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
-        aggregators: undefined,
-        supports_oauth: testExampleInstitution.oauth,
-        url: testExampleInstitution.url,
       });
     });
   });

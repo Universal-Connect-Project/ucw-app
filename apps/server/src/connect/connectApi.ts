@@ -1,10 +1,9 @@
 import * as logger from "../infra/logger";
-import type { Challenge, ComboJobTypes, Connection } from "@repo/utils";
+import type { Challenge, Connection } from "@repo/utils";
 import { ChallengeType, ConnectionStatus } from "@repo/utils";
 
 import { AggregatorAdapterBase } from "../adapters";
 import type { Member, MemberResponse } from "../shared/connect/contract";
-import { recordStartEvent } from "../services/performanceTracking";
 
 function mapConnection(connection: Connection): Member {
   return {
