@@ -83,44 +83,20 @@ export class ConnectApi extends AggregatorAdapterBase {
     super(req);
   }
 
-  async addMember({
-    aggregatorId,
-    jobTypes,
-    memberData,
-    ucpInstitutionId,
-  }: {
-    aggregatorId: string;
-    jobTypes: ComboJobTypes[];
-    memberData: Member;
-    ucpInstitutionId: string;
-  }): Promise<MemberResponse> {
-    const isOauth = memberData.is_oauth;
-
-    const institutionId = memberData.institution_guid;
-
+  async addMember(memberData: Member): Promise<MemberResponse> {
     const connection = await this.createConnection({
-      institutionId,
-      is_oauth: isOauth,
-      skip_aggregation: (memberData.skip_aggregation ?? false) && isOauth,
-      jobTypes,
+      institutionId: memberData.institution_guid,
+      is_oauth: memberData.is_oauth ?? false,
+      skip_aggregation:
+        (memberData.skip_aggregation ?? false) &&
+        (memberData.is_oauth ?? false),
+      jobTypes: this.context.jobTypes,
       credentials:
         memberData.credentials?.map((c) => ({
           id: c.guid,
           value: c.value,
         })) ?? [],
     });
-
-    const connectionId = connection?.id;
-
-    if (!isOauth && connectionId) {
-      recordStartEvent({
-        aggregatorId,
-        connectionId,
-        institutionId: ucpInstitutionId,
-        jobTypes,
-      });
-    }
-
     return { member: mapConnection(connection) };
   }
 

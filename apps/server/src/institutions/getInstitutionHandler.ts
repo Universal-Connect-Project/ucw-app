@@ -27,9 +27,7 @@ const getAggregatorInstitutionByUCPId = async (req: Request) => {
   );
 
   req.context.aggregator = aggregatorInstitution.aggregator;
-  req.context.aggregatorId = aggregatorInstitution.aggregatorId;
   req.context.institutionId = aggregatorInstitution.id;
-  req.context.ucpInstitutionId = ucpInstitutionId;
   req.context.resolvedUserId = null;
 
   const widgetAdapter = getAggregatorWidgetAdapter(req);

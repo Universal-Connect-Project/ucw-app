@@ -18,7 +18,6 @@ export interface Context {
   userId?: string;
   resolvedUserId?: string;
   aggregator?: string | null;
-  aggregatorId?: string | null;
   jobTypes?: ComboJobTypes[];
   job_type?: string; // Remove this
   partner?: string;
@@ -26,7 +25,6 @@ export interface Context {
   auth?: AuthRequest;
   oauth_referral_source?: string;
   scheme?: string;
-  ucpInstitutionId?: string;
   updated?: boolean;
   sessionId?: string;
 }
@@ -82,7 +80,6 @@ export interface ResolvedInstitution {
   name: string;
   logo_url: string;
   aggregator: Aggregator;
-  aggregatorId: string;
   oauth?: boolean;
 }
 

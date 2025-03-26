@@ -4,7 +4,6 @@ import type {
   Connection,
   CreateConnectionRequest,
   Credential,
-  Institution,
   KeyValuePair,
   UpdateConnectionRequest,
   WidgetAdapter,
