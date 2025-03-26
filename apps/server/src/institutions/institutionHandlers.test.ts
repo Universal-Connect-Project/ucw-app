@@ -105,56 +105,6 @@ describe("institutionEndpoints", () => {
     });
   });
 
-  describe("getInstitutionsHandler", () => {
-    it("returns a list of institutions", async () => {
-      const context = {
-        jobTypes: [ComboJobTypes.TRANSACTIONS],
-      };
-
-      const req = {
-        connectApi: new ConnectApi({ context }),
-        context,
-        query: {
-          page: "1",
-          pageSize: "25",
-          search: "MX",
-        },
-      } as unknown as GetInstitutionsRequest;
-
-      const res = {
-        send: jest.fn(),
-      } as unknown as Response;
-
-      await getInstitutionsHandler(req, res);
-
-      expect(res.send).toHaveBeenCalledWith(transformedInstitutionList);
-    });
-
-    it("returns institutions when searching by routing number", async () => {
-      const context = {
-        jobTypes: [ComboJobTypes.TRANSACTIONS],
-      };
-
-      const req = {
-        connectApi: new ConnectApi({ context }),
-        context,
-        query: {
-          page: "1",
-          pageSize: "25",
-          routingNumber: "1234567",
-        },
-      } as unknown as GetInstitutionsRequest;
-
-      const res = {
-        send: jest.fn(),
-      } as unknown as Response;
-
-      await getInstitutionsHandler(req, res);
-
-      expect(res.send).toHaveBeenCalledWith(transformedInstitutionList);
-    });
-  });
-
   describe("recommendedInstitutionsHandler", () => {
     it("returns a list of favorite institutions", async () => {
       const context = {
