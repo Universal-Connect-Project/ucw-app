@@ -37,7 +37,7 @@ describe("context", () => {
       expect(res.context).toEqual(contextObject);
     });
 
-    it("sets the meta on send if context is updated and calls the original send function", () => {
+    it("sets the meta on send and calls the original send function", () => {
       const req = {
         headers: {},
       } as any;
