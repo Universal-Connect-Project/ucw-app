@@ -54,7 +54,7 @@
             }
           },
           {
-            "description": "The connection id of the connection to be refreshed. A aggregator is required when this is used. Providing these will skip search, go directly to the authorization step for the institution, and hide the back button.",
+            "description": "The connection id of the connection to be refreshed. An aggregator and institutionId are required when this is used. Providing these will skip search, go directly to the authorization step for the institution, and hide the back button.",
             "name": "connectionId",
             "in": "query",
             "required": false,
@@ -63,7 +63,7 @@
             }
           },
           {
-            "description": "The aggregator of the connection to be refreshed. A connectionId is required when this is used. Providing these will skip search, go directly to the authorization step for the institution, and hide the back button.",
+            "description": "The aggregator of the connection to be refreshed. A connectionId and institutionId are required when this is used. Providing these will skip search, go directly to the authorization step for the institution, and hide the back button.",
             "name": "aggregator",
             "in": "query",
             "required": false,
