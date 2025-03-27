@@ -21,10 +21,10 @@ const mapResolvedInstitution = (ins: AggregatorInstitution) => {
 const getAggregatorInstitutionByUCPId = async (req: Request) => {
   const ucpInstitutionId = req.params.institution_guid;
 
-  const resolvedInstitution = await resolveInstitutionAggregator(
-    ucpInstitutionId,
-    req.context.jobTypes,
-  );
+  const resolvedInstitution = await resolveInstitutionAggregator({
+    ucpInstitutionId: ucpInstitutionId,
+    jobTypes: req.context.jobTypes,
+  });
 
   req.context.aggregator = resolvedInstitution.aggregator;
   req.context.institutionId = resolvedInstitution.id;

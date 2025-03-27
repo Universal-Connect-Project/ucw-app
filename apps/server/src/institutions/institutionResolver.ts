@@ -35,11 +35,14 @@ const getAggregatorByVolume = (
   })?.[0] as Aggregator;
 };
 
-export async function resolveInstitutionAggregator(
-  institutionId: string,
-  jobTypes: ComboJobTypes[],
-): Promise<ResolvedInstitution> {
-  const institution = await getInstitution(institutionId);
+export async function resolveInstitutionAggregator({
+  ucpInstitutionId,
+  jobTypes,
+}: {
+  ucpInstitutionId: string;
+  jobTypes: ComboJobTypes[];
+}): Promise<ResolvedInstitution> {
+  const institution = await getInstitution(ucpInstitutionId);
   const preferences = await getPreferences();
   const aggregatorsWithAtLeastPartialSupport: Aggregator[] =
     getAvailableAggregators({
@@ -65,7 +68,7 @@ export async function resolveInstitutionAggregator(
   const potentialResolvers = [
     () =>
       getAggregatorByVolume(
-        preferences?.institutionAggregatorVolumeMap?.[institutionId],
+        preferences?.institutionAggregatorVolumeMap?.[ucpInstitutionId],
       ),
     () => getAggregatorByVolume(preferences?.defaultAggregatorVolume),
     () => preferences?.defaultAggregator,
@@ -98,7 +101,7 @@ export async function resolveInstitutionAggregator(
   }
 
   debug(
-    `Resolving institution: ${institutionId} to aggregator: ${aggregator} available aggregators: ${JSON.stringify(aggregators)}`,
+    `Resolving institution: ${ucpInstitutionId} to aggregator: ${aggregator} available aggregators: ${JSON.stringify(aggregators)}`,
   );
 
   return {
