@@ -26,7 +26,6 @@ export const instrumentationHandler = async (req: Request, res: Response) => {
     req.context.scheme = "vcs";
     req.context.oauth_referral_source = "BROWSER";
     req.context.singleAccountSelect = singleAccountSelect;
-    req.context.updated = true;
 
     res.sendStatus(200);
   } catch (error) {

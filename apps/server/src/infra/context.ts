@@ -20,7 +20,6 @@ export function contextHandler(
   let context = {} as Context;
   if (req.headers.meta?.length > 0) {
     context = JSON.parse(req.headers.meta as string);
-    context.updated = false;
   }
 
   res.context = context;
@@ -32,9 +31,7 @@ export function contextHandler(
   res.send = function (...args: any): any {
     res.send = send;
 
-    if (res.context.updated) {
-      res.set("meta", JSON.stringify(res.context));
-    }
+    res.set("meta", JSON.stringify(res.context));
 
     send.apply(res, args);
   };

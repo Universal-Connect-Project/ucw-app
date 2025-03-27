@@ -1,8 +1,8 @@
 import type {
+  AggregatorInstitution,
   Connection,
   CreateConnectionRequest,
   Credential,
-  Institution,
   UpdateConnectionRequest,
   WidgetAdapter,
 } from "@repo/utils";
@@ -48,7 +48,7 @@ export class TestAdapter implements WidgetAdapter {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   DataRequestValidators: Record<string, (req: any) => string | undefined> = {};
 
-  async GetInstitutionById(id: string): Promise<Institution> {
+  async GetInstitutionById(id: string): Promise<AggregatorInstitution> {
     if (id.toLowerCase().indexOf("oauth") >= 0) {
       if (id.toLowerCase().indexOf("failed") >= 0) {
         return {

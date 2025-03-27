@@ -1,27 +1,21 @@
-// eslint-disable @typescript-eslint/naming-convention
-import { aggregators } from "../adapterSetup";
 import { createAggregatorWidgetAdapter } from "../adapterIndex";
-import * as logger from "../infra/logger";
-import { resolveInstitutionAggregator } from "../services/institutionResolver";
 import { set } from "../services/storageClient/redis";
 import type { Context, Aggregator } from "../shared/contract";
-import {
-  OAuthStatus,
-  type Challenge,
-  type Connection,
-  type CreateConnectionRequest,
-  type Credential,
-  type Institution,
-  type UpdateConnectionRequest,
-  type WidgetAdapter,
+import type {
+  Challenge,
+  Connection,
+  CreateConnectionRequest,
+  Credential,
+  UpdateConnectionRequest,
+  WidgetAdapter,
 } from "@repo/utils";
+import { OAuthStatus } from "@repo/utils";
 
 import { ConnectionStatus } from "../shared/contract";
 
 export class AggregatorAdapterBase {
   context: Context;
   aggregatorAdapter: WidgetAdapter;
-  aggregators: string[];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(req: any) {
@@ -36,44 +30,12 @@ export class AggregatorAdapterBase {
           sessionId: this.context.sessionId,
         });
       }
-      this.aggregators = aggregators;
       return true;
     } catch (err) {
-      logger.error("Error parsing auth token", err);
+      // do nothing
     }
 
     return false;
-  }
-
-  async resolveInstitution(id: string): Promise<Institution> {
-    const resolvedInstitution = await resolveInstitutionAggregator(
-      id,
-      this.context.jobTypes,
-    );
-    this.context.aggregator = resolvedInstitution.aggregator;
-    this.context.updated = true;
-    this.context.institutionId = resolvedInstitution.id;
-    this.context.resolvedUserId = null;
-    await this.init();
-    return resolvedInstitution;
-  }
-
-  async getAggregatorInstitution(ucpId: string): Promise<Institution> {
-    const resolved = await this.resolveInstitution(ucpId);
-    const inst = await this.aggregatorAdapter.GetInstitutionById(resolved.id);
-    if (inst != null) {
-      inst.name = resolved.name ?? inst.name;
-      inst.url = resolved?.url ?? inst.url?.trim();
-      inst.logo_url = resolved?.logo_url ?? inst.logo_url?.trim();
-    }
-    return inst;
-  }
-
-  async getInstitutionCredentials(guid: string): Promise<Credential[]> {
-    this.context.updated = true;
-    this.context.current_job_id = null;
-    // let id = await this.resolveInstitution(guid)
-    return await this.aggregatorAdapter.ListInstitutionCredentials(guid);
   }
 
   async getConnection(connectionId: string): Promise<Connection> {
@@ -95,7 +57,6 @@ export class AggregatorAdapterBase {
   async createConnection(
     connection: CreateConnectionRequest,
   ): Promise<Connection> {
-    this.context.updated = true;
     this.context.current_job_id = null;
     const ret = await this.aggregatorAdapter.CreateConnection(
       connection,
@@ -118,7 +79,6 @@ export class AggregatorAdapterBase {
       connection,
       this.getUserId(),
     );
-    this.context.updated = true;
     this.context.current_job_id = ret.cur_job_id;
     if (ret?.id != null) {
       await set(`context_${ret.id}`, {
@@ -179,7 +139,6 @@ export class AggregatorAdapterBase {
   }
 
   async getConnectionCredentials(memberGuid: string): Promise<Credential[]> {
-    this.context.updated = true;
     this.context.current_job_id = null;
     return await this.aggregatorAdapter.ListConnectionCredentials(
       memberGuid,

@@ -1,10 +1,10 @@
 import Joi from "joi";
 import type {
+  AggregatorInstitution,
   Challenge,
   Connection,
   CreateConnectionRequest,
   Credential,
-  Institution,
   UpdateConnectionRequest,
   WidgetAdapter,
 } from "@repo/utils";
@@ -17,7 +17,7 @@ import SophtronClientV1 from "./apiClient.v1";
 import SophtronClient from "./apiClient.v2";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function fromSophtronInstitution(ins: any): Institution | undefined {
+function fromSophtronInstitution(ins: any): AggregatorInstitution | undefined {
   if (!ins) {
     return undefined;
   }
@@ -27,7 +27,7 @@ function fromSophtronInstitution(ins: any): Institution | undefined {
     name: ins.InstitutionName,
     url: ins.URL,
     aggregator: SOPHTRON_ADAPTER_NAME,
-  };
+  } as AggregatorInstitution;
 }
 
 export class SophtronAdapter implements WidgetAdapter {
@@ -64,7 +64,7 @@ export class SophtronAdapter implements WidgetAdapter {
     },
   };
 
-  async GetInstitutionById(id: string): Promise<Institution> {
+  async GetInstitutionById(id: string): Promise<AggregatorInstitution> {
     const ins = await this.apiClientV1.getInstitutionById(id);
     return fromSophtronInstitution(ins);
   }

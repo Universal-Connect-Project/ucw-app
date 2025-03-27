@@ -2,19 +2,11 @@ import * as path from "path";
 import { contextHandler } from "../infra/context.ts";
 import { ApiEndpoints } from "../shared/connect/ApiEndpoint";
 import { ConnectApi } from "./connectApi";
-import {
-  recommendedInstitutionsHandler,
-  getInstitutionCredentialsHandler,
-  getInstitutionHandler,
-  getInstitutionsHandler,
-} from "./institutionEndpoints";
 import stubs from "./instrumentations.js";
 import { jobsRouteHandler } from "./jobEndpoints";
 import { instrumentationHandler } from "./instrumentationEndpoints";
 import {
   INSTRUMENTATION_URL,
-  RECOMMENDED_INSTITUTIONS_URL,
-  SEARCH_INSTITUTIONS_URL,
   MEMBERS_URL,
   OAUTH_STATES_URL,
 } from "@repo/utils";
@@ -58,18 +50,7 @@ export default function (app) {
   app.delete(`${ApiEndpoints.MEMBERS}/:member_guid`, async (req, res) => {
     res.sendFile(path.join(__dirname, "/stubs/member.json"));
   });
-  app.get(
-    `${ApiEndpoints.INSTITUTIONS}/:institution_guid/credentials`,
-    getInstitutionCredentialsHandler,
-  );
 
-  app.get(RECOMMENDED_INSTITUTIONS_URL, recommendedInstitutionsHandler);
-
-  app.get(
-    `${ApiEndpoints.INSTITUTIONS}/:institution_guid`,
-    getInstitutionHandler,
-  );
-  app.get(SEARCH_INSTITUTIONS_URL, getInstitutionsHandler);
   app.get(`${ApiEndpoints.JOBS}/:member_guid`, jobsRouteHandler);
 
   app.get(OAUTH_STATES_URL, async (req, res) => {

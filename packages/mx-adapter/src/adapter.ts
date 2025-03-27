@@ -1,9 +1,9 @@
 import type {
+  AggregatorInstitution,
   Challenge,
   Connection,
   CreateConnectionRequest,
   Credential,
-  Institution,
   KeyValuePair,
   UpdateConnectionRequest,
   WidgetAdapter,
@@ -82,7 +82,7 @@ export class MxAdapter implements WidgetAdapter {
     this.envConfig = dependencies?.envConfig;
   }
 
-  async GetInstitutionById(id: string): Promise<Institution> {
+  async GetInstitutionById(id: string): Promise<AggregatorInstitution> {
     const res = await this.apiClient.readInstitution(id);
     // TODO: if this is 401 we should throw an error
     const institution = res.data?.institution;

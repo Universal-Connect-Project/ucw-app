@@ -19,6 +19,7 @@ import {
 } from "./services/performanceSyncer";
 import { widgetHandler } from "./widgetEndpoint";
 import { oauthRedirectHandler, webhookHandler } from "./connect/oauthEndpoints";
+import useInstitutionEndpoints from "./institutions/useInstitutionEndpoints";
 
 process.on("unhandledRejection", (error) => {
   _error(`unhandledRejection: ${error.message}`, error);
@@ -84,6 +85,8 @@ app.use(express.static(path.join(__dirname, "../../ui/dist")));
 app.get("/widget", widgetHandler);
 
 useConnect(app);
+
+useInstitutionEndpoints(app);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use(function (err, req, res, next) {

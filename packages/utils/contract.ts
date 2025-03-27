@@ -69,6 +69,15 @@ export interface Institution {
   aggregators?: Object | {};
 }
 
+export interface AggregatorInstitution {
+  aggregator: string;
+  id: string;
+  logo_url: string;
+  name: string;
+  oauth: boolean;
+  url: string;
+}
+
 export interface KeyValuePair {
   key: string;
   value?: string | null;
@@ -188,7 +197,7 @@ export interface VCAdapterInput {
 
 export interface WidgetAdapter {
   ResolveUserId: (id: string, failIfNotFound?: boolean) => Promise<string>;
-  GetInstitutionById: (id: string) => Promise<Institution>;
+  GetInstitutionById: (id: string) => Promise<AggregatorInstitution>;
   ListInstitutionCredentials: (institutionId: string) => Promise<Credential[]>;
   ListConnectionCredentials: (
     connectionId: string,

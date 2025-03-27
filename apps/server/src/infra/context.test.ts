@@ -15,7 +15,7 @@ describe("context", () => {
       expect(res.context).toEqual({});
     });
 
-    it("sets the req and res context to the meta headers, sets updated to false, and doesn't set the res meta if there are headers", () => {
+    it("sets the req and res context to the meta headers and doesn't set the res meta if there are headers", () => {
       const testMetaObject = {
         test: "test",
       };
@@ -31,14 +31,13 @@ describe("context", () => {
 
       const contextObject = {
         ...testMetaObject,
-        updated: false,
       };
 
       expect(req.context).toEqual(contextObject);
       expect(res.context).toEqual(contextObject);
     });
 
-    it("sets the meta on send if context is updated and calls the original send function", () => {
+    it("sets the meta on send and calls the original send function", () => {
       const req = {
         headers: {},
       } as any;
@@ -52,8 +51,6 @@ describe("context", () => {
       contextHandler(req, res, next);
 
       expect(res.context).toEqual({});
-
-      res.context.updated = true;
 
       res.send("1", "2");
 

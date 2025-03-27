@@ -1,45 +1,9 @@
 import * as logger from "../infra/logger";
-import type {
-  CachedInstitution,
-  InstitutionSearchResponseItem,
-} from "../shared/contract";
-import type { Challenge, Connection, Institution } from "@repo/utils";
+import type { Challenge, Connection } from "@repo/utils";
 import { ChallengeType, ConnectionStatus } from "@repo/utils";
 
 import { AggregatorAdapterBase } from "../adapters";
-import { getRecommendedInstitutions } from "../services/ElasticSearchClient";
 import type { Member, MemberResponse } from "../shared/connect/contract";
-
-function mapResolvedInstitution(ins: Institution) {
-  return {
-    guid: ins.id,
-    code: ins.id,
-    name: ins.name,
-    url: ins.url,
-    logo_url: ins.logo_url,
-    instructional_data: {},
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    credentials: [] as any[],
-    supports_oauth: ins.oauth ?? ins.name?.includes("Oauth"),
-    aggregators: ins.aggregators,
-    aggregator: ins.aggregator,
-  };
-}
-
-export function mapCachedInstitution(
-  ins: CachedInstitution,
-): InstitutionSearchResponseItem {
-  const supportsOauth =
-    ins?.mx?.supports_oauth || ins?.sophtron?.supports_oauth;
-  // || ins.finicity.supports_oauth || ins.akoya.supports_oauth
-  return {
-    guid: ins.id,
-    name: ins.name,
-    url: ins.url,
-    logo_url: ins.logo,
-    supports_oauth: supportsOauth,
-  };
-}
 
 function mapConnection(connection: Connection): Member {
   return {
@@ -217,46 +181,5 @@ export class ConnectApi extends AggregatorAdapterBase {
       guid: c.id,
       field_type: c.field_type === "PASSWORD" ? 1 : 3,
     }));
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async getInstitutionCredentials(guid: string): Promise<any> {
-    const crs = await super.getInstitutionCredentials(guid);
-    return crs.map((c) => ({
-      ...c,
-      guid: c.id,
-      field_type: c.field_type === "PASSWORD" ? 1 : 3,
-    }));
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async loadInstitutionByUcpId(ucpId: string): Promise<any> {
-    const inst = await this.getAggregatorInstitution(ucpId);
-    return mapResolvedInstitution(inst);
-  }
-
-  async loadInstitutionByAggregatorId(
-    aggregatorInstitutionId: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<any> {
-    await this.init();
-
-    const institution = await this.aggregatorAdapter.GetInstitutionById(
-      aggregatorInstitutionId,
-    );
-
-    return mapResolvedInstitution(institution);
-  }
-
-  async loadPopularInstitutions() {
-    this.context.updated = true;
-    this.context.aggregator = null;
-
-    const recommendedInstitutions = await getRecommendedInstitutions({
-      jobTypes: this.context.jobTypes,
-    });
-    return recommendedInstitutions
-      .filter((ins: CachedInstitution) => ins != null)
-      .map(mapCachedInstitution);
   }
 }

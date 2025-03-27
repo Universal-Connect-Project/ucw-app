@@ -17,7 +17,7 @@ export const userDeleteHandler = withValidateAggregatorInPath(
     const { userId, aggregator } = req.params;
 
     try {
-      const aggregatorAdapter = createAggregatorWidgetAdapter({aggregator});
+      const aggregatorAdapter = createAggregatorWidgetAdapter({ aggregator });
       const failIfUserNotFound = true;
       const aggregatorUserId = await aggregatorAdapter.ResolveUserId(
         userId,
