@@ -36,73 +36,86 @@ const getAggregatorByVolume = (
 };
 
 export async function resolveInstitutionAggregator({
-  ucpInstitutionId,
+  aggregatorOverride,
   jobTypes,
+  ucpInstitutionId,
 }: {
-  ucpInstitutionId: string;
+  aggregatorOverride?: Aggregator;
   jobTypes: ComboJobTypes[];
+  ucpInstitutionId: string;
 }): Promise<ResolvedInstitution> {
   const institution = await getInstitution(ucpInstitutionId);
-  const preferences = await getPreferences();
-  const aggregatorsWithAtLeastPartialSupport: Aggregator[] =
-    getAvailableAggregators({
+
+  let aggregator: Aggregator;
+  let institutionAggregator;
+
+  if (aggregatorOverride) {
+    aggregator = aggregatorOverride;
+    institutionAggregator = institution[aggregator];
+
+    debug(
+      `Resolving institution: ${ucpInstitutionId} to aggregator: ${aggregator} because it's a refresh`,
+    );
+  } else {
+    const preferences = await getPreferences();
+    const aggregatorsWithAtLeastPartialSupport: Aggregator[] =
+      getAvailableAggregators({
+        institution,
+        jobTypes,
+        shouldRequireFullSupport: false,
+        supportedAggregators: preferences.supportedAggregators,
+      });
+
+    const aggregatorsWithFullSupport: Aggregator[] = getAvailableAggregators({
       institution,
       jobTypes,
-      shouldRequireFullSupport: false,
+      shouldRequireFullSupport: true,
       supportedAggregators: preferences.supportedAggregators,
     });
 
-  const aggregatorsWithFullSupport: Aggregator[] = getAvailableAggregators({
-    institution,
-    jobTypes,
-    shouldRequireFullSupport: true,
-    supportedAggregators: preferences.supportedAggregators,
-  });
+    const aggregators = aggregatorsWithFullSupport.length
+      ? aggregatorsWithFullSupport
+      : aggregatorsWithAtLeastPartialSupport;
 
-  const aggregators = aggregatorsWithFullSupport.length
-    ? aggregatorsWithFullSupport
-    : aggregatorsWithAtLeastPartialSupport;
+    const potentialResolvers = [
+      () =>
+        getAggregatorByVolume(
+          preferences?.institutionAggregatorVolumeMap?.[ucpInstitutionId],
+        ),
+      () => getAggregatorByVolume(preferences?.defaultAggregatorVolume),
+      () => preferences?.defaultAggregator,
+    ];
 
-  let aggregator: Aggregator;
+    for (const resolver of potentialResolvers) {
+      const possibleAggregator = resolver();
 
-  const potentialResolvers = [
-    () =>
-      getAggregatorByVolume(
-        preferences?.institutionAggregatorVolumeMap?.[ucpInstitutionId],
-      ),
-    () => getAggregatorByVolume(preferences?.defaultAggregatorVolume),
-    () => preferences?.defaultAggregator,
-  ];
-
-  for (const resolver of potentialResolvers) {
-    const possibleAggregator = resolver();
-
-    if (aggregators.includes(possibleAggregator)) {
-      aggregator = possibleAggregator;
-      break;
+      if (aggregators.includes(possibleAggregator)) {
+        aggregator = possibleAggregator;
+        break;
+      }
     }
+
+    if (!aggregator) {
+      aggregator = aggregators[Math.floor(Math.random() * aggregators.length)];
+    }
+
+    institutionAggregator = institution[
+      aggregator as keyof CachedInstitution
+    ] as InstitutionAggregator;
+
+    const testAdapterName =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (adapterMap[aggregator as keyof typeof adapterMap] as any)
+        ?.testInstitutionAdapterName;
+
+    if (testAdapterName && institution.is_test_bank) {
+      aggregator = testAdapterName;
+    }
+
+    debug(
+      `Resolving institution: ${ucpInstitutionId} to aggregator: ${aggregator} available aggregators: ${JSON.stringify(aggregators)}`,
+    );
   }
-
-  if (!aggregator) {
-    aggregator = aggregators[Math.floor(Math.random() * aggregators.length)];
-  }
-
-  const institutionAggregator = institution[
-    aggregator as keyof CachedInstitution
-  ] as InstitutionAggregator;
-
-  const testAdapterName =
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (adapterMap[aggregator as keyof typeof adapterMap] as any)
-      ?.testInstitutionAdapterName;
-
-  if (testAdapterName && institution.is_test_bank) {
-    aggregator = testAdapterName;
-  }
-
-  debug(
-    `Resolving institution: ${ucpInstitutionId} to aggregator: ${aggregator} available aggregators: ${JSON.stringify(aggregators)}`,
-  );
 
   return {
     id: institutionAggregator?.id,

@@ -18,10 +18,12 @@ const mapResolvedInstitution = (ins: AggregatorInstitution) => {
   };
 };
 
-const getAggregatorInstitutionByUCPId = async (req: Request) => {
-  const ucpInstitutionId = req.params.institution_guid;
+export const getInstitutionHandler = async (req: Request, res: Response) => {
+  const ucpInstitutionId =
+    req.context.institutionId || req.params.institution_guid;
 
   const resolvedInstitution = await resolveInstitutionAggregator({
+    aggregatorOverride: req.context.aggregator,
     ucpInstitutionId: ucpInstitutionId,
     jobTypes: req.context.jobTypes,
   });
@@ -34,38 +36,12 @@ const getAggregatorInstitutionByUCPId = async (req: Request) => {
 
   const inst = await widgetAdapter.GetInstitutionById(resolvedInstitution.id);
 
-  return mapResolvedInstitution({
-    ...inst,
-    name: resolvedInstitution.name,
-    url: resolvedInstitution.url,
-    logo_url: resolvedInstitution.logo_url,
-  });
-};
-
-const getInstitutionByAggregatorId = async (
-  req: Request,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Promise<any> => {
-  const aggregatorAdapter = getAggregatorWidgetAdapter(req);
-
-  const aggregatorInstitutionId = req.params.institution_guid;
-
-  const institution = await aggregatorAdapter.GetInstitutionById(
-    aggregatorInstitutionId,
+  res.send(
+    mapResolvedInstitution({
+      ...inst,
+      name: resolvedInstitution.name,
+      url: resolvedInstitution.url,
+      logo_url: resolvedInstitution.logo_url,
+    }),
   );
-
-  return mapResolvedInstitution(institution);
-};
-
-export const getInstitutionHandler = async (req: Request, res: Response) => {
-  if (req.context?.aggregator) {
-    const institution = await getInstitutionByAggregatorId(req);
-
-    res.send(institution);
-
-    return;
-  }
-
-  const ret = await getAggregatorInstitutionByUCPId(req);
-  res.send(ret);
 };
