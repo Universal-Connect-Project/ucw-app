@@ -39,6 +39,7 @@ export enum VCDataTypes {
 
 export type AdapterMap = {
   dataAdapter?: Function;
+  testAdapterId?: string;
   vcAdapter?: Function;
   createWidgetAdapter: ({
     sessionId,

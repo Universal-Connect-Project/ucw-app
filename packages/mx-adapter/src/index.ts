@@ -8,7 +8,7 @@ export const getMxAdapterMapObject = (dependencies: AdapterDependencies) => {
   return {
     mx: {
       dataAdapter: createMxProdDataAdapter(dependencies),
-      testInstitutionAdapterName: "mx_int",
+      testAdapterId: "mx_int",
       vcAdapter: createMxProdGetVC(dependencies),
       createWidgetAdapter: () =>
         new MxAdapter({

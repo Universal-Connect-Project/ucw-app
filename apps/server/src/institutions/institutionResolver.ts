@@ -10,6 +10,7 @@ import type {
 } from "../shared/contract";
 import { getPreferences } from "../shared/preferences";
 import { adapterMap } from "../adapterSetup";
+import { getAggregatorIdFromTestAggregatorId } from "../adapterIndex";
 
 const getAggregatorByVolume = (
   volumeMap: Record<string, number>,
@@ -51,7 +52,13 @@ export async function resolveInstitutionAggregator({
 
   if (aggregatorOverride) {
     aggregator = aggregatorOverride;
-    institutionAggregator = institution[aggregator];
+
+    if (institution.is_test_bank) {
+      institutionAggregator =
+        institution[getAggregatorIdFromTestAggregatorId(aggregatorOverride)];
+    } else {
+      institutionAggregator = institution[aggregator];
+    }
 
     debug(
       `Resolving institution: ${ucpInstitutionId} to aggregator: ${aggregator} because it's a refresh`,
@@ -105,8 +112,7 @@ export async function resolveInstitutionAggregator({
 
     const testAdapterName =
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (adapterMap[aggregator as keyof typeof adapterMap] as any)
-        ?.testInstitutionAdapterName;
+      (adapterMap[aggregator as keyof typeof adapterMap] as any)?.testAdapterId;
 
     if (testAdapterName && institution.is_test_bank) {
       aggregator = testAdapterName;
