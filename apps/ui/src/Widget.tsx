@@ -15,13 +15,15 @@ const Widget = ({
   institutionId: string;
   jobTypes: ComboJobTypes[];
 }) => {
+  const disableInstitutionSearch = !!(institutionId || connectionId);
+
   const clientConfig = {
     current_institution_guid: institutionId,
     current_member_guid: connectionId,
     data_request: {
       products: jobTypes,
     },
-    disable_institution_search: !!(institutionId || connectionId),
+    disable_institution_search: disableInstitutionSearch,
     update_credentials: connectionId && aggregator,
     ui_message_protocol: "post_message",
     ui_message_version: 4,
