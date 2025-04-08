@@ -57,7 +57,7 @@ jobs:
 
           cat ${ENV_FILE_PATH}
 
-      - name: Install Playwright Browsers
+      - name: Install Playwright Browserss
         run: npx playwright install --with-deps
       - name: Run Playwright tests
         run: npm run playwright:test --workspace=apps/server
