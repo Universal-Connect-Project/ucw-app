@@ -54,7 +54,7 @@ async function waitForEndpoint(
 
 async function globalSetup(config: FullConfig): Promise<void> {
   console.log("--- Global Setup Starting ---");
-  const appHealthUrl = "http://localhost:8080/health";
+  const appHealthUrl = "http://localhost:8080/ready";
   const elasticsearchUrl = "http://localhost:9200";
 
   try {

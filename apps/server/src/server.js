@@ -65,7 +65,16 @@ syncPerformanceData().then(() => {
   });
 });
 
-app.get("/health", async (req, res) => {
+app.get("/health", function (req, res) {
+  if (isReady) {
+    res.send("healthy");
+  } else {
+    res.status(503);
+    res.send("Service Unavailable");
+  }
+});
+
+app.get("/ready", async (req, res) => {
 
   if (!isReady) {
     res.status(503).send("Service Unavailable");
