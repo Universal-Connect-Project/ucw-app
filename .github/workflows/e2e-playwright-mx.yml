@@ -16,7 +16,11 @@ jobs:
     services:
       elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
-        options: --health-cmd="curl --silent --fail localhost:9200/_cluster/health || exit 1" --health-interval=10s --health-timeout=5s --health-retries=5
+        options: >-
+          --health-cmd "curl --silent --fail http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=30s || exit 1"
+          --health-interval 10s
+          --health-timeout 35s
+          --health-retries 5
         ports:
           - 9200:9200
           - 9300:9300
@@ -65,9 +69,22 @@ jobs:
         run: npx playwright install --with-deps
       - name: Run Playwright tests
         run: npm run playwright:test --workspace=packages/mx-adapter
+
+      - name: List files to check report location
+        run: |
+          echo "Listing contents of the root directory:"
+          ls -la
+          echo "Listing contents of apps/server:"
+          ls -la apps/server
+          echo "Attempting to list playwright-report in root:"
+          ls -la playwright-report || echo "--> playwright-report not found in root"
+          echo "Attempting to list playwright-report in apps/server:"
+          ls -la apps/server/playwright-report || echo "--> playwright-report not found in apps/server"
+          pwd # Print current working directory
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report
-          path: apps/server/playwright-report/
+          path: playwright-report/
           retention-days: 30
