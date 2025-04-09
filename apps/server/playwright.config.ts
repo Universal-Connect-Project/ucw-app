@@ -29,7 +29,7 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
   },
-
+  globalSetup: "./playwrightGlobalSetup.ts",
   projects: [
     {
       name: "chromium",
@@ -37,8 +37,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command:
-      "npm run start:e2e && wait-on http://localhost:8080/health http://localhost:9200",
+    command: "npm run start:e2e",
     cwd: "../../",
     url: "http://localhost:8080",
     reuseExistingServer: !process.env.CI,
