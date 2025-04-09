@@ -21,47 +21,37 @@ async function waitForEndpoint(
     }, POLLING_INTERVAL - 500); // Timeout slightly less than interval
 
     try {
-      // Pass the AbortSignal to fetch
       const response = await fetch(url, { signal: controller.signal });
 
-      // IMPORTANT: Clear the timeout timer if fetch completes (success or failure)
       clearTimeout(timeoutId);
 
       if (response.ok) {
-        // status code 200-299
         console.log(
           `${serviceName} is ready at ${url} (Status: ${response.status})`,
         );
-        return; // Success!
+        return;
       }
       console.log(
         `${serviceName} not ready yet at ${url} (Status: ${response.status}). Retrying...`,
       );
     } catch (error: any) {
-      // Clear the timeout timer in case of error too
       clearTimeout(timeoutId);
 
-      // Check if the error was due to the abort signal (timeout)
-      if (error.name === "AbortError") {
-        // Log message already printed by the setTimeout callback
-        // console.log(`${serviceName} fetch timed out at ${url}. Retrying...`);
-      } else {
+      if (error.name !== "AbortError") {
         console.log(
           `${serviceName} not reachable yet at ${url} (Error: ${error.message || error}). Retrying...`,
         );
       }
     }
-    // Wait before the next attempt in the while loop
+
     await new Promise((resolve) => setTimeout(resolve, POLLING_INTERVAL));
   }
 
-  // If the while loop finishes, the overall timeout was exceeded
   throw new Error(
     `${serviceName} at ${url} did not become ready within ${timeout / 1000} seconds.`,
   );
 }
 
-// --- Rest of your globalSetup function remains the same ---
 async function globalSetup(config: FullConfig): Promise<void> {
   console.log("--- Global Setup Starting ---");
   const appHealthUrl = "http://localhost:8080/health";
