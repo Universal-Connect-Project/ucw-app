@@ -57,10 +57,18 @@ jobs:
 
           cat ${ENV_FILE_PATH}
 
+      - name: Install wait-on
+        run: npm install -g wait-on
+
+      - name: Wait for app and services
+        run: wait-on http://localhost:8080/health http://localhost:9200
+
       - name: Install Playwright Browserss
         run: npx playwright install --with-deps
+
       - name: Run Playwright tests
         run: npm run playwright:test --workspace=apps/server
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
