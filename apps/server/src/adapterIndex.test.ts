@@ -1,7 +1,16 @@
 import { getDataFromVCJwt, VCDataTypes } from "@repo/utils";
-import { createAggregatorWidgetAdapter, getData, getVC } from "./adapterIndex";
+import {
+  createAggregatorWidgetAdapter,
+  getAggregatorIdFromTestAggregatorId,
+  getData,
+  getVC,
+} from "./adapterIndex";
 import type { Aggregator } from "./adapterSetup";
-import { TEST_EXAMPLE_A_AGGREGATOR_STRING, TestAdapter } from "./test-adapter";
+import {
+  TEST_EXAMPLE_A_AGGREGATOR_STRING,
+  TEST_EXAMPLE_C_AGGREGATOR_STRING,
+  TestAdapter,
+} from "./test-adapter";
 import { testVcAccountsData } from "./test/testData/testVcData";
 
 const connectionId = "testConectionId";
@@ -50,17 +59,31 @@ describe("adapterSetup", () => {
 
   describe("createAggregatorWidgetAdapter", () => {
     it("throws an error if its an unsupported aggregator", async () => {
-      expect(() => createAggregatorWidgetAdapter({aggregator: "junk" as Aggregator})).toThrow(
-        "Unsupported aggregator junk",
-      );
+      expect(() =>
+        createAggregatorWidgetAdapter({ aggregator: "junk" as Aggregator }),
+      ).toThrow("Unsupported aggregator junk");
     });
 
     it("returns the testExample widget adapter", () => {
-      const adapter = createAggregatorWidgetAdapter(
-        {aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING},
-      );
+      const adapter = createAggregatorWidgetAdapter({
+        aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+      });
 
       expect(adapter).toBeInstanceOf(TestAdapter);
+    });
+  });
+
+  describe("getAggregatorIdFromTestAggregatorId", () => {
+    it("gets the associated aggregatorId from a test adapter's id", () => {
+      expect(
+        getAggregatorIdFromTestAggregatorId(TEST_EXAMPLE_C_AGGREGATOR_STRING),
+      ).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
+    });
+
+    it("returns the testId if there is no aggregatorId associated with the one provided", () => {
+      expect(
+        getAggregatorIdFromTestAggregatorId(TEST_EXAMPLE_A_AGGREGATOR_STRING),
+      ).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
     });
   });
 });
