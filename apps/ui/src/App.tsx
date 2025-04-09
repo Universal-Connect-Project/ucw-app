@@ -26,7 +26,6 @@ const App = () => {
     userId: userId,
     current_member_guid: connectionId,
     current_aggregator: aggregator,
-    institutionId,
     jobTypes,
     singleAccountSelect,
     sessionId,

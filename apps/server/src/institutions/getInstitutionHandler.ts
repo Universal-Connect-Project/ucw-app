@@ -19,8 +19,7 @@ const mapResolvedInstitution = (ins: AggregatorInstitution) => {
 };
 
 export const getInstitutionHandler = async (req: Request, res: Response) => {
-  const ucpInstitutionId =
-    req.context.institutionId || req.params.institution_guid;
+  const ucpInstitutionId = req.params.institution_guid;
 
   const resolvedInstitution = await resolveInstitutionAggregator({
     aggregatorOverride: req.context.aggregator,
@@ -29,7 +28,6 @@ export const getInstitutionHandler = async (req: Request, res: Response) => {
   });
 
   req.context.aggregator = resolvedInstitution.aggregator;
-  req.context.institutionId = resolvedInstitution.id;
   req.context.resolvedUserId = null;
 
   const widgetAdapter = getAggregatorWidgetAdapter(req);
