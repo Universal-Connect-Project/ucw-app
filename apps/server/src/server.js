@@ -68,19 +68,19 @@ syncPerformanceData().then(() => {
 app.get("/health", async (req, res) => {
 
   if (!isReady) {
-    res.status(503);
-    res.send("Service Unavailable");
+    res.status(503).send("Service Unavailable");
+    return
   }
 
   try {
     const searchTest = await search({ from: 0, jobTypes: [ComboJobTypes.TRANSACTIONS], searchTerm: "test", size: 10})
     if (searchTest.length > 0) {
-      res.json("healthy")
+      res.send("healthy")
     } else {
-      res.status(503).json("Search successful but indexing incomplete")
+      res.status(503).send("Search successful but indexing incomplete")
     }
   } catch (error) {
-    res.status(503).json("ElasticSearch unable to perform search")
+    res.status(503).send("ElasticSearch unable to perform search")
   }
 });
 
