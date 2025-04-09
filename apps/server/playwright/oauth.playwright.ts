@@ -12,6 +12,10 @@ test("displays error page with failed oAuth", async ({ page }, testInfo) => {
 
   await page.getByPlaceholder("Search").fill("TestExampleFailedOauth Bank");
 
+  await expect(
+    page.getByLabel("Add account with TestExampleFailedOauth Bank"),
+  ).toBeVisible({ timeout: 15000 });
+
   await page.getByLabel("Add account with TestExampleFailedOauth Bank").click();
 
   const popupPromise = page.waitForEvent("popup");
@@ -33,7 +37,11 @@ test("connects to example bank with oAuth", async ({ page }, testInfo) => {
     `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
   );
 
-  await page.getByPlaceholder("Search").fill("TestExampleOauth Bank"); //TestExampleOauth Bank
+  await page.getByPlaceholder("Search").fill("TestExampleOauth Bank");
+
+  await expect(
+    page.getByLabel("Add account with TestExampleOauth Bank"),
+  ).toBeVisible({ timeout: 15000 });
 
   await page.getByLabel("Add account with TestExampleOauth Bank").click();
 
