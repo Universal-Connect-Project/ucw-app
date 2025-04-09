@@ -37,7 +37,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run start:e2e",
+    command:
+      "npm run start:e2e && wait-on http://localhost:8080/health http://localhost:9200",
     cwd: "../../",
     url: "http://localhost:8080",
     reuseExistingServer: !process.env.CI,
