@@ -36,12 +36,13 @@ export const getInstitutionHandler = async (req: Request, res: Response) => {
 
   const inst = await widgetAdapter.GetInstitutionById(resolvedInstitution.id);
 
-  res.send(
-    mapResolvedInstitution({
+  res.send({
+    ...mapResolvedInstitution({
       ...inst,
       name: resolvedInstitution.name,
       url: resolvedInstitution.url,
       logo_url: resolvedInstitution.logo_url,
     }),
-  );
+    ucpInstitutionId,
+  });
 };
