@@ -20,6 +20,8 @@ import {
 import { widgetHandler } from "./widgetEndpoint";
 import { oauthRedirectHandler, webhookHandler } from "./connect/oauthEndpoints";
 import useInstitutionEndpoints from "./institutions/useInstitutionEndpoints";
+import { search } from "./services/ElasticSearchClient";
+import { ComboJobTypes } from "@repo/utils";
 
 process.on("unhandledRejection", (error) => {
   _error(`unhandledRejection: ${error.message}`, error);
@@ -63,12 +65,22 @@ syncPerformanceData().then(() => {
   });
 });
 
-app.get("/health", function (req, res) {
-  if (isReady) {
-    res.send("healthy");
-  } else {
+app.get("/health", async (req, res) => {
+
+  if (!isReady) {
     res.status(503);
     res.send("Service Unavailable");
+  }
+
+  try {
+    const searchTest = await search({ from: 0, jobTypes: [ComboJobTypes.TRANSACTIONS], searchTerm: "test", size: 10})
+    if (searchTest.length > 0) {
+      res.json("healthy")
+    } else {
+      res.status(503).json("Search successful but indexing incomplete")
+    }
+  } catch (error) {
+    res.status(503).json("ElasticSearch unable to perform search")
   }
 });
 
