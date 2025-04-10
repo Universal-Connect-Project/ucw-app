@@ -114,9 +114,9 @@ export class ConnectApi extends AggregatorAdapterBase {
 
     if (!isOauth && connectionId) {
       recordStartEvent({
-        aggregatorId,
-        connectionId,
-        institutionId: ucpInstitutionId,
+        aggregatorId, // I don't think we have the right aggregatorId because we want test connection to show up under the main aggregator
+        connectionId, // This is right, but it's delayed because we have to wait until after createConnection. Maybe we should send in a generated connection id, and then update it after the connection is created
+        institutionId: ucpInstitutionId, // Need to make sure that we have the ucp Id here. Might be complex and require connect-widget changes to get it here
         jobTypes,
       });
     }
