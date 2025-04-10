@@ -1,17 +1,17 @@
 import { ComboJobTypes } from "@repo/utils";
 import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../../../../src/test-adapter/constants";
 
-describe("institution by guid", () => {
-  it("returns an institution by the aggregator guid when given an aggregator", () => {
-    const testExampleAGuid = "stringIdReturnedByTheTestAdapter";
+const testExampleAUCPId = "5e498f60-3496-4299-96ed-f8eb328ae8af";
 
+describe("institution by guid", () => {
+  it("returns an institution when given an aggregator", () => {
     cy.request({
       headers: {
         meta: JSON.stringify({
           aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
         }),
       },
-      url: `/institutions/${testExampleAGuid}`,
+      url: `/institutions/${testExampleAUCPId}`,
     }).then((response) => {
       expect(response.status).to.eq(200);
 
@@ -25,8 +25,6 @@ describe("institution by guid", () => {
         "logo_url",
         "code",
       ];
-
-      expect(body.code).to.eq(testExampleAGuid);
 
       expectedProperties.forEach((property) => {
         expect(body[property]).to.exist;

@@ -39,6 +39,7 @@ export enum VCDataTypes {
 
 export type AdapterMap = {
   dataAdapter?: Function;
+  testAdapterId?: string;
   vcAdapter?: Function;
   createWidgetAdapter: ({
     sessionId,
@@ -72,10 +73,7 @@ export interface Institution {
 export interface AggregatorInstitution {
   aggregator: string;
   id: string;
-  logo_url: string;
-  name: string;
   oauth: boolean;
-  url: string;
 }
 
 export interface KeyValuePair {

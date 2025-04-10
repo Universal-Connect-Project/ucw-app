@@ -3,29 +3,17 @@ import type { Aggregator } from "../adapterSetup";
 
 export type { Aggregator };
 
-export interface AuthRequest {
-  aggregator: string;
-  token: string;
-  iv: string;
-  key: string;
-}
-
 export interface Context {
   institutionId?: string;
-  institution_uid?: string;
   connectionId?: string;
   current_job_id?: string;
   userId?: string;
   resolvedUserId?: string;
   aggregator?: string | null;
   jobTypes?: ComboJobTypes[];
-  job_type?: string; // Remove this
-  partner?: string;
   singleAccountSelect?: boolean;
-  auth?: AuthRequest;
   oauth_referral_source?: string;
   scheme?: string;
-  updated?: boolean;
   sessionId?: string;
 }
 

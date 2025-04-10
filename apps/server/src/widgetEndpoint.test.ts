@@ -92,7 +92,7 @@ describe("server", () => {
         expect(res.send).toHaveBeenCalledWith(invalidAggregatorString);
       });
 
-      it("responds with a 400 if aggregator is provided without a connectionId", () => {
+      it("responds with a 400 if aggregator is provided with an institutionId and without a connectionId", () => {
         const res = {
           send: jest.fn(),
           status: jest.fn(),
@@ -101,6 +101,7 @@ describe("server", () => {
         widgetHandler(
           {
             query: {
+              institutionId: "testInstitutionId",
               jobTypes: ComboJobTypes.TRANSACTIONS,
               aggregator: Aggregators.TEST_A,
               userId: "testUserId",
@@ -111,11 +112,11 @@ describe("server", () => {
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith(
-          "&#x22;value&#x22; contains [aggregator] without its required peers [connectionId]",
+          "&#x22;aggregator&#x22; missing required peer &#x22;connectionId&#x22;",
         );
       });
 
-      it("responds with a 400 if connectionId is provided without a aggregator", () => {
+      it("responds with a 400 if aggregator is provided with a connectionId and without an institutionId", () => {
         const res = {
           send: jest.fn(),
           status: jest.fn(),
@@ -126,6 +127,7 @@ describe("server", () => {
             query: {
               connectionId: "testConnectionId",
               jobTypes: ComboJobTypes.TRANSACTIONS,
+              aggregator: Aggregators.TEST_A,
               userId: "testUserId",
             },
           } as unknown as Request,
@@ -134,7 +136,55 @@ describe("server", () => {
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith(
-          "&#x22;value&#x22; contains [connectionId] without its required peers [aggregator]",
+          "&#x22;aggregator&#x22; missing required peer &#x22;institutionId&#x22;",
+        );
+      });
+
+      it("responds with a 400 if connectionId is provided with an institutionId and without a aggregator", () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn(),
+        } as unknown as Response;
+
+        widgetHandler(
+          {
+            query: {
+              connectionId: "testConnectionId",
+              institutionId: "testInstitutionId",
+              jobTypes: ComboJobTypes.TRANSACTIONS,
+              userId: "testUserId",
+            },
+          } as unknown as Request,
+          res,
+        );
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith(
+          "&#x22;connectionId&#x22; missing required peer &#x22;aggregator&#x22;",
+        );
+      });
+
+      it("responds with a 400 if connectionId is provided with an aggregator and without an institutionId", () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn(),
+        } as unknown as Response;
+
+        widgetHandler(
+          {
+            query: {
+              aggregator: Aggregators.TEST_A,
+              connectionId: "testConnectionId",
+              jobTypes: ComboJobTypes.TRANSACTIONS,
+              userId: "testUserId",
+            },
+          } as unknown as Request,
+          res,
+        );
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith(
+          "&#x22;aggregator&#x22; missing required peer &#x22;institutionId&#x22;",
         );
       });
 

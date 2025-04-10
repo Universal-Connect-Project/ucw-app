@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import connectWidgetApiService from "./connectWidgetApiService";
 import {
   CREATE_MEMBER_URL,
   INSTITUTION_BY_GUID_MOCK_URL,
@@ -30,6 +29,9 @@ import { membersResponse } from "../shared/test/testData/members";
 import { oauthStateResponse } from "../shared/test/testData/oauthState";
 import { oauthStatesResponse } from "../shared/test/testData/oauthStates";
 import { updateMFAResponse } from "../shared/test/testData/updateMFA";
+import createConnectWidgetApiService from "./connectWidgetApiService";
+
+const connectWidgetApiService = createConnectWidgetApiService({});
 
 describe("connectWidgetApiService", () => {
   describe("addMember", () => {
