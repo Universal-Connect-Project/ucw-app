@@ -39,7 +39,7 @@ export default defineConfig({
   webServer: {
     command: "npm run start:e2e",
     cwd: "../../",
-    url: "http://localhost:8080",
+    url: "http://localhost:8080/health",
     reuseExistingServer: !process.env.CI,
     stdout: "pipe",
     timeout: 120 * 1000,
