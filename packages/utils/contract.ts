@@ -73,10 +73,7 @@ export interface Institution {
 export interface AggregatorInstitution {
   aggregator: string;
   id: string;
-  logo_url: string;
-  name: string;
   oauth: boolean;
-  url: string;
 }
 
 export interface KeyValuePair {

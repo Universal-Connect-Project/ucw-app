@@ -23,9 +23,6 @@ function fromSophtronInstitution(ins: any): AggregatorInstitution | undefined {
   }
   return {
     id: ins.InstitutionID,
-    logo_url: ins.Logo,
-    name: ins.InstitutionName,
-    url: ins.URL,
     aggregator: SOPHTRON_ADAPTER_NAME,
   } as AggregatorInstitution;
 }

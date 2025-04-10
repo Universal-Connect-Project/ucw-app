@@ -14,9 +14,6 @@ export const testDataRequestValidatorStartTimeError =
 export const testExampleOauthInstitution = {
   guid: "test bank_oauth",
   code: "test bank_oauth",
-  name: "test Bank (Oauth)",
-  url: "www.test.com",
-  logo_url: `http://localhost:8080/oauth/testExampleA/redirect_from/?code=examplecode&state=test_oauth_connection`,
   supports_oauth: true,
 };
 
