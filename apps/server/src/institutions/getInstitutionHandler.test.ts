@@ -11,6 +11,10 @@ import { ComboJobTypes } from "@repo/utils";
 import { elasticSearchInstitutionData } from "../test/testData/institution";
 
 describe("getInstitutionHandler", () => {
+  it("returns an institution object with name, url, and logo_url properties from the ucp institution list", () => {});
+
+  it("returns the institution from the provided aggregator", () => {});
+
   it("returns the institution by the aggregator id if it has a aggregator", async () => {
     const context = {
       aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,

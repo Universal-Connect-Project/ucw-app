@@ -13,6 +13,7 @@ const mapResolvedInstitution = (ins: AggregatorInstitution) => {
     instructional_data: {},
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     credentials: [] as any[],
+    // This name includes thing doesn't seem like it should be here
     supports_oauth: ins.oauth ?? ins.name?.includes("Oauth"),
     aggregator: ins.aggregator,
   };
