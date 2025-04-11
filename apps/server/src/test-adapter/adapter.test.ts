@@ -26,6 +26,7 @@ const successConnectionStatus = {
   id: testConnectionId,
   cur_job_id: "testJobId",
   userId: "userId",
+  raw_status: 'raw_status',
   status: ConnectionStatus.CONNECTED,
   challenges: [],
 } as any;
@@ -203,6 +204,7 @@ describe("TestAdapter", () => {
         id: testConnectionId,
         cur_job_id: "testJobId",
         userId: "testUserId",
+        raw_status: 'raw_status',
         status: ConnectionStatus.CHALLENGED,
         challenges: [
           {
@@ -319,23 +321,28 @@ describe("TestAdapter", () => {
   describe("HandleOauthResponse", () => {
     it("responds with success if the code isn't error", async () => {
       const ret = await testAdapterA.HandleOauthResponse({
-        query: {},
+        query: { state: `${aggregator}-userId` },
       });
 
       expect(ret).toEqual({
+        id: "aggregator-userId",
+        raw_status: 'raw_status',
         status: ConnectionStatus.CONNECTED,
+        userId: undefined
       });
     });
 
     it("returns with denied if the code is error", async () => {
       const ret = await testAdapterA.HandleOauthResponse({
         query: {
-          code: "error",
+          code: "error"
         },
       });
       expect(ret).toEqual({
         status: ConnectionStatus.DENIED,
-      });
+        error: "error",
+        raw_status: "raw_status",
     });
   });
+});
 });
