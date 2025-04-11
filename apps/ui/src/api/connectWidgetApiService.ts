@@ -13,7 +13,11 @@ interface LoadInstitutionsParams {
   search_name?: string;
 }
 
-const connectWidgetApiService = {
+const createConnectWidgetApiService = ({
+  institutionId,
+}: {
+  institutionId?: string;
+}) => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   addMember: async (memberData: any) => {
     return configuredAxios
@@ -32,7 +36,7 @@ const connectWidgetApiService = {
   },
   loadInstitutionByGuid: async (guid: string) => {
     return configuredAxios
-      .get(`/institutions/${guid}`)
+      .get(`/institutions/${institutionId || guid}`)
       .then((response) => response.data);
   },
   loadInstitutions: async ({
@@ -98,6 +102,6 @@ const connectWidgetApiService = {
       .put(`/members/${memberData.id}`, memberData)
       .then((response) => response.data);
   },
-};
+});
 
-export default connectWidgetApiService;
+export default createConnectWidgetApiService;

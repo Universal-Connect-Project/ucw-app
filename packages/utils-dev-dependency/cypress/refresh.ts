@@ -27,10 +27,11 @@ export const refreshAConnection = ({ enterCredentials, selectInstitution }) => {
       const { metadata } = connection?.args[0];
       const memberGuid = metadata.member_guid;
       const aggregator = metadata.aggregator;
+      const ucpInstitutionId = metadata.ucpInstitutionId;
 
       //Refresh the connection
       cy.visit(
-        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&connectionId=${memberGuid}&aggregator=${aggregator}&userId=${userId}`,
+        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&connectionId=${memberGuid}&aggregator=${aggregator}&userId=${userId}&institutionId=${ucpInstitutionId}`,
       );
 
       enterCredentials();
