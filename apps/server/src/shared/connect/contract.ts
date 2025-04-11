@@ -65,6 +65,8 @@ export interface Member {
   aggregated_at?: string | null;
   background_aggregation_is_disabled?: boolean;
   connection_status?: string | null | number; //
+  raw_status?: string | null //the original aggregator status
+  selected_account_id?: string | null; // the account_id that's selected during single_account_select
   guid: string;
   id?: string | null;
   institution_code?: string | null;

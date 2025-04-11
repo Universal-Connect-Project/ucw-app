@@ -234,6 +234,7 @@ export class TestAdapter implements WidgetAdapter {
         cur_job_id: testJobId,
         userId: "testUserId",
         status: ConnectionStatus.CHALLENGED,
+        raw_status: 'raw_status',
         challenges: [
           {
             id: "CRD-a81b35db-28dd-41ea-aed3-6ec8ef682011",
@@ -260,6 +261,7 @@ export class TestAdapter implements WidgetAdapter {
       cur_job_id: testJobId,
       userId: userId,
       status: ConnectionStatus.CONNECTED,
+      raw_status: 'raw_status',
       challenges: [],
     };
   }
@@ -295,16 +297,20 @@ export class TestAdapter implements WidgetAdapter {
   }: {
     query: Record<string, string>;
   }): Promise<Connection> {
-    const { code } = query;
-
+    const { state: request_id, code } = query;
     if (code === "error") {
       return {
         status: ConnectionStatus.DENIED,
-      } as Connection;
+        raw_status: 'raw_status',
+        id: request_id,
+        error: code,
+      } as Connection
     }
-
     return {
       status: ConnectionStatus.CONNECTED,
-    } as Connection;
+      raw_status: 'raw_status',
+      userId: code,
+      id: request_id
+    }
   }
 }

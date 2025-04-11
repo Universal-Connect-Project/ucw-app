@@ -9,6 +9,7 @@ module.exports = {
   setupFilesAfterEnv: ["./jestSetup.ts"],
   testPathIgnorePatterns: [
     "<rootDir>/node_modules/",
+    "<rootDir>/dist/",
     "<rootDir>/src/utils/Test.js",
     "<rootDir>/src/config/",
   ],

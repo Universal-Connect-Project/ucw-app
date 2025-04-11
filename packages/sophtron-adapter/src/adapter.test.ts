@@ -418,6 +418,9 @@ describe("sophtron adapter", () => {
 
       expect(response).toEqual({
         id: testUserInstitutionId,
+        challenges: null,
+        raw_status: 'success',
+        selected_account_id: '',
         userId: testUserId,
         cur_job_id: testJobId,
         status: ConnectionStatus.CONNECTED,
@@ -447,6 +450,9 @@ describe("sophtron adapter", () => {
         id: testUserInstitutionId,
         userId: testUserId,
         cur_job_id: testJobId,
+        challenges: null,
+        raw_status: 'failed',
+        selected_account_id: '',
         status: ConnectionStatus.FAILED,
         aggregator: SOPHTRON_ADAPTER_NAME,
       });
@@ -475,6 +481,9 @@ describe("sophtron adapter", () => {
         id: testUserInstitutionId,
         userId: testUserId,
         cur_job_id: testJobId,
+        challenges: null,
+        raw_status: 'AccountsReady',
+        selected_account_id: '',
         status: ConnectionStatus.CREATED,
         aggregator: SOPHTRON_ADAPTER_NAME,
       });
@@ -488,6 +497,7 @@ describe("sophtron adapter", () => {
             JobType: "verification",
             LastStatus: accountsReadyStatus,
             UserInstitutionID: testUserInstitutionId,
+            AccounntId: 'SAS_ACCOUNT_ID'
           }),
         ),
       );
@@ -519,6 +529,8 @@ describe("sophtron adapter", () => {
         id: testUserInstitutionId,
         userId: testUserId,
         cur_job_id: testJobId,
+        raw_status: 'AccountsReady',
+        selected_account_id: '',
         status: ConnectionStatus.CHALLENGED,
         aggregator: SOPHTRON_ADAPTER_NAME,
       });
@@ -561,6 +573,8 @@ describe("sophtron adapter", () => {
         id: testUserInstitutionId,
         userId: testUserId,
         cur_job_id: testJobId,
+        raw_status: 'SecurityQuestion',
+        selected_account_id: '',
         status: ConnectionStatus.CHALLENGED,
         aggregator: SOPHTRON_ADAPTER_NAME,
       });
@@ -604,6 +618,8 @@ describe("sophtron adapter", () => {
         id: testUserInstitutionId,
         userId: testUserId,
         cur_job_id: testJobId,
+        raw_status: 'TokenMethod',
+        selected_account_id: '',
         status: ConnectionStatus.CHALLENGED,
         aggregator: SOPHTRON_ADAPTER_NAME,
       });
@@ -648,6 +664,8 @@ describe("sophtron adapter", () => {
         id: testUserInstitutionId,
         userId: testUserId,
         cur_job_id: testJobId,
+        raw_status: 'TokenInput',
+        selected_account_id: '',
         status: ConnectionStatus.CHALLENGED,
         aggregator: SOPHTRON_ADAPTER_NAME,
       });
@@ -689,6 +707,8 @@ describe("sophtron adapter", () => {
         id: testUserInstitutionId,
         userId: testUserId,
         cur_job_id: testJobId,
+        raw_status: 'TokenInput',
+        selected_account_id: '',
         status: ConnectionStatus.CHALLENGED,
         aggregator: SOPHTRON_ADAPTER_NAME,
       });
@@ -732,6 +752,8 @@ describe("sophtron adapter", () => {
         id: testUserInstitutionId,
         userId: testUserId,
         cur_job_id: testJobId,
+        raw_status: 'TokenRead',
+        selected_account_id: '',
         status: ConnectionStatus.CHALLENGED,
         aggregator: SOPHTRON_ADAPTER_NAME,
       });
@@ -770,6 +792,8 @@ describe("sophtron adapter", () => {
         id: testUserInstitutionId,
         userId: testUserId,
         cur_job_id: testJobId,
+        raw_status: 'CaptchaImage',
+        selected_account_id: '',
         status: ConnectionStatus.CHALLENGED,
         aggregator: SOPHTRON_ADAPTER_NAME,
       });
@@ -798,6 +822,9 @@ describe("sophtron adapter", () => {
       id: testUserInstitutionId,
       userId: testUserId,
       cur_job_id: testJobId,
+      challenges: null,
+      raw_status: undefined,
+      selected_account_id: '',
       status: ConnectionStatus.CREATED,
       aggregator: SOPHTRON_ADAPTER_NAME,
     });

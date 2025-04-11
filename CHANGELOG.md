@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.10]
+
+### Changed
+
+- added raw_status in connection object which will later made available through client side events, the raw_status field contains the status returned from aggregator before mapped to universal widget contract, this richer information enables client to track the connection status at a more detailed and accurate level which in turns provide the opportunity to trigger more process at a better timing, as well as make diagnosing easier
+
 ## [1.0.9]
 
 ### Fixed

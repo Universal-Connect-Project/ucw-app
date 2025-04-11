@@ -145,6 +145,7 @@ export interface Connection {
   last_updated_utc?: string | null;
   background_aggregation_is_disabled?: boolean;
   status?: ConnectionStatus | null;
+  raw_status?: string | null;
   institution_code?: string | null;
   is_being_aggregated?: boolean | null;
   is_oauth?: boolean | null;
@@ -153,6 +154,7 @@ export interface Connection {
   userId?: string | null;
   challenges?: Challenge[];
   has_accounts?: boolean | null;
+  selected_account_id?: string | null;
   has_transactions?: boolean | null;
   is_authenticated?: boolean | null;
   vc?: string | null;
