@@ -1,27 +1,30 @@
 import { AkoyaAdapter } from "./adapter";
 import * as contract from "@repo/utils";
-import { createAkoyaProdDataAdapter, createAkoyaSandboxDataAdapter } from "./dataAdapter";
 import type { AdapterDependencies } from "./models";
 
 export const getAkoyaAdapterMapObject = (dependencies: AdapterDependencies) => {
   return {
     akoya: {
       testInstitutionAdapterName: "akoya_sandbox",
-      dataAdapter: createAkoyaProdDataAdapter(dependencies),
-      createWidgetAdapter: ({sessionId}: {sessionId: string}) => new AkoyaAdapter({
-        sandbox: false,
-        sessionId,
-        dependencies
-      })
+      dataAdapter: () => {
+        throw new Error("Data adapter not implemented for Akoya");
+      },
+      createWidgetAdapter: () =>
+        new AkoyaAdapter({
+          sandbox: false,
+          dependencies,
+        }),
     },
     akoya_sandbox: {
-      dataAdapter: createAkoyaSandboxDataAdapter(dependencies),
-      createWidgetAdapter: ({sessionId}: {sessionId: string}) => new AkoyaAdapter({
-        sandbox: true,
-        sessionId,
-        dependencies
-      })
-    }
+      dataAdapter: () => {
+        throw new Error("Data adapter not implemented for Akoya");
+      },
+      createWidgetAdapter: () =>
+        new AkoyaAdapter({
+          sandbox: true,
+          dependencies,
+        }),
+    },
   };
 };
 

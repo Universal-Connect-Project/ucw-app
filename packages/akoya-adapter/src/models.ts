@@ -1,46 +1,38 @@
 export type ApiCredentials = {
   clientId?: string;
   secret?: string;
-  username?: string;
-  password?: string;
-  partnerId?: string;
-  appKey?: string;
   basePath?: string;
-  vcEndpoint?: string;
   aggregator?: string;
-  available?: boolean;
   apiVersion?: string;
-  [key: string]: any;
-}
+};
 
 export type CacheClient = {
-  set: (key: string, value: any) => Promise<void> | void;
-  get: (key: string) => Promise<any> | any;
+  set: (key: string, value: unknown, params?: unknown) => Promise<void> | void;
+  get: (key: string) => Promise<unknown> | unknown;
 };
 
 export type LogClient = {
-  info: (message: string, error?: any) => void;
-  error: (message: string, data?: any) => void;
-  debug: (message: string, data?: any) => void;
-  trace: (message: string, data?: any) => void;
-  warning: (message: string, data?: any) => void;
-}
+  info: (message: string, error?: unknown) => void;
+  error: (message: string, data?: unknown) => void;
+  debug: (message: string, data?: unknown) => void;
+  trace: (message: string, data?: unknown) => void;
+  warning: (message: string, data?: unknown) => void;
+};
 
 export type AdapterDependencies = {
   cacheClient: CacheClient;
   logClient: LogClient;
   aggregatorCredentials: Record<string, ApiCredentials>;
   envConfig: Record<string, string>;
-}
+};
 
 export type AdapterConfig = {
   sandbox: boolean;
-  sessionId?: string;
   dependencies: AdapterDependencies;
-}
+};
 
 export type VCDependencies = {
   logClient: LogClient;
-  aggregatorCredentials: any;
+  aggregatorCredentials: unknown;
   envConfig: Record<string, string>;
 };

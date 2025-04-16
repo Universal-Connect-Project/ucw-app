@@ -1,42 +1,43 @@
-let storageObject: Record<string, any> = {}
+let storageObject: Record<string, unknown> = {};
 
 const constants = {
-  PREFERENCES_REDIS_KEY: 'preferences'
+  PREFERENCES_REDIS_KEY: "preferences",
 };
 
 export const clearRedisMock = () => {
   if (storageObject?.[constants.PREFERENCES_REDIS_KEY]) {
     storageObject = {
-      [constants.PREFERENCES_REDIS_KEY]: storageObject[constants.PREFERENCES_REDIS_KEY]
-    }
+      [constants.PREFERENCES_REDIS_KEY]:
+        storageObject[constants.PREFERENCES_REDIS_KEY],
+    };
   } else {
-    storageObject = {}
+    storageObject = {};
   }
-}
+};
 
 export const sAdd = jest.fn((key: string, values: string[]) => {
-  storageObject[key] = values
-})
+  storageObject[key] = values;
+});
 
 const del = jest.fn((key: string) => {
-  delete storageObject[key]
-})
+  delete storageObject[key];
+});
 
 const sMembers = jest.fn((key: string) => {
-  return storageObject[key]
-})
+  return storageObject[key];
+});
 
 const get = jest.fn((key: string) => {
-  return storageObject[key]
-})
+  return storageObject[key];
+});
 
-const set = jest.fn((key: string, value: any) => {
-  storageObject[key] = value
-})
+const set = jest.fn((key: string, value: unknown) => {
+  storageObject[key] = value;
+});
 
 export const createClient = () => ({
   connect: async () => {
-    return true
+    return true;
   },
   get,
   isReady: true,
@@ -44,5 +45,5 @@ export const createClient = () => ({
   sAdd,
   sMembers,
   del,
-  constants
-})
+  constants,
+});
