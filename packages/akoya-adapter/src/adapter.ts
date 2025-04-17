@@ -1,54 +1,56 @@
 import type {
   AggregatorInstitution,
+  CacheClient,
   Connection,
   CreateConnectionRequest,
   Credential,
+  LogClient,
   UpdateConnectionRequest,
   WidgetAdapter,
 } from "@repo/utils";
 import { ConnectionStatus } from "@repo/utils";
-import type { AdapterConfig, CacheClient, LogClient } from "./models";
-import AkoyaClient from "./apiClient";
+import type { AdapterDependencies, ApiCredentials } from "./models";
+import { createGetOauthUrl } from "./apiClient";
 import { v4 as uuidv4 } from "uuid";
+
+type AdapterConfig = {
+  sandbox: boolean;
+  dependencies: AdapterDependencies;
+};
 
 export class AkoyaAdapter implements WidgetAdapter {
   aggregator: string;
-  apiClient: AkoyaClient;
+  credentials: ApiCredentials;
   cacheClient: CacheClient;
   logger: LogClient;
   envConfig: Record<string, string>;
+  sandbox: boolean;
 
   constructor(args: AdapterConfig) {
     const { sandbox, dependencies } = args;
+    this.sandbox = sandbox;
     this.aggregator = sandbox ? "akoya_sandbox" : "akoya";
     this.cacheClient = dependencies?.cacheClient;
     this.logger = dependencies?.logClient;
     this.envConfig = dependencies?.envConfig;
-    const credentials = sandbox
+    this.credentials = sandbox
       ? dependencies?.aggregatorCredentials.akoyaSandbox
       : dependencies?.aggregatorCredentials.akoyaProd;
-
-    this.apiClient = new AkoyaClient(
-      sandbox,
-      credentials,
-      this.logger,
-      this.envConfig,
-    );
   }
 
   async GetInstitutionById(id: string): Promise<AggregatorInstitution> {
-    return Promise.resolve({
+    return {
       id,
       name: null,
       logo_url: null,
       url: null,
       oauth: true,
-      aggregator: this.apiClient.apiConfig.aggregator,
-    });
+      aggregator: this.aggregator,
+    };
   }
 
   async ListInstitutionCredentials(_id: string): Promise<Credential[]> {
-    return Promise.resolve([]);
+    return [];
   }
 
   async ListConnectionCredentials(
@@ -59,7 +61,7 @@ export class AkoyaAdapter implements WidgetAdapter {
   }
 
   async ListConnections(_userId: string): Promise<Connection[]> {
-    return Promise.resolve([]);
+    return [];
   }
 
   async CreateConnection(
@@ -74,13 +76,15 @@ export class AkoyaAdapter implements WidgetAdapter {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       credentials: [] as any[],
       institution_code: request.institutionId,
-      oauth_window_uri: this.apiClient.getOauthUrl(
-        request.institutionId,
-        requestId,
-      ),
-      aggregator: this.apiClient.apiConfig.aggregator,
+      oauth_window_uri: createGetOauthUrl({
+        sandbox: this.sandbox,
+        clientId: this.credentials.clientId,
+        hostUrl: this.envConfig.HostUrl,
+        institutionId: request.institutionId,
+        state: requestId,
+      }),
+      aggregator: this.aggregator,
       status: ConnectionStatus.PENDING,
-      raw_status: "PENDING",
     };
     await this.cacheClient.set(requestId, obj, {
       EX: 600, // 10 minutes
@@ -98,8 +102,7 @@ export class AkoyaAdapter implements WidgetAdapter {
     return;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
-  async DeleteUser(aggregatorUserId: string): Promise<any> {
+  async DeleteUser(_aggregatorUserId: string): Promise<unknown> {
     return;
   }
 
@@ -146,10 +149,9 @@ export class AkoyaAdapter implements WidgetAdapter {
       return connection;
     }
 
-    const token = code;
     connection.status = ConnectionStatus.CONNECTED;
     connection.id = connection.institution_code;
-    connection.userId = token;
+    connection.userId = code;
 
     await this.cacheClient.set(requestId, connection);
 

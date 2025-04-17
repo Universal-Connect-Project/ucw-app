@@ -1,5 +1,5 @@
+import { clearRedisMock } from "@repo/utils/test";
 import { server } from "./src/test/testServer";
-import { clearRedisMock } from "./src/test/utils/cacheClient";
 
 beforeAll(() => {
   server.listen();

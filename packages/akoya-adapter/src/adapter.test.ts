@@ -1,15 +1,18 @@
 import "dotenv/config";
 
-import { createClient as createCacheClient } from "./test/utils/cacheClient";
-import { logClient } from "./test/utils/logClient";
+import {
+  createClient as createCacheClient,
+  createLogClient,
+} from "@repo/utils/test";
 import { AkoyaAdapter } from "./adapter";
 import { Connection, ConnectionStatus } from "@repo/utils";
 
-export const cacheClient = createCacheClient();
+const cacheClient = createCacheClient();
+const logClient = createLogClient();
 
 jest.mock("uuid", () => ({ v4: () => "123456789" }));
 
-export const aggregatorCredentials = {
+const aggregatorCredentials = {
   akoyaSandbox: {
     clientId: "test-clientId",
     secret: "test-app-secret",
@@ -108,7 +111,6 @@ describe("akoya aggregator", () => {
         aggregator: "akoya",
         credentials: [],
         status: ConnectionStatus.PENDING,
-        raw_status: "PENDING",
         userId: testUserId,
       };
 

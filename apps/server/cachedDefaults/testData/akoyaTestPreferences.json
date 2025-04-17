@@ -1,8 +1,7 @@
 {
-  "defaultAggregator": "akoya_sandbox",
+  "defaultAggregator": "akoya",
 
   "supportedAggregators": [
-    "akoya_sandbox",
     "akoya"
   ],
 

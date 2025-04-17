@@ -1,13 +1,15 @@
 import { expect, test } from "@playwright/test";
 import { ComboJobTypes } from "@repo/utils";
 
-test("connects to mikomo bank with oAuth", async ({ page }, testInfo) => {
+const WIDGET_BASE_URL = "http://localhost:8080/widget";
+
+test("connects to mikomo bank with oAuth", async ({ page }) => {
   test.setTimeout(240000);
 
   const userId = crypto.randomUUID();
 
   await page.goto(
-    `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
+    `${WIDGET_BASE_URL}?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
   );
 
   page.evaluate(`
@@ -18,31 +20,20 @@ test("connects to mikomo bank with oAuth", async ({ page }, testInfo) => {
   `);
 
   await page.getByPlaceholder("Search").fill("mikomo bank");
-
   await page.getByLabel("Add account with Mikomo Bank").click();
 
   const popupPromise = page.waitForEvent("popup");
   await page.getByRole("link", { name: "Go to log in" }).click();
 
   const authorizeTab = await popupPromise;
-  const url = await authorizeTab.url();
-  console.log("popup => " + url);
-  const screenshotPath = testInfo.outputPath(`popup_login.png`);
-  await authorizeTab.screenshot({ path: screenshotPath, timeout: 5000 });
   await authorizeTab.locator("input[type='text']").fill("mikomo_1");
   await authorizeTab.locator("input[type='password']").fill("mikomo_1");
-  await authorizeTab.locator("button[type='submit']").click();
+  await authorizeTab.getByRole("button", { name: "Sign in →" }).click();
 
-  await expect(authorizeTab.locator("div.terms-disclaimer")).toBeVisible();
+  await authorizeTab.getByRole("button", { name: "Next" }).click();
 
-  await authorizeTab.locator("button[value='#accounts']").click();
-
-  await expect(
-    authorizeTab.locator("button[id='accounts-approve']"),
-  ).toBeVisible();
-
-  await authorizeTab.locator("label.form-check-label").last().click();
-  await authorizeTab.locator("button[id='accounts-approve']").click();
+  await authorizeTab.getByText("Individual (*****9276)").click();
+  await authorizeTab.getByRole("button", { name: "Approve" }).click();
 
   const connectedPromise = new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject("timed out"), 12000);
@@ -51,6 +42,10 @@ test("connects to mikomo bank with oAuth", async ({ page }, testInfo) => {
       const obj = (await msg.args()[0].jsonValue())?.message;
       if (obj?.type === "connect/memberConnected") {
         clearTimeout(timer);
+        expect(obj.metadata.user_guid).not.toBeNull();
+        expect(obj.metadata.member_guid).toEqual("mikomo");
+        expect(obj.metadata.aggregator).toEqual("akoya_sandbox");
+
         resolve("");
       }
     });
@@ -60,11 +55,6 @@ test("connects to mikomo bank with oAuth", async ({ page }, testInfo) => {
     timeout: 120000,
   });
   await connectedPromise;
-
-  const apiRequest = page.context().request;
-  await apiRequest.delete(
-    `http://localhost:8080/api/aggregator/akoya_sandbox/user/${userId}`,
-  );
 });
 
 test("should return 400 with error message when requesting akoya data", async ({

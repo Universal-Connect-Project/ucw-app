@@ -14,9 +14,6 @@
   "dependencies": {
     "@types/jest": "^29.5.13",
     "@types/node": "^22.7.6",
-    "axios": "^1.7.7",
-    "parse-address": "^1.1.2",
-    "parse-full-name": "^1.2.6",
     "uuid": "^11.0.3"
   },
   "devDependencies": {
@@ -28,8 +25,7 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-jest": "^27.6.3",
     "jest": "^30.0.0-alpha.6",
-    "msw": "^2.4.9",
-    "playwright": "^1.49.1",
+    "playwright": "^1.51",
     "ts-jest": "^29.2.5",
     "tslib": "^2.7.0"
   }

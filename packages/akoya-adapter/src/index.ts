@@ -1,5 +1,4 @@
 import { AkoyaAdapter } from "./adapter";
-import * as contract from "@repo/utils";
 import type { AdapterDependencies } from "./models";
 
 export const getAkoyaAdapterMapObject = (dependencies: AdapterDependencies) => {
@@ -27,6 +26,3 @@ export const getAkoyaAdapterMapObject = (dependencies: AdapterDependencies) => {
     },
   };
 };
-
-export * from "./models";
-export { contract };

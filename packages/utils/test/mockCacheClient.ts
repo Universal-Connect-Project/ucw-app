@@ -1,4 +1,4 @@
-let storageObject: Record<string, unknown> = {};
+let storageObject: Record<string, any> = {};
 
 const constants = {
   PREFERENCES_REDIS_KEY: "preferences",
@@ -15,7 +15,7 @@ export const clearRedisMock = () => {
   }
 };
 
-export const sAdd = jest.fn((key: string, values: string[]) => {
+const sAdd = jest.fn((key: string, values: string[]) => {
   storageObject[key] = values;
 });
 
@@ -31,7 +31,7 @@ const get = jest.fn((key: string) => {
   return storageObject[key];
 });
 
-const set = jest.fn((key: string, value: unknown) => {
+const set = jest.fn((key: string, value: any) => {
   storageObject[key] = value;
 });
 
