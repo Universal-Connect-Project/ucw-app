@@ -53,6 +53,19 @@ describe("connectApi", () => {
           },
           most_recent_job_guid: null,
           oauth_window_uri: undefined,
+          postMessageEventData: {
+            memberConnected: {
+              aggregator: "testExampleA",
+              member_guid: "testConnectionId",
+              user_guid: undefined,
+            },
+            memberStatusUpdate: {
+              aggregator: "testExampleA",
+              connection_status: 0,
+              member_guid: "testConnectionId",
+              user_guid: undefined,
+            },
+          },
           user_guid: undefined,
         },
       });
@@ -73,9 +86,23 @@ describe("connectApi", () => {
         mfa: {
           credentials: [],
         },
-        selected_account_id: undefined,
         most_recent_job_guid: testJobId,
         oauth_window_uri: undefined,
+        postMessageEventData: {
+          memberConnected: {
+            aggregator: "testExampleA",
+            member_guid: "testConnectionId",
+            test: "connected",
+            user_guid: null,
+          },
+          memberStatusUpdate: {
+            aggregator: "testExampleA",
+            connection_status: 6,
+            member_guid: "testConnectionId",
+            test: "updated",
+            user_guid: null,
+          },
+        },
         user_guid: null,
       });
     });
