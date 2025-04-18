@@ -131,8 +131,7 @@ describe("webhookHandler", () => {
     expect(res.send).toHaveBeenCalledWith({
       status: ConnectionStatus.CONNECTED,
       id: undefined,
-      raw_status: 'raw_status',
-      userId: undefined
+      userId: undefined,
     });
   });
 

@@ -73,7 +73,6 @@ describe("connectApi", () => {
         mfa: {
           credentials: [],
         },
-        raw_status: 'raw_status',
         selected_account_id: undefined,
         most_recent_job_guid: testJobId,
         oauth_window_uri: undefined,

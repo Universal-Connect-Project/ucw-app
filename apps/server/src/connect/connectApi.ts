@@ -6,11 +6,20 @@ import { AggregatorAdapterBase } from "../adapters";
 import type { Member, MemberResponse } from "../shared/connect/contract";
 
 function mapConnection(connection: Connection): Member {
+  const userId = connection.userId;
+  const memberGuid = connection.id;
+  const connectionStatus = connection.status ?? ConnectionStatus.CREATED;
+
+  const sharedEventData = {
+    aggregator: connection.aggregator,
+    member_guid: memberGuid,
+    user_guid: userId,
+  };
+
   return {
     institution_guid: connection.institution_code,
-    guid: connection.id,
-    connection_status: connection.status ?? ConnectionStatus.CREATED, // ?
-    raw_status: connection.raw_status,
+    guid: memberGuid,
+    connection_status: connectionStatus,
     most_recent_job_guid:
       connection.status === ConnectionStatus.CONNECTED
         ? connection.cur_job_id
@@ -18,9 +27,19 @@ function mapConnection(connection: Connection): Member {
     is_oauth: connection.is_oauth,
     oauth_window_uri: connection.oauth_window_uri,
     aggregator: connection.aggregator,
-    selected_account_id: connection.selected_account_id,
+    postMessageEventData: {
+      memberConnected: {
+        ...(connection.postMessageEventData?.memberConnected || {}),
+        ...sharedEventData,
+      },
+      memberStatusUpdate: {
+        ...(connection.postMessageEventData?.memberStatusUpdate || {}),
+        ...sharedEventData,
+        connection_status: connectionStatus,
+      },
+    },
     is_being_aggregated: connection.is_being_aggregated,
-    user_guid: connection.userId,
+    user_guid: userId,
     mfa: {
       credentials: connection.challenges?.map((c) => {
         const ret = {
