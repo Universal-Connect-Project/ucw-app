@@ -88,7 +88,6 @@ describe("oauthHandler", () => {
     await set(`context_request_id`, {
       scheme: "scheme",
       oauth_referral_source: "oauth_referral_source",
-      sessionId: "session_id",
       userId: "userId",
     });
 

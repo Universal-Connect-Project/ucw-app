@@ -40,11 +40,7 @@ export enum VCDataTypes {
 export type AdapterMap = {
   dataAdapter?: Function;
   vcAdapter?: Function;
-  createWidgetAdapter: ({
-    sessionId,
-  }: {
-    sessionId?: string | undefined;
-  }) => WidgetAdapter;
+  createWidgetAdapter: () => WidgetAdapter;
 };
 
 export interface Credential {
