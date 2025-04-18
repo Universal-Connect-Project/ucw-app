@@ -514,7 +514,6 @@ describe("sophtron adapter", () => {
             JobType: "verification",
             LastStatus: accountsReadyStatus,
             UserInstitutionID: testUserInstitutionId,
-            AccounntId: "SAS_ACCOUNT_ID",
           }),
         ),
       );
