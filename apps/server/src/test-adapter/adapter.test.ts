@@ -325,13 +325,11 @@ describe("TestAdapter", () => {
   describe("HandleOauthResponse", () => {
     it("responds with success if the code isn't error", async () => {
       const ret = await testAdapterA.HandleOauthResponse({
-        query: { state: `${aggregator}-userId` },
+        query: {},
       });
 
       expect(ret).toEqual({
-        id: "aggregator-userId",
         status: ConnectionStatus.CONNECTED,
-        userId: undefined,
       });
     });
 
@@ -343,7 +341,6 @@ describe("TestAdapter", () => {
       });
       expect(ret).toEqual({
         status: ConnectionStatus.DENIED,
-        error: "error",
       });
     });
   });

@@ -305,18 +305,15 @@ export class TestAdapter implements WidgetAdapter {
   }: {
     query: Record<string, string>;
   }): Promise<Connection> {
-    const { state: request_id, code } = query;
+    const { code } = query;
     if (code === "error") {
       return {
         status: ConnectionStatus.DENIED,
-        id: request_id,
-        error: code,
       } as Connection;
     }
+
     return {
       status: ConnectionStatus.CONNECTED,
-      userId: code,
-      id: request_id,
-    };
+    } as Connection;
   }
 }
