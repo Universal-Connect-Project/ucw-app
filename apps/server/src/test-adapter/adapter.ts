@@ -19,6 +19,15 @@ export const testJobId = "testJobId";
 export const testInstitutionCode = "institutionCode";
 export const testConnectionId = "testConnectionId";
 
+export const postMessageEventData = {
+  memberConnected: {
+    test: "connected",
+  },
+  memberStatusUpdate: {
+    test: "updated",
+  },
+};
+
 const createRedisStatusKey = ({
   aggregator,
   userId,
@@ -259,6 +268,7 @@ export class TestAdapter implements WidgetAdapter {
       id: testConnectionId,
       cur_job_id: testJobId,
       userId: userId,
+      postMessageEventData,
       status: ConnectionStatus.CONNECTED,
       challenges: [],
     };
@@ -296,7 +306,6 @@ export class TestAdapter implements WidgetAdapter {
     query: Record<string, string>;
   }): Promise<Connection> {
     const { code } = query;
-
     if (code === "error") {
       return {
         status: ConnectionStatus.DENIED,

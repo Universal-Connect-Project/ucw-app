@@ -1,6 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComboJobTypes, ConnectionStatus } from "@repo/utils";
-import { TestAdapter, testConnectionId, testInstitutionCode } from "./adapter";
+import {
+  postMessageEventData,
+  TestAdapter,
+  testConnectionId,
+  testInstitutionCode,
+} from "./adapter";
 import {
   testDataRequestValidators,
   testDataRequestValidatorStartTimeError,
@@ -26,6 +31,7 @@ const successConnectionStatus = {
   id: testConnectionId,
   cur_job_id: "testJobId",
   userId: "userId",
+  postMessageEventData,
   status: ConnectionStatus.CONNECTED,
   challenges: [],
 } as any;

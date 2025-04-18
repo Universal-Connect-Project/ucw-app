@@ -137,6 +137,11 @@ export interface CreateConnectionRequest {
   metadata?: string;
 }
 
+export interface PostMessageEventData {
+  memberConnected?: object;
+  memberStatusUpdate?: object;
+}
+
 export interface Connection {
   id: string | null;
   cur_job_id?: string | null;
@@ -158,6 +163,7 @@ export interface Connection {
   vc?: string | null;
   oauth_window_uri?: string | null;
   error_message?: string | null;
+  postMessageEventData?: PostMessageEventData;
 }
 
 export interface Connections {

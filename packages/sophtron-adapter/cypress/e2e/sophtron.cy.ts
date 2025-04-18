@@ -6,6 +6,8 @@ import {
   clickContinue,
   searchByText,
   refreshAConnection,
+  visitWithPostMessageSpy,
+  MEMBER_STATUS_UPDATE_EVENT_TYPE,
 } from "@repo/utils-dev-dependency";
 import {
   enterSophtronCredentials,
@@ -41,6 +43,40 @@ describe("Sophtron aggregator", () => {
       enterCredentials: enterSophtronCredentials,
       selectInstitution: searchAndSelectSophtron,
     });
+  });
+
+  it("fires a memberStatusUpdated event with custom properties", () => {
+    const jobTypes = [ComboJobTypes.TRANSACTIONS, ComboJobTypes.ACCOUNT_NUMBER];
+
+    const userId = Cypress.env("userId");
+
+    visitWithPostMessageSpy(`/widget?jobTypes=${jobTypes}&userId=${userId}`)
+      .then(() => makeAConnection(jobTypes))
+      .then(() => {
+        // Capture postmessages into variables
+        cy.get("@postMessage", { timeout: 90000 }).then((mySpy) => {
+          const memberStatusUpdateEvents = (mySpy as any)
+            .getCalls()
+            .filter(
+              (call) => call.args[0].type === MEMBER_STATUS_UPDATE_EVENT_TYPE,
+            );
+
+          expect(memberStatusUpdateEvents.length).to.be.greaterThan(1);
+
+          const { metadata } = memberStatusUpdateEvents.at(-1).args[0];
+
+          [
+            "rawStatus",
+            "selectedAccountId",
+            "aggregator",
+            "member_guid",
+            "user_guid",
+            "connection_status",
+          ].forEach((prop) => {
+            expect(!!metadata[prop]).to.be.true;
+          });
+        });
+      });
   });
 
   it("Connects to Sophtron Bank with all MFA options", () => {
