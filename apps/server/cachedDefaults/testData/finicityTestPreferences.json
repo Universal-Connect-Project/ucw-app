@@ -1,14 +1,11 @@
 {
-  "defaultAggregator": "finicity_sandbox",
+  "defaultAggregator": "finicity",
 
-  "supportedAggregators": [
-    "finicity_sandbox",
-    "finicity"
-  ],
+  "supportedAggregators": ["finicity"],
 
-  "defaultAggregatorVolume": { },
+  "defaultAggregatorVolume": {},
 
-  "institutionAggregatorVolumeMap": { },
+  "institutionAggregatorVolumeMap": {},
 
   "hiddenInstitutions": [],
 
