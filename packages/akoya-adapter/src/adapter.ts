@@ -57,7 +57,7 @@ export class AkoyaAdapter implements WidgetAdapter {
     _connectionId: string,
     _userId: string,
   ): Promise<Credential[]> {
-    return Promise.resolve([]);
+    return [];
   }
 
   async ListConnections(_userId: string): Promise<Connection[]> {
@@ -151,7 +151,14 @@ export class AkoyaAdapter implements WidgetAdapter {
 
     connection.status = ConnectionStatus.CONNECTED;
     connection.id = connection.institution_code;
-    connection.userId = code;
+    connection.postMessageEventData = {
+      memberConnected: {
+        akoyaAuthCode: code,
+      },
+      memberStatusUpdate: {
+        akoyaAuthCode: code,
+      },
+    };
 
     await this.cacheClient.set(requestId, connection);
 

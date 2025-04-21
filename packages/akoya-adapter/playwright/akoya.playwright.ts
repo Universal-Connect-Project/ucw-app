@@ -42,9 +42,10 @@ test("connects to mikomo bank with oAuth", async ({ page }) => {
       const obj = (await msg.args()[0].jsonValue())?.message;
       if (obj?.type === "connect/memberConnected") {
         clearTimeout(timer);
-        expect(obj.metadata.user_guid).not.toBeNull();
+        expect(obj.metadata.user_guid).toEqual(userId);
         expect(obj.metadata.member_guid).toEqual("mikomo");
         expect(obj.metadata.aggregator).toEqual("akoya_sandbox");
+        expect(obj.metadata.akoyaAuthCode).not.toBeNull();
 
         resolve("");
       }
