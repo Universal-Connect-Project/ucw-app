@@ -379,6 +379,17 @@ describe("sophtron adapter", () => {
   });
 
   describe("GetConnectionStatus", () => {
+    const createPostMessageEventData = ({ rawStatus, selectedAccountId }) => ({
+      memberConnected: {
+        rawStatus,
+        selectedAccountId,
+      },
+      memberStatusUpdate: {
+        rawStatus,
+        selectedAccountId,
+      },
+    });
+
     it("returns the connection using the memberId and userId if there is no jobId", async () => {
       const response = await adapter.GetConnectionStatus(
         testId,
@@ -415,6 +426,11 @@ describe("sophtron adapter", () => {
 
       expect(response).toEqual({
         id: testUserInstitutionId,
+        challenges: null,
+        postMessageEventData: createPostMessageEventData({
+          rawStatus: "success",
+          selectedAccountId: "",
+        }),
         userId: testUserId,
         cur_job_id: testJobId,
         status: ConnectionStatus.CONNECTED,
@@ -444,6 +460,11 @@ describe("sophtron adapter", () => {
         id: testUserInstitutionId,
         userId: testUserId,
         cur_job_id: testJobId,
+        challenges: null,
+        postMessageEventData: createPostMessageEventData({
+          rawStatus: "failed",
+          selectedAccountId: "",
+        }),
         status: ConnectionStatus.FAILED,
         aggregator: SOPHTRON_ADAPTER_NAME,
       });
@@ -472,6 +493,11 @@ describe("sophtron adapter", () => {
         id: testUserInstitutionId,
         userId: testUserId,
         cur_job_id: testJobId,
+        challenges: null,
+        postMessageEventData: createPostMessageEventData({
+          rawStatus: "AccountsReady",
+          selectedAccountId: "",
+        }),
         status: ConnectionStatus.CREATED,
         aggregator: SOPHTRON_ADAPTER_NAME,
       });
@@ -516,6 +542,10 @@ describe("sophtron adapter", () => {
         id: testUserInstitutionId,
         userId: testUserId,
         cur_job_id: testJobId,
+        postMessageEventData: createPostMessageEventData({
+          rawStatus: "AccountsReady",
+          selectedAccountId: "",
+        }),
         status: ConnectionStatus.CHALLENGED,
         aggregator: SOPHTRON_ADAPTER_NAME,
       });
@@ -558,6 +588,10 @@ describe("sophtron adapter", () => {
         id: testUserInstitutionId,
         userId: testUserId,
         cur_job_id: testJobId,
+        postMessageEventData: createPostMessageEventData({
+          rawStatus: "SecurityQuestion",
+          selectedAccountId: "",
+        }),
         status: ConnectionStatus.CHALLENGED,
         aggregator: SOPHTRON_ADAPTER_NAME,
       });
@@ -601,6 +635,10 @@ describe("sophtron adapter", () => {
         id: testUserInstitutionId,
         userId: testUserId,
         cur_job_id: testJobId,
+        postMessageEventData: createPostMessageEventData({
+          rawStatus: "TokenMethod",
+          selectedAccountId: "",
+        }),
         status: ConnectionStatus.CHALLENGED,
         aggregator: SOPHTRON_ADAPTER_NAME,
       });
@@ -645,6 +683,10 @@ describe("sophtron adapter", () => {
         id: testUserInstitutionId,
         userId: testUserId,
         cur_job_id: testJobId,
+        postMessageEventData: createPostMessageEventData({
+          rawStatus: "TokenInput",
+          selectedAccountId: "",
+        }),
         status: ConnectionStatus.CHALLENGED,
         aggregator: SOPHTRON_ADAPTER_NAME,
       });
@@ -686,6 +728,10 @@ describe("sophtron adapter", () => {
         id: testUserInstitutionId,
         userId: testUserId,
         cur_job_id: testJobId,
+        postMessageEventData: createPostMessageEventData({
+          rawStatus: "TokenInput",
+          selectedAccountId: "",
+        }),
         status: ConnectionStatus.CHALLENGED,
         aggregator: SOPHTRON_ADAPTER_NAME,
       });
@@ -729,6 +775,10 @@ describe("sophtron adapter", () => {
         id: testUserInstitutionId,
         userId: testUserId,
         cur_job_id: testJobId,
+        postMessageEventData: createPostMessageEventData({
+          rawStatus: "TokenRead",
+          selectedAccountId: "",
+        }),
         status: ConnectionStatus.CHALLENGED,
         aggregator: SOPHTRON_ADAPTER_NAME,
       });
@@ -767,36 +817,45 @@ describe("sophtron adapter", () => {
         id: testUserInstitutionId,
         userId: testUserId,
         cur_job_id: testJobId,
+        postMessageEventData: createPostMessageEventData({
+          rawStatus: "CaptchaImage",
+          selectedAccountId: "",
+        }),
         status: ConnectionStatus.CHALLENGED,
         aggregator: SOPHTRON_ADAPTER_NAME,
       });
     });
-  });
 
-  it("defaults to connection status created", async () => {
-    server.use(
-      http.get(SOPHTRON_GET_JOB_INFO_PATH, () =>
-        HttpResponse.json({
-          JobID: testJobId,
-          JobType: "agg",
-          UserInstitutionID: testUserInstitutionId,
+    it("defaults to connection status created", async () => {
+      server.use(
+        http.get(SOPHTRON_GET_JOB_INFO_PATH, () =>
+          HttpResponse.json({
+            JobID: testJobId,
+            JobType: "agg",
+            UserInstitutionID: testUserInstitutionId,
+          }),
+        ),
+      );
+
+      const response = await adapter.GetConnectionStatus(
+        testId,
+        testJobId,
+        false,
+        testUserId,
+      );
+
+      expect(response).toEqual({
+        id: testUserInstitutionId,
+        userId: testUserId,
+        cur_job_id: testJobId,
+        challenges: null,
+        postMessageEventData: createPostMessageEventData({
+          rawStatus: undefined,
+          selectedAccountId: "",
         }),
-      ),
-    );
-
-    const response = await adapter.GetConnectionStatus(
-      testId,
-      testJobId,
-      false,
-      testUserId,
-    );
-
-    expect(response).toEqual({
-      id: testUserInstitutionId,
-      userId: testUserId,
-      cur_job_id: testJobId,
-      status: ConnectionStatus.CREATED,
-      aggregator: SOPHTRON_ADAPTER_NAME,
+        status: ConnectionStatus.CREATED,
+        aggregator: SOPHTRON_ADAPTER_NAME,
+      });
     });
   });
 

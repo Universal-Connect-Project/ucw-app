@@ -208,6 +208,13 @@ export class SophtronAdapter implements WidgetAdapter {
     } else if (job.SuccessFlag === false) {
       jobStatus = "failed";
     }
+    let sas_account = "";
+    if (
+      job.AccountID &&
+      job.AccountID !== "00000000-0000-0000-0000-000000000000"
+    ) {
+      sas_account = job.AccountID;
+    }
     switch (jobStatus) {
       case "success":
         // case 'Completed':
@@ -220,8 +227,7 @@ export class SophtronAdapter implements WidgetAdapter {
         const jobType = job.JobType.toLowerCase();
         if (
           singleAccountSelect &&
-          (!job.AccountID ||
-            job.AccountID === "00000000-0000-0000-0000-000000000000") &&
+          !sas_account &&
           (jobType.indexOf("verification") >= 0 ||
             jobType.indexOf("verify") >= 0)
         ) {
@@ -248,6 +254,7 @@ export class SophtronAdapter implements WidgetAdapter {
           challenge.data = JSON.parse(job.SecurityQuestion).map(
             (q: string) => ({ key: q, value: q }),
           );
+          jobStatus = "SecurityQuestion";
         } else if (job.TokenMethod) {
           challenge.id = "TokenMethod";
           challenge.type = ChallengeType.OPTIONS;
@@ -257,6 +264,7 @@ export class SophtronAdapter implements WidgetAdapter {
             key: q,
             value: q,
           }));
+          jobStatus = "TokenMethod";
         } else if (job.TokenSentFlag === true) {
           challenge.id = "TokenInput";
           challenge.type = ChallengeType.QUESTION;
@@ -267,6 +275,7 @@ export class SophtronAdapter implements WidgetAdapter {
               value: `Please enter the ${job.TokenInputName || "OTA code"}`,
             },
           ];
+          jobStatus = "TokenInput";
         } else if (job.TokenRead) {
           challenge.id = "TokenRead";
           challenge.type = ChallengeType.OPTIONS;
@@ -277,6 +286,7 @@ export class SophtronAdapter implements WidgetAdapter {
               value: "token_read",
             },
           ];
+          jobStatus = "TokenRead";
         } else if (job.CaptchaImage) {
           challenge.id = "CaptchaImage";
           challenge.type = ChallengeType.IMAGE;
@@ -285,17 +295,28 @@ export class SophtronAdapter implements WidgetAdapter {
           // TODO: select captcha, currently it's combined into one image and treated as a normal Captcha Image
           // challenge.type = ChallengeType.IMAGE_OPTION
           // challenge.label = ''
+          jobStatus = "CaptchaImage";
         } else {
           status = ConnectionStatus.CREATED;
         }
         break;
     }
+
+    const postMessageEventData = {
+      rawStatus: jobStatus,
+      selectedAccountId: sas_account,
+    };
+
     return {
       id: job.UserInstitutionID,
       userId: userId,
       cur_job_id: job.JobID,
+      postMessageEventData: {
+        memberConnected: postMessageEventData,
+        memberStatusUpdate: postMessageEventData,
+      },
       status,
-      challenges: challenge?.id ? [challenge] : undefined,
+      challenges: challenge?.id ? [challenge] : null,
       aggregator: SOPHTRON_ADAPTER_NAME,
     };
   }

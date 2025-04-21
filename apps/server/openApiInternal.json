@@ -494,6 +494,19 @@
                     "is_oauth": false,
                     "aggregator": "testExampleC",
                     "is_being_aggregated": false,
+                    "postMessageEventData": {
+                      "memberConnected": {
+                        "aggregator": "mx_int",
+                        "member_guid": "MBR-b3b1c287-9dea-447a-83c9-2554d7cfc310",
+                        "user_guid": "USR-35223fe6-391d-4d02-9184-55a8fcb0b099"
+                      },
+                      "memberStatusUpdate": {
+                        "aggregator": "mx_int",
+                        "member_guid": "MBR-b3b1c287-9dea-447a-83c9-2554d7cfc310",
+                        "user_guid": "USR-35223fe6-391d-4d02-9184-55a8fcb0b099",
+                        "connection_status": 0
+                      }
+                    },
                     "user_guid": "e07115cc-bbf9-466a-b7db-cdbc9c7cd31b",
                     "mfa": {
                       "credentials": [
