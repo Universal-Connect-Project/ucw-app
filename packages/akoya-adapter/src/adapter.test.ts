@@ -181,7 +181,15 @@ describe("akoya aggregator", () => {
         status: ConnectionStatus.CONNECTED,
         institution_code: "inst-001",
         id: "inst-001",
-        userId: "fake_oauth_code",
+        postMessageEventData: {
+          memberConnected: {
+            akoyaAuthCode: "fake_oauth_code",
+          },
+          memberStatusUpdate: {
+            akoyaAuthCode: "fake_oauth_code",
+          },
+        },
+        userId: null,
       });
 
       const cached = await cacheClient.get(requestId);
