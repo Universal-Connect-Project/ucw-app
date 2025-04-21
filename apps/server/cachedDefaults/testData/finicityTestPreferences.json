@@ -1,0 +1,16 @@
+{
+  "defaultAggregator": "finicity_sandbox",
+
+  "supportedAggregators": [
+    "finicity_sandbox",
+    "finicity"
+  ],
+
+  "defaultAggregatorVolume": { },
+
+  "institutionAggregatorVolumeMap": { },
+
+  "hiddenInstitutions": [],
+
+  "recommendedInstitutions": ["5deb6fca-557e-4d45-b2f8-354351675ad4"]
+}

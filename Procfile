@@ -1,1 +1,1 @@
-web: npm run copyDemoPreferences && npm start --workspace=apps/server
+web: npm run copyFinicityTestPreferences && npm start --workspace=apps/server
