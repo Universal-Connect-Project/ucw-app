@@ -76,8 +76,8 @@ export class FinicityAdapter implements WidgetAdapter {
       institution_code: request.institutionId,
       oauth_window_uri: await this.apiClient.generateConnectLiteUrl(request.institutionId, user_id, request_id),
       aggregator: this.aggregator,
-      status: ConnectionStatus.PENDING,
-      raw_status: 'PENDING'
+      status: ConnectionStatus.CREATED,
+      raw_status: 'CREATED'
     }
     await this.cacheClient.set(request_id, obj);
     return obj;
@@ -203,11 +203,22 @@ export class FinicityAdapter implements WidgetAdapter {
 
   async getConnection(id: string, user_id: string){
     if(id.startsWith(this.sessionId || user_id)){
-      return await this.cacheClient.get(id);
+      const connection = await this.cacheClient.get(id);
+      if(connection.status === ConnectionStatus.CREATED){
+        connection.status = ConnectionStatus.PENDING
+        connection.raw_status = 'PENDING'
+        await this.cacheClient.set(id, connection);
+      }
+      return connection;
     }else{
       const request_id = `${this.sessionId || user_id};${id}`;
       const existing = await this.cacheClient.get(request_id);
       if(existing?.id){
+        if(existing.status === ConnectionStatus.CREATED){
+          existing.status = ConnectionStatus.PENDING
+          existing.raw_status = 'PENDING'
+          await this.cacheClient.set(id, existing);
+        }
         return existing;
       }
       const obj = {
