@@ -7,6 +7,7 @@ import config from "./config";
 import * as logger from "./infra/logger";
 import { get, set } from "./services/storageClient/redis";
 import { adapterMapObject as testAdapterMapObject } from "./test-adapter";
+import { getWebhookHostUrl } from "./webhooks";
 
 const mxAdapterMapObject = getMxAdapterMapObject({
   cacheClient: {
@@ -64,9 +65,9 @@ const finicityAdapterMapObject: Record<string, AdapterMap> =
         secret: config.FINICITY_SECRET_PROD,
       },
     },
+    getWebhookHostUrl: getWebhookHostUrl,
     envConfig: {
       HostUrl: config.HOST_URL,
-      WebhookHostUrl: config.WEBHOOK_HOST_URL,
     },
   });
 
