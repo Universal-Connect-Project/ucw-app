@@ -1,15 +1,15 @@
 import "dotenv/config";
 import type { DataAdapterDependencies } from "./models";
-import { logClient } from "./test/utils/logClient";
 import { aggregatorCredentials } from "./adapter.test";
 import { VCDataTypes } from "@repo/utils";
 import {
   createFinicitySandboxDataAdapter,
   createFinicityProdDataAdapter,
 } from "./dataAdapter";
+import { createLogClient } from "@repo/utils/test";
 
 const dependencies: DataAdapterDependencies = {
-  logClient,
+  logClient: createLogClient(),
   aggregatorCredentials,
   envConfig: process.env,
   getWebhookHostUrl: () => "testWebhookHostUrl",

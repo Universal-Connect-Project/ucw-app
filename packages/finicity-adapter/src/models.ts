@@ -1,30 +1,20 @@
+import { CacheClient, LogClient } from "@repo/utils";
+
 export type ApiCredentials = {
   secret?: string;
   partnerId?: string;
   appKey?: string;
-  basePath?: string;
-  aggregator?: string;
-  available?: boolean;
-  [key: string]: any;
 };
 
-export type CacheClient = {
-  set: (key: string, value: any) => Promise<void> | void;
-  get: (key: string) => Promise<any> | any;
-};
-
-export type LogClient = {
-  info: (message: string, error?: any) => void;
-  error: (message: string, data?: any) => void;
-  debug: (message: string, data?: any) => void;
-  trace: (message: string, data?: any) => void;
-  warning: (message: string, data?: any) => void;
-};
+export interface AggregatorCredentials {
+  finicitySandbox: ApiCredentials;
+  finicityProd: ApiCredentials;
+}
 
 export type AdapterDependencies = {
   cacheClient: CacheClient;
   logClient: LogClient;
-  aggregatorCredentials: Record<string, ApiCredentials>;
+  aggregatorCredentials: AggregatorCredentials;
   envConfig: Record<string, string>;
   getWebhookHostUrl: () => string;
 };
@@ -37,7 +27,7 @@ export type AdapterConfig = {
 
 export type DataAdapterDependencies = {
   logClient: LogClient;
-  aggregatorCredentials: any;
+  aggregatorCredentials: AggregatorCredentials;
   envConfig: Record<string, string>;
   getWebhookHostUrl: () => string;
 };

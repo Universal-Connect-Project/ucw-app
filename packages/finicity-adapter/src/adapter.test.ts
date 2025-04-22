@@ -1,7 +1,9 @@
 import { http, HttpResponse } from "msw";
 
-import { createClient as createCacheClient } from "./test/utils/cacheClient";
-import { logClient } from "./test/utils/logClient";
+import {
+  createClient as createCacheClient,
+  createLogClient,
+} from "@repo/utils/test";
 import { FinicityAdapter } from "./adapter";
 import { ConnectionStatus } from "@repo/utils";
 
@@ -47,7 +49,7 @@ const finicityAdapterSandbox = new FinicityAdapter({
   sessionId: "test-session",
   dependencies: {
     cacheClient,
-    logClient,
+    logClient: createLogClient(),
     aggregatorCredentials,
     getWebhookHostUrl: () => "testWebhookHostUrl",
     envConfig: {
@@ -61,7 +63,7 @@ const finicityAdapter = new FinicityAdapter({
   sessionId: "test-session",
   dependencies: {
     cacheClient,
-    logClient,
+    logClient: createLogClient(),
     aggregatorCredentials,
     getWebhookHostUrl: () => "testWebhookHostUrl",
     envConfig: {
@@ -138,7 +140,7 @@ describe("finicity aggregator", () => {
 
     describe("DeleteConnection", () => {
       it("deletes the connection", async () => {
-        await finicityAdapter.DeleteConnection("testId", "test-user-name");
+        await finicityAdapter.DeleteConnection("testId");
         const cached = await cacheClient.get("testId");
         expect(cached).toBe(null);
       });
@@ -166,16 +168,14 @@ describe("finicity aggregator", () => {
 
     describe("UpdateConnection", () => {
       it("is not available with finicity", async () => {
-        const ret = await finicityAdapter.UpdateConnection(
-          null,
-          "test-user-name",
-        );
+        const ret = await finicityAdapter.UpdateConnection(null);
         expect(ret).toEqual(null);
       });
     });
 
     describe("GetConnectionById", () => {
       it("returns the member from readMember", async () => {
+        // This test relys on other tests running first, any dependencies should be contained within the same "it" block
         const testUserId = "test-user-name";
         const member = await finicityAdapter.GetConnectionById(
           "connectionId",
@@ -183,13 +183,12 @@ describe("finicity aggregator", () => {
         );
 
         expect(member).toEqual({
-          id: `test-session;connectionId`,
+          id: `connectionId`,
           is_oauth: true,
           oauth_window_uri: "http://example.url",
           aggregator: "finicity",
           credentials: [],
           status: ConnectionStatus.PENDING,
-          raw_status: "PENDING",
           userId: testUserId,
         });
       });
@@ -197,11 +196,10 @@ describe("finicity aggregator", () => {
 
     describe("GetConnectionStatus", () => {
       it("returns a rejected connection status if there's an error with oauthStatus", async () => {
+        // This test relys on other tests running first, any dependencies should be contained within the same "it" block
         const connectionStatus = await finicityAdapter.GetConnectionStatus(
           "testMemberId",
           "testJobId",
-          false,
-          "test-user-name",
         );
 
         expect(connectionStatus.status).toEqual(ConnectionStatus.PENDING);
