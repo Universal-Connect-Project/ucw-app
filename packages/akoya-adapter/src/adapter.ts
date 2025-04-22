@@ -10,8 +10,11 @@ import type {
 } from "@repo/utils";
 import { ConnectionStatus } from "@repo/utils";
 import type { AdapterDependencies, ApiCredentials } from "./models";
-import { createGetOauthUrl } from "./apiClient";
+
 import { v4 as uuidv4 } from "uuid";
+
+export const AKOYA_BASE_PATH = "https://sandbox-idp.ddp.akoya.com";
+export const AKOYA_BASE_PROD_PATH = "https://idp.ddp.akoya.com";
 
 type AdapterConfig = {
   sandbox: boolean;
@@ -84,7 +87,7 @@ export class AkoyaAdapter implements WidgetAdapter {
         state: requestId,
       }),
       aggregator: this.aggregator,
-      status: ConnectionStatus.PENDING,
+      status: ConnectionStatus.CREATED,
     };
     await this.cacheClient.set(requestId, obj, {
       EX: 600, // 10 minutes
@@ -120,7 +123,12 @@ export class AkoyaAdapter implements WidgetAdapter {
     connectionId: string,
     _jobId: string,
   ): Promise<Connection> {
-    return (await this.cacheClient.get(connectionId)) as Connection;
+    const connection = await this.cacheClient.get(connectionId);
+    if (connection.status === ConnectionStatus.CREATED) {
+      connection.status = ConnectionStatus.PENDING;
+    }
+    await this.cacheClient.set(connectionId, connection);
+    return connection;
   }
 
   async AnswerChallenge(
@@ -164,4 +172,39 @@ export class AkoyaAdapter implements WidgetAdapter {
 
     return connection;
   }
+}
+
+interface CreateGetOauthUrlParams {
+  sandbox: boolean;
+  clientId: string;
+  hostUrl: string;
+  institutionId: string;
+  state: string;
+}
+
+function createGetOauthUrl({
+  sandbox,
+  clientId,
+  hostUrl,
+  institutionId,
+  state,
+}: CreateGetOauthUrlParams): string {
+  const basePath = sandbox ? AKOYA_BASE_PATH : AKOYA_BASE_PROD_PATH;
+  const aggregator = sandbox ? "akoya_sandbox" : "akoya";
+
+  const client_redirect_url = `${hostUrl}/oauth/${aggregator}/redirect_from`;
+
+  const params = {
+    connector: institutionId,
+    client_id: clientId,
+    redirect_uri: client_redirect_url,
+    state: state,
+    response_type: "code",
+    scope: "openid profile offline_access",
+  };
+
+  const baseUrl = new URL("/auth", basePath);
+  baseUrl.search = new URLSearchParams(params).toString();
+
+  return baseUrl.toString();
 }

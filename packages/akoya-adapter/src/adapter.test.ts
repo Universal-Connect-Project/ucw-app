@@ -4,7 +4,7 @@ import {
   createClient as createCacheClient,
   createLogClient,
 } from "@repo/utils/test";
-import { AkoyaAdapter } from "./adapter";
+import { AKOYA_BASE_PATH, AKOYA_BASE_PROD_PATH, AkoyaAdapter } from "./adapter";
 import { Connection, ConnectionStatus } from "@repo/utils";
 
 const cacheClient = createCacheClient();
@@ -29,7 +29,9 @@ const akoyaAdapterSandbox = new AkoyaAdapter({
     cacheClient,
     logClient,
     aggregatorCredentials,
-    envConfig: process.env,
+    envConfig: {
+      HostUrl: "http://localhost:8080",
+    },
   },
 });
 
@@ -39,7 +41,9 @@ const akoyaAdapter = new AkoyaAdapter({
     cacheClient,
     logClient,
     aggregatorCredentials,
-    envConfig: process.env,
+    envConfig: {
+      HostUrl: "http://localhost:8080",
+    },
   },
 });
 
@@ -88,11 +92,11 @@ describe("akoya aggregator", () => {
       credentials: [],
       institutionId: "testInstitutionId",
     };
+    const testUserId = "test-user-id";
 
     it("creates a connection and gets the connection by id then gets the status", async () => {
-      const testUserId = "test-user-id";
       const oauth_window_uri_example =
-        "https://idp.ddp.akoya.com/auth?connector=testInstitutionId&client_id=prod-test-clientId&redirect_uri=undefined%2Foauth%2Fakoya%2Fredirect_from&state=123456789&response_type=code&scope=openid+profile+offline_access";
+        "https://idp.ddp.akoya.com/auth?connector=testInstitutionId&client_id=prod-test-clientId&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Foauth%2Fakoya%2Fredirect_from&state=123456789&response_type=code&scope=openid+profile+offline_access";
 
       const connection = await akoyaAdapter.CreateConnection(
         {
@@ -110,7 +114,7 @@ describe("akoya aggregator", () => {
         oauth_window_uri: oauth_window_uri_example,
         aggregator: "akoya",
         credentials: [],
-        status: ConnectionStatus.PENDING,
+        status: ConnectionStatus.CREATED,
         userId: testUserId,
       };
 
@@ -125,6 +129,44 @@ describe("akoya aggregator", () => {
       );
 
       expect(connectionStatus.status).toEqual(ConnectionStatus.PENDING);
+    });
+
+    it("gets the proper oauth_window_uri for production", async () => {
+      const connection = await akoyaAdapter.CreateConnection(
+        {
+          ...baseConnectionRequest,
+          is_oauth: true,
+        },
+        testUserId,
+      );
+
+      const oauthUrl = new URL(connection.oauth_window_uri);
+      expect(oauthUrl.origin).toBe(AKOYA_BASE_PROD_PATH);
+      expect(oauthUrl.pathname).toBe("/auth");
+
+      const search = oauthUrl.searchParams;
+      expect(search.get("redirect_uri")).toBe(
+        "http://localhost:8080/oauth/akoya/redirect_from",
+      );
+    });
+
+    it("gets the proper oauth_window_uri for sandbox", async () => {
+      const connection = await akoyaAdapterSandbox.CreateConnection(
+        {
+          ...baseConnectionRequest,
+          is_oauth: true,
+        },
+        testUserId,
+      );
+
+      const oauthUrl = new URL(connection.oauth_window_uri);
+      expect(oauthUrl.origin).toBe(AKOYA_BASE_PATH);
+      expect(oauthUrl.pathname).toBe("/auth");
+
+      const search = oauthUrl.searchParams;
+      expect(search.get("redirect_uri")).toBe(
+        "http://localhost:8080/oauth/akoya_sandbox/redirect_from",
+      );
     });
   });
 
