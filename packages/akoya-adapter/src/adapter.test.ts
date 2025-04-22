@@ -131,7 +131,7 @@ describe("akoya aggregator", () => {
           oauth_window_uri: oauth_window_uri_example,
           aggregator: "akoya",
           credentials: [],
-          status: ConnectionStatus.PENDING,
+          status: ConnectionStatus.CREATED,
           raw_status: 'PENDING',
           userId: testUserId
         });

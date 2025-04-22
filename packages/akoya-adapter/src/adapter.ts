@@ -79,7 +79,7 @@ export class AkoyaAdapter implements WidgetAdapter {
         request_id,
       ),
       aggregator: this.apiClient.apiConfig.aggregator,
-      status: ConnectionStatus.PENDING,
+      status: ConnectionStatus.CREATED,
       raw_status: 'PENDING',
     };
     await this.cacheClient.set(request_id, obj);
@@ -123,7 +123,12 @@ export class AkoyaAdapter implements WidgetAdapter {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     user_id?: string,
   ): Promise<Connection> {
-    return await this.cacheClient.get(connectionId);
+    const connection = await this.cacheClient.get(connectionId);
+    if(connection.status === ConnectionStatus.CREATED){
+      connection.status = ConnectionStatus.PENDING;
+    }
+    await this.cacheClient.set(connectionId, connection);
+    return connection;
   }
 
   async AnswerChallenge(
