@@ -1,6 +1,7 @@
 import type { AdapterMap } from "@repo/utils";
 import { getMxAdapterMapObject } from "@repo/mx-adapter";
 import { getSophtronAdapterMapObject } from "@repo/sophtron-adapter";
+import { getAkoyaAdapterMapObject } from "@repo/akoya-adapter";
 import config from "./config";
 import * as logger from "./infra/logger";
 import { get, set } from "./services/storageClient/redis";
@@ -43,7 +44,31 @@ const sophtronAdapterMapObject: Record<string, AdapterMap> =
     },
   });
 
+const akoyaAdapterMapObject: Record<string, AdapterMap> =
+  getAkoyaAdapterMapObject({
+    cacheClient: {
+      set: set,
+      get: get,
+    },
+    logClient: logger,
+    aggregatorCredentials: {
+      akoyaSandbox: {
+        clientId: config.AKOYA_CLIENT_ID,
+        secret: config.AKOYA_SECRET,
+      },
+      akoyaProd: {
+        clientId: config.AKOYA_CLIENT_ID_PROD,
+        secret: config.AKOYA_SECRET_PROD,
+      },
+    },
+    envConfig: {
+      HostUrl: config.HOST_URL,
+      WebhookHostUrl: config.WebhookHostUrl,
+    },
+  });
+
 export const adapterMap: Record<string, AdapterMap> = {
+  ...akoyaAdapterMapObject,
   ...mxAdapterMapObject,
   ...sophtronAdapterMapObject,
   ...testAdapterMapObject,

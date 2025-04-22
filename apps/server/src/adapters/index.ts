@@ -27,7 +27,6 @@ export class AggregatorAdapterBase {
       if (this.context?.aggregator) {
         this.aggregatorAdapter = createAggregatorWidgetAdapter({
           aggregator: this.context?.aggregator as Aggregator,
-          sessionId: this.context.sessionId,
         });
       }
       return true;

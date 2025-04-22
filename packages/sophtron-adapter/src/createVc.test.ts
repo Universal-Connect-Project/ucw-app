@@ -1,7 +1,7 @@
+import { createLogClient } from "@repo/utils/test";
 import { VCDataTypes } from "@repo/utils";
 
 import type { AdapterDependencies } from "./models";
-import { logClient } from "./test/utils/logClient";
 import { aggregatorCredentials } from "./test/testData/aggregatorCredentials";
 import { createSophtronVC } from "./createVc";
 
@@ -12,7 +12,7 @@ import {
 } from "./test/testData/sophtronVcData";
 
 const dependencies: AdapterDependencies = {
-  logClient,
+  logClient: createLogClient(),
   aggregatorCredentials,
   envConfig: {
     HOSTURL: undefined,
@@ -25,9 +25,7 @@ describe("getVc", () => {
   const accountId = "accountId";
 
   it("gets accounts VC", async () => {
-    const vc = await (
-      createSophtronVC(dependencies)
-    )({
+    const vc = await createSophtronVC(dependencies)({
       connectionId,
       type: VCDataTypes.ACCOUNTS,
       userId,
@@ -36,9 +34,7 @@ describe("getVc", () => {
   });
 
   it("gets identity VC", async () => {
-    const vc = await (
-      createSophtronVC(dependencies)
-    )({
+    const vc = await createSophtronVC(dependencies)({
       connectionId,
       type: VCDataTypes.IDENTITY,
       userId,
@@ -47,9 +43,7 @@ describe("getVc", () => {
   });
 
   it("gets transactions VC", async () => {
-    const vc = await (
-      createSophtronVC(dependencies)
-    )({
+    const vc = await createSophtronVC(dependencies)({
       connectionId,
       type: VCDataTypes.TRANSACTIONS,
       userId,

@@ -1,12 +1,12 @@
 import { VCDataTypes } from "@repo/utils";
 
 import { createDataAdapter } from "./createDataAdapter";
-import { logClient } from "./test/utils/logClient";
+import { createLogClient } from "@repo/utils/test";
 import { aggregatorCredentials } from "./test/testData/aggregatorCredentials";
 import type { AdapterDependencies } from "./models";
 
 const dependencies: AdapterDependencies = {
-  logClient,
+  logClient: createLogClient(),
   aggregatorCredentials,
   envConfig: {
     HOSTURL: undefined,

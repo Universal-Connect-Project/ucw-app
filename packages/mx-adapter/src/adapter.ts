@@ -1,10 +1,12 @@
 import type {
   AggregatorInstitution,
+  CacheClient,
   Challenge,
   Connection,
   CreateConnectionRequest,
   Credential,
   KeyValuePair,
+  LogClient,
   UpdateConnectionRequest,
   WidgetAdapter,
 } from "@repo/utils";
@@ -18,7 +20,7 @@ import type {
 } from "mx-platform-node";
 
 import { MxIntApiClient, MxProdApiClient } from "./apiClient";
-import type { AdapterConfig, CacheClient, LogClient } from "./models";
+import type { AdapterConfig } from "./models";
 
 const MXJobTypeMap = {
   [ComboJobTypes.ACCOUNT_NUMBER]: "account_verification",

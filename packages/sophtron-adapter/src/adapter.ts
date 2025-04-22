@@ -5,12 +5,13 @@ import type {
   Connection,
   CreateConnectionRequest,
   Credential,
+  LogClient,
   UpdateConnectionRequest,
   WidgetAdapter,
 } from "@repo/utils";
 import { ChallengeType, ConnectionStatus } from "@repo/utils";
 
-import type { AdapterConfig, LogClient } from "./models";
+import type { AdapterConfig } from "./models";
 import { SOPHTRON_ADAPTER_NAME } from "./constants";
 
 import SophtronClientV1 from "./apiClient.v1";

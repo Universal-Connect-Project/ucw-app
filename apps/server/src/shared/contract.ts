@@ -26,7 +26,6 @@ export interface Context {
   oauth_referral_source?: string;
   scheme?: string;
   updated?: boolean;
-  sessionId?: string;
 }
 
 export enum ConnectionStatus {

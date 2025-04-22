@@ -4,7 +4,6 @@ import "./App.css";
 import { useErrorBoundary, withErrorBoundary } from "react-error-boundary";
 import Widget from "./Widget";
 import { ComboJobTypes } from "@repo/utils";
-import { v4 as uuidV4 } from "uuid";
 
 // eslint-disable-next-line react-refresh/only-export-components
 const App = () => {
@@ -20,15 +19,12 @@ const App = () => {
   const singleAccountSelect =
     queryParams.get("singleAccountSelect") !== "false";
 
-  const [sessionId] = useState(queryParams.get("sessionId") || uuidV4());
-
   const instrumentationProps = {
     userId: userId,
     current_member_guid: connectionId,
     current_aggregator: aggregator,
     jobTypes,
     singleAccountSelect,
-    sessionId,
   };
 
   const { showBoundary } = useErrorBoundary();

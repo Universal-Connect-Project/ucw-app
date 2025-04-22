@@ -10,13 +10,12 @@ import { mxVcAccountsData } from "./test/testData/mxVcData";
 import { server } from "./test/testServer";
 
 import { aggregatorCredentials } from "./test/testData/aggregatorCredentials";
-import { createClient } from "./test/utils/cacheClient";
-import { logClient } from "./test/utils/logClient";
+import { createClient, createLogClient } from "@repo/utils/test";
 
 const accountsPath = "users/userId/members/connectionId/accounts";
 
 const dependencies: AdapterDependencies = {
-  logClient,
+  logClient: createLogClient(),
   cacheClient: createClient(),
   aggregatorCredentials,
   envConfig: {

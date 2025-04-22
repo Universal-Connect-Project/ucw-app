@@ -26,10 +26,13 @@ import {
 import { createUserData, listUsersData } from "./test/testData/users";
 import { server } from "./test/testServer";
 
-import { createClient as createCacheClient } from "./test/utils/cacheClient";
-import { logClient } from "./test/utils/logClient";
+import {
+  createClient as createCacheClient,
+  createLogClient,
+} from "@repo/utils/test";
 
 const cacheClient = createCacheClient();
+const logClient = createLogClient();
 
 const HOSTURL = "test";
 

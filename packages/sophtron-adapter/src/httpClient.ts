@@ -1,6 +1,7 @@
 import axios, { type AxiosInstance } from "axios";
 
-import type { AdapterDependencies, LogClient, IHttpClient } from "./models";
+import type { AdapterDependencies, IHttpClient } from "./models";
+import type { LogClient } from "@repo/utils";
 
 export default class HttpClient implements IHttpClient {
   logClient: LogClient;
