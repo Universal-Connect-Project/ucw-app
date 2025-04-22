@@ -19,13 +19,10 @@ const createDataAdapter = (
   }) => {
     const { logClient, envConfig, aggregatorCredentials, getWebhookHostUrl } =
       dependencies;
-    const configuration = sandbox
-      ? aggregatorCredentials.finicitySandbox
-      : aggregatorCredentials.finicityProd;
 
     const dataClient = new FinicityClient(
       sandbox,
-      configuration,
+      aggregatorCredentials,
       logClient,
       envConfig,
       getWebhookHostUrl,

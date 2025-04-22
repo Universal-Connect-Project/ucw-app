@@ -3,7 +3,7 @@
     "baseUrl": "./src",
     "lib": ["ES5", "ESNext"],
 
-    "module": "CommonJS",
+    "module": "ES2015",
     "moduleResolution": "Node",
 
     "allowJs": true,

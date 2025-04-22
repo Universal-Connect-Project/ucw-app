@@ -1,18 +1,19 @@
 import type {
   AggregatorInstitution,
+  CacheClient,
   Connection,
   CreateConnectionRequest,
   Credential,
+  LogClient,
   UpdateConnectionRequest,
   WidgetAdapter,
 } from "@repo/utils";
 import { ConnectionStatus } from "@repo/utils";
-import type { AdapterConfig, CacheClient, LogClient } from "./models";
+import type { AdapterConfig } from "./models";
 import FinicityClient from "./apiClient";
 import { v4 as uuidv4 } from "uuid";
 
 export class FinicityAdapter implements WidgetAdapter {
-  sessionId: string;
   aggregator: string;
   apiClient: FinicityClient;
   cacheClient: CacheClient;
@@ -20,27 +21,18 @@ export class FinicityAdapter implements WidgetAdapter {
   envConfig: Record<string, string>;
 
   constructor(args: AdapterConfig) {
-    const { sandbox, sessionId, dependencies } = args;
+    const { sandbox, dependencies } = args;
     this.aggregator = sandbox ? "finicity_sandbox" : "finicity";
-    this.sessionId = sessionId;
     this.cacheClient = dependencies?.cacheClient;
     this.logger = dependencies?.logClient;
     this.envConfig = dependencies?.envConfig;
-    this.apiClient = sandbox
-      ? new FinicityClient(
-          sandbox,
-          dependencies?.aggregatorCredentials.finicitySandbox,
-          this.logger,
-          this.envConfig,
-          dependencies.getWebhookHostUrl,
-        )
-      : new FinicityClient(
-          sandbox,
-          dependencies?.aggregatorCredentials.finicityProd,
-          this.logger,
-          this.envConfig,
-          dependencies.getWebhookHostUrl,
-        );
+    this.apiClient = new FinicityClient(
+      sandbox,
+      dependencies?.aggregatorCredentials,
+      this.logger,
+      this.envConfig,
+      dependencies.getWebhookHostUrl,
+    );
   }
 
   async DeleteUser(userId: string) {
@@ -60,21 +52,18 @@ export class FinicityAdapter implements WidgetAdapter {
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async ListInstitutionCredentials(id: string): Promise<Array<Credential>> {
-    return Promise.resolve([]);
+  async ListInstitutionCredentials(_id: string): Promise<Credential[]> {
+    return [];
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async ListConnectionCredentials(
-    connectionId: string,
-    userId: string,
+    _connectionId: string,
+    _userId: string,
   ): Promise<Credential[]> {
-    return Promise.resolve([]);
+    return [];
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ListConnections(userId: string): Promise<Connection[]> {
+  ListConnections(_userId: string): Promise<Connection[]> {
     return Promise.resolve([]);
   }
 
@@ -82,11 +71,12 @@ export class FinicityAdapter implements WidgetAdapter {
     request: CreateConnectionRequest,
     user_id: string,
   ): Promise<Connection | undefined> {
-    const request_id = `${this.sessionId || user_id};${uuidv4()}`;
+    const request_id = uuidv4();
     const obj = {
       id: request_id,
       is_oauth: true,
       userId: user_id,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       credentials: [] as any[],
       institution_code: request.institutionId,
       oauth_window_uri: await this.apiClient.generateConnectLiteUrl(
@@ -96,54 +86,44 @@ export class FinicityAdapter implements WidgetAdapter {
       ),
       aggregator: this.aggregator,
       status: ConnectionStatus.CREATED,
-      raw_status: "CREATED",
     };
     await this.cacheClient.set(request_id, obj);
     return obj;
   }
 
-  async DeleteConnection(
-    id: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    userId: string,
-  ): Promise<void> {
+  async DeleteConnection(id: string): Promise<void> {
     await this.cacheClient.set(id, null);
   }
 
   async UpdateConnection(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    request: UpdateConnectionRequest,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    user_id: string,
+    _request: UpdateConnectionRequest,
   ): Promise<Connection> {
     return null;
   }
 
-  GetConnectionById(
+  async GetConnectionById(
     connectionId: string,
-    user_id: string,
+    _user_id: string,
   ): Promise<Connection> {
-    return this.getConnection(connectionId, user_id);
+    return await this.cacheClient.get(connectionId);
   }
 
-  GetConnectionStatus(
+  async GetConnectionStatus(
     connectionId: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    jobId: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    single_account_select?: boolean,
-    user_id?: string,
+    _jobId: string,
   ): Promise<Connection> {
-    return this.getConnection(connectionId, user_id);
+    const connection = await this.cacheClient.get(connectionId);
+
+    if (connection.status === ConnectionStatus.CREATED) {
+      connection.status = ConnectionStatus.PENDING;
+      await this.cacheClient.set(connectionId, connection);
+    }
+    return connection;
   }
 
   async AnswerChallenge(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    request: UpdateConnectionRequest,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    jobId: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    user_id: string,
+    _request: UpdateConnectionRequest,
+    _jobId: string,
   ): Promise<boolean> {
     return true;
   }
@@ -169,6 +149,7 @@ export class FinicityAdapter implements WidgetAdapter {
     return user_id;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async HandleOauthResponse(request: any): Promise<Connection> {
     const { connection_id, reason, code } = request?.query || {};
     const { eventType, payload } = request?.body || {};
@@ -223,44 +204,5 @@ export class FinicityAdapter implements WidgetAdapter {
       connection.status = ConnectionStatus.CONNECTED;
     }
     return connection;
-  }
-
-  async getConnection(id: string, user_id: string) {
-    if (id.startsWith(this.sessionId || user_id)) {
-      const connection = await this.cacheClient.get(id);
-      if (connection.status === ConnectionStatus.CREATED) {
-        connection.status = ConnectionStatus.PENDING;
-        connection.raw_status = "PENDING";
-        await this.cacheClient.set(id, connection);
-      }
-      return connection;
-    } else {
-      const request_id = `${this.sessionId || user_id};${id}`;
-      const existing = await this.cacheClient.get(request_id);
-      if (existing?.id) {
-        if (existing.status === ConnectionStatus.CREATED) {
-          existing.status = ConnectionStatus.PENDING;
-          existing.raw_status = "PENDING";
-          await this.cacheClient.set(id, existing);
-        }
-        return existing;
-      }
-      const obj = {
-        id: request_id,
-        is_oauth: true,
-        userId: user_id,
-        credentials: [] as any[],
-        oauth_window_uri: await this.apiClient.generateConnectFixUrl(
-          id,
-          user_id,
-          request_id,
-        ),
-        aggregator: this.aggregator,
-        status: ConnectionStatus.PENDING,
-        raw_status: "PENDING",
-      };
-      await this.cacheClient.set(request_id, obj);
-      return obj;
-    }
   }
 }

@@ -1,5 +1,6 @@
 import { default as axios, type AxiosInstance } from "axios";
-import type { LogClient, ApiCredentials } from "./models";
+import type { ApiCredentials, AggregatorCredentials } from "./models";
+import { LogClient } from "@repo/utils";
 
 function makeFinicityAuthHeaders(apiConfig: any, tokenRes: any) {
   return {
@@ -18,28 +19,21 @@ export default class FinicityClient {
   logger: LogClient;
   envConfig: Record<string, string>;
   getWebhookHostUrl: () => string;
+  basePath = "https://api.finicity.com";
+  aggregator: "finicity_sandbox" | "finicity";
 
   constructor(
     sandbox: boolean,
-    apiConfig: ApiCredentials,
+    apiConfig: AggregatorCredentials,
     logger: LogClient,
     envConfig: Record<string, string>,
     getWebhookHostUrl: () => string,
   ) {
-    this.apiConfig = sandbox
-      ? {
-          ...apiConfig,
-          basePath: "https://api.finicity.com",
-          aggregator: "finicity_sandbox",
-          available: true,
-        }
-      : {
-          ...apiConfig,
-          basePath: "https://api.finicity.com",
-          aggregator: "finicity",
-          available: true,
-        };
-    this.logger = logger;
+    this.aggregator = sandbox ? "finicity_sandbox" : "finicity";
+    (this.apiConfig = sandbox
+      ? apiConfig.finicitySandbox
+      : apiConfig.finicityProd),
+      (this.logger = logger);
     this.envConfig = envConfig;
     this.getWebhookHostUrl = getWebhookHostUrl;
   }
@@ -47,7 +41,7 @@ export default class FinicityClient {
   getAuthToken() {
     return axios
       .post(
-        this.apiConfig.basePath + "/aggregation/v2/partners/authentication",
+        this.basePath + "/aggregation/v2/partners/authentication",
         {
           partnerId: this.apiConfig.partnerId,
           partnerSecret: this.apiConfig.secret,
@@ -109,10 +103,6 @@ export default class FinicityClient {
   }
 
   getAccountAchDetail(customerId: string, accountId: string) {
-    // {
-    //   "routingNumber": "123456789",
-    //   "realAccountNumber": 2345678901
-    // }
     return this.get(
       `aggregation/v1/customers/${customerId}/accounts/${accountId}/details`,
     );
@@ -140,14 +130,14 @@ export default class FinicityClient {
     customerId: string,
     request_id: string,
   ) {
-    const redir = `${this.envConfig.HostUrl}/oauth/${this.apiConfig.aggregator}/redirect_from?connection_id=${request_id}`;
+    const redir = `${this.getWebhookHostUrl()}/oauth/${this.aggregator}/redirect_from?connection_id=${request_id}`;
     return this.post("connect/v2/generate/lite", {
       language: "en-US",
       partnerId: this.apiConfig.partnerId,
       customerId: customerId,
       institutionId,
       redirectUri: redir,
-      webhook: `${this.getWebhookHostUrl()}/webhook/${this.apiConfig.aggregator}/?connection_id=${request_id}`,
+      webhook: `${this.getWebhookHostUrl()}/webhook/${this.aggregator}/?connection_id=${request_id}`,
       webhookContentType: "application/json",
       // 'singleUseUrl': true,
       // 'experience': 'default',
@@ -164,15 +154,15 @@ export default class FinicityClient {
       partnerId: this.apiConfig.partnerId,
       customerId: customerId,
       institutionLoginId,
-      redirectUri: `${this.envConfig.HostUrl}/oauth/${this.apiConfig.aggregator}/redirect_from?connection_id=${request_id}`,
-      webhook: `${this.getWebhookHostUrl()}/webhook/${this.apiConfig.aggregator}/?connection_id=${request_id}`,
+      redirectUri: `${this.getWebhookHostUrl()}/oauth/${this.aggregator}/redirect_from?connection_id=${request_id}`,
+      webhook: `${this.getWebhookHostUrl()}/webhook/${this.aggregator}/?connection_id=${request_id}`,
       webhookContentType: "application/json",
     }).then((ret) => ret.link);
   }
 
   createCustomer(unique_name: string) {
     return this.post(
-      `aggregation/v2/customers/${this.apiConfig.aggregator === "finicity" ? "active" : "testing"}`,
+      `aggregation/v2/customers/${this.aggregator === "finicity" ? "active" : "testing"}`,
       {
         username: unique_name,
         firstName: "John",
@@ -201,7 +191,7 @@ export default class FinicityClient {
       const token = await this.getAuthToken();
       const headers = makeFinicityAuthHeaders(this.apiConfig, token);
       this.axios = axios.create({
-        baseURL: this.apiConfig.basePath,
+        baseURL: this.basePath,
         headers,
       });
     }

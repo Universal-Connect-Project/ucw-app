@@ -1,5 +1,5 @@
 import { server } from "./src/test/testServer";
-import { clearRedisMock } from "./src/test/utils/cacheClient";
+import { clearRedisMock } from "@repo/utils/test";
 
 beforeAll(() => {
   server.listen();
@@ -7,6 +7,7 @@ beforeAll(() => {
 
 afterEach(() => {
   server.resetHandlers();
+  clearRedisMock();
 });
 
 afterAll(() => server.close());
