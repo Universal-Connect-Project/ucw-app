@@ -13,6 +13,7 @@ These are the environment variables that can be set in apps/server/env/(staging|
 | LOG_LEVEL                  | The level of logs that should be outputted                                                                                   | debug, trace, info, warning, error           |
 | PORT                       | The port where the server runs                                                                                               | 8080                                         |
 | REDIS_SERVER               | The url of the redis server                                                                                                  | redis://localhost:6379                       |
+| WEBHOOK_HOST_URL           | The webhook url for finicity                                                                                                 |                                              |
 
 ## Aggregator specific variables
 
@@ -37,6 +38,12 @@ These are the environment variables that can be set in apps/server/env/(staging|
 | REDIS_CACHE_TIME_SECONDS     | The default expiration of things stored in redis               | 600      | 600             |
 | REDIS_ENABLE_TLS             | Enables TLS (Useful for some deployment platforms like heroku) | true     | false/undefined |
 | ELASTIC_SEARCH_SINGLE_THREAD | Enables single-threaded Elasticsearch indexing/updating        | true     | undefined       |
+
+## Local development variables
+
+| Variable name   | Description                                                           | Examples | Default value |
+| --------------- | --------------------------------------------------------------------- | -------- | ------------- |
+| NGROK_AUTHTOKEN | Auth token from NGROK to be able to run finicity in local development |          |               |
 
 ## Authentication variables
 
