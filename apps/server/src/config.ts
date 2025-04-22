@@ -3,6 +3,8 @@ import "./dotEnv";
 const keysToPullFromEnv = [
   "AUTH0_TOKEN_URL",
 
+  "NGROK_AUTHTOKEN",
+
   "PORT",
 
   "HOST_URL",
@@ -82,6 +84,7 @@ const config: Record<string, any> = keysToPullFromEnv.reduce((acc, envKey) => {
 
 if (process.env.HEROKU_APP_NAME) {
   config.HOST_URL = `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`;
+  config.WEBHOOK_HOST_URL = `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`;
 }
 
 if (config.INSTITUTION_POLLING_INTERVAL === undefined) {
