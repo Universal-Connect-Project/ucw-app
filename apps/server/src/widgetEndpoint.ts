@@ -24,7 +24,6 @@ export const widgetHandler = (req: Request, res: Response) => {
       })
       .required(),
     aggregator: Joi.string().valid(...aggregators),
-    sessionId: Joi.string(),
     singleAccountSelect: Joi.bool(),
     userId: Joi.string().required(),
     token: Joi.string(),

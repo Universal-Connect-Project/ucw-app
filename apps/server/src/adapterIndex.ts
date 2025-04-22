@@ -18,16 +18,14 @@ export const getAggregatorIdFromTestAggregatorId = (testId: string) => {
 
 export function createAggregatorWidgetAdapter({
   aggregator,
-  sessionId,
 }: {
   aggregator: Aggregator;
-  sessionId?: string | undefined;
 }): WidgetAdapter {
   const createWidgetAdapter =
     adapterMap[aggregator as keyof typeof adapterMap]?.createWidgetAdapter;
 
   if (createWidgetAdapter) {
-    return createWidgetAdapter({ sessionId });
+    return createWidgetAdapter();
   }
 
   throw new Error(`Unsupported aggregator ${aggregator}`);

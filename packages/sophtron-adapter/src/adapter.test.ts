@@ -38,12 +38,11 @@ import {
   testDataRequestValidatorEndTimeError,
   testDataValidatorStartTimeError,
 } from "./constants";
-
-import { logClient } from "./test/utils/logClient";
+import { createLogClient } from "@repo/utils/test";
 
 const adapter = new SophtronAdapter({
   dependencies: {
-    logClient,
+    logClient: createLogClient(),
     aggregatorCredentials,
     envConfig: {
       HOSTURL: undefined,
