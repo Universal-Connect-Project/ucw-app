@@ -25,6 +25,12 @@ These are the environment variables that can be set in apps/server/env/(staging|
 | MX_CLIENT_ID_PROD        | The client id for MX production APIs found in the MX dashboard (Client Id)          |
 | SOPHTRON_API_USER_ID     | The user id for Sophtron APIs found at sophtron.com/Manage -> UserId                |
 | SOPHTRON_API_USER_SECRET | The user secret Sophtron APIs found at sophtron.com/Manage -> AccessKey             |
+| FINICITY_PARTNER_ID      | The integration partner id for Finicity                                             |
+| FINICITY_APP_KEY         | The integration app key for Finicity                                                |
+| FINICITY_SECRET          | The integration secret for Finicity                                                 |
+| FINICITY_PARTNER_ID_PROD | The production partner id for Finicity                                              |
+| FINICITY_APP_KEY_PROD    | The production app key for Finicity                                                 |
+| FINICITY_SECRET_PROD     | The production secret for Finicity                                                  |
 | AKOYA_CLIENT_ID          | The client id for akoya sandbox integration found in the akoya dashboard            |
 | AKOYA_CLIENT_ID_PROD     | The client id for the akoya production integration found in the akoya dashboard     |
 | AKOYA_SECRET             | The client secret for the akoya sandbox integration found in the akoya dashboard    |
