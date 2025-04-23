@@ -161,10 +161,45 @@ describe("connectWidgetApiService", () => {
   });
 
   describe("loadInstitutionByGuid", () => {
-    it("resolves with an institution", async () => {
+    it("resolves with an institution using the institutionId if it's provided", async () => {
+      const institutionId = "overrideInstitutionId";
+
       expect(
-        await connectWidgetApiService.loadInstitutionByGuid("test"),
+        await createConnectWidgetApiService({
+          institutionId,
+        }).loadInstitutionByGuid("test"),
       ).toEqual(institutionByGuid);
+    });
+
+    it("resolves with an institution using the provided guid or the overridden institutionId", async () => {
+      const institutionByInstitutionId = {
+        ...institutionByGuid,
+        guid: "override",
+      };
+
+      const institutionId = "overrideInstitutionId";
+
+      const institutionGuid = "test";
+
+      server.use(
+        http.get(INSTITUTION_BY_GUID_MOCK_URL, ({ params }) => {
+          if (params.guid === institutionGuid) {
+            return HttpResponse.json(institutionByGuid);
+          } else if (params.guid === institutionId) {
+            return HttpResponse.json(institutionByInstitutionId);
+          }
+        }),
+      );
+
+      expect(
+        await connectWidgetApiService.loadInstitutionByGuid(institutionGuid),
+      ).toEqual(institutionByGuid);
+
+      expect(
+        await createConnectWidgetApiService({
+          institutionId,
+        }).loadInstitutionByGuid(institutionGuid),
+      ).toEqual(institutionByInstitutionId);
     });
 
     it("throws an error on failure", async () => {
