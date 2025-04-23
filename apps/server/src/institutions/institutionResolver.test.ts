@@ -103,6 +103,81 @@ describe("institutionResolver", () => {
       ElasticSearchMock.clearAll();
     });
 
+    it("resolves to the aggregatorOverride with a regular adapter and a non institution", async () => {
+      const aggregatorInstitutionId = "testAggregatorInstitutionId";
+
+      const institutionData = {
+        ...elasticSearchInstitutionData,
+        is_test_bank: false,
+      };
+
+      ElasticSearchMock.add(
+        {
+          method: "GET",
+          path: `/institutions/_doc/${aggregatorInstitutionId}`,
+        },
+        () => {
+          return {
+            _source: {
+              ...institutionData,
+              [TEST_EXAMPLE_A_AGGREGATOR_STRING]: {
+                id: aggregatorInstitutionId,
+              },
+            },
+          };
+        },
+      );
+
+      const institution = await resolveInstitutionAggregator({
+        aggregatorOverride: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+        ucpInstitutionId: aggregatorInstitutionId,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+      });
+
+      expect(institution).toEqual({
+        aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+        id: aggregatorInstitutionId,
+        logo_url: institutionData.logo,
+        name: institutionData.name,
+        url: institutionData.url,
+      });
+    });
+
+    it("resolves to the aggregatorOverride with a test adapter and a test institution", async () => {
+      const aggregatorInstitutionId = "testAggregatorInstitutionId";
+
+      ElasticSearchMock.add(
+        {
+          method: "GET",
+          path: `/institutions/_doc/${aggregatorInstitutionId}`,
+        },
+        () => {
+          return {
+            _source: {
+              ...elasticSearchInstitutionData,
+              [TEST_EXAMPLE_A_AGGREGATOR_STRING]: {
+                id: aggregatorInstitutionId,
+              },
+            },
+          };
+        },
+      );
+
+      const institution = await resolveInstitutionAggregator({
+        aggregatorOverride: TEST_EXAMPLE_C_AGGREGATOR_STRING,
+        ucpInstitutionId: aggregatorInstitutionId,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+      });
+
+      expect(institution).toEqual({
+        aggregator: TEST_EXAMPLE_C_AGGREGATOR_STRING,
+        id: aggregatorInstitutionId,
+        logo_url: elasticSearchInstitutionData.logo,
+        name: elasticSearchInstitutionData.name,
+        url: elasticSearchInstitutionData.url,
+      });
+    });
+
     it(`resolves to ${TEST_EXAMPLE_C_AGGREGATOR_STRING} if its a test bank and ${TEST_EXAMPLE_A_AGGREGATOR_STRING} is the aggregator`, async () => {
       mockInstitutionWithA(undefined, {
         is_test_bank: true,
