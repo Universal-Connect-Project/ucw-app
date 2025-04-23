@@ -3,6 +3,7 @@ import { ApiProvider, ConnectWidget } from "@mxenabled/connect-widget";
 import "./App.css";
 import createConnectWidgetApiService from "./api/connectWidgetApiService";
 import { ComboJobTypes } from "@repo/utils";
+import postMessageEventOverrides from "./postMessageEventOverrides";
 
 const Widget = ({
   aggregator,
@@ -55,6 +56,7 @@ const Widget = ({
             window.opener.postMessage(payload);
           }
         }}
+        postMessageEventOverrides={postMessageEventOverrides}
         profiles={{
           clientProfile: {
             account_verification_is_enabled: true,
