@@ -4,7 +4,7 @@ import type { AdapterDependencies } from "./models";
 export const getAkoyaAdapterMapObject = (dependencies: AdapterDependencies) => {
   return {
     akoya: {
-      testInstitutionAdapterName: "akoya_sandbox",
+      testAdapterId: "akoya_sandbox",
       dataAdapter: () => {
         throw new Error("Data adapter not implemented for Akoya");
       },
