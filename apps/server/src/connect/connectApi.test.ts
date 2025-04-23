@@ -10,7 +10,6 @@ import {
 
 const testContext = {
   aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
-  updated: false,
   institutionId: "xxx",
   resolvedUserId: null,
   jobTypes: [ComboJobTypes.TRANSACTIONS],
