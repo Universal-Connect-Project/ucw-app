@@ -9,7 +9,10 @@ vi.mock("./Widget", () => ({
 
 import App from "./App";
 import { http, HttpResponse } from "msw";
-import { INSTRUMENTATION_MOCK_URL } from "@repo/utils";
+import {
+  INSTRUMENTATION_MOCK_URL,
+  SOMETHING_WENT_WRONG_ERROR_TEXT,
+} from "@repo/utils";
 
 describe("<App />", () => {
   it("doesn't render the widget until instrumentation succeeds", async () => {
@@ -30,6 +33,8 @@ describe("<App />", () => {
 
     render(<App />);
 
-    expect(await screen.findByText("Something went wrong")).toBeInTheDocument();
+    expect(
+      await screen.findByText(SOMETHING_WENT_WRONG_ERROR_TEXT),
+    ).toBeInTheDocument();
   });
 });

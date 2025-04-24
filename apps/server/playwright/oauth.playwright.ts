@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { ComboJobTypes } from "@repo/utils";
+import { ComboJobTypes, SOMETHING_WENT_WRONG_ERROR_TEXT } from "@repo/utils";
 
 test("displays error page with failed oAuth", async ({ page }, testInfo) => {
   test.setTimeout(40000);
@@ -18,9 +18,11 @@ test("displays error page with failed oAuth", async ({ page }, testInfo) => {
   await page.getByRole("link", { name: "Go to log in" }).click();
 
   const authorizeTab = await popupPromise;
-  await expect(authorizeTab.getByText("Something went wrong")).toBeVisible();
+  await expect(
+    authorizeTab.getByText(SOMETHING_WENT_WRONG_ERROR_TEXT),
+  ).toBeVisible();
 
-  await expect(page.getByText("Something went wrong")).toBeVisible();
+  await expect(page.getByText(SOMETHING_WENT_WRONG_ERROR_TEXT)).toBeVisible();
   await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
 });
 

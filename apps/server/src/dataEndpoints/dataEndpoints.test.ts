@@ -1,7 +1,10 @@
 import type { Response } from "express";
 import he from "he";
 import { transactionsResponse } from "../test-adapter/vcResponses";
-import { testDataRequestValidatorStartTimeError } from "../test-adapter/constants";
+import {
+  TEST_EXAMPLE_A_AGGREGATOR_STRING,
+  testDataRequestValidatorStartTimeError,
+} from "../test-adapter/constants";
 import * as adapterIndex from "../adapterIndex";
 import {
   testVcAccountsData,
@@ -21,7 +24,12 @@ import {
 import type { Aggregator } from "../shared/contract";
 import { Aggregators } from "../shared/contract";
 import { invalidAggregatorString } from "../utils/validators";
-import { getDataFromVCJwt } from "@repo/utils";
+import {
+  getDataFromVCJwt,
+  SOMETHING_WENT_WRONG_ERROR_TEXT,
+  USER_NOT_RESOLVED_ERROR_TEXT,
+} from "@repo/utils";
+import { userIdNotFound } from "../test-adapter/adapter";
 
 /* eslint-disable @typescript-eslint/unbound-method */
 
@@ -35,6 +43,27 @@ describe("dataEndpoints", () => {
   });
 
   describe("accountsDataHandler", () => {
+    it("responds with a failure if the userId isn't found", async () => {
+      const res = {
+        send: jest.fn(),
+        status: jest.fn(),
+      } as unknown as Response;
+
+      await vcAccountsDataHandler(
+        {
+          params: {
+            connectionId: "testConnectionId",
+            aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+            userId: userIdNotFound,
+          },
+        },
+        res,
+      );
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.send).toHaveBeenCalledWith(USER_NOT_RESOLVED_ERROR_TEXT);
+    });
+
     it("responds with a failure if aggregator isn't valid", async () => {
       const res = {
         send: jest.fn(),
@@ -116,12 +145,33 @@ describe("dataEndpoints", () => {
 
       await vcAccountsDataHandler(req, res);
 
-      expect(res.send).toHaveBeenCalledWith("Something went wrong");
+      expect(res.send).toHaveBeenCalledWith(SOMETHING_WENT_WRONG_ERROR_TEXT);
       expect(res.status).toHaveBeenCalledWith(400);
     });
   });
 
   describe("identityDataHandler", () => {
+    it("responds with a failure if the userId isn't found", async () => {
+      const res = {
+        send: jest.fn(),
+        status: jest.fn(),
+      } as unknown as Response;
+
+      await vcIdentityDataHandler(
+        {
+          params: {
+            connectionId: "testConnectionId",
+            aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+            userId: userIdNotFound,
+          },
+        },
+        res,
+      );
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.send).toHaveBeenCalledWith(USER_NOT_RESOLVED_ERROR_TEXT);
+    });
+
     it("responds with a failure if aggregator isn't valid", async () => {
       const res = {
         send: jest.fn(),
@@ -205,13 +255,35 @@ describe("dataEndpoints", () => {
 
       await vcIdentityDataHandler(req, res);
 
-      expect(res.send).toHaveBeenCalledWith("Something went wrong");
+      expect(res.send).toHaveBeenCalledWith(SOMETHING_WENT_WRONG_ERROR_TEXT);
       expect(res.status).toHaveBeenCalledWith(400);
     });
   });
 
   describe("transactionsDataHandler", () => {
     describe("validation", () => {
+      it("responds with a failure if the userId isn't found", async () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn(),
+        } as unknown as Response;
+
+        await vcTransactionsDataHandler(
+          {
+            params: {
+              connectionId: "testConnectionId",
+              aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+              userId: userIdNotFound,
+            },
+            query: {},
+          },
+          res,
+        );
+
+        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.send).toHaveBeenCalledWith(USER_NOT_RESOLVED_ERROR_TEXT);
+      });
+
       it("fails if aggregator is invalid", async () => {
         const res = {
           send: jest.fn(),
@@ -318,7 +390,7 @@ describe("dataEndpoints", () => {
 
         await vcTransactionsDataHandler(req, res);
 
-        expect(res.send).toHaveBeenCalledWith("Something went wrong");
+        expect(res.send).toHaveBeenCalledWith(SOMETHING_WENT_WRONG_ERROR_TEXT);
         expect(res.status).toHaveBeenCalledWith(400);
       });
 

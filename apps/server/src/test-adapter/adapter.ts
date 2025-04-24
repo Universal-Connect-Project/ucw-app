@@ -6,7 +6,11 @@ import type {
   UpdateConnectionRequest,
   WidgetAdapter,
 } from "@repo/utils";
-import { ComboJobTypes, ConnectionStatus } from "@repo/utils";
+import {
+  ComboJobTypes,
+  ConnectionStatus,
+  USER_NOT_RESOLVED_ERROR_TEXT,
+} from "@repo/utils";
 import { get, set } from "../services/storageClient/redis";
 import {
   testExampleCredentials,
@@ -18,6 +22,8 @@ import config from "../config";
 export const testJobId = "testJobId";
 export const testInstitutionCode = "institutionCode";
 export const testConnectionId = "testConnectionId";
+
+export const userIdNotFound = "userIdNotFound";
 
 export const postMessageEventData = {
   memberConnected: {
@@ -295,6 +301,10 @@ export class TestAdapter implements WidgetAdapter {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     failIfNotFound: boolean = false,
   ): Promise<string> {
+    if (failIfNotFound && userId === userIdNotFound) {
+      throw new Error(USER_NOT_RESOLVED_ERROR_TEXT);
+    }
+
     return userId;
   }
 

@@ -10,7 +10,12 @@ import type {
   UpdateConnectionRequest,
   WidgetAdapter,
 } from "@repo/utils";
-import { ChallengeType, ComboJobTypes, ConnectionStatus } from "@repo/utils";
+import {
+  ChallengeType,
+  ComboJobTypes,
+  ConnectionStatus,
+  USER_NOT_RESOLVED_ERROR_TEXT,
+} from "@repo/utils";
 import type {
   CredentialRequest,
   CredentialResponse,
@@ -305,7 +310,7 @@ export class MxAdapter implements WidgetAdapter {
       this.logClient.trace(`Found existing mx user ${mxUser.guid}`);
       return mxUser.guid || "";
     } else if (failIfNotFound) {
-      throw new Error("User not resolved successfully");
+      throw new Error(USER_NOT_RESOLVED_ERROR_TEXT);
     }
 
     this.logClient.trace(`Creating mx user ${userId}`);

@@ -4,6 +4,7 @@ import { ConnectionStatus } from "../shared/contract";
 import * as path from "path";
 import * as fs from "fs";
 import * as logger from "../infra/logger";
+import { SOMETHING_WENT_WRONG_ERROR_TEXT } from "@repo/utils";
 
 //GET '/oauth/:aggregator/redirect_from/'
 export const oauthRedirectHandler = async (req: Request, res: Response) => {
@@ -23,7 +24,7 @@ export const oauthRedirectHandler = async (req: Request, res: Response) => {
 
     const oAuthText = isError
       ? {
-          message: "Something went wrong",
+          message: SOMETHING_WENT_WRONG_ERROR_TEXT,
           title: "OAuth Error",
         }
       : {

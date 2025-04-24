@@ -3,7 +3,12 @@ import type {
   CreateConnectionRequest,
   UpdateConnectionRequest,
 } from "@repo/utils";
-import { ChallengeType, ComboJobTypes, ConnectionStatus } from "@repo/utils";
+import {
+  ChallengeType,
+  ComboJobTypes,
+  ConnectionStatus,
+  USER_NOT_RESOLVED_ERROR_TEXT,
+} from "@repo/utils";
 
 import {
   SOPHTRON_ANSWER_JOB_MFA_PATH,
@@ -1038,7 +1043,7 @@ describe("sophtron adapter", () => {
 
       await expect(
         async () => await adapter.ResolveUserId(userId, true),
-      ).rejects.toThrow("User not resolved successfully");
+      ).rejects.toThrow(USER_NOT_RESOLVED_ERROR_TEXT);
     });
   });
 
