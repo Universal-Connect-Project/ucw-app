@@ -3,7 +3,11 @@ import type { Response } from "express";
 import * as logger from "../infra/logger";
 import he from "he";
 
-import { USER_NOT_RESOLVED_ERROR_TEXT, VCDataTypes } from "@repo/utils";
+import {
+  SOMETHING_WENT_WRONG_ERROR_TEXT,
+  USER_NOT_RESOLVED_ERROR_TEXT,
+  VCDataTypes,
+} from "@repo/utils";
 import type { Aggregator } from "../shared/contract";
 import { withValidateAggregatorInPath } from "../utils/validators";
 import { createAggregatorWidgetAdapter, getData, getVC } from "../adapterIndex";
@@ -63,7 +67,7 @@ export const createAccountsDataHandler = (isVc: boolean) =>
         res.send(USER_NOT_RESOLVED_ERROR_TEXT);
       } else {
         res.status(400);
-        res.send("Something went wrong");
+        res.send(SOMETHING_WENT_WRONG_ERROR_TEXT);
       }
     }
   });
@@ -109,7 +113,7 @@ export const createIdentityDataHandler = (isVc: boolean) =>
         res.send(USER_NOT_RESOLVED_ERROR_TEXT);
       } else {
         res.status(400);
-        res.send("Something went wrong");
+        res.send(SOMETHING_WENT_WRONG_ERROR_TEXT);
       }
     }
   });
@@ -182,7 +186,7 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
           res.send(USER_NOT_RESOLVED_ERROR_TEXT);
         } else {
           res.status(400);
-          res.send("Something went wrong");
+          res.send(SOMETHING_WENT_WRONG_ERROR_TEXT);
         }
       }
     },

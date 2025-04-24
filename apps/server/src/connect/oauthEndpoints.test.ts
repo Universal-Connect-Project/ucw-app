@@ -4,7 +4,7 @@ import type { Request } from "express";
 import { ConnectApi } from "./connectApi";
 import { webhookHandler, oauthRedirectHandler } from "./oauthEndpoints";
 import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../test-adapter";
-import { ConnectionStatus } from "@repo/utils";
+import { ConnectionStatus, SOMETHING_WENT_WRONG_ERROR_TEXT } from "@repo/utils";
 
 const context = {
   aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
@@ -61,7 +61,7 @@ describe("oauthHandler", () => {
     await oauthRedirectHandler(req, res);
     const htmlResponse = res.send.mock.calls[0][0].toString();
 
-    expect(htmlResponse.includes("Something went wrong")).toBe(true);
+    expect(htmlResponse.includes(SOMETHING_WENT_WRONG_ERROR_TEXT)).toBe(true);
     expect(htmlResponse.includes("OAuth Error")).toBe(true);
   });
 

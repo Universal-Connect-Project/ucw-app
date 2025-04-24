@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { ComboJobTypes } from "@repo/utils";
+import { ComboJobTypes, SOMETHING_WENT_WRONG_ERROR_TEXT } from "@repo/utils";
 
 test("connects to mx bank with oAuth", async ({ page }) => {
   test.setTimeout(240000);
@@ -55,7 +55,9 @@ test("shows an error page if you deny an mx bank oauth connection", async ({
 
   const authorizeTab = await popupPromise;
   await authorizeTab.getByRole("button", { name: "Deny" }).click();
-  await expect(authorizeTab.getByText("Something went wrong")).toBeVisible();
+  await expect(
+    authorizeTab.getByText(SOMETHING_WENT_WRONG_ERROR_TEXT),
+  ).toBeVisible();
 
   // When we fix the issue so that we can see an error state we need to check for it here
 

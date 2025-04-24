@@ -24,10 +24,12 @@ import {
 import type { Aggregator } from "../shared/contract";
 import { Aggregators } from "../shared/contract";
 import { invalidAggregatorString } from "../utils/validators";
-import { getDataFromVCJwt, USER_NOT_RESOLVED_ERROR_TEXT } from "@repo/utils";
+import {
+  getDataFromVCJwt,
+  SOMETHING_WENT_WRONG_ERROR_TEXT,
+  USER_NOT_RESOLVED_ERROR_TEXT,
+} from "@repo/utils";
 import { userIdNotFound } from "../test-adapter/adapter";
-
-const somethingWentWrongErrorText = "Something went wrong";
 
 /* eslint-disable @typescript-eslint/unbound-method */
 
@@ -143,7 +145,7 @@ describe("dataEndpoints", () => {
 
       await vcAccountsDataHandler(req, res);
 
-      expect(res.send).toHaveBeenCalledWith(somethingWentWrongErrorText);
+      expect(res.send).toHaveBeenCalledWith(SOMETHING_WENT_WRONG_ERROR_TEXT);
       expect(res.status).toHaveBeenCalledWith(400);
     });
   });
@@ -253,7 +255,7 @@ describe("dataEndpoints", () => {
 
       await vcIdentityDataHandler(req, res);
 
-      expect(res.send).toHaveBeenCalledWith(somethingWentWrongErrorText);
+      expect(res.send).toHaveBeenCalledWith(SOMETHING_WENT_WRONG_ERROR_TEXT);
       expect(res.status).toHaveBeenCalledWith(400);
     });
   });
@@ -388,7 +390,7 @@ describe("dataEndpoints", () => {
 
         await vcTransactionsDataHandler(req, res);
 
-        expect(res.send).toHaveBeenCalledWith(somethingWentWrongErrorText);
+        expect(res.send).toHaveBeenCalledWith(SOMETHING_WENT_WRONG_ERROR_TEXT);
         expect(res.status).toHaveBeenCalledWith(400);
       });
 
