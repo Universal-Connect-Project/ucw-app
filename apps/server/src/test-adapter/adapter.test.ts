@@ -5,6 +5,7 @@ import {
   TestAdapter,
   testConnectionId,
   testInstitutionCode,
+  userIdNotFound,
 } from "./adapter";
 import {
   testDataRequestValidators,
@@ -318,6 +319,18 @@ describe("TestAdapter", () => {
       expect(await testAdapterA.ResolveUserId("userId", false)).toEqual(
         "userId",
       );
+    });
+
+    it("returns a response object if failIfNotFound is false and the user id doesnt match", async () => {
+      expect(await testAdapterA.ResolveUserId(userIdNotFound, false)).toEqual(
+        userIdNotFound,
+      );
+    });
+
+    it("fails if failIfNotFound and a specific userId", async () => {
+      await expect(
+        async () => await testAdapterA.ResolveUserId(userIdNotFound, true),
+      ).rejects.toThrow("User id not found");
     });
   });
 

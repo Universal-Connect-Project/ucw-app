@@ -31,17 +31,20 @@ export const createAccountsDataHandler = (isVc: boolean) =>
   withValidateAggregatorInPath(async (req: AccountsRequest, res: Response) => {
     const { aggregator, connectionId, userId } = req.params;
 
-    const aggregatorAdapter = createAggregatorWidgetAdapter({ aggregator });
-    const aggregatorUserId = await aggregatorAdapter.ResolveUserId(userId);
-
-    const dataArgs = {
-      aggregator,
-      connectionId,
-      type: VCDataTypes.ACCOUNTS,
-      userId: aggregatorUserId,
-    };
-
     try {
+      const aggregatorAdapter = createAggregatorWidgetAdapter({ aggregator });
+      const aggregatorUserId = await aggregatorAdapter.ResolveUserId(
+        userId,
+        true,
+      );
+
+      const dataArgs = {
+        aggregator,
+        connectionId,
+        type: VCDataTypes.ACCOUNTS,
+        userId: aggregatorUserId,
+      };
+
       if (isVc) {
         const vc = await getVC(dataArgs);
         res.send({
@@ -69,17 +72,20 @@ export const createIdentityDataHandler = (isVc: boolean) =>
   withValidateAggregatorInPath(async (req: IdentityRequest, res: Response) => {
     const { aggregator, connectionId, userId } = req.params;
 
-    const aggregatorAdapter = createAggregatorWidgetAdapter({ aggregator });
-    const aggregatorUserId = await aggregatorAdapter.ResolveUserId(userId);
-
-    const dataArgs = {
-      aggregator,
-      connectionId,
-      type: VCDataTypes.IDENTITY,
-      userId: aggregatorUserId,
-    };
-
     try {
+      const aggregatorAdapter = createAggregatorWidgetAdapter({ aggregator });
+      const aggregatorUserId = await aggregatorAdapter.ResolveUserId(
+        userId,
+        true,
+      );
+
+      const dataArgs = {
+        aggregator,
+        connectionId,
+        type: VCDataTypes.IDENTITY,
+        userId: aggregatorUserId,
+      };
+
       if (isVc) {
         const vc = await getVC(dataArgs);
         res.send({
@@ -114,36 +120,39 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
       const { accountId, aggregator, userId } = req.params;
       const { start_time, end_time, connectionId } = req.query;
 
-      const aggregatorAdapter = createAggregatorWidgetAdapter({ aggregator });
-      const aggregatorUserId = await aggregatorAdapter.ResolveUserId(userId);
-
-      const dataArgs = {
-        aggregator,
-        type: VCDataTypes.TRANSACTIONS,
-        userId: aggregatorUserId,
-        accountId,
-        connectionId: connectionId,
-        startTime: start_time,
-        endTime: end_time,
-      };
-
-      let validationError: string | undefined;
-
-      if (
-        typeof aggregatorAdapter?.DataRequestValidators?.transactions ===
-        "function"
-      ) {
-        validationError =
-          aggregatorAdapter.DataRequestValidators?.transactions(req);
-      }
-
-      if (validationError) {
-        res.status(400);
-        res.send(he.encode(validationError));
-        return;
-      }
-
       try {
+        const aggregatorAdapter = createAggregatorWidgetAdapter({ aggregator });
+        const aggregatorUserId = await aggregatorAdapter.ResolveUserId(
+          userId,
+          true,
+        );
+
+        const dataArgs = {
+          aggregator,
+          type: VCDataTypes.TRANSACTIONS,
+          userId: aggregatorUserId,
+          accountId,
+          connectionId: connectionId,
+          startTime: start_time,
+          endTime: end_time,
+        };
+
+        let validationError: string | undefined;
+
+        if (
+          typeof aggregatorAdapter?.DataRequestValidators?.transactions ===
+          "function"
+        ) {
+          validationError =
+            aggregatorAdapter.DataRequestValidators?.transactions(req);
+        }
+
+        if (validationError) {
+          res.status(400);
+          res.send(he.encode(validationError));
+          return;
+        }
+
         if (isVc) {
           const vc = await getVC(dataArgs);
           res.send({

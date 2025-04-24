@@ -1,7 +1,10 @@
 import type { Response } from "express";
 import he from "he";
 import { transactionsResponse } from "../test-adapter/vcResponses";
-import { testDataRequestValidatorStartTimeError } from "../test-adapter/constants";
+import {
+  TEST_EXAMPLE_A_AGGREGATOR_STRING,
+  testDataRequestValidatorStartTimeError,
+} from "../test-adapter/constants";
 import * as adapterIndex from "../adapterIndex";
 import {
   testVcAccountsData,
@@ -22,6 +25,9 @@ import type { Aggregator } from "../shared/contract";
 import { Aggregators } from "../shared/contract";
 import { invalidAggregatorString } from "../utils/validators";
 import { getDataFromVCJwt } from "@repo/utils";
+import { userIdNotFound } from "../test-adapter/adapter";
+
+const somethingWentWrongErrorText = "Something went wrong";
 
 /* eslint-disable @typescript-eslint/unbound-method */
 
@@ -35,6 +41,27 @@ describe("dataEndpoints", () => {
   });
 
   describe("accountsDataHandler", () => {
+    it("responds with a failure if the userId isn't found", async () => {
+      const res = {
+        send: jest.fn(),
+        status: jest.fn(),
+      } as unknown as Response;
+
+      await vcAccountsDataHandler(
+        {
+          params: {
+            connectionId: "testConnectionId",
+            aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+            userId: userIdNotFound,
+          },
+        },
+        res,
+      );
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith(somethingWentWrongErrorText);
+    });
+
     it("responds with a failure if aggregator isn't valid", async () => {
       const res = {
         send: jest.fn(),
@@ -122,6 +149,27 @@ describe("dataEndpoints", () => {
   });
 
   describe("identityDataHandler", () => {
+    it("responds with a failure if the userId isn't found", async () => {
+      const res = {
+        send: jest.fn(),
+        status: jest.fn(),
+      } as unknown as Response;
+
+      await vcIdentityDataHandler(
+        {
+          params: {
+            connectionId: "testConnectionId",
+            aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+            userId: userIdNotFound,
+          },
+        },
+        res,
+      );
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith(somethingWentWrongErrorText);
+    });
+
     it("responds with a failure if aggregator isn't valid", async () => {
       const res = {
         send: jest.fn(),
@@ -212,6 +260,28 @@ describe("dataEndpoints", () => {
 
   describe("transactionsDataHandler", () => {
     describe("validation", () => {
+      it("responds with a failure if the userId isn't found", async () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn(),
+        } as unknown as Response;
+
+        await vcTransactionsDataHandler(
+          {
+            params: {
+              connectionId: "testConnectionId",
+              aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+              userId: userIdNotFound,
+            },
+            query: {},
+          },
+          res,
+        );
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith(somethingWentWrongErrorText);
+      });
+
       it("fails if aggregator is invalid", async () => {
         const res = {
           send: jest.fn(),

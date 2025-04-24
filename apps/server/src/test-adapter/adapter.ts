@@ -19,6 +19,8 @@ export const testJobId = "testJobId";
 export const testInstitutionCode = "institutionCode";
 export const testConnectionId = "testConnectionId";
 
+export const userIdNotFound = "userIdNotFound";
+
 export const postMessageEventData = {
   memberConnected: {
     test: "connected",
@@ -295,6 +297,10 @@ export class TestAdapter implements WidgetAdapter {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     failIfNotFound: boolean = false,
   ): Promise<string> {
+    if (failIfNotFound && userId === userIdNotFound) {
+      throw new Error("User id not found");
+    }
+
     return userId;
   }
 
