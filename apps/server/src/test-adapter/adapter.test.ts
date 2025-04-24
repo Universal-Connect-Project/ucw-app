@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ComboJobTypes, ConnectionStatus } from "@repo/utils";
+import {
+  ComboJobTypes,
+  ConnectionStatus,
+  USER_NOT_RESOLVED_ERROR_TEXT,
+} from "@repo/utils";
 import {
   postMessageEventData,
   TestAdapter,
@@ -330,7 +334,7 @@ describe("TestAdapter", () => {
     it("fails if failIfNotFound and a specific userId", async () => {
       await expect(
         async () => await testAdapterA.ResolveUserId(userIdNotFound, true),
-      ).rejects.toThrow("User id not found");
+      ).rejects.toThrow(USER_NOT_RESOLVED_ERROR_TEXT);
     });
   });
 

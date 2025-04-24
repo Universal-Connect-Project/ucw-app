@@ -3,7 +3,7 @@ import type { Response } from "express";
 import * as logger from "../infra/logger";
 import he from "he";
 
-import { VCDataTypes } from "@repo/utils";
+import { USER_NOT_RESOLVED_ERROR_TEXT, VCDataTypes } from "@repo/utils";
 import type { Aggregator } from "../shared/contract";
 import { withValidateAggregatorInPath } from "../utils/validators";
 import { createAggregatorWidgetAdapter, getData, getVC } from "../adapterIndex";
@@ -57,8 +57,14 @@ export const createAccountsDataHandler = (isVc: boolean) =>
       }
     } catch (error) {
       logger.error("createAccountsDataHandler error", error);
-      res.status(400);
-      res.send("Something went wrong");
+
+      if (error.message === USER_NOT_RESOLVED_ERROR_TEXT) {
+        res.status(404);
+        res.send(USER_NOT_RESOLVED_ERROR_TEXT);
+      } else {
+        res.status(400);
+        res.send("Something went wrong");
+      }
     }
   });
 
@@ -97,8 +103,14 @@ export const createIdentityDataHandler = (isVc: boolean) =>
       }
     } catch (error) {
       logger.error("createIdentityDataHandler error", error);
-      res.status(400);
-      res.send("Something went wrong");
+
+      if (error.message === USER_NOT_RESOLVED_ERROR_TEXT) {
+        res.status(404);
+        res.send(USER_NOT_RESOLVED_ERROR_TEXT);
+      } else {
+        res.status(400);
+        res.send("Something went wrong");
+      }
     }
   });
 
@@ -164,8 +176,14 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
         }
       } catch (error) {
         logger.error("createTransactionsDataHandler error", error);
-        res.status(400);
-        res.send("Something went wrong");
+
+        if (error.message === USER_NOT_RESOLVED_ERROR_TEXT) {
+          res.status(404);
+          res.send(USER_NOT_RESOLVED_ERROR_TEXT);
+        } else {
+          res.status(400);
+          res.send("Something went wrong");
+        }
       }
     },
   );

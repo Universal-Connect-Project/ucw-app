@@ -9,7 +9,11 @@ import type {
   UpdateConnectionRequest,
   WidgetAdapter,
 } from "@repo/utils";
-import { ChallengeType, ConnectionStatus } from "@repo/utils";
+import {
+  ChallengeType,
+  ConnectionStatus,
+  USER_NOT_RESOLVED_ERROR_TEXT,
+} from "@repo/utils";
 
 import type { AdapterConfig } from "./models";
 import { SOPHTRON_ADAPTER_NAME } from "./constants";
@@ -360,7 +364,7 @@ export class SophtronAdapter implements WidgetAdapter {
       );
       return sophtronUser.CustomerID;
     } else if (failIfNotFound) {
-      throw new Error("User not resolved successfully");
+      throw new Error(USER_NOT_RESOLVED_ERROR_TEXT);
     }
     this.logClient.trace(`Creating sophtron user ${userId}`);
     const ret = await this.apiClient.createCustomer(userId);

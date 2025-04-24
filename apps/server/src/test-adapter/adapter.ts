@@ -6,7 +6,11 @@ import type {
   UpdateConnectionRequest,
   WidgetAdapter,
 } from "@repo/utils";
-import { ComboJobTypes, ConnectionStatus } from "@repo/utils";
+import {
+  ComboJobTypes,
+  ConnectionStatus,
+  USER_NOT_RESOLVED_ERROR_TEXT,
+} from "@repo/utils";
 import { get, set } from "../services/storageClient/redis";
 import {
   testExampleCredentials,
@@ -298,7 +302,7 @@ export class TestAdapter implements WidgetAdapter {
     failIfNotFound: boolean = false,
   ): Promise<string> {
     if (failIfNotFound && userId === userIdNotFound) {
-      throw new Error("User id not found");
+      throw new Error(USER_NOT_RESOLVED_ERROR_TEXT);
     }
 
     return userId;

@@ -1,4 +1,9 @@
-import { ChallengeType, ComboJobTypes, ConnectionStatus } from "@repo/utils";
+import {
+  ChallengeType,
+  ComboJobTypes,
+  ConnectionStatus,
+  USER_NOT_RESOLVED_ERROR_TEXT,
+} from "@repo/utils";
 import { http, HttpResponse } from "msw";
 
 import { MxAdapter } from "./adapter";
@@ -626,7 +631,7 @@ describe("mx aggregator", () => {
 
         await expect(
           async () => await mxAdapter.ResolveUserId(userId, true),
-        ).rejects.toThrow("User not resolved successfully");
+        ).rejects.toThrow(USER_NOT_RESOLVED_ERROR_TEXT);
       });
     });
 

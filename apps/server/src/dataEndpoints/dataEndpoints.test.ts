@@ -24,7 +24,7 @@ import {
 import type { Aggregator } from "../shared/contract";
 import { Aggregators } from "../shared/contract";
 import { invalidAggregatorString } from "../utils/validators";
-import { getDataFromVCJwt } from "@repo/utils";
+import { getDataFromVCJwt, USER_NOT_RESOLVED_ERROR_TEXT } from "@repo/utils";
 import { userIdNotFound } from "../test-adapter/adapter";
 
 const somethingWentWrongErrorText = "Something went wrong";
@@ -58,8 +58,8 @@ describe("dataEndpoints", () => {
         res,
       );
 
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.send).toHaveBeenCalledWith(somethingWentWrongErrorText);
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.send).toHaveBeenCalledWith(USER_NOT_RESOLVED_ERROR_TEXT);
     });
 
     it("responds with a failure if aggregator isn't valid", async () => {
@@ -143,7 +143,7 @@ describe("dataEndpoints", () => {
 
       await vcAccountsDataHandler(req, res);
 
-      expect(res.send).toHaveBeenCalledWith("Something went wrong");
+      expect(res.send).toHaveBeenCalledWith(somethingWentWrongErrorText);
       expect(res.status).toHaveBeenCalledWith(400);
     });
   });
@@ -166,8 +166,8 @@ describe("dataEndpoints", () => {
         res,
       );
 
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.send).toHaveBeenCalledWith(somethingWentWrongErrorText);
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.send).toHaveBeenCalledWith(USER_NOT_RESOLVED_ERROR_TEXT);
     });
 
     it("responds with a failure if aggregator isn't valid", async () => {
@@ -253,7 +253,7 @@ describe("dataEndpoints", () => {
 
       await vcIdentityDataHandler(req, res);
 
-      expect(res.send).toHaveBeenCalledWith("Something went wrong");
+      expect(res.send).toHaveBeenCalledWith(somethingWentWrongErrorText);
       expect(res.status).toHaveBeenCalledWith(400);
     });
   });
@@ -278,8 +278,8 @@ describe("dataEndpoints", () => {
           res,
         );
 
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith(somethingWentWrongErrorText);
+        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.send).toHaveBeenCalledWith(USER_NOT_RESOLVED_ERROR_TEXT);
       });
 
       it("fails if aggregator is invalid", async () => {
@@ -388,7 +388,7 @@ describe("dataEndpoints", () => {
 
         await vcTransactionsDataHandler(req, res);
 
-        expect(res.send).toHaveBeenCalledWith("Something went wrong");
+        expect(res.send).toHaveBeenCalledWith(somethingWentWrongErrorText);
         expect(res.status).toHaveBeenCalledWith(400);
       });
 
