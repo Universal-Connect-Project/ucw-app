@@ -124,10 +124,11 @@ export async function resolveInstitutionAggregator({
   }
 
   return {
-    id: institutionAggregator?.id,
-    url: institution?.url,
-    name: institution?.name,
-    logo_url: institution?.logo,
     aggregator: aggregator as Aggregator,
+    id: institutionAggregator?.id,
+    logo_url: institution?.logo,
+    name: institution?.name,
+    supportsOauth: institutionAggregator?.supports_oauth,
+    url: institution?.url,
   };
 }

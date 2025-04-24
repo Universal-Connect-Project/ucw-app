@@ -44,7 +44,6 @@ export class AkoyaAdapter implements WidgetAdapter {
   async GetInstitutionById(id: string): Promise<AggregatorInstitution> {
     return {
       id,
-      oauth: true,
       aggregator: this.aggregator,
     };
   }

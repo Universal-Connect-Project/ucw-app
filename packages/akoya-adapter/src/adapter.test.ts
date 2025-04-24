@@ -53,7 +53,6 @@ describe("akoya aggregator", () => {
       const ret = await akoyaAdapterSandbox.GetInstitutionById("testId");
       expect(ret).toEqual({
         id: "testId",
-        oauth: true,
         aggregator: "akoya_sandbox",
       });
     });

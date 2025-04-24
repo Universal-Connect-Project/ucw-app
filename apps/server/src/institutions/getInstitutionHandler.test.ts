@@ -3,7 +3,6 @@ import {
   TEST_EXAMPLE_A_AGGREGATOR_STRING,
   TEST_EXAMPLE_B_AGGREGATOR_STRING,
   TEST_EXAMPLE_C_AGGREGATOR_STRING,
-  testExampleInstitution,
 } from "../test-adapter";
 import { getInstitutionHandler } from "./getInstitutionHandler";
 import * as preferences from "../shared/preferences";
@@ -49,7 +48,7 @@ describe("getInstitutionHandler", () => {
       logo_url: ucpInstitution.logo,
       name: ucpInstitution.name,
       aggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING,
-      supports_oauth: testExampleInstitution.oauth,
+      supports_oauth: ucpTestExampleInstitution.supports_oauth,
       ucpInstitutionId,
       url: ucpInstitution.url,
     });
@@ -85,7 +84,7 @@ describe("getInstitutionHandler", () => {
       logo_url: ucpInstitution.logo,
       name: ucpInstitution.name,
       aggregator: TEST_EXAMPLE_C_AGGREGATOR_STRING,
-      supports_oauth: testExampleInstitution.oauth,
+      supports_oauth: ucpTestExampleInstitution.supports_oauth,
       ucpInstitutionId,
       url: ucpInstitution.url,
     });

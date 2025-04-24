@@ -20,7 +20,6 @@ export const testExampleOauthInstitution = {
 export const testExampleInstitution = {
   logo_url: "https://ucp-ui-f6cdc44acc3f.herokuapp.com/ucpLogo.png",
   name: "testInstitutionName",
-  oauth: false,
   url: "testInstitutionUrl",
 };
 

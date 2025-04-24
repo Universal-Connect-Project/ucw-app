@@ -73,7 +73,6 @@ describe("TestAdapter", () => {
         id: "test",
         logo_url: testExampleInstitution.logo_url,
         name: testExampleInstitution.name,
-        oauth: testExampleInstitution.oauth,
         aggregator,
         url: testExampleInstitution.url,
       });

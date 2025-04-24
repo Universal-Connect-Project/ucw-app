@@ -90,7 +90,6 @@ export class MxAdapter implements WidgetAdapter {
     const institution = res.data?.institution;
     return {
       id: institution?.code || null,
-      oauth: institution?.supports_oauth || false,
       aggregator: this.aggregator,
     };
   }

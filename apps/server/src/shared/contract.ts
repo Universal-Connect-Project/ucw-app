@@ -67,7 +67,7 @@ export interface ResolvedInstitution {
   name: string;
   logo_url: string;
   aggregator: Aggregator;
-  oauth?: boolean;
+  supportsOauth: boolean;
 }
 
 // This will go away once all aggregators are migrated

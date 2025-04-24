@@ -28,8 +28,7 @@ export const getInstitutionHandler = async (req: Request, res: Response) => {
     instructional_data: {},
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     credentials: [] as any[],
-    // This name includes thing doesn't seem like it should be here
-    supports_oauth: inst.oauth ?? name?.includes("Oauth"),
+    supports_oauth: resolvedInstitution.supportsOauth,
     aggregator: inst.aggregator,
     ucpInstitutionId,
     url: resolvedInstitution.url,
