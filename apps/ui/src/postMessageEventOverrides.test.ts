@@ -67,7 +67,7 @@ describe("postMessageEventOverrides", () => {
         ).toBe(true);
       });
 
-      it("returns false if the object has changed", () => {
+      it("returns false if the object has not changed", () => {
         expect(
           postMessageEventOverrides.memberStatusUpdate.getHasStatusChanged({
             currentMember: member1,
