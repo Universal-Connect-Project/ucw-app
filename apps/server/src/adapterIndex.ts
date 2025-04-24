@@ -9,11 +9,7 @@ export const getAggregatorIdFromTestAggregatorId = (testId: string) => {
     ([key, value]) => value.testAdapterId === testId,
   )?.[0];
 
-  if (aggregatorId) {
-    return aggregatorId;
-  }
-
-  return testId;
+  return aggregatorId || testId;
 };
 
 export function createAggregatorWidgetAdapter({
