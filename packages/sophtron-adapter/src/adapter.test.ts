@@ -66,10 +66,7 @@ describe("sophtron adapter", () => {
 
       expect(response).toEqual({
         id: sophtronInstitutionData.InstitutionID,
-        logo_url: sophtronInstitutionData.Logo,
-        name: sophtronInstitutionData.InstitutionName,
         aggregator: SOPHTRON_ADAPTER_NAME,
-        url: sophtronInstitutionData.URL,
       });
     });
   });

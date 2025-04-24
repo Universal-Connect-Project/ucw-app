@@ -4,11 +4,14 @@ import { createMxIntGetVC, createMxProdGetVC } from "./createVc";
 import type { AdapterDependencies } from "./models";
 import { createMxIntDataAdapter, createMxProdDataAdapter } from "./dataAdapter";
 
+const MX_AGGREGATOR_STRING = "mx";
+const MX_INT_AGGREGATOR_STRING = "mx_int";
+
 export const getMxAdapterMapObject = (dependencies: AdapterDependencies) => {
   return {
-    mx: {
+    [MX_AGGREGATOR_STRING]: {
       dataAdapter: createMxProdDataAdapter(dependencies),
-      testInstitutionAdapterName: "mx_int",
+      testAdapterId: MX_INT_AGGREGATOR_STRING,
       vcAdapter: createMxProdGetVC(dependencies),
       createWidgetAdapter: () =>
         new MxAdapter({
@@ -16,7 +19,7 @@ export const getMxAdapterMapObject = (dependencies: AdapterDependencies) => {
           dependencies: dependencies,
         }),
     } as AdapterMap,
-    mx_int: {
+    [MX_INT_AGGREGATOR_STRING]: {
       dataAdapter: createMxIntDataAdapter(dependencies),
       vcAdapter: createMxIntGetVC(dependencies),
       createWidgetAdapter: () =>

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import connectWidgetApiService from "./connectWidgetApiService";
 import {
   CREATE_MEMBER_URL,
   INSTITUTION_BY_GUID_MOCK_URL,
@@ -30,6 +29,9 @@ import { membersResponse } from "../shared/test/testData/members";
 import { oauthStateResponse } from "../shared/test/testData/oauthState";
 import { oauthStatesResponse } from "../shared/test/testData/oauthStates";
 import { updateMFAResponse } from "../shared/test/testData/updateMFA";
+import createConnectWidgetApiService from "./connectWidgetApiService";
+
+const connectWidgetApiService = createConnectWidgetApiService({});
 
 describe("connectWidgetApiService", () => {
   describe("addMember", () => {
@@ -159,10 +161,45 @@ describe("connectWidgetApiService", () => {
   });
 
   describe("loadInstitutionByGuid", () => {
-    it("resolves with an institution", async () => {
+    it("resolves with an institution using the institutionId if it's provided", async () => {
+      const institutionId = "overrideInstitutionId";
+
       expect(
-        await connectWidgetApiService.loadInstitutionByGuid("test"),
+        await createConnectWidgetApiService({
+          institutionId,
+        }).loadInstitutionByGuid("test"),
       ).toEqual(institutionByGuid);
+    });
+
+    it("resolves with an institution using the provided guid or the overridden institutionId", async () => {
+      const institutionByInstitutionId = {
+        ...institutionByGuid,
+        guid: "override",
+      };
+
+      const institutionId = "overrideInstitutionId";
+
+      const institutionGuid = "test";
+
+      server.use(
+        http.get(INSTITUTION_BY_GUID_MOCK_URL, ({ params }) => {
+          if (params.guid === institutionGuid) {
+            return HttpResponse.json(institutionByGuid);
+          } else if (params.guid === institutionId) {
+            return HttpResponse.json(institutionByInstitutionId);
+          }
+        }),
+      );
+
+      expect(
+        await connectWidgetApiService.loadInstitutionByGuid(institutionGuid),
+      ).toEqual(institutionByGuid);
+
+      expect(
+        await createConnectWidgetApiService({
+          institutionId,
+        }).loadInstitutionByGuid(institutionGuid),
+      ).toEqual(institutionByInstitutionId);
     });
 
     it("throws an error on failure", async () => {

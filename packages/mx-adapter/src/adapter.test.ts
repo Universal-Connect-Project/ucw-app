@@ -10,7 +10,6 @@ import {
   DELETE_CONNECTION_PATH,
   DELETE_MEMBER_PATH,
   MX_DELETE_USER_PATH,
-  MX_INSTITUTION_BY_ID_PATH,
   READ_MEMBER_STATUS_PATH,
   UPDATE_CONNECTION_PATH,
 } from "./test/handlers";
@@ -85,45 +84,14 @@ describe("mx aggregator", () => {
     it("works with integration credentials", async () => {
       expect(await mxAdapterInt.GetInstitutionById("testId")).toEqual({
         id: institutionResponse.code,
-        logo_url: institutionResponse.medium_logo_url,
-        name: institutionResponse.name,
-        oauth: institutionResponse.supports_oauth,
-        url: institutionResponse.url,
         aggregator: "mx_int",
       });
     });
 
     describe("GetInsitutionById", () => {
-      it("uses the medium logo if available", async () => {
+      it("returns an institution", async () => {
         expect(await mxAdapter.GetInstitutionById("testId")).toEqual({
           id: institutionResponse.code,
-          logo_url: institutionResponse.medium_logo_url,
-          name: institutionResponse.name,
-          oauth: institutionResponse.supports_oauth,
-          url: institutionResponse.url,
-          aggregator: "mx",
-        });
-      });
-
-      it("uses the small logo if no medium logo", async () => {
-        server.use(
-          http.get(MX_INSTITUTION_BY_ID_PATH, () =>
-            HttpResponse.json({
-              ...institutionData,
-              institution: {
-                ...institutionData.institution,
-                medium_logo_url: undefined,
-              },
-            }),
-          ),
-        );
-
-        expect(await mxAdapter.GetInstitutionById("testId")).toEqual({
-          id: institutionResponse.code,
-          logo_url: institutionResponse.small_logo_url,
-          name: institutionResponse.name,
-          oauth: institutionResponse.supports_oauth,
-          url: institutionResponse.url,
           aggregator: "mx",
         });
       });

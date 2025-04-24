@@ -62,14 +62,12 @@ export class TestAdapter implements WidgetAdapter {
       if (id.toLowerCase().indexOf("failed") >= 0) {
         return {
           ...testExampleOauthInstitution,
-          oauth: true,
           id,
           aggregator: this.aggregator,
         };
       }
       return {
         ...testExampleOauthInstitution,
-        oauth: true,
         id,
         aggregator: this.aggregator,
       };

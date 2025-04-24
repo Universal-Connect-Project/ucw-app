@@ -15,6 +15,7 @@ module.exports = {
     "jestSetup.ts",
     "cypress.config.*.js",
     "cypress/**/*",
+    "playwright-report/**/*",
   ],
   rules: {
     "@typescript-eslint/no-explicit-any": "off",

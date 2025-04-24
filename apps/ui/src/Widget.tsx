@@ -1,8 +1,9 @@
 // @ts-expect-error import doesn't work
 import { ApiProvider, ConnectWidget } from "@mxenabled/connect-widget";
 import "./App.css";
-import connectWidgetApiService from "./api/connectWidgetApiService";
+import createConnectWidgetApiService from "./api/connectWidgetApiService";
 import { ComboJobTypes } from "@repo/utils";
+import postMessageEventOverrides from "./postMessageEventOverrides";
 
 const Widget = ({
   aggregator,
@@ -15,19 +16,25 @@ const Widget = ({
   institutionId: string;
   jobTypes: ComboJobTypes[];
 }) => {
+  const disableInstitutionSearch = !!(institutionId || connectionId);
+
   const clientConfig = {
     current_institution_guid: institutionId,
     current_member_guid: connectionId,
     data_request: {
       products: jobTypes,
     },
-    disable_institution_search: !!(institutionId || connectionId),
+    disable_institution_search: disableInstitutionSearch,
     update_credentials: connectionId && aggregator,
     ui_message_protocol: "post_message",
     ui_message_version: 4,
     ui_message_webview_url_scheme: "vcs",
     wait_for_full_aggregation: false,
   };
+
+  const connectWidgetApiService = createConnectWidgetApiService({
+    institutionId,
+  });
 
   return (
     <ApiProvider apiValue={connectWidgetApiService}>
@@ -49,6 +56,7 @@ const Widget = ({
             window.opener.postMessage(payload);
           }
         }}
+        postMessageEventOverrides={postMessageEventOverrides}
         profiles={{
           clientProfile: {
             account_verification_is_enabled: true,

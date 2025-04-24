@@ -3,6 +3,15 @@ import { info } from "./infra/logger";
 import type { Aggregator } from "./adapterSetup";
 import { adapterMap } from "./adapterSetup";
 
+export const getAggregatorIdFromTestAggregatorId = (testId: string) => {
+  const aggregatorId = Object.entries(adapterMap).find(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    ([key, value]) => value.testAdapterId === testId,
+  )?.[0];
+
+  return aggregatorId || testId;
+};
+
 export function createAggregatorWidgetAdapter({
   aggregator,
 }: {

@@ -15,7 +15,7 @@ import { getVC } from "./vc";
 
 export const adapterMapObject = {
   [TEST_EXAMPLE_A_AGGREGATOR_STRING]: {
-    testInstitutionAdapterName: TEST_EXAMPLE_C_AGGREGATOR_STRING,
+    testAdapterId: TEST_EXAMPLE_C_AGGREGATOR_STRING,
     dataAdapter,
     vcAdapter: getVC,
     createWidgetAdapter: () =>

@@ -10,6 +10,7 @@ import type {
 } from "../shared/contract";
 import { getPreferences } from "../shared/preferences";
 import { adapterMap } from "../adapterSetup";
+import { getAggregatorIdFromTestAggregatorId } from "../adapterIndex";
 
 const getAggregatorByVolume = (
   volumeMap: Record<string, number>,
@@ -35,11 +36,17 @@ const getAggregatorByVolume = (
   })?.[0] as Aggregator;
 };
 
-export async function resolveInstitutionAggregator(
-  institutionId: string,
-  jobTypes: ComboJobTypes[],
-): Promise<ResolvedInstitution> {
-  const institution = await getInstitution(institutionId);
+const resolveAggregator = async ({
+  institution,
+  jobTypes,
+  ucpInstitutionId,
+}: {
+  institution: CachedInstitution;
+  jobTypes: ComboJobTypes[];
+  ucpInstitutionId: string;
+}) => {
+  let aggregator: Aggregator;
+
   const preferences = await getPreferences();
   const aggregatorsWithAtLeastPartialSupport: Aggregator[] =
     getAvailableAggregators({
@@ -60,12 +67,10 @@ export async function resolveInstitutionAggregator(
     ? aggregatorsWithFullSupport
     : aggregatorsWithAtLeastPartialSupport;
 
-  let aggregator: Aggregator;
-
   const potentialResolvers = [
     () =>
       getAggregatorByVolume(
-        preferences?.institutionAggregatorVolumeMap?.[institutionId],
+        preferences?.institutionAggregatorVolumeMap?.[ucpInstitutionId],
       ),
     () => getAggregatorByVolume(preferences?.defaultAggregatorVolume),
     () => preferences?.defaultAggregator,
@@ -90,22 +95,80 @@ export async function resolveInstitutionAggregator(
 
   const testAdapterName =
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (adapterMap[aggregator as keyof typeof adapterMap] as any)
-      ?.testInstitutionAdapterName;
+    (adapterMap[aggregator as keyof typeof adapterMap] as any)?.testAdapterId;
 
   if (testAdapterName && institution.is_test_bank) {
     aggregator = testAdapterName;
   }
 
   debug(
-    `Resolving institution: ${institutionId} to aggregator: ${aggregator} available aggregators: ${JSON.stringify(aggregators)}`,
+    `Resolving institution: ${ucpInstitutionId} to aggregator: ${aggregator} available aggregators: ${JSON.stringify(aggregators)}`,
   );
 
   return {
-    id: institutionAggregator?.id,
-    url: institution?.url,
-    name: institution?.name,
-    logo_url: institution?.logo,
+    aggregator,
+    institutionAggregator,
+  };
+};
+
+const resolveByAggregatorOverride = ({
+  aggregatorOverride,
+  institution,
+  ucpInstitutionId,
+}: {
+  aggregatorOverride: Aggregator;
+  institution: CachedInstitution;
+  ucpInstitutionId: string;
+}) => {
+  const aggregator = aggregatorOverride;
+  let institutionAggregator;
+
+  if (institution.is_test_bank) {
+    institutionAggregator =
+      institution[getAggregatorIdFromTestAggregatorId(aggregatorOverride)];
+  } else {
+    institutionAggregator = institution[aggregator];
+  }
+
+  debug(
+    `Resolving institution: ${ucpInstitutionId} to aggregator: ${aggregator} because it's a refresh`,
+  );
+
+  return {
+    aggregator,
+    institutionAggregator,
+  };
+};
+
+export async function resolveInstitutionAggregator({
+  aggregatorOverride,
+  jobTypes,
+  ucpInstitutionId,
+}: {
+  aggregatorOverride?: Aggregator;
+  jobTypes: ComboJobTypes[];
+  ucpInstitutionId: string;
+}): Promise<ResolvedInstitution> {
+  const institution = await getInstitution(ucpInstitutionId);
+
+  const { aggregator, institutionAggregator } = aggregatorOverride
+    ? resolveByAggregatorOverride({
+        aggregatorOverride,
+        institution,
+        ucpInstitutionId,
+      })
+    : await resolveAggregator({
+        institution,
+        jobTypes,
+        ucpInstitutionId,
+      });
+
+  return {
     aggregator: aggregator as Aggregator,
+    id: institutionAggregator?.id,
+    logo_url: institution?.logo,
+    name: institution?.name,
+    supportsOauth: institutionAggregator?.supports_oauth,
+    url: institution?.url,
   };
 }

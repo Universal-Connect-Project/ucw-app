@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import {
   TEST_EXAMPLE_A_AGGREGATOR_STRING,
   TEST_EXAMPLE_B_AGGREGATOR_STRING,
-  testExampleInstitution,
+  TEST_EXAMPLE_C_AGGREGATOR_STRING,
 } from "../test-adapter";
 import { getInstitutionHandler } from "./getInstitutionHandler";
 import * as preferences from "../shared/preferences";
@@ -10,39 +10,10 @@ import testPreferences from "../../cachedDefaults/testData/testPreferences.json"
 import { ComboJobTypes } from "@repo/utils";
 import { elasticSearchInstitutionData } from "../test/testData/institution";
 
+const ucpInstitutionId = "testAggregatorInstitutionGuid";
+
 describe("getInstitutionHandler", () => {
-  it("returns the institution by the aggregator id if it has a aggregator", async () => {
-    const context = {
-      aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
-    };
-
-    const req = {
-      context,
-      params: {
-        institution_guid: "testAggregatorInstitutionGuid",
-      },
-    } as unknown as Request;
-
-    const res = {
-      send: jest.fn(),
-    } as unknown as Response;
-
-    await getInstitutionHandler(req, res);
-
-    expect(res.send).toHaveBeenCalledWith({
-      code: "testAggregatorInstitutionGuid",
-      credentials: [],
-      guid: "testAggregatorInstitutionGuid",
-      instructional_data: {},
-      logo_url: testExampleInstitution.logo_url,
-      name: testExampleInstitution.name,
-      aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
-      supports_oauth: testExampleInstitution.oauth,
-      url: testExampleInstitution.url,
-    });
-  });
-
-  it("returns the institution by the ucp id if it doesn't have a aggregator", async () => {
+  it("returns an institution object with name, url, and logo_url properties from the ucp institution list", async () => {
     jest.spyOn(preferences, "getPreferences").mockResolvedValue({
       ...testPreferences,
       supportedAggregators: [TEST_EXAMPLE_B_AGGREGATOR_STRING],
@@ -55,7 +26,7 @@ describe("getInstitutionHandler", () => {
     const req = {
       context,
       params: {
-        institution_guid: "testAggregatorInstitutionGuid",
+        institution_guid: ucpInstitutionId,
       },
     } as unknown as Request;
 
@@ -77,7 +48,44 @@ describe("getInstitutionHandler", () => {
       logo_url: ucpInstitution.logo,
       name: ucpInstitution.name,
       aggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING,
-      supports_oauth: testExampleInstitution.oauth,
+      supports_oauth: ucpTestExampleInstitution.supports_oauth,
+      ucpInstitutionId,
+      url: ucpInstitution.url,
+    });
+  });
+
+  it("returns the institution by the aggregator id if it has a aggregator", async () => {
+    const context = {
+      aggregator: TEST_EXAMPLE_C_AGGREGATOR_STRING,
+    };
+
+    const req = {
+      context,
+      params: {
+        institution_guid: ucpInstitutionId,
+      },
+    } as unknown as Request;
+
+    const res = {
+      send: jest.fn(),
+    } as unknown as Response;
+
+    await getInstitutionHandler(req, res);
+
+    const ucpInstitution = elasticSearchInstitutionData;
+    const ucpTestExampleInstitution =
+      ucpInstitution[TEST_EXAMPLE_A_AGGREGATOR_STRING];
+
+    expect(res.send).toHaveBeenCalledWith({
+      code: ucpTestExampleInstitution.id,
+      credentials: [],
+      guid: ucpTestExampleInstitution.id,
+      instructional_data: {},
+      logo_url: ucpInstitution.logo,
+      name: ucpInstitution.name,
+      aggregator: TEST_EXAMPLE_C_AGGREGATOR_STRING,
+      supports_oauth: ucpTestExampleInstitution.supports_oauth,
+      ucpInstitutionId,
       url: ucpInstitution.url,
     });
   });
