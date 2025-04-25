@@ -3,6 +3,8 @@ import "./dotEnv";
 const keysToPullFromEnv = [
   "AUTH0_TOKEN_URL",
 
+  "NGROK_AUTHTOKEN",
+
   "PORT",
 
   "HOST_URL",
@@ -29,9 +31,9 @@ const keysToPullFromEnv = [
   "FINICITY_PARTNER_ID",
   "FINICITY_APP_KEY",
   "FINICITY_SECRET",
-  "FINICITY_PARTNER_IDProd",
-  "FINICITY_APP_KEYProd",
-  "FINICITY_SECRETProd",
+  "FINICITY_PARTNER_ID_PROD",
+  "FINICITY_APP_KEY_PROD",
+  "FINICITY_SECRET_PROD",
 
   "AKOYA_CLIENT_ID",
   "AKOYA_CLIENT_ID_PROD",
@@ -82,6 +84,7 @@ const config: Record<string, any> = keysToPullFromEnv.reduce((acc, envKey) => {
 
 if (process.env.HEROKU_APP_NAME) {
   config.HOST_URL = `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`;
+  config.WEBHOOK_HOST_URL = `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`;
 }
 
 if (config.INSTITUTION_POLLING_INTERVAL === undefined) {

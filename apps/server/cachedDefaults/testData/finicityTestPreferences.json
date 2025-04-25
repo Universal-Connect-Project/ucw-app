@@ -1,0 +1,13 @@
+{
+  "defaultAggregator": "finicity",
+
+  "supportedAggregators": ["finicity"],
+
+  "defaultAggregatorVolume": {},
+
+  "institutionAggregatorVolumeMap": {},
+
+  "hiddenInstitutions": [],
+
+  "recommendedInstitutions": ["2deb6fca-557e-4d45-b2f8-354351675ad4"]
+}

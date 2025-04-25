@@ -1,0 +1,71 @@
+name: Finicity Adapter Playwright Tests
+
+on: pull_request
+
+jobs:
+  setup-env:
+    name: "Load ENV Vars"
+    uses: ./.github/workflows/setup-env.yml
+    secrets: inherit
+
+  e2e-tests:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    needs: [setup-env]
+
+    services:
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+        options: --health-cmd="curl --silent --fail localhost:9200/_cluster/health || exit 1" --health-interval=10s --health-timeout=5s --health-retries=5
+        ports:
+          - 9200:9200
+          - 9300:9300
+        env:
+          discovery.type: single-node
+          xpack.security.enabled: false
+
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 20s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - "${{vars.REDIS_PORT}}:${{vars.REDIS_PORT}}"
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/Iron
+      - name: Install dependencies
+        run: npm ci
+
+      - run: npm run copyFinicityTestPreferences
+
+      - name: "Create env file"
+        run: |
+          ENV_FILE_PATH=./apps/server/.env
+          touch ${ENV_FILE_PATH}
+          
+          # Vars
+          echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
+          echo FINICITY_PARTNER_ID=${{ secrets.FINICITY_PARTNER_ID }} >> ${ENV_FILE_PATH}
+          echo FINICITY_APP_KEY=${{ secrets.FINICITY_APP_KEY }} >> ${ENV_FILE_PATH}
+          echo FINICITY_SECRET=${{ secrets.FINICITY_SECRET }} >> ${ENV_FILE_PATH}
+          # This fails if using https, so we have to override it
+          echo HOST_URL=http://localhost:8080 >> ${ENV_FILE_PATH}
+
+          cat ${ENV_FILE_PATH}
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        run: npm run playwright:test --workspace=packages/finicity-adapter
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: packages/finicity-adapter/test-results/
+          retention-days: 30

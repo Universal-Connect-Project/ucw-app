@@ -1,6 +1,5 @@
 import "dotenv/config";
 import config from "./config";
-import ngrok from "@ngrok/ngrok";
 import cookieParser from "cookie-parser";
 import express from "express";
 import "express-async-errors";
@@ -20,6 +19,7 @@ import {
 import { widgetHandler } from "./widgetEndpoint";
 import { oauthRedirectHandler, webhookHandler } from "./connect/oauthEndpoints";
 import useInstitutionEndpoints from "./institutions/useInstitutionEndpoints";
+import { startNgrok, stopNgrok } from "./webhooks";
 
 process.on("unhandledRejection", (error) => {
   _error(`unhandledRejection: ${error.message}`, error);
@@ -111,18 +111,11 @@ app.listen(config.PORT, () => {
 });
 
 // Ngrok is required for Finicity webhooks local and github testing
-if (["dev", "test"].includes(config.ENV)) {
-  ngrok.listen(app).then(() => {
-    config.WEBHOOK_HOST_URL = app.listener.url();
-    info("Established listener at: " + app.listener.url());
-  });
-}
+startNgrok(app);
 
 process.on("SIGINT", () => {
   info("\nGracefully shutting down from SIGINT (Ctrl-C)");
-  if (["dev", "test"].includes(config.ENV)) {
-    info("Closing Ngrok tunnel");
-    void ngrok.kill();
-  }
+  stopNgrok();
+
   process.exit(0);
 });
