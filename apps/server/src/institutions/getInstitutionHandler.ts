@@ -20,6 +20,13 @@ export const getInstitutionHandler = async (req: Request, res: Response) => {
 
   const name = resolvedInstitution.name;
 
+  const oauthOverride = [
+    "akoya",
+    "akoya_sandbox",
+    "finicity",
+    "finicity_sandbox",
+  ].includes(inst.aggregator);
+
   res.send({
     guid: inst.id,
     code: inst.id,
@@ -28,7 +35,7 @@ export const getInstitutionHandler = async (req: Request, res: Response) => {
     instructional_data: {},
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     credentials: [] as any[],
-    supports_oauth: resolvedInstitution.supportsOauth,
+    supports_oauth: oauthOverride || resolvedInstitution.supportsOauth,
     aggregator: inst.aggregator,
     ucpInstitutionId,
     url: resolvedInstitution.url,

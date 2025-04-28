@@ -1,4 +1,3 @@
-import { default as axios, type AxiosInstance } from "axios";
 import type {
   ApiCredentials,
   AggregatorCredentials,
@@ -16,6 +15,7 @@ function makeFinicityAuthHeaders(apiConfig: ApiCredentials, token: string) {
     "Finicity-App-Key": apiConfig.appKey,
     "Finicity-App-Token": token,
     accept: "application/json",
+    "Content-Type": "application/json",
   };
 }
 
@@ -23,7 +23,6 @@ export const BASE_PATH = "https://api.finicity.com";
 
 export default class FinicityClient {
   apiConfig: ApiCredentials;
-  axios: AxiosInstance;
   logger: LogClient;
   envConfig: Record<string, string>;
   getWebhookHostUrl: () => string;
@@ -86,28 +85,14 @@ export default class FinicityClient {
     return token;
   }
 
-  getInstitutions() {
-    return this.get("institution/v2/institutions").then(
-      (ret) => ret.institutions,
-    );
-  }
-
-  async getInstitution(institutionId: string) {
-    return this.newGet(`institution/v2/institutions/${institutionId}`).then(
-      // TODO: Fix this type after merge
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (ret: { institution: any }) => ret.institution,
-    );
-  }
-
   getCustomers() {
-    return this.newGet("aggregation/v1/customers").then(
+    return this.get("aggregation/v1/customers").then(
       (ret: { customers: Customer[] }) => ret.customers,
     );
   }
 
   async getCustomer(ucpUserId: string): Promise<Customer> {
-    return this.newGet(`aggregation/v1/customers`, {
+    return this.get(`aggregation/v1/customers`, {
       username: ucpUserId,
     }).then((res: { customers: Customer[] }) => res.customers?.[0]);
   }
@@ -116,19 +101,19 @@ export default class FinicityClient {
     customerId: string,
     institutionLoginId: string,
   ) {
-    return this.newGet(
+    return this.get(
       `aggregation/v1/customers/${customerId}/institutionLogins/${institutionLoginId}/accounts`,
     ).then((res: { accounts: Account[] }) => res.accounts);
   }
 
   getAccountOwnerDetail(customerId: string, accountId: string) {
-    return this.newGet(
+    return this.get(
       `aggregation/v3/customers/${customerId}/accounts/${accountId}/owner`,
     ).then((res: { holders: AccountOwner[] }) => res.holders);
   }
 
   getAccountAchDetail(customerId: string, accountId: string) {
-    return this.newGet(
+    return this.get(
       `aggregation/v1/customers/${customerId}/accounts/${accountId}/details`,
     );
   }
@@ -139,15 +124,15 @@ export default class FinicityClient {
     fromDate: string,
     toDate: string,
   ) {
-    const body = {
-      fromDate: Math.floor(new Date(fromDate).getTime() / 1000),
-      toDate: Math.floor(new Date(toDate).getTime() / 1000),
-      limit: 100,
+    const params = {
+      fromDate: String(Math.floor(new Date(fromDate).getTime() / 1000)),
+      toDate: String(Math.floor(new Date(toDate).getTime() / 1000)),
+      limit: "100",
     };
 
-    return this.newGet(
+    return this.get(
       `aggregation/v4/customers/${customerId}/accounts/${accountId}/transactions`,
-      body,
+      params,
     ).then((res: { transactions: Transaction[] }) => res.transactions);
   }
 
@@ -167,7 +152,7 @@ export default class FinicityClient {
       webhookContentType: "application/json",
       // 'singleUseUrl': true,
       // 'experience': 'default',
-    }).then((ret) => ret.link);
+    }).then((ret: { link: string }) => ret.link);
   }
 
   generateConnectFixUrl(
@@ -183,7 +168,7 @@ export default class FinicityClient {
       redirectUri: `${this.getWebhookHostUrl()}/oauth/${this.aggregator}/redirect_from?connection_id=${request_id}`,
       webhook: `${this.getWebhookHostUrl()}/webhook/${this.aggregator}/?connection_id=${request_id}`,
       webhookContentType: "application/json",
-    }).then((ret) => ret.link);
+    }).then((ret: { link: string }) => ret.link);
   }
 
   createCustomer(unique_name: string) {
@@ -201,25 +186,28 @@ export default class FinicityClient {
   }
 
   deleteCustomer(customerId: string) {
-    return this.del(`aggregation/v2/customers/${customerId}`);
+    return this.delete(`aggregation/v2/customers/${customerId}`);
   }
-  post(path: string, body: any) {
-    return this.request("post", path, null, body);
+
+  async post(path: string, body: Record<string, string | number | boolean>) {
+    return this.request("post", path, undefined, body);
   }
-  async newGet(path: string, params: any = null): Promise<unknown> {
-    return this.nonAxiosRequest("get", path, params);
-  }
-  async get(path: string, params: any = null) {
+  async get(
+    path: string,
+    params: Record<string, string> = null,
+  ): Promise<unknown> {
     return this.request("get", path, params);
   }
-  del(path: string, params: any = null) {
-    return this.request("delete", path, params);
+
+  async delete(path: string) {
+    return this.request("delete", path);
   }
-  async nonAxiosRequest(
+
+  async request(
     method: string,
     url: string,
     params: Record<string, string> = {},
-    data: Record<string, string> = undefined,
+    data: Record<string, string | number | boolean> = undefined,
   ) {
     const token = await this.getAuthToken();
     const headers = makeFinicityAuthHeaders(this.apiConfig, token);
@@ -242,39 +230,5 @@ export default class FinicityClient {
     }
 
     return response.json();
-  }
-
-  async request(
-    method: string,
-    url: string,
-    params: Record<string, string> = {},
-    data: any = undefined,
-  ) {
-    if (!this.axios) {
-      const token = await this.getAuthToken();
-      const headers = makeFinicityAuthHeaders(this.apiConfig, token);
-      this.axios = axios.create({
-        baseURL: this.basePath,
-        headers,
-      });
-    }
-    const ret = await this.axios
-      .request({
-        url: `${url}`,
-        method,
-        params,
-        data,
-      })
-      .then((res) => {
-        console.log("in old request");
-        return res.data;
-      })
-      .catch((err) => {
-        this.logger.error(
-          `Error at finicityClient.${method} ${url}`,
-          err?.response?.data || err,
-        );
-      });
-    return ret;
   }
 }

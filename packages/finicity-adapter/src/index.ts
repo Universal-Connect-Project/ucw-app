@@ -10,7 +10,7 @@ export const getFinicityAdapterMapObject = (
 ) => {
   return {
     finicity: {
-      testInstitutionAdapterName: "finicity_sandbox",
+      testAdapterId: "finicity_sandbox",
       dataAdapter: createFinicityProdDataAdapter(dependencies),
       createWidgetAdapter: () =>
         new FinicityAdapter({

@@ -31,6 +31,33 @@ export interface TransactionsRequest {
   params: TransactionsDataPathParameters;
 }
 
+interface CustomError extends Error {
+  cause: {
+    statusCode?: number;
+  };
+}
+
+const parseError = (
+  error: CustomError,
+): { statusCode: number; message: string } => {
+  if (error.message === USER_NOT_RESOLVED_ERROR_TEXT) {
+    return {
+      statusCode: 404,
+      message: USER_NOT_RESOLVED_ERROR_TEXT,
+    };
+  } else if (error.message) {
+    return {
+      statusCode: error.cause?.statusCode || 400,
+      message: error.message,
+    };
+  } else {
+    return {
+      statusCode: 400,
+      message: SOMETHING_WENT_WRONG_ERROR_TEXT,
+    };
+  }
+};
+
 export const createAccountsDataHandler = (isVc: boolean) =>
   withValidateAggregatorInPath(async (req: AccountsRequest, res: Response) => {
     const { aggregator, connectionId, userId } = req.params;
@@ -62,13 +89,11 @@ export const createAccountsDataHandler = (isVc: boolean) =>
     } catch (error) {
       logger.error("createAccountsDataHandler error", error);
 
-      if (error.message === USER_NOT_RESOLVED_ERROR_TEXT) {
-        res.status(404);
-        res.send(USER_NOT_RESOLVED_ERROR_TEXT);
-      } else {
-        res.status(400);
-        res.send(SOMETHING_WENT_WRONG_ERROR_TEXT);
-      }
+      const parsedError = parseError(error);
+
+      res.status(parsedError.statusCode).json({
+        message: parsedError.message,
+      });
     }
   });
 
@@ -108,13 +133,11 @@ export const createIdentityDataHandler = (isVc: boolean) =>
     } catch (error) {
       logger.error("createIdentityDataHandler error", error);
 
-      if (error.message === USER_NOT_RESOLVED_ERROR_TEXT) {
-        res.status(404);
-        res.send(USER_NOT_RESOLVED_ERROR_TEXT);
-      } else {
-        res.status(400);
-        res.send(SOMETHING_WENT_WRONG_ERROR_TEXT);
-      }
+      const parsedError = parseError(error);
+
+      res.status(parsedError.statusCode).json({
+        message: parsedError.message,
+      });
     }
   });
 
@@ -181,20 +204,11 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
       } catch (error) {
         logger.error("createTransactionsDataHandler error", error);
 
-        if (error.message === USER_NOT_RESOLVED_ERROR_TEXT) {
-          res.status(404).json({
-            message: USER_NOT_RESOLVED_ERROR_TEXT,
-          });
-          res.send(USER_NOT_RESOLVED_ERROR_TEXT);
-        } else if (error?.cause?.statusCode || error?.message) {
-          res.status(error?.cause?.statusCode || 400).json({
-            message: error.message,
-          });
-        } else {
-          res.status(400).json({
-            message: SOMETHING_WENT_WRONG_ERROR_TEXT,
-          });
-        }
+        const parsedError = parseError(error);
+
+        res.status(parsedError.statusCode).json({
+          message: parsedError.message,
+        });
       }
     },
   );

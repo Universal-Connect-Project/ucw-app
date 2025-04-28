@@ -8,7 +8,7 @@ import type {
   UpdateConnectionRequest,
   WidgetAdapter,
 } from "@repo/utils";
-import { ConnectionStatus } from "@repo/utils";
+import { ConnectionStatus, USER_NOT_RESOLVED_ERROR_TEXT } from "@repo/utils";
 import type { Account, AdapterConfig } from "./models";
 import FinicityClient from "./apiClient";
 import { v4 as uuidv4 } from "uuid";
@@ -42,13 +42,8 @@ export class FinicityAdapter implements WidgetAdapter {
   }
 
   async GetInstitutionById(id: string): Promise<AggregatorInstitution> {
-    const ins = await this.apiClient.getInstitution(id);
     return {
       id,
-      name: ins?.name,
-      logo_url: ins?.urlLogonApp,
-      url: ins?.urlHomeApp,
-      oauth: true,
       aggregator: this.aggregator,
     };
   }
@@ -136,7 +131,11 @@ export class FinicityAdapter implements WidgetAdapter {
       this.logger.trace(`Found existing finicity customer ${finicityUser.id}`);
       return finicityUser.id;
     } else if (failIfNotFound) {
-      throw new Error("User not resolved successfully");
+      throw new Error(USER_NOT_RESOLVED_ERROR_TEXT, {
+        cause: {
+          statusCode: 404,
+        },
+      });
     }
 
     this.logger.trace(`Creating finicity user ${user_id}`);
