@@ -9,7 +9,7 @@ import type {
   WidgetAdapter,
 } from "@repo/utils";
 import { ConnectionStatus } from "@repo/utils";
-import type { AdapterConfig } from "./models";
+import type { Account, AdapterConfig } from "./models";
 import FinicityClient from "./apiClient";
 import { v4 as uuidv4 } from "uuid";
 
@@ -32,6 +32,7 @@ export class FinicityAdapter implements WidgetAdapter {
       this.logger,
       this.envConfig,
       dependencies.getWebhookHostUrl,
+      this.cacheClient,
     );
   }
 
@@ -69,19 +70,19 @@ export class FinicityAdapter implements WidgetAdapter {
 
   async CreateConnection(
     request: CreateConnectionRequest,
-    user_id: string,
+    userId: string,
   ): Promise<Connection | undefined> {
     const request_id = uuidv4();
     const obj = {
       id: request_id,
       is_oauth: true,
-      userId: user_id,
+      userId,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       credentials: [] as any[],
       institution_code: request.institutionId,
       oauth_window_uri: await this.apiClient.generateConnectLiteUrl(
         request.institutionId,
-        user_id,
+        userId,
         request_id,
       ),
       aggregator: this.aggregator,
@@ -154,28 +155,34 @@ export class FinicityAdapter implements WidgetAdapter {
     const { connection_id, reason, code } = request?.query || {};
     const { eventType, payload } = request?.body || {};
     let institutionLoginId = false;
-    let error = JSON.stringify(reason || "");
+    let accounts: string[] = [];
+    //
+    // let error = JSON.stringify(reason || "");
     let redirect_complete = false;
-    // eventType comes from webhook events,
-    // reason === complete can indicate process end from redirect, however, it lacks of the necessary institutionLoginId information so we don't take that event even if it comes before the webhook
     switch (eventType) {
       case "added":
         institutionLoginId = payload?.accounts?.[0]?.institutionLoginId;
-        error = "";
+        accounts = payload?.accounts?.map((account: Account) => {
+          return {
+            id: account.id,
+            name: account.name,
+            type: account.type,
+          };
+        });
         break;
       default:
         switch (reason) {
           case "error": {
             if (code === "201") {
               // refresh but unnecessary to refresh
-              institutionLoginId = connection_id.split(";")[1];
+              institutionLoginId = connection_id.split(";")[1]; // This seems pointless
             }
             break;
           }
-          case "complete": {
-            if (code === "200") {
-              error = "";
-            }
+          case "done": {
+            // if (code === "200") {
+            //   error = "";
+            // }
             redirect_complete = true;
           }
         }
@@ -183,26 +190,51 @@ export class FinicityAdapter implements WidgetAdapter {
     this.logger.info(
       `Received finicity ${eventType ? "webhook" : "redirect"} response ${connection_id}`,
     );
-    const connection = await this.cacheClient.get(connection_id);
+    const connection = (await this.cacheClient.get(
+      connection_id,
+    )) as Connection;
     if (!connection) {
       return null;
     }
     if (institutionLoginId) {
       connection.status = ConnectionStatus.CONNECTED;
-      connection.raw_status = "CONNECTED";
-      connection.guid = connection_id;
+      // connection.raw_status = "CONNECTED";
+      // connection.guid = connection_id;
       connection.id = `${institutionLoginId}`;
+      connection.postMessageEventData = {
+        memberConnected: {
+          ...connection.postMessageEventData?.memberConnected,
+          connectionId: `${institutionLoginId}`,
+        },
+        memberStatusUpdate: {
+          ...connection.postMessageEventData?.memberStatusUpdate,
+          connectionId: `${institutionLoginId}`,
+        },
+      };
     }
-    connection.request_id = connection_id;
-    connection.error = error;
+    if (accounts.length) {
+      connection.postMessageEventData = {
+        memberConnected: {
+          ...connection.postMessageEventData.memberConnected,
+          accounts,
+        },
+        memberStatusUpdate: {
+          ...connection.postMessageEventData.memberStatusUpdate,
+          accounts,
+        },
+      };
+    }
+    // connection.request_id = connection_id;
+    // connection.error = error;
+    // connection.storageClient = this.cacheClient;
+
     await this.cacheClient.set(connection_id, connection);
-    connection.storageClient = this.cacheClient;
 
     if (redirect_complete) {
-      //make sure redirect page displays correct successful message
-      //while don't save the status in case if oauth redirect is received before webhook
+      // don't save the status in case if oauth redirect is received before webhook
       connection.status = ConnectionStatus.CONNECTED;
     }
+
     return connection;
   }
 }

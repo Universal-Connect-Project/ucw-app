@@ -182,11 +182,18 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
         logger.error("createTransactionsDataHandler error", error);
 
         if (error.message === USER_NOT_RESOLVED_ERROR_TEXT) {
-          res.status(404);
+          res.status(404).json({
+            message: USER_NOT_RESOLVED_ERROR_TEXT,
+          });
           res.send(USER_NOT_RESOLVED_ERROR_TEXT);
+        } else if (error?.cause?.statusCode || error?.message) {
+          res.status(error?.cause?.statusCode || 400).json({
+            message: error.message,
+          });
         } else {
-          res.status(400);
-          res.send(SOMETHING_WENT_WRONG_ERROR_TEXT);
+          res.status(400).json({
+            message: SOMETHING_WENT_WRONG_ERROR_TEXT,
+          });
         }
       }
     },

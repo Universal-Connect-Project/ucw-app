@@ -4,7 +4,7 @@
   "description": "Finicity Adapter for the Universal Connect Widget",
   "main": "src/index.ts",
   "scripts": {
-    "lint": "eslint . --ext .js,.ts",
+    "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --fix --ext .js,.ts",
     "playwright": "playwright test --ui",
     "playwright:test": "playwright test",

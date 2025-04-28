@@ -1,12 +1,20 @@
 import { default as axios, type AxiosInstance } from "axios";
-import type { ApiCredentials, AggregatorCredentials } from "./models";
-import { LogClient } from "@repo/utils";
+import type {
+  ApiCredentials,
+  AggregatorCredentials,
+  Transaction,
+  Customer,
+  Account,
+  AccountOwner,
+} from "./models";
+import { CacheClient, LogClient } from "@repo/utils";
 
-function makeFinicityAuthHeaders(apiConfig: any, tokenRes: any) {
+const FINICITY_TOKEN_REDIS_KEY = "finicityAccessToken";
+
+function makeFinicityAuthHeaders(apiConfig: ApiCredentials, token: string) {
   return {
     "Finicity-App-Key": apiConfig.appKey,
-    "Finicity-App-Token": tokenRes.token,
-    // 'Content-Type': 'application/json', //msw error with this header?
+    "Finicity-App-Token": token,
     accept: "application/json",
   };
 }
@@ -21,42 +29,61 @@ export default class FinicityClient {
   getWebhookHostUrl: () => string;
   basePath = "https://api.finicity.com";
   aggregator: "finicity_sandbox" | "finicity";
+  cacheClient: CacheClient;
 
   constructor(
     sandbox: boolean,
-    apiConfig: AggregatorCredentials,
+    aggregatorCredentials: AggregatorCredentials,
     logger: LogClient,
     envConfig: Record<string, string>,
     getWebhookHostUrl: () => string,
+    cacheClient: CacheClient,
   ) {
     this.aggregator = sandbox ? "finicity_sandbox" : "finicity";
     (this.apiConfig = sandbox
-      ? apiConfig.finicitySandbox
-      : apiConfig.finicityProd),
+      ? aggregatorCredentials.finicitySandbox
+      : aggregatorCredentials.finicityProd),
       (this.logger = logger);
     this.envConfig = envConfig;
     this.getWebhookHostUrl = getWebhookHostUrl;
+    this.cacheClient = cacheClient;
   }
 
-  getAuthToken() {
-    return axios
-      .post(
-        this.basePath + "/aggregation/v2/partners/authentication",
-        {
+  async getAuthToken() {
+    let token = await this.cacheClient.get(FINICITY_TOKEN_REDIS_KEY);
+    if (token) {
+      return token;
+    }
+
+    const response = await fetch(
+      this.basePath + "/aggregation/v2/partners/authentication",
+      {
+        method: "POST",
+        headers: {
+          "Finicity-App-Key": this.apiConfig.appKey,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
           partnerId: this.apiConfig.partnerId,
           partnerSecret: this.apiConfig.secret,
-        },
-        {
-          headers: {
-            "Finicity-App-Key": this.apiConfig.appKey,
-            "Content-Type": "application/json",
-          },
-        },
-      )
-      .then((res) => res.data)
-      .catch((err) => {
-        this.logger.error(`Error at finicityClient.getAuthToken`, err);
-      });
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      this.logger.error("Error getting access token" + response.json());
+      throw new Error("Error getting Finicity access token");
+    }
+
+    const responseJson = (await response.json()) as { token: string };
+    token = responseJson.token;
+
+    await this.cacheClient.set(FINICITY_TOKEN_REDIS_KEY, token, {
+      EX: 7100, // ~ 2 hours
+    });
+
+    return token;
   }
 
   getInstitutions() {
@@ -66,49 +93,47 @@ export default class FinicityClient {
   }
 
   async getInstitution(institutionId: string) {
-    return this.get(`institution/v2/institutions/${institutionId}`).then(
-      (ret) => ret.institution,
+    return this.newGet(`institution/v2/institutions/${institutionId}`).then(
+      // TODO: Fix this type after merge
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (ret: { institution: any }) => ret.institution,
     );
   }
 
   getCustomers() {
-    return this.get("aggregation/v1/customers").then((ret) => ret.customers);
-  }
-
-  getCustomer(unique_name: string) {
-    return this.get(`aggregation/v1/customers?username=${unique_name}`).then(
-      (ret) => ret.customers?.[0],
+    return this.newGet("aggregation/v1/customers").then(
+      (ret: { customers: Customer[] }) => ret.customers,
     );
   }
 
-  getCustomerAccounts(customerId: string) {
-    return this.get(`aggregation/v1/customers/${customerId}/accounts`).then(
-      (ret) => ret.accounts,
-    );
+  async getCustomer(ucpUserId: string): Promise<Customer> {
+    return this.newGet(`aggregation/v1/customers`, {
+      username: ucpUserId,
+    }).then((res: { customers: Customer[] }) => res.customers?.[0]);
   }
 
   getCustomerAccountsByInstitutionLoginId(
     customerId: string,
     institutionLoginId: string,
   ) {
-    return this.get(
+    return this.newGet(
       `aggregation/v1/customers/${customerId}/institutionLogins/${institutionLoginId}/accounts`,
-    ).then((res) => res.accounts);
+    ).then((res: { accounts: Account[] }) => res.accounts);
   }
 
   getAccountOwnerDetail(customerId: string, accountId: string) {
-    return this.get(
+    return this.newGet(
       `aggregation/v3/customers/${customerId}/accounts/${accountId}/owner`,
-    ).then((res) => res.holders?.[0]);
+    ).then((res: { holders: AccountOwner[] }) => res.holders);
   }
 
   getAccountAchDetail(customerId: string, accountId: string) {
-    return this.get(
+    return this.newGet(
       `aggregation/v1/customers/${customerId}/accounts/${accountId}/details`,
     );
   }
 
-  getTransactions(
+  async getTransactions(
     customerId: string,
     accountId: string,
     fromDate: string,
@@ -117,12 +142,13 @@ export default class FinicityClient {
     const body = {
       fromDate: Math.floor(new Date(fromDate).getTime() / 1000),
       toDate: Math.floor(new Date(toDate).getTime() / 1000),
-      limit: 20,
+      limit: 100,
     };
-    return this.get(
+
+    return this.newGet(
       `aggregation/v4/customers/${customerId}/accounts/${accountId}/transactions`,
       body,
-    ).then((res) => res.transactions);
+    ).then((res: { transactions: Transaction[] }) => res.transactions);
   }
 
   generateConnectLiteUrl(
@@ -180,13 +206,50 @@ export default class FinicityClient {
   post(path: string, body: any) {
     return this.request("post", path, null, body);
   }
-  get(path: string, params: any = null) {
+  async newGet(path: string, params: any = null): Promise<unknown> {
+    return this.nonAxiosRequest("get", path, params);
+  }
+  async get(path: string, params: any = null) {
     return this.request("get", path, params);
   }
   del(path: string, params: any = null) {
     return this.request("delete", path, params);
   }
-  async request(method: string, url: string, params: any, data: any = null) {
+  async nonAxiosRequest(
+    method: string,
+    url: string,
+    params: Record<string, string> = {},
+    data: Record<string, string> = undefined,
+  ) {
+    const token = await this.getAuthToken();
+    const headers = makeFinicityAuthHeaders(this.apiConfig, token);
+
+    const urlParams = new URLSearchParams(params);
+    const path = `${this.basePath}/${url}?${urlParams}`;
+    const response = await fetch(path, {
+      method,
+      headers,
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = (await response.json()) as Error;
+      console.error(error);
+      throw new Error(`${error.message}`, {
+        cause: {
+          statusCode: response.status,
+        },
+      });
+    }
+
+    return response.json();
+  }
+
+  async request(
+    method: string,
+    url: string,
+    params: Record<string, string> = {},
+    data: any = undefined,
+  ) {
     if (!this.axios) {
       const token = await this.getAuthToken();
       const headers = makeFinicityAuthHeaders(this.apiConfig, token);
@@ -202,7 +265,10 @@ export default class FinicityClient {
         params,
         data,
       })
-      .then((res) => res.data)
+      .then((res) => {
+        console.log("in old request");
+        return res.data;
+      })
       .catch((err) => {
         this.logger.error(
           `Error at finicityClient.${method} ${url}`,

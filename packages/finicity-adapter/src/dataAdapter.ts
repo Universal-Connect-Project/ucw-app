@@ -1,5 +1,9 @@
-import type { DataAdapterDependencies } from "./models";
-import { mapAccount, mapIdentity, mapTransaction } from "./mapper";
+import type { Account, DataAdapterDependencies, Transaction } from "./models";
+import {
+  mapAccount,
+  mapTransaction,
+  transformAccountsToCustomers,
+} from "./mapper";
 import FinicityClient from "./apiClient";
 
 const createDataAdapter = (
@@ -17,8 +21,13 @@ const createDataAdapter = (
     userId: string;
     accountId?: string;
   }) => {
-    const { logClient, envConfig, aggregatorCredentials, getWebhookHostUrl } =
-      dependencies;
+    const {
+      logClient,
+      envConfig,
+      aggregatorCredentials,
+      getWebhookHostUrl,
+      cacheClient,
+    } = dependencies;
 
     const dataClient = new FinicityClient(
       sandbox,
@@ -26,15 +35,27 @@ const createDataAdapter = (
       logClient,
       envConfig,
       getWebhookHostUrl,
+      cacheClient,
     );
     switch (type) {
       case "identity": {
-        const customer = await dataClient.getAccountOwnerDetail(
-          userId,
-          connectionId,
-        );
-        const identity = mapIdentity(userId, customer);
-        return { customers: [identity] };
+        const accounts: Account[] =
+          await dataClient.getCustomerAccountsByInstitutionLoginId(
+            userId,
+            connectionId,
+          );
+
+        const accountsWithHolders = [];
+
+        for (const account of accounts) {
+          const ownerDetails = await dataClient.getAccountOwnerDetail(
+            userId,
+            account.id,
+          );
+          accountsWithHolders.push({ ...account, holders: ownerDetails });
+        }
+
+        return transformAccountsToCustomers(accountsWithHolders);
       }
       case "accounts": {
         const accounts =
@@ -42,7 +63,29 @@ const createDataAdapter = (
             userId,
             connectionId,
           );
-        return { accounts: accounts.map(mapAccount) };
+
+        const accountsWithAchDetails = [];
+
+        const accountTypesWithAchSupport = [
+          "checking",
+          "savings",
+          "moneyMarket",
+          "certificateOfDeposit",
+        ];
+
+        for (const account of accounts) {
+          if (accountTypesWithAchSupport.includes(account.type)) {
+            const achDetails = await dataClient.getAccountAchDetail(
+              userId,
+              account.id,
+            );
+            accountsWithAchDetails.push({ ...account, achDetails });
+          } else {
+            accountsWithAchDetails.push(account);
+          }
+        }
+
+        return { accounts: accountsWithAchDetails.map(mapAccount) };
       }
       case "transactions": {
         const startDate = new Date(
@@ -55,8 +98,8 @@ const createDataAdapter = (
           new Date().toISOString(),
         );
         return {
-          transactions: transactions.map((t: any) =>
-            mapTransaction(t, accountId),
+          transactions: transactions.map((transaction: Transaction) =>
+            mapTransaction(transaction, accountId),
           ),
         };
       }
