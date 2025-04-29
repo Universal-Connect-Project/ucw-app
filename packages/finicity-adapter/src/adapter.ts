@@ -9,7 +9,7 @@ import type {
   WidgetAdapter,
 } from "@repo/utils";
 import { ConnectionStatus, USER_NOT_RESOLVED_ERROR_TEXT } from "@repo/utils";
-import type { Account, AdapterConfig } from "./models";
+import type { AdapterConfig, Customer } from "./models";
 import FinicityClient from "./apiClient";
 import { v4 as uuidv4 } from "uuid";
 
@@ -124,9 +124,9 @@ export class FinicityAdapter implements WidgetAdapter {
     return true;
   }
 
-  async ResolveUserId(user_id: string, failIfNotFound: boolean = false) {
-    this.logger.debug("Resolving UserId: " + user_id);
-    const finicityUser = await this.apiClient.getCustomer(user_id);
+  async ResolveUserId(userId: string, failIfNotFound: boolean = false) {
+    this.logger.debug("Resolving UserId: " + userId);
+    const finicityUser = await this.apiClient.getCustomer(userId);
     if (finicityUser) {
       this.logger.trace(`Found existing finicity customer ${finicityUser.id}`);
       return finicityUser.id;
@@ -138,15 +138,13 @@ export class FinicityAdapter implements WidgetAdapter {
       });
     }
 
-    this.logger.trace(`Creating finicity user ${user_id}`);
-    const ret = await this.apiClient.createCustomer(user_id);
+    this.logger.trace(`Creating finicity user ${userId}`);
+    const ret = (await this.apiClient.createCustomer(userId)) as Customer;
     if (ret) {
       return ret.id;
     }
-    this.logger.trace(
-      `Failed creating finicity user, using user_id: ${user_id}`,
-    );
-    return user_id;
+    this.logger.trace(`Failed creating finicity user, using userId: ${userId}`);
+    return userId;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -154,34 +152,35 @@ export class FinicityAdapter implements WidgetAdapter {
     const { connection_id, reason, code } = request?.query || {};
     const { eventType, payload } = request?.body || {};
     let institutionLoginId = false;
-    let accounts: string[] = [];
-    //
-    // let error = JSON.stringify(reason || "");
     let redirect_complete = false;
+
+    const connection = (await this.cacheClient.get(
+      connection_id,
+    )) as Connection;
+
+    if (!connection) {
+      return null;
+    }
+
     switch (eventType) {
       case "added":
         institutionLoginId = payload?.accounts?.[0]?.institutionLoginId;
-        accounts = payload?.accounts?.map((account: Account) => {
-          return {
-            id: account.id,
-            name: account.name,
-            type: account.type,
-          };
-        });
         break;
       default:
         switch (reason) {
+          case "exit": {
+            if (code === "100") {
+              connection.status = ConnectionStatus.CLOSED;
+            }
+            break;
+          }
           case "error": {
             if (code === "201") {
-              // refresh but unnecessary to refresh
-              institutionLoginId = connection_id.split(";")[1]; // This seems pointless
+              connection.status = ConnectionStatus.FAILED;
             }
             break;
           }
           case "done": {
-            // if (code === "200") {
-            //   error = "";
-            // }
             redirect_complete = true;
           }
         }
@@ -189,16 +188,9 @@ export class FinicityAdapter implements WidgetAdapter {
     this.logger.info(
       `Received finicity ${eventType ? "webhook" : "redirect"} response ${connection_id}`,
     );
-    const connection = (await this.cacheClient.get(
-      connection_id,
-    )) as Connection;
-    if (!connection) {
-      return null;
-    }
+
     if (institutionLoginId) {
       connection.status = ConnectionStatus.CONNECTED;
-      // connection.raw_status = "CONNECTED";
-      // connection.guid = connection_id;
       connection.id = `${institutionLoginId}`;
       connection.postMessageEventData = {
         memberConnected: {
@@ -211,21 +203,6 @@ export class FinicityAdapter implements WidgetAdapter {
         },
       };
     }
-    if (accounts.length) {
-      connection.postMessageEventData = {
-        memberConnected: {
-          ...connection.postMessageEventData.memberConnected,
-          accounts,
-        },
-        memberStatusUpdate: {
-          ...connection.postMessageEventData.memberStatusUpdate,
-          accounts,
-        },
-      };
-    }
-    // connection.request_id = connection_id;
-    // connection.error = error;
-    // connection.storageClient = this.cacheClient;
 
     await this.cacheClient.set(connection_id, connection);
 
