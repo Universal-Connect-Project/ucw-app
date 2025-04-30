@@ -25,7 +25,9 @@ import { getSet, overwriteSet } from "./storageClient/redis";
 export function getInstitutionFilePath() {
   return resolve(__dirname, "../../cachedDefaults/ucwInstitutionsMapping.json");
 }
-
+export function getTestInstitutionFilePath() {
+  return resolve(__dirname, "../../cachedDefaults/testInstitutionsMapping.json");
+}
 export const ElasticsearchClient = new Client({
   node: config.ELASTIC_SEARCH_URL ?? "http://localhost:9200",
   ssl: {
@@ -98,18 +100,25 @@ async function getInstitutions(): Promise<CachedInstitution[]> {
       info("Updating institution cache list");
       return newInstitutions;
     } else {
-      return getInstitutionDataFromFile();
+      return getInstitutionDataFromFile(true);
     }
   } else {
-    return getInstitutionDataFromFile();
+    return getInstitutionDataFromFile(true);
   }
 }
 
-function getInstitutionDataFromFile(): CachedInstitution[] {
+function getInstitutionDataFromFile(includeTestInstitutions: boolean): CachedInstitution[] {
   info("Elasticsearch indexing from local file");
   const dataFilePath = getInstitutionFilePath();
   const rawData = readFileSync(dataFilePath);
-  return JSON.parse(rawData.toString());
+  const ucwList = JSON.parse(rawData.toString());
+  if(includeTestInstitutions){
+    const testDataFilePath = getTestInstitutionFilePath();
+    const rawTestData = readFileSync(testDataFilePath)
+    const testList = JSON.parse(rawTestData.toString())
+    return testList.concat(ucwList)
+  }
+  return ucwList
 }
 
 export async function searchByRoutingNumber(

@@ -270,7 +270,7 @@ describe("indexElasticSearch", () => {
 
     await indexElasticSearch();
     expect(indexCreated).toBeTruthy();
-    expect(institutionsIndexedCount).toEqual(3);
+    expect(institutionsIndexedCount).toEqual(6); 
   });
 
   describe.each([
