@@ -91,6 +91,14 @@ export const elasticSearchInstitutionData: CachedInstitution = {
     supports_verification: true,
     supports_history: false,
   },
+  akoya: {
+    id: "akoya_bank",
+    supports_aggregation: true,
+    supports_oauth: false,
+    supports_identification: true,
+    supports_verification: true,
+    supports_history: false,
+  },
 };
 
 export const elasticSearchInstitutionDataFavs: CachedInstitution[] = [

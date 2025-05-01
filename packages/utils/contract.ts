@@ -157,6 +157,7 @@ export interface Connection {
   oauth_window_uri?: string | null;
   error_message?: string | null;
   postMessageEventData?: PostMessageEventData;
+  jobTypes?: ComboJobTypes[];
 }
 
 export interface Connections {

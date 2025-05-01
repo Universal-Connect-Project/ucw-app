@@ -2,6 +2,13 @@ import type { Request, Response } from "express";
 import { getAggregatorWidgetAdapter } from "../adapters/getAggregatorWidgetAdapter";
 import { resolveInstitutionAggregator } from "./institutionResolver";
 
+export const OAuthOnlyAggregatorsList = [
+  "akoya",
+  "akoya_sandbox",
+  "finicity",
+  "finicity_sandbox",
+];
+
 export const getInstitutionHandler = async (req: Request, res: Response) => {
   const ucpInstitutionId = req.params.institution_guid;
 
@@ -20,12 +27,7 @@ export const getInstitutionHandler = async (req: Request, res: Response) => {
 
   const name = resolvedInstitution.name;
 
-  const oauthOverride = [
-    "akoya",
-    "akoya_sandbox",
-    "finicity",
-    "finicity_sandbox",
-  ].includes(inst.aggregator);
+  const oauthOverride = OAuthOnlyAggregatorsList.includes(inst.aggregator);
 
   res.send({
     guid: inst.id,

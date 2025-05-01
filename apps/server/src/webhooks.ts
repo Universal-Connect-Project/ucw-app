@@ -16,7 +16,6 @@ export const getWebhookHostUrl = () =>
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const startNgrok = async (app: any) => {
   if (getShouldUseNgrok()) {
-    // ngrok.listen must be awaited
     await ngrok.listen(app);
 
     ngrokListenerUrl = app.listener.url();

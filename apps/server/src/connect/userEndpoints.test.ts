@@ -54,18 +54,20 @@ describe("userEndpoints", () => {
 
     it("responds with a failure if TestA deletion fails", async () => {
       // Mock DeleteUser from TestAdapter
+      const deleteFailedMessage = "User Delete Failed";
+
       jest
         .spyOn(adapterIndex, "createAggregatorWidgetAdapter")
         .mockReturnValue({
           DeleteUser: () => {
-            throw new Error("Delete failed");
+            throw new Error(deleteFailedMessage);
           },
           ResolveUserId: () => "test",
         } as unknown as WidgetAdapter);
 
       const res = {
-        send: jest.fn(),
-        status: jest.fn(),
+        json: jest.fn(),
+        status: jest.fn().mockReturnThis(),
       } as unknown as Response;
 
       const req: UserDeleteRequest = {
@@ -77,7 +79,9 @@ describe("userEndpoints", () => {
 
       await userDeleteHandler(req, res);
 
-      expect(res.send).toHaveBeenCalledWith("User delete failed");
+      expect(res.json).toHaveBeenCalledWith({
+        message: deleteFailedMessage,
+      });
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(res.status).toHaveBeenCalledWith(400);
     });

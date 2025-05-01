@@ -8,7 +8,11 @@ import type {
   UpdateConnectionRequest,
   WidgetAdapter,
 } from "@repo/utils";
-import { ConnectionStatus, USER_NOT_RESOLVED_ERROR_TEXT } from "@repo/utils";
+import {
+  ComboJobTypes,
+  ConnectionStatus,
+  USER_NOT_RESOLVED_ERROR_TEXT,
+} from "@repo/utils";
 import type { AdapterConfig, Customer } from "./models";
 import FinicityClient from "./apiClient";
 import { v4 as uuidv4 } from "uuid";
@@ -37,8 +41,7 @@ export class FinicityAdapter implements WidgetAdapter {
   }
 
   async DeleteUser(userId: string) {
-    const resolved = await this.ResolveUserId(userId);
-    await this.apiClient.deleteCustomer(resolved);
+    return await this.apiClient.deleteCustomer(userId);
   }
 
   async GetInstitutionById(id: string): Promise<AggregatorInstitution> {
@@ -82,6 +85,7 @@ export class FinicityAdapter implements WidgetAdapter {
       ),
       aggregator: this.aggregator,
       status: ConnectionStatus.CREATED,
+      jobTypes: request.jobTypes,
     };
     await this.cacheClient.set(request_id, obj);
     return obj;
@@ -165,6 +169,12 @@ export class FinicityAdapter implements WidgetAdapter {
     switch (eventType) {
       case "added":
         institutionLoginId = payload?.accounts?.[0]?.institutionLoginId;
+
+        if (connection.jobTypes.includes(ComboJobTypes.TRANSACTIONS)) {
+          await this.apiClient.refreshAccountsToAggregateTransactions(
+            connection.userId,
+          );
+        }
         break;
       default:
         switch (reason) {

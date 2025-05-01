@@ -16,6 +16,7 @@
     "@types/node": "^22.7.6",
     "@types/parse-full-name": "^1.2.5",
     "addresser": "^1.1.20",
+    "axios": "^1.9.0",
     "fs": "^0.0.1-security",
     "parse-full-name": "^1.2.6",
     "uuid": "^11.0.3"

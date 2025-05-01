@@ -1,6 +1,6 @@
 {
   "watch": [".", "../../packages"],
   "ext": "js,ts,json,env",
-  "ignore": ["**/cypress/**", "**/cachedDefaults/ucwInstitutionsMapping.json"],
+  "ignore": ["**/cypress/**", "**/cachedDefaults/ucwInstitutionsMapping.json", "**/playwright/**"],
   "exec": "ts-node src/server.js"
 }

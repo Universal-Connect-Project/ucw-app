@@ -1,3 +1,4 @@
+import axios, { AxiosInstance } from "axios";
 import type {
   ApiCredentials,
   AggregatorCredentials,
@@ -14,7 +15,7 @@ function makeFinicityAuthHeaders(apiConfig: ApiCredentials, token: string) {
   return {
     "Finicity-App-Key": apiConfig.appKey,
     "Finicity-App-Token": token,
-    accept: "application/json",
+    Accept: "application/json",
     "Content-Type": "application/json",
   };
 }
@@ -29,6 +30,7 @@ export default class FinicityClient {
   basePath = "https://api.finicity.com";
   aggregator: "finicity_sandbox" | "finicity";
   cacheClient: CacheClient;
+  axios: AxiosInstance;
 
   constructor(
     sandbox: boolean,
@@ -85,16 +87,24 @@ export default class FinicityClient {
     return token;
   }
 
-  getCustomers() {
-    return this.get("aggregation/v1/customers").then(
-      (ret: { customers: Customer[] }) => ret.customers,
-    );
+  getCustomers(ucpUserId: string) {
+    return this.get("aggregation/v1/customers", {
+      username: ucpUserId,
+    }).then((res: { customers: Customer[] }) => res.customers?.[0]);
   }
 
   async getCustomer(ucpUserId: string): Promise<Customer> {
-    return this.get(`aggregation/v1/customers`, {
-      username: ucpUserId,
-    }).then((res: { customers: Customer[] }) => res.customers?.[0]);
+    try {
+      return (await this.get(
+        `/aggregation/v1/customers/${ucpUserId}`,
+      )) as Customer;
+    } catch {
+      return this.getCustomers(ucpUserId);
+    }
+  }
+
+  async refreshAccountsToAggregateTransactions(customerId: string) {
+    return this.post(`aggregation/v2/customers/${customerId}/accounts`, {});
   }
 
   getCustomerAccountsByInstitutionLoginId(
@@ -185,22 +195,35 @@ export default class FinicityClient {
     );
   }
 
-  deleteCustomer(customerId: string) {
-    return this.delete(`aggregation/v2/customers/${customerId}`);
+  async deleteCustomer(customerId: string) {
+    return this.delete(`aggregation/v1/customers/${customerId}`);
   }
 
   async post(path: string, body: Record<string, string | number | boolean>) {
-    return this.request("post", path, undefined, body);
+    return this.request("post", path, undefined, body).then((res) => res.data);
   }
   async get(
     path: string,
     params: Record<string, string> = null,
   ): Promise<unknown> {
-    return this.request("get", path, params);
+    return this.request("get", path, params).then((res) => res.data);
   }
 
   async delete(path: string) {
     return this.request("delete", path);
+  }
+
+  async getAxiosInstance() {
+    if (this.axios) {
+      return this.axios;
+    }
+
+    const token = await this.getAuthToken();
+    const headers = makeFinicityAuthHeaders(this.apiConfig, token);
+    return (this.axios = axios.create({
+      baseURL: BASE_PATH,
+      headers,
+    }));
   }
 
   async request(
@@ -209,26 +232,25 @@ export default class FinicityClient {
     params: Record<string, string> = {},
     data: Record<string, string | number | boolean> = undefined,
   ) {
-    const token = await this.getAuthToken();
-    const headers = makeFinicityAuthHeaders(this.apiConfig, token);
+    const axios = await this.getAxiosInstance();
 
-    const urlParams = new URLSearchParams(params);
-    const path = `${this.basePath}/${url}?${urlParams}`;
-    const response = await fetch(path, {
-      method,
-      headers,
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-      const error = (await response.json()) as Error;
-      console.error(error);
-      throw new Error(`${error.message}`, {
-        cause: {
-          statusCode: response.status,
-        },
+    return axios
+      .request({
+        url,
+        method,
+        params,
+        data,
+      })
+      .catch((err) => {
+        this.logger.error(
+          `Error at finicityClient.${method} ${url}`,
+          err?.response?.data || err,
+        );
+        throw new Error(err?.response?.data?.message, {
+          cause: {
+            statusCode: err.status || 400,
+          },
+        });
       });
-    }
-
-    return response.json();
   }
 }

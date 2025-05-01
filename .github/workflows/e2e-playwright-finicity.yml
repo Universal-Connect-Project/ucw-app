@@ -48,7 +48,7 @@ jobs:
         run: |
           ENV_FILE_PATH=./apps/server/.env
           touch ${ENV_FILE_PATH}
-          
+
           # Vars
           echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
           echo FINICITY_PARTNER_ID=${{ secrets.FINICITY_PARTNER_ID }} >> ${ENV_FILE_PATH}
@@ -67,5 +67,5 @@ jobs:
         if: always()
         with:
           name: test-results
-          path: packages/finicity-adapter/test-results/
+          path: packages/finicity-adapter/playwright-report/
           retention-days: 30

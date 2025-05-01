@@ -5,6 +5,7 @@ import {
   transformAccountsToCustomers,
 } from "./mapper";
 import FinicityClient from "./apiClient";
+import { VCDataTypes } from "@repo/utils";
 
 const createDataAdapter = (
   sandbox: boolean,
@@ -38,7 +39,7 @@ const createDataAdapter = (
       cacheClient,
     );
     switch (type) {
-      case "identity": {
+      case VCDataTypes.IDENTITY: {
         const accounts: Account[] =
           await dataClient.getCustomerAccountsByInstitutionLoginId(
             userId,
@@ -57,7 +58,7 @@ const createDataAdapter = (
 
         return transformAccountsToCustomers(accountsWithHolders);
       }
-      case "accounts": {
+      case VCDataTypes.ACCOUNTS: {
         const accounts =
           await dataClient.getCustomerAccountsByInstitutionLoginId(
             userId,
@@ -87,7 +88,7 @@ const createDataAdapter = (
 
         return { accounts: accountsWithAchDetails.map(mapAccount) };
       }
-      case "transactions": {
+      case VCDataTypes.TRANSACTIONS: {
         const startDate = new Date(
           new Date().setDate(new Date().getDate() - 30),
         );

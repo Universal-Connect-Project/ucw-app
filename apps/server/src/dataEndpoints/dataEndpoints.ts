@@ -3,11 +3,7 @@ import type { Response } from "express";
 import * as logger from "../infra/logger";
 import he from "he";
 
-import {
-  SOMETHING_WENT_WRONG_ERROR_TEXT,
-  USER_NOT_RESOLVED_ERROR_TEXT,
-  VCDataTypes,
-} from "@repo/utils";
+import { parseError, VCDataTypes } from "@repo/utils";
 import type { Aggregator } from "../shared/contract";
 import { withValidateAggregatorInPath } from "../utils/validators";
 import { createAggregatorWidgetAdapter, getData, getVC } from "../adapterIndex";
@@ -31,33 +27,6 @@ export interface TransactionsRequest {
   params: TransactionsDataPathParameters;
 }
 
-interface CustomError extends Error {
-  cause: {
-    statusCode?: number;
-  };
-}
-
-const parseError = (
-  error: CustomError,
-): { statusCode: number; message: string } => {
-  if (error.message === USER_NOT_RESOLVED_ERROR_TEXT) {
-    return {
-      statusCode: 404,
-      message: USER_NOT_RESOLVED_ERROR_TEXT,
-    };
-  } else if (error.message) {
-    return {
-      statusCode: error.cause?.statusCode || 400,
-      message: error.message,
-    };
-  } else {
-    return {
-      statusCode: 400,
-      message: SOMETHING_WENT_WRONG_ERROR_TEXT,
-    };
-  }
-};
-
 export const createAccountsDataHandler = (isVc: boolean) =>
   withValidateAggregatorInPath(async (req: AccountsRequest, res: Response) => {
     const { aggregator, connectionId, userId } = req.params;
@@ -78,7 +47,7 @@ export const createAccountsDataHandler = (isVc: boolean) =>
 
       if (isVc) {
         const vc = await getVC(dataArgs);
-        res.send({
+        res.json({
           jwt: vc,
         });
       } else {
@@ -123,7 +92,7 @@ export const createIdentityDataHandler = (isVc: boolean) =>
 
       if (isVc) {
         const vc = await getVC(dataArgs);
-        res.send({
+        res.json({
           jwt: vc,
         });
       } else {
@@ -188,13 +157,13 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
 
         if (validationError) {
           res.status(400);
-          res.send(he.encode(validationError));
+          res.json(he.encode(validationError));
           return;
         }
 
         if (isVc) {
           const vc = await getVC(dataArgs);
-          res.send({
+          res.json({
             jwt: vc,
           });
         } else {
