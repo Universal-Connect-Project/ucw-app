@@ -9,7 +9,7 @@ import type {
 } from "./models";
 import { CacheClient, LogClient } from "@repo/utils";
 
-const FINICITY_TOKEN_REDIS_KEY = "finicityAccessToken";
+export const FINICITY_TOKEN_REDIS_KEY = "finicityAccessToken";
 
 function makeFinicityAuthHeaders(apiConfig: ApiCredentials, token: string) {
   return {
@@ -160,24 +160,6 @@ export default class FinicityClient {
       redirectUri: redir,
       webhook: `${this.getWebhookHostUrl()}/webhook/${this.aggregator}/?connection_id=${request_id}`,
       webhookContentType: "application/json",
-      // 'singleUseUrl': true,
-      // 'experience': 'default',
-    }).then((ret: { link: string }) => ret.link);
-  }
-
-  generateConnectFixUrl(
-    institutionLoginId: string,
-    customerId: string,
-    request_id: string,
-  ) {
-    return this.post("connect/v2/generate/fix", {
-      language: "en-US",
-      partnerId: this.apiConfig.partnerId,
-      customerId: customerId,
-      institutionLoginId,
-      redirectUri: `${this.getWebhookHostUrl()}/oauth/${this.aggregator}/redirect_from?connection_id=${request_id}`,
-      webhook: `${this.getWebhookHostUrl()}/webhook/${this.aggregator}/?connection_id=${request_id}`,
-      webhookContentType: "application/json",
     }).then((ret: { link: string }) => ret.link);
   }
 
@@ -188,7 +170,6 @@ export default class FinicityClient {
         username: unique_name,
         firstName: "John",
         lastName: "Smith",
-        // applicationId: '123456789',
         phone: "1-801-984-4200",
         email: "myname@mycompany.com",
       },

@@ -102,10 +102,10 @@ export const createIdentityDataHandler = (isVc: boolean) =>
     } catch (error) {
       logger.error("createIdentityDataHandler error", error);
 
-      const parsedError = parseError(error);
+      const { statusCode, message } = parseError(error);
 
-      res.status(parsedError.statusCode).json({
-        message: parsedError.message,
+      res.status(statusCode).json({
+        message,
       });
     }
   });

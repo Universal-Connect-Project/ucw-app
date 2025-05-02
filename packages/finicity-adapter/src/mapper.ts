@@ -121,12 +121,16 @@ export function mapAccount(a: AccountWithAchDetails) {
       currentBalance: a.balance,
       balanceAsOf: new Date(a.balanceDate),
       availableBalance: accountDetails?.availableBalanceAmount,
-      nextPaymentAmount: accountDetails?.nextPayment,
-      nextPaymentDate: accountDetails?.nextPaymentDate
-        ? new Date(accountDetails?.nextPaymentDate)
-        : undefined,
-      principalBalance: accountDetails?.principalBalance,
-      loadTerm: accountDetails?.termOfMl,
+      ...(accountDetails?.nextPayment !== undefined && {
+        nextPaymentAmount: accountDetails.nextPayment,
+      }),
+      ...(accountDetails?.nextPaymentDate && {
+        nextPaymentDate: new Date(accountDetails.nextPaymentDate),
+      }),
+      ...(accountDetails?.principalBalance !== undefined && {
+        principalBalance: accountDetails.principalBalance,
+      }),
+      ...(accountDetails?.termOfMl && { loanTerm: accountDetails.termOfMl }),
     },
   };
 }
@@ -177,14 +181,16 @@ export function transformAccountsToCustomers(
           first: parsedName?.first,
           last: parsedName?.last,
         },
-        email: accountOwner.emails?.map((e: { email: string }) => e.email),
-        telephones: accountOwner.phones?.map(
-          (p: { phone: string; type: string; country: string }) => ({
-            type: p.type,
-            country: p.country,
-            number: p.phone,
-          }),
-        ),
+        emails:
+          accountOwner.emails?.map((e: { email: string }) => e.email) || [],
+        telephones:
+          accountOwner.phones?.map(
+            (p: { phone: string; type: string; country: string }) => ({
+              type: p.type,
+              country: p.country,
+              number: p.phone,
+            }),
+          ) || [],
         accounts: [],
       });
     }

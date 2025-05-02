@@ -103,14 +103,14 @@ export class FinicityAdapter implements WidgetAdapter {
 
   async GetConnectionById(
     connectionId: string,
-    _user_id: string,
+    _user_id?: string,
   ): Promise<Connection> {
     return await this.cacheClient.get(connectionId);
   }
 
   async GetConnectionStatus(
     connectionId: string,
-    _jobId: string,
+    _jobId?: string,
   ): Promise<Connection> {
     const connection = await this.cacheClient.get(connectionId);
 
@@ -143,12 +143,10 @@ export class FinicityAdapter implements WidgetAdapter {
     }
 
     this.logger.trace(`Creating finicity user ${userId}`);
-    const ret = (await this.apiClient.createCustomer(userId)) as Customer;
-    if (ret) {
-      return ret.id;
-    }
-    this.logger.trace(`Failed creating finicity user, using userId: ${userId}`);
-    return userId;
+    const newCustomer = (await this.apiClient.createCustomer(
+      userId,
+    )) as Customer;
+    return newCustomer.id;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
