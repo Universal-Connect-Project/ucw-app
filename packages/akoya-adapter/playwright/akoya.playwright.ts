@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { ComboJobTypes, SOMETHING_WENT_WRONG_ERROR_TEXT } from "@repo/utils";
+import { ComboJobTypes } from "@repo/utils";
 
 const WIDGET_BASE_URL = "http://localhost:8080/widget";
 
