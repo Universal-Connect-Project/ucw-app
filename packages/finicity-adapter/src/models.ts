@@ -185,8 +185,8 @@ export interface AccountOwnerAddress {
 
 export interface AccountOwner {
   ownerName: string;
-  nameClassification: string;
-  nameClassificationconfidencescore: number;
+  nameClassification?: string;
+  nameClassificationconfidencescore?: number;
   addresses: AccountOwnerAddress[];
   emails?: { email: string }[];
   phones?: { phone: string; type: string; country: string }[];
@@ -199,6 +199,7 @@ export interface Transaction {
   transactionDate: number;
   description: string;
   memo: string;
+  type?: string;
   accountId: number;
   customerId: number;
   status: string;

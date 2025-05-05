@@ -8,16 +8,37 @@ import type {
 } from "./models";
 import { parseFullName } from "parse-full-name";
 
+function mapTransactionType(finicityType: string | undefined): string {
+  const transactionTypeMapping: Record<string, string> = {
+    atm: "depositTransaction",
+    cash: "depositTransaction",
+    check: "depositTransaction",
+    credit: "locTransaction",
+    debit: "locTransaction",
+    deposit: "depositTransaction",
+    directDebit: "loanTransaction",
+    directDeposit: "depositTransaction",
+    dividend: "investmentTransaction",
+    fee: "depositTransaction",
+    interest: "investmentTransaction",
+    other: "depositTransaction",
+    payment: "loanTransaction",
+    pointOfSale: "locTransaction",
+    repeatPayment: "loanTransaction",
+    serviceCharge: "depositTransaction",
+    transfer: "depositTransaction",
+    withdrawal: "depositTransaction",
+    default: "depositTransaction",
+  };
+
+  return transactionTypeMapping[finicityType] || transactionTypeMapping.default;
+}
 export function mapTransaction(transaction: Transaction, accountId: string) {
-  // Finicity sandbox (prod unknown) transactions dont have "type"
-  // even though it says that it exists in the docs, so we can't get
-  // an accurate "key"
-  // https://developer.mastercard.com/open-banking-us/documentation/api-reference/?view=api#GetCustomerAccountTransactions
-  const key = "depositTransaction";
+  const transactionTypeKey: string = mapTransactionType(transaction.type);
   const debitCreditMemo = transaction.amount < 0 ? "DEBIT" : "CREDIT";
 
   return {
-    [key]: {
+    [transactionTypeKey]: {
       amount: Math.abs(transaction.amount),
       accountId,
       transactionId: `${transaction.id}`,
@@ -217,72 +238,3 @@ export function transformAccountsToCustomers(
     customers: Array.from(customersMap.values()),
   };
 }
-
-// transaction type
-// 'atm'
-// 'cash'
-// 'check'
-// 'credit'
-// 'debit'
-// 'deposit'
-// 'directDebit'
-// 'directDeposit'
-// 'dividend'
-// 'fee'
-// 'interest'
-// 'other'
-// 'payment'
-// 'pointOfSale'
-// 'repeatPayment'
-// 'serviceCharge'
-// 'transfer'
-
-// transaction:
-// {
-//   'id': 21284820852,
-//   'amount': -828.9,
-//   'accountId': 5011648377,
-//   'customerId': 1005061234,
-//   'status': 'active',
-//   'description': 'Buy Stock',
-//   'memo': 'UWM HOLDINGS CORPORATION - CLASS A COMMON STOCK',
-//   'type': 'atm',
-//   'transactionDate': 1607450357,
-//   'postedDate': 1607450357,
-//   'createdDate': 1607450357,
-//   'firstEffectiveDate': 1607450357,
-//   'effectiveDate': 1607450357,
-//   'optionExpireDate': 1607450357,
-//   'checkNum': 299,
-//   'escrowAmount': 2534,
-//   'feeAmount': 0.51,
-//   'suspenseAmount': 0.25,
-//   'interestAmount': 132,
-//   'principalAmount': 32560,
-//   'optionStrikePrice': 32560,
-//   'unitQuantity': 150,
-//   'unitPrice': 5.53,
-//   'categorization': {
-//     'normalizedPayeeName': 'Mad Science Research',
-//     'category': 'ATM Fee',
-//     'city': 'Murray',
-//     'state': 'UT',
-//     'postalCode': '84123',
-//     'country': 'USA',
-//     'bestRepresentation': 'VERIZON WIRELESS PAYMENTS'
-//   },
-//   'runningBalanceAmount': 1000,
-//   'subaccountSecurityType': 'MARGIN',
-//   'commissionAmount': 0,
-//   'ticker': 'UWMC',
-//   'investmentTransactionType': 'transfer',
-//   'taxesAmount': 0,
-//   'currencySymbol': 'USD',
-//   'incomeType': 'DIV',
-//   'splitDenominator': 152,
-//   'splitNumerator': 20,
-//   'sharesPerContract': 100,
-//   'subAccountFund': 'MARGIN',
-//   'securityId': '91823B109',
-//   'securityIdType': 'CUSIP'
-// }

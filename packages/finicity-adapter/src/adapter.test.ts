@@ -11,7 +11,6 @@ import {
   USER_NOT_RESOLVED_ERROR_TEXT,
 } from "@repo/utils";
 
-// import { institutionDetailData } from "./test/testData/institutions";
 import { customerData } from "./test/testData/users";
 import { server } from "./test/testServer";
 
