@@ -67,6 +67,8 @@ test("should return 400 with error message when requesting akoya data", async ({
 
   expect(response.status()).toBe(400);
 
-  const body = await response.text();
-  expect(body).toContain(SOMETHING_WENT_WRONG_ERROR_TEXT);
+  const body = await response.json();
+  expect(body).toEqual({
+    message: "Data adapter not implemented for Akoya",
+  });
 });

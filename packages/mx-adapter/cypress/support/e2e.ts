@@ -38,6 +38,6 @@ afterEach(() => {
     url: `/api/aggregator/mx_int/user/${userId}`,
     failOnStatusCode: false,
   }).should((response) => {
-    expect(response.status).to.be.oneOf([200, 204, 400]);
+    expect(response.status).to.be.oneOf([200, 204, 400, 404]);
   });
 });
