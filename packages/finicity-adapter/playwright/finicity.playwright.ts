@@ -1,93 +1,116 @@
 import { expect, test } from "@playwright/test";
 import { ComboJobTypes } from "@repo/utils";
 
-let authorizeTab;
+test.describe("Finicity Adapter Tests", () => {
+  test("Successful connection and data retrieval", async ({
+    page,
+    request,
+  }) => {
+    test.setTimeout(300000);
 
-test("connects to Finbank Profiles A and gets expected data", async ({
-  page,
-}) => {
-  test.setTimeout(300000);
+    const userId = crypto.randomUUID();
 
-  const userId = crypto.randomUUID();
+    await page.goto(
+      `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
+    );
 
-  await page.goto(
-    `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
-  );
-
-  page.evaluate(`
+    page.evaluate(`
       window.addEventListener('message', (event) => {
-          const message = event.data
-          console.log({message})
-    })
-  `);
+        const message = event.data;
+        console.log({ message });
+      });
+    `);
 
-  await page.getByPlaceholder("Search").fill("finbank");
+    await page.getByPlaceholder("Search").fill("finbank");
+    await page.getByLabel("Add account with FinBank Profiles - A").click();
 
-  await page.getByLabel("Add account with FinBank Profiles - A").click();
+    const popupPromise = page.waitForEvent("popup");
+    await page.getByRole("link", { name: "Go to log in" }).click();
 
-  const popupPromise = page.waitForEvent("popup");
-  await page.getByRole("link", { name: "Go to log in" }).click();
+    const authorizeTab = await popupPromise;
 
-  authorizeTab = await popupPromise;
+    await authorizeTab.getByRole("button", { name: "Next" }).click();
+    await authorizeTab.getByLabel("Banking Userid").fill("sue_wealthy");
+    await authorizeTab.getByLabel("Banking Password").fill("profile_700");
+    await authorizeTab.getByLabel("Submit").click();
 
-  await authorizeTab.getByRole("button", { name: "Next" }).click();
-  await authorizeTab.getByLabel("Banking Userid").fill("sue_wealthy");
-  await authorizeTab.getByLabel("Banking Password").fill("profile_700");
+    const connectedPromise = new Promise<void>((resolve, reject) => {
+      const timer = setTimeout(() => reject("timed out"), 120000);
 
-  await authorizeTab.getByLabel("Submit").click();
+      page.on("console", async (msg) => {
+        const obj = (await msg.args()[0].jsonValue())?.message;
+        if (obj?.type === "connect/memberConnected") {
+          console.log("member connected", obj);
+          clearTimeout(timer);
+          expect(obj.metadata.user_guid).not.toBeNull();
+          expect(obj.metadata.member_guid).not.toBeNull();
+          expect(obj.metadata.aggregator).toEqual("finicity_sandbox");
+          expect(obj.metadata.connectionId).not.toBeNull();
 
-  const apiRequest = page.context().request;
+          const { connectionId, user_guid, aggregator } = obj.metadata;
 
-  const connectedPromise = new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject("timed out"), 120000);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    page.on("console", async (msg: any) => {
-      const obj = (await msg.args()[0].jsonValue())?.message;
-      if (obj?.type === "connect/memberConnected") {
-        console.log("member connected", obj);
-        clearTimeout(timer);
-        expect(obj.metadata.user_guid).not.toBeNull();
-        expect(obj.metadata.member_guid).not.toBeNull();
-        expect(obj.metadata.aggregator).toEqual("finicity_sandbox");
-        expect(obj.metadata.connectionId).not.toBeNull();
+          await testDataEndpoints(request, user_guid, connectionId, aggregator);
 
-        const { connectionId, user_guid, aggregator } = obj.metadata;
-
-        await testDataEndpoints(
-          apiRequest,
-          user_guid,
-          connectionId,
-          aggregator,
-        );
-
-        resolve("");
-      }
+          resolve();
+        }
+      });
     });
+
+    await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
+      timeout: 120000,
+    });
+
+    await connectedPromise;
+
+    await request.delete(
+      `http://localhost:8080/api/aggregator/finicity_sandbox/user/${userId}`,
+    );
   });
 
-  await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
-    timeout: 120000,
+  test("Failed connection", async ({ page, request }) => {
+    test.setTimeout(300000);
+
+    const userId = crypto.randomUUID();
+
+    await page.goto(
+      `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
+    );
+
+    await page.getByPlaceholder("Search").fill("finbank");
+    await page.getByLabel("Add account with FinBank Profiles - A").click();
+
+    const popupPromise = page.waitForEvent("popup");
+    await page.getByRole("link", { name: "Go to log in" }).click();
+
+    const authorizeTab = await popupPromise;
+
+    expect(authorizeTab.getByRole("button", { name: "Next" })).toBeVisible({
+      timeout: 10000,
+    });
+    await authorizeTab.getByLabel("Exit").click();
+    await authorizeTab.getByLabel("Confirm link").click();
+    await authorizeTab.getByText("Visit Site").click();
+
+    await expect(page.getByText("Something went wrong")).toBeVisible({
+      timeout: 120000,
+    });
+
+    await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
+
+    await request.delete(
+      `http://localhost:8080/api/aggregator/finicity_sandbox/user/${userId}`,
+    );
   });
 
-  await expect(true).toBeTruthy();
+  async function testDataEndpoints(request, userId, connectionId, aggregator) {
+    let url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/accounts`;
 
-  await connectedPromise;
-
-  await apiRequest.delete(
-    `http://localhost:8080/api/aggregator/finicity_sandbox/user/${userId}`,
-  );
-});
-
-async function testDataEndpoints(request, userId, connectionId, aggregator) {
-  let accountId;
-  let url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/accounts`;
-
-  await request.get(url).then(async (response) => {
-    const text = await response.text();
-    const accounts = JSON.parse(text);
+    const accountsResponse = await request.get(url);
+    const accounts = await accountsResponse.json();
     expect(accounts?.accounts?.length).toBeGreaterThanOrEqual(1);
+
     const account = accounts.accounts[6]; // This is a deposit account
-    accountId = account["depositAccount"].accountId;
+    const accountId = account["depositAccount"].accountId;
 
     expect(account).toEqual(
       expect.objectContaining({
@@ -110,15 +133,13 @@ async function testDataEndpoints(request, userId, connectionId, aggregator) {
         }),
       }),
     );
-  });
 
-  expect(accountId).not.toBeNull();
-  url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/identity`;
+    expect(accountId).not.toBeNull();
 
-  await request.get(url).then(async (response) => {
-    const text = await response.text();
-    const customers = JSON.parse(text);
-    console.log(customers);
+    url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/identity`;
+
+    const identityResponse = await request.get(url);
+    const customers = await identityResponse.json();
     expect(customers).toEqual(
       expect.objectContaining({
         customers: expect.arrayContaining([
@@ -143,13 +164,11 @@ async function testDataEndpoints(request, userId, connectionId, aggregator) {
         ]),
       }),
     );
-  });
 
-  url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions`;
+    url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions`;
 
-  await request.get(url).then(async (response) => {
-    const text = await response.text();
-    const transactions = JSON.parse(text);
+    const transactionsResponse = await request.get(url);
+    const transactions = await transactionsResponse.json();
 
     expect(transactions).toEqual(
       expect.objectContaining({
@@ -172,5 +191,5 @@ async function testDataEndpoints(request, userId, connectionId, aggregator) {
         ]),
       }),
     );
-  });
-}
+  }
+});
