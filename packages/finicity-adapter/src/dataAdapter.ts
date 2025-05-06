@@ -90,7 +90,7 @@ const createDataAdapter = (
       }
       case VCDataTypes.TRANSACTIONS: {
         const startDate = new Date(
-          new Date().setDate(new Date().getDate() - 30),
+          new Date().setDate(new Date().getDate() - 120),
         );
         const transactions = await dataClient.getTransactions(
           userId,

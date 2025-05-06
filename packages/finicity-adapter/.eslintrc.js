@@ -13,8 +13,6 @@ module.exports = {
     ".eslintrc.js",
     "jest.config.cjs",
     "jestSetup.ts",
-    "cypress.config.*.js",
-    "cypress/**/*",
   ],
   rules: {
     "@typescript-eslint/no-unused-vars": [

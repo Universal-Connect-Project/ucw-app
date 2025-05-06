@@ -41,10 +41,10 @@ export default class FinicityClient {
     cacheClient: CacheClient,
   ) {
     this.aggregator = sandbox ? "finicity_sandbox" : "finicity";
-    (this.apiConfig = sandbox
+    this.apiConfig = sandbox
       ? aggregatorCredentials.finicitySandbox
-      : aggregatorCredentials.finicityProd),
-      (this.logger = logger);
+      : aggregatorCredentials.finicityProd;
+    this.logger = logger;
     this.envConfig = envConfig;
     this.getWebhookHostUrl = getWebhookHostUrl;
     this.cacheClient = cacheClient;
@@ -163,11 +163,11 @@ export default class FinicityClient {
     }).then((ret: { link: string }) => ret.link);
   }
 
-  createCustomer(unique_name: string) {
+  createCustomer(uniqueName: string) {
     return this.post(
       `aggregation/v2/customers/${this.aggregator === "finicity" ? "active" : "testing"}`,
       {
-        username: unique_name,
+        username: uniqueName,
         firstName: "John",
         lastName: "Smith",
         phone: "1-801-984-4200",
@@ -201,10 +201,12 @@ export default class FinicityClient {
 
     const token = await this.getAuthToken();
     const headers = makeFinicityAuthHeaders(this.apiConfig, token);
-    return (this.axios = axios.create({
+    this.axios = axios.create({
       baseURL: BASE_PATH,
       headers,
-    }));
+    });
+
+    return this.axios;
   }
 
   async request(

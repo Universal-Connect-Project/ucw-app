@@ -40,7 +40,6 @@ test.describe("Finicity Adapter Tests", () => {
       page.on("console", async (msg) => {
         const obj = (await msg.args()[0].jsonValue())?.message;
         if (obj?.type === "connect/memberConnected") {
-          console.log("member connected", obj);
           clearTimeout(timer);
           expect(obj.metadata.user_guid).not.toBeNull();
           expect(obj.metadata.member_guid).not.toBeNull();
@@ -106,13 +105,15 @@ test.describe("Finicity Adapter Tests", () => {
     let url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/accounts`;
 
     const accountsResponse = await request.get(url);
-    const accounts = await accountsResponse.json();
-    expect(accounts?.accounts?.length).toBeGreaterThanOrEqual(1);
+    const accountsJson = await accountsResponse.json();
+    expect(accountsJson?.accounts?.length).toBeGreaterThanOrEqual(1);
 
-    const account = accounts.accounts[6]; // This is a deposit account
-    const accountId = account["depositAccount"].accountId;
+    const depositAccount = accountsJson.accounts.find(
+      (account) => account.depositAccount,
+    );
+    const accountId = depositAccount["depositAccount"].accountId;
 
-    expect(account).toEqual(
+    expect(depositAccount).toEqual(
       expect.objectContaining({
         depositAccount: expect.objectContaining({
           accountId: expect.any(String),

@@ -82,6 +82,7 @@ export class TestAdapter implements WidgetAdapter {
       ...testExampleInstitution,
       id,
       aggregator: this.aggregator,
+      supports_oauth: false,
     };
   }
 

@@ -77,6 +77,7 @@ describe("finicity aggregator", () => {
       expect(institution).toEqual({
         id: testInstitutionId,
         aggregator: "finicity_sandbox",
+        supports_oauth: true,
       });
     });
   });
@@ -116,7 +117,6 @@ describe("finicity aggregator", () => {
     const testUserId = "test-user-id";
     const expectedConnectionObject = {
       institution_code: testInstitutionId,
-      jobTypes: baseConnectionRequest.jobTypes,
       is_oauth: true,
       userId: testUserId,
       oauth_window_uri: MOCKED_OAUTH_URL,
@@ -159,7 +159,7 @@ describe("finicity aggregator", () => {
         createdConnection.id,
       );
 
-      expect(connectionByIdAfterDelete).toBeNull();
+      expect(connectionByIdAfterDelete).toBeUndefined();
     });
   });
 

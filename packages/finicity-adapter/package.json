@@ -1,6 +1,6 @@
 {
   "name": "@repo/finicity-adapter",
-  "version": "0.0.1-alpha",
+  "version": "0.0.1",
   "description": "Finicity Adapter for the Universal Connect Widget",
   "main": "src/index.ts",
   "scripts": {
@@ -29,7 +29,6 @@
     "eslint-config-standard-with-typescript": "^43.0.1",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-jest": "^27.6.3",
-    "jest": "^30.0.0-alpha.6",
     "msw": "^2.4.9",
     "playwright": "^1.49.1",
     "ts-jest": "^29.2.5",

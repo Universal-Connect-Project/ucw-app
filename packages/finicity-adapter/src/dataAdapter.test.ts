@@ -23,13 +23,16 @@ const dependencies: DataAdapterDependencies = {
   getWebhookHostUrl: () => "testWebhookHostUrl",
 };
 
+const sandboxDataAdapter = createFinicitySandboxDataAdapter(dependencies);
+const prodDataAdapter = createFinicityProdDataAdapter(dependencies);
+
 describe("dataAdapter", () => {
   const connectionId = "connectionId";
   const userId = "userId";
   const accountId = "accountId";
 
   it("retrieves accounts data", async () => {
-    const data = await createFinicitySandboxDataAdapter(dependencies)({
+    const data = await sandboxDataAdapter({
       connectionId,
       type: VCDataTypes.ACCOUNTS,
       userId,
@@ -95,7 +98,7 @@ describe("dataAdapter", () => {
       ),
     );
 
-    const data = await createFinicityProdDataAdapter(dependencies)({
+    const data = await prodDataAdapter({
       connectionId,
       type: VCDataTypes.IDENTITY,
       userId,
@@ -130,7 +133,7 @@ describe("dataAdapter", () => {
   });
 
   it("retrieves transactions data", async () => {
-    const data = await createFinicityProdDataAdapter(dependencies)({
+    const data = await prodDataAdapter({
       connectionId,
       type: VCDataTypes.TRANSACTIONS,
       userId,

@@ -69,6 +69,7 @@ export interface Institution {
 export interface AggregatorInstitution {
   aggregator: string;
   id: string;
+  supports_oauth: boolean;
 }
 
 export interface KeyValuePair {
@@ -157,7 +158,6 @@ export interface Connection {
   oauth_window_uri?: string | null;
   error_message?: string | null;
   postMessageEventData?: PostMessageEventData;
-  jobTypes?: ComboJobTypes[];
 }
 
 export interface Connections {

@@ -2,7 +2,7 @@ import type { Response } from "express";
 import { createAggregatorWidgetAdapter } from "../adapterIndex";
 import { withValidateAggregatorInPath } from "../utils/validators";
 import type { Aggregator } from "../adapterSetup";
-import { parseError } from "@repo/utils";
+import handleError from "../utils/errorHandler";
 
 interface UserDeleteParameters {
   aggregator: Aggregator;
@@ -28,11 +28,7 @@ export const userDeleteHandler = withValidateAggregatorInPath(
       res.status(ret.status);
       res.send(ret.data);
     } catch (error) {
-      const { statusCode, message } = parseError(error);
-
-      res.status(statusCode).json({
-        message,
-      });
+      handleError({ error, res });
     }
   },
 );

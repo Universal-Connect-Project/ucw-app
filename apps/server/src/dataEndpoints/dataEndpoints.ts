@@ -3,10 +3,11 @@ import type { Response } from "express";
 import * as logger from "../infra/logger";
 import he from "he";
 
-import { parseError, VCDataTypes } from "@repo/utils";
+import { VCDataTypes } from "@repo/utils";
 import type { Aggregator } from "../shared/contract";
 import { withValidateAggregatorInPath } from "../utils/validators";
 import { createAggregatorWidgetAdapter, getData, getVC } from "../adapterIndex";
+import handleError from "../utils/errorHandler";
 
 export interface AccountsDataQueryParameters {
   connectionId: string;
@@ -58,11 +59,7 @@ export const createAccountsDataHandler = (isVc: boolean) =>
     } catch (error) {
       logger.error("createAccountsDataHandler error", error);
 
-      const parsedError = parseError(error);
-
-      res.status(parsedError.statusCode).json({
-        message: parsedError.message,
-      });
+      handleError({ error, res });
     }
   });
 
@@ -102,11 +99,7 @@ export const createIdentityDataHandler = (isVc: boolean) =>
     } catch (error) {
       logger.error("createIdentityDataHandler error", error);
 
-      const { statusCode, message } = parseError(error);
-
-      res.status(statusCode).json({
-        message,
-      });
+      handleError({ error, res });
     }
   });
 
@@ -173,11 +166,7 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
       } catch (error) {
         logger.error("createTransactionsDataHandler error", error);
 
-        const parsedError = parseError(error);
-
-        res.status(parsedError.statusCode).json({
-          message: parsedError.message,
-        });
+        handleError({ error, res });
       }
     },
   );

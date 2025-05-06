@@ -17,6 +17,11 @@ import type { AdapterConfig, Customer } from "./models";
 import FinicityClient from "./apiClient";
 import { v4 as uuidv4 } from "uuid";
 
+interface CachedConnection {
+  connection?: Connection;
+  jobTypes?: ComboJobTypes[];
+}
+
 export class FinicityAdapter implements WidgetAdapter {
   aggregator: string;
   apiClient: FinicityClient;
@@ -48,6 +53,7 @@ export class FinicityAdapter implements WidgetAdapter {
     return {
       id,
       aggregator: this.aggregator,
+      supports_oauth: true,
     };
   }
 
@@ -62,8 +68,8 @@ export class FinicityAdapter implements WidgetAdapter {
     return [];
   }
 
-  ListConnections(_userId: string): Promise<Connection[]> {
-    return Promise.resolve([]);
+  async ListConnections(_userId: string): Promise<Connection[]> {
+    return [];
   }
 
   async CreateConnection(
@@ -71,7 +77,7 @@ export class FinicityAdapter implements WidgetAdapter {
     userId: string,
   ): Promise<Connection | undefined> {
     const request_id = uuidv4();
-    const obj = {
+    const connection = {
       id: request_id,
       is_oauth: true,
       userId,
@@ -85,10 +91,12 @@ export class FinicityAdapter implements WidgetAdapter {
       ),
       aggregator: this.aggregator,
       status: ConnectionStatus.CREATED,
-      jobTypes: request.jobTypes,
     };
-    await this.cacheClient.set(request_id, obj);
-    return obj;
+    await this.cacheClient.set(request_id, {
+      connection,
+      jobTypes: request.jobTypes,
+    });
+    return connection;
   }
 
   async DeleteConnection(id: string): Promise<void> {
@@ -105,18 +113,28 @@ export class FinicityAdapter implements WidgetAdapter {
     connectionId: string,
     _user_id?: string,
   ): Promise<Connection> {
-    return await this.cacheClient.get(connectionId);
+    const cachedConnection = (await this.cacheClient.get(
+      connectionId,
+    )) as CachedConnection;
+    return cachedConnection?.connection;
   }
 
   async GetConnectionStatus(
     connectionId: string,
     _jobId?: string,
   ): Promise<Connection> {
-    const connection = await this.cacheClient.get(connectionId);
+    const cachedConnection = (await this.cacheClient.get(
+      connectionId,
+    )) as CachedConnection;
 
-    if (connection.status === ConnectionStatus.CREATED) {
-      connection.status = ConnectionStatus.PENDING;
-      await this.cacheClient.set(connectionId, connection);
+    const { connection } = cachedConnection;
+
+    if (connection?.status === ConnectionStatus.CREATED) {
+      cachedConnection.connection.status = ConnectionStatus.PENDING;
+      await this.cacheClient.set(connectionId, {
+        ...cachedConnection,
+        connection,
+      });
     }
     return connection;
   }
@@ -156,19 +174,21 @@ export class FinicityAdapter implements WidgetAdapter {
     let institutionLoginId = false;
     let redirect_complete = false;
 
-    const connection = (await this.cacheClient.get(
+    const cachedConnection = (await this.cacheClient.get(
       connection_id,
-    )) as Connection;
+    )) as CachedConnection;
 
-    if (!connection) {
+    if (!cachedConnection) {
       return null;
     }
+
+    const { connection, jobTypes } = cachedConnection;
 
     switch (eventType) {
       case "added":
         institutionLoginId = payload?.accounts?.[0]?.institutionLoginId;
 
-        if (connection.jobTypes.includes(ComboJobTypes.TRANSACTIONS)) {
+        if (jobTypes?.includes(ComboJobTypes.TRANSACTIONS)) {
           await this.apiClient.refreshAccountsToAggregateTransactions(
             connection.userId,
           );
@@ -212,7 +232,7 @@ export class FinicityAdapter implements WidgetAdapter {
       };
     }
 
-    await this.cacheClient.set(connection_id, connection);
+    await this.cacheClient.set(connection_id, { connection, jobTypes });
 
     if (redirect_complete) {
       // don't save the status in case if oauth redirect is received before webhook

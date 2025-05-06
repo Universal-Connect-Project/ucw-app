@@ -108,6 +108,7 @@
     "eslint-plugin-jest": "^27.6.3",
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-promise": "^6.1.1",
+    "jest-mock-extended": "^4.0.0-beta1",
     "jsonwebtoken": "^9.0.2",
     "msw": "^2.2.13",
     "nodemon": "^3.1.0",

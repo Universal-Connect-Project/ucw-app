@@ -72,6 +72,7 @@ describe("sophtron adapter", () => {
       expect(response).toEqual({
         id: sophtronInstitutionData.InstitutionID,
         aggregator: SOPHTRON_ADAPTER_NAME,
+        supports_oauth: false,
       });
     });
   });
