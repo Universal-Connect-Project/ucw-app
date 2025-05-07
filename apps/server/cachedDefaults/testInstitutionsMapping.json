@@ -2,30 +2,26 @@
   {
     "name": "Mikomo Bank",
     "id": "54a2ed11-54ab-44e2-9490-027866485003",
-    "keywords": [
-      "mikomo",
-      "akoya"
-    ],
-    "logo": "https://thewealthmosaic.s3.amazonaws.com/media/Logo_Akoya.png",
-    "url": "https://docs.akoya.com/",
+    "keywords": ["akoya", "mikomo"],
+    "logo": "https://mikomo.ddp.akoya.com/img/default.png",
+    "url": "https://docs.akoya.com/docs/introduction-to-mikomo-and-the-sandbox",
     "is_test_bank": true,
     "routing_numbers": [],
     "akoya": {
       "id": "mikomo",
       "supports_aggregation": true,
-      "supports_history": false,
+      "supports_history": true,
       "supports_identification": true,
       "supports_oauth": true,
-      "supports_verification": true
+      "supports_verification": true,
+      "supportsRewards": false,
+      "supportsBalance": false
     }
   },
   {
     "name": "FinBank",
     "id": "ee2dc8c3-c9d2-42c6-9129-07376b992ada",
-    "keywords": [
-      "finbank",
-      "finicity"
-    ],
+    "keywords": ["finbank", "finicity"],
     "logo": "https://prod-carpintero-branding.s3.us-west-2.amazonaws.com/102105/icon.svg",
     "url": "http://www.finbank.com",
     "is_test_bank": true,
@@ -44,10 +40,7 @@
   {
     "name": "FinBank C",
     "id": "c4a5a783-38a9-4cda-b230-048c204d2db9",
-    "keywords": [
-      "finbank",
-      "finicity"
-    ],
+    "keywords": ["finbank", "finicity"],
     "logo": "https://prod-carpintero-branding.s3.us-west-2.amazonaws.com/102105/icon.svg",
     "url": "http://www.finbank.com",
     "is_test_bank": true,
@@ -66,10 +59,7 @@
   {
     "name": "Finbank Oauth Billable",
     "id": "d495b4ee-d612-468f-990a-acc3b3c57eac",
-    "keywords": [
-      "finbank",
-      "finicity"
-    ],
+    "keywords": ["finbank", "finicity"],
     "logo": "https://prod-carpintero-branding.s3.us-west-2.amazonaws.com/102105/icon.svg",
     "url": "http://www.finbank.com",
     "is_test_bank": true,
@@ -88,10 +78,7 @@
   {
     "name": "FinBank P",
     "id": "7e97f6f6-d6fb-482d-984c-9243ee31dae0",
-    "keywords": [
-      "finbank",
-      "finicity"
-    ],
+    "keywords": ["finbank", "finicity"],
     "logo": "https://prod-carpintero-branding.s3.us-west-2.amazonaws.com/102105/icon.svg",
     "url": "http://www.finbank.com",
     "is_test_bank": true,
@@ -110,10 +97,7 @@
   {
     "name": "FinBank M1",
     "id": "5bb693a9-8bd7-438b-93bf-1e37dd75a8d4",
-    "keywords": [
-      "finbank",
-      "finicity"
-    ],
+    "keywords": ["finbank", "finicity"],
     "logo": "https://prod-carpintero-branding.s3.us-west-2.amazonaws.com/102105/icon.svg",
     "url": "http://www.finbank.com",
     "is_test_bank": true,
@@ -132,10 +116,7 @@
   {
     "name": "FinBank O",
     "id": "0ba60e93-f916-4d7f-8cbe-f104f8c7a4bc",
-    "keywords": [
-      "finbank",
-      "finicity"
-    ],
+    "keywords": ["finbank", "finicity"],
     "logo": "https://prod-carpintero-branding.s3.us-west-2.amazonaws.com/102105/icon.svg",
     "url": "http://www.finbank.com",
     "is_test_bank": true,
@@ -154,10 +135,7 @@
   {
     "name": "FinBank Decertified",
     "id": "d47e3be9-383e-4e0d-a55a-e8ce983178f1",
-    "keywords": [
-      "finbank",
-      "finicity"
-    ],
+    "keywords": ["finbank", "finicity"],
     "logo": "https://prod-carpintero-branding.s3.us-west-2.amazonaws.com/102105/icon.svg",
     "url": "http://www.finbank.com",
     "is_test_bank": true,
@@ -176,10 +154,7 @@
   {
     "name": "FinBank Offline",
     "id": "a68b58f2-e315-4b65-a47b-d754fdf30066",
-    "keywords": [
-      "finbank",
-      "finicity"
-    ],
+    "keywords": ["finbank", "finicity"],
     "logo": "https://prod-carpintero-branding.s3.us-west-2.amazonaws.com/102105/icon.svg",
     "url": "http://www.finbank.com",
     "is_test_bank": true,
@@ -198,10 +173,7 @@
   {
     "name": "FinBank Billable",
     "id": "a8ead815-3096-4d1b-a607-9fa8cec3484a",
-    "keywords": [
-      "finbank",
-      "finicity"
-    ],
+    "keywords": ["finbank", "finicity"],
     "logo": "https://prod-carpintero-branding.s3.us-west-2.amazonaws.com/102105/icon.svg",
     "url": "http://www.finbank.com",
     "is_test_bank": true,
@@ -220,10 +192,7 @@
   {
     "name": "Health Check",
     "id": "c99123cf-1aa1-459e-a72c-2bb941e7eb09",
-    "keywords": [
-      "finbank",
-      "finicity"
-    ],
+    "keywords": ["finbank", "finicity"],
     "logo": "https://prod-carpintero-branding.s3.us-west-2.amazonaws.com/102105/icon.svg",
     "url": "http://www.finbank.com",
     "is_test_bank": true,
@@ -242,10 +211,7 @@
   {
     "name": "FinBank Profiles - C",
     "id": "cb67e174-1b6d-4be3-9db5-92aec5993e7f",
-    "keywords": [
-      "finbank",
-      "finicity"
-    ],
+    "keywords": ["finbank", "finicity"],
     "logo": "https://prod-carpintero-branding.s3.us-west-2.amazonaws.com/102105/icon.svg",
     "url": "http://www.finbank.com",
     "is_test_bank": true,
@@ -264,10 +230,7 @@
   {
     "name": "FinBank Profiles J",
     "id": "a49f56b5-3968-4bd0-9621-45dfdf36e0a6",
-    "keywords": [
-      "finbank",
-      "finicity"
-    ],
+    "keywords": ["finbank", "finicity"],
     "logo": "https://prod-carpintero-branding.s3.us-west-2.amazonaws.com/102105/icon.svg",
     "url": "http://www.finbank.com",
     "is_test_bank": true,
@@ -286,10 +249,7 @@
   {
     "name": "FinBank Profiles - B",
     "id": "95d1c06c-30f8-4301-9102-736d1e07554f",
-    "keywords": [
-      "finbank",
-      "finicity"
-    ],
+    "keywords": ["finbank", "finicity"],
     "logo": "https://prod-carpintero-branding.s3.us-west-2.amazonaws.com/102105/icon.svg",
     "url": "http://www.finbank.com",
     "is_test_bank": true,
@@ -308,10 +268,7 @@
   {
     "name": "FinBank Profiles - A",
     "id": "2deb6fca-557e-4d45-b2f8-354351675ad4",
-    "keywords": [
-      "finbank",
-      "finicity"
-    ],
+    "keywords": ["finbank", "finicity"],
     "logo": "https://prod-carpintero-branding.s3.us-west-2.amazonaws.com/102105/icon.svg",
     "url": "http://www.finbank.com",
     "is_test_bank": true,
@@ -321,18 +278,16 @@
       "supports_aggregation": true,
       "supports_history": false,
       "supports_identification": true,
-      "supports_oauth": false,
-      "supports_verification": true
+      "supports_oauth": true,
+      "supports_verification": true,
+      "supportsRewards": false,
+      "supportsBalance": false
     }
   },
   {
     "name": "MX Bank (Oauth)",
     "id": "048b9a67-53ac-453c-9bff-baf418282311",
-    "keywords": [
-      "Gringotts",
-      "MX Bank",
-      "oauth"
-    ],
+    "keywords": ["Gringotts", "MX Bank", "oauth"],
     "logo": "https://s3.amazonaws.com/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png",
     "url": "https://mx.com",
     "is_test_bank": true,
@@ -343,15 +298,15 @@
       "supports_history": false,
       "supports_identification": true,
       "supports_oauth": true,
-      "supports_verification": true
+      "supports_verification": true,
+      "supportsRewards": false,
+      "supportsBalance": false
     }
   },
   {
     "name": "Sophtron Bank Token",
     "id": "25988c40-f074-4fb6-97d8-14ddcbe49136",
-    "keywords": [
-      "soph"
-    ],
+    "keywords": ["soph"],
     "logo": null,
     "url": "https://sophtron.com",
     "is_test_bank": true,
@@ -362,15 +317,15 @@
       "supports_history": true,
       "supports_identification": true,
       "supports_oauth": false,
-      "supports_verification": true
+      "supports_verification": true,
+      "supportsRewards": false,
+      "supportsBalance": false
     }
   },
   {
     "name": "Sophtron Bank",
     "id": "14627498-29cb-4296-a77f-910859eef104",
-    "keywords": [
-      "soph"
-    ],
+    "keywords": ["soph"],
     "logo": null,
     "url": "https://sophtron.com",
     "is_test_bank": true,
@@ -381,15 +336,15 @@
       "supports_history": false,
       "supports_identification": false,
       "supports_oauth": false,
-      "supports_verification": false
+      "supports_verification": false,
+      "supportsRewards": false,
+      "supportsBalance": false
     }
   },
   {
     "name": "Sophtron Bank Captcha",
     "id": "2a183e23-8220-4611-aabd-61c7de5179f6",
-    "keywords": [
-      "soph"
-    ],
+    "keywords": ["soph"],
     "logo": null,
     "url": "https://sophtron.com",
     "is_test_bank": true,
@@ -400,15 +355,15 @@
       "supports_history": false,
       "supports_identification": false,
       "supports_oauth": false,
-      "supports_verification": false
+      "supports_verification": false,
+      "supportsRewards": false,
+      "supportsBalance": false
     }
   },
   {
     "name": "Sophtron Bank NoMFA",
     "id": "a7130e74-7309-4515-94e4-d302778cb99f",
-    "keywords": [
-      "soph"
-    ],
+    "keywords": ["soph"],
     "logo": null,
     "url": "https://sophtron.com",
     "is_test_bank": true,
@@ -419,15 +374,15 @@
       "supports_history": true,
       "supports_identification": true,
       "supports_oauth": false,
-      "supports_verification": true
+      "supports_verification": true,
+      "supportsRewards": false,
+      "supportsBalance": false
     }
   },
   {
     "name": "Sophtron Bank SecurityQuestion",
     "id": "f6138b3c-8dd7-4a8e-8b2b-f6db14e21878",
-    "keywords": [
-      "soph"
-    ],
+    "keywords": ["soph"],
     "logo": null,
     "url": "https://sophtron.com",
     "is_test_bank": true,
@@ -438,15 +393,15 @@
       "supports_history": false,
       "supports_identification": false,
       "supports_oauth": false,
-      "supports_verification": false
+      "supports_verification": false,
+      "supportsRewards": false,
+      "supportsBalance": false
     }
   },
   {
     "name": "Sophtron Bank SecurityQuestion Multiple",
     "id": "2bec7722-ab26-4ab6-8c6e-ca60fc2601fc",
-    "keywords": [
-      "soph"
-    ],
+    "keywords": ["soph"],
     "logo": null,
     "url": "https://sophtron.com",
     "is_test_bank": true,
@@ -457,15 +412,15 @@
       "supports_history": false,
       "supports_identification": false,
       "supports_oauth": false,
-      "supports_verification": false
+      "supports_verification": false,
+      "supportsRewards": false,
+      "supportsBalance": false
     }
   },
   {
     "name": "Sophtron Bank TokenRead",
     "id": "ea32b271-3784-442c-83c0-f1b95ca88568",
-    "keywords": [
-      "soph"
-    ],
+    "keywords": ["soph"],
     "logo": null,
     "url": "https://sophtron.com",
     "is_test_bank": true,
@@ -476,16 +431,15 @@
       "supports_history": false,
       "supports_identification": false,
       "supports_oauth": false,
-      "supports_verification": false
+      "supports_verification": false,
+      "supportsRewards": false,
+      "supportsBalance": false
     }
   },
   {
     "name": "MX Bank",
     "id": "a76f5333-8493-42cf-bc86-dcc8a0f17d4c",
-    "keywords": [
-      "Gringotts",
-      "MX Bank"
-    ],
+    "keywords": ["Gringotts", "MX Bank"],
     "logo": "https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png",
     "url": "https://mx.com",
     "is_test_bank": true,
@@ -502,9 +456,7 @@
   {
     "name": "MXCU (OAuth)",
     "id": "85c46d4f-1c88-4cd2-8717-b10395afb19e",
-    "keywords": [
-      "oauth"
-    ],
+    "keywords": ["oauth"],
     "logo": null,
     "url": "https://mxcu.mx.com",
     "is_test_bank": true,
@@ -515,7 +467,9 @@
       "supports_history": false,
       "supports_identification": true,
       "supports_oauth": true,
-      "supports_verification": true
+      "supports_verification": true,
+      "supportsRewards": false,
+      "supportsBalance": false
     }
   },
   {
@@ -532,17 +486,15 @@
       "supports_history": true,
       "supports_identification": true,
       "supports_oauth": false,
-      "supports_verification": true
+      "supports_verification": true,
+      "supportsRewards": false,
+      "supportsBalance": false
     }
   },
   {
     "name": "TestExampleOauth Bank",
     "id": "test_oauth_example_bank",
-    "keywords": [
-      "test",
-      "example",
-      "oauth"
-    ],
+    "keywords": ["test", "example", "oauth"],
     "logo": "https://universalconnectproject.org/images/ucp-logo-icon.svg",
     "url": "https://test-example.com",
     "is_test_bank": true,
@@ -559,11 +511,7 @@
   {
     "name": "TestExampleFailedOauth Bank",
     "id": "test_oauth_example_bank_failed",
-    "keywords": [
-      "test",
-      "example",
-      "oauth"
-    ],
+    "keywords": ["test", "example", "oauth"],
     "logo": "https://universalconnectproject.org/images/ucp-logo-icon.svg",
     "url": "https://test-example.com",
     "is_test_bank": true,
@@ -580,11 +528,7 @@
   {
     "name": "TestExampleA Bank",
     "id": "5e498f60-3496-4299-96ed-f8eb328ae8af",
-    "keywords": [
-      "test",
-      "example",
-      "tex"
-    ],
+    "keywords": ["test", "example", "tex"],
     "logo": "https://universalconnectproject.org/images/ucp-logo-icon.svg",
     "url": "https://test-example.com",
     "is_test_bank": true,
@@ -595,39 +539,34 @@
       "supports_history": true,
       "supports_identification": true,
       "supports_oauth": true,
-      "supports_verification": true
+      "supports_verification": true,
+      "supportsRewards": false,
+      "supportsBalance": false
     }
   },
   {
     "name": "TestExampleB Bank",
     "id": "aeab64a9-7a78-4c5f-bd27-687f3c8b8492",
-    "keywords": [
-      "test",
-      "example",
-      "tex"
-    ],
+    "keywords": ["test", "example", "tex"],
     "logo": "https://universalconnectproject.org/images/ucp-logo-icon.svg",
     "url": "https://test-example.com",
     "is_test_bank": true,
-    "routing_numbers": [
-      "111111111"
-    ],
+    "routing_numbers": ["111111111"],
     "testExampleB": {
       "id": "testExampleB",
       "supports_aggregation": true,
       "supports_history": true,
       "supports_identification": true,
       "supports_oauth": true,
-      "supports_verification": true
+      "supports_verification": true,
+      "supportsRewards": false,
+      "supportsBalance": false
     }
   },
   {
     "name": "TestExample Prod",
     "id": "cd27ed3b-f81c-4fa9-94a9-039a9f534c7b",
-    "keywords": [
-      "test",
-      "example"
-    ],
+    "keywords": ["test", "example"],
     "logo": "https://universalconnectproject.org/images/ucp-logo-icon.svg",
     "url": "https://test-example.com",
     "is_test_bank": false,
@@ -638,16 +577,15 @@
       "supports_history": true,
       "supports_identification": true,
       "supports_oauth": true,
-      "supports_verification": true
+      "supports_verification": true,
+      "supportsRewards": false,
+      "supportsBalance": false
     }
   },
   {
     "name": "TestExample Doesnt Support Verification Bank",
     "id": "d20bf4b6-ca19-41c6-a3f8-79801fab379b",
-    "keywords": [
-      "test",
-      "example"
-    ],
+    "keywords": ["test", "example"],
     "logo": "https://universalconnectproject.org/images/ucp-logo-icon.svg",
     "url": "https://test-example.com",
     "is_test_bank": true,
@@ -658,16 +596,15 @@
       "supports_history": true,
       "supports_identification": true,
       "supports_oauth": true,
-      "supports_verification": false
+      "supports_verification": false,
+      "supportsRewards": false,
+      "supportsBalance": false
     }
   },
   {
     "name": "TestExample Doesnt Support Identification Bank",
     "id": "4c1b2595-a5aa-41a1-a2c6-f6caa1e226a6",
-    "keywords": [
-      "test",
-      "example"
-    ],
+    "keywords": ["test", "example"],
     "logo": "https://universalconnectproject.org/images/ucp-logo-icon.svg",
     "url": "https://test-example.com",
     "is_test_bank": true,
@@ -678,35 +615,38 @@
       "supports_history": true,
       "supports_identification": false,
       "supports_oauth": true,
-      "supports_verification": true
+      "supports_verification": true,
+      "supportsRewards": false,
+      "supportsBalance": false
     }
   },
   {
     "name": "TestExample Bank To Hide",
     "id": "7a909e62-98b6-4a34-8725-b2a6a63e830a",
-    "keywords": [
-      "test",
-      "example"
-    ],
+    "keywords": ["test", "example"],
     "logo": "https://universalconnectproject.org/images/ucp-logo-icon.svg",
     "url": "https://test-example.com",
     "is_test_bank": true,
     "routing_numbers": [],
-    "testExampleA": {
-      "id": "testExampleA",
-      "supports_aggregation": true,
-      "supports_history": true,
-      "supports_identification": true,
-      "supports_oauth": true,
-      "supports_verification": true
-    },
     "testExampleB": {
       "id": "testExampleB",
       "supports_aggregation": true,
       "supports_history": true,
       "supports_identification": true,
       "supports_oauth": true,
-      "supports_verification": true
+      "supports_verification": true,
+      "supportsRewards": false,
+      "supportsBalance": false
+    },
+    "testExampleA": {
+      "id": "testExampleA",
+      "supports_aggregation": true,
+      "supports_history": true,
+      "supports_identification": true,
+      "supports_oauth": true,
+      "supports_verification": true,
+      "supportsRewards": false,
+      "supportsBalance": false
     }
   }
 ]
