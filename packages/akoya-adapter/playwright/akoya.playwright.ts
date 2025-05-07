@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { ComboJobTypes, SOMETHING_WENT_WRONG_ERROR_TEXT } from "@repo/utils";
+import { ComboJobTypes } from "@repo/utils";
 
 const WIDGET_BASE_URL = "http://localhost:8080/widget";
 
@@ -67,6 +67,8 @@ test("should return 400 with error message when requesting akoya data", async ({
 
   expect(response.status()).toBe(400);
 
-  const body = await response.text();
-  expect(body).toContain(SOMETHING_WENT_WRONG_ERROR_TEXT);
+  const body = await response.json();
+  expect(body).toEqual({
+    message: "Data adapter not implemented for Akoya",
+  });
 });

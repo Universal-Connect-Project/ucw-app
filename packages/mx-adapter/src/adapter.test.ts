@@ -90,6 +90,7 @@ describe("mx aggregator", () => {
       expect(await mxAdapterInt.GetInstitutionById("testId")).toEqual({
         id: institutionResponse.code,
         aggregator: "mx_int",
+        supportsOauth: true,
       });
     });
 
@@ -98,6 +99,7 @@ describe("mx aggregator", () => {
         expect(await mxAdapter.GetInstitutionById("testId")).toEqual({
           id: institutionResponse.code,
           aggregator: "mx",
+          supportsOauth: true,
         });
       });
     });

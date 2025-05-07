@@ -2,10 +2,12 @@ import type { AdapterMap } from "@repo/utils";
 import { getMxAdapterMapObject } from "@repo/mx-adapter";
 import { getSophtronAdapterMapObject } from "@repo/sophtron-adapter";
 import { getAkoyaAdapterMapObject } from "@repo/akoya-adapter";
+import { getFinicityAdapterMapObject } from "@repo/finicity-adapter";
 import config from "./config";
 import * as logger from "./infra/logger";
 import { get, set } from "./services/storageClient/redis";
 import { adapterMapObject as testAdapterMapObject } from "./test-adapter";
+import { getWebhookHostUrl } from "./webhooks";
 
 const mxAdapterMapObject = getMxAdapterMapObject({
   cacheClient: {
@@ -44,6 +46,31 @@ const sophtronAdapterMapObject: Record<string, AdapterMap> =
     },
   });
 
+const finicityAdapterMapObject: Record<string, AdapterMap> =
+  getFinicityAdapterMapObject({
+    cacheClient: {
+      set: set,
+      get: get,
+    },
+    logClient: logger,
+    aggregatorCredentials: {
+      finicitySandbox: {
+        partnerId: config.FINICITY_PARTNER_ID,
+        appKey: config.FINICITY_APP_KEY,
+        secret: config.FINICITY_SECRET,
+      },
+      finicityProd: {
+        partnerId: config.FINICITY_PARTNER_ID_PROD,
+        appKey: config.FINICITY_APP_KEY_PROD,
+        secret: config.FINICITY_SECRET_PROD,
+      },
+    },
+    getWebhookHostUrl: getWebhookHostUrl,
+    envConfig: {
+      HostUrl: config.HOST_URL,
+    },
+  });
+
 const akoyaAdapterMapObject: Record<string, AdapterMap> =
   getAkoyaAdapterMapObject({
     cacheClient: {
@@ -69,6 +96,7 @@ const akoyaAdapterMapObject: Record<string, AdapterMap> =
 
 export const adapterMap: Record<string, AdapterMap> = {
   ...akoyaAdapterMapObject,
+  ...finicityAdapterMapObject,
   ...mxAdapterMapObject,
   ...sophtronAdapterMapObject,
   ...testAdapterMapObject,

@@ -76,7 +76,7 @@ export const elasticSearchInstitutionData: CachedInstitution = {
     supports_history: false,
   },
   [TEST_EXAMPLE_A_AGGREGATOR_STRING]: {
-    id: "aId",
+    id: "aId_oauth",
     supports_aggregation: true,
     supports_oauth: true,
     supports_identification: true,
@@ -84,9 +84,17 @@ export const elasticSearchInstitutionData: CachedInstitution = {
     supports_history: false,
   },
   [TEST_EXAMPLE_B_AGGREGATOR_STRING]: {
-    id: "bId",
+    id: "bId_oauth",
     supports_aggregation: true,
     supports_oauth: true,
+    supports_identification: true,
+    supports_verification: true,
+    supports_history: false,
+  },
+  akoya: {
+    id: "akoya_bank",
+    supports_aggregation: true,
+    supports_oauth: false,
     supports_identification: true,
     supports_verification: true,
     supports_history: false,

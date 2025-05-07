@@ -69,6 +69,7 @@ export interface Institution {
 export interface AggregatorInstitution {
   aggregator: string;
   id: string;
+  supportsOauth: boolean;
 }
 
 export interface KeyValuePair {

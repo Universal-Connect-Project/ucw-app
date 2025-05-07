@@ -91,11 +91,11 @@ export class MxAdapter implements WidgetAdapter {
 
   async GetInstitutionById(id: string): Promise<AggregatorInstitution> {
     const res = await this.apiClient.readInstitution(id);
-    // TODO: if this is 401 we should throw an error
     const institution = res.data?.institution;
     return {
       id: institution?.code || null,
       aggregator: this.aggregator,
+      supportsOauth: institution.supports_oauth || false,
     };
   }
 

@@ -3,14 +3,11 @@ import type { Response } from "express";
 import * as logger from "../infra/logger";
 import he from "he";
 
-import {
-  SOMETHING_WENT_WRONG_ERROR_TEXT,
-  USER_NOT_RESOLVED_ERROR_TEXT,
-  VCDataTypes,
-} from "@repo/utils";
+import { VCDataTypes } from "@repo/utils";
 import type { Aggregator } from "../shared/contract";
 import { withValidateAggregatorInPath } from "../utils/validators";
 import { createAggregatorWidgetAdapter, getData, getVC } from "../adapterIndex";
+import handleError from "../utils/errorHandler";
 
 export interface AccountsDataQueryParameters {
   connectionId: string;
@@ -51,7 +48,7 @@ export const createAccountsDataHandler = (isVc: boolean) =>
 
       if (isVc) {
         const vc = await getVC(dataArgs);
-        res.send({
+        res.json({
           jwt: vc,
         });
       } else {
@@ -62,13 +59,7 @@ export const createAccountsDataHandler = (isVc: boolean) =>
     } catch (error) {
       logger.error("createAccountsDataHandler error", error);
 
-      if (error.message === USER_NOT_RESOLVED_ERROR_TEXT) {
-        res.status(404);
-        res.send(USER_NOT_RESOLVED_ERROR_TEXT);
-      } else {
-        res.status(400);
-        res.send(SOMETHING_WENT_WRONG_ERROR_TEXT);
-      }
+      handleError({ error, res });
     }
   });
 
@@ -98,7 +89,7 @@ export const createIdentityDataHandler = (isVc: boolean) =>
 
       if (isVc) {
         const vc = await getVC(dataArgs);
-        res.send({
+        res.json({
           jwt: vc,
         });
       } else {
@@ -108,13 +99,7 @@ export const createIdentityDataHandler = (isVc: boolean) =>
     } catch (error) {
       logger.error("createIdentityDataHandler error", error);
 
-      if (error.message === USER_NOT_RESOLVED_ERROR_TEXT) {
-        res.status(404);
-        res.send(USER_NOT_RESOLVED_ERROR_TEXT);
-      } else {
-        res.status(400);
-        res.send(SOMETHING_WENT_WRONG_ERROR_TEXT);
-      }
+      handleError({ error, res });
     }
   });
 
@@ -165,13 +150,13 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
 
         if (validationError) {
           res.status(400);
-          res.send(he.encode(validationError));
+          res.json(he.encode(validationError));
           return;
         }
 
         if (isVc) {
           const vc = await getVC(dataArgs);
-          res.send({
+          res.json({
             jwt: vc,
           });
         } else {
@@ -181,13 +166,7 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
       } catch (error) {
         logger.error("createTransactionsDataHandler error", error);
 
-        if (error.message === USER_NOT_RESOLVED_ERROR_TEXT) {
-          res.status(404);
-          res.send(USER_NOT_RESOLVED_ERROR_TEXT);
-        } else {
-          res.status(400);
-          res.send(SOMETHING_WENT_WRONG_ERROR_TEXT);
-        }
+        handleError({ error, res });
       }
     },
   );

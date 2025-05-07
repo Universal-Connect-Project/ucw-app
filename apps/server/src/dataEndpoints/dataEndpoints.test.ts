@@ -45,8 +45,8 @@ describe("dataEndpoints", () => {
   describe("accountsDataHandler", () => {
     it("responds with a failure if the userId isn't found", async () => {
       const res = {
-        send: jest.fn(),
-        status: jest.fn(),
+        json: jest.fn(),
+        status: jest.fn().mockReturnThis(),
       } as unknown as Response;
 
       await vcAccountsDataHandler(
@@ -61,7 +61,9 @@ describe("dataEndpoints", () => {
       );
 
       expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.send).toHaveBeenCalledWith(USER_NOT_RESOLVED_ERROR_TEXT);
+      expect(res.json).toHaveBeenCalledWith({
+        message: USER_NOT_RESOLVED_ERROR_TEXT,
+      });
     });
 
     it("responds with a failure if aggregator isn't valid", async () => {
@@ -87,7 +89,7 @@ describe("dataEndpoints", () => {
 
     it("responds with the vc data in the jwt on success", async () => {
       const res = {
-        send: jest.fn(),
+        json: jest.fn(),
       } as unknown as Response;
 
       const req: AccountsRequest = {
@@ -100,7 +102,7 @@ describe("dataEndpoints", () => {
 
       await vcAccountsDataHandler(req, res);
 
-      expect(res.send).toHaveBeenCalledWith({
+      expect(res.json).toHaveBeenCalledWith({
         jwt: testVcAccountsData,
       });
     });
@@ -131,8 +133,8 @@ describe("dataEndpoints", () => {
       });
 
       const res = {
-        send: jest.fn(),
-        status: jest.fn(),
+        json: jest.fn(),
+        status: jest.fn().mockReturnThis(),
       } as unknown as Response;
 
       const req: AccountsRequest = {
@@ -145,16 +147,49 @@ describe("dataEndpoints", () => {
 
       await vcAccountsDataHandler(req, res);
 
-      expect(res.send).toHaveBeenCalledWith(SOMETHING_WENT_WRONG_ERROR_TEXT);
+      expect(res.json).toHaveBeenCalledWith({
+        message: SOMETHING_WENT_WRONG_ERROR_TEXT,
+      });
       expect(res.status).toHaveBeenCalledWith(400);
+    });
+
+    it("responds with a custom error on failure with custom error", async () => {
+      const customErrorMessage = "This is custom";
+      const customErrorStatus = 401;
+
+      jest.spyOn(adapterIndex, "getVC").mockImplementation(() => {
+        throw new Error(customErrorMessage, {
+          cause: { statusCode: customErrorStatus },
+        });
+      });
+
+      const res = {
+        json: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+      } as unknown as Response;
+
+      const req: AccountsRequest = {
+        params: {
+          connectionId: "testConnectionId",
+          aggregator: Aggregators.TEST_A,
+          userId: "testUserId",
+        },
+      };
+
+      await vcAccountsDataHandler(req, res);
+
+      expect(res.json).toHaveBeenCalledWith({
+        message: customErrorMessage,
+      });
+      expect(res.status).toHaveBeenCalledWith(customErrorStatus);
     });
   });
 
   describe("identityDataHandler", () => {
     it("responds with a failure if the userId isn't found", async () => {
       const res = {
-        send: jest.fn(),
-        status: jest.fn(),
+        json: jest.fn(),
+        status: jest.fn().mockReturnThis(),
       } as unknown as Response;
 
       await vcIdentityDataHandler(
@@ -169,7 +204,9 @@ describe("dataEndpoints", () => {
       );
 
       expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.send).toHaveBeenCalledWith(USER_NOT_RESOLVED_ERROR_TEXT);
+      expect(res.json).toHaveBeenCalledWith({
+        message: USER_NOT_RESOLVED_ERROR_TEXT,
+      });
     });
 
     it("responds with a failure if aggregator isn't valid", async () => {
@@ -195,8 +232,8 @@ describe("dataEndpoints", () => {
 
     it("responds with the vc data in the jwt on success", async () => {
       const res = {
-        send: jest.fn(),
-        status: jest.fn(),
+        json: jest.fn(),
+        status: jest.fn().mockReturnThis(),
       } as unknown as Response;
 
       const req: IdentityRequest = {
@@ -209,7 +246,7 @@ describe("dataEndpoints", () => {
 
       await vcIdentityDataHandler(req, res);
 
-      expect(res.send).toHaveBeenCalledWith({
+      expect(res.json).toHaveBeenCalledWith({
         jwt: testVcIdentityData,
       });
     });
@@ -217,7 +254,7 @@ describe("dataEndpoints", () => {
     it("responds with the data on success", async () => {
       const res = {
         json: jest.fn(),
-        status: jest.fn(),
+        status: jest.fn().mockReturnThis(),
       } as unknown as Response;
 
       const req: IdentityRequest = {
@@ -241,8 +278,8 @@ describe("dataEndpoints", () => {
       });
 
       const res = {
-        send: jest.fn(),
-        status: jest.fn(),
+        json: jest.fn(),
+        status: jest.fn().mockReturnThis(),
       } as unknown as Response;
 
       const req: IdentityRequest = {
@@ -255,8 +292,41 @@ describe("dataEndpoints", () => {
 
       await vcIdentityDataHandler(req, res);
 
-      expect(res.send).toHaveBeenCalledWith(SOMETHING_WENT_WRONG_ERROR_TEXT);
+      expect(res.json).toHaveBeenCalledWith({
+        message: SOMETHING_WENT_WRONG_ERROR_TEXT,
+      });
       expect(res.status).toHaveBeenCalledWith(400);
+    });
+
+    it("responds with a custom error on failure with custom error", async () => {
+      const customErrorMessage = "This is custom";
+      const customErrorStatus = 401;
+
+      jest.spyOn(adapterIndex, "getVC").mockImplementation(() => {
+        throw new Error(customErrorMessage, {
+          cause: { statusCode: customErrorStatus },
+        });
+      });
+
+      const res = {
+        json: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+      } as unknown as Response;
+
+      const req: IdentityRequest = {
+        params: {
+          connectionId: "testConnectionId",
+          aggregator: Aggregators.TEST_A,
+          userId: "testUserId",
+        },
+      };
+
+      await vcIdentityDataHandler(req, res);
+
+      expect(res.json).toHaveBeenCalledWith({
+        message: customErrorMessage,
+      });
+      expect(res.status).toHaveBeenCalledWith(customErrorStatus);
     });
   });
 
@@ -264,8 +334,8 @@ describe("dataEndpoints", () => {
     describe("validation", () => {
       it("responds with a failure if the userId isn't found", async () => {
         const res = {
-          send: jest.fn(),
-          status: jest.fn(),
+          json: jest.fn(),
+          status: jest.fn().mockReturnThis(),
         } as unknown as Response;
 
         await vcTransactionsDataHandler(
@@ -281,13 +351,15 @@ describe("dataEndpoints", () => {
         );
 
         expect(res.status).toHaveBeenCalledWith(404);
-        expect(res.send).toHaveBeenCalledWith(USER_NOT_RESOLVED_ERROR_TEXT);
+        expect(res.json).toHaveBeenCalledWith({
+          message: USER_NOT_RESOLVED_ERROR_TEXT,
+        });
       });
 
       it("fails if aggregator is invalid", async () => {
         const res = {
           send: jest.fn(),
-          status: jest.fn(),
+          status: jest.fn().mockReturnThis(),
         } as unknown as Response;
 
         const req: TransactionsRequest = {
@@ -314,8 +386,8 @@ describe("dataEndpoints", () => {
           .mockImplementationOnce(async () => testVcTransactionsData);
 
         const res = {
-          send: jest.fn(),
-          status: jest.fn(),
+          json: jest.fn(),
+          status: jest.fn().mockReturnThis(),
         } as unknown as Response;
 
         const req: TransactionsRequest = {
@@ -332,7 +404,7 @@ describe("dataEndpoints", () => {
 
         await vcTransactionsDataHandler(req, res);
 
-        expect(res.send).toHaveBeenCalledWith({
+        expect(res.json).toHaveBeenCalledWith({
           jwt: testVcTransactionsData,
         });
       });
@@ -344,7 +416,7 @@ describe("dataEndpoints", () => {
 
         const res = {
           json: jest.fn(),
-          status: jest.fn(),
+          status: jest.fn().mockReturnThis(),
         } as unknown as Response;
 
         const req: TransactionsRequest = {
@@ -372,8 +444,8 @@ describe("dataEndpoints", () => {
         });
 
         const res = {
-          send: jest.fn(),
-          status: jest.fn(),
+          json: jest.fn(),
+          status: jest.fn().mockReturnThis(),
         } as unknown as Response;
 
         const req: TransactionsRequest = {
@@ -390,7 +462,9 @@ describe("dataEndpoints", () => {
 
         await vcTransactionsDataHandler(req, res);
 
-        expect(res.send).toHaveBeenCalledWith(SOMETHING_WENT_WRONG_ERROR_TEXT);
+        expect(res.json).toHaveBeenCalledWith({
+          message: SOMETHING_WENT_WRONG_ERROR_TEXT,
+        });
         expect(res.status).toHaveBeenCalledWith(400);
       });
 
@@ -406,22 +480,22 @@ describe("dataEndpoints", () => {
         } as unknown as TransactionsRequest;
 
         const res = {
-          send: jest.fn(),
-          status: jest.fn(),
+          json: jest.fn(),
+          status: jest.fn().mockReturnThis(),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as unknown as any;
 
         await createTransactionsDataHandler(true)(req, res);
 
-        expect(res.send).toHaveBeenCalledWith({
+        expect(res.json).toHaveBeenCalledWith({
           jwt: transactionsResponse,
         });
       });
 
       it("succeeds if there isn't a custom validator", async () => {
         const res = {
-          send: jest.fn(),
-          status: jest.fn(),
+          json: jest.fn(),
+          status: jest.fn().mockReturnThis(),
         } as unknown as Response;
 
         const req: TransactionsRequest = {
@@ -452,16 +526,51 @@ describe("dataEndpoints", () => {
         } as unknown as TransactionsRequest;
 
         const res = {
-          send: jest.fn(),
-          status: jest.fn(),
+          json: jest.fn(),
+          status: jest.fn().mockReturnThis(),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as unknown as any;
 
         await createTransactionsDataHandler(false)(req, res);
 
-        expect(res.send).toHaveBeenCalledWith(
+        expect(res.json).toHaveBeenCalledWith(
           he.encode(testDataRequestValidatorStartTimeError),
         );
+      });
+
+      it("responds with a custom error on failure with custom error", async () => {
+        const customErrorMessage = "This is custom";
+        const customErrorStatus = 401;
+
+        jest.spyOn(adapterIndex, "getVC").mockImplementation(() => {
+          throw new Error(customErrorMessage, {
+            cause: { statusCode: customErrorStatus },
+          });
+        });
+
+        const res = {
+          json: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+        } as unknown as Response;
+
+        const req: TransactionsRequest = {
+          params: {
+            accountId: "testAccountId",
+            aggregator: Aggregators.TEST_A,
+            userId: "testUserId",
+          },
+          query: {
+            start_time: undefined,
+            end_time: undefined,
+          },
+        };
+
+        await vcTransactionsDataHandler(req, res);
+
+        expect(res.json).toHaveBeenCalledWith({
+          message: customErrorMessage,
+        });
+        expect(res.status).toHaveBeenCalledWith(customErrorStatus);
       });
     });
   });

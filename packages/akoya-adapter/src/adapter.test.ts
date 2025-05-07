@@ -54,6 +54,7 @@ describe("akoya aggregator", () => {
       expect(ret).toEqual({
         id: "testId",
         aggregator: "akoya_sandbox",
+        supportsOauth: true,
       });
     });
   });
