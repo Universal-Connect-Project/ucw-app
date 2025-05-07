@@ -9,7 +9,7 @@ import {
 } from "@repo/utils/test";
 import { server } from "./test/testServer";
 import { http, HttpResponse } from "msw";
-import { MOCKED_OAUTH_URL } from "./test/handlers";
+import { CREATE_USER_PATH, MOCKED_OAUTH_URL } from "./test/handlers";
 import { accountTransactionsData } from "./test/testData/accounts";
 
 const cacheClient = createCacheClient();
@@ -54,6 +54,12 @@ describe("FinicityClient", () => {
     });
 
     it("throws an error for invalid user data", async () => {
+      server.use(
+        http.post(CREATE_USER_PATH, async () => {
+          return HttpResponse.json({ error: "Failed" }, { status: 400 });
+        }),
+      );
+
       await expect(apiClient.createCustomer("invalid-user")).rejects.toThrow();
     });
   });
@@ -65,6 +71,12 @@ describe("FinicityClient", () => {
     });
 
     it("returns undefined if no customer is found", async () => {
+      server.use(
+        http.get(`${BASE_PATH}/aggregation/v1/customers`, () => {
+          return HttpResponse.json({ customers: [] });
+        }),
+      );
+
       const customer = await apiClient.getCustomers("nonExistingUserId");
       expect(customer).toBeUndefined();
     });

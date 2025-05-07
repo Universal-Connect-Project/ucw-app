@@ -189,9 +189,16 @@ export function transformAccountsToCustomers(
     const { customerId, id: accountId, holders } = account;
     const accountOwner = holders[0];
 
-    let parsedName = parseFullName(accountOwner.ownerName);
-    if (parsedName.error.length > 0) {
-      parsedName = { first: accountOwner.ownerName };
+    let parsedName;
+    try {
+      parsedName = parseFullName(
+        accountOwner.ownerName,
+        undefined,
+        undefined,
+        true,
+      );
+    } catch {
+      parsedName = { first: accountOwner?.ownerName };
     }
 
     if (!customersMap.has(customerId)) {
@@ -203,9 +210,9 @@ export function transformAccountsToCustomers(
           last: parsedName?.last,
         },
         emails:
-          accountOwner.emails?.map((e: { email: string }) => e.email) || [],
+          accountOwner?.emails?.map((e: { email: string }) => e.email) || [],
         telephones:
-          accountOwner.phones?.map(
+          accountOwner?.phones?.map(
             (p: { phone: string; type: string; country: string }) => ({
               type: p.type,
               country: p.country,

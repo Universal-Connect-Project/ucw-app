@@ -146,23 +146,23 @@ interface AccountDetail {
 
 export interface Account {
   id: string;
-  number: string;
-  accountNumberDisplay: string;
-  name: string;
-  balance: number;
+  number?: string;
+  accountNumberDisplay?: string;
+  name?: string;
+  balance?: number;
   type: string;
-  status: string;
+  status?: string;
   customerId: string;
-  institutionId: string;
-  balanceDate: number;
-  aggregationAttemptDate: number;
-  createdDate: number;
-  linkedAccountDate: number;
-  currency: string;
-  institutionLoginId: number;
-  displayPosition: number;
-  accountNickname: string;
-  marketSegment: string;
+  institutionId?: string;
+  balanceDate?: number;
+  aggregationAttemptDate?: number;
+  createdDate?: number;
+  linkedAccountDate?: number;
+  currency?: string;
+  institutionLoginId?: number;
+  displayPosition?: number;
+  accountNickname?: string;
+  marketSegment?: string;
   detail?: AccountDetail;
 }
 

@@ -207,6 +207,12 @@ describe("finicity aggregator", () => {
     });
 
     it("creates the user if the user isn't in the list and returns it from there", async () => {
+      server.use(
+        http.get(`${BASE_PATH}/aggregation/v1/customers`, () => {
+          return HttpResponse.json({ customers: [] });
+        }),
+      );
+
       const returnedUserId =
         await finicityAdapter.ResolveUserId("nonExistingUser");
 
@@ -214,6 +220,12 @@ describe("finicity aggregator", () => {
     });
 
     it("throws an error if customer does not exist and failIfNotFound is true", async () => {
+      server.use(
+        http.get(`${BASE_PATH}/aggregation/v1/customers`, () => {
+          return HttpResponse.json({ customers: [] });
+        }),
+      );
+
       const userId = "nonExistingUserId";
 
       await expect(

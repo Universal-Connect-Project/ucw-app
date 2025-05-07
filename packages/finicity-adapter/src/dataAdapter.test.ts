@@ -63,6 +63,57 @@ describe("dataAdapter", () => {
     });
   });
 
+  it("retrieves accounts data when account type does not support ACH", async () => {
+    server.use(
+      http.get(
+        `${BASE_PATH}/aggregation/v1/customers/${userId}/institutionLogins/${connectionId}/accounts`,
+        () =>
+          HttpResponse.json({
+            accounts: [
+              {
+                id: "account123",
+                type: "investment",
+                balance: 5000,
+                status: "active",
+                currency: "USD",
+                balanceDate: 1609459200,
+                accountNumberDisplay: "1234",
+                name: "Investment Account",
+              },
+            ],
+          }),
+      ),
+    );
+
+    const data = await sandboxDataAdapter({
+      connectionId,
+      type: VCDataTypes.ACCOUNTS,
+      userId,
+    });
+
+    expect(data).toEqual({
+      accounts: [
+        {
+          investmentAccount: {
+            accountId: "account123",
+            accountCategory: "INVESTMENT_ACCOUNT",
+            accountType: "investment",
+            accountNumber: undefined,
+            routingTransitNumber: undefined,
+            accountNumberDisplay: "1234",
+            status: "active",
+            currency: { currencyCode: "USD" },
+            balanceType: "ASSET",
+            nickname: "Investment Account",
+            currentBalance: 5000,
+            balanceAsOf: expect.any(Date),
+            availableBalance: undefined,
+          },
+        },
+      ],
+    });
+  });
+
   it("retrieves identity data", async () => {
     server.use(
       http.get(

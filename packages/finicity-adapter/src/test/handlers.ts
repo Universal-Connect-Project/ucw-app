@@ -45,16 +45,8 @@ const handlers = [
       { status: 404 },
     ),
   ),
-  http.get(`${FINICITY_BASE_PATH}/aggregation/v1/customers`, ({ request }) => {
-    const url = new URL(request.url);
-    const username = url.searchParams.get("username");
-    switch (username) {
-      case "test-user-name":
-        return HttpResponse.json(customerData);
-      case "nonExistingUserId":
-      default:
-        return HttpResponse.json({ customers: [] });
-    }
+  http.get(`${FINICITY_BASE_PATH}/aggregation/v1/customers`, () => {
+    return HttpResponse.json(customerData);
   }),
   http.get(
     `${FINICITY_BASE_PATH}/aggregation/v1/customers/testCustomerId/accounts`,
@@ -86,26 +78,13 @@ const handlers = [
   http.post(`${FINICITY_BASE_PATH}/connect/v2/generate/fix`, () =>
     HttpResponse.json({ link: MOCKED_OAUTH_URL }),
   ),
-  http.post(CREATE_USER_PATH, async ({ request }) => {
-    const body = (await request.json()) as { username: string };
-    if (body.username === "invalid-user") {
-      return HttpResponse.json({ error: "Failed" }, { status: 400 });
-    }
+  http.post(CREATE_USER_PATH, async () => {
     return HttpResponse.json({ ...customerData, id: "createdNewCustomerId" });
   }),
   http.post(
     `${FINICITY_BASE_PATH}/aggregation/v2/customers/:customerId/accounts`,
-    ({ params }) => {
-      const { customerId } = params;
-
-      if (customerId === "testCustomerId") {
-        return HttpResponse.json({ success: true });
-      }
-
-      return HttpResponse.json(
-        { error: "Customer not found" },
-        { status: 404 },
-      );
+    () => {
+      return HttpResponse.json({ success: true });
     },
   ),
   http.delete(DELETE_USER_PATH, () => new HttpResponse(null, { status: 200 })),
