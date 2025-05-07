@@ -29,7 +29,7 @@ function fromSophtronInstitution(ins: any): AggregatorInstitution | undefined {
   return {
     id: ins.InstitutionID,
     aggregator: SOPHTRON_ADAPTER_NAME,
-    supports_oauth: false,
+    supportsOauth: false,
   } as AggregatorInstitution;
 }
 

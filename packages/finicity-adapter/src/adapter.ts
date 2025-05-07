@@ -53,7 +53,7 @@ export class FinicityAdapter implements WidgetAdapter {
     return {
       id,
       aggregator: this.aggregator,
-      supports_oauth: true,
+      supportsOauth: true,
     };
   }
 

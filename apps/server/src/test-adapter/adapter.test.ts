@@ -79,7 +79,7 @@ describe("TestAdapter", () => {
         logo_url: testExampleInstitution.logo_url,
         name: testExampleInstitution.name,
         aggregator,
-        supports_oauth: false,
+        supportsOauth: false,
         url: testExampleInstitution.url,
       });
     });

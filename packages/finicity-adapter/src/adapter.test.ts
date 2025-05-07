@@ -77,7 +77,7 @@ describe("finicity aggregator", () => {
       expect(institution).toEqual({
         id: testInstitutionId,
         aggregator: "finicity_sandbox",
-        supports_oauth: true,
+        supportsOauth: true,
       });
     });
   });

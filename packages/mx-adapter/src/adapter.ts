@@ -95,7 +95,7 @@ export class MxAdapter implements WidgetAdapter {
     return {
       id: institution?.code || null,
       aggregator: this.aggregator,
-      supports_oauth: institution.supports_oauth || false,
+      supportsOauth: institution.supports_oauth || false,
     };
   }
 

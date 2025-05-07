@@ -14,7 +14,7 @@ export const testDataRequestValidatorStartTimeError =
 export const testExampleOauthInstitution = {
   guid: "test bank_oauth",
   code: "test bank_oauth",
-  supports_oauth: true,
+  supportsOauth: true,
 };
 
 export const testExampleInstitution = {
