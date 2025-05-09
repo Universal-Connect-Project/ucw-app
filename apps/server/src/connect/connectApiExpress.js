@@ -27,7 +27,7 @@ export default function (app) {
   });
 
   app.post(MEMBERS_URL, async (req, res) => {
-    const ret = await req.connectApi.addMember(req.body);
+    const ret = await req.connectApi.addMember({...req.body, guid: req.context?.connectionId});
     res.send(ret);
   });
   app.put(`${ApiEndpoints.MEMBERS}/:member_guid`, async (req, res) => {
