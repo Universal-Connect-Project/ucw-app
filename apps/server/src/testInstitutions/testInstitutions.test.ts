@@ -12,4 +12,12 @@ describe("testInstitutions", () => {
       ]);
     });
   });
+
+  it("ensures that all test institutions have is_test_bank as true", () => {
+    expect(testInstitutions.length).toBeGreaterThan(0);
+
+    testInstitutions.forEach((institution) => {
+      expect(institution.is_test_bank).toBe(true);
+    });
+  });
 });
