@@ -28,3 +28,5 @@ export const getFinicityAdapterMapObject = (
     },
   };
 };
+
+export { testInstitutions } from "./testInstitutions";
