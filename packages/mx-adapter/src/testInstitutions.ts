@@ -1,4 +1,6 @@
-export const testInstitutions = [
+import type { CachedInstitution } from "@repo/utils";
+
+export const testInstitutions: CachedInstitution[] = [
   {
     name: "MX Bank",
     id: "mxBank",

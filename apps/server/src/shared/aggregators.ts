@@ -1,11 +1,7 @@
 import { JobTypeSupports } from "./contract";
-import { ComboJobTypes } from "@repo/utils";
+import { type CachedInstitution, ComboJobTypes } from "@repo/utils";
 
-import type {
-  CachedInstitution,
-  InstitutionAggregator,
-  Aggregator,
-} from "./contract";
+import type { InstitutionAggregator, Aggregator } from "./contract";
 
 export const JobTypesPartialSupportsMap = {
   [ComboJobTypes.ACCOUNT_NUMBER]: JobTypeSupports.VERIFICATION,

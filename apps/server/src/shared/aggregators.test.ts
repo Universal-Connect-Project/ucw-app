@@ -1,7 +1,7 @@
 import { getAvailableAggregators } from "../shared/aggregators";
-import type { Aggregator, CachedInstitution } from "./contract";
+import type { Aggregator } from "./contract";
 import { Aggregators, JobTypeSupports } from "./contract";
-import { ComboJobTypes } from "@repo/utils";
+import { type CachedInstitution, ComboJobTypes } from "@repo/utils";
 
 const institutionAggregatorsSupportEverything: CachedInstitution = {
   url: "testUrl",

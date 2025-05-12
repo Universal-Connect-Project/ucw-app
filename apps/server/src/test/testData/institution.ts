@@ -2,7 +2,7 @@ import {
   TEST_EXAMPLE_A_AGGREGATOR_STRING,
   TEST_EXAMPLE_B_AGGREGATOR_STRING,
 } from "../../test-adapter";
-import type { CachedInstitution } from "../../shared/contract";
+import type { CachedInstitution } from "@repo/utils";
 
 export const finicityInsitutionData = {
   institution: {

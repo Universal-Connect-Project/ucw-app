@@ -232,3 +232,15 @@ export interface WidgetAdapter {
   DataRequestValidators?: Record<string, (req: any) => string | undefined>;
   HandleOauthResponse?: (request: any) => Promise<Connection>;
 }
+
+export interface CachedInstitution {
+  name: string;
+  keywords: string[];
+  logo: string;
+  url: string;
+  id: string;
+  is_test_bank: boolean | false;
+  routing_numbers: string[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [propName: string]: any;
+}

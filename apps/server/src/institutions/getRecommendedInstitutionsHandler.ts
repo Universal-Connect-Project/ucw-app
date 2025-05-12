@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { getRecommendedInstitutions } from "../services/ElasticSearchClient";
-import type { CachedInstitution } from "../shared/contract";
+import type { CachedInstitution } from "@repo/utils";
 import { mapCachedInstitution } from "./utils";
 
 export const getRecommendedInstitutionsHandler = async (
