@@ -133,9 +133,9 @@
                 "schema": {
                   "type": "object",
                   "example": {
-                    "guid": "testExampleA",
-                    "code": "testExampleA",
-                    "name": "TestExampleA Bank",
+                    "guid": "mx",
+                    "code": "mx",
+                    "name": "mx Bank",
                     "url": "https://test-example.com",
                     "logo_url": "https://universalconnectproject.org/images/ucp-logo-icon.svg",
                     "instructional_data": {},
@@ -223,7 +223,7 @@
                   "example": [
                     {
                       "guid": "5e498f60-3496-4299-96ed-f8eb328ae8af",
-                      "name": "TestExampleA Bank",
+                      "name": "mx Bank",
                       "url": "https://test-example.com",
                       "logo_url": "https://universalconnectproject.org/images/ucp-logo-icon.svg"
                     }
@@ -294,7 +294,7 @@
                   "example": [
                     {
                       "guid": "5e498f60-3496-4299-96ed-f8eb328ae8af",
-                      "name": "TestExampleA Bank",
+                      "name": "mx Bank",
                       "url": "https://test-example.com",
                       "logo_url": "https://universalconnectproject.org/images/ucp-logo-icon.svg"
                     }
@@ -577,7 +577,7 @@
                       "id": "testConnectionId",
                       "field_name": "testFieldName",
                       "field_type": 3,
-                      "label": "TestExampleA Label",
+                      "label": "mx Label",
                       "guid": "testConnectionId"
                     }
                   ]
