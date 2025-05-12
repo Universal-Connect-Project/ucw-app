@@ -10,6 +10,7 @@
     "copyMXTestPreferences": "cp ./apps/server/cachedDefaults/testData/mxTestPreferences.json ./apps/server/cachedDefaults/preferences.json",
     "copySophtronTestPreferences": "cp ./apps/server/cachedDefaults/testData/sophtronTestPreferences.json ./apps/server/cachedDefaults/preferences.json",
     "copyFinicityTestPreferences": "cp ./apps/server/cachedDefaults/testData/finicityTestPreferences.json ./apps/server/cachedDefaults/preferences.json",
+    "copyProdTestPreferences": "cp ./apps/server/cachedDefaults/testData/prodTestPreferences.json ./apps/server/cachedDefaults/preferences.json",
     "copyTestPreferences": "cp ./apps/server/cachedDefaults/testData/testPreferences.json ./apps/server/cachedDefaults/preferences.json",
     "copyServerEnv": "tee ./apps/server/env/staging.env ./apps/server/env/production.env < ./apps/server/env/.env.example",
     "dev": "turbo dev",

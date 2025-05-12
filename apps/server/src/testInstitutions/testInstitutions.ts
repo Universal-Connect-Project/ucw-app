@@ -4,6 +4,26 @@ import { testInstitutions as finicityTestInstitutions } from "@repo/finicity-ada
 import { testInstitutions as sophtronTestInstitutions } from "@repo/sophtron-adapter";
 import { testInstitutions as akoyaTestInstitutions } from "@repo/akoya-adapter";
 
+export const testChaseBankToFilter: CachedInstitution = {
+  name: "Chase Bank Test Filter",
+  id: "prodTestBankFilter",
+  keywords: ["test"],
+  logo: "https://universalconnectproject.org/images/ucp-logo-icon.svg",
+  url: "",
+  is_test_bank: true,
+  routing_numbers: [],
+  mx: {
+    id: "test",
+    supports_aggregation: true,
+    supports_history: true,
+    supports_identification: true,
+    supports_oauth: true,
+    supports_verification: true,
+    supportsRewards: false,
+    supportsBalance: false,
+  },
+};
+
 const buildTestInstitutions = (testInstitutions: CachedInstitution[][]) =>
   testInstitutions.reduce(
     (acc, institutions) => [
@@ -21,6 +41,7 @@ export const testInstitutions = buildTestInstitutions([
   finicityTestInstitutions,
   sophtronTestInstitutions,
   akoyaTestInstitutions,
+  [testChaseBankToFilter],
   [
     {
       name: "TestExampleOauth Bank",
