@@ -21,7 +21,7 @@ import { getPreferences } from "../shared/preferences";
 import { fetchInstitutions } from "./institutionSyncer";
 import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
 import { getSet, overwriteSet } from "./storageClient/redis";
-import { testInstitutions } from "../testInstitutions/testInstitutions";
+import { addTestInstitutions } from "../testInstitutions/testInstitutions";
 
 function getInstitutionFilePath() {
   return resolve(__dirname, "../../cachedDefaults/ucwInstitutionsMapping.json");
@@ -106,7 +106,7 @@ async function getInstitutions(): Promise<CachedInstitution[]> {
     newInstitutions = getInstitutionDataFromFile();
   }
 
-  return [...newInstitutions, ...testInstitutions];
+  return addTestInstitutions(newInstitutions);
 }
 
 function getInstitutionDataFromFile(): CachedInstitution[] {

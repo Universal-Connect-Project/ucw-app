@@ -14,12 +14,7 @@ import {
   SUCCESS_RESPONSE,
   UNAUTHORIZED_RESPONSE,
 } from "../infra/http/constants";
-import { testInstitutions } from "../testInstitutions/testInstitutions";
-
-export const addTestInstitutions = (institutions: CachedInstitution[]) => [
-  ...institutions,
-  ...testInstitutions,
-];
+import { addTestInstitutions } from "../testInstitutions/testInstitutions";
 
 export async function setInstitutionSyncSchedule(minutes: number = 1) {
   return setIntervalAsync(

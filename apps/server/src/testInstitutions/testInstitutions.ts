@@ -207,3 +207,8 @@ export const testInstitutions = buildTestInstitutions([
     },
   ],
 ]);
+
+export const addTestInstitutions = (institutions: CachedInstitution[]) => [
+  ...institutions,
+  ...testInstitutions,
+];
