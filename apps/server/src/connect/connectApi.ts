@@ -105,6 +105,7 @@ export class ConnectApi extends AggregatorAdapterBase {
 
   async addMember(memberData: Member): Promise<MemberResponse> {
     const connection = await this.createConnection({
+      id: memberData.guid,
       institutionId: memberData.institution_guid,
       is_oauth: memberData.is_oauth ?? false,
       skip_aggregation:

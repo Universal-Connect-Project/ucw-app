@@ -163,6 +163,54 @@ describe("finicity aggregator", () => {
     });
   });
 
+  describe("CreateConnection when refreshing", () => {
+    it("generates a connect fix url for the oauth_window_uri", async () => {
+      const connectionId = "testConnectionId";
+      const request = {
+        id: connectionId,
+        institution_code: "junk",
+        credentials: [],
+        institutionId: "testInstitutionId",
+      };
+      const userId = "testUserId";
+      await finicityAdapter.CreateConnection(request, userId);
+    });
+  });
+
+  describe("GetConnectionStatus when connection not found in the cache", () => {
+    it("returns null when connection not found", async () => {
+      const connectionStatus =
+        await finicityAdapter.GetConnectionStatus("junk");
+      expect(connectionStatus).toBeNull();
+    });
+  });
+
+  describe("GetConnectionById when refreshing", () => {
+    it("sets the connection in cache if it's not found in the cache and userId is present.", async () => {
+      const connectionId = "testConnectionId";
+      const connectionStatus = await finicityAdapter.GetConnectionById(
+        connectionId,
+        "testUser",
+      );
+      expect(connectionStatus).toEqual({
+        id: connectionId,
+        userId: "testUser",
+        aggregator: "finicity",
+        is_oauth: true,
+      });
+
+      const cachedConnection = await cacheClient.get(connectionId);
+      expect(cachedConnection).toEqual({
+        connection: {
+          id: connectionId,
+          userId: "testUser",
+          aggregator: "finicity",
+          is_oauth: true,
+        },
+      });
+    });
+  });
+
   describe("UpdateConnection", () => {
     it("is not available with finicity", async () => {
       const ret = await finicityAdapter.UpdateConnection(null);
@@ -323,7 +371,7 @@ describe("finicity aggregator", () => {
       );
     });
 
-    it("handles 'error' reason with code 201 and updates connection status to FAILED", async () => {
+    it("handles 'error' reason with code 201 and updates connection status to Connected", async () => {
       const createdConnection = await finicityAdapter.CreateConnection(
         {
           institutionId: "testInstitutionId",
@@ -347,7 +395,7 @@ describe("finicity aggregator", () => {
       expect(updatedConnection).toEqual(
         expect.objectContaining({
           id: createdConnection.id,
-          status: ConnectionStatus.FAILED,
+          status: ConnectionStatus.CONNECTED,
         }),
       );
     });
