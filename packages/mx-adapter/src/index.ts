@@ -31,4 +31,6 @@ export const getMxAdapterMapObject = (dependencies: AdapterDependencies) => {
   } as Record<string, AdapterMap>;
 };
 
+export { testInstitutions } from "./testInstitutions";
+
 export * from "./models";

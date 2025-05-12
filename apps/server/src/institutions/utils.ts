@@ -1,7 +1,5 @@
-import type {
-  CachedInstitution,
-  InstitutionSearchResponseItem,
-} from "../shared/contract";
+import type { CachedInstitution } from "@repo/utils";
+import type { InstitutionSearchResponseItem } from "../shared/contract";
 
 export const mapCachedInstitution = (
   ins: CachedInstitution,

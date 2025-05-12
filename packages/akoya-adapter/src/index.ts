@@ -26,3 +26,5 @@ export const getAkoyaAdapterMapObject = (dependencies: AdapterDependencies) => {
     },
   };
 };
+
+export { testInstitutions } from "./testInstitutions";

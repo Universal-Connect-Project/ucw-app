@@ -5,11 +5,13 @@
   "scripts": {
     "cypress:open": "cypress open --config-file cypress.config.ts",
     "cypress:open:authentication": "cypress open --config-file cypress.config.authentication.ts",
+    "cypress:open:nonProd": "cypress open --config-file cypress.config.nonProd.ts",
     "cypress:open:prod": "cypress open --config-file cypress.config.prod.ts",
     "cypress:open:syncing": "cypress open --config-file cypress.config.syncing.ts",
     "cypress:open:testExample": "cypress open --config-file cypress.config.testExample.ts",
     "cypress:run": "cypress run --config-file cypress.config.ts",
     "cypress:run:authentication": "cypress run --config-file cypress.config.authentication.ts",
+    "cypress:run:nonProd": "cypress run --config-file cypress.config.nonProd.ts",
     "cypress:run:prod": "cypress run --config-file cypress.config.prod.ts",
     "cypress:run:syncing": "cypress run --config-file cypress.config.syncing.ts",
     "cypress:run:testExample": "cypress run --config-file cypress.config.testExample.ts",

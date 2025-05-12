@@ -1,0 +1,16 @@
+{
+  "defaultAggregator": "mx",
+
+  "supportedAggregators": ["mx"],
+
+  "defaultAggregatorVolume": {},
+
+  "institutionAggregatorVolumeMap": {},
+
+  "hiddenInstitutions": [],
+
+  "recommendedInstitutions": [
+    "4685482a-573e-4903-a689-2ebcedf2c545",
+    "prodTestBankFilter"
+  ]
+}
