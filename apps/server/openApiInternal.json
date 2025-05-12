@@ -317,7 +317,7 @@
             "schema": {
               "type": "object",
               "example": {
-                "aggregator": "testExampleA"
+                "aggregator": "mx"
               }
             }
           },
@@ -356,7 +356,7 @@
             "schema": {
               "type": "object",
               "example": {
-                "aggregator": "testExampleA",
+                "aggregator": "sophtron",
                 "connectionId": "test"
               }
             }
@@ -376,7 +376,7 @@
                       "connection_status": 0,
                       "most_recent_job_guid": null,
                       "is_oauth": false,
-                      "aggregator": "testExampleA",
+                      "aggregator": "mx",
                       "is_being_aggregated": false,
                       "user_guid": "e07115cc-bbf9-466a-b7db-cdbc9c7cd31b",
                       "mfa": {}
@@ -398,7 +398,7 @@
             "schema": {
               "type": "object",
               "example": {
-                "aggregator": "testExampleA",
+                "aggregator": "finicity",
                 "jobTypes": ["transactions"]
               }
             }
@@ -466,7 +466,7 @@
             "schema": {
               "type": "object",
               "example": {
-                "aggregator": "testExampleA"
+                "aggregator": "sophtron"
               }
             }
           },
@@ -559,7 +559,7 @@
             "schema": {
               "type": "object",
               "example": {
-                "aggregator": "testExampleA",
+                "aggregator": "mx",
                 "jobTypes": ["transactions"]
               }
             }

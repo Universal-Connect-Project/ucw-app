@@ -1,14 +1,7 @@
 {
   "defaultAggregator": "mx",
 
-  "supportedAggregators": [
-    "akoya",
-    "finicity",
-    "mx",
-    "sophtron",
-    "testExampleA",
-    "testExampleB"
-  ],
+  "supportedAggregators": ["akoya", "finicity", "mx", "sophtron"],
 
   "defaultAggregatorVolume": {
     "mx": 50,
@@ -21,9 +14,6 @@
 
   "recommendedInstitutions": [
     "a76f5333-8493-42cf-bc86-dcc8a0f17d4c",
-    "a7130e74-7309-4515-94e4-d302778cb99f",
-    "5e498f60-3496-4299-96ed-f8eb328ae8af",
-    "4c1b2595-a5aa-41a1-a2c6-f6caa1e226a6",
-    "cd27ed3b-f81c-4fa9-94a9-039a9f534c7b"
+    "a7130e74-7309-4515-94e4-d302778cb99f"
   ]
 }

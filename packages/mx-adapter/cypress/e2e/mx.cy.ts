@@ -1,12 +1,10 @@
 import {
-  generateDataTests,
-  refreshAConnection,
-} from "@repo/utils-dev-dependency";
-import {
   enterMxCredentials,
+  generateDataTests,
   makeAConnection,
+  refreshAConnection,
   searchAndSelectMx,
-} from "../utils/mx";
+} from "@repo/utils-dev-dependency";
 
 describe("mx aggregator", () => {
   generateDataTests({ makeAConnection, shouldTestVcEndpoint: true });
