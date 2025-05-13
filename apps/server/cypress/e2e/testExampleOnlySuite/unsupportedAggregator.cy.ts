@@ -1,5 +1,5 @@
 import { TEST_EXAMPLE_B_ONLY_INSTITUTION_NAME } from "../../shared/constants/testExample";
-import { searchByText, visitAgg } from "@repo/utils-dev-dependency";
+import { searchByText, visitAgg } from "@repo/utils-cypress";
 
 describe("unsupported aggregator", () => {
   it("filters out institutions which are not supported by a aggregator in your list of supported aggregators.", () => {

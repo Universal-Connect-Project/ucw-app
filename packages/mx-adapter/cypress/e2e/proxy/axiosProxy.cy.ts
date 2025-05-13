@@ -4,7 +4,7 @@ import {
   verifyAccountsAndReturnAccountId,
   visitAgg,
   visitWithPostMessageSpy,
-} from "@repo/utils-dev-dependency";
+} from "@repo/utils-cypress";
 import { makeAConnection } from "../../utils/mx";
 import { ComboJobTypes } from "@repo/utils";
 

@@ -1,4 +1,4 @@
-import { searchByText, visitAgg } from "@repo/utils-dev-dependency";
+import { searchByText, visitAgg } from "@repo/utils-cypress";
 
 // These tests expect local preferences to match testPreferences.json
 describe("preferences", () => {

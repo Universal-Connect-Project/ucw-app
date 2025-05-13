@@ -49,8 +49,6 @@ const Widget = ({
             type,
           };
 
-          console.log({ payload });
-
           if (window.parent) {
             window.parent.postMessage(payload);
           }

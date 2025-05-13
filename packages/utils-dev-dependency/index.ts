@@ -1,1 +1,1 @@
-export * from "./cypress/index";
+export * from "./mx/index";

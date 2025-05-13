@@ -1,5 +1,4 @@
 import { ComboJobTypes } from "@repo/utils";
-import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../test-adapter";
 import {
   getInstitutionCredentialsHandler,
   type GetInstitutionCredentialsRequest,
@@ -9,12 +8,13 @@ import {
   TEST_EXAMPLE_A_LABEL_TEXT,
   testExampleCredentials,
 } from "../test-adapter/constants";
+import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
 
 describe("getInstitutionCredentialsHandler", () => {
   it("returns with the institution credentials", async () => {
     const context = {
       jobTypes: [ComboJobTypes.TRANSACTIONS],
-      aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+      aggregator: MX_AGGREGATOR_STRING,
     };
 
     const req = {

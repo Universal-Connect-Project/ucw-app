@@ -5,7 +5,7 @@ import {
   generateDataTests,
   MEMBER_CONNECTED_EVENT_TYPE,
   visitWithPostMessageSpy,
-} from "@repo/utils-dev-dependency";
+} from "@repo/utils-cypress";
 import { TEST_EXAMPLE_B_AGGREGATOR_STRING } from "../../../src/test-adapter/constants";
 import {
   enterTestExampleACredentials,

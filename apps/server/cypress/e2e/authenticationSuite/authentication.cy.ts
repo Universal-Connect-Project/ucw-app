@@ -6,7 +6,7 @@ import {
   searchAndSelectMx,
   visitAgg,
   visitWithPostMessageSpy,
-} from "@repo/utils-dev-dependency";
+} from "@repo/utils-cypress";
 import {
   WIDGET_DEMO_ACCESS_TOKEN_ENV,
   WIDGET_DEMO_DATA_ACCESS_TOKEN_ENV,

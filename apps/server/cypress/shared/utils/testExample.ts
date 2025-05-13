@@ -1,7 +1,4 @@
-import {
-  searchByText,
-  selectInstitutionByName,
-} from "@repo/utils-dev-dependency";
+import { searchByText, selectInstitutionByName } from "@repo/utils-cypress";
 import {
   TEST_EXAMPLE_B_LABEL_TEXT,
   TEST_EXAMPLE_C_LABEL_TEXT,

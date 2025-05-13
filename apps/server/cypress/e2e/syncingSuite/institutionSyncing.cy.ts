@@ -1,4 +1,4 @@
-import { visitAgg } from "@repo/utils-dev-dependency";
+import { visitAgg } from "@repo/utils-cypress";
 import { searchAndSelectTestExampleA } from "../../shared/utils/testExample";
 
 describe("institution syncing", () => {

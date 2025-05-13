@@ -8,7 +8,7 @@ import {
   refreshAConnection,
   visitWithPostMessageSpy,
   MEMBER_STATUS_UPDATE_EVENT_TYPE,
-} from "@repo/utils-dev-dependency";
+} from "@repo/utils-cypress";
 import {
   enterSophtronCredentials,
   searchAndSelectSophtron,

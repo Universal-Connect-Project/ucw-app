@@ -4,7 +4,7 @@ import {
   makeAConnection,
   refreshAConnection,
   searchAndSelectMx,
-} from "@repo/utils-dev-dependency";
+} from "@repo/utils-cypress";
 
 describe("mx aggregator", () => {
   generateDataTests({ makeAConnection, shouldTestVcEndpoint: true });

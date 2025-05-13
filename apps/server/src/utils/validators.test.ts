@@ -3,7 +3,7 @@ import {
   invalidAggregatorString,
   withValidateAggregatorInPath,
 } from "./validators";
-import { Aggregators } from "../shared/contract";
+import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
 
 const successString = "success!";
 
@@ -56,7 +56,7 @@ describe("validators", () => {
     it("calls the handler if the aggregator is valid", () => {
       const req = {
         params: {
-          aggregator: Aggregators.TEST_A,
+          aggregator: MX_AGGREGATOR_STRING,
         },
       };
 

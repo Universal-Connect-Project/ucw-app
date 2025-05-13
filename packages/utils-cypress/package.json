@@ -1,12 +1,10 @@
 {
-  "name": "@repo/utils-dev-dependency",
+  "name": "@repo/utils-cypress",
   "version": "0.0.1",
   "main": "index.ts",
   "type": "commonjs",
   "scripts": {},
-  "dependencies": {
-    "msw": "^2.2.13"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@testing-library/cypress": "^10.0.1",
     "typescript": "^5.5.4"

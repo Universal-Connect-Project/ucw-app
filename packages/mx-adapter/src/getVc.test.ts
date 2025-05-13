@@ -5,7 +5,7 @@ import type { AdapterDependencies } from "./models";
 import {
   MX_INTEGRATION_VC_GET_ACCOUNTS_PATH,
   MX_VC_GET_ACCOUNTS_PATH,
-} from "./test/handlers";
+} from "@repo/utils-dev-dependency";
 import { mxVcAccountsData } from "./test/testData/mxVcData";
 import { server } from "./test/testServer";
 

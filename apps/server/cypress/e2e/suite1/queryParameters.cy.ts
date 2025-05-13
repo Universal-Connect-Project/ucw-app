@@ -4,7 +4,7 @@ import {
   expectConnectionSuccess,
   refreshAConnection,
   visitWithPostMessageSpy,
-} from "@repo/utils-dev-dependency";
+} from "@repo/utils-cypress";
 import {
   enterTestExampleACredentials,
   searchAndSelectTestExampleA,

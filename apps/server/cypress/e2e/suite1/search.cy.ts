@@ -1,8 +1,4 @@
-import {
-  searchByText,
-  visitAgg,
-  visitIdentity,
-} from "@repo/utils-dev-dependency";
+import { searchByText, visitAgg, visitIdentity } from "@repo/utils-cypress";
 import {
   TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME,
   TEST_EXAMPLE_B_ONLY_INSTITUTION_NAME,
