@@ -1,13 +1,13 @@
 import type { Response } from "express";
 import type { Aggregator } from "../shared/contract";
-import { Aggregators } from "../shared/contract";
 import { listUsersData } from "../test/testData/users";
 import { invalidAggregatorString } from "../utils/validators";
 import type { UserDeleteRequest } from "./userEndpoints";
 import { userDeleteHandler } from "./userEndpoints";
-import * as adapterIndex from "../adapterIndex";
-import type { WidgetAdapter } from "@repo/utils";
 import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
+import { server } from "../test/testServer";
+import { http, HttpResponse } from "msw";
+import { MX_DELETE_USER_PATH } from "@repo/utils-dev-dependency";
 
 const user = listUsersData.users[0];
 
@@ -54,7 +54,12 @@ describe("userEndpoints", () => {
     });
 
     it("responds with a failure if deletion fails", async () => {
-      const deleteFailedMessage = "User Delete Failed";
+      server.use(
+        http.delete(
+          MX_DELETE_USER_PATH,
+          () => new HttpResponse(null, { status: 400 }),
+        ),
+      );
 
       const res = {
         json: jest.fn(),
@@ -71,7 +76,7 @@ describe("userEndpoints", () => {
       await userDeleteHandler(req, res);
 
       expect(res.json).toHaveBeenCalledWith({
-        message: deleteFailedMessage,
+        message: "Request failed with status code 400",
       });
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(res.status).toHaveBeenCalledWith(400);
