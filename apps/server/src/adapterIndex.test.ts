@@ -11,7 +11,7 @@ import {
   MX_INT_AGGREGATOR_STRING,
   MxAdapter,
 } from "@repo/mx-adapter";
-import { mxVcAccountsData } from "@repo/utils-dev-dependency";
+import { mxVcIntegrationAccountsData } from "@repo/utils-dev-dependency";
 
 const connectionId = "testConectionId";
 const type = VCDataTypes.ACCOUNTS;
@@ -35,13 +35,13 @@ describe("adapterIndex", () => {
   describe("getData", () => {
     it("uses mx if the aggregator is mx", async () => {
       const response = await getData({
-        aggregator: MX_AGGREGATOR_STRING,
+        aggregator: MX_INT_AGGREGATOR_STRING,
         connectionId,
         type,
         userId,
       });
 
-      expect(response).toEqual(getDataFromVCJwt(mxVcAccountsData));
+      expect(response).toEqual(getDataFromVCJwt(mxVcIntegrationAccountsData));
     });
 
     it("throws an error if the aggregator doesnt have a handler", async () => {
