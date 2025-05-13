@@ -1,15 +1,13 @@
 {
   "defaultAggregator": "akoya",
 
-  "supportedAggregators": [
-    "akoya"
-  ],
+  "supportedAggregators": ["akoya"],
 
-  "defaultAggregatorVolume": { },
+  "defaultAggregatorVolume": {},
 
-  "institutionAggregatorVolumeMap": { },
+  "institutionAggregatorVolumeMap": {},
 
   "hiddenInstitutions": [],
 
-  "recommendedInstitutions": ["5deb6fca-557e-4d45-b2f8-354351675ad4"]
+  "recommendedInstitutions": ["mikomoBank"]
 }

@@ -1,6 +1,6 @@
 import { getRecommendedInstitutions } from "../services/ElasticSearchClient";
 import testPreferences from "../../cachedDefaults/testData/testPreferences.json";
-import type { CachedInstitution } from "../shared/contract";
+import type { CachedInstitution } from "@repo/utils";
 import { ComboJobTypes } from "@repo/utils";
 import * as preferences from "../shared/preferences";
 import { ElasticSearchMock } from "./elasticSearchMock";

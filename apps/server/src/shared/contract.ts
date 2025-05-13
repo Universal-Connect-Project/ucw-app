@@ -84,18 +84,6 @@ export enum JobTypeSupports {
   FULLHISTORY = "supports_history",
 }
 
-export interface CachedInstitution {
-  name: string;
-  keywords: string[];
-  logo: string;
-  url: string;
-  id: string;
-  is_test_bank: boolean | false;
-  routing_numbers: string[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [propName: string]: any;
-}
-
 export interface InstitutionAggregator {
   id: string | null;
   supports_aggregation: boolean | false;

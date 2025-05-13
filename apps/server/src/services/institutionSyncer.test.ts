@@ -16,6 +16,7 @@ import {
   INSTITUTION_ETAG_REDIS_KEY,
 } from "./storageClient/constants";
 import { overwriteSet, set } from "./storageClient/redis";
+import { testInstitutions } from "../testInstitutions/testInstitutions";
 
 jest.mock("fs");
 
@@ -68,7 +69,7 @@ describe("syncInstitutions", () => {
     );
   });
 
-  it("should call update methods if response is 200", async () => {
+  it("should call update methods if response is 200 and include test institutions", async () => {
     const infoLogSpy = jest.spyOn(logger, "info");
     const oldInstitutionUcpId = "UCP-old1";
 
@@ -113,7 +114,7 @@ describe("syncInstitutions", () => {
 
     expect(infoLogSpy).toHaveBeenCalledWith("Updating institution cache list");
     expect(deletedInsIds).toEqual([oldInstitutionUcpId]);
-    expect(esUpdatesCount).toEqual(1);
+    expect(esUpdatesCount).toEqual(1 + testInstitutions.length);
   });
 
   it("should log warning message when forbidden access", async () => {

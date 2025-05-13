@@ -1,5 +1,5 @@
 import { Client } from "@opensearch-project/opensearch";
-import type { ComboJobTypes } from "@repo/utils";
+import type { CachedInstitution, ComboJobTypes } from "@repo/utils";
 import type {
   MgetRequest,
   SearchHit,
@@ -16,13 +16,14 @@ import {
   getAvailableAggregators,
   JobTypesPartialSupportsMap,
 } from "../shared/aggregators";
-import type { Aggregator, CachedInstitution } from "../shared/contract";
+import type { Aggregator } from "../shared/contract";
 import { getPreferences } from "../shared/preferences";
 import { fetchInstitutions } from "./institutionSyncer";
 import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
 import { getSet, overwriteSet } from "./storageClient/redis";
+import { addTestInstitutions } from "../testInstitutions/testInstitutions";
 
-export function getInstitutionFilePath() {
+function getInstitutionFilePath() {
   return resolve(__dirname, "../../cachedDefaults/ucwInstitutionsMapping.json");
 }
 
@@ -86,9 +87,11 @@ export async function indexElasticSearch() {
 
 async function getInstitutions(): Promise<CachedInstitution[]> {
   const response = await fetchInstitutions();
+
+  let newInstitutions;
+
   if (response?.ok) {
     info("Elasticsearch indexing from server list");
-    let newInstitutions;
     try {
       newInstitutions = await response.json();
     } catch {
@@ -96,13 +99,14 @@ async function getInstitutions(): Promise<CachedInstitution[]> {
     }
     if (newInstitutions?.length > 0) {
       info("Updating institution cache list");
-      return newInstitutions;
     } else {
-      return getInstitutionDataFromFile();
+      newInstitutions = getInstitutionDataFromFile();
     }
   } else {
-    return getInstitutionDataFromFile();
+    newInstitutions = getInstitutionDataFromFile();
   }
+
+  return addTestInstitutions(newInstitutions);
 }
 
 function getInstitutionDataFromFile(): CachedInstitution[] {

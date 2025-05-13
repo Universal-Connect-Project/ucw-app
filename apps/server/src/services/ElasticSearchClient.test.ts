@@ -14,7 +14,7 @@ import {
   searchByRoutingNumber,
   updateInstitutions,
 } from "../services/ElasticSearchClient";
-import type { CachedInstitution } from "../shared/contract";
+import type { CachedInstitution } from "@repo/utils";
 import { ComboJobTypes } from "@repo/utils";
 import * as preferences from "../shared/preferences";
 import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../test-adapter";
@@ -30,6 +30,7 @@ import {
 import { server } from "../test/testServer";
 import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
 import { overwriteSet } from "./storageClient/redis";
+import { testInstitutions } from "../testInstitutions/testInstitutions";
 
 const pageProps = {
   from: 0,
@@ -226,7 +227,7 @@ describe("indexElasticSearch", () => {
   let indexCreated: boolean;
   let institutionsIndexedCount: number;
 
-  it("makes call to create index and makes call to index 3 institutions retrieved from the local cache file because the institution cache list server is unavailable", async () => {
+  it("makes call to create index and makes call to index 3 (+ test institutions) institutions retrieved from the local cache file because the institution cache list server is unavailable", async () => {
     ElasticSearchMock.clearAll();
 
     server.use(
@@ -270,14 +271,14 @@ describe("indexElasticSearch", () => {
 
     await indexElasticSearch();
     expect(indexCreated).toBeTruthy();
-    expect(institutionsIndexedCount).toEqual(3);
+    expect(institutionsIndexedCount).toEqual(3 + testInstitutions.length);
   });
 
   describe.each([
     { singleThread: true, description: "with single-threading" },
     { singleThread: false, description: "without single-threading" },
   ])("Index Elasticsearch $description", ({ singleThread }) => {
-    it("indexes institutions retrieved from the institution server", async () => {
+    it("indexes institutions retrieved from the institution server + test institutions", async () => {
       jest.spyOn(_config, "getConfig").mockReturnValueOnce({
         ...config,
         ELASTIC_SEARCH_SINGLE_THREAD: singleThread,
@@ -319,7 +320,7 @@ describe("indexElasticSearch", () => {
 
       await indexElasticSearch();
       expect(indexCreated).toBeTruthy();
-      expect(institutionsIndexedCount).toEqual(2);
+      expect(institutionsIndexedCount).toEqual(2 + testInstitutions.length);
     });
   });
 });
