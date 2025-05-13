@@ -6,10 +6,12 @@ import {
   MX_INTEGRATION_VC_GET_ACCOUNTS_PATH,
   MX_VC_GET_ACCOUNTS_PATH,
 } from "@repo/utils-dev-dependency";
-import { mxVcAccountsData } from "./test/testData/mxVcData";
 import { server } from "./test/testServer";
 
-import { aggregatorCredentials } from "./test/testData/aggregatorCredentials";
+import {
+  aggregatorCredentials,
+  mxVcAccountsData,
+} from "@repo/utils-dev-dependency";
 import { createClient, createLogClient } from "@repo/utils/test";
 
 const accountsPath = "users/userId/members/connectionId/accounts";

@@ -1,7 +1,7 @@
 import { VCDataTypes } from "@repo/utils";
 import { createMxIntDataAdapter } from "./dataAdapter";
 import { createClient, createLogClient } from "@repo/utils/test";
-import { aggregatorCredentials } from "./test/testData/aggregatorCredentials";
+import { aggregatorCredentials } from "@repo/utils-dev-dependency";
 import type { AdapterDependencies } from "./models";
 
 const dependencies: AdapterDependencies = {

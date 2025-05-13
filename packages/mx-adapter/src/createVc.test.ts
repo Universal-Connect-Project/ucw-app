@@ -2,14 +2,14 @@ import { VCDataTypes } from "@repo/utils";
 
 import type { AdapterDependencies } from "./models";
 import { createMxIntGetVC, createMxProdGetVC } from "./createVc";
-import { aggregatorCredentials } from "./test/testData/aggregatorCredentials";
 
 import {
+  aggregatorCredentials,
   mxVcAccountsData,
   mxVcIdentityData,
   mxVcIntegrationAccountsData,
   mxVcTranscationsData,
-} from "./test/testData/mxVcData";
+} from "@repo/utils-dev-dependency";
 import { createClient, createLogClient } from "@repo/utils/test";
 
 const dependencies: AdapterDependencies = {

@@ -16,16 +16,17 @@ import {
   READ_MEMBER_STATUS_PATH,
   UPDATE_CONNECTION_PATH,
 } from "@repo/utils-dev-dependency";
-import { institutionData } from "./test/testData/institution";
-import { institutionCredentialsData } from "./test/testData/institutionCredentials";
-import { aggregatorCredentials } from "./test/testData/aggregatorCredentials";
 import {
+  aggregatorCredentials,
   connectionByIdMemberData,
+  createUserData,
+  institutionCredentialsData,
+  institutionData,
+  listUsersData,
   memberData,
   membersData,
   memberStatusData,
-} from "./test/testData/members";
-import { createUserData, listUsersData } from "./test/testData/users";
+} from "@repo/utils-dev-dependency";
 import { server } from "./test/testServer";
 import {
   createClient as createCacheClient,
