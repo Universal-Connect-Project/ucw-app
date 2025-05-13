@@ -3,11 +3,11 @@ import { set } from "../services/storageClient/redis";
 import type { Request } from "express";
 import { ConnectApi } from "./connectApi";
 import { webhookHandler, oauthRedirectHandler } from "./oauthEndpoints";
-import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../test-adapter";
 import { ConnectionStatus, SOMETHING_WENT_WRONG_ERROR_TEXT } from "@repo/utils";
+import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
 
 const context = {
-  aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+  aggregator: MX_AGGREGATOR_STRING,
 };
 let connect: ConnectApi;
 
@@ -24,9 +24,11 @@ describe("oauthHandler", () => {
       connectApi: connect,
       params: {
         userId: "userId",
-        aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+        aggregator: MX_AGGREGATOR_STRING,
       },
-      query: {},
+      query: {
+        status: "success",
+      },
     } as unknown as Request;
 
     const res = {
@@ -46,11 +48,9 @@ describe("oauthHandler", () => {
       connectApi: connect,
       params: {
         userId: "userId",
-        aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+        aggregator: MX_AGGREGATOR_STRING,
       },
-      query: {
-        code: "error",
-      },
+      query: {},
     } as unknown as Request;
 
     const res = {
@@ -115,9 +115,9 @@ describe("webhookHandler", () => {
       connectApi: connect,
       params: {
         userId: "userId",
-        aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+        aggregator: MX_AGGREGATOR_STRING,
       },
-      query: {},
+      query: { status: "success" },
     } as unknown as Request;
 
     const res = {
