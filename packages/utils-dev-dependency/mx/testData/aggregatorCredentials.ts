@@ -1,10 +1,10 @@
 export const aggregatorCredentials = {
   mxInt: {
-    username: null,
-    password: null,
+    username: "",
+    password: "",
   },
   mxProd: {
-    username: null,
-    password: null,
+    username: "",
+    password: "",
   },
 };

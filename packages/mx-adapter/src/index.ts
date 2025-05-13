@@ -5,7 +5,7 @@ import type { AdapterDependencies } from "./models";
 import { createMxIntDataAdapter, createMxProdDataAdapter } from "./dataAdapter";
 
 export const MX_AGGREGATOR_STRING = "mx";
-const MX_INT_AGGREGATOR_STRING = "mx_int";
+export const MX_INT_AGGREGATOR_STRING = "mx_int";
 
 export const getMxAdapterMapObject = (dependencies: AdapterDependencies) => {
   return {
@@ -34,3 +34,5 @@ export const getMxAdapterMapObject = (dependencies: AdapterDependencies) => {
 export { testInstitutions } from "./testInstitutions";
 
 export * from "./models";
+
+export { MxAdapter } from "./adapter";
