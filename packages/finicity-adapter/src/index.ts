@@ -5,6 +5,8 @@ import {
 } from "./dataAdapter";
 import type { AdapterDependencies } from "./models";
 
+export const FINICITY_AGGREGATOR_STRING = "finicity";
+
 export const getFinicityAdapterMapObject = (
   dependencies: AdapterDependencies,
 ) => {

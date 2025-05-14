@@ -21,6 +21,7 @@
   "devDependencies": {
     "@testing-library/cypress": "^10.0.2",
     "@typescript-eslint/eslint-plugin": "^6.20.0",
+    "@repo/utils-dev-dependency": "*",
     "cypress": "^13.15.0",
     "dotenv": "^16.4.5",
     "eslint": "^8.57.1",

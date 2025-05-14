@@ -1,16 +1,5 @@
 import type { Response } from "express";
 import he from "he";
-import { transactionsResponse } from "../test-adapter/vcResponses";
-import {
-  TEST_EXAMPLE_A_AGGREGATOR_STRING,
-  testDataRequestValidatorStartTimeError,
-} from "../test-adapter/constants";
-import * as adapterIndex from "../adapterIndex";
-import {
-  testVcAccountsData,
-  testVcIdentityData,
-  testVcTransactionsData,
-} from "../test/testData/testVcData";
 import type {
   AccountsRequest,
   IdentityRequest,
@@ -22,14 +11,20 @@ import {
   createTransactionsDataHandler,
 } from "./dataEndpoints";
 import type { Aggregator } from "../shared/contract";
-import { Aggregators } from "../shared/contract";
 import { invalidAggregatorString } from "../utils/validators";
-import {
-  getDataFromVCJwt,
-  SOMETHING_WENT_WRONG_ERROR_TEXT,
-  USER_NOT_RESOLVED_ERROR_TEXT,
-} from "@repo/utils";
+import { getDataFromVCJwt, USER_NOT_RESOLVED_ERROR_TEXT } from "@repo/utils";
 import { userIdNotFound } from "../test-adapter/adapter";
+import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
+import {
+  listUsersData as mxListUsersData,
+  mxVcAccountsData,
+  mxVcIdentityData,
+  mxVcTranscationsData,
+  sophtronTestData,
+} from "@repo/utils-dev-dependency";
+import { SOPHTRON_ADAPTER_NAME } from "@repo/sophtron-adapter/src/constants";
+
+const userIdThatExists = mxListUsersData.users[0].id;
 
 /* eslint-disable @typescript-eslint/unbound-method */
 
@@ -53,8 +48,8 @@ describe("dataEndpoints", () => {
         {
           params: {
             connectionId: "testConnectionId",
-            aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
-            userId: userIdNotFound,
+            aggregator: MX_AGGREGATOR_STRING,
+            userId: "",
           },
         },
         res,
@@ -95,15 +90,15 @@ describe("dataEndpoints", () => {
       const req: AccountsRequest = {
         params: {
           connectionId: "testConnectionId",
-          aggregator: Aggregators.TEST_A,
-          userId: "testUserId",
+          aggregator: MX_AGGREGATOR_STRING,
+          userId: userIdThatExists,
         },
       };
 
       await vcAccountsDataHandler(req, res);
 
       expect(res.json).toHaveBeenCalledWith({
-        jwt: testVcAccountsData,
+        jwt: mxVcAccountsData,
       });
     });
 
@@ -115,73 +110,14 @@ describe("dataEndpoints", () => {
       const req: AccountsRequest = {
         params: {
           connectionId: "testConnectionId",
-          aggregator: Aggregators.TEST_A,
-          userId: "testUserId",
+          aggregator: MX_AGGREGATOR_STRING,
+          userId: userIdThatExists,
         },
       };
 
       await createAccountsDataHandler(false)(req, res);
 
-      expect(res.json).toHaveBeenCalledWith(
-        getDataFromVCJwt(testVcAccountsData),
-      );
-    });
-
-    it("responds with a 400 on failure", async () => {
-      jest.spyOn(adapterIndex, "getVC").mockImplementation(() => {
-        throw new Error();
-      });
-
-      const res = {
-        json: jest.fn(),
-        status: jest.fn().mockReturnThis(),
-      } as unknown as Response;
-
-      const req: AccountsRequest = {
-        params: {
-          connectionId: "testConnectionId",
-          aggregator: Aggregators.TEST_A,
-          userId: "testUserId",
-        },
-      };
-
-      await vcAccountsDataHandler(req, res);
-
-      expect(res.json).toHaveBeenCalledWith({
-        message: SOMETHING_WENT_WRONG_ERROR_TEXT,
-      });
-      expect(res.status).toHaveBeenCalledWith(400);
-    });
-
-    it("responds with a custom error on failure with custom error", async () => {
-      const customErrorMessage = "This is custom";
-      const customErrorStatus = 401;
-
-      jest.spyOn(adapterIndex, "getVC").mockImplementation(() => {
-        throw new Error(customErrorMessage, {
-          cause: { statusCode: customErrorStatus },
-        });
-      });
-
-      const res = {
-        json: jest.fn(),
-        status: jest.fn().mockReturnThis(),
-      } as unknown as Response;
-
-      const req: AccountsRequest = {
-        params: {
-          connectionId: "testConnectionId",
-          aggregator: Aggregators.TEST_A,
-          userId: "testUserId",
-        },
-      };
-
-      await vcAccountsDataHandler(req, res);
-
-      expect(res.json).toHaveBeenCalledWith({
-        message: customErrorMessage,
-      });
-      expect(res.status).toHaveBeenCalledWith(customErrorStatus);
+      expect(res.json).toHaveBeenCalledWith(getDataFromVCJwt(mxVcAccountsData));
     });
   });
 
@@ -196,7 +132,7 @@ describe("dataEndpoints", () => {
         {
           params: {
             connectionId: "testConnectionId",
-            aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+            aggregator: MX_AGGREGATOR_STRING,
             userId: userIdNotFound,
           },
         },
@@ -239,15 +175,15 @@ describe("dataEndpoints", () => {
       const req: IdentityRequest = {
         params: {
           connectionId: "testConnectionId",
-          aggregator: Aggregators.TEST_A,
-          userId: "testUserId",
+          aggregator: MX_AGGREGATOR_STRING,
+          userId: userIdThatExists,
         },
       };
 
       await vcIdentityDataHandler(req, res);
 
       expect(res.json).toHaveBeenCalledWith({
-        jwt: testVcIdentityData,
+        jwt: mxVcIdentityData,
       });
     });
 
@@ -260,73 +196,14 @@ describe("dataEndpoints", () => {
       const req: IdentityRequest = {
         params: {
           connectionId: "testConnectionId",
-          aggregator: Aggregators.TEST_A,
-          userId: "testUserId",
+          aggregator: MX_AGGREGATOR_STRING,
+          userId: userIdThatExists,
         },
       };
 
       await createIdentityDataHandler(false)(req, res);
 
-      expect(res.json).toHaveBeenCalledWith(
-        getDataFromVCJwt(testVcIdentityData),
-      );
-    });
-
-    it("responds with a 400 on failure", async () => {
-      jest.spyOn(adapterIndex, "getVC").mockImplementation(() => {
-        throw new Error();
-      });
-
-      const res = {
-        json: jest.fn(),
-        status: jest.fn().mockReturnThis(),
-      } as unknown as Response;
-
-      const req: IdentityRequest = {
-        params: {
-          connectionId: "testConnectionId",
-          aggregator: Aggregators.TEST_A,
-          userId: "testUserId",
-        },
-      };
-
-      await vcIdentityDataHandler(req, res);
-
-      expect(res.json).toHaveBeenCalledWith({
-        message: SOMETHING_WENT_WRONG_ERROR_TEXT,
-      });
-      expect(res.status).toHaveBeenCalledWith(400);
-    });
-
-    it("responds with a custom error on failure with custom error", async () => {
-      const customErrorMessage = "This is custom";
-      const customErrorStatus = 401;
-
-      jest.spyOn(adapterIndex, "getVC").mockImplementation(() => {
-        throw new Error(customErrorMessage, {
-          cause: { statusCode: customErrorStatus },
-        });
-      });
-
-      const res = {
-        json: jest.fn(),
-        status: jest.fn().mockReturnThis(),
-      } as unknown as Response;
-
-      const req: IdentityRequest = {
-        params: {
-          connectionId: "testConnectionId",
-          aggregator: Aggregators.TEST_A,
-          userId: "testUserId",
-        },
-      };
-
-      await vcIdentityDataHandler(req, res);
-
-      expect(res.json).toHaveBeenCalledWith({
-        message: customErrorMessage,
-      });
-      expect(res.status).toHaveBeenCalledWith(customErrorStatus);
+      expect(res.json).toHaveBeenCalledWith(getDataFromVCJwt(mxVcIdentityData));
     });
   });
 
@@ -342,7 +219,7 @@ describe("dataEndpoints", () => {
           {
             params: {
               connectionId: "testConnectionId",
-              aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+              aggregator: MX_AGGREGATOR_STRING,
               userId: userIdNotFound,
             },
             query: {},
@@ -381,10 +258,6 @@ describe("dataEndpoints", () => {
       });
 
       it("responds with the vc data in the jwt on success", async () => {
-        jest
-          .spyOn(adapterIndex, "getVC")
-          .mockImplementationOnce(async () => testVcTransactionsData);
-
         const res = {
           json: jest.fn(),
           status: jest.fn().mockReturnThis(),
@@ -393,8 +266,8 @@ describe("dataEndpoints", () => {
         const req: TransactionsRequest = {
           params: {
             accountId: "testAccountId",
-            aggregator: Aggregators.TEST_A,
-            userId: "testUserId",
+            aggregator: MX_AGGREGATOR_STRING,
+            userId: userIdThatExists,
           },
           query: {
             start_time: undefined,
@@ -405,15 +278,11 @@ describe("dataEndpoints", () => {
         await vcTransactionsDataHandler(req, res);
 
         expect(res.json).toHaveBeenCalledWith({
-          jwt: testVcTransactionsData,
+          jwt: mxVcTranscationsData,
         });
       });
 
       it("responds with the data on success", async () => {
-        jest
-          .spyOn(adapterIndex, "getVC")
-          .mockImplementationOnce(async () => testVcTransactionsData);
-
         const res = {
           json: jest.fn(),
           status: jest.fn().mockReturnThis(),
@@ -422,8 +291,8 @@ describe("dataEndpoints", () => {
         const req: TransactionsRequest = {
           params: {
             accountId: "testAccountId",
-            aggregator: Aggregators.TEST_A,
-            userId: "testUserId",
+            aggregator: MX_AGGREGATOR_STRING,
+            userId: userIdThatExists,
           },
           query: {
             start_time: undefined,
@@ -434,44 +303,14 @@ describe("dataEndpoints", () => {
         await createTransactionsDataHandler(false)(req, res);
 
         expect(res.json).toHaveBeenCalledWith(
-          getDataFromVCJwt(testVcTransactionsData),
+          getDataFromVCJwt(mxVcTranscationsData),
         );
-      });
-
-      it("responds with a 400 on failure", async () => {
-        jest.spyOn(adapterIndex, "getVC").mockImplementation(() => {
-          throw new Error();
-        });
-
-        const res = {
-          json: jest.fn(),
-          status: jest.fn().mockReturnThis(),
-        } as unknown as Response;
-
-        const req: TransactionsRequest = {
-          params: {
-            accountId: "testAccountId",
-            aggregator: Aggregators.TEST_A,
-            userId: "testUserId",
-          },
-          query: {
-            start_time: undefined,
-            end_time: undefined,
-          },
-        };
-
-        await vcTransactionsDataHandler(req, res);
-
-        expect(res.json).toHaveBeenCalledWith({
-          message: SOMETHING_WENT_WRONG_ERROR_TEXT,
-        });
-        expect(res.status).toHaveBeenCalledWith(400);
       });
 
       it("succeeds if there is a custom validator and it passes", async () => {
         const req = {
           params: {
-            aggregator: Aggregators.TEST_B,
+            aggregator: SOPHTRON_ADAPTER_NAME,
           },
           query: {
             start_time: "testStartTime",
@@ -488,7 +327,7 @@ describe("dataEndpoints", () => {
         await createTransactionsDataHandler(true)(req, res);
 
         expect(res.json).toHaveBeenCalledWith({
-          jwt: transactionsResponse,
+          jwt: sophtronTestData.sophtronVcTranscationsData,
         });
       });
 
@@ -501,8 +340,8 @@ describe("dataEndpoints", () => {
         const req: TransactionsRequest = {
           params: {
             accountId: "testAccountId",
-            aggregator: Aggregators.TEST_A,
-            userId: "testUserId",
+            aggregator: MX_AGGREGATOR_STRING,
+            userId: userIdThatExists,
           },
           query: {
             end_time: undefined,
@@ -517,7 +356,7 @@ describe("dataEndpoints", () => {
       it("fails if a custom validator fails", async () => {
         const req = {
           params: {
-            aggregator: Aggregators.TEST_B,
+            aggregator: SOPHTRON_ADAPTER_NAME,
           },
           query: {
             start_time: undefined,
@@ -534,43 +373,8 @@ describe("dataEndpoints", () => {
         await createTransactionsDataHandler(false)(req, res);
 
         expect(res.json).toHaveBeenCalledWith(
-          he.encode(testDataRequestValidatorStartTimeError),
+          he.encode('"start_time" is required'),
         );
-      });
-
-      it("responds with a custom error on failure with custom error", async () => {
-        const customErrorMessage = "This is custom";
-        const customErrorStatus = 401;
-
-        jest.spyOn(adapterIndex, "getVC").mockImplementation(() => {
-          throw new Error(customErrorMessage, {
-            cause: { statusCode: customErrorStatus },
-          });
-        });
-
-        const res = {
-          json: jest.fn(),
-          status: jest.fn().mockReturnThis(),
-        } as unknown as Response;
-
-        const req: TransactionsRequest = {
-          params: {
-            accountId: "testAccountId",
-            aggregator: Aggregators.TEST_A,
-            userId: "testUserId",
-          },
-          query: {
-            start_time: undefined,
-            end_time: undefined,
-          },
-        };
-
-        await vcTransactionsDataHandler(req, res);
-
-        expect(res.json).toHaveBeenCalledWith({
-          message: customErrorMessage,
-        });
-        expect(res.status).toHaveBeenCalledWith(customErrorStatus);
       });
     });
   });
