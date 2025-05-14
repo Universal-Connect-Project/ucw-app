@@ -1,7 +1,3 @@
-import {
-  TEST_EXAMPLE_A_AGGREGATOR_STRING,
-  TEST_EXAMPLE_B_AGGREGATOR_STRING,
-} from "../../test-adapter";
 import type { CachedInstitution } from "@repo/utils";
 
 export const finicityInsitutionData = {
@@ -71,30 +67,6 @@ export const elasticSearchInstitutionData: CachedInstitution = {
     id: "INS-68e96dd6-eabd-42d3-9f05-416897f0746c",
     supports_aggregation: true,
     supports_oauth: true,
-    supports_identification: true,
-    supports_verification: true,
-    supports_history: false,
-  },
-  [TEST_EXAMPLE_A_AGGREGATOR_STRING]: {
-    id: "aId_oauth",
-    supports_aggregation: true,
-    supports_oauth: true,
-    supports_identification: true,
-    supports_verification: true,
-    supports_history: false,
-  },
-  [TEST_EXAMPLE_B_AGGREGATOR_STRING]: {
-    id: "bId_oauth",
-    supports_aggregation: true,
-    supports_oauth: true,
-    supports_identification: true,
-    supports_verification: true,
-    supports_history: false,
-  },
-  akoya: {
-    id: "akoya_bank",
-    supports_aggregation: true,
-    supports_oauth: false,
     supports_identification: true,
     supports_verification: true,
     supports_history: false,

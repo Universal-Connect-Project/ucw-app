@@ -17,7 +17,6 @@ import {
 import type { CachedInstitution } from "@repo/utils";
 import { ComboJobTypes } from "@repo/utils";
 import * as preferences from "../shared/preferences";
-import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../test-adapter";
 import {
   ElasticSearchMock,
   elasticSearchMockError,
@@ -31,6 +30,7 @@ import { server } from "../test/testServer";
 import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
 import { overwriteSet } from "./storageClient/redis";
 import { testInstitutions } from "../testInstitutions/testInstitutions";
+import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
 
 const pageProps = {
   from: 0,
@@ -609,16 +609,14 @@ describe("getRecommendedInstitutions", () => {
     expect(recommendedInstitutions).toEqual([elasticSearchInstitutionData]);
   });
 
-  it("filters out institutions that don't have available aggregators because of job type", async () => {
-    const mockPreferences: preferences.Preferences = {
-      ...testPreferences,
-      supportedAggregators: [TEST_EXAMPLE_A_AGGREGATOR_STRING],
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any;
+  it("filters out institutions that don't have available aggregators because of job type, ", async () => {
+    const recommendedInstitutionId = "test";
 
-    jest
-      .spyOn(preferences, "getPreferences")
-      .mockResolvedValue(mockPreferences);
+    jest.spyOn(preferences, "getPreferences").mockResolvedValue({
+      ...testPreferences,
+      supportedAggregators: [MX_AGGREGATOR_STRING],
+      recommendedInstitutions: [recommendedInstitutionId],
+    });
 
     ElasticSearchMock.clearAll();
 
@@ -627,12 +625,12 @@ describe("getRecommendedInstitutions", () => {
         method: "POST",
         path: "/_mget",
         body: {
-          docs: testPreferences.recommendedInstitutions.map(
-            (institutionId: string) => ({
+          docs: [
+            {
               _index: "institutions",
-              _id: institutionId,
-            }),
-          ),
+              _id: recommendedInstitutionId,
+            },
+          ],
         },
       },
       () => {
@@ -641,12 +639,9 @@ describe("getRecommendedInstitutions", () => {
             {
               _source: {
                 ...elasticSearchInstitutionData,
-                [TEST_EXAMPLE_A_AGGREGATOR_STRING]: {
+                [MX_AGGREGATOR_STRING]: {
+                  id: "test",
                   supports_aggregation: false,
-                  supports_oauth: false,
-                  supports_identification: false,
-                  supports_verification: false,
-                  supports_history: false,
                 },
               },
             },
