@@ -325,7 +325,7 @@ export async function getRecommendedInstitutions({
   const supportedAggregators = preferences.supportedAggregators;
   const recommendedInstitutions = preferences?.recommendedInstitutions;
 
-  if (!recommendedInstitutions) {
+  if (!recommendedInstitutions || !recommendedInstitutions.length) {
     return [];
   }
 
