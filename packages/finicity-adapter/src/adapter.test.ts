@@ -14,7 +14,11 @@ import {
 import { customerData } from "./test/testData/users";
 import { server } from "./test/testServer";
 
-import { DELETE_USER_PATH, MOCKED_OAUTH_URL } from "./test/handlers";
+import {
+  DELETE_USER_PATH,
+  MOCKED_FIX_OAUTH_URL,
+  MOCKED_OAUTH_URL,
+} from "./test/handlers";
 import { BASE_PATH } from "./apiClient";
 
 export const cacheClient = createCacheClient();
@@ -166,14 +170,28 @@ describe("finicity aggregator", () => {
   describe("CreateConnection when refreshing", () => {
     it("generates a connect fix url for the oauth_window_uri", async () => {
       const connectionId = "testConnectionId";
+      const institutionId = "testInstitutionId";
       const request = {
         id: connectionId,
         institution_code: "junk",
         credentials: [],
-        institutionId: "testInstitutionId",
+        institutionId,
       };
       const userId = "testUserId";
-      await finicityAdapter.CreateConnection(request, userId);
+      const connection = await finicityAdapter.CreateConnection(
+        request,
+        userId,
+      );
+      expect(connection).toEqual({
+        aggregator: "finicity",
+        credentials: [],
+        id: expect.any(String),
+        institution_code: institutionId,
+        is_oauth: true,
+        oauth_window_uri: MOCKED_FIX_OAUTH_URL,
+        status: ConnectionStatus.CREATED,
+        userId,
+      });
     });
   });
 
@@ -303,16 +321,9 @@ describe("finicity aggregator", () => {
       server.use(
         http.post(
           `${BASE_PATH}/aggregation/v2/customers/:customerId/accounts`,
-          ({ params }) => {
-            const { customerId } = params;
-            if (customerId === userId) {
-              accountRefreshCalled = true;
-              return HttpResponse.json({ success: true });
-            }
-            return HttpResponse.json(
-              { error: "Customer not found" },
-              { status: 404 },
-            );
+          () => {
+            accountRefreshCalled = true;
+            return HttpResponse.json({ success: true });
           },
         ),
       );
@@ -338,6 +349,33 @@ describe("finicity aggregator", () => {
               connectionId: "test-institution-login-id",
             }),
           }),
+        }),
+      );
+    });
+
+    it("handles 'credentialsUpdated' event and updates connection status to CONNECTED", async () => {
+      const userId = "test-user-id";
+      const createdConnection = await finicityAdapter.CreateConnection(
+        {
+          institutionId: "testInstitutionId",
+          jobTypes: [ComboJobTypes.TRANSACTIONS],
+          credentials: [],
+        },
+        userId,
+      );
+
+      const request = {
+        query: { connection_id: createdConnection.id },
+        body: { eventType: "credentialsUpdated", payload: {} },
+      };
+
+      const updatedConnection =
+        await finicityAdapter.HandleOauthResponse(request);
+
+      expect(updatedConnection).toEqual(
+        expect.objectContaining({
+          id: createdConnection.id,
+          status: ConnectionStatus.CONNECTED,
         }),
       );
     });

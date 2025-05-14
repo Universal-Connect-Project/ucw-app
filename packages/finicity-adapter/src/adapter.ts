@@ -220,6 +220,9 @@ export class FinicityAdapter implements WidgetAdapter {
           );
         }
         break;
+      case "credentialsUpdated":
+        connection.status = ConnectionStatus.CONNECTED;
+        break;
       default:
         switch (reason) {
           case "exit": {

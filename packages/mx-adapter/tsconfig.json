@@ -3,7 +3,8 @@
     "baseUrl": "./src",
     "lib": ["ES5", "ESNext"],
 
-    "module": "ES2015",
+    "target": "ES2022",
+    "module": "ES2022",
     "moduleResolution": "Node",
 
     "allowJs": true,

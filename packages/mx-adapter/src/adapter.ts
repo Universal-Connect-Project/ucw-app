@@ -38,6 +38,7 @@ const convertToMXJobTypes = (jobTypes: ComboJobTypes[]) =>
   jobTypes.map((jobType: ComboJobTypes) => MXJobTypeMap[jobType]);
 
 export const AGGREGATION_JOB_TYPE = 0;
+export const DUPLICATE_MEMBER_CREATION_ATTEMPTED_ERROR_CODE = 409;
 
 const mapCredentials = (mxCreds: CredentialsResponseBody): Credential[] => {
   if (mxCreds.credentials != null) {
@@ -124,28 +125,10 @@ export class MxAdapter implements WidgetAdapter {
     return mapCredentials(res.data);
   }
 
-  async CreateConnection(
-    request: CreateConnectionRequest,
-    userId?: string,
-  ): Promise<Connection> {
+  #GetNewMemberPropertiesFromRequest(request: CreateConnectionRequest) {
     const jobTypes = convertToMXJobTypes(request.jobTypes);
-    const entityId = request.institutionId;
-    try {
-      const existings = await this.apiClient.listMembers(userId || "");
-      const existing = existings?.data?.members?.find(
-        (m) => m.institution_code === entityId,
-      );
-      if (existing != null) {
-        this.logClient.info(
-          `Found existing member for institution ${entityId}, deleting`,
-        );
-        await this.apiClient.deleteMember(existing?.guid || "", userId || "");
-      }
-    } catch (e) {
-      this.logClient.error(e);
-    }
 
-    const memberRes = await this.apiClient.createMember(userId || "", {
+    return {
       referral_source: "APP",
       client_redirect_url: request.is_oauth
         ? `${this.envConfig.HOSTURL}/oauth/${this.aggregator}/redirect_from/`
@@ -159,15 +142,119 @@ export class MxAdapter implements WidgetAdapter {
               value: c.value,
             }) satisfies CredentialRequest,
         ),
-        institution_code: entityId,
+        institution_code: request.institutionId,
       },
       data_request: {
         products: jobTypes,
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any);
+    } as any;
+  }
 
-    const member = memberRes.data.member;
+  async #GetOauthRefreshConnection(
+    userGuid: string,
+    connectionId: string,
+  ): Promise<Connection> {
+    const request = await this.apiClient.requestOAuthWindowURI(
+      connectionId,
+      userGuid,
+      `${this.envConfig.HOSTURL}/oauth/${this.aggregator}/redirect_from/`,
+    );
+
+    return {
+      id: connectionId,
+      is_oauth: true,
+      userId: userGuid,
+      oauth_window_uri: request.data.member.oauth_window_uri,
+      aggregator: this.aggregator,
+      status: ConnectionStatus.CREATED,
+    };
+  }
+
+  async #CreateOrUpdateExistingInstitutionConnection(
+    userId: string,
+    memberGuid: string,
+    newMemberProperties: any,
+  ): Promise<Connection> {
+    try {
+      const newMemberRes = await this.apiClient.createMember(
+        userId || "",
+        newMemberProperties,
+      );
+      return fromMxMember(newMemberRes.data.member, this.aggregator);
+    } catch (error) {
+      if (
+        error?.response?.status ===
+        DUPLICATE_MEMBER_CREATION_ATTEMPTED_ERROR_CODE
+      ) {
+        return this.UpdateConnection(
+          {
+            id: memberGuid,
+            credentials: newMemberProperties.member.credentials,
+          },
+          userId,
+        );
+      }
+      this.logClient.error(error);
+      throw new Error(error.message);
+    }
+  }
+
+  async #GetExistingMemberIfExists(
+    userId: string,
+    institutionCode: string,
+  ): Promise<MemberResponse | undefined> {
+    const existingMembersPerUserId = await this.apiClient.listMembers(
+      userId || "",
+    );
+    return existingMembersPerUserId?.data?.members?.find(
+      (m) => m.institution_code === institutionCode,
+    );
+  }
+
+  async CreateConnection(
+    request: CreateConnectionRequest,
+    userId?: string,
+  ): Promise<Connection> {
+    const connectionId = request.id;
+
+    if (connectionId && userId) {
+      // Refreshing non-oauth connections don't go through `CreateConnection`
+      return this.#GetOauthRefreshConnection(userId, connectionId);
+    }
+
+    const institutionCode = request.institutionId;
+
+    const newMemberProperties =
+      this.#GetNewMemberPropertiesFromRequest(request);
+
+    try {
+      const existingMember = await this.#GetExistingMemberIfExists(
+        userId,
+        institutionCode,
+      );
+
+      if (existingMember?.is_oauth) {
+        // We're not allowing multiple oauth connections per user/institution.
+        // MX Api is limiting us from having that feature.
+        return this.#GetOauthRefreshConnection(userId, existingMember.guid);
+      } else if (existingMember) {
+        return this.#CreateOrUpdateExistingInstitutionConnection(
+          userId,
+          existingMember.guid,
+          newMemberProperties,
+        );
+      }
+    } catch (e) {
+      this.logClient.error(e);
+    }
+
+    const newMemberRes = await this.apiClient.createMember(
+      userId || "",
+      newMemberProperties,
+    );
+
+    const member = newMemberRes.data.member;
 
     return fromMxMember(member || {}, this.aggregator);
   }
@@ -190,7 +277,7 @@ export class MxAdapter implements WidgetAdapter {
         credentials: request.credentials?.map(
           (credential) =>
             ({
-              guid: credential.id,
+              guid: credential.guid || credential.id,
               value: credential.value,
             }) satisfies CredentialRequest,
         ),

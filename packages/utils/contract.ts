@@ -46,6 +46,7 @@ export type AdapterMap = {
 
 export interface Credential {
   id: string;
+  guid?: string;
   label?: string;
   value?: string;
   field_type?: string;

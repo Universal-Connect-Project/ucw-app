@@ -14,6 +14,7 @@ const FINICITY_INT_BASE_PATH = "https://int-api.finicity.com";
 export const CREATE_USER_PATH = `${FINICITY_BASE_PATH}/aggregation/v2/customers/active`;
 export const DELETE_USER_PATH = `${FINICITY_BASE_PATH}/aggregation/v1/customers/:customerId`;
 export const MOCKED_OAUTH_URL = "http://example.url";
+export const MOCKED_FIX_OAUTH_URL = "http://fix.example.url";
 
 const handlers = [
   http.post(
@@ -76,7 +77,7 @@ const handlers = [
     HttpResponse.json({ link: MOCKED_OAUTH_URL }),
   ),
   http.post(`${FINICITY_BASE_PATH}/connect/v2/generate/fix`, () =>
-    HttpResponse.json({ link: MOCKED_OAUTH_URL }),
+    HttpResponse.json({ link: MOCKED_FIX_OAUTH_URL }),
   ),
   http.post(CREATE_USER_PATH, async () => {
     return HttpResponse.json({ ...customerData, id: "createdNewCustomerId" });
