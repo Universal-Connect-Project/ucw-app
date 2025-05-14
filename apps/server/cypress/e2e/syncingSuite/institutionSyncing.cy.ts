@@ -1,10 +1,9 @@
-import { visitAgg } from "@repo/utils-cypress";
-import { searchAndSelectTestExampleA } from "../../shared/utils/testExample";
+import { searchAndSelectMx, visitAgg } from "@repo/utils-cypress";
 
 describe("institution syncing", () => {
-  it("shows a testExampleA institution even after the github setup nuked the institution mapping before starting the server", () => {
+  it("shows an MX institution even after the github setup nuked the institution mapping before starting the server", () => {
     visitAgg();
 
-    searchAndSelectTestExampleA();
+    searchAndSelectMx();
   });
 });
