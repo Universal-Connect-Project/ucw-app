@@ -62,6 +62,8 @@ jobs:
           echo AUTHENTICATION_ENABLE=true >> ${ENV_FILE_PATH}
           echo DATA_ENDPOINT_AUTHENTICATION_ENABLE=true >> ${ENV_FILE_PATH}
           echo DELETE_USER_ENDPOINT_AUTHENTICATION_ENABLE=true >> ${ENV_FILE_PATH}
+          echo MX_CLIENT_ID=${{ secrets.MX_CLIENT_ID }} >> ${ENV_FILE_PATH}
+          echo MX_API_SECRET=${{ secrets.MX_API_SECRET }} >> ${ENV_FILE_PATH}
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
