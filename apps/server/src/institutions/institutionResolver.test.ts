@@ -8,13 +8,13 @@ import * as preferences from "../shared/preferences";
 import { ElasticSearchMock } from "../test/elasticSearchMock";
 import { elasticSearchInstitutionData } from "../test/testData/institution";
 import { resolveInstitutionAggregator } from "./institutionResolver";
+import { SOPHTRON_ADAPTER_NAME } from "@repo/sophtron-adapter/src/constants";
 import {
-  TEST_EXAMPLE_A_AGGREGATOR_STRING,
-  TEST_EXAMPLE_B_AGGREGATOR_STRING,
-  TEST_EXAMPLE_C_AGGREGATOR_STRING,
-} from "../test-adapter";
+  MX_AGGREGATOR_STRING,
+  MX_INT_AGGREGATOR_STRING,
+} from "@repo/mx-adapter";
 
-const mockInstitutionWithAAndB = (institutionId = "test") => {
+const mockInstitutionWithMxAndSophtron = (institutionId = "test") => {
   ElasticSearchMock.add(
     {
       method: "GET",
@@ -25,11 +25,11 @@ const mockInstitutionWithAAndB = (institutionId = "test") => {
         _source: {
           ...elasticSearchInstitutionData,
           is_test_bank: false,
-          [TEST_EXAMPLE_A_AGGREGATOR_STRING]: {
+          [MX_AGGREGATOR_STRING]: {
             id: "mx_id",
             supports_aggregation: true,
           },
-          [TEST_EXAMPLE_B_AGGREGATOR_STRING]: {
+          [SOPHTRON_ADAPTER_NAME]: {
             id: "sophtron_bank",
             supports_aggregation: true,
           },
@@ -39,7 +39,7 @@ const mockInstitutionWithAAndB = (institutionId = "test") => {
   );
 };
 
-const mockInstitutionWithA = (
+const mockInstitutionWithSophtron = (
   institutionId = "test",
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   institutionProps?: any,
@@ -54,11 +54,11 @@ const mockInstitutionWithA = (
         _source: {
           ...elasticSearchInstitutionData,
           is_test_bank: false,
-          [TEST_EXAMPLE_A_AGGREGATOR_STRING]: {
+          [SOPHTRON_ADAPTER_NAME]: {
             id: "a_id",
             supports_aggregation: true,
           },
-          [TEST_EXAMPLE_B_AGGREGATOR_STRING]: {
+          [MX_AGGREGATOR_STRING]: {
             id: null,
           },
           ...institutionProps,
@@ -70,8 +70,7 @@ const mockInstitutionWithA = (
 
 const mockInstitutionForJobTypes = (
   institutionId = "test",
-  testExampleAAttrs: InstitutionAggregator,
-  testExampleBAttrs: InstitutionAggregator,
+  aggregatorIntegrationMap: Record<string, InstitutionAggregator>,
 ) => {
   ElasticSearchMock.add(
     {
@@ -83,8 +82,7 @@ const mockInstitutionForJobTypes = (
         _source: {
           ...elasticSearchInstitutionData,
           is_test_bank: false,
-          [TEST_EXAMPLE_A_AGGREGATOR_STRING]: testExampleAAttrs,
-          [TEST_EXAMPLE_B_AGGREGATOR_STRING]: testExampleBAttrs,
+          ...aggregatorIntegrationMap,
         },
       };
     },
@@ -120,7 +118,7 @@ describe("institutionResolver", () => {
           return {
             _source: {
               ...institutionData,
-              [TEST_EXAMPLE_A_AGGREGATOR_STRING]: {
+              [MX_AGGREGATOR_STRING]: {
                 id: aggregatorInstitutionId,
               },
             },
@@ -129,13 +127,13 @@ describe("institutionResolver", () => {
       );
 
       const institution = await resolveInstitutionAggregator({
-        aggregatorOverride: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+        aggregatorOverride: MX_AGGREGATOR_STRING,
         ucpInstitutionId: aggregatorInstitutionId,
         jobTypes: [ComboJobTypes.TRANSACTIONS],
       });
 
       expect(institution).toEqual({
-        aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+        aggregator: MX_AGGREGATOR_STRING,
         id: aggregatorInstitutionId,
         logo_url: institutionData.logo,
         name: institutionData.name,
@@ -155,7 +153,7 @@ describe("institutionResolver", () => {
           return {
             _source: {
               ...elasticSearchInstitutionData,
-              [TEST_EXAMPLE_A_AGGREGATOR_STRING]: {
+              [MX_AGGREGATOR_STRING]: {
                 id: aggregatorInstitutionId,
               },
             },
@@ -164,13 +162,13 @@ describe("institutionResolver", () => {
       );
 
       const institution = await resolveInstitutionAggregator({
-        aggregatorOverride: TEST_EXAMPLE_C_AGGREGATOR_STRING,
+        aggregatorOverride: MX_INT_AGGREGATOR_STRING,
         ucpInstitutionId: aggregatorInstitutionId,
         jobTypes: [ComboJobTypes.TRANSACTIONS],
       });
 
       expect(institution).toEqual({
-        aggregator: TEST_EXAMPLE_C_AGGREGATOR_STRING,
+        aggregator: MX_INT_AGGREGATOR_STRING,
         id: aggregatorInstitutionId,
         logo_url: elasticSearchInstitutionData.logo,
         name: elasticSearchInstitutionData.name,
@@ -178,19 +176,34 @@ describe("institutionResolver", () => {
       });
     });
 
-    it(`resolves to ${TEST_EXAMPLE_C_AGGREGATOR_STRING} if its a test bank and ${TEST_EXAMPLE_A_AGGREGATOR_STRING} is the aggregator`, async () => {
-      mockInstitutionWithA(undefined, {
-        is_test_bank: true,
-      });
+    it(`resolves to ${MX_INT_AGGREGATOR_STRING} if its a test bank and ${MX_AGGREGATOR_STRING} is the aggregator`, async () => {
+      ElasticSearchMock.add(
+        {
+          method: "GET",
+          path: `/institutions/_doc/test`,
+        },
+        () => {
+          return {
+            _source: {
+              ...elasticSearchInstitutionData,
+              is_test_bank: true,
+              [MX_AGGREGATOR_STRING]: {
+                id: "a_id",
+                supports_aggregation: true,
+              },
+            },
+          };
+        },
+      );
 
       const institution = await resolveInstitutionAggregator({
         ucpInstitutionId: "test",
         jobTypes: [ComboJobTypes.TRANSACTIONS],
       });
-      expect(institution.aggregator).toEqual(TEST_EXAMPLE_C_AGGREGATOR_STRING);
+      expect(institution.aggregator).toEqual(MX_INT_AGGREGATOR_STRING);
     });
 
-    it(`resolves to ${TEST_EXAMPLE_B_AGGREGATOR_STRING} if it's the only option`, async () => {
+    it(`resolves to ${MX_AGGREGATOR_STRING} if it's the only option`, async () => {
       ElasticSearchMock.add(
         {
           method: "GET",
@@ -200,10 +213,11 @@ describe("institutionResolver", () => {
           return {
             _source: {
               ...elasticSearchInstitutionData,
-              [TEST_EXAMPLE_A_AGGREGATOR_STRING]: {
+              is_test_bank: false,
+              [SOPHTRON_ADAPTER_NAME]: {
                 id: null,
               },
-              [TEST_EXAMPLE_B_AGGREGATOR_STRING]: {
+              [MX_AGGREGATOR_STRING]: {
                 id: "bBank",
                 supports_aggregation: true,
               },
@@ -216,20 +230,20 @@ describe("institutionResolver", () => {
         ucpInstitutionId: "test",
         jobTypes: [ComboJobTypes.TRANSACTIONS],
       });
-      expect(institution.aggregator).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
+      expect(institution.aggregator).toEqual(MX_AGGREGATOR_STRING);
     });
 
-    it(`resolves to ${TEST_EXAMPLE_A_AGGREGATOR_STRING} if its the only option`, async () => {
-      mockInstitutionWithA("test");
+    it(`resolves to ${SOPHTRON_ADAPTER_NAME} if its the only option`, async () => {
+      mockInstitutionWithSophtron("test");
 
       const institution = await resolveInstitutionAggregator({
         ucpInstitutionId: "test",
         jobTypes: [ComboJobTypes.TRANSACTIONS],
       });
-      expect(institution.aggregator).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
+      expect(institution.aggregator).toEqual(SOPHTRON_ADAPTER_NAME);
     });
 
-    it(`resolves to ${TEST_EXAMPLE_B_AGGREGATOR_STRING} if it supports history and ${TEST_EXAMPLE_A_AGGREGATOR_STRING} doesnt`, async () => {
+    it(`resolves to ${MX_AGGREGATOR_STRING} if it supports history and ${SOPHTRON_ADAPTER_NAME} doesnt`, async () => {
       ElasticSearchMock.add(
         {
           method: "GET",
@@ -239,11 +253,12 @@ describe("institutionResolver", () => {
           return {
             _source: {
               ...elasticSearchInstitutionData,
-              [TEST_EXAMPLE_A_AGGREGATOR_STRING]: {
+              is_test_bank: false,
+              [SOPHTRON_ADAPTER_NAME]: {
                 id: "aBank",
                 [JobTypeSupports.AGGREGATE]: true,
               },
-              [TEST_EXAMPLE_B_AGGREGATOR_STRING]: {
+              [MX_AGGREGATOR_STRING]: {
                 id: "bBank",
                 [JobTypeSupports.AGGREGATE]: true,
                 [JobTypeSupports.FULLHISTORY]: true,
@@ -257,10 +272,10 @@ describe("institutionResolver", () => {
         ucpInstitutionId: "test",
         jobTypes: [ComboJobTypes.TRANSACTION_HISTORY],
       });
-      expect(institution.aggregator).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
+      expect(institution.aggregator).toEqual(MX_AGGREGATOR_STRING);
     });
 
-    it(`resolves to ${TEST_EXAMPLE_B_AGGREGATOR_STRING} if it doesnt support history, but it does support aggregation, and nothing else supports fullhistory`, async () => {
+    it(`resolves to ${MX_AGGREGATOR_STRING} if it doesnt support history, but it does support aggregation, and nothing else supports fullhistory`, async () => {
       ElasticSearchMock.add(
         {
           method: "GET",
@@ -270,10 +285,11 @@ describe("institutionResolver", () => {
           return {
             _source: {
               ...elasticSearchInstitutionData,
-              [TEST_EXAMPLE_A_AGGREGATOR_STRING]: {
+              is_test_bank: false,
+              [SOPHTRON_ADAPTER_NAME]: {
                 id: null,
               },
-              [TEST_EXAMPLE_B_AGGREGATOR_STRING]: {
+              [MX_AGGREGATOR_STRING]: {
                 id: "b_bank",
                 [JobTypeSupports.AGGREGATE]: true,
               },
@@ -286,22 +302,25 @@ describe("institutionResolver", () => {
         ucpInstitutionId: "test",
         jobTypes: [ComboJobTypes.TRANSACTION_HISTORY],
       });
-      expect(institution.aggregator).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
+      expect(institution.aggregator).toEqual(MX_AGGREGATOR_STRING);
     });
 
     it("routes using institution specific volume", async () => {
-      const firstInstitutionWithVolumeControl = Object.entries(
-        testPreferences.institutionAggregatorVolumeMap,
-      )[0];
+      const institutionId = "institutionId";
 
-      const [institutionId, volumeMap] = firstInstitutionWithVolumeControl;
-
-      expect(volumeMap).toEqual({
-        [TEST_EXAMPLE_A_AGGREGATOR_STRING]: 70,
-        [TEST_EXAMPLE_B_AGGREGATOR_STRING]: 30,
+      jest.spyOn(preferences, "getPreferences").mockResolvedValue({
+        ...(testPreferences as preferences.Preferences),
+        institutionAggregatorVolumeMap: {
+          [institutionId]: {
+            [MX_AGGREGATOR_STRING]: 70,
+            [SOPHTRON_ADAPTER_NAME]: 30,
+          },
+        },
+        defaultAggregatorVolume: undefined,
+        defaultAggregator: undefined,
       });
 
-      mockInstitutionWithAAndB(institutionId);
+      mockInstitutionWithMxAndSophtron(institutionId);
 
       jest.spyOn(global.Math, "random").mockReturnValueOnce(0.7);
 
@@ -312,7 +331,7 @@ describe("institutionResolver", () => {
             jobTypes: [ComboJobTypes.TRANSACTIONS],
           })
         ).aggregator,
-      ).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
+      ).toEqual(MX_AGGREGATOR_STRING);
 
       jest.spyOn(global.Math, "random").mockReturnValueOnce(0.71);
 
@@ -323,15 +342,15 @@ describe("institutionResolver", () => {
             jobTypes: [ComboJobTypes.TRANSACTIONS],
           })
         ).aggregator,
-      ).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
+      ).toEqual(SOPHTRON_ADAPTER_NAME);
     });
 
     it("routes using default volume", async () => {
-      mockInstitutionWithAAndB();
+      mockInstitutionWithMxAndSophtron();
 
       expect(testPreferences.defaultAggregatorVolume).toEqual({
-        [TEST_EXAMPLE_A_AGGREGATOR_STRING]: 50,
-        [TEST_EXAMPLE_B_AGGREGATOR_STRING]: 50,
+        [MX_AGGREGATOR_STRING]: 50,
+        [SOPHTRON_ADAPTER_NAME]: 50,
       });
 
       jest.spyOn(global.Math, "random").mockReturnValueOnce(0.5);
@@ -343,7 +362,7 @@ describe("institutionResolver", () => {
             jobTypes: [ComboJobTypes.TRANSACTIONS],
           })
         ).aggregator,
-      ).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
+      ).toEqual(MX_AGGREGATOR_STRING);
 
       jest.spyOn(global.Math, "random").mockReturnValueOnce(0.51);
 
@@ -354,17 +373,17 @@ describe("institutionResolver", () => {
             jobTypes: [ComboJobTypes.TRANSACTIONS],
           })
         ).aggregator,
-      ).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
+      ).toEqual(SOPHTRON_ADAPTER_NAME);
     });
 
     it("routes using default aggregator", async () => {
-      mockInstitutionWithAAndB();
+      mockInstitutionWithMxAndSophtron();
 
       jest.spyOn(preferences, "getPreferences").mockResolvedValue({
         ...(testPreferences as preferences.Preferences),
         institutionAggregatorVolumeMap: undefined,
         defaultAggregatorVolume: undefined,
-        defaultAggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+        defaultAggregator: SOPHTRON_ADAPTER_NAME,
       });
 
       expect(
@@ -374,13 +393,13 @@ describe("institutionResolver", () => {
             jobTypes: [ComboJobTypes.TRANSACTIONS],
           })
         ).aggregator,
-      ).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
+      ).toEqual(SOPHTRON_ADAPTER_NAME);
 
       jest.spyOn(preferences, "getPreferences").mockResolvedValue({
         ...(testPreferences as preferences.Preferences),
         institutionAggregatorVolumeMap: undefined,
         defaultAggregatorVolume: undefined,
-        defaultAggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING,
+        defaultAggregator: MX_AGGREGATOR_STRING,
       });
 
       expect(
@@ -390,7 +409,7 @@ describe("institutionResolver", () => {
             jobTypes: [ComboJobTypes.TRANSACTIONS],
           })
         ).aggregator,
-      ).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
+      ).toEqual(MX_AGGREGATOR_STRING);
     });
 
     it("falls back to default volume if institution specific volume doesnt have an available aggregator", async () => {
@@ -398,16 +417,16 @@ describe("institutionResolver", () => {
         ...(testPreferences as preferences.Preferences),
         institutionAggregatorVolumeMap: {
           test: {
-            [TEST_EXAMPLE_B_AGGREGATOR_STRING]: 100,
+            [MX_AGGREGATOR_STRING]: 100,
           },
         },
         defaultAggregatorVolume: {
-          [TEST_EXAMPLE_A_AGGREGATOR_STRING]: 100,
+          [SOPHTRON_ADAPTER_NAME]: 100,
         },
         defaultAggregator: undefined,
       });
 
-      mockInstitutionWithA();
+      mockInstitutionWithSophtron();
 
       expect(
         (
@@ -416,7 +435,7 @@ describe("institutionResolver", () => {
             jobTypes: [ComboJobTypes.TRANSACTIONS],
           })
         ).aggregator,
-      ).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
+      ).toEqual(SOPHTRON_ADAPTER_NAME);
     });
 
     it("falls back to default aggregator if institution specific and default volume dont have an available aggregator", async () => {
@@ -424,16 +443,16 @@ describe("institutionResolver", () => {
         ...(testPreferences as preferences.Preferences),
         institutionAggregatorVolumeMap: {
           test: {
-            [TEST_EXAMPLE_B_AGGREGATOR_STRING]: 100,
+            [MX_AGGREGATOR_STRING]: 100,
           },
         },
         defaultAggregatorVolume: {
-          [TEST_EXAMPLE_B_AGGREGATOR_STRING]: 100,
+          [MX_AGGREGATOR_STRING]: 100,
         },
-        defaultAggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+        defaultAggregator: SOPHTRON_ADAPTER_NAME,
       });
 
-      mockInstitutionWithA();
+      mockInstitutionWithSophtron();
 
       expect(
         (
@@ -442,7 +461,7 @@ describe("institutionResolver", () => {
             jobTypes: [ComboJobTypes.TRANSACTIONS],
           })
         ).aggregator,
-      ).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
+      ).toEqual(SOPHTRON_ADAPTER_NAME);
     });
 
     it("chooses a random available aggregator if institution specific, default volume, and default aggregator dont have an available aggregator", async () => {
@@ -453,7 +472,7 @@ describe("institutionResolver", () => {
         defaultAggregator: undefined,
       });
 
-      mockInstitutionWithAAndB();
+      mockInstitutionWithMxAndSophtron();
 
       jest.spyOn(global.Math, "random").mockReturnValueOnce(0.49);
 
@@ -464,7 +483,7 @@ describe("institutionResolver", () => {
             jobTypes: [ComboJobTypes.TRANSACTIONS],
           })
         ).aggregator,
-      ).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
+      ).toEqual(MX_AGGREGATOR_STRING);
 
       jest.spyOn(global.Math, "random").mockReturnValueOnce(0.5);
 
@@ -475,16 +494,16 @@ describe("institutionResolver", () => {
             jobTypes: [ComboJobTypes.TRANSACTIONS],
           })
         ).aggregator,
-      ).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
+      ).toEqual(SOPHTRON_ADAPTER_NAME);
     });
 
-    it(`returns undefined if ${TEST_EXAMPLE_A_AGGREGATOR_STRING} is the only option but ${TEST_EXAMPLE_B_AGGREGATOR_STRING} is the only supported aggregator`, async () => {
+    it(`returns undefined if ${SOPHTRON_ADAPTER_NAME} is the only option but ${MX_AGGREGATOR_STRING} is the only supported aggregator`, async () => {
       jest.spyOn(preferences, "getPreferences").mockResolvedValue({
         ...(testPreferences as preferences.Preferences),
-        supportedAggregators: [TEST_EXAMPLE_B_AGGREGATOR_STRING],
+        supportedAggregators: [MX_AGGREGATOR_STRING],
       });
 
-      mockInstitutionWithA();
+      mockInstitutionWithSophtron();
 
       const institution = await resolveInstitutionAggregator({
         ucpInstitutionId: "test",
@@ -493,36 +512,35 @@ describe("institutionResolver", () => {
       expect(institution.aggregator).toEqual(undefined);
     });
 
-    it("returns a aggregator if that aggregator is the only supported aggregator", async () => {
+    it("returns an aggregator if that aggregator is the only supported aggregator", async () => {
       jest.spyOn(preferences, "getPreferences").mockResolvedValue({
         ...(testPreferences as preferences.Preferences),
-        supportedAggregators: [TEST_EXAMPLE_A_AGGREGATOR_STRING],
+        supportedAggregators: [MX_AGGREGATOR_STRING],
       });
 
-      mockInstitutionWithAAndB();
+      mockInstitutionWithMxAndSophtron();
 
       const institution = await resolveInstitutionAggregator({
         ucpInstitutionId: "test",
         jobTypes: [ComboJobTypes.TRANSACTIONS],
       });
-      expect(institution.aggregator).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
+      expect(institution.aggregator).toEqual(MX_AGGREGATOR_STRING);
 
       jest.spyOn(preferences, "getPreferences").mockResolvedValue({
         ...(testPreferences as preferences.Preferences),
-        supportedAggregators: [TEST_EXAMPLE_B_AGGREGATOR_STRING],
+        supportedAggregators: [SOPHTRON_ADAPTER_NAME],
       });
 
       const institution2 = await resolveInstitutionAggregator({
         ucpInstitutionId: "test",
         jobTypes: [ComboJobTypes.TRANSACTIONS],
       });
-      expect(institution2.aggregator).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
+      expect(institution2.aggregator).toEqual(SOPHTRON_ADAPTER_NAME);
     });
 
-    it(`returns ${TEST_EXAMPLE_A_AGGREGATOR_STRING} for job types where ${TEST_EXAMPLE_B_AGGREGATOR_STRING} doesnt support the job type`, async () => {
-      mockInstitutionForJobTypes(
-        "test",
-        {
+    it(`returns ${MX_AGGREGATOR_STRING} for job types where ${SOPHTRON_ADAPTER_NAME} doesnt support the job type`, async () => {
+      mockInstitutionForJobTypes("test", {
+        [MX_AGGREGATOR_STRING]: {
           id: "testABank",
           supports_aggregation: true,
           supports_oauth: true,
@@ -530,7 +548,7 @@ describe("institutionResolver", () => {
           supports_verification: true,
           supports_history: true,
         },
-        {
+        [SOPHTRON_ADAPTER_NAME]: {
           id: "testBBank",
           supports_aggregation: true,
           supports_oauth: false,
@@ -538,19 +556,19 @@ describe("institutionResolver", () => {
           supports_verification: false,
           supports_history: false,
         },
-      );
+      });
 
       const institution = await resolveInstitutionAggregator({
         ucpInstitutionId: "test",
         jobTypes: [ComboJobTypes.ACCOUNT_OWNER],
       });
-      expect(institution.aggregator).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
+      expect(institution.aggregator).toEqual(MX_AGGREGATOR_STRING);
 
       const institution2 = await resolveInstitutionAggregator({
         ucpInstitutionId: "test",
         jobTypes: [ComboJobTypes.ACCOUNT_NUMBER],
       });
-      expect(institution2.aggregator).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
+      expect(institution2.aggregator).toEqual(MX_AGGREGATOR_STRING);
 
       const institution3 = await resolveInstitutionAggregator({
         ucpInstitutionId: "test",
@@ -560,41 +578,40 @@ describe("institutionResolver", () => {
           ComboJobTypes.ACCOUNT_OWNER,
         ],
       });
-      expect(institution3.aggregator).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
+      expect(institution3.aggregator).toEqual(MX_AGGREGATOR_STRING);
     });
 
-    it(`returns ${TEST_EXAMPLE_B_AGGREGATOR_STRING} for job types where ${TEST_EXAMPLE_A_AGGREGATOR_STRING} doesnt support the job type`, async () => {
-      mockInstitutionForJobTypes(
-        "test",
-        {
-          id: "testABank",
+    it(`returns ${SOPHTRON_ADAPTER_NAME} for job types where ${MX_AGGREGATOR_STRING} doesnt support the job type`, async () => {
+      mockInstitutionForJobTypes("test", {
+        [MX_AGGREGATOR_STRING]: {
+          id: MX_AGGREGATOR_STRING,
           supports_aggregation: true,
           supports_oauth: false,
           supports_identification: false,
           supports_verification: false,
           supports_history: false,
         },
-        {
-          id: "testBBank",
+        [SOPHTRON_ADAPTER_NAME]: {
+          id: SOPHTRON_ADAPTER_NAME,
           supports_aggregation: true,
           supports_oauth: true,
           supports_identification: true,
           supports_verification: true,
           supports_history: true,
         },
-      );
+      });
 
       const institution = await resolveInstitutionAggregator({
         ucpInstitutionId: "test",
         jobTypes: [ComboJobTypes.ACCOUNT_OWNER],
       });
-      expect(institution.aggregator).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
+      expect(institution.aggregator).toEqual(SOPHTRON_ADAPTER_NAME);
 
       const institution2 = await resolveInstitutionAggregator({
         ucpInstitutionId: "test",
         jobTypes: [ComboJobTypes.ACCOUNT_NUMBER],
       });
-      expect(institution2.aggregator).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
+      expect(institution2.aggregator).toEqual(SOPHTRON_ADAPTER_NAME);
 
       const institution3 = await resolveInstitutionAggregator({
         ucpInstitutionId: "test",
@@ -604,7 +621,7 @@ describe("institutionResolver", () => {
           ComboJobTypes.ACCOUNT_OWNER,
         ],
       });
-      expect(institution3.aggregator).toEqual(TEST_EXAMPLE_B_AGGREGATOR_STRING);
+      expect(institution3.aggregator).toEqual(SOPHTRON_ADAPTER_NAME);
     });
   });
 });
