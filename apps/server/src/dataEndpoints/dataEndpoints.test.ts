@@ -13,7 +13,6 @@ import {
 import type { Aggregator } from "../shared/contract";
 import { invalidAggregatorString } from "../utils/validators";
 import { getDataFromVCJwt, USER_NOT_RESOLVED_ERROR_TEXT } from "@repo/utils";
-import { userIdNotFound } from "../test-adapter/adapter";
 import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
 import {
   listUsersData as mxListUsersData,
@@ -133,7 +132,7 @@ describe("dataEndpoints", () => {
           params: {
             connectionId: "testConnectionId",
             aggregator: MX_AGGREGATOR_STRING,
-            userId: userIdNotFound,
+            userId: "junk",
           },
         },
         res,
@@ -220,7 +219,7 @@ describe("dataEndpoints", () => {
             params: {
               connectionId: "testConnectionId",
               aggregator: MX_AGGREGATOR_STRING,
-              userId: userIdNotFound,
+              userId: "junk",
             },
             query: {},
           },
