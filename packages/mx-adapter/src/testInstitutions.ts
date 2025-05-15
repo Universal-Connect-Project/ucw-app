@@ -1,9 +1,11 @@
 import type { CachedInstitution } from "@repo/utils";
 
+export const MX_BANK_UCP_INSTITUTION_ID = "mxBank";
+
 export const testInstitutions: CachedInstitution[] = [
   {
     name: "MX Bank",
-    id: "mxBank",
+    id: MX_BANK_UCP_INSTITUTION_ID,
     keywords: ["Gringotts", "MX Bank"],
     logo: "https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png",
     url: "https://mx.com",
