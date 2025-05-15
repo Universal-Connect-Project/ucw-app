@@ -1,13 +1,16 @@
 import {
   enterMxCredentials,
   generateDataTests,
-  makeAnMXConnection
+  makeAnMXConnection,
   refreshAConnection,
   searchAndSelectMx,
 } from "@repo/utils-cypress";
 
 describe("mx aggregator", () => {
-  generateDataTests({ makeAConnection: makeAnMXConnection, shouldTestVcEndpoint: true });
+  generateDataTests({
+    makeAConnection: makeAnMXConnection,
+    shouldTestVcEndpoint: true,
+  });
 
   it("refreshes an mx connection if given the correct parameters and hides the back button", () => {
     refreshAConnection({

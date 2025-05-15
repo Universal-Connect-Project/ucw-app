@@ -1,6 +1,6 @@
 import {
   MEMBER_CONNECTED_EVENT_TYPE,
-  makeAnMXConnection
+  makeAnMXConnection,
   searchByText,
   verifyAccountsAndReturnAccountId,
   visitAgg,
