@@ -1,11 +1,11 @@
 import {
   MEMBER_CONNECTED_EVENT_TYPE,
+  makeAnMXConnection
   searchByText,
   verifyAccountsAndReturnAccountId,
   visitAgg,
   visitWithPostMessageSpy,
 } from "@repo/utils-cypress";
-import { makeAnMXConnection } from "@repo/utils-dev-dependency";
 import { ComboJobTypes } from "@repo/utils";
 
 describe("mx aggregator using axios proxy", () => {
