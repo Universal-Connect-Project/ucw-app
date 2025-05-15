@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import { ComboJobTypes } from "@repo/utils";
 
 test.describe("Finicity Adapter Tests", () => {
-  test("Successful connection and data retrieval", async ({
+  test("Successful connection and data retrieval and then refresh", async ({
     page,
     request,
   }) => {
@@ -46,17 +46,38 @@ test.describe("Finicity Adapter Tests", () => {
           expect(obj.metadata.aggregator).toEqual("finicity_sandbox");
           expect(obj.metadata.connectionId).not.toBeNull();
 
-          const { connectionId, user_guid, aggregator } = obj.metadata;
+          const { connectionId, user_guid, aggregator, ucpInstitutionId } =
+            obj.metadata;
 
           await testDataEndpoints(request, user_guid, connectionId, aggregator);
+
+          await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
+            timeout: 120000,
+          });
+
+          await page.goto(
+            `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&aggregator=${aggregator}&institutionId=${ucpInstitutionId}&connectionId=${connectionId}`,
+          );
+
+          const popupPromise2 = page.waitForEvent("popup");
+          await page.getByRole("link", { name: "Go to log in" }).click();
+
+          const authorizeTab2 = await popupPromise2;
+          await expect(
+            authorizeTab2.getByText("You're good to go."),
+          ).toBeVisible();
+
+          await authorizeTab2.getByLabel("Exit").click();
+
+          authorizeTab2.getByText("Visit Site").click();
+
+          await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
+            timeout: 120000,
+          });
 
           resolve();
         }
       });
-    });
-
-    await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
-      timeout: 120000,
     });
 
     await connectedPromise;

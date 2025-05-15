@@ -13,7 +13,7 @@ import {
   CREATE_MEMBER_PATH,
   CREATE_USER_PATH,
   DELETE_CONNECTION_PATH,
-  DELETE_MEMBER_PATH,
+  LIST_MEMBERS_PATH,
   MX_DELETE_USER_PATH,
   READ_MEMBER_STATUS_PATH,
   UPDATE_CONNECTION_PATH,
@@ -26,6 +26,7 @@ import {
   memberData,
   membersData,
   memberStatusData,
+  oauthMemberdata,
 } from "./test/testData/members";
 import { createUserData, listUsersData } from "./test/testData/users";
 import { server } from "./test/testServer";
@@ -127,7 +128,7 @@ describe("mx aggregator", () => {
     });
 
     describe("ListConnections", () => {
-      const [firstMember, secondMember] = membersData.members;
+      const [firstMember, secondMember, thirdMember] = membersData.members;
 
       it("retrieves and transforms the members", async () => {
         expect(await mxAdapter.ListConnections("testId")).toEqual([
@@ -147,6 +148,15 @@ describe("mx aggregator", () => {
             is_being_aggregated: secondMember.is_being_aggregated,
             is_oauth: secondMember.is_oauth,
             oauth_window_uri: secondMember.oauth_window_uri,
+            aggregator: "mx",
+          },
+          {
+            id: thirdMember.guid,
+            cur_job_id: thirdMember.guid,
+            institution_code: thirdMember.institution_code,
+            is_being_aggregated: thirdMember.is_being_aggregated,
+            is_oauth: thirdMember.is_oauth,
+            oauth_window_uri: thirdMember.oauth_window_uri,
             aggregator: "mx",
           },
         ]);
@@ -182,41 +192,16 @@ describe("mx aggregator", () => {
 
     describe("CreateConnection", () => {
       const baseConnectionRequest = {
-        id: "testId",
+        id: undefined,
         initial_job_type: "verification",
         background_aggregation_is_disabled: false,
         credentials: [testCredential],
         jobTypes: [ComboJobTypes.TRANSACTIONS, ComboJobTypes.ACCOUNT_NUMBER],
-        institutionId: "testInstitutionId",
+        institutionId: undefined,
         is_oauth: false,
         skip_aggregation: false,
         metadata: "testMetadata",
       };
-
-      it("deletes the existing member if one is found", async () => {
-        let memberDeletionAttempted = false;
-
-        server.use(
-          http.delete(DELETE_MEMBER_PATH, () => {
-            memberDeletionAttempted = true;
-
-            return new HttpResponse(null, {
-              status: 200,
-            });
-          }),
-        );
-
-        await mxAdapter.CreateConnection(
-          {
-            ...baseConnectionRequest,
-            institutionId: membersData.members[0].institution_code,
-            is_oauth: true,
-          },
-          "testUserId",
-        );
-
-        expect(memberDeletionAttempted).toBe(true);
-      });
 
       describe("createMemberPayload spy tests", () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -286,6 +271,160 @@ describe("mx aggregator", () => {
             },
             referral_source: "APP",
           });
+        });
+      });
+
+      describe("When member already exists", () => {
+        const existingConnectionRequest = {
+          ...baseConnectionRequest,
+          institutionId: "insitutionCode2",
+        };
+        const userId = "testUserId";
+        let memberCreateAttempted: boolean;
+
+        beforeEach(() => {
+          memberCreateAttempted = false;
+          server.use(
+            http.post(CREATE_MEMBER_PATH, async () => {
+              memberCreateAttempted = true;
+              return HttpResponse.json(memberData);
+            }),
+            http.get(LIST_MEMBERS_PATH, async () => {
+              return HttpResponse.json(membersData);
+            }),
+          );
+        });
+
+        it("initiates refresh on Oauth connection", async () => {
+          const connection = await mxAdapter.CreateConnection(
+            {
+              ...existingConnectionRequest,
+              is_oauth: true,
+              institutionId: oauthMemberdata.member.institution_code,
+            },
+            userId,
+          );
+
+          expect(memberCreateAttempted).toBeFalsy();
+          expect(connection).toEqual({
+            aggregator: "mx",
+            id: oauthMemberdata.member.guid,
+            is_oauth: true,
+            oauth_window_uri: oauthMemberdata.member.oauth_window_uri,
+            status: ConnectionStatus.CREATED,
+            userId,
+          });
+        });
+
+        it("initiates refresh on Oauth when a connectionId is included in the request", async () => {
+          const connection = await mxAdapter.CreateConnection(
+            {
+              ...existingConnectionRequest,
+              is_oauth: true,
+              id: "testConnectionId",
+              institutionId: oauthMemberdata.member.institution_code,
+            },
+            userId,
+          );
+
+          expect(memberCreateAttempted).toBeFalsy();
+          expect(connection).toEqual({
+            aggregator: "mx",
+            id: "testConnectionId",
+            is_oauth: true,
+            oauth_window_uri: oauthMemberdata.member.oauth_window_uri,
+            status: ConnectionStatus.CREATED,
+            userId,
+          });
+        });
+
+        it("creates another member when it doesn't conflict", async () => {
+          const connection = await mxAdapter.CreateConnection(
+            {
+              ...existingConnectionRequest,
+              institutionId: "insitutionCode1",
+            },
+            userId,
+          );
+
+          expect(memberCreateAttempted).toBeTruthy();
+          expect(connection).toEqual({
+            id: "testGuid1",
+            institution_code: "insitutionCode1",
+            is_being_aggregated: false,
+            aggregator: "mx",
+            cur_job_id: "testGuid1",
+            is_oauth: false,
+            oauth_window_uri: undefined,
+          });
+        });
+
+        it("updates member when it conflicts with an existing member", async () => {
+          let memberUpdateCalled = false;
+
+          server.use(
+            http.post(CREATE_MEMBER_PATH, async () => {
+              memberCreateAttempted = true;
+              return new HttpResponse("Conflicting member already exists", {
+                status: 409,
+              });
+            }),
+            http.put(UPDATE_CONNECTION_PATH, () => {
+              memberUpdateCalled = true;
+              return HttpResponse.json(memberData);
+            }),
+          );
+
+          const connection = await mxAdapter.CreateConnection(
+            {
+              ...existingConnectionRequest,
+              institutionId: "insitutionCode1",
+            },
+            userId,
+          );
+
+          expect(memberCreateAttempted).toBeTruthy();
+          expect(memberUpdateCalled).toBeTruthy();
+          expect(connection).toEqual({
+            id: "testGuid1",
+            institution_code: "insitutionCode1",
+            is_being_aggregated: false,
+            aggregator: "mx",
+            cur_job_id: "testGuid1",
+            is_oauth: false,
+            oauth_window_uri: undefined,
+          });
+        });
+
+        it("throws an error if create and update member both fail", async () => {
+          let memberUpdateCalled = false;
+
+          server.use(
+            http.post(CREATE_MEMBER_PATH, async () => {
+              memberCreateAttempted = true;
+              return new HttpResponse("Unknown Error", {
+                status: 400,
+              });
+            }),
+            http.put(UPDATE_CONNECTION_PATH, () => {
+              memberUpdateCalled = true;
+              return HttpResponse.json(memberData);
+            }),
+          );
+
+          await expect(
+            async () =>
+              await mxAdapter.CreateConnection(
+                {
+                  ...existingConnectionRequest,
+                  institutionId: "insitutionCode1",
+                },
+                userId,
+              ),
+          ).rejects.toThrow("Request failed with status code 400");
+
+          expect(memberCreateAttempted).toBeTruthy();
+          expect(memberUpdateCalled).toBeFalsy();
         });
       });
     });

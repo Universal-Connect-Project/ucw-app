@@ -149,16 +149,33 @@ export default class FinicityClient {
   generateConnectLiteUrl(
     institutionId: string,
     customerId: string,
-    request_id: string,
+    connectSessionId: string,
   ) {
-    const redir = `${this.getWebhookHostUrl()}/oauth/${this.aggregator}/redirect_from?connection_id=${request_id}`;
+    const redir = `${this.getWebhookHostUrl()}/oauth/${this.aggregator}/redirect_from?connection_id=${connectSessionId}`;
     return this.post("connect/v2/generate/lite", {
       language: "en-US",
       partnerId: this.apiConfig.partnerId,
       customerId: customerId,
       institutionId,
       redirectUri: redir,
-      webhook: `${this.getWebhookHostUrl()}/webhook/${this.aggregator}/?connection_id=${request_id}`,
+      webhook: `${this.getWebhookHostUrl()}/webhook/${this.aggregator}/?connection_id=${connectSessionId}`,
+      webhookContentType: "application/json",
+    }).then((ret: { link: string }) => ret.link);
+  }
+
+  generateConnectFixUrl(
+    institutionLoginId: string,
+    customerId: string,
+    connectSessionId: string,
+  ) {
+    const redir = `${this.getWebhookHostUrl()}/oauth/${this.aggregator}/redirect_from?connection_id=${connectSessionId}`;
+    return this.post("connect/v2/generate/fix", {
+      language: "en-US",
+      partnerId: this.apiConfig.partnerId,
+      customerId: customerId,
+      institutionLoginId,
+      redirectUri: redir,
+      webhook: `${this.getWebhookHostUrl()}/webhook/${this.aggregator}/?connection_id=${connectSessionId}`,
       webhookContentType: "application/json",
     }).then((ret: { link: string }) => ret.link);
   }
