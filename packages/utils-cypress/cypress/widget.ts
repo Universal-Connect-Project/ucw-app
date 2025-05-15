@@ -26,7 +26,7 @@ export const enterMxCredentials = () => {
   cy.findByLabelText("Password").type("correct");
 };
 
-export const makeAConnection = async () => {
+export const makeAnMXConnection = async () => {
   searchAndSelectMx();
   enterMxCredentials();
   clickContinue();
