@@ -23,6 +23,7 @@ import {
   WIDGET_DEMO_DATA_ACCESS_TOKEN_ENV,
   WIDGET_DEMO_DELETE_USER_ACCESS_TOKEN_ENV,
 } from "../shared/constants/accessToken";
+import { deleteMxUser } from "@repo/utils-cypress";
 
 configure({ testIdAttribute: "data-test" });
 
@@ -88,6 +89,10 @@ before(() => {
 
 beforeEach(() => {
   Cypress.env("userId", crypto.randomUUID());
+});
+
+afterEach(() => {
+  deleteMxUser();
 });
 
 // Alternatively you can use CommonJS syntax:

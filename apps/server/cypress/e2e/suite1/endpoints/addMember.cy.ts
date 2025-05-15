@@ -1,13 +1,29 @@
 import { ComboJobTypes, MEMBERS_URL } from "@repo/utils";
-import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../../../../src/test-adapter/constants";
+import { MX_INT_AGGREGATOR_STRING } from "@repo/mx-adapter";
 
 describe("addMember", () => {
   it("responds with a member", () => {
+    const userId = Cypress.env("userId");
+
     cy.request({
+      body: {
+        institution_guid: "mxbank",
+        credentials: [
+          {
+            guid: "CRD-9f61fb4c-912c-bd1e-b175-ccc7f0275cc1",
+            value: "mxuser",
+          },
+          {
+            guid: "CRD-e3d7ea81-aac7-05e9-fbdd-4b493c6e474d",
+            value: "correct",
+          },
+        ],
+      },
       headers: {
         meta: JSON.stringify({
-          aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+          aggregator: MX_INT_AGGREGATOR_STRING,
           jobTypes: [ComboJobTypes.TRANSACTIONS],
+          userId,
         }),
       },
       method: "POST",
