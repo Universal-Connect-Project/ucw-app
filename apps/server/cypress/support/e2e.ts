@@ -92,7 +92,9 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  const widgetDemoAccessToken = Cypress.env(WIDGET_DEMO_ACCESS_TOKEN_ENV);
+  const widgetDemoAccessToken = Cypress.env(
+    WIDGET_DEMO_DELETE_USER_ACCESS_TOKEN_ENV,
+  );
 
   deleteMxUser({
     headers: {
