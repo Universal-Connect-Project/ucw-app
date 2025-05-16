@@ -38,6 +38,37 @@ describe("Sophtron aggregator", () => {
     transactionsQueryString: "?start_time=2021/1/1&end_time=2099/12/31",
   });
 
+  it.only("shows single account select if no parameter is passed, and skips single account select if singleAccountSelect=false", () => {
+    const userId = Cypress.env("userId");
+
+    cy.visit(
+      `/widget?jobTypes=${ComboJobTypes.ACCOUNT_NUMBER}&userId=${userId}`,
+    );
+
+    searchAndSelectSophtron();
+
+    enterSophtronCredentials();
+
+    clickContinue();
+
+    selectSophtronAccount();
+    clickContinue();
+
+    expectConnectionSuccess();
+
+    cy.visit(
+      `/widget?jobTypes=${ComboJobTypes.ACCOUNT_NUMBER}&userId=${userId}&singleAccountSelect=false`,
+    );
+
+    searchAndSelectSophtron();
+
+    enterSophtronCredentials();
+
+    clickContinue();
+
+    expectConnectionSuccess();
+  });
+
   it("refreshes a sophtron connection if given the correct parameters and hides the back button", () => {
     refreshAConnection({
       enterCredentials: enterSophtronCredentials,
