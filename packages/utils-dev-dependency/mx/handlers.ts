@@ -37,7 +37,7 @@ export const READ_MEMBER_STATUS_PATH = `${MX_BASE_PATH_PROD}/users/:userId/membe
 export const ANSWER_CHALLENGE_PATH = `${MX_BASE_PATH_PROD}/users/:userId/members/:id/resume`;
 export const USERS_PATH = `${MX_BASE_PATH_PROD}/users`;
 export const CREATE_USER_PATH = `${MX_BASE_PATH_PROD}/users`;
-export const GET_OAUTH_REFRESH = `${MX_BASE_PATH}/users/:userId/members/:memberId/oauth_window_uri`;
+export const GET_OAUTH_REFRESH = `${MX_BASE_PATH_PROD}/users/:userId/members/:memberId/oauth_window_uri`;
 
 export const MX_INTEGRATION_VC_GET_ACCOUNTS_PATH = `${MX_BASE_PATH_INT}/vc/users/:userId/members/:connectionId/accounts`;
 export const MX_VC_GET_ACCOUNTS_PATH = `${MX_BASE_PATH_PROD}/vc/users/:userId/members/:connectionId/accounts`;

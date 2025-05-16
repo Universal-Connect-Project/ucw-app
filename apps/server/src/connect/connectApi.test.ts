@@ -4,8 +4,8 @@ import type { Context } from "../shared/contract";
 import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
 import {
   connectionByIdMemberData,
-  memberData as mxMemberData,
   memberStatusData as mxMemberStatusData,
+  oauthMemberdata as mxOauthMemberData,
 } from "@repo/utils-dev-dependency";
 
 const resolvedUserId = "resolvedUserId";
@@ -39,7 +39,7 @@ describe("connectApi", () => {
         ],
       };
 
-      const mxMember = mxMemberData.member;
+      const mxMember = mxOauthMemberData.member;
 
       const response = await connectApi.addMember(memberData);
 
@@ -47,10 +47,10 @@ describe("connectApi", () => {
         member: {
           aggregator: testContext.aggregator,
           connection_status: ConnectionStatus.CREATED,
-          guid: mxMember.guid,
-          institution_guid: mxMember.institution_code,
-          is_being_aggregated: false,
-          is_oauth: false,
+          guid: memberData.guid,
+          institution_guid: undefined,
+          is_being_aggregated: undefined,
+          is_oauth: mxMember.is_oauth,
           mfa: {
             credentials: undefined,
           },
@@ -59,17 +59,17 @@ describe("connectApi", () => {
           postMessageEventData: {
             memberConnected: {
               aggregator: MX_AGGREGATOR_STRING,
-              member_guid: mxMember.guid,
-              user_guid: undefined,
+              member_guid: memberData.guid,
+              user_guid: resolvedUserId,
             },
             memberStatusUpdate: {
               aggregator: MX_AGGREGATOR_STRING,
               connection_status: 0,
-              member_guid: mxMember.guid,
-              user_guid: undefined,
+              member_guid: memberData.guid,
+              user_guid: resolvedUserId,
             },
           },
-          user_guid: undefined,
+          user_guid: resolvedUserId,
         },
       });
     });
