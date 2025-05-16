@@ -14,7 +14,11 @@ import {
 import { customerData } from "./test/testData/users";
 import { server } from "./test/testServer";
 
-import { DELETE_USER_PATH, MOCKED_OAUTH_URL } from "./test/handlers";
+import {
+  DELETE_USER_PATH,
+  MOCKED_FIX_OAUTH_URL,
+  MOCKED_OAUTH_URL,
+} from "./test/handlers";
 import { BASE_PATH } from "./apiClient";
 
 export const cacheClient = createCacheClient();
@@ -163,6 +167,68 @@ describe("finicity aggregator", () => {
     });
   });
 
+  describe("CreateConnection when refreshing", () => {
+    it("generates a connect fix url for the oauth_window_uri", async () => {
+      const connectionId = "testConnectionId";
+      const institutionId = "testInstitutionId";
+      const request = {
+        id: connectionId,
+        institution_code: "junk",
+        credentials: [],
+        institutionId,
+      };
+      const userId = "testUserId";
+      const connection = await finicityAdapter.CreateConnection(
+        request,
+        userId,
+      );
+      expect(connection).toEqual({
+        aggregator: "finicity",
+        credentials: [],
+        id: expect.any(String),
+        institution_code: institutionId,
+        is_oauth: true,
+        oauth_window_uri: MOCKED_FIX_OAUTH_URL,
+        status: ConnectionStatus.CREATED,
+        userId,
+      });
+    });
+  });
+
+  describe("GetConnectionStatus when connection not found in the cache", () => {
+    it("returns null when connection not found", async () => {
+      const connectionStatus =
+        await finicityAdapter.GetConnectionStatus("junk");
+      expect(connectionStatus).toBeNull();
+    });
+  });
+
+  describe("GetConnectionById when refreshing", () => {
+    it("sets the connection in cache if it's not found in the cache and userId is present.", async () => {
+      const connectionId = "testConnectionId";
+      const connectionStatus = await finicityAdapter.GetConnectionById(
+        connectionId,
+        "testUser",
+      );
+      expect(connectionStatus).toEqual({
+        id: connectionId,
+        userId: "testUser",
+        aggregator: "finicity",
+        is_oauth: true,
+      });
+
+      const cachedConnection = await cacheClient.get(connectionId);
+      expect(cachedConnection).toEqual({
+        connection: {
+          id: connectionId,
+          userId: "testUser",
+          aggregator: "finicity",
+          is_oauth: true,
+        },
+      });
+    });
+  });
+
   describe("UpdateConnection", () => {
     it("is not available with finicity", async () => {
       const ret = await finicityAdapter.UpdateConnection(null);
@@ -255,16 +321,9 @@ describe("finicity aggregator", () => {
       server.use(
         http.post(
           `${BASE_PATH}/aggregation/v2/customers/:customerId/accounts`,
-          ({ params }) => {
-            const { customerId } = params;
-            if (customerId === userId) {
-              accountRefreshCalled = true;
-              return HttpResponse.json({ success: true });
-            }
-            return HttpResponse.json(
-              { error: "Customer not found" },
-              { status: 404 },
-            );
+          () => {
+            accountRefreshCalled = true;
+            return HttpResponse.json({ success: true });
           },
         ),
       );
@@ -290,6 +349,33 @@ describe("finicity aggregator", () => {
               connectionId: "test-institution-login-id",
             }),
           }),
+        }),
+      );
+    });
+
+    it("handles 'credentialsUpdated' event and updates connection status to CONNECTED", async () => {
+      const userId = "test-user-id";
+      const createdConnection = await finicityAdapter.CreateConnection(
+        {
+          institutionId: "testInstitutionId",
+          jobTypes: [ComboJobTypes.TRANSACTIONS],
+          credentials: [],
+        },
+        userId,
+      );
+
+      const request = {
+        query: { connection_id: createdConnection.id },
+        body: { eventType: "credentialsUpdated", payload: {} },
+      };
+
+      const updatedConnection =
+        await finicityAdapter.HandleOauthResponse(request);
+
+      expect(updatedConnection).toEqual(
+        expect.objectContaining({
+          id: createdConnection.id,
+          status: ConnectionStatus.CONNECTED,
         }),
       );
     });
@@ -323,7 +409,7 @@ describe("finicity aggregator", () => {
       );
     });
 
-    it("handles 'error' reason with code 201 and updates connection status to FAILED", async () => {
+    it("handles 'error' reason with code 201 and updates connection status to Connected", async () => {
       const createdConnection = await finicityAdapter.CreateConnection(
         {
           institutionId: "testInstitutionId",
@@ -347,7 +433,7 @@ describe("finicity aggregator", () => {
       expect(updatedConnection).toEqual(
         expect.objectContaining({
           id: createdConnection.id,
-          status: ConnectionStatus.FAILED,
+          status: ConnectionStatus.CONNECTED,
         }),
       );
     });

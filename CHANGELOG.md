@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Removed the test adapters and replaced the tests with other aggregators
 
+## [1.4.1]
+
+### Fixed
+
+- Fixed "refresh connection" for Finicity connections
+- Fixed "refresh connection" for MX OAuth connections
+- Fixed create new connection logic for MX users attempting to make multiple connections to the same institution
+
 ## [1.4.0]
 
 ### Changed

@@ -9,7 +9,11 @@ import {
 } from "@repo/utils/test";
 import { server } from "./test/testServer";
 import { http, HttpResponse } from "msw";
-import { CREATE_USER_PATH, MOCKED_OAUTH_URL } from "./test/handlers";
+import {
+  CREATE_USER_PATH,
+  MOCKED_FIX_OAUTH_URL,
+  MOCKED_OAUTH_URL,
+} from "./test/handlers";
 import { accountTransactionsData } from "./test/testData/accounts";
 
 const cacheClient = createCacheClient();
@@ -102,6 +106,18 @@ describe("FinicityClient", () => {
       expect(url).toEqual(MOCKED_OAUTH_URL);
     });
   });
+
+  describe("generateConnectFixUrl", () => {
+    it("generates a Connect Fix URL", async () => {
+      const url = await apiClient.generateConnectFixUrl(
+        "testInstitutionLoginId",
+        "testCustomerId",
+        "testConnectSessionId",
+      );
+      expect(url).toEqual(MOCKED_FIX_OAUTH_URL);
+    });
+  });
+
   describe("getCustomer", () => {
     it("retrieves a customer by ID successfully", async () => {
       const customerId = customerData.customers[0].id;

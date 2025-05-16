@@ -11,6 +11,7 @@ import {
   memberData,
   membersData,
   memberStatusData,
+  oauthMemberdata,
 } from "./testData/members";
 import {
   mxVcAccountsData,
@@ -27,6 +28,7 @@ export const CONNECTIONS_BY_ID_PATH = `${MX_BASE_PATH_PROD}/users/:userId/member
 export const CONNECTION_CREDENTIALS_PATH = `${MX_BASE_PATH_PROD}/users/:userId/members/:memberId/credentials`;
 export const DELETE_MEMBER_PATH = `${MX_BASE_PATH_PROD}/users/:userId/members/:memberGuid`;
 export const CREATE_MEMBER_PATH = `${MX_BASE_PATH_PROD}/users/:userId/members`;
+export const LIST_MEMBERS_PATH = `${MX_BASE_PATH_PROD}/users/:userId/members`;
 export const DELETE_CONNECTION_PATH = `${MX_BASE_PATH_PROD}/users/:userId/managed_members/:id`;
 export const MX_DELETE_USER_PATH = `${MX_BASE_PATH_PROD}/users/:userId`;
 export const UPDATE_CONNECTION_PATH = `${MX_BASE_PATH_PROD}/users/:userId/members/:id`;
@@ -35,6 +37,7 @@ export const READ_MEMBER_STATUS_PATH = `${MX_BASE_PATH_PROD}/users/:userId/membe
 export const ANSWER_CHALLENGE_PATH = `${MX_BASE_PATH_PROD}/users/:userId/members/:id/resume`;
 export const USERS_PATH = `${MX_BASE_PATH_PROD}/users`;
 export const CREATE_USER_PATH = `${MX_BASE_PATH_PROD}/users`;
+export const GET_OAUTH_REFRESH = `${MX_BASE_PATH}/users/:userId/members/:memberId/oauth_window_uri`;
 
 export const MX_INTEGRATION_VC_GET_ACCOUNTS_PATH = `${MX_BASE_PATH_INT}/vc/users/:userId/members/:connectionId/accounts`;
 export const MX_VC_GET_ACCOUNTS_PATH = `${MX_BASE_PATH_PROD}/vc/users/:userId/members/:connectionId/accounts`;
@@ -83,6 +86,7 @@ export const mxHandlers = [
     HttpResponse.json(connectionByIdMemberData),
   ),
   http.get(READ_MEMBER_STATUS_PATH, () => HttpResponse.json(memberStatusData)),
+  http.get(GET_OAUTH_REFRESH, () => HttpResponse.json(oauthMemberdata)),
   http.put(
     ANSWER_CHALLENGE_PATH,
     () => new HttpResponse(null, { status: 200 }),

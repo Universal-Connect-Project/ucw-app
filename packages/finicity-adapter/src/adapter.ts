@@ -76,23 +76,34 @@ export class FinicityAdapter implements WidgetAdapter {
     request: CreateConnectionRequest,
     userId: string,
   ): Promise<Connection | undefined> {
-    const request_id = uuidv4();
+    const connectSessionId = uuidv4();
+    const connectionId = request.id;
+    let oauthWindowUri: string;
+    if (connectionId) {
+      oauthWindowUri = await this.apiClient.generateConnectFixUrl(
+        connectionId,
+        userId,
+        connectSessionId,
+      );
+    } else {
+      oauthWindowUri = await this.apiClient.generateConnectLiteUrl(
+        request.institutionId,
+        userId,
+        connectSessionId,
+      );
+    }
     const connection = {
-      id: request_id,
+      id: connectSessionId,
       is_oauth: true,
       userId,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       credentials: [] as any[],
       institution_code: request.institutionId,
-      oauth_window_uri: await this.apiClient.generateConnectLiteUrl(
-        request.institutionId,
-        userId,
-        request_id,
-      ),
+      oauth_window_uri: oauthWindowUri,
       aggregator: this.aggregator,
       status: ConnectionStatus.CREATED,
     };
-    await this.cacheClient.set(request_id, {
+    await this.cacheClient.set(connectSessionId, {
       connection,
       jobTypes: request.jobTypes,
     });
@@ -111,11 +122,22 @@ export class FinicityAdapter implements WidgetAdapter {
 
   async GetConnectionById(
     connectionId: string,
-    _user_id?: string,
+    userId?: string,
   ): Promise<Connection> {
     const cachedConnection = (await this.cacheClient.get(
       connectionId,
     )) as CachedConnection;
+
+    if (!cachedConnection && connectionId && userId) {
+      const connection = {
+        id: connectionId,
+        userId,
+        aggregator: this.aggregator,
+        is_oauth: true,
+      } as Connection;
+      await this.cacheClient.set(connectionId, { connection });
+      return connection;
+    }
     return cachedConnection?.connection;
   }
 
@@ -126,6 +148,10 @@ export class FinicityAdapter implements WidgetAdapter {
     const cachedConnection = (await this.cacheClient.get(
       connectionId,
     )) as CachedConnection;
+
+    if (!cachedConnection) {
+      return null;
+    }
 
     const { connection } = cachedConnection;
 
@@ -199,6 +225,9 @@ export class FinicityAdapter implements WidgetAdapter {
           );
         }
         break;
+      case "credentialsUpdated":
+        connection.status = ConnectionStatus.CONNECTED;
+        break;
       default:
         switch (reason) {
           case "exit": {
@@ -208,8 +237,11 @@ export class FinicityAdapter implements WidgetAdapter {
             break;
           }
           case "error": {
+            // 201 means the widget exited because there wasn't anything to do.
+            // If you attempt to fix a connection but it doesn't need fixing then
+            // this is the response you get.
             if (code === "201") {
-              connection.status = ConnectionStatus.FAILED;
+              connection.status = ConnectionStatus.CONNECTED;
             }
             break;
           }
