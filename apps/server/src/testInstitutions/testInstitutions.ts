@@ -4,8 +4,10 @@ import { testInstitutions as finicityTestInstitutions } from "@repo/finicity-ada
 import { testInstitutions as sophtronTestInstitutions } from "@repo/sophtron-adapter";
 import { testInstitutions as akoyaTestInstitutions } from "@repo/akoya-adapter";
 
+export const CHASE_BANK_TEST_FILTER_NAME = "Chase Bank Test Filter";
+
 export const testChaseBankToFilter: CachedInstitution = {
-  name: "Chase Bank Test Filter",
+  name: CHASE_BANK_TEST_FILTER_NAME,
   id: "prodTestBankFilter",
   keywords: ["test"],
   logo: "https://universalconnectproject.org/images/ucp-logo-icon.svg",

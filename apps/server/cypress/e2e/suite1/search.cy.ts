@@ -4,6 +4,7 @@ import {
   TEST_EXAMPLE_B_ONLY_INSTITUTION_NAME,
 } from "../../shared/constants/testExample";
 import { ComboJobTypes } from "@repo/utils";
+import { CHASE_BANK_TEST_FILTER_NAME } from "../../../src/testInstitutions/testInstitutions";
 
 const institutionThatIsInFavoritesButDoesntSupportIdentification =
   "TestExample Doesnt Support Identification Bank";
@@ -12,7 +13,7 @@ describe("search", () => {
   it("loads more institutions", () => {
     visitAgg();
 
-    searchByText(TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME);
+    searchByText("test");
 
     cy.findByText("25 search results");
 
@@ -20,10 +21,7 @@ describe("search", () => {
 
     cy.findByText("50 search results");
 
-    cy.findAllByText(TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME).should(
-      "have.length",
-      1,
-    );
+    cy.findAllByText(CHASE_BANK_TEST_FILTER_NAME).should("have.length", 1);
   });
 
   it("filters recommended institutions by job type", () => {
