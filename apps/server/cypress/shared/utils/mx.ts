@@ -1,4 +1,5 @@
 import { MX_INT_AGGREGATOR_STRING } from "@repo/mx-adapter";
+import { MX_BANK_UCP_INSTITUTION_ID } from "@repo/mx-adapter/src/testInstitutions";
 import { ComboJobTypes, MEMBERS_URL } from "@repo/utils";
 
 export const addMember = () => {
@@ -27,5 +28,16 @@ export const addMember = () => {
     },
     method: "POST",
     url: MEMBERS_URL,
+  });
+};
+
+export const getInstitution = () => {
+  return cy.request({
+    headers: {
+      meta: JSON.stringify({
+        aggregator: MX_INT_AGGREGATOR_STRING,
+      }),
+    },
+    url: `/institutions/${MX_BANK_UCP_INSTITUTION_ID}`,
   });
 };

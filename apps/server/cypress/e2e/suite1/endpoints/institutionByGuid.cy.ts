@@ -1,17 +1,10 @@
-import { MX_INT_AGGREGATOR_STRING } from "@repo/mx-adapter";
 import { MX_BANK_UCP_INSTITUTION_ID } from "@repo/mx-adapter/src/testInstitutions";
 import { ComboJobTypes } from "@repo/utils";
+import { getInstitution } from "../../../shared/utils/mx";
 
 describe("institution by guid", () => {
   it("returns an institution when given an aggregator", () => {
-    cy.request({
-      headers: {
-        meta: JSON.stringify({
-          aggregator: MX_INT_AGGREGATOR_STRING,
-        }),
-      },
-      url: `/institutions/${MX_BANK_UCP_INSTITUTION_ID}`,
-    }).then((response) => {
+    getInstitution().then((response) => {
       expect(response.status).to.eq(200);
 
       const { body } = response;
