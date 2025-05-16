@@ -17,13 +17,14 @@ export const makeAnMXConnection = async () => {
   expectConnectionSuccess();
 };
 
-export const deleteMxUser = () => {
+export const deleteMxUser = (requestProps: object) => {
   const userId = Cypress.env("userId");
 
   cy.request({
     method: "DELETE",
     url: `/api/aggregator/mx_int/user/${userId}`,
     failOnStatusCode: false,
+    ...requestProps,
   }).should((response) => {
     expect(response.status).to.be.oneOf([200, 204, 400, 404]);
   });

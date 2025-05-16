@@ -92,8 +92,11 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  deleteMxUser();
-});
+  const widgetDemoAccessToken = Cypress.env(WIDGET_DEMO_ACCESS_TOKEN_ENV);
 
-// Alternatively you can use CommonJS syntax:
-// require('./commands')
+  deleteMxUser({
+    headers: {
+      authorization: `Bearer ${widgetDemoAccessToken}`,
+    },
+  });
+});
