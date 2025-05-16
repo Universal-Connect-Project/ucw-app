@@ -9,5 +9,5 @@
 
   "hiddenInstitutions": ["mxBankToHide"],
 
-  "recommendedInstitutions": ["mxBank"]
+  "recommendedInstitutions": ["mxBank", "mxBankTransactionsOnly"]
 }

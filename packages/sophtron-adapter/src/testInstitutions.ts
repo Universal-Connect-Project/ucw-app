@@ -1,8 +1,10 @@
 import type { CachedInstitution } from "@repo/utils";
 
+export const SOPHTRON_BANK_NAME = "Sophtron Bank";
+
 export const testInstitutions: CachedInstitution[] = [
   {
-    name: "Sophtron Bank",
+    name: SOPHTRON_BANK_NAME,
     id: "sophtronBank",
     keywords: ["soph"],
     logo: null,
