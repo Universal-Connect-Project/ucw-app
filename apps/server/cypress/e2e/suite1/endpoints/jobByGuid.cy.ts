@@ -1,4 +1,4 @@
-import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
+import { MX_INT_AGGREGATOR_STRING } from "@repo/mx-adapter";
 
 describe("jobByGuid", () => {
   it("returns a job", () => {
@@ -7,7 +7,7 @@ describe("jobByGuid", () => {
     cy.request({
       headers: {
         meta: JSON.stringify({
-          aggregator: MX_AGGREGATOR_STRING,
+          aggregator: MX_INT_AGGREGATOR_STRING,
         }),
       },
       url: `/jobs/${testJobGuid}`,
