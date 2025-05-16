@@ -2,14 +2,15 @@ import { createLogClient } from "@repo/utils/test";
 import { VCDataTypes } from "@repo/utils";
 
 import type { AdapterDependencies } from "./models";
-import { aggregatorCredentials } from "./test/testData/aggregatorCredentials";
+import { sophtronTestData } from "@repo/utils-dev-dependency";
 import { createSophtronVC } from "./createVc";
 
-import {
+const {
+  aggregatorCredentials,
   sophtronVcTranscationsData,
   sophtronVcAccountsData,
   sophtronVcIdentityData,
-} from "./test/testData/sophtronVcData";
+} = sophtronTestData;
 
 const dependencies: AdapterDependencies = {
   logClient: createLogClient(),

@@ -21,21 +21,8 @@ import {
   SOPHTRON_INSTITUTION_BY_ID_PATH,
   SOPHTRON_MEMBER_BY_ID_PATH,
   SOPHTRON_UPDATE_MEMBER_PATH,
-} from "./test/handlers";
-import {
-  sophtronInstitutionData,
-  sophtronUserInstitutionAccountsData,
-} from "./test/testData/institution";
-import { aggregatorCredentials } from "./test/testData/aggregatorCredentials";
-import {
-  createCustomerData,
-  customerFromUniqueIdData,
-} from "./test/testData/sophtronCustomer";
-import {
-  createMemberData,
-  getMemberData,
-  updateMemberData,
-} from "./test/testData/sophtronMember";
+  sophtronTestData,
+} from "@repo/utils-dev-dependency";
 import { server } from "./test/testServer";
 import { SophtronAdapter } from "./adapter";
 import {
@@ -44,6 +31,17 @@ import {
   testDataValidatorStartTimeError,
 } from "./constants";
 import { createLogClient } from "@repo/utils/test";
+
+const {
+  aggregatorCredentials,
+  createCustomerData,
+  createMemberData,
+  customerFromUniqueIdData,
+  getMemberData,
+  sophtronInstitutionData,
+  sophtronUserInstitutionAccountsData,
+  updateMemberData,
+} = sophtronTestData;
 
 const adapter = new SophtronAdapter({
   dependencies: {

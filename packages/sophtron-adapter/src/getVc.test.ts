@@ -1,7 +1,8 @@
 import { createLogClient } from "@repo/utils/test";
-import { sophtronVcTranscationsData } from "./test/testData/sophtronVcData";
-import { aggregatorCredentials } from "./test/testData/aggregatorCredentials";
+import { sophtronTestData } from "@repo/utils-dev-dependency";
 import { getVc } from "./getVc";
+
+const { aggregatorCredentials, sophtronVcTranscationsData } = sophtronTestData;
 
 describe("Sophtron Vc Client", () => {
   it("returns the data from a vc endpoint", async () => {

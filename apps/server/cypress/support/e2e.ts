@@ -23,6 +23,7 @@ import {
   WIDGET_DEMO_DATA_ACCESS_TOKEN_ENV,
   WIDGET_DEMO_DELETE_USER_ACCESS_TOKEN_ENV,
 } from "../shared/constants/accessToken";
+import { deleteMxUser } from "@repo/utils-cypress";
 
 configure({ testIdAttribute: "data-test" });
 
@@ -90,5 +91,14 @@ beforeEach(() => {
   Cypress.env("userId", crypto.randomUUID());
 });
 
-// Alternatively you can use CommonJS syntax:
-// require('./commands')
+afterEach(() => {
+  const widgetDemoAccessToken = Cypress.env(
+    WIDGET_DEMO_DELETE_USER_ACCESS_TOKEN_ENV,
+  );
+
+  deleteMxUser({
+    headers: {
+      authorization: `Bearer ${widgetDemoAccessToken}`,
+    },
+  });
+});

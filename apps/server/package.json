@@ -8,13 +8,11 @@
     "cypress:open:nonProd": "cypress open --config-file cypress.config.nonProd.ts",
     "cypress:open:prod": "cypress open --config-file cypress.config.prod.ts",
     "cypress:open:syncing": "cypress open --config-file cypress.config.syncing.ts",
-    "cypress:open:testExample": "cypress open --config-file cypress.config.testExample.ts",
     "cypress:run": "cypress run --config-file cypress.config.ts",
     "cypress:run:authentication": "cypress run --config-file cypress.config.authentication.ts",
     "cypress:run:nonProd": "cypress run --config-file cypress.config.nonProd.ts",
     "cypress:run:prod": "cypress run --config-file cypress.config.prod.ts",
     "cypress:run:syncing": "cypress run --config-file cypress.config.syncing.ts",
-    "cypress:run:testExample": "cypress run --config-file cypress.config.testExample.ts",
     "elasticsearch": "docker volume create esdata && docker run --rm --name elasticsearch_container -p 9200:9200 -p 9300:9300 -v esdata:/usr/share/elasticsearch/data -e \"discovery.type=single-node\" -e \"xpack.security.enabled=false\" docker.elastic.co/elasticsearch/elasticsearch:7.10.2",
     "dev": "concurrently --kill-others \"npm run elasticsearch\" \"npm run server\" \"npm run redisserver\"",
     "dev:debug": "concurrently --kill-others \"npm run elasticsearch\" \"npm run server:debug\" \"npm run redisserver\"",
@@ -29,9 +27,7 @@
     "coverage": "npm test -- --verbose --coverage --watchAll",
     "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --no-coverage",
     "test:watch": "cross-env DEBUG_PRINT_LIMIT=50000 npm run test -- --watch",
-    "test-clear": "npm test -- --clearCache",
-    "playwright": "playwright test --ui",
-    "playwright:test": "npx playwright test"
+    "test-clear": "npm test -- --clearCache"
   },
   "dependencies": {
     "@babel/eslint-parser": "^7.18.2",
@@ -94,7 +90,7 @@
     "@babel/plugin-proposal-optional-chaining": "^7.21.0",
     "@babel/preset-env": "^7.23.8",
     "@babel/preset-react": "^7.18.6",
-    "@playwright/test": "^1.50.1",
+    "@repo/utils-cypress": "*",
     "@repo/utils-dev-dependency": "*",
     "@testing-library/cypress": "^10.0.1",
     "@types/jest": "^29.5.12",
@@ -114,7 +110,6 @@
     "jsonwebtoken": "^9.0.2",
     "msw": "^2.2.13",
     "nodemon": "^3.1.0",
-    "playwright": "^1.50.1",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "wait-on": "^8.0.1"

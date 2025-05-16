@@ -5,11 +5,13 @@ import type { AdapterDependencies } from "./models";
 import {
   MX_INTEGRATION_VC_GET_ACCOUNTS_PATH,
   MX_VC_GET_ACCOUNTS_PATH,
-} from "./test/handlers";
-import { mxVcAccountsData } from "./test/testData/mxVcData";
+} from "@repo/utils-dev-dependency";
 import { server } from "./test/testServer";
 
-import { aggregatorCredentials } from "./test/testData/aggregatorCredentials";
+import {
+  aggregatorCredentials,
+  mxVcAccountsData,
+} from "@repo/utils-dev-dependency";
 import { createClient, createLogClient } from "@repo/utils/test";
 
 const accountsPath = "users/userId/members/connectionId/accounts";

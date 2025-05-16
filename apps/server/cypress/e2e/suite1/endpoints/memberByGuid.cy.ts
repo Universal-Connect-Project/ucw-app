@@ -1,31 +1,42 @@
-import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../../../../src/test-adapter/constants";
+import {
+  MX_AGGREGATOR_STRING,
+  MX_INT_AGGREGATOR_STRING,
+} from "@repo/mx-adapter";
+import { addMember } from "../../../shared/utils/mx";
 
 describe("member by guid", () => {
   it("returns a member", () => {
-    const testConnectionId = "testExampleA";
+    addMember().then((response) => {
+      const connectionId = response.body.member.guid;
 
-    cy.request({
-      headers: {
-        meta: JSON.stringify({
-          aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
-        }),
-      },
-      url: `/members/${testConnectionId}`,
-    }).then((response) => {
-      expect(response.status).to.eq(200);
+      const resolvedUserId = JSON.parse(
+        response.headers.meta as string,
+      ).resolvedUserId;
 
-      const { body } = response;
+      cy.request({
+        headers: {
+          meta: JSON.stringify({
+            aggregator: MX_INT_AGGREGATOR_STRING,
+            resolvedUserId,
+          }),
+        },
+        url: `/members/${connectionId}`,
+      }).then((response) => {
+        expect(response.status).to.eq(200);
 
-      const expectedProperties = [
-        "aggregator",
-        "connection_status",
-        "guid",
-        "institution_guid",
-        "is_oauth",
-      ];
+        const { body } = response;
 
-      expectedProperties.forEach((property) => {
-        expect(body[property]).to.exist;
+        const expectedProperties = [
+          "aggregator",
+          "connection_status",
+          "guid",
+          "institution_guid",
+          "is_oauth",
+        ];
+
+        expectedProperties.forEach((property) => {
+          expect(body[property]).to.exist;
+        });
       });
     });
   });

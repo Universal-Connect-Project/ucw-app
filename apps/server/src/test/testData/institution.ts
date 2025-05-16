@@ -1,7 +1,3 @@
-import {
-  TEST_EXAMPLE_A_AGGREGATOR_STRING,
-  TEST_EXAMPLE_B_AGGREGATOR_STRING,
-} from "../../test-adapter";
 import type { CachedInstitution } from "@repo/utils";
 
 export const finicityInsitutionData = {
@@ -75,42 +71,18 @@ export const elasticSearchInstitutionData: CachedInstitution = {
     supports_verification: true,
     supports_history: false,
   },
-  [TEST_EXAMPLE_A_AGGREGATOR_STRING]: {
-    id: "aId_oauth",
-    supports_aggregation: true,
-    supports_oauth: true,
-    supports_identification: true,
-    supports_verification: true,
-    supports_history: false,
-  },
-  [TEST_EXAMPLE_B_AGGREGATOR_STRING]: {
-    id: "bId_oauth",
-    supports_aggregation: true,
-    supports_oauth: true,
-    supports_identification: true,
-    supports_verification: true,
-    supports_history: false,
-  },
-  akoya: {
-    id: "akoya_bank",
-    supports_aggregation: true,
-    supports_oauth: false,
-    supports_identification: true,
-    supports_verification: true,
-    supports_history: false,
-  },
 };
 
 export const elasticSearchInstitutionDataFavs: CachedInstitution[] = [
   {
-    name: "TestExample Prod",
+    name: "Non test bank",
     id: "cd27ed3b-f81c-4fa9-94a9-039a9f534c7b",
     keywords: ["test", "example"],
     logo: "https://universalconnectproject.org/images/ucp-logo-icon.svg",
     url: "https://test-example.com",
     is_test_bank: false,
     routing_numbers: [],
-    testExampleB: {
+    mx: {
       id: "testExampleB",
       supports_aggregation: true,
       supports_history: true,
@@ -120,14 +92,14 @@ export const elasticSearchInstitutionDataFavs: CachedInstitution[] = [
     },
   },
   {
-    name: "TestExampleA Bank",
+    name: "Test bank",
     id: "5e498f60-3496-4299-96ed-f8eb328ae8af",
     keywords: ["test", "example", "tex"],
     logo: "https://universalconnectproject.org/images/ucp-logo-icon.svg",
     url: "https://test-example.com",
     is_test_bank: true,
     routing_numbers: [],
-    testExampleA: {
+    mx: {
       id: "testExampleA",
       supports_aggregation: true,
       supports_history: true,
@@ -137,14 +109,14 @@ export const elasticSearchInstitutionDataFavs: CachedInstitution[] = [
     },
   },
   {
-    name: "TestExample Doesnt Support Identification Bank",
+    name: "Test Doesnt Support Identification Bank",
     id: "4c1b2595-a5aa-41a1-a2c6-f6caa1e226a6",
     keywords: ["test", "example"],
     logo: "https://universalconnectproject.org/images/ucp-logo-icon.svg",
     url: "https://test-example.com",
     is_test_bank: true,
     routing_numbers: [],
-    testExampleB: {
+    mx: {
       id: "testExampleB",
       supports_aggregation: true,
       supports_history: true,

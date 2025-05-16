@@ -1,13 +1,10 @@
 import { WidgetJobTypes } from "@repo/utils";
 import { ConnectApi } from "./connectApi";
 import { type JobsRequest, jobsRouteHandler } from "./jobEndpoints";
-import {
-  TEST_EXAMPLE_A_AGGREGATOR_STRING,
-  testAggregatorMemberGuid,
-} from "../test-adapter";
+import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
 
 const context = {
-  aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+  aggregator: MX_AGGREGATOR_STRING,
 };
 let connect: ConnectApi;
 
@@ -31,7 +28,7 @@ describe("jobEndpoints", () => {
       const req = {
         connectApi: connect,
         params: {
-          member_guid: testAggregatorMemberGuid,
+          member_guid: "memberGuid",
         },
       } as unknown as JobsRequest;
 

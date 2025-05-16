@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
 import { widgetHandler } from "./widgetEndpoint";
 import { ComboJobTypes } from "@repo/utils";
-import { Aggregators } from "./shared/contract";
 import { invalidAggregatorString } from "./utils/validators";
+import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
 
 /* eslint-disable @typescript-eslint/unbound-method  */
 
@@ -103,7 +103,7 @@ describe("server", () => {
             query: {
               institutionId: "testInstitutionId",
               jobTypes: ComboJobTypes.TRANSACTIONS,
-              aggregator: Aggregators.TEST_A,
+              aggregator: MX_AGGREGATOR_STRING,
               userId: "testUserId",
             },
           } as unknown as Request,
@@ -127,7 +127,7 @@ describe("server", () => {
             query: {
               connectionId: "testConnectionId",
               jobTypes: ComboJobTypes.TRANSACTIONS,
-              aggregator: Aggregators.TEST_A,
+              aggregator: MX_AGGREGATOR_STRING,
               userId: "testUserId",
             },
           } as unknown as Request,
@@ -173,7 +173,7 @@ describe("server", () => {
         widgetHandler(
           {
             query: {
-              aggregator: Aggregators.TEST_A,
+              aggregator: MX_AGGREGATOR_STRING,
               connectionId: "testConnectionId",
               jobTypes: ComboJobTypes.TRANSACTIONS,
               userId: "testUserId",

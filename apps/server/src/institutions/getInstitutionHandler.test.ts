@@ -1,14 +1,14 @@
 import type { Request, Response } from "express";
-import {
-  TEST_EXAMPLE_A_AGGREGATOR_STRING,
-  TEST_EXAMPLE_B_AGGREGATOR_STRING,
-  TEST_EXAMPLE_C_AGGREGATOR_STRING,
-} from "../test-adapter";
 import { getInstitutionHandler } from "./getInstitutionHandler";
 import * as preferences from "../shared/preferences";
 import testPreferences from "../../cachedDefaults/testData/testPreferences.json";
 import { ComboJobTypes } from "@repo/utils";
 import { elasticSearchInstitutionData } from "../test/testData/institution";
+import {
+  MX_AGGREGATOR_STRING,
+  MX_INT_AGGREGATOR_STRING,
+} from "@repo/mx-adapter";
+import { institutionData as mxInstitutionData } from "@repo/utils-dev-dependency";
 
 const ucpInstitutionId = "testAggregatorInstitutionGuid";
 
@@ -16,7 +16,7 @@ describe("getInstitutionHandler", () => {
   it("returns an institution object with name, url, and logo_url properties from the ucp institution list", async () => {
     jest.spyOn(preferences, "getPreferences").mockResolvedValue({
       ...testPreferences,
-      supportedAggregators: [TEST_EXAMPLE_B_AGGREGATOR_STRING],
+      supportedAggregators: [MX_AGGREGATOR_STRING],
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
 
@@ -37,18 +37,17 @@ describe("getInstitutionHandler", () => {
     await getInstitutionHandler(req, res);
 
     const ucpInstitution = elasticSearchInstitutionData;
-    const ucpTestExampleInstitution =
-      ucpInstitution[TEST_EXAMPLE_B_AGGREGATOR_STRING];
+    const ucpMxInstitution = ucpInstitution[MX_AGGREGATOR_STRING];
 
     expect(res.send).toHaveBeenCalledWith({
-      code: ucpTestExampleInstitution.id,
+      code: mxInstitutionData.institution.code,
       credentials: [],
-      guid: ucpTestExampleInstitution.id,
+      guid: mxInstitutionData.institution.code,
       instructional_data: {},
       logo_url: ucpInstitution.logo,
       name: ucpInstitution.name,
-      aggregator: TEST_EXAMPLE_B_AGGREGATOR_STRING,
-      supports_oauth: ucpTestExampleInstitution.supports_oauth,
+      aggregator: MX_INT_AGGREGATOR_STRING,
+      supports_oauth: ucpMxInstitution.supports_oauth,
       ucpInstitutionId,
       url: ucpInstitution.url,
     });
@@ -56,7 +55,7 @@ describe("getInstitutionHandler", () => {
 
   it("returns the institution by the aggregator id if it has a aggregator", async () => {
     const context = {
-      aggregator: TEST_EXAMPLE_C_AGGREGATOR_STRING,
+      aggregator: MX_AGGREGATOR_STRING,
     };
 
     const req = {
@@ -73,18 +72,17 @@ describe("getInstitutionHandler", () => {
     await getInstitutionHandler(req, res);
 
     const ucpInstitution = elasticSearchInstitutionData;
-    const ucpTestExampleInstitution =
-      ucpInstitution[TEST_EXAMPLE_A_AGGREGATOR_STRING];
+    const ucpMXInstitution = ucpInstitution[MX_AGGREGATOR_STRING];
 
     expect(res.send).toHaveBeenCalledWith({
-      code: ucpTestExampleInstitution.id,
+      code: mxInstitutionData.institution.code,
       credentials: [],
-      guid: ucpTestExampleInstitution.id,
+      guid: mxInstitutionData.institution.code,
       instructional_data: {},
       logo_url: ucpInstitution.logo,
       name: ucpInstitution.name,
-      aggregator: TEST_EXAMPLE_C_AGGREGATOR_STRING,
-      supports_oauth: ucpTestExampleInstitution.supports_oauth,
+      aggregator: MX_AGGREGATOR_STRING,
+      supports_oauth: ucpMXInstitution.supports_oauth,
       ucpInstitutionId,
       url: ucpInstitution.url,
     });

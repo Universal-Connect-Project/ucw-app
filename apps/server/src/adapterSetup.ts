@@ -6,7 +6,6 @@ import { getFinicityAdapterMapObject } from "@repo/finicity-adapter";
 import config from "./config";
 import * as logger from "./infra/logger";
 import { get, set } from "./services/storageClient/redis";
-import { adapterMapObject as testAdapterMapObject } from "./test-adapter";
 import { getWebhookHostUrl } from "./webhooks";
 
 const mxAdapterMapObject = getMxAdapterMapObject({
@@ -99,7 +98,6 @@ export const adapterMap: Record<string, AdapterMap> = {
   ...finicityAdapterMapObject,
   ...mxAdapterMapObject,
   ...sophtronAdapterMapObject,
-  ...testAdapterMapObject,
 };
 
 export type Aggregator = keyof typeof adapterMap;

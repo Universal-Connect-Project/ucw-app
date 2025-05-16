@@ -1,18 +1,10 @@
+import { MX_BANK_UCP_INSTITUTION_ID } from "@repo/mx-adapter/src/testInstitutions";
 import { ComboJobTypes } from "@repo/utils";
-import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../../../../src/test-adapter/constants";
-
-const testExampleAUCPId = "5e498f60-3496-4299-96ed-f8eb328ae8af";
+import { getInstitution } from "../../../shared/utils/mx";
 
 describe("institution by guid", () => {
   it("returns an institution when given an aggregator", () => {
-    cy.request({
-      headers: {
-        meta: JSON.stringify({
-          aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
-        }),
-      },
-      url: `/institutions/${testExampleAUCPId}`,
-    }).then((response) => {
+    getInstitution().then((response) => {
       expect(response.status).to.eq(200);
 
       const { body } = response;
@@ -33,15 +25,13 @@ describe("institution by guid", () => {
   });
 
   it("returns an institution when not given an aggregator but given a UCP id and a job type", () => {
-    const testExampleAUCPId = "5e498f60-3496-4299-96ed-f8eb328ae8af";
-
     cy.request({
       headers: {
         meta: JSON.stringify({
           jobTypes: [ComboJobTypes.TRANSACTIONS],
         }),
       },
-      url: `/institutions/${testExampleAUCPId}`,
+      url: `/institutions/${MX_BANK_UCP_INSTITUTION_ID}`,
     }).then((response) => {
       expect(response.status).to.eq(200);
 

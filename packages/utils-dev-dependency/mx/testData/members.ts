@@ -6,7 +6,7 @@ export const memberData = {
     is_oauth: false,
     oauth_window_uri: undefined,
   },
-};
+} as any;
 
 export const oauthMemberdata = {
   member: {

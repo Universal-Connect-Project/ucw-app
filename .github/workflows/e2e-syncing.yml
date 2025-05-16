@@ -50,7 +50,7 @@ jobs:
           check-latest: true
       - run: npm ci
 
-      - run: npm run copyE2EPreferences
+      - run: npm run copyMXTestPreferences
 
       - name: "Remove institutions cache"
         run: |

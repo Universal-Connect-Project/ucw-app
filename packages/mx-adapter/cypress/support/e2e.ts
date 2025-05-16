@@ -14,6 +14,7 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
+import { deleteMxUser } from "@repo/utils-cypress";
 import "./commands";
 
 import { configure } from "@testing-library/cypress";
@@ -31,13 +32,5 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  const userId = Cypress.env("userId");
-
-  cy.request({
-    method: "DELETE",
-    url: `/api/aggregator/mx_int/user/${userId}`,
-    failOnStatusCode: false,
-  }).should((response) => {
-    expect(response.status).to.be.oneOf([200, 204, 400, 404]);
-  });
+  deleteMxUser();
 });

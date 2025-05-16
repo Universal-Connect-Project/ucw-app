@@ -133,9 +133,9 @@
                 "schema": {
                   "type": "object",
                   "example": {
-                    "guid": "testExampleA",
-                    "code": "testExampleA",
-                    "name": "TestExampleA Bank",
+                    "guid": "mx",
+                    "code": "mx",
+                    "name": "mx Bank",
                     "url": "https://test-example.com",
                     "logo_url": "https://universalconnectproject.org/images/ucp-logo-icon.svg",
                     "instructional_data": {},
@@ -223,7 +223,7 @@
                   "example": [
                     {
                       "guid": "5e498f60-3496-4299-96ed-f8eb328ae8af",
-                      "name": "TestExampleA Bank",
+                      "name": "mx Bank",
                       "url": "https://test-example.com",
                       "logo_url": "https://universalconnectproject.org/images/ucp-logo-icon.svg"
                     }
@@ -294,7 +294,7 @@
                   "example": [
                     {
                       "guid": "5e498f60-3496-4299-96ed-f8eb328ae8af",
-                      "name": "TestExampleA Bank",
+                      "name": "mx Bank",
                       "url": "https://test-example.com",
                       "logo_url": "https://universalconnectproject.org/images/ucp-logo-icon.svg"
                     }
@@ -317,7 +317,7 @@
             "schema": {
               "type": "object",
               "example": {
-                "aggregator": "testExampleA"
+                "aggregator": "mx"
               }
             }
           },
@@ -356,7 +356,7 @@
             "schema": {
               "type": "object",
               "example": {
-                "aggregator": "testExampleA",
+                "aggregator": "sophtron",
                 "connectionId": "test"
               }
             }
@@ -376,7 +376,7 @@
                       "connection_status": 0,
                       "most_recent_job_guid": null,
                       "is_oauth": false,
-                      "aggregator": "testExampleA",
+                      "aggregator": "mx",
                       "is_being_aggregated": false,
                       "user_guid": "e07115cc-bbf9-466a-b7db-cdbc9c7cd31b",
                       "mfa": {}
@@ -398,7 +398,7 @@
             "schema": {
               "type": "object",
               "example": {
-                "aggregator": "testExampleA",
+                "aggregator": "finicity",
                 "jobTypes": ["transactions"]
               }
             }
@@ -466,7 +466,7 @@
             "schema": {
               "type": "object",
               "example": {
-                "aggregator": "testExampleA"
+                "aggregator": "sophtron"
               }
             }
           },
@@ -559,7 +559,7 @@
             "schema": {
               "type": "object",
               "example": {
-                "aggregator": "testExampleA",
+                "aggregator": "mx",
                 "jobTypes": ["transactions"]
               }
             }
@@ -577,7 +577,7 @@
                       "id": "testConnectionId",
                       "field_name": "testFieldName",
                       "field_type": 3,
-                      "label": "TestExampleA Label",
+                      "label": "mx Label",
                       "guid": "testConnectionId"
                     }
                   ]
