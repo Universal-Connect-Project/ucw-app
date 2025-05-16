@@ -7,7 +7,7 @@
 
   "institutionAggregatorVolumeMap": {},
 
-  "hiddenInstitutions": [],
+  "hiddenInstitutions": ["mxBankToHide"],
 
-  "recommendedInstitutions": []
+  "recommendedInstitutions": ["mxBank"]
 }

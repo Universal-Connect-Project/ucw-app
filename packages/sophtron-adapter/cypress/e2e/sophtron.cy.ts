@@ -38,7 +38,7 @@ describe("Sophtron aggregator", () => {
     transactionsQueryString: "?start_time=2021/1/1&end_time=2099/12/31",
   });
 
-  it.only("shows single account select if no parameter is passed, and skips single account select if singleAccountSelect=false", () => {
+  it("shows single account select if no parameter is passed, and skips single account select if singleAccountSelect=false", () => {
     const userId = Cypress.env("userId");
 
     cy.visit(
