@@ -3,16 +3,16 @@ import { visitWithPostMessageSpy } from "./visit";
 import { MEMBER_CONNECTED_EVENT_TYPE } from "./postMessageEvents";
 
 const jobTypesTestMap = [
-  // { jobTypes: [ComboJobTypes.ACCOUNT_NUMBER] },
-  // { jobTypes: [ComboJobTypes.ACCOUNT_OWNER], shouldExpectAccountOwners: true },
-  // {
-  //   jobTypes: [ComboJobTypes.TRANSACTIONS],
-  //   shouldExpectTransactions: true,
-  // },
-  // {
-  //   jobTypes: [ComboJobTypes.TRANSACTION_HISTORY],
-  //   shouldExpectTransactions: true,
-  // },
+  { jobTypes: [ComboJobTypes.ACCOUNT_NUMBER] },
+  { jobTypes: [ComboJobTypes.ACCOUNT_OWNER], shouldExpectAccountOwners: true },
+  {
+    jobTypes: [ComboJobTypes.TRANSACTIONS],
+    shouldExpectTransactions: true,
+  },
+  {
+    jobTypes: [ComboJobTypes.TRANSACTION_HISTORY],
+    shouldExpectTransactions: true,
+  },
   {
     jobTypes: [
       ComboJobTypes.ACCOUNT_NUMBER,
