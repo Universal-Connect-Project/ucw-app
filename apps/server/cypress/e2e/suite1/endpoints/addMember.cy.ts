@@ -1,23 +1,11 @@
-import { ComboJobTypes, MEMBERS_URL } from "@repo/utils";
-import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../../../../src/test-adapter/constants";
+import { addMember } from "../../../shared/utils/mx";
 
 describe("addMember", () => {
   it("responds with a member", () => {
-    cy.request({
-      headers: {
-        meta: JSON.stringify({
-          aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
-          jobTypes: [ComboJobTypes.TRANSACTIONS],
-        }),
-      },
-      method: "POST",
-      url: MEMBERS_URL,
-    }).then(
+    addMember().then(
       (
         response: Cypress.Response<{
-          member: {
-            institution_guid: string;
-          };
+          member: {};
         }>,
       ) => {
         expect(response.status).to.eq(200);
@@ -27,7 +15,17 @@ describe("addMember", () => {
 
         expect(member).to.exist;
 
-        expect(member.institution_guid).to.exist;
+        const expectedProperties = [
+          "aggregator",
+          "connection_status",
+          "guid",
+          "institution_guid",
+          "is_oauth",
+        ];
+
+        expectedProperties.forEach((property) => {
+          expect(member[property]).to.exist;
+        });
       },
     );
   });

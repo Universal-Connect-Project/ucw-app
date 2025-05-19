@@ -4,6 +4,9 @@
   "main": "index.ts",
   "type": "commonjs",
   "scripts": {},
+  "dependencies": {
+    "msw": "^2.2.13"
+  },
   "devDependencies": {
     "@testing-library/cypress": "^10.0.1",
     "typescript": "^5.5.4"

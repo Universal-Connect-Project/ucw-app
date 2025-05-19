@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 
-import { BASE_PATH as MX_BASE_PATH } from "../apiClient";
+import { MX_BASE_PATH_PROD, MX_BASE_PATH_INT } from "./consts";
 
 import { institutionData } from "./testData/institution";
 
@@ -21,32 +21,30 @@ import {
 } from "./testData/mxVcData";
 import { createUserData, listUsersData } from "./testData/users";
 
-const MX_INTEGRATION_PATH = "https://int-api.mx.com";
+export const MX_INSTITUTION_BY_ID_PATH = `${MX_BASE_PATH_PROD}/institutions/:institutionId`;
+export const MX_TEST_INSTITUTION_BY_ID_PATH = `${MX_BASE_PATH_INT}/institutions/:institutionId`;
+export const INSTITUTION_CREDENTIALS_BY_ID_PATH = `${MX_BASE_PATH_PROD}/institutions/:institutionId/credentials`;
+export const CONNECTIONS_BY_ID_PATH = `${MX_BASE_PATH_PROD}/users/:userId/members`;
+export const CONNECTION_CREDENTIALS_PATH = `${MX_BASE_PATH_PROD}/users/:userId/members/:memberId/credentials`;
+export const DELETE_MEMBER_PATH = `${MX_BASE_PATH_PROD}/users/:userId/members/:memberGuid`;
+export const CREATE_MEMBER_PATH = `${MX_BASE_PATH_PROD}/users/:userId/members`;
+export const LIST_MEMBERS_PATH = `${MX_BASE_PATH_PROD}/users/:userId/members`;
+export const DELETE_CONNECTION_PATH = `${MX_BASE_PATH_PROD}/users/:userId/managed_members/:id`;
+export const MX_DELETE_USER_PATH = `${MX_BASE_PATH_PROD}/users/:userId`;
+export const UPDATE_CONNECTION_PATH = `${MX_BASE_PATH_PROD}/users/:userId/members/:id`;
+export const CONNECTION_BY_ID_PATH = `${MX_BASE_PATH_PROD}/users/:userId/members/:id`;
+export const READ_MEMBER_STATUS_PATH = `${MX_BASE_PATH_PROD}/users/:userId/members/:id/status`;
+export const ANSWER_CHALLENGE_PATH = `${MX_BASE_PATH_PROD}/users/:userId/members/:id/resume`;
+export const USERS_PATH = `${MX_BASE_PATH_PROD}/users`;
+export const CREATE_USER_PATH = `${MX_BASE_PATH_PROD}/users`;
+export const GET_OAUTH_REFRESH = `${MX_BASE_PATH_PROD}/users/:userId/members/:memberId/oauth_window_uri`;
 
-export const MX_INSTITUTION_BY_ID_PATH = `${MX_BASE_PATH}/institutions/:institutionId`;
-export const MX_TEST_INSTITUTION_BY_ID_PATH = `${MX_INTEGRATION_PATH}/institutions/:institutionId`;
-export const INSTITUTION_CREDENTIALS_BY_ID_PATH = `${MX_BASE_PATH}/institutions/:institutionId/credentials`;
-export const CONNECTIONS_BY_ID_PATH = `${MX_BASE_PATH}/users/:userId/members`;
-export const CONNECTION_CREDENTIALS_PATH = `${MX_BASE_PATH}/users/:userId/members/:memberId/credentials`;
-export const DELETE_MEMBER_PATH = `${MX_BASE_PATH}/users/:userId/members/:memberGuid`;
-export const CREATE_MEMBER_PATH = `${MX_BASE_PATH}/users/:userId/members`;
-export const LIST_MEMBERS_PATH = `${MX_BASE_PATH}/users/:userId/members`;
-export const DELETE_CONNECTION_PATH = `${MX_BASE_PATH}/users/:userId/managed_members/:id`;
-export const MX_DELETE_USER_PATH = `${MX_BASE_PATH}/users/:userId`;
-export const UPDATE_CONNECTION_PATH = `${MX_BASE_PATH}/users/:userId/members/:id`;
-export const CONNECTION_BY_ID_PATH = `${MX_BASE_PATH}/users/:userId/members/:id`;
-export const READ_MEMBER_STATUS_PATH = `${MX_BASE_PATH}/users/:userId/members/:id/status`;
-export const ANSWER_CHALLENGE_PATH = `${MX_BASE_PATH}/users/:userId/members/:id/resume`;
-export const USERS_PATH = `${MX_BASE_PATH}/users`;
-export const CREATE_USER_PATH = `${MX_BASE_PATH}/users`;
-export const GET_OAUTH_REFRESH = `${MX_BASE_PATH}/users/:userId/members/:memberId/oauth_window_uri`;
+export const MX_INTEGRATION_VC_GET_ACCOUNTS_PATH = `${MX_BASE_PATH_INT}/vc/users/:userId/members/:connectionId/accounts`;
+export const MX_VC_GET_ACCOUNTS_PATH = `${MX_BASE_PATH_PROD}/vc/users/:userId/members/:connectionId/accounts`;
+export const MX_VC_GET_IDENTITY_PATH = `${MX_BASE_PATH_PROD}/vc/users/:userId/members/:connectionId/customers`;
+export const MX_VC_GET_TRANSACTIONS_PATH = `${MX_BASE_PATH_PROD}/vc/users/:userId/accounts/:accountId/transactions`;
 
-export const MX_INTEGRATION_VC_GET_ACCOUNTS_PATH = `${MX_INTEGRATION_PATH}/vc/users/:userId/members/:connectionId/accounts`;
-export const MX_VC_GET_ACCOUNTS_PATH = `${MX_BASE_PATH}/vc/users/:userId/members/:connectionId/accounts`;
-export const MX_VC_GET_IDENTITY_PATH = `${MX_BASE_PATH}/vc/users/:userId/members/:connectionId/customers`;
-export const MX_VC_GET_TRANSACTIONS_PATH = `${MX_BASE_PATH}/vc/users/:userId/accounts/:accountId/transactions`;
-
-const handlers = [
+export const mxHandlers = [
   http.get(MX_VC_GET_TRANSACTIONS_PATH, () =>
     HttpResponse.json({ verifiableCredential: mxVcTranscationsData }),
   ),
@@ -96,5 +94,3 @@ const handlers = [
   http.get(USERS_PATH, () => HttpResponse.json(listUsersData)),
   http.post(CREATE_USER_PATH, () => HttpResponse.json(createUserData)),
 ];
-
-export default handlers;

@@ -7,17 +7,19 @@ import {
 } from "./adapterIndex";
 import type { Aggregator } from "./adapterSetup";
 import {
-  TEST_EXAMPLE_A_AGGREGATOR_STRING,
-  TEST_EXAMPLE_C_AGGREGATOR_STRING,
-  TestAdapter,
-} from "./test-adapter";
-import { testVcAccountsData } from "./test/testData/testVcData";
+  MX_AGGREGATOR_STRING,
+  MX_INT_AGGREGATOR_STRING,
+  MxAdapter,
+} from "@repo/mx-adapter";
+import { mxTestData } from "@repo/utils-dev-dependency";
+
+const { mxVcIntegrationAccountsData } = mxTestData;
 
 const connectionId = "testConectionId";
 const type = VCDataTypes.ACCOUNTS;
 const userId = "testUserId";
 
-describe("adapterSetup", () => {
+describe("adapterIndex", () => {
   describe("getVC", () => {
     it("throws an error if the aggregator doesnt have a handler", async () => {
       await expect(
@@ -33,15 +35,15 @@ describe("adapterSetup", () => {
   });
 
   describe("getData", () => {
-    it("uses testExample if the aggregator is testExampleA", async () => {
+    it("uses mx if the aggregator is mx", async () => {
       const response = await getData({
-        aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+        aggregator: MX_INT_AGGREGATOR_STRING,
         connectionId,
         type,
         userId,
       });
 
-      expect(response).toEqual(getDataFromVCJwt(testVcAccountsData));
+      expect(response).toEqual(getDataFromVCJwt(mxVcIntegrationAccountsData));
     });
 
     it("throws an error if the aggregator doesnt have a handler", async () => {
@@ -64,26 +66,26 @@ describe("adapterSetup", () => {
       ).toThrow("Unsupported aggregator junk");
     });
 
-    it("returns the testExample widget adapter", () => {
+    it("returns the mx widget adapter", () => {
       const adapter = createAggregatorWidgetAdapter({
-        aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+        aggregator: MX_AGGREGATOR_STRING,
       });
 
-      expect(adapter).toBeInstanceOf(TestAdapter);
+      expect(adapter).toBeInstanceOf(MxAdapter);
     });
   });
 
   describe("getAggregatorIdFromTestAggregatorId", () => {
     it("gets the associated aggregatorId from a test adapter's id", () => {
       expect(
-        getAggregatorIdFromTestAggregatorId(TEST_EXAMPLE_C_AGGREGATOR_STRING),
-      ).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
+        getAggregatorIdFromTestAggregatorId(MX_INT_AGGREGATOR_STRING),
+      ).toEqual(MX_AGGREGATOR_STRING);
     });
 
     it("returns the testId if there is no aggregatorId associated with the one provided", () => {
-      expect(
-        getAggregatorIdFromTestAggregatorId(TEST_EXAMPLE_A_AGGREGATOR_STRING),
-      ).toEqual(TEST_EXAMPLE_A_AGGREGATOR_STRING);
+      expect(getAggregatorIdFromTestAggregatorId(MX_AGGREGATOR_STRING)).toEqual(
+        MX_AGGREGATOR_STRING,
+      );
     });
   });
 });

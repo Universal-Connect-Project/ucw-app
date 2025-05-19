@@ -2,7 +2,7 @@ import {
   expectConnectionSuccess,
   clickContinue,
   searchByText,
-} from "@repo/utils-dev-dependency";
+} from "@repo/utils-cypress";
 
 export const searchAndSelectSophtron = () => {
   searchByText("Sophtron Bank NoMFA");

@@ -1,22 +1,21 @@
-import {
-  searchByText,
-  visitAgg,
-  visitIdentity,
-} from "@repo/utils-dev-dependency";
-import {
-  TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME,
-  TEST_EXAMPLE_B_ONLY_INSTITUTION_NAME,
-} from "../../shared/constants/testExample";
+import { searchByText, visitAgg, visitIdentity } from "@repo/utils-cypress";
 import { ComboJobTypes } from "@repo/utils";
+import { CHASE_BANK_TEST_FILTER_NAME } from "../../../src/testInstitutions/testInstitutions";
+import {
+  MX_BANK_NAME,
+  MX_BANK_ROUTING_NUMBER,
+  MX_BANK_TRANSACTIONS_ONLY_NAME,
+} from "@repo/mx-adapter/src/testInstitutions";
+import { SOPHTRON_BANK_NAME } from "@repo/sophtron-adapter/src/testInstitutions";
 
 const institutionThatIsInFavoritesButDoesntSupportIdentification =
-  "TestExample Doesnt Support Identification Bank";
+  MX_BANK_TRANSACTIONS_ONLY_NAME;
 
 describe("search", () => {
   it("loads more institutions", () => {
     visitAgg();
 
-    searchByText(TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME);
+    searchByText("test");
 
     cy.findByText("25 search results");
 
@@ -24,17 +23,13 @@ describe("search", () => {
 
     cy.findByText("50 search results");
 
-    cy.findAllByText(TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME).should(
-      "have.length",
-      1,
-    );
+    cy.findAllByText(CHASE_BANK_TEST_FILTER_NAME).should("have.length", 1);
   });
 
   it("filters recommended institutions by job type", () => {
     visitAgg();
 
-    const institutionThatIsInFavoriteAndSupportsAll =
-      TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME;
+    const institutionThatIsInFavoriteAndSupportsAll = MX_BANK_NAME;
 
     cy.findByText(
       institutionThatIsInFavoritesButDoesntSupportIdentification,
@@ -55,13 +50,13 @@ describe("search", () => {
     it("Finds expected banks", () => {
       visitAgg();
 
-      searchByText("tex");
-      cy.findByText(TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME, {
+      searchByText("soperton");
+      cy.findByText(SOPHTRON_BANK_NAME, {
         timeout: 45000,
       }).should("exist");
 
-      cy.findByPlaceholderText("Search").clear().type("testexamplo");
-      cy.findByText(TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME, {
+      cy.findByPlaceholderText("Search").clear().type("gringotts");
+      cy.findByText(MX_BANK_NAME, {
         timeout: 45000,
       }).should("exist");
     });
@@ -71,25 +66,14 @@ describe("search", () => {
 
       const needMoreThanResultNumber = 4;
 
-      cy.findByPlaceholderText("Search").clear().type("TestExample");
-      cy.findByText(TEST_EXAMPLE_B_ONLY_INSTITUTION_NAME).should("exist");
+      searchByText("sophtron");
+      cy.findByText(SOPHTRON_BANK_NAME).should("exist");
+      cy.findByText("Soperton").should("exist");
       cy.findAllByTestId(new RegExp("-row")).then((institutions) => {
         expect(institutions.length).to.be.greaterThan(needMoreThanResultNumber);
 
-        let noIdentificationBankFound = false;
-
-        for (let i = 0; i < needMoreThanResultNumber; i++) {
-          const ariaLabel = institutions.eq(i).attr("aria-label");
-
-          if (
-            ariaLabel ===
-            `Add account with ${institutionThatIsInFavoritesButDoesntSupportIdentification}`
-          ) {
-            noIdentificationBankFound = true;
-          }
-        }
-
-        expect(noIdentificationBankFound).to.be.true;
+        const ariaLabel = institutions.eq(0).attr("aria-label");
+        expect(ariaLabel).to.eq(`Add account with ${SOPHTRON_BANK_NAME}`);
       });
     });
   });
@@ -108,8 +92,8 @@ describe("search", () => {
     it(`does not show ${institutionThatIsInFavoritesButDoesntSupportIdentification} for identity job type because that job type is not supported`, () => {
       visitIdentity();
 
-      searchByText("test example");
-      cy.findByText(TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME, {
+      searchByText("mx bank");
+      cy.findByText(MX_BANK_NAME, {
         timeout: 45000,
       }).should("exist");
       cy.findByText(
@@ -119,12 +103,11 @@ describe("search", () => {
   });
 
   describe("Search by routing number", () => {
-    it('shows "America First Credit Union" when the routing number is entered into search', () => {
+    it("shows a bank when the routing number is entered into search", () => {
       visitAgg();
 
-      searchByText("111111111");
-      cy.findByText(TEST_EXAMPLE_B_ONLY_INSTITUTION_NAME).should("exist");
-      cy.findByText(TEST_EXAMPLE_A_ONLY_INSTITUTION_NAME).should("not.exist");
+      searchByText(MX_BANK_ROUTING_NUMBER);
+      cy.findByText(MX_BANK_NAME).should("exist");
     });
   });
 });

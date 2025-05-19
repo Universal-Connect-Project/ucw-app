@@ -174,7 +174,9 @@ export class FinicityAdapter implements WidgetAdapter {
 
   async ResolveUserId(userId: string, failIfNotFound: boolean = false) {
     this.logger.debug("Resolving UserId: " + userId);
+
     const finicityUser = await this.apiClient.getCustomer(userId);
+
     if (finicityUser) {
       this.logger.trace(`Found existing finicity customer ${finicityUser.id}`);
       return finicityUser.id;

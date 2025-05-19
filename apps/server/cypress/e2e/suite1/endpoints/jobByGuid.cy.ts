@@ -1,13 +1,13 @@
-import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../../../../src/test-adapter/constants";
+import { MX_INT_AGGREGATOR_STRING } from "@repo/mx-adapter";
 
 describe("jobByGuid", () => {
   it("returns a job", () => {
-    const testJobGuid = "testExampleA";
+    const testJobGuid = "junk";
 
     cy.request({
       headers: {
         meta: JSON.stringify({
-          aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+          aggregator: MX_INT_AGGREGATOR_STRING,
         }),
       },
       url: `/jobs/${testJobGuid}`,

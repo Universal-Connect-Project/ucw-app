@@ -1,17 +1,21 @@
 import { ConnectApi } from "./connectApi";
-import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../test-adapter/constants";
 import { ComboJobTypes, ConnectionStatus } from "@repo/utils";
 import type { Context } from "../shared/contract";
-import {
-  testConnectionId,
-  testInstitutionCode,
-  testJobId,
-} from "../test-adapter/adapter";
+import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
+import { mxTestData } from "@repo/utils-dev-dependency";
+
+const {
+  connectionByIdMemberData,
+  memberStatusData: mxMemberStatusData,
+  oauthMemberdata: mxOauthMemberData,
+} = mxTestData;
+
+const resolvedUserId = "resolvedUserId";
 
 const testContext = {
-  aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+  aggregator: MX_AGGREGATOR_STRING,
   institutionId: "xxx",
-  resolvedUserId: null,
+  resolvedUserId,
   jobTypes: [ComboJobTypes.TRANSACTIONS],
 } as Context;
 
@@ -37,35 +41,37 @@ describe("connectApi", () => {
         ],
       };
 
+      const mxMember = mxOauthMemberData.member;
+
       const response = await connectApi.addMember(memberData);
 
       expect(response).toEqual({
         member: {
           aggregator: testContext.aggregator,
           connection_status: ConnectionStatus.CREATED,
-          guid: testConnectionId,
-          institution_guid: testInstitutionCode,
-          is_being_aggregated: false,
-          is_oauth: false,
+          guid: memberData.guid,
+          institution_guid: undefined,
+          is_being_aggregated: undefined,
+          is_oauth: mxMember.is_oauth,
           mfa: {
             credentials: undefined,
           },
           most_recent_job_guid: null,
-          oauth_window_uri: undefined,
+          oauth_window_uri: mxMember.oauth_window_uri,
           postMessageEventData: {
             memberConnected: {
-              aggregator: "testExampleA",
-              member_guid: "testConnectionId",
-              user_guid: undefined,
+              aggregator: MX_AGGREGATOR_STRING,
+              member_guid: memberData.guid,
+              user_guid: resolvedUserId,
             },
             memberStatusUpdate: {
-              aggregator: "testExampleA",
+              aggregator: MX_AGGREGATOR_STRING,
               connection_status: 0,
-              member_guid: "testConnectionId",
-              user_guid: undefined,
+              member_guid: memberData.guid,
+              user_guid: resolvedUserId,
             },
           },
-          user_guid: undefined,
+          user_guid: resolvedUserId,
         },
       });
     });
@@ -75,34 +81,36 @@ describe("connectApi", () => {
     it("returns a member array with a most recent job guid", async () => {
       const response = await connectApi.loadMemberByGuid("testGuid");
 
+      const mxConnectionByIdMember = connectionByIdMemberData.member;
+
+      const mxMemberStatus = mxMemberStatusData.member;
+
       expect(response).toEqual({
         aggregator: testContext.aggregator,
         connection_status: ConnectionStatus.CONNECTED,
-        guid: testConnectionId,
-        institution_guid: testInstitutionCode,
+        guid: mxConnectionByIdMember.guid,
+        institution_guid: mxConnectionByIdMember.institution_code,
         is_being_aggregated: false,
         is_oauth: false,
         mfa: {
           credentials: [],
         },
-        most_recent_job_guid: testJobId,
-        oauth_window_uri: undefined,
+        most_recent_job_guid: mxMemberStatus.guid,
+        oauth_window_uri: mxConnectionByIdMember.oauth_window_uri,
         postMessageEventData: {
           memberConnected: {
-            aggregator: "testExampleA",
-            member_guid: "testConnectionId",
-            test: "connected",
-            user_guid: null,
+            aggregator: MX_AGGREGATOR_STRING,
+            member_guid: mxConnectionByIdMember.guid,
+            user_guid: resolvedUserId,
           },
           memberStatusUpdate: {
-            aggregator: "testExampleA",
+            aggregator: MX_AGGREGATOR_STRING,
             connection_status: 6,
-            member_guid: "testConnectionId",
-            test: "updated",
-            user_guid: null,
+            member_guid: mxConnectionByIdMember.guid,
+            user_guid: resolvedUserId,
           },
         },
-        user_guid: null,
+        user_guid: resolvedUserId,
       });
     });
   });

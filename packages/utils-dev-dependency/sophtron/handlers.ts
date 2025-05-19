@@ -40,7 +40,7 @@ export const SOPHTRON_VC_GET_IDENTITY_PATH = `${SOPHTRON_VC_BASE_PATH}/customers
 export const SOPHTRON_VC_GET_ACCOUNTS_PATH = `${SOPHTRON_VC_BASE_PATH}/customers/:userId/members/:connectionId/accounts`;
 export const SOPHTRON_VC_GET_TRANSACTIONS_PATH = `${SOPHTRON_VC_BASE_PATH}/customers/:userId/accounts/:accountId/transactions`;
 
-const handlers = [
+export const sophtronHandlers = [
   http.get(SOPHTRON_VC_GET_TRANSACTIONS_PATH, () =>
     HttpResponse.json({ vc: sophtronVcTranscationsData }),
   ),
@@ -86,5 +86,3 @@ const handlers = [
     () => new HttpResponse(null, { status: 200 }),
   ),
 ];
-
-export default handlers;

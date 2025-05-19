@@ -1,20 +1,19 @@
 import { ComboJobTypes } from "@repo/utils";
-import { TEST_EXAMPLE_A_AGGREGATOR_STRING } from "../test-adapter";
 import {
   getInstitutionCredentialsHandler,
   type GetInstitutionCredentialsRequest,
 } from "./getInstitutionCredentialsHandler";
 import type { Response } from "express";
-import {
-  TEST_EXAMPLE_A_LABEL_TEXT,
-  testExampleCredentials,
-} from "../test-adapter/constants";
+import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
+import { mxTestData } from "@repo/utils-dev-dependency";
+
+const { institutionCredentialsData: mxInstitutionCredentialsData } = mxTestData;
 
 describe("getInstitutionCredentialsHandler", () => {
   it("returns with the institution credentials", async () => {
     const context = {
       jobTypes: [ComboJobTypes.TRANSACTIONS],
-      aggregator: TEST_EXAMPLE_A_AGGREGATOR_STRING,
+      aggregator: MX_AGGREGATOR_STRING,
     };
 
     const req = {
@@ -28,15 +27,24 @@ describe("getInstitutionCredentialsHandler", () => {
       send: jest.fn(),
     } as unknown as Response;
 
+    const institutionCredentials = mxInstitutionCredentialsData.credentials;
+
     await getInstitutionCredentialsHandler(req, res);
 
     expect(res.send).toHaveBeenCalledWith([
       {
-        field_name: testExampleCredentials.field_name,
+        field_name: institutionCredentials[0].field_name,
+        field_type: 1,
+        guid: institutionCredentials[0].guid,
+        id: institutionCredentials[0].guid,
+        label: institutionCredentials[0].label,
+      },
+      {
+        field_name: institutionCredentials[1].field_name,
         field_type: 3,
-        guid: testExampleCredentials.id,
-        id: testExampleCredentials.id,
-        label: TEST_EXAMPLE_A_LABEL_TEXT,
+        guid: institutionCredentials[1].guid,
+        id: institutionCredentials[1].guid,
+        label: institutionCredentials[1].label,
       },
     ]);
   });

@@ -1,11 +1,11 @@
 import {
   MEMBER_CONNECTED_EVENT_TYPE,
+  makeAnMXConnection,
   searchByText,
   verifyAccountsAndReturnAccountId,
   visitAgg,
   visitWithPostMessageSpy,
-} from "@repo/utils-dev-dependency";
-import { makeAConnection } from "../../utils/mx";
+} from "@repo/utils-cypress";
 import { ComboJobTypes } from "@repo/utils";
 
 describe("mx aggregator using axios proxy", () => {
@@ -18,7 +18,7 @@ describe("mx aggregator using axios proxy", () => {
     visitWithPostMessageSpy(
       `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
     )
-      .then(() => makeAConnection())
+      .then(() => makeAnMXConnection())
       .then(() => {
         // Capture postmessages into variables
         cy.get("@postMessage", { timeout: 90000 }).then((mySpy) => {

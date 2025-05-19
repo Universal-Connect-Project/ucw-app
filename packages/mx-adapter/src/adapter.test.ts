@@ -5,9 +5,7 @@ import {
   USER_NOT_RESOLVED_ERROR_TEXT,
 } from "@repo/utils";
 import { http, HttpResponse } from "msw";
-
 import { MxAdapter } from "./adapter";
-
 import {
   ANSWER_CHALLENGE_PATH,
   CREATE_MEMBER_PATH,
@@ -17,24 +15,26 @@ import {
   MX_DELETE_USER_PATH,
   READ_MEMBER_STATUS_PATH,
   UPDATE_CONNECTION_PATH,
-} from "./test/handlers";
-import { institutionData } from "./test/testData/institution";
-import { institutionCredentialsData } from "./test/testData/institutionCredentials";
-import { aggregatorCredentials } from "./test/testData/aggregatorCredentials";
-import {
-  connectionByIdMemberData,
-  memberData,
-  membersData,
-  memberStatusData,
-  oauthMemberdata,
-} from "./test/testData/members";
-import { createUserData, listUsersData } from "./test/testData/users";
+} from "@repo/utils-dev-dependency";
+import { mxTestData } from "@repo/utils-dev-dependency";
 import { server } from "./test/testServer";
-
 import {
   createClient as createCacheClient,
   createLogClient,
 } from "@repo/utils/test";
+
+const {
+  aggregatorCredentials,
+  connectionByIdMemberData,
+  createUserData,
+  institutionCredentialsData,
+  institutionData,
+  listUsersData,
+  memberData,
+  membersData,
+  memberStatusData,
+  oauthMemberdata,
+} = mxTestData;
 
 const cacheClient = createCacheClient();
 const logClient = createLogClient();

@@ -4,7 +4,7 @@ import axios from "mx-platform-node/node_modules/axios";
 import { basePathInt, basePathProd } from "./consts";
 import type { ApiCredentials } from "./models";
 
-export const BASE_PATH = "https://api.mx.com".replace(/\/+$/, "");
+export const BASE_PATH = "https://api.mx.com";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const MxProdApiClient: any = ({

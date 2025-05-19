@@ -5,8 +5,10 @@ import { http, HttpResponse } from "msw";
 import {
   SOPHTRON_CREATE_MEMBER_PATH,
   SOPHTRON_UPDATE_MEMBER_PATH,
-} from "./test/handlers";
-import { createMemberData } from "./test/testData/sophtronMember";
+  sophtronTestData,
+} from "@repo/utils-dev-dependency";
+
+const { createMemberData } = sophtronTestData;
 
 const client = new SophtronV2Client({
   aggregatorCredentials: {
