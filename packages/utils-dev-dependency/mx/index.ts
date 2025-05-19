@@ -1,3 +1,5 @@
 export * from "./handlers";
 export * from "./consts";
-export * from "./testData";
+export * as testData from "./testData";
+
+export const mxTestData = testData;

@@ -14,14 +14,15 @@ import type { Aggregator } from "../shared/contract";
 import { invalidAggregatorString } from "../utils/validators";
 import { getDataFromVCJwt, USER_NOT_RESOLVED_ERROR_TEXT } from "@repo/utils";
 import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
-import {
-  listUsersData as mxListUsersData,
+import { mxTestData, sophtronTestData } from "@repo/utils-dev-dependency";
+import { SOPHTRON_ADAPTER_NAME } from "@repo/sophtron-adapter/src/constants";
+
+const {
+  listUsersData: mxListUsersData,
   mxVcAccountsData,
   mxVcIdentityData,
   mxVcTranscationsData,
-  sophtronTestData,
-} from "@repo/utils-dev-dependency";
-import { SOPHTRON_ADAPTER_NAME } from "@repo/sophtron-adapter/src/constants";
+} = mxTestData;
 
 const userIdThatExists = mxListUsersData.users[0].id;
 

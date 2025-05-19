@@ -8,7 +8,9 @@ import {
   MX_AGGREGATOR_STRING,
   MX_INT_AGGREGATOR_STRING,
 } from "@repo/mx-adapter";
-import { institutionData as mxInstitutionData } from "@repo/utils-dev-dependency";
+import { mxTestData } from "@repo/utils-dev-dependency";
+
+const { institutionData: mxInstitutionData } = mxTestData;
 
 const ucpInstitutionId = "testAggregatorInstitutionGuid";
 

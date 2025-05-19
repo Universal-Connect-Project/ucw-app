@@ -16,7 +16,14 @@ import {
   READ_MEMBER_STATUS_PATH,
   UPDATE_CONNECTION_PATH,
 } from "@repo/utils-dev-dependency";
+import { mxTestData } from "@repo/utils-dev-dependency";
+import { server } from "./test/testServer";
 import {
+  createClient as createCacheClient,
+  createLogClient,
+} from "@repo/utils/test";
+
+const {
   aggregatorCredentials,
   connectionByIdMemberData,
   createUserData,
@@ -27,12 +34,7 @@ import {
   membersData,
   memberStatusData,
   oauthMemberdata,
-} from "@repo/utils-dev-dependency";
-import { server } from "./test/testServer";
-import {
-  createClient as createCacheClient,
-  createLogClient,
-} from "@repo/utils/test";
+} = mxTestData;
 
 const cacheClient = createCacheClient();
 const logClient = createLogClient();

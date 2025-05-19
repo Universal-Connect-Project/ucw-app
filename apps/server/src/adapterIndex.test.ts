@@ -11,7 +11,9 @@ import {
   MX_INT_AGGREGATOR_STRING,
   MxAdapter,
 } from "@repo/mx-adapter";
-import { mxVcIntegrationAccountsData } from "@repo/utils-dev-dependency";
+import { mxTestData } from "@repo/utils-dev-dependency";
+
+const { mxVcIntegrationAccountsData } = mxTestData;
 
 const connectionId = "testConectionId";
 const type = VCDataTypes.ACCOUNTS;

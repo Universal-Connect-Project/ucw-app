@@ -8,11 +8,10 @@ import {
 } from "@repo/utils-dev-dependency";
 import { server } from "./test/testServer";
 
-import {
-  aggregatorCredentials,
-  mxVcAccountsData,
-} from "@repo/utils-dev-dependency";
+import { mxTestData } from "@repo/utils-dev-dependency";
 import { createClient, createLogClient } from "@repo/utils/test";
+
+const { aggregatorCredentials, mxVcAccountsData } = mxTestData;
 
 const accountsPath = "users/userId/members/connectionId/accounts";
 

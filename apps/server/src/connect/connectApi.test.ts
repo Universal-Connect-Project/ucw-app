@@ -2,11 +2,13 @@ import { ConnectApi } from "./connectApi";
 import { ComboJobTypes, ConnectionStatus } from "@repo/utils";
 import type { Context } from "../shared/contract";
 import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
-import {
+import { mxTestData } from "@repo/utils-dev-dependency";
+
+const {
   connectionByIdMemberData,
-  memberStatusData as mxMemberStatusData,
-  oauthMemberdata as mxOauthMemberData,
-} from "@repo/utils-dev-dependency";
+  memberStatusData: mxMemberStatusData,
+  oauthMemberdata: mxOauthMemberData,
+} = mxTestData;
 
 const resolvedUserId = "resolvedUserId";
 

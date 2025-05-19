@@ -5,7 +5,9 @@ import {
 } from "./getInstitutionCredentialsHandler";
 import type { Response } from "express";
 import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
-import { institutionCredentialsData as mxInstitutionCredentialsData } from "@repo/utils-dev-dependency";
+import { mxTestData } from "@repo/utils-dev-dependency";
+
+const { institutionCredentialsData: mxInstitutionCredentialsData } = mxTestData;
 
 describe("getInstitutionCredentialsHandler", () => {
   it("returns with the institution credentials", async () => {
