@@ -269,10 +269,7 @@ describe("dataEndpoints", () => {
             aggregator: MX_AGGREGATOR_STRING,
             userId: userIdThatExists,
           },
-          query: {
-            start_time: undefined,
-            end_time: undefined,
-          },
+          query: {},
         };
 
         await vcTransactionsDataHandler(req, res);
@@ -294,10 +291,7 @@ describe("dataEndpoints", () => {
             aggregator: MX_AGGREGATOR_STRING,
             userId: userIdThatExists,
           },
-          query: {
-            start_time: undefined,
-            end_time: undefined,
-          },
+          query: {},
         };
 
         await createTransactionsDataHandler(false)(req, res);
@@ -313,8 +307,32 @@ describe("dataEndpoints", () => {
             aggregator: SOPHTRON_ADAPTER_NAME,
           },
           query: {
-            start_time: "testStartTime",
-            end_time: "testEndTime",
+            start_time: "2021/1/1",
+            end_time: "2025/1/5",
+          },
+        } as unknown as TransactionsRequest;
+
+        const res = {
+          json: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as unknown as any;
+
+        await createTransactionsDataHandler(true)(req, res);
+
+        expect(res.json).toHaveBeenCalledWith({
+          jwt: sophtronTestData.sophtronVcTranscationsData,
+        });
+      });
+
+      it("succeeds with standardized transaction date params", async () => {
+        const req = {
+          params: {
+            aggregator: SOPHTRON_ADAPTER_NAME,
+          },
+          query: {
+            startDate: "2025-01-01",
+            endDate: "2025-05-20",
           },
         } as unknown as TransactionsRequest;
 
@@ -343,10 +361,7 @@ describe("dataEndpoints", () => {
             aggregator: MX_AGGREGATOR_STRING,
             userId: userIdThatExists,
           },
-          query: {
-            end_time: undefined,
-            start_time: undefined,
-          },
+          query: {},
         };
 
         await vcTransactionsDataHandler(req, res);
@@ -359,8 +374,8 @@ describe("dataEndpoints", () => {
             aggregator: SOPHTRON_ADAPTER_NAME,
           },
           query: {
-            start_time: undefined,
-            end_time: "testEndTime",
+            startDate: undefined,
+            endDate: "testEndTime",
           },
         } as unknown as TransactionsRequest;
 
@@ -373,7 +388,7 @@ describe("dataEndpoints", () => {
         await createTransactionsDataHandler(false)(req, res);
 
         expect(res.json).toHaveBeenCalledWith(
-          he.encode('"start_time" is required'),
+          he.encode('"endDate" must be in iso format'),
         );
       });
     });

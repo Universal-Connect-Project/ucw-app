@@ -38,6 +38,16 @@ describe("Sophtron aggregator", () => {
     transactionsQueryString: "?start_time=2021/1/1&end_time=2099/12/31",
   });
 
+  generateDataTests({
+    makeAConnection,
+    transactionsAccountSelector: (accounts) =>
+      accounts.find(
+        (account) => account?.depositAccount?.nickname === "Primary Checking",
+      ),
+    shouldTestVcEndpoint: true,
+    transactionsQueryString: "?startDate=2021-01-01&endDate=2099-12-31",
+  });
+
   it("shows single account select if no parameter is passed, and skips single account select if singleAccountSelect=false", () => {
     const userId = Cypress.env("userId");
 

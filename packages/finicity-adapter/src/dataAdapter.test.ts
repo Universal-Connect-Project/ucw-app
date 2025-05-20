@@ -13,7 +13,10 @@ import {
 import { http, HttpResponse } from "msw";
 import { server } from "./test/testServer";
 import { BASE_PATH } from "./apiClient";
-import { accountsData } from "./test/testData/accounts";
+import {
+  accountsData,
+  accountTransactionsData,
+} from "./test/testData/accounts";
 
 const dependencies: DataAdapterDependencies = {
   logClient: createLogClient(),
@@ -224,6 +227,126 @@ describe("dataAdapter", () => {
           },
         },
       ],
+    });
+  });
+
+  describe("getPreparedDateRangeParams (transactions date params)", () => {
+    let requestFromDate: string | undefined;
+    let requestToDate: string | undefined;
+
+    beforeEach(() => {
+      requestFromDate = undefined;
+      requestToDate = undefined;
+      server.use(
+        http.get(
+          `${BASE_PATH}/aggregation/v4/customers/${userId}/accounts/${accountId}/transactions`,
+          ({ request }) => {
+            const url = new URL(request.url);
+            requestFromDate = url.searchParams.get("fromDate") ?? undefined;
+            requestToDate = url.searchParams.get("toDate") ?? undefined;
+            return HttpResponse.json(accountTransactionsData);
+          },
+        ),
+      );
+    });
+
+    it("uses provided valid ISO date strings (YYYY-MM-DD)", async () => {
+      const startDate = "2022-01-01";
+      const endDate = "2022-02-01";
+      await prodDataAdapter({
+        connectionId,
+        type: VCDataTypes.TRANSACTIONS,
+        userId,
+        accountId,
+        startDate,
+        endDate,
+      });
+      expect(requestFromDate).toBe(
+        String(Math.floor(new Date(startDate).getTime() / 1000)),
+      );
+      expect(requestToDate).toBe(
+        String(Math.floor(new Date(endDate).getTime() / 1000)),
+      );
+    });
+
+    it("defaults fromDate to 120 days ago if startDate is not provided", async () => {
+      const endDate = "2022-02-01";
+      const daysAgo = new Date();
+      daysAgo.setDate(daysAgo.getDate() - 120);
+      const expectedFrom = String(Math.floor(daysAgo.getTime() / 1000));
+
+      await prodDataAdapter({
+        connectionId,
+        type: VCDataTypes.TRANSACTIONS,
+        userId,
+        accountId,
+        endDate,
+      });
+      expect(requestFromDate).toBe(expectedFrom);
+      expect(requestToDate).toBe(
+        String(Math.floor(new Date(endDate).getTime() / 1000)),
+      );
+    });
+
+    it("defaults toDate to now if endDate is not provided", async () => {
+      const startDate = "2022-01-01";
+      const nowUnix = Math.floor(Date.now() / 1000);
+
+      await prodDataAdapter({
+        connectionId,
+        type: VCDataTypes.TRANSACTIONS,
+        userId,
+        accountId,
+        startDate,
+      });
+      expect(requestFromDate).toBe(
+        String(Math.floor(new Date(startDate).getTime() / 1000)),
+      );
+      const toDateNum = Number(requestToDate);
+      expect(toDateNum).toBeGreaterThanOrEqual(nowUnix - 5);
+      expect(toDateNum).toBeLessThanOrEqual(nowUnix + 5);
+    });
+
+    it("defaults both fromDate and toDate if neither are provided", async () => {
+      const daysAgo = new Date();
+      daysAgo.setDate(daysAgo.getDate() - 120);
+      const expectedFrom = String(Math.floor(daysAgo.getTime() / 1000));
+      const nowUnix = Math.floor(Date.now() / 1000);
+
+      await prodDataAdapter({
+        connectionId,
+        type: VCDataTypes.TRANSACTIONS,
+        userId,
+        accountId,
+      });
+      expect(requestFromDate).toBe(expectedFrom);
+      const toDateNum = Number(requestToDate);
+      expect(toDateNum).toBeGreaterThanOrEqual(nowUnix - 5);
+      expect(toDateNum).toBeLessThanOrEqual(nowUnix + 5);
+    });
+
+    it("throws if startDate is invalid", async () => {
+      await expect(
+        prodDataAdapter({
+          connectionId,
+          type: VCDataTypes.TRANSACTIONS,
+          userId,
+          accountId,
+          startDate: "not-a-date",
+        }),
+      ).rejects.toThrow("startDate must be a valid ISO 8601 date string");
+    });
+
+    it("throws if endDate is invalid", async () => {
+      await expect(
+        prodDataAdapter({
+          connectionId,
+          type: VCDataTypes.TRANSACTIONS,
+          userId,
+          accountId,
+          endDate: "not-a-date",
+        }),
+      ).rejects.toThrow("endDate must be a valid ISO 8601 date string");
     });
   });
 });

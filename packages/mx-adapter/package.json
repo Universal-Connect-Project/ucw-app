@@ -20,6 +20,7 @@
     "@types/node": "^22.7.6",
     "axios": "^1.7.7",
     "eslint-config-prettier": "^10.1.1",
+    "joi": "^17.13.3",
     "mx-platform-node": "^0.43.0"
   },
   "devDependencies": {

@@ -245,3 +245,12 @@ export interface CachedInstitution {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [propName: string]: any;
 }
+
+export interface DataAdapterRequestParams {
+  connectionId: string;
+  type: string;
+  userId: string;
+  accountId?: string;
+  startDate?: string;
+  endDate?: string;
+}

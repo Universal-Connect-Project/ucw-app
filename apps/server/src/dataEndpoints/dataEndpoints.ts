@@ -104,8 +104,10 @@ export const createIdentityDataHandler = (isVc: boolean) =>
   });
 
 export interface TransactionsDataQueryParameters {
-  end_time: string;
-  start_time: string;
+  endDate?: string;
+  startDate?: string;
+  start_time?: string;
+  end_time?: string;
   connectionId?: string;
 }
 
@@ -119,7 +121,8 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
   withValidateAggregatorInPath(
     async (req: TransactionsRequest, res: Response) => {
       const { accountId, aggregator, userId } = req.params;
-      const { start_time, end_time, connectionId } = req.query;
+      const { startDate, endDate, connectionId, start_time, end_time } =
+        req.query;
 
       try {
         const aggregatorAdapter = createAggregatorWidgetAdapter({ aggregator });
@@ -134,8 +137,8 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
           userId: aggregatorUserId,
           accountId,
           connectionId: connectionId,
-          startTime: start_time,
-          endTime: end_time,
+          startDate: startDate || start_time,
+          endDate: endDate || end_time,
         };
 
         let validationError: string | undefined;

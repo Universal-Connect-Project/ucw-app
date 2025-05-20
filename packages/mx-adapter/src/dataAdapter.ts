@@ -1,9 +1,6 @@
+import type { DataAdapterRequestParams } from "@repo/utils";
 import { getDataFromVCJwt } from "@repo/utils";
-import {
-  createMxIntGetVC,
-  createMxProdGetVC,
-  type DataParameters,
-} from "./createVc";
+import { createMxIntGetVC, createMxProdGetVC } from "./createVc";
 import type { VCDependencies } from "./models";
 
 const createDataAdapter = (isProd: boolean, dependencies: VCDependencies) => {
@@ -11,7 +8,7 @@ const createDataAdapter = (isProd: boolean, dependencies: VCDependencies) => {
     ? createMxProdGetVC(dependencies)
     : createMxIntGetVC(dependencies);
 
-  return async (params: DataParameters) =>
+  return async (params: DataAdapterRequestParams) =>
     getDataFromVCJwt(await getVC(params));
 };
 

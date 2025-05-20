@@ -16,6 +16,7 @@ import {
 import type { AdapterConfig, Customer } from "./models";
 import FinicityClient from "./apiClient";
 import { v4 as uuidv4 } from "uuid";
+import Joi from "joi";
 
 interface CachedConnection {
   connection?: Connection;
@@ -44,6 +45,24 @@ export class FinicityAdapter implements WidgetAdapter {
       this.cacheClient,
     );
   }
+
+  DataRequestValidators = {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    transactions: (req: any) => {
+      const schema = Joi.object({
+        startDate: Joi.string().isoDate(),
+        endDate: Joi.string().isoDate(),
+      });
+
+      const { error } = schema.validate(req.query);
+
+      if (error) {
+        return error.details[0].message;
+      }
+
+      return undefined;
+    },
+  };
 
   async DeleteUser(userId: string) {
     return await this.apiClient.deleteCustomer(userId);
