@@ -187,7 +187,12 @@ test.describe("Finicity Adapter Tests", () => {
       }),
     );
 
-    url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions`;
+    const oneMonthAgoIso = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10);
+    const todayIso = new Date().toISOString().slice(0, 10);
+
+    url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions?startDate=${oneMonthAgoIso}&endDate=${todayIso}`;
 
     const transactionsResponse = await request.get(url);
     const transactions = await transactionsResponse.json();
