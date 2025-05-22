@@ -30,9 +30,9 @@ export function createAggregatorWidgetAdapter({
 interface DataParameters {
   accountId?: string;
   connectionId?: string;
-  endTime?: string;
+  endDate?: string;
   aggregator: Aggregator;
-  startTime?: string;
+  startDate?: string;
   type: VCDataTypes;
   userId: string;
 }
@@ -40,9 +40,9 @@ interface DataParameters {
 export async function getData({
   accountId,
   connectionId,
-  endTime,
+  endDate,
   aggregator,
-  startTime,
+  startDate,
   type,
   userId,
 }: DataParameters) {
@@ -55,8 +55,8 @@ export async function getData({
     return dataAdapter({
       accountId,
       connectionId,
-      endTime,
-      startTime,
+      endDate,
+      startDate,
       type,
       userId,
     });
@@ -68,9 +68,9 @@ export async function getData({
 export async function getVC({
   accountId,
   connectionId,
-  endTime,
+  endDate,
   aggregator,
-  startTime,
+  startDate,
   type,
   userId,
 }: DataParameters) {
@@ -83,8 +83,8 @@ export async function getVC({
     return vcAdapter({
       accountId,
       connectionId,
-      endTime,
-      startTime,
+      endDate,
+      startDate,
       type,
       userId,
     });

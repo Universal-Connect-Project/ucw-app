@@ -1,28 +1,22 @@
-import { VCDataTypes } from "@repo/utils";
-
 import type { VCDependencies } from "./models";
 import { getVc as getSophtronVc } from "./getVc";
-
-export type DataParameters = {
-  connectionId: string;
-  type: VCDataTypes;
-  userId: string;
-  accountId?: string;
-  startTime?: string;
-  endTime?: string;
-}
+import {
+  getPreparedDateRangeParams,
+  VCDataTypes,
+  type DataAdapterRequestParams,
+} from "@repo/utils";
 
 export const createSophtronVC = (dependencies: VCDependencies) => {
   return async ({
-     accountId,
-     connectionId,
-     endTime,
-     startTime,
-     type,
-     userId,
-   }: DataParameters) => {
-
+    accountId,
+    connectionId,
+    startDate,
+    endDate,
+    type,
+    userId,
+  }: DataAdapterRequestParams) => {
     let path = "";
+    let params;
 
     switch (type) {
       case VCDataTypes.IDENTITY:
@@ -31,13 +25,24 @@ export const createSophtronVC = (dependencies: VCDependencies) => {
       case VCDataTypes.ACCOUNTS:
         path = `customers/${userId}/members/${connectionId}/accounts`;
         break;
-      case VCDataTypes.TRANSACTIONS:
-        path = `customers/${userId}/accounts/${accountId}/transactions?startTime=${startTime}&endTime=${endTime}`;
+      case VCDataTypes.TRANSACTIONS: {
+        const { preparedStartDate, preparedEndDate } =
+          getPreparedDateRangeParams({
+            startDate,
+            endDate,
+            validDatePattern: /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/,
+          });
+        params = {
+          startTime: preparedStartDate.toISOString().slice(0, 10),
+          endTime: preparedEndDate.toISOString().slice(0, 10),
+        };
+        path = `customers/${userId}/accounts/${accountId}/transactions`;
         break;
+      }
       default:
         break;
     }
 
-    return await getSophtronVc(path, dependencies);
-  }
+    return await getSophtronVc(path, dependencies, params);
+  };
 };

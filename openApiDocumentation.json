@@ -59,7 +59,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["mx", "mx_int", "sophtron"]
+              "enum": ["mx", "mx_int", "sophtron", "finicity", "finicity_sandbox"]
             }
           },
           {
@@ -110,7 +110,7 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["mx", "mx_int", "sophtron"]
+              "enum": ["mx", "mx_int", "sophtron", "finicity", "finicity_sandbox"]
             }
           },
           {
@@ -436,7 +436,7 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["mx", "mx_int", "sophtron"]
+              "enum": ["mx", "mx_int", "sophtron", "finicity", "finicity_sandbox"]
             }
           },
           {
@@ -638,20 +638,25 @@
             }
           },
           {
-            "description": "The connection id, returns accounts of specific connectionId if provided, depends on adapter implementation",
-            "name": "connectionId",
+            "description": "Period start of the transactions to return. Must be in ISO 8601 format (YYYY-MM-DD), timestamp not allowed. Defaults to 120 days ago if not provided.",
+            "name": "startDate",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "example": "2025-01-01"
             }
           },
           {
-            "description": "Period end of the transactions to return. This is only used for Sophtron, and it is required for Sophtron. ex: 1/1/2024",
-            "name": "end_time",
+            "description": "Period end of the transactions to return. Must be in ISO 8601 format (YYYY-MM-DD), timestamp not allowed. Defaults to 5 days in the future if not provided.",
+            "name": "endDate",
             "in": "query",
+            "required": false,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "example": "2025-05-20"
             }
           },
           {
@@ -661,15 +666,7 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["mx", "mx_int", "sophtron"]
-            }
-          },
-          {
-            "description": "Period start of the transactions to return. This is only used for Sophtron, and it is required for Sophtron. ex: 1/1/2024",
-            "name": "start_time",
-            "in": "query",
-            "schema": {
-              "type": "string"
+              "enum": ["mx", "mx_int", "sophtron", "finicity", "finicity_sandbox"]
             }
           },
           {
@@ -6821,11 +6818,25 @@
             }
           },
           {
-            "description": "Period end of the transactions to return. This is only used for Sophtron, and it is required for Sophtron. ex: 1/1/2024",
-            "name": "end_time",
+            "description": "Period start of the transactions to return. Must be in ISO 8601 format (YYYY-MM-DD), timestamp not allowed.",
+            "name": "startDate",
             "in": "query",
+            "required": false,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "example": "2025-01-01"
+            }
+          },
+          {
+            "description": "Period end of the transactions to return. Must be in ISO 8601 format (YYYY-MM-DD), timestamp not allowed.",
+            "name": "endDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "example": "2025-05-20"
             }
           },
           {
@@ -6836,14 +6847,6 @@
             "schema": {
               "type": "string",
               "enum": ["mx", "mx_int", "sophtron"]
-            }
-          },
-          {
-            "description": "Period start of the transactions to return. This is only used for Sophtron, and it is required for Sophtron. ex: 1/1/2024",
-            "name": "start_time",
-            "in": "query",
-            "schema": {
-              "type": "string"
             }
           },
           {

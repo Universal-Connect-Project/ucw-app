@@ -1,3 +1,4 @@
+import { invalidCharacterFixTestToken } from "./test/jwtData";
 import { decodeVcData, getDataFromVCJwt } from "./verifiableCredentials";
 
 describe("verifiable credentials", () => {
@@ -8,6 +9,10 @@ describe("verifiable credentials", () => {
       expect(
         decodeVcData(`abcd.${btoa(JSON.stringify(testObject))}.efgh`),
       ).toEqual(testObject);
+    });
+
+    it("parses a token which caused 'Invalid Character' to throw on previous jwt parsing code", () => {
+      expect(() => decodeVcData(invalidCharacterFixTestToken)).not.toThrow();
     });
   });
 

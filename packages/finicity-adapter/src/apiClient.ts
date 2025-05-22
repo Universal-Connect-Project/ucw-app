@@ -135,9 +135,9 @@ export default class FinicityClient {
     toDate: string,
   ) {
     const params = {
-      fromDate: String(Math.floor(new Date(fromDate).getTime() / 1000)),
-      toDate: String(Math.floor(new Date(toDate).getTime() / 1000)),
-      limit: "100",
+      fromDate,
+      toDate,
+      includePending: "true",
     };
 
     return this.get(

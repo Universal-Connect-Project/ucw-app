@@ -15,8 +15,7 @@
     "@types/jest": "^29.5.13",
     "@types/node": "^22.7.6",
     "axios": "^1.7.7",
-    "he": "^1.2.0",
-    "joi": "^17.13.3"
+    "he": "^1.2.0"
   },
   "devDependencies": {
     "@testing-library/cypress": "^10.0.2",

@@ -230,7 +230,6 @@ export interface WidgetAdapter {
     singleAccountSelect?: boolean,
     userId?: string,
   ) => Promise<Connection | undefined>;
-  DataRequestValidators?: Record<string, (req: any) => string | undefined>;
   HandleOauthResponse?: (request: any) => Promise<Connection>;
 }
 
@@ -244,4 +243,13 @@ export interface CachedInstitution {
   routing_numbers: string[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [propName: string]: any;
+}
+
+export interface DataAdapterRequestParams {
+  connectionId: string;
+  type: string;
+  userId: string;
+  accountId?: string;
+  startDate?: string;
+  endDate?: string;
 }

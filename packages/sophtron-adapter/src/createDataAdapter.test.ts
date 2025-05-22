@@ -22,11 +22,11 @@ describe("dataAdapter", () => {
     const connectionId = "connectionId";
     const userId = "userId";
 
-    const result = await dataAdapter({
+    const result = (await dataAdapter({
       connectionId,
       type: VCDataTypes.ACCOUNTS,
       userId,
-    });
+    })) as { accounts: any[] };
     expect(result.accounts.length).toBeGreaterThan(0);
   });
 });

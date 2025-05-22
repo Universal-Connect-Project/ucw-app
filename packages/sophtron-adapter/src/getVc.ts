@@ -9,7 +9,11 @@ interface VcResponse {
   vc: string;
 }
 
-export const getVc = async (path: string, args: VCDependencies) => {
+export const getVc = async (
+  path: string,
+  args: VCDependencies,
+  params?: { startTime: string; endTime: string },
+) => {
   const { aggregatorCredentials } = args;
   const { clientId, secret } = aggregatorCredentials;
 
@@ -26,6 +30,7 @@ export const getVc = async (path: string, args: VCDependencies) => {
       url: `${vcEndpoint}/vc/${path}`,
       method: "get",
       headers,
+      params,
     })
   ).data;
 
