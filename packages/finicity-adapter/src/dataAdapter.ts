@@ -5,7 +5,11 @@ import {
   transformAccountsToCustomers,
 } from "./mapper";
 import FinicityClient from "./apiClient";
-import { DataAdapterRequestParams, VCDataTypes } from "@repo/utils";
+import {
+  DataAdapterRequestParams,
+  getPreparedDateRangeParams,
+  VCDataTypes,
+} from "@repo/utils";
 
 const createDataAdapter = (
   sandbox: boolean,
@@ -87,10 +91,14 @@ const createDataAdapter = (
         return { accounts: accountsWithAchDetails.map(mapAccount) };
       }
       case VCDataTypes.TRANSACTIONS: {
-        const { fromDate, toDate } = getPreparedDateRangeParams(
-          startDate,
-          endDate,
-        );
+        const { preparedStartDate, preparedEndDate } =
+          getPreparedDateRangeParams({
+            startDate,
+            endDate,
+            defaultEndOverride: new Date(),
+          });
+        const fromDate = String(Math.floor(preparedStartDate.getTime() / 1000));
+        const toDate = String(Math.floor(preparedEndDate.getTime() / 1000));
         const transactions = await dataClient.getTransactions(
           userId,
           accountId,
@@ -105,42 +113,6 @@ const createDataAdapter = (
       }
     }
   };
-};
-
-const getPreparedDateRangeParams = (
-  startDate?: string,
-  endDate?: string,
-): { fromDate: string; toDate: string } => {
-  return {
-    fromDate: getPreparedStartDate(startDate),
-    toDate: getPreparedEndDate(endDate),
-  };
-};
-
-const getPreparedStartDate = (startDate?: string): string => {
-  if (startDate) {
-    const date = new Date(startDate);
-    if (!isNaN(date.getTime())) {
-      return String(Math.floor(date.getTime() / 1000));
-    } else {
-      throw new Error("startDate must be a valid ISO 8601 date string");
-    }
-  }
-  const now = new Date();
-  const daysAgo = new Date(now.setDate(now.getDate() - 120));
-  return String(Math.floor(daysAgo.getTime() / 1000));
-};
-
-const getPreparedEndDate = (endDate?: string): string => {
-  if (endDate) {
-    const date = new Date(endDate);
-    if (!isNaN(date.getTime())) {
-      return String(Math.floor(date.getTime() / 1000));
-    } else {
-      throw new Error("endDate must be a valid ISO 8601 date string");
-    }
-  }
-  return String(Math.floor(Date.now() / 1000));
 };
 
 export const createFinicityProdDataAdapter = (

@@ -1,4 +1,8 @@
-import { VCDataTypes } from "@repo/utils";
+import {
+  getDefaultTransactionRequestEndDate,
+  getDefaultTransactionRequestStartDate,
+  VCDataTypes,
+} from "@repo/utils";
 
 import type { AdapterDependencies } from "./models";
 import { createMxIntGetVC, createMxProdGetVC } from "./createVc";
@@ -71,7 +75,7 @@ describe("getVc", () => {
   });
 });
 
-describe("createMxProdGetVC - getPreparedDateRangeParams", () => {
+describe("createMxProdGetVC - Transaction date params", () => {
   const connectionId = "connectionId";
   const userId = "userId";
   const accountId = "accountId";
@@ -109,8 +113,12 @@ describe("createMxProdGetVC - getPreparedDateRangeParams", () => {
     expect(requestEndTime).toEqual(endDate);
   });
 
-  it("sets startTime to undefined if startDate is not provided", async () => {
+  it("defaults startTime to 120 days ago if startDate is not provided", async () => {
     const endDate = "2022-02-01";
+    const expectedStart = getDefaultTransactionRequestStartDate()
+      .toISOString()
+      .slice(0, 10);
+
     const vc = await createMxProdGetVC(dependencies)({
       connectionId,
       type: VCDataTypes.TRANSACTIONS,
@@ -119,12 +127,16 @@ describe("createMxProdGetVC - getPreparedDateRangeParams", () => {
       endDate,
     });
     expect(vc).toEqual(mxVcTranscationsData);
-    expect(requestStartTime).toBeUndefined();
+    expect(requestStartTime).toEqual(expectedStart);
     expect(requestEndTime).toEqual(endDate);
   });
 
-  it("sets endTime to undefined if endDate is not provided", async () => {
+  it("defaults endTime to 5 days in the future if endDate is not provided", async () => {
     const startDate = "2022-01-01";
+    const expectedEnd = getDefaultTransactionRequestEndDate()
+      .toISOString()
+      .slice(0, 10);
+
     const vc = await createMxProdGetVC(dependencies)({
       connectionId,
       type: VCDataTypes.TRANSACTIONS,
@@ -134,10 +146,16 @@ describe("createMxProdGetVC - getPreparedDateRangeParams", () => {
     });
     expect(vc).toEqual(mxVcTranscationsData);
     expect(requestStartTime).toEqual(startDate);
-    expect(requestEndTime).toBeUndefined();
+    expect(requestEndTime).toEqual(expectedEnd);
   });
 
-  it("returns undefined for both if both startDate and endDate are missing", async () => {
+  it("defaults both startTime and endTime if both startDate and endDate are missing", async () => {
+    const defaultStartDate = getDefaultTransactionRequestStartDate();
+    const expectedStart = defaultStartDate.toISOString().slice(0, 10);
+    const expectedEnd = getDefaultTransactionRequestEndDate()
+      .toISOString()
+      .slice(0, 10);
+
     const vc = await createMxProdGetVC(dependencies)({
       connectionId,
       type: VCDataTypes.TRANSACTIONS,
@@ -145,8 +163,8 @@ describe("createMxProdGetVC - getPreparedDateRangeParams", () => {
       accountId,
     });
     expect(vc).toEqual(mxVcTranscationsData);
-    expect(requestStartTime).toBeUndefined();
-    expect(requestEndTime).toBeUndefined();
+    expect(requestStartTime).toEqual(expectedStart);
+    expect(requestEndTime).toEqual(expectedEnd);
   });
 
   it("throws if startDate is invalid", async () => {

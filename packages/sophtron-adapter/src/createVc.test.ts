@@ -1,5 +1,9 @@
 import { createLogClient } from "@repo/utils/test";
-import { VCDataTypes } from "@repo/utils";
+import {
+  getDefaultTransactionRequestEndDate,
+  getDefaultTransactionRequestStartDate,
+  VCDataTypes,
+} from "@repo/utils";
 
 import type { AdapterDependencies } from "./models";
 import {
@@ -111,11 +115,11 @@ describe("createSophtronVC - getPreparedDateRangeParams", () => {
     expect(requestEndTime).toEqual("2022-02-01");
   });
 
-  it("defaults startTime to 1 year ago if startDate is not provided", async () => {
+  it("defaults startTime to 120 days ago if startDate is not provided", async () => {
     const endDate = "2022-02-01";
-    const before = new Date();
-    before.setFullYear(before.getFullYear() - 1);
-    const expectedStart = before.toISOString().slice(0, 10);
+    const expectedStart = getDefaultTransactionRequestStartDate()
+      .toISOString()
+      .slice(0, 10);
 
     const vc = await createSophtronVC(dependencies)({
       connectionId,
@@ -131,9 +135,9 @@ describe("createSophtronVC - getPreparedDateRangeParams", () => {
 
   it("defaults endTime to 5 days in the future if endDate is not provided", async () => {
     const startDate = "2022-01-01";
-    const after = new Date();
-    after.setDate(after.getDate() + 5);
-    const expectedEnd = after.toISOString().slice(0, 10);
+    const expectedEnd = getDefaultTransactionRequestEndDate()
+      .toISOString()
+      .slice(0, 10);
 
     const vc = await createSophtronVC(dependencies)({
       connectionId,
