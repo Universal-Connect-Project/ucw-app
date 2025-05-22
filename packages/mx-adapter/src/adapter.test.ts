@@ -21,7 +21,6 @@ import { server } from "./test/testServer";
 import {
   createClient as createCacheClient,
   createLogClient,
-  testStandardizedDatesOnTransactionEndpoints,
 } from "@repo/utils/test";
 
 const {
@@ -798,10 +797,6 @@ describe("mx aggregator", () => {
           status: ConnectionStatus.DENIED,
         });
       });
-    });
-
-    describe("DataRequestValidators", () => {
-      testStandardizedDatesOnTransactionEndpoints(mxAdapter);
     });
   });
 });

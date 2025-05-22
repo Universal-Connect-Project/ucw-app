@@ -230,7 +230,6 @@ export interface WidgetAdapter {
     singleAccountSelect?: boolean,
     userId?: string,
   ) => Promise<Connection | undefined>;
-  DataRequestValidators?: Record<string, (req: any) => string | undefined>;
   HandleOauthResponse?: (request: any) => Promise<Connection>;
 }
 

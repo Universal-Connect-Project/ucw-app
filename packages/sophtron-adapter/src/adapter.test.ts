@@ -25,15 +25,8 @@ import {
 } from "@repo/utils-dev-dependency";
 import { server } from "./test/testServer";
 import { SophtronAdapter } from "./adapter";
-import {
-  SOPHTRON_ADAPTER_NAME,
-  testDataValidatorEndDateError,
-  testDataValidatorStartDateError,
-} from "./constants";
-import {
-  createLogClient,
-  testStandardizedDatesOnTransactionEndpoints,
-} from "@repo/utils/test";
+import { SOPHTRON_ADAPTER_NAME } from "./constants";
+import { createLogClient } from "@repo/utils/test";
 
 const {
   aggregatorCredentials,
@@ -63,7 +56,6 @@ const testUserInstitutionId = "testUserInstitutionId";
 const usernameValue = "testUsernameValue";
 const passwordValue = "passwordValue";
 const accountsReadyStatus = "AccountsReady";
-const dataRequestValidators = adapter.DataRequestValidators;
 
 describe("sophtron adapter", () => {
   describe("GetInstitutionById", () => {
@@ -1046,93 +1038,6 @@ describe("sophtron adapter", () => {
       await expect(
         async () => await adapter.ResolveUserId(userId, true),
       ).rejects.toThrow(USER_NOT_RESOLVED_ERROR_TEXT);
-    });
-  });
-
-  describe("DataRequestValidators", () => {
-    it("returns an object of validator functions", async () => {
-      const handlers: Record<string, (req: any, res: any) => void> =
-        adapter.DataRequestValidators;
-      expect(Object.keys(handlers)).toHaveLength(1);
-    });
-
-    testStandardizedDatesOnTransactionEndpoints(adapter);
-
-    describe("transactionValidator", () => {
-      const { transactions } = dataRequestValidators;
-
-      it("returns undefined for valid start_time and end_time (any string)", () => {
-        const req = {
-          query: {
-            start_time: "anything",
-            end_time: "something",
-          },
-        };
-        expect(transactions(req)).toBeUndefined();
-      });
-
-      it("returns undefined for only start_time", () => {
-        const req = {
-          query: {
-            start_time: "anything",
-          },
-        };
-        expect(transactions(req)).toBeUndefined();
-      });
-
-      it("returns undefined for only end_time", () => {
-        const req = {
-          query: {
-            end_time: "something",
-          },
-        };
-        expect(transactions(req)).toBeUndefined();
-      });
-
-      it("returns undefined if neither startDate/endDate nor start_time/end_time are provided", () => {
-        const req = { query: {} };
-        expect(transactions(req)).toBeUndefined();
-      });
-
-      it("returns undefined if both start_time and valid startDate are provided", () => {
-        const req = {
-          query: {
-            start_time: "anything",
-            startDate: "2021-01-01",
-          },
-        };
-        expect(transactions(req)).toBeUndefined();
-      });
-
-      it("returns error if startDate is invalid but start_time is present", () => {
-        const req = {
-          query: {
-            start_time: "anything",
-            startDate: "not-a-date",
-          },
-        };
-        expect(transactions(req)).toEqual(testDataValidatorStartDateError);
-      });
-
-      it("returns undefined if both end_time and valid endDate are provided", () => {
-        const req = {
-          query: {
-            end_time: "anything",
-            endDate: "2022-01-01",
-          },
-        };
-        expect(transactions(req)).toBeUndefined();
-      });
-
-      it("returns error if endDate is invalid but end_time is present", () => {
-        const req = {
-          query: {
-            end_time: "anything",
-            endDate: "not-a-date",
-          },
-        };
-        expect(transactions(req)).toEqual(testDataValidatorEndDateError);
-      });
     });
   });
 });

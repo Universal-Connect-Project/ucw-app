@@ -1,4 +1,3 @@
-import Joi from "joi";
 import type {
   AggregatorInstitution,
   Challenge,
@@ -49,25 +48,6 @@ export class SophtronAdapter implements WidgetAdapter {
     this.apiClient = new SophtronClient(dependencies);
     this.apiClientV1 = new SophtronClientV1(dependencies);
   }
-
-  DataRequestValidators = {
-    transactions: (req: any) => {
-      const schema = Joi.object({
-        end_time: Joi.string(),
-        start_time: Joi.string(),
-        startDate: Joi.string().isoDate(),
-        endDate: Joi.string().isoDate(),
-      });
-
-      const { error } = schema.validate(req.query);
-
-      if (error) {
-        return error.details[0].message;
-      }
-
-      return undefined;
-    },
-  };
 
   async GetInstitutionById(id: string): Promise<AggregatorInstitution> {
     const ins = await this.apiClientV1.getInstitutionById(id);

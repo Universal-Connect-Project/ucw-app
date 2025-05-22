@@ -16,6 +16,7 @@ describe("mx aggregator", () => {
     makeAConnection: makeAnMXConnection,
     shouldTestVcEndpoint: true,
     transactionsQueryStrings: [
+      "",
       `?startDate=${oneMonthAgoIso}&endDate=${todayIso}`,
     ],
   });

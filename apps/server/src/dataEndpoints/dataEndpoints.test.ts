@@ -1,5 +1,4 @@
 import type { Response } from "express";
-import he from "he";
 import type {
   AccountsRequest,
   IdentityRequest,
@@ -301,7 +300,7 @@ describe("dataEndpoints", () => {
         );
       });
 
-      it("succeeds if there is a custom validator and it passes", async () => {
+      it("succeeds if using deprecated start_time/end_time as supported by sophtron", async () => {
         const req = {
           params: {
             aggregator: SOPHTRON_ADAPTER_NAME,
@@ -325,71 +324,208 @@ describe("dataEndpoints", () => {
         });
       });
 
-      it("succeeds with standardized transaction date params", async () => {
+      it("accepts valid ISO 8601 startDate and endDate", async () => {
         const req = {
           params: {
-            aggregator: SOPHTRON_ADAPTER_NAME,
+            accountId: "testAccountId",
+            aggregator: MX_AGGREGATOR_STRING,
+            userId: userIdThatExists,
           },
           query: {
-            startDate: "2025-01-01",
-            endDate: "2025-05-20",
+            startDate: "2021-01-01",
+            endDate: "2022-01-01",
           },
         } as unknown as TransactionsRequest;
 
         const res = {
           json: jest.fn(),
           status: jest.fn().mockReturnThis(),
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as unknown as any;
+        } as unknown as Response;
 
-        await createTransactionsDataHandler(true)(req, res);
-
-        expect(res.json).toHaveBeenCalledWith({
-          jwt: sophtronTestData.sophtronVcTranscationsData,
-        });
+        await vcTransactionsDataHandler(req, res);
+        expect(res.status).not.toHaveBeenCalledWith(400);
       });
 
-      it("succeeds if there isn't a custom validator", async () => {
+      it("accepts only valid startDate", async () => {
+        const req = {
+          params: {
+            accountId: "testAccountId",
+            aggregator: MX_AGGREGATOR_STRING,
+            userId: userIdThatExists,
+          },
+          query: {
+            startDate: "2021-01-01",
+          },
+        } as unknown as TransactionsRequest;
+
         const res = {
           json: jest.fn(),
           status: jest.fn().mockReturnThis(),
         } as unknown as Response;
 
-        const req: TransactionsRequest = {
+        await vcTransactionsDataHandler(req, res);
+        expect(res.status).not.toHaveBeenCalledWith(400);
+      });
+
+      it("accepts only valid endDate", async () => {
+        const req = {
+          params: {
+            accountId: "testAccountId",
+            aggregator: MX_AGGREGATOR_STRING,
+            userId: userIdThatExists,
+          },
+          query: {
+            endDate: "2022-01-01",
+          },
+        } as unknown as TransactionsRequest;
+
+        const res = {
+          json: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+        } as unknown as Response;
+
+        await vcTransactionsDataHandler(req, res);
+        expect(res.status).not.toHaveBeenCalledWith(400);
+      });
+
+      it("rejects if startDate is not ISO 8601", async () => {
+        const req = {
+          params: {
+            accountId: "testAccountId",
+            aggregator: MX_AGGREGATOR_STRING,
+            userId: userIdThatExists,
+          },
+          query: {
+            startDate: "2021/01/01",
+            endDate: "2022-01-01",
+          },
+        } as unknown as TransactionsRequest;
+
+        const res = {
+          json: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+        } as unknown as Response;
+
+        await vcTransactionsDataHandler(req, res);
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith(
+          expect.stringMatching(/startDate/),
+        );
+      });
+
+      it("rejects if endDate is not ISO 8601", async () => {
+        const req = {
+          params: {
+            accountId: "testAccountId",
+            aggregator: MX_AGGREGATOR_STRING,
+            userId: userIdThatExists,
+          },
+          query: {
+            startDate: "2021-01-01",
+            endDate: "2022/01/01",
+          },
+        } as unknown as TransactionsRequest;
+
+        const res = {
+          json: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+        } as unknown as Response;
+
+        await vcTransactionsDataHandler(req, res);
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith(expect.stringMatching(/endDate/));
+      });
+
+      it("rejects if both are not ISO 8601", async () => {
+        const req = {
+          params: {
+            accountId: "testAccountId",
+            aggregator: MX_AGGREGATOR_STRING,
+            userId: userIdThatExists,
+          },
+          query: {
+            startDate: "2021/01/01",
+            endDate: "2022/01/01",
+          },
+        } as unknown as TransactionsRequest;
+
+        const res = {
+          json: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+        } as unknown as Response;
+
+        await vcTransactionsDataHandler(req, res);
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith(
+          expect.stringMatching(/startDate/),
+        );
+      });
+
+      it("accepts if neither startDate nor endDate are provided", async () => {
+        const req = {
           params: {
             accountId: "testAccountId",
             aggregator: MX_AGGREGATOR_STRING,
             userId: userIdThatExists,
           },
           query: {},
-        };
+        } as unknown as TransactionsRequest;
+
+        const res = {
+          json: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+        } as unknown as Response;
 
         await vcTransactionsDataHandler(req, res);
         expect(res.status).not.toHaveBeenCalledWith(400);
       });
 
-      it("fails if a custom validator fails", async () => {
+      it("rejects if startDate is empty string", async () => {
         const req = {
           params: {
-            aggregator: SOPHTRON_ADAPTER_NAME,
+            accountId: "testAccountId",
+            aggregator: MX_AGGREGATOR_STRING,
+            userId: userIdThatExists,
           },
           query: {
-            startDate: undefined,
-            endDate: "testEndTime",
+            startDate: "",
+            endDate: "2022-01-01",
           },
         } as unknown as TransactionsRequest;
 
         const res = {
           json: jest.fn(),
           status: jest.fn().mockReturnThis(),
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as unknown as any;
+        } as unknown as Response;
 
-        await createTransactionsDataHandler(false)(req, res);
-
+        await vcTransactionsDataHandler(req, res);
+        expect(res.status).toHaveBeenCalledWith(400);
         expect(res.json).toHaveBeenCalledWith(
-          he.encode('"endDate" must be in iso format'),
+          expect.stringMatching(/startDate/),
         );
+      });
+
+      it("rejects if endDate is empty string", async () => {
+        const req = {
+          params: {
+            accountId: "testAccountId",
+            aggregator: MX_AGGREGATOR_STRING,
+            userId: userIdThatExists,
+          },
+          query: {
+            startDate: "2022-01-01",
+            endDate: "",
+          },
+        } as unknown as TransactionsRequest;
+
+        const res = {
+          json: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+        } as unknown as Response;
+
+        await vcTransactionsDataHandler(req, res);
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith(expect.stringMatching(/endDate/));
       });
     });
   });

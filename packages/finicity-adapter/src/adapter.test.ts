@@ -3,7 +3,6 @@ import { http, HttpResponse } from "msw";
 import {
   createClient as createCacheClient,
   createLogClient,
-  testStandardizedDatesOnTransactionEndpoints,
 } from "@repo/utils/test";
 import { FinicityAdapter } from "./adapter";
 import {
@@ -476,9 +475,5 @@ describe("finicity aggregator", () => {
 
       expect(updatedConnection).toBeNull();
     });
-  });
-
-  describe("DataRequestValidators", () => {
-    testStandardizedDatesOnTransactionEndpoints(finicityAdapter);
   });
 });

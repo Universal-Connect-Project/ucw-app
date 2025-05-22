@@ -192,31 +192,36 @@ test.describe("Finicity Adapter Tests", () => {
       .slice(0, 10);
     const todayIso = new Date().toISOString().slice(0, 10);
 
-    url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions?startDate=${oneMonthAgoIso}&endDate=${todayIso}`;
+    for (const dateRangeQueryParams of [
+      `?startDate=${oneMonthAgoIso}&endDate=${todayIso}`,
+      "",
+    ]) {
+      url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions${dateRangeQueryParams}`;
 
-    const transactionsResponse = await request.get(url);
-    const transactions = await transactionsResponse.json();
+      const transactionsResponse = await request.get(url);
+      const transactions = await transactionsResponse.json();
 
-    expect(transactions).toEqual(
-      expect.objectContaining({
-        transactions: expect.arrayContaining([
-          expect.objectContaining({
-            depositTransaction: expect.objectContaining({
-              amount: expect.any(Number),
-              accountId: expect.any(String),
-              transactionId: expect.any(String),
-              postedTimestamp: expect.any(String),
-              transactionTimestamp: expect.any(String),
-              description: expect.any(String),
-              debitCreditMemo: expect.any(String),
-              memo: expect.any(String),
-              category: expect.any(String),
-              status: "active",
-              payee: expect.any(String),
+      expect(transactions).toEqual(
+        expect.objectContaining({
+          transactions: expect.arrayContaining([
+            expect.objectContaining({
+              depositTransaction: expect.objectContaining({
+                amount: expect.any(Number),
+                accountId: expect.any(String),
+                transactionId: expect.any(String),
+                postedTimestamp: expect.any(String),
+                transactionTimestamp: expect.any(String),
+                description: expect.any(String),
+                debitCreditMemo: expect.any(String),
+                memo: expect.any(String),
+                category: expect.any(String),
+                status: "active",
+                payee: expect.any(String),
+              }),
             }),
-          }),
-        ]),
-      }),
-    );
+          ]),
+        }),
+      );
+    }
   }
 });

@@ -2,6 +2,7 @@
 import type { Response } from "express";
 import * as logger from "../infra/logger";
 import he from "he";
+import Joi from "joi";
 
 import { VCDataTypes } from "@repo/utils";
 import type { Aggregator } from "../shared/contract";
@@ -117,12 +118,26 @@ export interface TransactionsDataPathParameters {
   userId: string;
 }
 
+const transactionsQuerySchema = Joi.object({
+  end_time: Joi.string(),
+  start_time: Joi.string(),
+  startDate: Joi.string().isoDate(),
+  endDate: Joi.string().isoDate(),
+});
+
 export const createTransactionsDataHandler = (isVc: boolean) =>
   withValidateAggregatorInPath(
     async (req: TransactionsRequest, res: Response) => {
       const { accountId, aggregator, userId } = req.params;
       const { startDate, endDate, connectionId, start_time, end_time } =
         req.query;
+
+      const { error } = transactionsQuerySchema.validate(req.query);
+      if (error) {
+        res.status(400);
+        res.json(he.encode(error.details[0].message));
+        return;
+      }
 
       try {
         const aggregatorAdapter = createAggregatorWidgetAdapter({ aggregator });
@@ -140,22 +155,6 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
           startDate: startDate || start_time,
           endDate: endDate || end_time,
         };
-
-        let validationError: string | undefined;
-
-        if (
-          typeof aggregatorAdapter?.DataRequestValidators?.transactions ===
-          "function"
-        ) {
-          validationError =
-            aggregatorAdapter.DataRequestValidators?.transactions(req);
-        }
-
-        if (validationError) {
-          res.status(400);
-          res.json(he.encode(validationError));
-          return;
-        }
 
         if (isVc) {
           const vc = await getVC(dataArgs);

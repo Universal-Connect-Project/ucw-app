@@ -26,7 +26,6 @@ import type {
 
 import { MxIntApiClient, MxProdApiClient } from "./apiClient";
 import type { AdapterConfig } from "./models";
-import Joi from "joi";
 
 const MXJobTypeMap = {
   [ComboJobTypes.ACCOUNT_NUMBER]: "account_verification",
@@ -90,23 +89,6 @@ export class MxAdapter implements WidgetAdapter {
     this.logClient = dependencies?.logClient;
     this.envConfig = dependencies?.envConfig;
   }
-
-  DataRequestValidators = {
-    transactions: (req: any) => {
-      const schema = Joi.object({
-        startDate: Joi.string().isoDate(),
-        endDate: Joi.string().isoDate(),
-      });
-
-      const { error } = schema.validate(req.query);
-
-      if (error) {
-        return error.details[0].message;
-      }
-
-      return undefined;
-    },
-  };
 
   async GetInstitutionById(id: string): Promise<AggregatorInstitution> {
     const res = await this.apiClient.readInstitution(id);
