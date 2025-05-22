@@ -35,7 +35,7 @@ describe("Sophtron aggregator", () => {
         (account) => account?.depositAccount?.nickname === "Primary Checking",
       ),
     shouldTestVcEndpoint: true,
-    // Can't test passing nothing to sophtron because even though it's valid, the default time frame wont work because
+    // Can't test passing nothing to Sophtron because even though it's valid, the default time frame wont work because
     // Sophtron's test transaction dates are hardcoded to start in 2021 and end before the default startDate begins.
     transactionsQueryStrings: [
       "?start_time=2021/1/1&end_time=2099/12/31",
