@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1]
+
+### Fixed
+
+- Fixed bug where oauth landing page said "Something went wrong" after everything went right.
+- Fixed bug where memberConnected postMessage wasn't returning correct member_guid after successful connection.
+
 ## [1.5.0]
 
 ### Removed
