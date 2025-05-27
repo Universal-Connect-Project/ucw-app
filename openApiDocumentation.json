@@ -6818,7 +6818,7 @@
             }
           },
           {
-            "description": "Period start of the transactions to return. Must be in ISO 8601 format (YYYY-MM-DD), timestamp not allowed.",
+            "description": "Period start of the transactions to return. Must be in ISO 8601 format (YYYY-MM-DD), timestamp not allowed. Defaults to 120 days ago if not provided.",
             "name": "startDate",
             "in": "query",
             "required": false,
@@ -6829,7 +6829,7 @@
             }
           },
           {
-            "description": "Period end of the transactions to return. Must be in ISO 8601 format (YYYY-MM-DD), timestamp not allowed.",
+            "description": "Period end of the transactions to return. Must be in ISO 8601 format (YYYY-MM-DD), timestamp not allowed. Defaults to 5 days in the future if not provided.",
             "name": "endDate",
             "in": "query",
             "required": false,
