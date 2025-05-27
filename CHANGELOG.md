@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed bug where oauth landing page said "Something went wrong" after everything went right.
-- Fixed bug where memberConnected postMessage wasn't returning correct member_guid after successful connection.
+- Fixed bug where memberConnected postMessage wasn't returning correct member_guid after successful connection with Finicity.
 
 ## [1.5.0]
 
