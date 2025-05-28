@@ -92,6 +92,7 @@ export class FinicityAdapter implements WidgetAdapter {
         connectSessionId,
       );
     }
+
     const connection = {
       id: connectSessionId,
       is_oauth: true,
@@ -225,8 +226,13 @@ export class FinicityAdapter implements WidgetAdapter {
       case "credentialsUpdated":
         connection.status = ConnectionStatus.CONNECTED;
         break;
+      case "done":
+        return connection;
       default:
         switch (reason) {
+          case "complete":
+            connection.status = ConnectionStatus.CONNECTED;
+            break;
           case "exit": {
             if (code === "100") {
               connection.status = ConnectionStatus.CLOSED;
