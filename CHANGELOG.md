@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added the ability to pass in a date range in transaction requests from the data endpoints.
 
+## [1.5.1]
+
+### Fixed
+
+- Fixed bug where oauth landing page said "Something went wrong" after everything went right.
+- Fixed bug where memberConnected postMessage wasn't returning correct member_guid after successful connection with Finicity.
+
 ## [1.5.0]
 
 ### Removed

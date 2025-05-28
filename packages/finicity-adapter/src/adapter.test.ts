@@ -353,6 +353,33 @@ describe("finicity aggregator", () => {
       );
     });
 
+    it("handles 'done' eventType and returns the connection", async () => {
+      const userId = "test-user-id";
+      const createdConnection = await finicityAdapter.CreateConnection(
+        {
+          institutionId: "testInstitutionId",
+          jobTypes: [ComboJobTypes.TRANSACTIONS],
+          credentials: [],
+        },
+        userId,
+      );
+
+      const request = {
+        query: { connection_id: createdConnection.id },
+        body: { eventType: "done", payload: {} },
+      };
+
+      const updatedConnection =
+        await finicityAdapter.HandleOauthResponse(request);
+
+      expect(updatedConnection).toEqual(
+        expect.objectContaining({
+          id: createdConnection.id,
+          status: ConnectionStatus.CREATED,
+        }),
+      );
+    });
+
     it("handles 'credentialsUpdated' event and updates connection status to CONNECTED", async () => {
       const userId = "test-user-id";
       const createdConnection = await finicityAdapter.CreateConnection(
@@ -450,6 +477,34 @@ describe("finicity aggregator", () => {
 
       const request = {
         query: { connection_id: createdConnection.id, reason: "done" },
+      };
+
+      const updatedConnection =
+        await finicityAdapter.HandleOauthResponse(request);
+
+      expect(updatedConnection).toEqual(
+        expect.objectContaining({
+          id: createdConnection.id,
+          status: ConnectionStatus.CONNECTED,
+        }),
+      );
+    });
+
+    it("handles 'complete' reason and updates connection status to CONNECTED", async () => {
+      const createdConnection = await finicityAdapter.CreateConnection(
+        {
+          institutionId: "testInstitutionId",
+          jobTypes: [ComboJobTypes.TRANSACTIONS],
+          credentials: [],
+        },
+        "test-user-id",
+      );
+
+      const request = {
+        query: {
+          connection_id: createdConnection.id,
+          reason: "complete",
+        },
       };
 
       const updatedConnection =
