@@ -5,7 +5,11 @@ import {
   transformAccountsToCustomers,
 } from "./mapper";
 import FinicityClient from "./apiClient";
-import { VCDataTypes } from "@repo/utils";
+import {
+  DataAdapterRequestParams,
+  getPreparedDateRangeParams,
+  VCDataTypes,
+} from "@repo/utils";
 
 const createDataAdapter = (
   sandbox: boolean,
@@ -16,12 +20,9 @@ const createDataAdapter = (
     type,
     userId,
     accountId,
-  }: {
-    connectionId: string;
-    type: string;
-    userId: string;
-    accountId?: string;
-  }) => {
+    startDate,
+    endDate,
+  }: DataAdapterRequestParams) => {
     const {
       logClient,
       envConfig,
@@ -38,6 +39,7 @@ const createDataAdapter = (
       getWebhookHostUrl,
       cacheClient,
     );
+
     switch (type) {
       case VCDataTypes.IDENTITY: {
         const accounts: Account[] =
@@ -89,14 +91,19 @@ const createDataAdapter = (
         return { accounts: accountsWithAchDetails.map(mapAccount) };
       }
       case VCDataTypes.TRANSACTIONS: {
-        const startDate = new Date(
-          new Date().setDate(new Date().getDate() - 120),
-        );
+        const { preparedStartDate, preparedEndDate } =
+          getPreparedDateRangeParams({
+            startDate,
+            endDate,
+            defaultEndOverride: new Date(),
+          });
+        const fromDate = String(Math.floor(preparedStartDate.getTime() / 1000));
+        const toDate = String(Math.floor(preparedEndDate.getTime() / 1000));
         const transactions = await dataClient.getTransactions(
           userId,
           accountId,
-          startDate.toISOString(),
-          new Date().toISOString(),
+          fromDate,
+          toDate,
         );
         return {
           transactions: transactions.map((transaction: Transaction) =>

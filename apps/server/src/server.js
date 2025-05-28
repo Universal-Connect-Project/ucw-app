@@ -20,6 +20,7 @@ import { widgetHandler } from "./widgetEndpoint";
 import { oauthRedirectHandler, webhookHandler } from "./connect/oauthEndpoints";
 import useInstitutionEndpoints from "./institutions/useInstitutionEndpoints";
 import { startNgrok, stopNgrok } from "./webhooks";
+import cors from "cors"
 
 process.on("unhandledRejection", (error) => {
   _error(`unhandledRejection: ${error.message}`, error);
@@ -28,6 +29,7 @@ process.removeAllListeners("warning"); // remove the noise caused by capacitor-c
 
 let isReady = false;
 const app = express();
+app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

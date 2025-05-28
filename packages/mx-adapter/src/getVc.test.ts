@@ -5,13 +5,15 @@ import type { AdapterDependencies } from "./models";
 import {
   MX_INTEGRATION_VC_GET_ACCOUNTS_PATH,
   MX_VC_GET_ACCOUNTS_PATH,
+  MX_VC_GET_TRANSACTIONS_PATH,
 } from "@repo/utils-dev-dependency";
 import { server } from "./test/testServer";
 
 import { mxTestData } from "@repo/utils-dev-dependency";
 import { createClient, createLogClient } from "@repo/utils/test";
 
-const { aggregatorCredentials, mxVcAccountsData } = mxTestData;
+const { aggregatorCredentials, mxVcAccountsData, mxVcTranscationsData } =
+  mxTestData;
 
 const accountsPath = "users/userId/members/connectionId/accounts";
 
@@ -139,6 +141,35 @@ describe("mx vc", () => {
           },
         },
       });
+    });
+
+    it("includes date range params in transactions request", async () => {
+      const startTime = "2021-01-01";
+      const endTime = "2025-01-15";
+      let requestStartTime: string;
+      let requestEndTime: string;
+
+      server.use(
+        http.get(MX_VC_GET_TRANSACTIONS_PATH, ({ request }) => {
+          const url = new URL(request.url);
+          requestStartTime = url.searchParams.get("startTime");
+          requestEndTime = url.searchParams.get("endTime");
+          return HttpResponse.json({
+            verifiableCredential: mxVcTranscationsData,
+          });
+        }),
+      );
+
+      const response = await getVC(
+        `users/testUserId/accounts/testAccountId/transactions?startTime=${startTime}&endTime=${endTime}`,
+        true,
+        dependencies,
+      );
+
+      expect(requestStartTime).toEqual(startTime);
+      expect(requestEndTime).toEqual(endTime);
+
+      expect(response).toEqual(mxVcTranscationsData);
     });
   });
 });

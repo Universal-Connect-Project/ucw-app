@@ -25,11 +25,7 @@ import {
 } from "@repo/utils-dev-dependency";
 import { server } from "./test/testServer";
 import { SophtronAdapter } from "./adapter";
-import {
-  SOPHTRON_ADAPTER_NAME,
-  testDataRequestValidatorEndTimeError,
-  testDataValidatorStartTimeError,
-} from "./constants";
+import { SOPHTRON_ADAPTER_NAME } from "./constants";
 import { createLogClient } from "@repo/utils/test";
 
 const {
@@ -60,7 +56,6 @@ const testUserInstitutionId = "testUserInstitutionId";
 const usernameValue = "testUsernameValue";
 const passwordValue = "passwordValue";
 const accountsReadyStatus = "AccountsReady";
-const dataRequestValidators = adapter.DataRequestValidators;
 
 describe("sophtron adapter", () => {
   describe("GetInstitutionById", () => {
@@ -1043,56 +1038,6 @@ describe("sophtron adapter", () => {
       await expect(
         async () => await adapter.ResolveUserId(userId, true),
       ).rejects.toThrow(USER_NOT_RESOLVED_ERROR_TEXT);
-    });
-  });
-
-  describe("DataRequestValidators", () => {
-    it("returns an object of validator functions", async () => {
-      const handlers: Record<string, (req: any, res: any) => void> =
-        adapter.DataRequestValidators;
-      expect(Object.keys(handlers)).toHaveLength(1);
-    });
-
-    describe("transactionValidator", () => {
-      it("returns transaction data, if it passes the transactionValidator", async () => {
-        const validatorSpy = jest.spyOn(dataRequestValidators, "transactions");
-        const req = {
-          query: {
-            start_time: "testStartTime",
-            end_time: "testEndTime",
-          },
-        };
-
-        dataRequestValidators.transactions(req);
-
-        expect(validatorSpy).toHaveBeenCalledWith(req);
-      });
-
-      it("fails aggregator's transactionValidator if start_time is undefined", async () => {
-        const req = {
-          query: {
-            start_time: undefined,
-            end_time: "testEndTime",
-          },
-        };
-
-        const validatorResult = dataRequestValidators.transactions(req);
-
-        expect(validatorResult).toEqual(testDataValidatorStartTimeError);
-      });
-
-      it("fails aggregator's transactionValidator if end_time is undefined", async () => {
-        const req = {
-          query: {
-            start_time: "testStartTime",
-            end_time: undefined,
-          },
-        };
-
-        const validatorResult = dataRequestValidators.transactions(req);
-
-        expect(validatorResult).toEqual(testDataRequestValidatorEndTimeError);
-      });
     });
   });
 });

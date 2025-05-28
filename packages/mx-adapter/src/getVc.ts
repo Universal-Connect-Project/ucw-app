@@ -7,6 +7,7 @@ export const getVC = async (
   path: string,
   isProd: boolean,
   dependencies: VCDependencies,
+  params?: { startTime?: string; endTime?: string },
 ): Promise<any> => {
   const { logClient, aggregatorCredentials, envConfig } = dependencies;
 
@@ -42,6 +43,7 @@ export const getVC = async (
       "content-type": "application/json",
       Authorization: authHeader,
     },
+    params,
   })
     .then((res) => {
       logClient.debug(

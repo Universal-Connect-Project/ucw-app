@@ -188,30 +188,24 @@ describe("FinicityClient", () => {
   });
 
   describe("getTransactions", () => {
-    it("retrieves transactions for a given customer ID, account ID, and date range", async () => {
+    it("retrieves transactions for a given customer ID, account ID, and date range and includes pending transactions.", async () => {
       const customerId = "testCustomerId";
       const accountId = "testAccountId";
       const fromDate = "2023-01-01";
       const toDate = "2023-01-31";
+      let requestedFromDate: string;
+      let requestedToDate: string;
+      let includePendingParamExists = false;
 
       server.use(
         http.get(
           `${BASE_PATH}/aggregation/v4/customers/${customerId}/accounts/${accountId}/transactions`,
           ({ request }) => {
             const searchParams = new URL(request.url).searchParams;
-            const fromDateParam = searchParams.get("fromDate");
-            const toDateParam = searchParams.get("toDate");
-
-            if (
-              fromDateParam ===
-                String(Math.floor(new Date(fromDate).getTime() / 1000)) &&
-              toDateParam ===
-                String(Math.floor(new Date(toDate).getTime() / 1000))
-            ) {
-              return HttpResponse.json(accountTransactionsData);
-            }
-
-            return HttpResponse.json({ transactions: [] });
+            requestedFromDate = searchParams.get("fromDate");
+            requestedToDate = searchParams.get("toDate");
+            includePendingParamExists = !!searchParams.get("includePending");
+            return HttpResponse.json(accountTransactionsData);
           },
         ),
       );
@@ -224,6 +218,9 @@ describe("FinicityClient", () => {
       );
 
       expect(transactions).toEqual(accountTransactionsData.transactions);
+      expect(requestedFromDate).toEqual(fromDate);
+      expect(requestedToDate).toEqual(toDate);
+      expect(includePendingParamExists).toBeTruthy();
     });
 
     it("returns an empty array if no transactions are found", async () => {
