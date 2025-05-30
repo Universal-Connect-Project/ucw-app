@@ -189,6 +189,7 @@ export class SophtronAdapter implements WidgetAdapter {
       id: "",
       type: ChallengeType.QUESTION,
     };
+    let challenges = [challenge];
     let status = ConnectionStatus.CHALLENGED;
     let jobStatus = job.LastStatus;
     if (job.SuccessFlag === true) {
@@ -237,11 +238,11 @@ export class SophtronAdapter implements WidgetAdapter {
       }
       default:
         if (job.SecurityQuestion) {
-          challenge.id = "SecurityQuestion";
-          challenge.type = ChallengeType.QUESTION;
-          challenge.data = JSON.parse(job.SecurityQuestion).map(
-            (q: string) => ({ key: q, value: q }),
-          );
+          challenges = JSON.parse(job.SecurityQuestion).map( (q: string) => ({
+            id: `SecurityQuestion`,
+            type: ChallengeType.QUESTION,
+            data: [{ key: q, value: q }]
+          }))
           jobStatus = "SecurityQuestion";
         } else if (job.TokenMethod) {
           challenge.id = "TokenMethod";
@@ -304,7 +305,7 @@ export class SophtronAdapter implements WidgetAdapter {
         memberStatusUpdate: postMessageEventData,
       },
       status,
-      challenges: challenge?.id ? [challenge] : null,
+      challenges: challenges[0]?.id ? challenges : null,
       aggregator: SOPHTRON_ADAPTER_NAME,
     };
   }
@@ -320,7 +321,7 @@ export class SophtronAdapter implements WidgetAdapter {
         answer = true;
         break;
       case "SecurityQuestion":
-        answer = JSON.stringify([c.response]);
+        answer = JSON.stringify(request.challenges.map( ch => ch.response));
         break;
       case "TokenInput":
       case "single_account_select":
