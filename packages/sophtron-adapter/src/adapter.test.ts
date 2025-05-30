@@ -550,14 +550,15 @@ describe("sophtron adapter", () => {
     });
 
     it("handles the job status SecurityQuestion case", async () => {
-      const securityQuestionString = "securityQuestionString";
+      const securityQuestionString1 = "securityQuestionString1";
+      const securityQuestionString2 = "securityQuestionString2";
 
       server.use(
         http.get(SOPHTRON_GET_JOB_INFO_PATH, () =>
           HttpResponse.json({
             JobID: testJobId,
             JobType: "agg",
-            SecurityQuestion: JSON.stringify([securityQuestionString]),
+            SecurityQuestion: JSON.stringify([securityQuestionString1, securityQuestionString2]),
             UserInstitutionID: testUserInstitutionId,
           }),
         ),
@@ -577,9 +578,19 @@ describe("sophtron adapter", () => {
             type: ChallengeType.QUESTION,
             data: [
               {
-                key: securityQuestionString,
-                value: securityQuestionString,
-              },
+                key: securityQuestionString1,
+                value: securityQuestionString1,
+              }
+            ],
+          },
+          {
+            id: "SecurityQuestion",
+            type: ChallengeType.QUESTION,
+            data: [
+              {
+                key: securityQuestionString2,
+                value: securityQuestionString2,
+              }
             ],
           },
         ],
@@ -913,7 +924,11 @@ describe("sophtron adapter", () => {
           challenges: [
             {
               id: "SecurityQuestion",
-              response: testQuestionResponse,
+              response: testQuestionResponse + 1,
+            },
+            {
+              id: "SecurityQuestion",
+              response: testQuestionResponse + 2,
             },
           ],
         } as UpdateConnectionRequest,
@@ -921,7 +936,7 @@ describe("sophtron adapter", () => {
       );
 
       expect(requestBody).toEqual({
-        AnswerText: JSON.stringify([testQuestionResponse]),
+        AnswerText: JSON.stringify([testQuestionResponse + 1, testQuestionResponse + 2]),
       });
       expect(requestParams).toEqual({
         challengeId: "SecurityQuestion",
