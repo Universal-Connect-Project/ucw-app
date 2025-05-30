@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed bug where sophtron adapter was unable to handle multiple security question challenge.
 
+### Changed
+
+- Updated the auth token urls to use the new domains.
+
 ## [1.6.0]
 
 ### Added
