@@ -5,14 +5,14 @@ import { get, set } from "./storageClient/redis";
 export const REDIS_AUTH_ACCESS_KEY = "auth0AccessToken";
 
 export async function getAccessToken() {
-  const { UCP_CLIENT_ID, UCP_CLIENT_SECRET } = config;
+  const { AUTH0_TOKEN_URL, UCP_CLIENT_ID, UCP_CLIENT_SECRET } = config;
 
   const cachedAccessToken = await get(REDIS_AUTH_ACCESS_KEY);
   if (cachedAccessToken) {
     return cachedAccessToken;
   }
 
-  const response = await fetch(config.AUTH0_TOKEN_URL, {
+  const response = await fetch(AUTH0_TOKEN_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
