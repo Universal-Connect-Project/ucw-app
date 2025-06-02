@@ -4,16 +4,17 @@ These are the environment variables that can be set in apps/server/env/(staging|
 
 ## Suggested variables
 
-| Variable name              | Description                                                                                                                  | Examples                                     |
-| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| ELASTIC_SEARCH_URL         | The url of the elastic search server                                                                                         | http://localhost:9200                        |
-| ENV                        | The server will behave differently depending on this variable. For instance test institutions won't show up when env is prod | dev, test, prod                              |
-| HOST_URL                   | The base url of the server                                                                                                   | http://localhost:8080                        |
-| INSTITUTION_CACHE_LIST_URL | The url to poll for institutions                                                                                             | http://localhost:8088/institutions/cacheList |
-| LOG_LEVEL                  | The level of logs that should be outputted                                                                                   | debug, trace, info, warning, error           |
-| PORT                       | The port where the server runs                                                                                               | 8080                                         |
-| REDIS_SERVER               | The url of the redis server                                                                                                  | redis://localhost:6379                       |
-| WEBHOOK_HOST_URL           | The webhook url for finicity                                                                                                 |                                              |
+| Variable name      | Description                                                                                                                                                                                                                   | Examples                           |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| ELASTIC_SEARCH_URL | The url of the elastic search server                                                                                                                                                                                          | http://localhost:9200              |
+| ENV                | The server will behave differently depending on this variable. For instance test institutions won't show up when env is prod                                                                                                  | dev, test, prod                    |
+| HOST_URL           | The base url of the server                                                                                                                                                                                                    | http://localhost:8080              |
+| LOG_LEVEL          | The level of logs that should be outputted                                                                                                                                                                                    | debug, trace, info, warning, error |
+| PORT               | The port where the server runs                                                                                                                                                                                                | 8080                               |
+| REDIS_SERVER       | The url of the redis server                                                                                                                                                                                                   | redis://localhost:6379             |
+| WEBHOOK_HOST_URL   | The webhook url for finicity                                                                                                                                                                                                  |                                    |
+| UCP_CLIENT_ID      | Client ID, available in the (UCP dashboard)[https://app.universalconnectproject.org/]. Providing these api keys will sync the latest data(institutions, performance, etc.) to the widget and provide performance data to UCP. |
+| UCP_CLIENT_SECRET  | Client Secret, available in the (UCP dashboard)[https://app.universalconnectproject.org/]                                                                                                                                     |
 
 ## Aggregator specific variables
 
