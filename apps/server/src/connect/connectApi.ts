@@ -4,6 +4,12 @@ import { ChallengeType, ConnectionStatus } from "@repo/utils";
 
 import { AggregatorAdapterBase } from "../adapters";
 import type { Member, MemberResponse } from "../shared/connect/contract";
+import {
+  recordConnectionPauseEvent,
+  recordConnectionResumeEvent,
+  recordStartEvent,
+  recordSuccessEvent,
+} from "../services/performanceTracking";
 
 function mapConnection(connection: Connection): Member {
   const userId = connection.userId;
@@ -97,6 +103,19 @@ function mapConnection(connection: Connection): Member {
   } as any;
 }
 
+const getMainAggregator = (aggregator: string): string => {
+  const AggregatorToMainAggregatorMap: Record<string, string> = {
+    mx: "mx",
+    mx_int: "mx",
+    sophtron: "sophtron",
+    finicity: "finicity",
+    finicity_sandbox: "finicity",
+    akoya: "akoya",
+    akoya_sandbox: "akoya",
+  };
+  return AggregatorToMainAggregatorMap[aggregator] || aggregator;
+};
+
 export class ConnectApi extends AggregatorAdapterBase {
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor, @typescript-eslint/no-explicit-any
   constructor(req: any) {
@@ -104,6 +123,9 @@ export class ConnectApi extends AggregatorAdapterBase {
   }
 
   async addMember(memberData: Member): Promise<MemberResponse> {
+    const performanceSessionId = crypto.randomUUID();
+    this.context.performanceSessionId = performanceSessionId;
+
     const connection = await this.createConnection({
       id: memberData.guid,
       institutionId: memberData.institution_guid,
@@ -117,17 +139,21 @@ export class ConnectApi extends AggregatorAdapterBase {
           id: c.guid,
           value: c.value,
         })) ?? [],
+      performanceSessionId,
     });
 
-    const connectionId = connection?.id;
-
-    if (!isOauth && connectionId) {
-      recordStartEvent({
-        aggregatorId, // I don't think we have the right aggregatorId because we want test connection to show up under the main aggregator
-        connectionId, // This is right, but it's delayed because we have to wait until after createConnection. Maybe we should send in a generated connection id, and then update it after the connection is created
-        institutionId: ucpInstitutionId, // Need to make sure that we have the ucp Id here. Might be complex and require connect-widget changes to get it here
-        jobTypes,
-      });
+    const mainAggregatorId = getMainAggregator(this.context.aggregator);
+    const startEvent = recordStartEvent({
+      aggregatorId: mainAggregatorId,
+      connectionId: performanceSessionId,
+      institutionId: this.context.latestResolvedInstitutionId,
+      jobTypes: this.context.jobTypes,
+    });
+    if (memberData.is_oauth) {
+      // This is if we decide to include user interaction time with akoya
+      if (mainAggregatorId != "akoya") {
+        startEvent.then(() => recordConnectionPauseEvent(performanceSessionId));
+      }
     }
 
     return { member: mapConnection(connection) };
@@ -135,6 +161,7 @@ export class ConnectApi extends AggregatorAdapterBase {
 
   async updateMember(member: Member): Promise<Member> {
     if (this.context.current_job_id && member.credentials !== undefined) {
+      recordConnectionResumeEvent(this.context.performanceSessionId);
       await this.answerChallenge(
         member.guid,
         member.credentials.map((c) => {
@@ -195,12 +222,27 @@ export class ConnectApi extends AggregatorAdapterBase {
   }
 
   async loadMemberByGuid(memberGuid: string): Promise<Member> {
-    const mfa = await this.getConnectionStatus(memberGuid);
-    if (mfa?.institution_code == null) {
-      const connection = await this.getConnection(memberGuid);
-      return mapConnection({ ...mfa, ...connection });
+    const member = await this.getConnectionStatus(memberGuid);
+    if (member?.challenges?.length > 0) {
+      await recordConnectionPauseEvent(this.context.performanceSessionId);
     }
-    return mapConnection({ ...mfa });
+    if (member?.institution_code == null) {
+      const connection = await this.getConnection(memberGuid);
+
+      if (member.status === ConnectionStatus.CONNECTED) {
+        if (connection.is_being_aggregated) {
+          if (connection.is_oauth) {
+            recordConnectionResumeEvent(this.context.performanceSessionId);
+          }
+        } else {
+          recordSuccessEvent(this.context.performanceSessionId);
+        }
+      }
+
+      return mapConnection({ ...member, ...connection });
+    }
+
+    return mapConnection({ ...member });
   }
 
   async deleteMember(member: Member): Promise<void> {

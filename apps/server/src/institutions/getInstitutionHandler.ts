@@ -4,6 +4,7 @@ import { resolveInstitutionAggregator } from "./institutionResolver";
 
 export const getInstitutionHandler = async (req: Request, res: Response) => {
   const ucpInstitutionId = req.params.institution_guid;
+  req.context.latestResolvedInstitutionId = ucpInstitutionId;
 
   const resolvedInstitution = await resolveInstitutionAggregator({
     aggregatorOverride: req.context.aggregator,
