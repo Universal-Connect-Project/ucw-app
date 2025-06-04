@@ -102,6 +102,8 @@ describe("Sophtron aggregator", () => {
           const { metadata } = memberStatusUpdateEvents.at(-1).args[0];
 
           [
+            "jobId",
+            "jobLastStep",
             "rawStatus",
             "selectedAccountId",
             "aggregator",
