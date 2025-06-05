@@ -294,6 +294,8 @@ export class SophtronAdapter implements WidgetAdapter {
     const postMessageEventData = {
       rawStatus: jobStatus,
       selectedAccountId: sas_account,
+      jobLastStep: job.LastStep,
+      jobId: job.JobID,
     };
 
     return {

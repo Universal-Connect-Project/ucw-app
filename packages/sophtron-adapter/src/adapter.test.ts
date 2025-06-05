@@ -377,12 +377,16 @@ describe("sophtron adapter", () => {
   });
 
   describe("GetConnectionStatus", () => {
-    const createPostMessageEventData = ({ rawStatus, selectedAccountId }) => ({
+    const createPostMessageEventData = ({ rawStatus, selectedAccountId, jobId, jobLastStep }) => ({
       memberConnected: {
+        jobId,
+        jobLastStep,
         rawStatus,
         selectedAccountId,
       },
       memberStatusUpdate: {
+        jobId,
+        jobLastStep,
         rawStatus,
         selectedAccountId,
       },
@@ -410,6 +414,7 @@ describe("sophtron adapter", () => {
           HttpResponse.json({
             JobID: testJobId,
             SuccessFlag: true,
+            LastStep: "job_step",
             UserInstitutionID: testUserInstitutionId,
           }),
         ),
@@ -428,6 +433,8 @@ describe("sophtron adapter", () => {
         postMessageEventData: createPostMessageEventData({
           rawStatus: "success",
           selectedAccountId: "",
+          jobId: testJobId,
+          jobLastStep: "job_step"
         }),
         userId: testUserId,
         cur_job_id: testJobId,
@@ -441,6 +448,7 @@ describe("sophtron adapter", () => {
         http.get(SOPHTRON_GET_JOB_INFO_PATH, () =>
           HttpResponse.json({
             JobID: testJobId,
+            LastStep: "job_step",
             SuccessFlag: false,
             UserInstitutionID: testUserInstitutionId,
           }),
@@ -462,6 +470,8 @@ describe("sophtron adapter", () => {
         postMessageEventData: createPostMessageEventData({
           rawStatus: "failed",
           selectedAccountId: "",
+          jobId: testJobId,
+          jobLastStep: "job_step"
         }),
         status: ConnectionStatus.FAILED,
         aggregator: SOPHTRON_ADAPTER_NAME,
@@ -474,6 +484,7 @@ describe("sophtron adapter", () => {
           HttpResponse.json({
             JobID: testJobId,
             JobType: "agg",
+            LastStep: "job_step",
             LastStatus: accountsReadyStatus,
             UserInstitutionID: testUserInstitutionId,
           }),
@@ -495,6 +506,8 @@ describe("sophtron adapter", () => {
         postMessageEventData: createPostMessageEventData({
           rawStatus: "AccountsReady",
           selectedAccountId: "",
+          jobId: testJobId,
+          jobLastStep: "job_step"
         }),
         status: ConnectionStatus.CREATED,
         aggregator: SOPHTRON_ADAPTER_NAME,
@@ -507,6 +520,7 @@ describe("sophtron adapter", () => {
           HttpResponse.json({
             JobID: testJobId,
             JobType: "verification",
+            LastStep: "job_step",
             LastStatus: accountsReadyStatus,
             UserInstitutionID: testUserInstitutionId,
           }),
@@ -543,6 +557,8 @@ describe("sophtron adapter", () => {
         postMessageEventData: createPostMessageEventData({
           rawStatus: "AccountsReady",
           selectedAccountId: "",
+          jobId: testJobId,
+          jobLastStep: "job_step"
         }),
         status: ConnectionStatus.CHALLENGED,
         aggregator: SOPHTRON_ADAPTER_NAME,
@@ -558,6 +574,7 @@ describe("sophtron adapter", () => {
           HttpResponse.json({
             JobID: testJobId,
             JobType: "agg",
+            LastStep: "job_step",
             SecurityQuestion: JSON.stringify([securityQuestionString1, securityQuestionString2]),
             UserInstitutionID: testUserInstitutionId,
           }),
@@ -600,6 +617,8 @@ describe("sophtron adapter", () => {
         postMessageEventData: createPostMessageEventData({
           rawStatus: "SecurityQuestion",
           selectedAccountId: "",
+          jobId: testJobId,
+          jobLastStep: "job_step"
         }),
         status: ConnectionStatus.CHALLENGED,
         aggregator: SOPHTRON_ADAPTER_NAME,
@@ -614,6 +633,7 @@ describe("sophtron adapter", () => {
           HttpResponse.json({
             JobID: testJobId,
             JobType: "agg",
+            LastStep: "job_step",
             TokenMethod: JSON.stringify([tokenMethodString]),
             UserInstitutionID: testUserInstitutionId,
           }),
@@ -647,6 +667,8 @@ describe("sophtron adapter", () => {
         postMessageEventData: createPostMessageEventData({
           rawStatus: "TokenMethod",
           selectedAccountId: "",
+          jobId: testJobId,
+          jobLastStep: "job_step"
         }),
         status: ConnectionStatus.CHALLENGED,
         aggregator: SOPHTRON_ADAPTER_NAME,
@@ -661,6 +683,7 @@ describe("sophtron adapter", () => {
           HttpResponse.json({
             JobID: testJobId,
             JobType: "agg",
+            LastStep: "job_step",
             TokenInputName: testTokenInputName,
             TokenSentFlag: true,
             UserInstitutionID: testUserInstitutionId,
@@ -695,6 +718,8 @@ describe("sophtron adapter", () => {
         postMessageEventData: createPostMessageEventData({
           rawStatus: "TokenInput",
           selectedAccountId: "",
+          jobId: testJobId,
+          jobLastStep: "job_step"
         }),
         status: ConnectionStatus.CHALLENGED,
         aggregator: SOPHTRON_ADAPTER_NAME,
@@ -707,6 +732,7 @@ describe("sophtron adapter", () => {
           HttpResponse.json({
             JobID: testJobId,
             JobType: "agg",
+            LastStep: "job_step",
             TokenSentFlag: true,
             UserInstitutionID: testUserInstitutionId,
           }),
@@ -740,6 +766,8 @@ describe("sophtron adapter", () => {
         postMessageEventData: createPostMessageEventData({
           rawStatus: "TokenInput",
           selectedAccountId: "",
+          jobId: testJobId,
+          jobLastStep: "job_step"
         }),
         status: ConnectionStatus.CHALLENGED,
         aggregator: SOPHTRON_ADAPTER_NAME,
@@ -753,6 +781,7 @@ describe("sophtron adapter", () => {
         http.get(SOPHTRON_GET_JOB_INFO_PATH, () =>
           HttpResponse.json({
             JobID: testJobId,
+            LastStep: "job_step",
             JobType: "agg",
             TokenRead: testTokenRead,
             UserInstitutionID: testUserInstitutionId,
@@ -787,6 +816,8 @@ describe("sophtron adapter", () => {
         postMessageEventData: createPostMessageEventData({
           rawStatus: "TokenRead",
           selectedAccountId: "",
+          jobId: testJobId,
+          jobLastStep: "job_step"
         }),
         status: ConnectionStatus.CHALLENGED,
         aggregator: SOPHTRON_ADAPTER_NAME,
@@ -801,6 +832,7 @@ describe("sophtron adapter", () => {
           HttpResponse.json({
             JobID: testJobId,
             JobType: "agg",
+            LastStep: "job_step",
             CaptchaImage: testCaptchaImage,
             UserInstitutionID: testUserInstitutionId,
           }),
@@ -829,6 +861,8 @@ describe("sophtron adapter", () => {
         postMessageEventData: createPostMessageEventData({
           rawStatus: "CaptchaImage",
           selectedAccountId: "",
+          jobId: testJobId,
+          jobLastStep: "job_step"
         }),
         status: ConnectionStatus.CHALLENGED,
         aggregator: SOPHTRON_ADAPTER_NAME,
@@ -840,6 +874,7 @@ describe("sophtron adapter", () => {
         http.get(SOPHTRON_GET_JOB_INFO_PATH, () =>
           HttpResponse.json({
             JobID: testJobId,
+            LastStep: "job_step",
             JobType: "agg",
             UserInstitutionID: testUserInstitutionId,
           }),
@@ -861,6 +896,8 @@ describe("sophtron adapter", () => {
         postMessageEventData: createPostMessageEventData({
           rawStatus: undefined,
           selectedAccountId: "",
+          jobId: testJobId,
+          jobLastStep: "job_step"
         }),
         status: ConnectionStatus.CREATED,
         aggregator: SOPHTRON_ADAPTER_NAME,
