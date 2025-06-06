@@ -49,11 +49,14 @@ export const syncPerformanceData = async () => {
 export async function fetchPerformanceData(): Promise<Response> {
   const performanceCacheETag = await get(PERFORMANCE_ETAG_REDIS_KEY);
   const accessToken = await getAccessToken();
-  return await fetch(config.PERFORMANCE_ROUTING_DATA_URL, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "If-None-Match": performanceCacheETag,
-      "Cache-Control": "public",
+  return await fetch(
+    `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "If-None-Match": performanceCacheETag,
+        "Cache-Control": "public",
+      },
     },
-  });
+  );
 }

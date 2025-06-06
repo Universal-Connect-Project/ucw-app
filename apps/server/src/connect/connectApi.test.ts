@@ -1,8 +1,15 @@
+import config from "../config";
 import { ConnectApi } from "./connectApi";
-import { ComboJobTypes, ConnectionStatus } from "@repo/utils";
+import { ChallengeType, ComboJobTypes, ConnectionStatus } from "@repo/utils";
 import type { Context } from "../shared/contract";
 import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
-import { mxTestData } from "@repo/utils-dev-dependency";
+import {
+  CONNECTION_BY_ID_PATH,
+  mxTestData,
+  READ_MEMBER_STATUS_PATH,
+} from "@repo/utils-dev-dependency";
+import { server } from "../test/testServer";
+import { http, HttpResponse } from "msw";
 
 const {
   connectionByIdMemberData,
@@ -12,22 +19,69 @@ const {
 
 const resolvedUserId = "resolvedUserId";
 
-const testContext = {
-  aggregator: MX_AGGREGATOR_STRING,
-  institutionId: "xxx",
-  resolvedUserId,
-  jobTypes: [ComboJobTypes.TRANSACTIONS],
-} as Context;
-
-const connectApi = new ConnectApi({
-  context: testContext,
-});
-
-connectApi.init();
+async function waitForRequestLogLength(
+  requestLog: unknown[],
+  expectedLength: number,
+  timeout = 2000,
+) {
+  const start = Date.now();
+  while (requestLog.length < expectedLength) {
+    if (Date.now() - start > timeout)
+      throw new Error("Timed out waiting for requestLog");
+    await new Promise((r) => setTimeout(r, 10));
+  }
+}
 
 describe("connectApi", () => {
+  let testContext: Context;
+  let connectApi: ConnectApi;
+  beforeEach(() => {
+    testContext = {
+      aggregator: MX_AGGREGATOR_STRING,
+      institutionId: "xxx",
+      resolvedUserId,
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
+    } as Context;
+
+    connectApi = new ConnectApi({
+      context: testContext,
+    });
+
+    connectApi.init();
+  });
+
   describe("addMember", () => {
     it("returns a member", async () => {
+      const requestLog: {
+        connectionId: string;
+        eventType: string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        body?: any;
+      }[] = [];
+      server.use(
+        http.post(
+          `${config.PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionStart`,
+          async ({ request, params }) => {
+            requestLog.push({
+              eventType: "connectionStart",
+              connectionId: String(params.connectionId),
+              body: await request.json(),
+            });
+            return HttpResponse.json({ ok: true });
+          },
+        ),
+        http.put(
+          `${config.PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionPause`,
+          ({ params }) => {
+            requestLog.push({
+              eventType: "connectionPause",
+              connectionId: String(params.connectionId),
+            });
+            return HttpResponse.json({ ok: true });
+          },
+        ),
+      );
+
       const memberData = {
         guid: "testMemberGuid",
         institution_guid: "testInstitutionGuid",
@@ -39,6 +93,9 @@ describe("connectApi", () => {
             value: "testCredentialValue",
           },
         ],
+        rawInstitutionData: {
+          ucpInstitutionId: "testUcpInstitutionId",
+        },
       };
 
       const mxMember = mxOauthMemberData.member;
@@ -74,6 +131,90 @@ describe("connectApi", () => {
           user_guid: resolvedUserId,
         },
       });
+
+      await waitForRequestLogLength(requestLog, 1);
+
+      expect(requestLog[0]).toEqual(
+        expect.objectContaining({
+          connectionId: expect.any(String),
+          body: {
+            aggregatorId: MX_AGGREGATOR_STRING,
+            institutionId: "testUcpInstitutionId",
+            jobTypes: [ComboJobTypes.TRANSACTIONS],
+          },
+        }),
+      );
+    });
+
+    it("calls connectionStart and connectionPause when is_oauth is true", async () => {
+      const requestLog: {
+        connectionId: string;
+        eventType: string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        body?: any;
+      }[] = [];
+
+      server.use(
+        http.post(
+          `${config.PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionStart`,
+          async ({ request, params }) => {
+            requestLog.push({
+              eventType: "connectionStart",
+              connectionId: String(params.connectionId),
+              body: await request.json(),
+            });
+            return HttpResponse.json({ ok: true });
+          },
+        ),
+        http.put(
+          `${config.PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionPause`,
+          ({ params }) => {
+            requestLog.push({
+              eventType: "connectionPause",
+              connectionId: String(params.connectionId),
+            });
+            return HttpResponse.json({ ok: true });
+          },
+        ),
+      );
+
+      const memberData = {
+        guid: "testMemberGuid",
+        institution_guid: "testInstitutionGuid",
+        is_oauth: true,
+        skip_aggregration: false,
+        credentials: [
+          {
+            guid: "testCredentialGuid",
+            value: "testCredentialValue",
+          },
+        ],
+        rawInstitutionData: {
+          ucpInstitutionId: "testUcpInstitutionId",
+        },
+      };
+
+      await connectApi.addMember(memberData);
+
+      await waitForRequestLogLength(requestLog, 2);
+
+      expect(requestLog[0]).toEqual(
+        expect.objectContaining({
+          eventType: "connectionStart",
+          connectionId: expect.any(String),
+          body: {
+            aggregatorId: "mx",
+            institutionId: "testUcpInstitutionId",
+            jobTypes: [ComboJobTypes.TRANSACTIONS],
+          },
+        }),
+      );
+      expect(requestLog[1]).toEqual(
+        expect.objectContaining({
+          eventType: "connectionPause",
+          connectionId: expect.any(String),
+        }),
+      );
     });
   });
 
@@ -112,6 +253,128 @@ describe("connectApi", () => {
         },
         user_guid: resolvedUserId,
       });
+    });
+
+    it("records a pause event when mfa challenges", async () => {
+      const requestLog: {
+        connectionId: string;
+        eventType: string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        body?: any;
+      }[] = [];
+
+      server.use(
+        http.put(
+          `${config.PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionPause`,
+          ({ params }) => {
+            requestLog.push({
+              eventType: "connectionPause",
+              connectionId: String(params.connectionId),
+            });
+            return HttpResponse.json({ ok: true });
+          },
+        ),
+        http.get(READ_MEMBER_STATUS_PATH, () =>
+          HttpResponse.json({
+            member: {
+              connection_status: ConnectionStatus.CHALLENGED,
+              guid: "testGuid",
+              challenges: [
+                {
+                  id: "testId",
+                  question: "testQuestion",
+                  type: ChallengeType.QUESTION,
+                },
+              ],
+            },
+          }),
+        ),
+      );
+
+      await connectApi.loadMemberByGuid("testGuid");
+
+      await waitForRequestLogLength(requestLog, 1);
+
+      expect(requestLog[0]).toEqual(
+        expect.objectContaining({
+          eventType: "connectionPause",
+          connectionId: expect.any(String),
+        }),
+      );
+    });
+
+    it("records success event if member is connected and is not being aggregated", async () => {
+      const requestLog: {
+        connectionId: string;
+        eventType: string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        body?: any;
+      }[] = [];
+
+      server.use(
+        http.put(
+          `${config.PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionSuccess`,
+          ({ params }) => {
+            requestLog.push({
+              eventType: "connectionSuccess",
+              connectionId: String(params.connectionId),
+            });
+            return HttpResponse.json({ ok: true });
+          },
+        ),
+      );
+
+      await connectApi.loadMemberByGuid("testGuid");
+
+      await waitForRequestLogLength(requestLog, 1);
+
+      expect(requestLog[0]).toEqual(
+        expect.objectContaining({
+          eventType: "connectionSuccess",
+          connectionId: expect.any(String),
+        }),
+      );
+    });
+
+    it("records resume event if member is connected is being aggregated and is Oauth", async () => {
+      const requestLog: {
+        connectionId: string;
+        eventType: string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        body?: any;
+      }[] = [];
+
+      server.use(
+        http.put(
+          `${config.PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionResume`,
+          ({ params }) => {
+            requestLog.push({
+              eventType: "connectionResume",
+              connectionId: String(params.connectionId),
+            });
+            return HttpResponse.json({ ok: true });
+          },
+        ),
+        http.get(CONNECTION_BY_ID_PATH, () =>
+          HttpResponse.json({
+            member: {
+              ...mxOauthMemberData.member,
+              is_being_aggregated: true,
+            },
+          }),
+        ),
+      );
+
+      await connectApi.loadMemberByGuid("testGuid");
+
+      await waitForRequestLogLength(requestLog, 1);
+
+      expect(requestLog[0]).toEqual(
+        expect.objectContaining({
+          eventType: "connectionResume",
+          connectionId: expect.any(String),
+        }),
+      );
     });
   });
 });

@@ -130,6 +130,7 @@ export interface CreateConnectionRequest {
   is_oauth?: boolean;
   skip_aggregation?: boolean;
   metadata?: string;
+  performanceSessionId?: string;
 }
 
 export interface PostMessageEventData {

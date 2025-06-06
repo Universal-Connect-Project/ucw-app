@@ -7,6 +7,12 @@ import config from "./config";
 import * as logger from "./infra/logger";
 import { get, set } from "./services/storageClient/redis";
 import { getWebhookHostUrl } from "./webhooks";
+import {
+  recordConnectionPauseEvent,
+  recordConnectionResumeEvent,
+  recordStartEvent,
+  recordSuccessEvent,
+} from "./services/performanceTracking";
 
 const mxAdapterMapObject = getMxAdapterMapObject({
   cacheClient: {
@@ -52,6 +58,12 @@ const finicityAdapterMapObject: Record<string, AdapterMap> =
       get: get,
     },
     logClient: logger,
+    performanceClient: {
+      recordStartEvent: recordStartEvent,
+      recordSuccessEvent: recordSuccessEvent,
+      recordConnectionPauseEvent: recordConnectionPauseEvent,
+      recordConnectionResumeEvent: recordConnectionResumeEvent,
+    },
     aggregatorCredentials: {
       finicitySandbox: {
         partnerId: config.FINICITY_PARTNER_ID,
@@ -77,6 +89,12 @@ const akoyaAdapterMapObject: Record<string, AdapterMap> =
       get: get,
     },
     logClient: logger,
+    performanceClient: {
+      recordStartEvent: recordStartEvent,
+      recordSuccessEvent: recordSuccessEvent,
+      recordConnectionPauseEvent: recordConnectionPauseEvent,
+      recordConnectionResumeEvent: recordConnectionResumeEvent,
+    },
     aggregatorCredentials: {
       akoyaSandbox: {
         clientId: config.AKOYA_CLIENT_ID,
