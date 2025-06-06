@@ -18,9 +18,16 @@ async function sendPerformanceEvent({
   method?: "POST" | "PUT";
   body?: string;
 }) {
+  const { PERFORMANCE_SERVICE_URL, UCP_CLIENT_ID, UCP_CLIENT_SECRET } = config;
+
+  if (!UCP_CLIENT_ID || !UCP_CLIENT_SECRET) {
+    debug("Performance disabled until UCP credentials are configured");
+    return;
+  }
+
   try {
     const accessToken = await getAccessToken();
-    const url = `${config.PERFORMANCE_SERVICE_URL}/events/${connectionId}/${eventType}`;
+    const url = `${PERFORMANCE_SERVICE_URL}/events/${connectionId}/${eventType}`;
 
     const response = await fetch(url, {
       method,
@@ -28,7 +35,7 @@ async function sendPerformanceEvent({
         Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       },
-      ...(body ? { body } : {}),
+      body,
     });
 
     if (!response.ok) {

@@ -10,6 +10,7 @@ import {
   recordStartEvent,
   recordSuccessEvent,
 } from "../services/performanceTracking";
+import { getAggregatorIdFromTestAggregatorId } from "../adapterIndex";
 
 function mapConnection(connection: Connection): Member {
   const userId = connection.userId;
@@ -103,19 +104,6 @@ function mapConnection(connection: Connection): Member {
   } as any;
 }
 
-const getMainAggregator = (aggregator: string): string => {
-  const AggregatorToMainAggregatorMap: Record<string, string> = {
-    mx: "mx",
-    mx_int: "mx",
-    sophtron: "sophtron",
-    finicity: "finicity",
-    finicity_sandbox: "finicity",
-    akoya: "akoya",
-    akoya_sandbox: "akoya",
-  };
-  return AggregatorToMainAggregatorMap[aggregator] || aggregator;
-};
-
 export class ConnectApi extends AggregatorAdapterBase {
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor, @typescript-eslint/no-explicit-any
   constructor(req: any) {
@@ -125,6 +113,16 @@ export class ConnectApi extends AggregatorAdapterBase {
   async addMember(memberData: Member): Promise<MemberResponse> {
     const performanceSessionId = crypto.randomUUID();
     this.context.performanceSessionId = performanceSessionId;
+
+    const aggregatorId = getAggregatorIdFromTestAggregatorId(
+      this.context.aggregator,
+    );
+    const startEvent = recordStartEvent({
+      aggregatorId,
+      connectionId: performanceSessionId,
+      institutionId: memberData?.rawInstitutionData?.ucpInstitutionId,
+      jobTypes: this.context.jobTypes,
+    });
 
     const connection = await this.createConnection({
       id: memberData.guid,
@@ -142,18 +140,8 @@ export class ConnectApi extends AggregatorAdapterBase {
       performanceSessionId,
     });
 
-    const mainAggregatorId = getMainAggregator(this.context.aggregator);
-    const startEvent = recordStartEvent({
-      aggregatorId: mainAggregatorId,
-      connectionId: performanceSessionId,
-      institutionId: this.context.latestResolvedInstitutionId,
-      jobTypes: this.context.jobTypes,
-    });
     if (memberData.is_oauth) {
-      // This is if we decide to include user interaction time with akoya
-      if (mainAggregatorId != "akoya") {
-        startEvent.then(() => recordConnectionPauseEvent(performanceSessionId));
-      }
+      startEvent.then(() => recordConnectionPauseEvent(performanceSessionId));
     }
 
     return { member: mapConnection(connection) };
@@ -224,7 +212,7 @@ export class ConnectApi extends AggregatorAdapterBase {
   async loadMemberByGuid(memberGuid: string): Promise<Member> {
     const member = await this.getConnectionStatus(memberGuid);
     if (member?.challenges?.length > 0) {
-      await recordConnectionPauseEvent(this.context.performanceSessionId);
+      recordConnectionPauseEvent(this.context.performanceSessionId);
     }
     if (member?.institution_code == null) {
       const connection = await this.getConnection(memberGuid);

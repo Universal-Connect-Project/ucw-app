@@ -88,6 +88,9 @@ export interface Member {
   };
   skip_aggregation?: boolean | null;
   credentials?: Credential[];
+  rawInstitutionData?: {
+    ucpInstitutionId: string;
+  };
 }
 
 export interface MemberResponse {

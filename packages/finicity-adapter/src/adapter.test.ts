@@ -3,11 +3,13 @@ import { http, HttpResponse } from "msw";
 import {
   createClient as createCacheClient,
   createLogClient,
+  createMockPerformanceClient,
 } from "@repo/utils/test";
 import { FinicityAdapter } from "./adapter";
 import {
   ComboJobTypes,
   ConnectionStatus,
+  PerformanceClient,
   USER_NOT_RESOLVED_ERROR_TEXT,
 } from "@repo/utils";
 
@@ -44,35 +46,45 @@ export const aggregatorCredentials = {
   },
 };
 
-const finicityAdapterSandbox = new FinicityAdapter({
-  sandbox: true,
-  sessionId: "test-session",
-  dependencies: {
-    cacheClient,
-    logClient: createLogClient(),
-    aggregatorCredentials,
-    getWebhookHostUrl: () => "testWebhookHostUrl",
-    envConfig: {
-      HostUrl: "http://test.universalconnect.org",
-    },
-  },
-});
-
-const finicityAdapter = new FinicityAdapter({
-  sandbox: false,
-  sessionId: "test-session",
-  dependencies: {
-    cacheClient,
-    logClient: createLogClient(),
-    aggregatorCredentials,
-    getWebhookHostUrl: () => "testWebhookHostUrl",
-    envConfig: {
-      HostUrl: "http://test.universalconnect.org",
-    },
-  },
-});
-
 describe("finicity aggregator", () => {
+  let finicityAdapterSandbox: FinicityAdapter;
+  let finicityAdapter: FinicityAdapter;
+  let mockPerformanceClient: PerformanceClient;
+
+  beforeEach(() => {
+    mockPerformanceClient = createMockPerformanceClient();
+
+    finicityAdapterSandbox = new FinicityAdapter({
+      sandbox: true,
+      sessionId: "test-session",
+      dependencies: {
+        cacheClient,
+        logClient: createLogClient(),
+        performanceClient: mockPerformanceClient,
+        aggregatorCredentials,
+        getWebhookHostUrl: () => "testWebhookHostUrl",
+        envConfig: {
+          HostUrl: "http://test.universalconnect.org",
+        },
+      },
+    });
+
+    finicityAdapter = new FinicityAdapter({
+      sandbox: false,
+      sessionId: "test-session",
+      dependencies: {
+        cacheClient,
+        logClient: createLogClient(),
+        performanceClient: mockPerformanceClient,
+        aggregatorCredentials,
+        getWebhookHostUrl: () => "testWebhookHostUrl",
+        envConfig: {
+          HostUrl: "http://test.universalconnect.org",
+        },
+      },
+    });
+  });
+
   describe("GetInsitutionById", () => {
     it("Maps correct fields", async () => {
       const testInstitutionId = "testId";
@@ -176,6 +188,7 @@ describe("finicity aggregator", () => {
         institution_code: "junk",
         credentials: [],
         institutionId,
+        performanceSessionId: connectionId,
       };
       const userId = "testUserId";
       const connection = await finicityAdapter.CreateConnection(
@@ -301,7 +314,7 @@ describe("finicity aggregator", () => {
   });
 
   describe("HandleOauthResponse", () => {
-    it("handles 'added' event and updates connection status to CONNECTED, triggering account refresh with transactions job type", async () => {
+    it("handles 'added' event and updates connection status to CONNECTED, triggering account refresh with transactions job type, and calling a resume performance event", async () => {
       const userId = "test-user-id";
       const payload = {
         accounts: [{ institutionLoginId: "test-institution-login-id" }],
@@ -312,6 +325,7 @@ describe("finicity aggregator", () => {
           institutionId: "testInstitutionId",
           jobTypes: [ComboJobTypes.TRANSACTIONS],
           credentials: [],
+          performanceSessionId: "testPerfomanceSessionId",
         },
         userId,
       );
@@ -351,15 +365,47 @@ describe("finicity aggregator", () => {
           }),
         }),
       );
+      expect(
+        mockPerformanceClient.recordConnectionResumeEvent,
+      ).toHaveBeenCalledWith("testPerfomanceSessionId");
     });
 
-    it("handles 'done' eventType and returns the connection", async () => {
+    it("handles 'adding' event by calling a resume performance event", async () => {
+      const userId = "test-user-id";
+      const payload = {
+        accounts: [{ institutionLoginId: "test-institution-login-id" }],
+      };
+
+      const createdConnection = await finicityAdapter.CreateConnection(
+        {
+          institutionId: "testInstitutionId",
+          jobTypes: [ComboJobTypes.TRANSACTIONS],
+          credentials: [],
+          performanceSessionId: "testPerfomanceSessionId",
+        },
+        userId,
+      );
+
+      const request = {
+        query: { connection_id: createdConnection.id },
+        body: { eventType: "adding", payload },
+      };
+
+      await finicityAdapter.HandleOauthResponse(request);
+
+      expect(
+        mockPerformanceClient.recordConnectionResumeEvent,
+      ).toHaveBeenCalledWith("testPerfomanceSessionId");
+    });
+
+    it("handles 'done' eventType and returns the connection and sends a success performance event", async () => {
       const userId = "test-user-id";
       const createdConnection = await finicityAdapter.CreateConnection(
         {
           institutionId: "testInstitutionId",
           jobTypes: [ComboJobTypes.TRANSACTIONS],
           credentials: [],
+          performanceSessionId: "testPerfomanceSessionId",
         },
         userId,
       );
@@ -377,6 +423,9 @@ describe("finicity aggregator", () => {
           id: createdConnection.id,
           status: ConnectionStatus.CREATED,
         }),
+      );
+      expect(mockPerformanceClient.recordSuccessEvent).toHaveBeenCalledWith(
+        "testPerfomanceSessionId",
       );
     });
 
