@@ -217,9 +217,9 @@ export class ConnectApi extends AggregatorAdapterBase {
     if (member?.institution_code == null) {
       const connection = await this.getConnection(memberGuid);
 
-      if (member.status === ConnectionStatus.CONNECTED) {
-        if (connection.is_being_aggregated) {
-          if (connection.is_oauth) {
+      if (member?.status === ConnectionStatus.CONNECTED) {
+        if (connection?.is_being_aggregated) {
+          if (connection?.is_oauth) {
             recordConnectionResumeEvent(this.context.performanceSessionId);
           }
         } else {
