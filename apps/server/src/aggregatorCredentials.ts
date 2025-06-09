@@ -1,3 +1,4 @@
+import { AKOYA_AGGREGATOR_STRING } from "@repo/akoya-adapter";
 import config from "./config";
 
 const aggregatorCredentials = {
@@ -14,7 +15,7 @@ const aggregatorCredentials = {
     secret: config.AkoyaApiSecretProd,
     basePath: "idp.ddp.akoya.com",
     productPath: "products.ddp.akoya.com",
-    aggregator: "akoya",
+    aggregator: AKOYA_AGGREGATOR_STRING,
     available: true,
   },
   finicityProd: {

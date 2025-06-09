@@ -40,8 +40,6 @@ jobs:
           echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
 
           # Secrets (can't load these from another job, due to GH security features)
-          echo UCP_CLIENT_SECRET=fakeSecret >> ${ENV_FILE_PATH}
-          echo UCP_CLIENT_ID=fakeClientId >> ${ENV_FILE_PATH}
 
       - name: Run Jest Tests
         run: |

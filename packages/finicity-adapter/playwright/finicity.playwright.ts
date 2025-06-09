@@ -35,7 +35,7 @@ test.describe("Finicity Adapter Tests", () => {
     await authorizeTab.getByLabel("Submit").click();
 
     const msg = await page.waitForEvent("console", {
-      timeout: 120_000,
+      timeout: 120000,
       predicate: async (msg) => {
         try {
           const args = msg.args();

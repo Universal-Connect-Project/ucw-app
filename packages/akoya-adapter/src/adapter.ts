@@ -11,6 +11,7 @@ import type {
 } from "@repo/utils";
 import { ConnectionStatus } from "@repo/utils";
 import type { AdapterDependencies, ApiCredentials } from "./models";
+import { AKOYA_AGGREGATOR_STRING } from "./index";
 
 export const AKOYA_BASE_PATH = "https://sandbox-idp.ddp.akoya.com";
 export const AKOYA_BASE_PROD_PATH = "https://idp.ddp.akoya.com";
@@ -32,7 +33,7 @@ export class AkoyaAdapter implements WidgetAdapter {
   constructor(args: AdapterConfig) {
     const { sandbox, dependencies } = args;
     this.sandbox = sandbox;
-    this.aggregator = sandbox ? "akoya_sandbox" : "akoya";
+    this.aggregator = sandbox ? "akoya_sandbox" : AKOYA_AGGREGATOR_STRING;
     this.cacheClient = dependencies?.cacheClient;
     this.logger = dependencies?.logClient;
     this.envConfig = dependencies?.envConfig;

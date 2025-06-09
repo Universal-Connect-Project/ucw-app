@@ -7,6 +7,7 @@ import {
 } from "@repo/utils/test";
 import { AKOYA_BASE_PATH, AKOYA_BASE_PROD_PATH, AkoyaAdapter } from "./adapter";
 import { Connection, ConnectionStatus, PerformanceClient } from "@repo/utils";
+import { AKOYA_AGGREGATOR_STRING } from "./index";
 
 const cacheClient = createCacheClient();
 const logClient = createLogClient();
@@ -119,7 +120,7 @@ describe("akoya aggregator", () => {
         institution_code: "testInstitutionId",
         is_oauth: true,
         oauth_window_uri: oauth_window_uri_example,
-        aggregator: "akoya",
+        aggregator: AKOYA_AGGREGATOR_STRING,
         credentials: [],
         status: ConnectionStatus.CREATED,
         userId: testUserId,

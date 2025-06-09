@@ -68,7 +68,7 @@ export interface Member {
   background_aggregation_is_disabled?: boolean;
   connection_status?: string | null | number; //
   postMessageEventData?: PostMessageEventData;
-  guid: string;
+  guid?: string;
   id?: string | null;
   institution_code?: string | null;
   is_being_aggregated?: boolean | null; //

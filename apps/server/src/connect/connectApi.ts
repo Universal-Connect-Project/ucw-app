@@ -11,6 +11,7 @@ import {
   recordSuccessEvent,
 } from "../services/performanceTracking";
 import { getAggregatorIdFromTestAggregatorId } from "../adapterIndex";
+import { AKOYA_AGGREGATOR_STRING } from "@repo/akoya-adapter";
 
 function mapConnection(connection: Connection): Member {
   const userId = connection.userId;
@@ -117,12 +118,21 @@ export class ConnectApi extends AggregatorAdapterBase {
     const aggregatorId = getAggregatorIdFromTestAggregatorId(
       this.context.aggregator,
     );
-    const startEvent = recordStartEvent({
-      aggregatorId,
-      connectionId: performanceSessionId,
-      institutionId: memberData?.rawInstitutionData?.ucpInstitutionId,
-      jobTypes: this.context.jobTypes,
-    });
+
+    const isRefreshConnection = !!memberData.guid;
+
+    let startEvent: Promise<void> | undefined;
+
+    if (!isRefreshConnection) {
+      startEvent = recordStartEvent({
+        aggregatorId,
+        connectionId: performanceSessionId,
+        institutionId: memberData?.rawInstitutionData?.ucpInstitutionId,
+        jobTypes: this.context.jobTypes,
+        // akoya doesn't provide a way to accurately measure performance duration
+        recordDuration: aggregatorId == AKOYA_AGGREGATOR_STRING ? false : true,
+      });
+    }
 
     const connection = await this.createConnection({
       id: memberData.guid,
@@ -140,7 +150,7 @@ export class ConnectApi extends AggregatorAdapterBase {
       performanceSessionId,
     });
 
-    if (memberData.is_oauth) {
+    if (!isRefreshConnection && memberData.is_oauth && startEvent) {
       startEvent.then(() => recordConnectionPauseEvent(performanceSessionId));
     }
 

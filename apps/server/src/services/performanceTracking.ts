@@ -1,5 +1,5 @@
 import type { ComboJobTypes } from "@repo/utils";
-import config from "../config";
+import { getConfig } from "../config";
 import { debug } from "../infra/logger";
 import { getAccessToken } from "./auth0Service";
 
@@ -18,12 +18,7 @@ async function sendPerformanceEvent({
   method?: "POST" | "PUT";
   body?: string;
 }) {
-  const { PERFORMANCE_SERVICE_URL, UCP_CLIENT_ID, UCP_CLIENT_SECRET } = config;
-
-  if (!UCP_CLIENT_ID || !UCP_CLIENT_SECRET) {
-    debug("Performance disabled until UCP credentials are configured");
-    return;
-  }
+  const { PERFORMANCE_SERVICE_URL } = getConfig();
 
   try {
     const accessToken = await getAccessToken();
@@ -54,17 +49,24 @@ export const recordStartEvent = async ({
   connectionId,
   institutionId,
   jobTypes,
+  recordDuration,
 }: {
   aggregatorId: string;
   connectionId: string;
   institutionId: string;
   jobTypes: ComboJobTypes[];
+  recordDuration?: boolean;
 }) => {
   await sendPerformanceEvent({
     connectionId,
     eventType: "connectionStart",
     method: "POST",
-    body: JSON.stringify({ aggregatorId, institutionId, jobTypes }),
+    body: JSON.stringify({
+      aggregatorId,
+      institutionId,
+      jobTypes,
+      recordDuration,
+    }),
   });
 };
 
