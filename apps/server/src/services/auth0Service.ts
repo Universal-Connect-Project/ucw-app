@@ -26,7 +26,7 @@ export async function getAccessToken() {
   });
   if (response.status === 401) {
     logWarning("Unauthorized to retrieve UCP access token");
-    throw new Error("Unauthorized");
+    return null;
   }
   try {
     if (response.ok) {

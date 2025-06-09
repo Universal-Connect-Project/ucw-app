@@ -22,6 +22,12 @@ async function sendPerformanceEvent({
 
   try {
     const accessToken = await getAccessToken();
+
+    if (!accessToken) {
+      debug("UCP credentials need to be configured for performance features");
+      return;
+    }
+
     const url = `${PERFORMANCE_SERVICE_URL}/events/${connectionId}/${eventType}`;
 
     const response = await fetch(url, {

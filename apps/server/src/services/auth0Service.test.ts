@@ -45,7 +45,7 @@ describe("getAccessToken", () => {
     expect(token).toBe(mockAccessToken);
   });
 
-  it("should log a warning and throw when unauthorized", async () => {
+  it("should log a warning and return null when unauthorized", async () => {
     const warningLogSpy = jest.spyOn(logger, "warning");
 
     server.use(
@@ -57,7 +57,8 @@ describe("getAccessToken", () => {
       }),
     );
 
-    await expect(getAccessToken()).rejects.toThrow("Unauthorized");
+    const token = await getAccessToken();
+    expect(token).toBeNull();
     expect(warningLogSpy).toHaveBeenCalledWith(
       "Unauthorized to retrieve UCP access token",
     );

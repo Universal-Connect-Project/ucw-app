@@ -112,9 +112,8 @@ describe("performanceTracking", () => {
     await recordSuccessEvent("conn5");
     expect(debugSpy).toHaveBeenCalledWith(
       expect.stringContaining(
-        "Performance event (connectionSuccess) failed with error:",
+        "UCP credentials need to be configured for performance features",
       ),
-      expect.objectContaining({ message: "Unauthorized" }),
     );
   });
 
