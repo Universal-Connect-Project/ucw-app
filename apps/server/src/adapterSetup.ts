@@ -2,6 +2,7 @@ import type { AdapterMap } from "@repo/utils";
 import { getMxAdapterMapObject } from "@repo/mx-adapter";
 import { getSophtronAdapterMapObject } from "@repo/sophtron-adapter";
 import { getAkoyaAdapterMapObject } from "@repo/akoya-adapter";
+import { getPlaidAdapterMapObject } from "@repo/plaid-adapter";
 import { getFinicityAdapterMapObject } from "@repo/finicity-adapter";
 import config from "./config";
 import * as logger from "./infra/logger";
@@ -93,11 +94,38 @@ const akoyaAdapterMapObject: Record<string, AdapterMap> =
     },
   });
 
+const plaidAdapterMapObject: Record<string, AdapterMap> =
+  getPlaidAdapterMapObject({
+    cacheClient: {
+      set: set,
+      get: get,
+    },
+    logClient: logger,
+    aggregatorCredentials: {
+      plaidSandbox: {
+        clientName: config.PLAID_CLIENT_NAME,
+        clientId: config.PLAID_CLIENT_ID,
+        secret: config.PLAID_SECRET,
+      },
+      plaidProd: {
+        clientName: config.PLAID_CLIENT_NAME_PROD,
+        clientId: config.PLAID_CLIENT_ID_PROD,
+        secret: config.PLAID_SECRET_PROD,
+      },
+    },
+    getWebhookHostUrl: getWebhookHostUrl,
+    envConfig: {
+      HostUrl: config.HOST_URL,
+      WebhookHostUrl: config.WebhookHostUrl,
+    },
+  });
+
 export const adapterMap: Record<string, AdapterMap> = {
   ...akoyaAdapterMapObject,
   ...finicityAdapterMapObject,
   ...mxAdapterMapObject,
   ...sophtronAdapterMapObject,
+  ...plaidAdapterMapObject,
 };
 
 export type Aggregator = keyof typeof adapterMap;

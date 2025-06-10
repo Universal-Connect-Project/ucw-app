@@ -3,6 +3,7 @@ import { testInstitutions as mxTestInstitutions } from "@repo/mx-adapter";
 import { testInstitutions as finicityTestInstitutions } from "@repo/finicity-adapter";
 import { testInstitutions as sophtronTestInstitutions } from "@repo/sophtron-adapter";
 import { testInstitutions as akoyaTestInstitutions } from "@repo/akoya-adapter";
+import { testInstitutions as plaidTestInstitutions } from "@repo/plaid-adapter";
 
 export const CHASE_BANK_TEST_FILTER_NAME = "Chase Bank Test Filter";
 
@@ -43,6 +44,7 @@ export const testInstitutions = buildTestInstitutions([
   finicityTestInstitutions,
   sophtronTestInstitutions,
   akoyaTestInstitutions,
+  plaidTestInstitutions,
   [testChaseBankToFilter],
 ]);
 
