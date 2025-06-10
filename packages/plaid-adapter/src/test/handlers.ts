@@ -1,0 +1,33 @@
+import { http, HttpResponse } from "msw";
+
+import {PLAID_BASE_PATH, PLAID_BASE_PATH_PROD } from "../adapter";
+
+
+export const CREATE_USER_PATH = `${PLAID_BASE_PATH}/aggregation/v2/customers/active`;
+export const DELETE_USER_PATH = `${PLAID_BASE_PATH}/aggregation/v1/customers/:customerId`;
+export const MOCKED_OAUTH_URL = "http://example.url";
+export const MOCKED_FIX_OAUTH_URL = "http://fix.example.url";
+
+const handlers = [
+  http.post(
+    `${PLAID_BASE_PATH}/link/token/create`,
+    () => HttpResponse.json({
+      "expiration": "2025-06-23T12:54:37Z",
+      "link_token": "link-sandbox-9791370e-9f28-401e-af44-96031b21d98d",
+      "request_id": "DtPD4pznLCMKZ48",
+      "hosted_link_url": PLAID_BASE_PATH
+    }),
+  ),
+  http.post(
+    `${PLAID_BASE_PATH_PROD}/link/token/create`,
+    () => HttpResponse.json({
+      "expiration": "2025-06-23T12:54:37Z",
+      "link_token": "link-sandbox-9791370e-9f28-401e-af44-96031b21d98d",
+      "request_id": "DtPD4pznLCMKZ48",
+      "hosted_link_url": PLAID_BASE_PATH_PROD
+    }),
+  ),
+  http.delete(DELETE_USER_PATH, () => new HttpResponse(null, { status: 200 })),
+];
+
+export default handlers;
