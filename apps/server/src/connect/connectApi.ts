@@ -11,7 +11,6 @@ import {
   recordSuccessEvent,
 } from "../services/performanceTracking";
 import { getAggregatorIdFromTestAggregatorId } from "../adapterIndex";
-import { AKOYA_AGGREGATOR_STRING } from "@repo/akoya-adapter";
 
 function mapConnection(connection: Connection): Member {
   const userId = connection.userId;
@@ -129,8 +128,7 @@ export class ConnectApi extends AggregatorAdapterBase {
         connectionId: performanceSessionId,
         institutionId: memberData?.rawInstitutionData?.ucpInstitutionId,
         jobTypes: this.context.jobTypes,
-        // akoya doesn't provide a way to accurately measure performance duration
-        recordDuration: aggregatorId == AKOYA_AGGREGATOR_STRING ? false : true,
+        recordDuration: this.getShouldRecordPerformanceDuration(),
       });
     }
 

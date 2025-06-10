@@ -43,6 +43,11 @@ export class AkoyaAdapter implements WidgetAdapter {
       : dependencies?.aggregatorCredentials.akoyaProd;
   }
 
+  getShouldRecordPerformanceDuration() {
+    // Akoya doesn't provide enough visibility to measure duration performance
+    return false;
+  }
+
   async GetInstitutionById(id: string): Promise<AggregatorInstitution> {
     return {
       id,

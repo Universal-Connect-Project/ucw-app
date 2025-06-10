@@ -232,6 +232,7 @@ export interface WidgetAdapter {
     userId?: string,
   ) => Promise<Connection | undefined>;
   HandleOauthResponse?: (request: any) => Promise<Connection>;
+  getShouldRecordPerformanceDuration?: () => boolean;
 }
 
 export interface CachedInstitution {
