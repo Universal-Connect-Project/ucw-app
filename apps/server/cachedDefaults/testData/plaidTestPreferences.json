@@ -1,0 +1,13 @@
+{
+  "defaultAggregator": "plaid",
+
+  "supportedAggregators": ["plaid"],
+
+  "defaultAggregatorVolume": {},
+
+  "institutionAggregatorVolumeMap": {},
+
+  "hiddenInstitutions": [],
+
+  "recommendedInstitutions": ["plaidbank"]
+}
