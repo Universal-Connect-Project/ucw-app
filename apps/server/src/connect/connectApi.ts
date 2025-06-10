@@ -4,6 +4,13 @@ import { ChallengeType, ConnectionStatus } from "@repo/utils";
 
 import { AggregatorAdapterBase } from "../adapters";
 import type { Member, MemberResponse } from "../shared/connect/contract";
+import {
+  recordConnectionPauseEvent,
+  recordConnectionResumeEvent,
+  recordStartEvent,
+  recordSuccessEvent,
+} from "../services/performanceTracking";
+import { getAggregatorIdFromTestAggregatorId } from "../adapterIndex";
 
 function mapConnection(connection: Connection): Member {
   const userId = connection.userId;
@@ -104,6 +111,27 @@ export class ConnectApi extends AggregatorAdapterBase {
   }
 
   async addMember(memberData: Member): Promise<MemberResponse> {
+    const performanceSessionId = crypto.randomUUID();
+    this.context.performanceSessionId = performanceSessionId;
+
+    const aggregatorId = getAggregatorIdFromTestAggregatorId(
+      this.context.aggregator,
+    );
+
+    const isRefreshConnection = !!memberData.guid;
+
+    let startEvent: Promise<void> | undefined;
+
+    if (!isRefreshConnection) {
+      startEvent = recordStartEvent({
+        aggregatorId,
+        connectionId: performanceSessionId,
+        institutionId: memberData?.rawInstitutionData?.ucpInstitutionId,
+        jobTypes: this.context.jobTypes,
+        recordDuration: this.getShouldRecordPerformanceDuration(),
+      });
+    }
+
     const connection = await this.createConnection({
       id: memberData.guid,
       institutionId: memberData.institution_guid,
@@ -117,12 +145,19 @@ export class ConnectApi extends AggregatorAdapterBase {
           id: c.guid,
           value: c.value,
         })) ?? [],
+      performanceSessionId,
     });
+
+    if (!isRefreshConnection && memberData.is_oauth && startEvent) {
+      startEvent.then(() => recordConnectionPauseEvent(performanceSessionId));
+    }
+
     return { member: mapConnection(connection) };
   }
 
   async updateMember(member: Member): Promise<Member> {
     if (this.context.current_job_id && member.credentials !== undefined) {
+      recordConnectionResumeEvent(this.context.performanceSessionId);
       await this.answerChallenge(
         member.guid,
         member.credentials.map((c) => {
@@ -183,12 +218,27 @@ export class ConnectApi extends AggregatorAdapterBase {
   }
 
   async loadMemberByGuid(memberGuid: string): Promise<Member> {
-    const mfa = await this.getConnectionStatus(memberGuid);
-    if (mfa?.institution_code == null) {
-      const connection = await this.getConnection(memberGuid);
-      return mapConnection({ ...mfa, ...connection });
+    const member = await this.getConnectionStatus(memberGuid);
+    if (member?.challenges?.length > 0) {
+      recordConnectionPauseEvent(this.context.performanceSessionId);
     }
-    return mapConnection({ ...mfa });
+    if (member?.institution_code == null) {
+      const connection = await this.getConnection(memberGuid);
+
+      if (member?.status === ConnectionStatus.CONNECTED) {
+        if (connection?.is_being_aggregated) {
+          if (connection?.is_oauth) {
+            recordConnectionResumeEvent(this.context.performanceSessionId);
+          }
+        } else {
+          recordSuccessEvent(this.context.performanceSessionId);
+        }
+      }
+
+      return mapConnection({ ...member, ...connection });
+    }
+
+    return mapConnection({ ...member });
   }
 
   async deleteMember(member: Member): Promise<void> {

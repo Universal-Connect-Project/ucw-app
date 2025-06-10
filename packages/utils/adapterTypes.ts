@@ -1,3 +1,5 @@
+import { ComboJobTypes } from "./contract";
+
 export type CacheClient = {
   set: (key: string, value: any, params?: unknown) => Promise<void> | void;
   get: (key: string) => Promise<any> | any;
@@ -10,3 +12,20 @@ export type LogClient = {
   trace: (message: string, data?: any) => void;
   warning: (message: string, data?: any) => void;
 };
+
+export interface PerformanceClient {
+  recordStartEvent: ({
+    aggregatorId,
+    connectionId,
+    institutionId,
+    jobTypes,
+  }: {
+    aggregatorId: string;
+    connectionId: string;
+    institutionId: string;
+    jobTypes: ComboJobTypes[];
+  }) => Promise<void>;
+  recordSuccessEvent: (connectionId: string) => Promise<void>;
+  recordConnectionPauseEvent: (connectionId: string) => Promise<void>;
+  recordConnectionResumeEvent: (connectionId: string) => Promise<void>;
+}

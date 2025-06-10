@@ -1,4 +1,4 @@
-import { CacheClient, LogClient } from "@repo/utils";
+import { CacheClient, LogClient, PerformanceClient } from "@repo/utils";
 
 export type ApiCredentials = {
   secret?: string;
@@ -215,6 +215,7 @@ export interface Transaction {
 export type AdapterDependencies = {
   cacheClient: CacheClient;
   logClient: LogClient;
+  performanceClient: PerformanceClient;
   aggregatorCredentials: AggregatorCredentials;
   envConfig: Record<string, string>;
   getWebhookHostUrl: () => string;

@@ -3,9 +3,11 @@ import "dotenv/config";
 import {
   createClient as createCacheClient,
   createLogClient,
+  createMockPerformanceClient,
 } from "@repo/utils/test";
 import { AKOYA_BASE_PATH, AKOYA_BASE_PROD_PATH, AkoyaAdapter } from "./adapter";
-import { Connection, ConnectionStatus } from "@repo/utils";
+import { Connection, ConnectionStatus, PerformanceClient } from "@repo/utils";
+import { AKOYA_AGGREGATOR_STRING } from "./index";
 
 const cacheClient = createCacheClient();
 const logClient = createLogClient();
@@ -23,31 +25,41 @@ const aggregatorCredentials = {
   },
 };
 
-const akoyaAdapterSandbox = new AkoyaAdapter({
-  sandbox: true,
-  dependencies: {
-    cacheClient,
-    logClient,
-    aggregatorCredentials,
-    envConfig: {
-      HostUrl: "http://localhost:8080",
-    },
-  },
-});
-
-const akoyaAdapter = new AkoyaAdapter({
-  sandbox: false,
-  dependencies: {
-    cacheClient,
-    logClient,
-    aggregatorCredentials,
-    envConfig: {
-      HostUrl: "http://localhost:8080",
-    },
-  },
-});
-
 describe("akoya aggregator", () => {
+  let akoyaAdapterSandbox: AkoyaAdapter;
+  let akoyaAdapter: AkoyaAdapter;
+  let mockPerformanceClient: PerformanceClient;
+
+  beforeEach(() => {
+    mockPerformanceClient = createMockPerformanceClient();
+
+    akoyaAdapterSandbox = new AkoyaAdapter({
+      sandbox: true,
+      dependencies: {
+        cacheClient,
+        logClient,
+        performanceClient: mockPerformanceClient,
+        aggregatorCredentials,
+        envConfig: {
+          HostUrl: "http://localhost:8080",
+        },
+      },
+    });
+
+    akoyaAdapter = new AkoyaAdapter({
+      sandbox: false,
+      dependencies: {
+        cacheClient,
+        logClient,
+        performanceClient: mockPerformanceClient,
+        aggregatorCredentials,
+        envConfig: {
+          HostUrl: "http://localhost:8080",
+        },
+      },
+    });
+  });
+
   describe("GetInsitutionById", () => {
     it("Maps correct fields", async () => {
       const ret = await akoyaAdapterSandbox.GetInstitutionById("testId");
@@ -92,24 +104,23 @@ describe("akoya aggregator", () => {
     const testUserId = "test-user-id";
 
     it("creates a connection and gets the connection by id then gets the status", async () => {
-      const oauth_window_uri_example =
-        "https://idp.ddp.akoya.com/auth?connector=testInstitutionId&client_id=prod-test-clientId&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Foauth%2Fakoya%2Fredirect_from&state=123456789&response_type=code&scope=openid+profile+offline_access";
-
+      const connectionId = "testConnectionId";
       const connection = await akoyaAdapter.CreateConnection(
         {
           ...baseConnectionRequest,
           is_oauth: true,
+          performanceSessionId: connectionId,
         },
         testUserId,
       );
-      const connectionId = connection.id;
+      const oauth_window_uri_example = `https://idp.ddp.akoya.com/auth?connector=testInstitutionId&client_id=prod-test-clientId&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Foauth%2Fakoya%2Fredirect_from&state=${connectionId}&response_type=code&scope=openid+profile+offline_access`;
 
       const expectedConnectionObj = {
         id: connectionId,
         institution_code: "testInstitutionId",
         is_oauth: true,
         oauth_window_uri: oauth_window_uri_example,
-        aggregator: "akoya",
+        aggregator: AKOYA_AGGREGATOR_STRING,
         credentials: [],
         status: ConnectionStatus.CREATED,
         userId: testUserId,
@@ -198,7 +209,7 @@ describe("akoya aggregator", () => {
   });
 
   describe("HandleOauthResponse", () => {
-    it("returns the updated connection if valid code and connection is found", async () => {
+    it("returns the updated connection if valid code and connection is found. And records performance success event", async () => {
       const requestId = "abc123";
       const connection: Connection = {
         id: requestId,
@@ -231,6 +242,10 @@ describe("akoya aggregator", () => {
         userId: null,
       });
 
+      expect(mockPerformanceClient.recordSuccessEvent).toHaveBeenCalledWith(
+        requestId,
+      );
+
       const cached = await cacheClient.get(requestId);
       expect(cached).toEqual(result);
     });
@@ -242,6 +257,8 @@ describe("akoya aggregator", () => {
           code: "code123",
         },
       };
+
+      expect(mockPerformanceClient.recordSuccessEvent).not.toHaveBeenCalled();
 
       await expect(akoyaAdapter.HandleOauthResponse(request)).rejects.toThrow(
         "Connection failed",
@@ -257,6 +274,8 @@ describe("akoya aggregator", () => {
           state: requestId,
         },
       });
+
+      expect(mockPerformanceClient.recordSuccessEvent).not.toHaveBeenCalled();
 
       expect(result.status).toEqual(ConnectionStatus.DENIED);
 

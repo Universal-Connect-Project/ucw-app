@@ -5,6 +5,7 @@ import type {
   CreateConnectionRequest,
   Credential,
   LogClient,
+  PerformanceClient,
   UpdateConnectionRequest,
   WidgetAdapter,
 } from "@repo/utils";
@@ -15,7 +16,6 @@ import {
 } from "@repo/utils";
 import type { AdapterConfig, Customer } from "./models";
 import FinicityClient from "./apiClient";
-import { v4 as uuidv4 } from "uuid";
 
 interface CachedConnection {
   connection?: Connection;
@@ -28,6 +28,7 @@ export class FinicityAdapter implements WidgetAdapter {
   cacheClient: CacheClient;
   logger: LogClient;
   envConfig: Record<string, string>;
+  performanceClient: PerformanceClient;
 
   constructor(args: AdapterConfig) {
     const { sandbox, dependencies } = args;
@@ -35,6 +36,7 @@ export class FinicityAdapter implements WidgetAdapter {
     this.cacheClient = dependencies?.cacheClient;
     this.logger = dependencies?.logClient;
     this.envConfig = dependencies?.envConfig;
+    this.performanceClient = dependencies?.performanceClient;
     this.apiClient = new FinicityClient(
       sandbox,
       dependencies?.aggregatorCredentials,
@@ -76,7 +78,7 @@ export class FinicityAdapter implements WidgetAdapter {
     request: CreateConnectionRequest,
     userId: string,
   ): Promise<Connection | undefined> {
-    const connectSessionId = uuidv4();
+    const connectSessionId = request.performanceSessionId;
     const connectionId = request.id;
     let oauthWindowUri: string;
     if (connectionId) {
@@ -214,7 +216,12 @@ export class FinicityAdapter implements WidgetAdapter {
     const { connection, jobTypes } = cachedConnection;
 
     switch (eventType) {
+      case "adding":
+        this.performanceClient.recordConnectionResumeEvent(connection_id);
+        break;
       case "added":
+        this.performanceClient.recordSuccessEvent(connection_id);
+
         institutionLoginId = payload?.accounts?.[0]?.institutionLoginId;
 
         if (jobTypes?.includes(ComboJobTypes.TRANSACTIONS)) {
@@ -228,6 +235,10 @@ export class FinicityAdapter implements WidgetAdapter {
         break;
       case "done":
         return connection;
+      case "invalidCredentials":
+      case "mfa":
+        this.performanceClient.recordConnectionPauseEvent(connection_id);
+        break;
       default:
         switch (reason) {
           case "complete":

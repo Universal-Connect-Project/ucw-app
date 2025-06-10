@@ -14,6 +14,7 @@ export interface Context {
   singleAccountSelect?: boolean;
   oauth_referral_source?: string;
   scheme?: string;
+  performanceSessionId?: string;
 }
 
 export enum ConnectionStatus {

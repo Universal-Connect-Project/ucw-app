@@ -23,10 +23,13 @@ describe("setPerformanceSyncSchedule", () => {
     jest.useFakeTimers();
     let pollerCounter = 0;
     server.use(
-      http.get(config.PERFORMANCE_ROUTING_DATA_URL, () => {
-        pollerCounter += 1;
-        return HttpResponse.json({});
-      }),
+      http.get(
+        `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+        () => {
+          pollerCounter += 1;
+          return HttpResponse.json({});
+        },
+      ),
     );
 
     const poller = await setPerformanceSyncSchedule(0.25);
@@ -55,7 +58,7 @@ describe("syncPerformanceData", () => {
 
     server.use(
       http.get(
-        config.PERFORMANCE_ROUTING_DATA_URL,
+        `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
         () =>
           new HttpResponse(null, {
             status: RESPONSE_NOT_MODIFIED,
@@ -85,12 +88,14 @@ describe("syncPerformanceData", () => {
     const fakeEtag = "12345abcde";
 
     server.use(
-      http.get(config.PERFORMANCE_ROUTING_DATA_URL, () =>
-        HttpResponse.json(performanceRoutingData, {
-          headers: {
-            etag: fakeEtag,
-          },
-        }),
+      http.get(
+        `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+        () =>
+          HttpResponse.json(performanceRoutingData, {
+            headers: {
+              etag: fakeEtag,
+            },
+          }),
       ),
     );
 
@@ -106,11 +111,13 @@ describe("syncPerformanceData", () => {
     const warningLogSpy = jest.spyOn(logger, "warning");
 
     server.use(
-      http.get(config.PERFORMANCE_ROUTING_DATA_URL, () =>
-        HttpResponse.json(null, {
-          status: UNAUTHORIZED_RESPONSE,
-          statusText: "Forbidden",
-        }),
+      http.get(
+        `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+        () =>
+          HttpResponse.json(null, {
+            status: UNAUTHORIZED_RESPONSE,
+            statusText: "Forbidden",
+          }),
       ),
     );
 
@@ -125,7 +132,10 @@ describe("syncPerformanceData", () => {
     const warningLogSpy = jest.spyOn(logger, "warning");
 
     server.use(
-      http.get(config.PERFORMANCE_ROUTING_DATA_URL, () => HttpResponse.error()),
+      http.get(
+        `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+        () => HttpResponse.error(),
+      ),
     );
 
     await syncPerformanceData();
@@ -140,7 +150,7 @@ describe("fetchPerformanceData", () => {
   it("returns a response when the server is available", async () => {
     server.use(
       http.get(
-        config.PERFORMANCE_ROUTING_DATA_URL,
+        `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
         () =>
           new HttpResponse(null, {
             status: UNAUTHORIZED_RESPONSE,
@@ -155,7 +165,10 @@ describe("fetchPerformanceData", () => {
 
   it("Throws an error when the server is unavailable", async () => {
     server.use(
-      http.get(config.PERFORMANCE_ROUTING_DATA_URL, () => HttpResponse.error()),
+      http.get(
+        `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+        () => HttpResponse.error(),
+      ),
     );
 
     await expect(fetchPerformanceData()).rejects.toThrow();
