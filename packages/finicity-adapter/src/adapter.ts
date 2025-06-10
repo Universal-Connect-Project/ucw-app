@@ -220,7 +220,7 @@ export class FinicityAdapter implements WidgetAdapter {
         this.performanceClient.recordConnectionResumeEvent(connection_id);
         break;
       case "added":
-        this.performanceClient.recordConnectionResumeEvent(connection_id);
+        this.performanceClient.recordSuccessEvent(connection_id);
 
         institutionLoginId = payload?.accounts?.[0]?.institutionLoginId;
 
@@ -234,8 +234,6 @@ export class FinicityAdapter implements WidgetAdapter {
         connection.status = ConnectionStatus.CONNECTED;
         break;
       case "done":
-        this.performanceClient.recordSuccessEvent(connection_id);
-
         return connection;
       case "invalidCredentials":
       case "mfa":

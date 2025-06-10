@@ -314,7 +314,7 @@ describe("finicity aggregator", () => {
   });
 
   describe("HandleOauthResponse", () => {
-    it("handles 'added' event and updates connection status to CONNECTED, triggering account refresh with transactions job type, and calling a resume performance event", async () => {
+    it("handles 'added' event and updates connection status to CONNECTED, triggering account refresh with transactions job type, and calling a success performance event", async () => {
       const userId = "test-user-id";
       const payload = {
         accounts: [{ institutionLoginId: "test-institution-login-id" }],
@@ -365,9 +365,9 @@ describe("finicity aggregator", () => {
           }),
         }),
       );
-      expect(
-        mockPerformanceClient.recordConnectionResumeEvent,
-      ).toHaveBeenCalledWith("testPerfomanceSessionId");
+      expect(mockPerformanceClient.recordSuccessEvent).toHaveBeenCalledWith(
+        "testPerfomanceSessionId",
+      );
     });
 
     it("handles 'adding' event by calling a resume performance event", async () => {
@@ -398,7 +398,7 @@ describe("finicity aggregator", () => {
       ).toHaveBeenCalledWith("testPerfomanceSessionId");
     });
 
-    it("handles 'done' eventType and returns the connection and sends a success performance event", async () => {
+    it("handles 'done' eventType and returns the connection", async () => {
       const userId = "test-user-id";
       const createdConnection = await finicityAdapter.CreateConnection(
         {
@@ -423,9 +423,6 @@ describe("finicity aggregator", () => {
           id: createdConnection.id,
           status: ConnectionStatus.CREATED,
         }),
-      );
-      expect(mockPerformanceClient.recordSuccessEvent).toHaveBeenCalledWith(
-        "testPerfomanceSessionId",
       );
     });
 
