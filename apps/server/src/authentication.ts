@@ -93,6 +93,8 @@ export const cookieAuthenticationMiddleware = (
 const useAuthentication = (app: Express) => {
   const config = getConfig();
 
+  console.log("stuff\n\n", config.HOST_URL)
+
   if (config.AUTHENTICATION_ENABLE !== "true") {
     return;
   }
