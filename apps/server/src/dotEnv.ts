@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import path from "path";
 
-if (process.env.PRODUCTION === "true") {
+if (process.env.ENV === "prod") {
   dotenv.config({
     path: [
       path.join(__dirname, "../env/production.env"),
