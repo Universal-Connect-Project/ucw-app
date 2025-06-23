@@ -1,12 +1,7 @@
 {
-  "defaultAggregator": "mx",
-
   "supportedAggregators": ["akoya", "finicity", "mx", "sophtron"],
 
-  "defaultAggregatorVolume": {
-    "mx": 50,
-    "sophtron": 50
-  },
+  "defaultAggregatorVolume": {},
 
   "institutionAggregatorVolumeMap": {},
 
