@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.4]
+
+### Added
+
+- Added an environment variable to change cookie settings for the connect widget. This is useful for testing in environments that don't support cookies. The environment variable is `COOKIE_SETTINGS` and can be set to `none` to disable cookies.
+
 ## [1.7.3]
 
 ### Fixed
