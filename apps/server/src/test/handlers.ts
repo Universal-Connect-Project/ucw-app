@@ -25,6 +25,10 @@ const handlers = [
   http.post(config.AUTH0_TOKEN_URL, () =>
     HttpResponse.json(accessTokenResponse),
   ),
+  http.put(
+    `${config.PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionSuccess`,
+    () => HttpResponse.json({}),
+  ),
 ];
 
 export default handlers;

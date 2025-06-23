@@ -130,6 +130,7 @@ export interface CreateConnectionRequest {
   is_oauth?: boolean;
   skip_aggregation?: boolean;
   metadata?: string;
+  performanceSessionId?: string;
 }
 
 export interface PostMessageEventData {
@@ -231,6 +232,7 @@ export interface WidgetAdapter {
     userId?: string,
   ) => Promise<Connection | undefined>;
   HandleOauthResponse?: (request: any) => Promise<Connection>;
+  getShouldRecordPerformanceDuration?: () => boolean;
 }
 
 export interface CachedInstitution {

@@ -5,13 +5,13 @@ import type {
   CreateConnectionRequest,
   Credential,
   LogClient,
+  PerformanceClient,
   UpdateConnectionRequest,
   WidgetAdapter,
 } from "@repo/utils";
 import { ConnectionStatus } from "@repo/utils";
 import type { AdapterDependencies, ApiCredentials } from "./models";
-
-import { v4 as uuidv4 } from "uuid";
+import { AKOYA_AGGREGATOR_STRING } from "./index";
 
 export const AKOYA_BASE_PATH = "https://sandbox-idp.ddp.akoya.com";
 export const AKOYA_BASE_PROD_PATH = "https://idp.ddp.akoya.com";
@@ -26,19 +26,26 @@ export class AkoyaAdapter implements WidgetAdapter {
   credentials: ApiCredentials;
   cacheClient: CacheClient;
   logger: LogClient;
+  performanceClient: PerformanceClient;
   envConfig: Record<string, string>;
   sandbox: boolean;
 
   constructor(args: AdapterConfig) {
     const { sandbox, dependencies } = args;
     this.sandbox = sandbox;
-    this.aggregator = sandbox ? "akoya_sandbox" : "akoya";
+    this.aggregator = sandbox ? "akoya_sandbox" : AKOYA_AGGREGATOR_STRING;
     this.cacheClient = dependencies?.cacheClient;
     this.logger = dependencies?.logClient;
     this.envConfig = dependencies?.envConfig;
+    this.performanceClient = dependencies?.performanceClient;
     this.credentials = sandbox
       ? dependencies?.aggregatorCredentials.akoyaSandbox
       : dependencies?.aggregatorCredentials.akoyaProd;
+  }
+
+  getShouldRecordPerformanceDuration() {
+    // Akoya doesn't provide enough visibility to measure duration performance
+    return false;
   }
 
   async GetInstitutionById(id: string): Promise<AggregatorInstitution> {
@@ -68,9 +75,9 @@ export class AkoyaAdapter implements WidgetAdapter {
     request: CreateConnectionRequest,
     userId: string,
   ): Promise<Connection | undefined> {
-    const requestId = uuidv4();
+    const connectionId = request.performanceSessionId;
     const obj = {
-      id: requestId,
+      id: connectionId,
       is_oauth: true,
       userId,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -81,12 +88,12 @@ export class AkoyaAdapter implements WidgetAdapter {
         clientId: this.credentials.clientId,
         hostUrl: this.envConfig.HostUrl,
         institutionId: request.institutionId,
-        state: requestId,
+        state: connectionId,
       }),
       aggregator: this.aggregator,
       status: ConnectionStatus.CREATED,
     };
-    await this.cacheClient.set(requestId, obj, {
+    await this.cacheClient.set(connectionId, obj, {
       EX: 600, // 10 minutes
     });
     this.logger.debug(
@@ -153,6 +160,8 @@ export class AkoyaAdapter implements WidgetAdapter {
       await this.cacheClient.set(requestId, connection);
       return connection;
     }
+
+    this.performanceClient.recordSuccessEvent(requestId);
 
     connection.status = ConnectionStatus.CONNECTED;
     connection.id = connection.institution_code;

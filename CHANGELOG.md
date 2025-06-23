@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.2]
+
+### Removed
+
+- Dependence on two environment variables which indicate that an environment is production: `ENV=prod` and `PRODUCTION=true`. Now just `ENV=prod` is all that's required for the production environment.
+
+## [1.7.1]
+
+### Fixed
+
+- Fixed node version to 22.x so that it wont attempt to use v24.x on new deployments which fails.
+
+## [1.7.0]
+
+### Added
+
+- Added performance tracking events to track aggregator performance
+
 ## [1.6.4]
 
 ### Added

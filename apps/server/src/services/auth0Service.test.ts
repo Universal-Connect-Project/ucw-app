@@ -58,7 +58,6 @@ describe("getAccessToken", () => {
     );
 
     const token = await getAccessToken();
-
     expect(token).toBeNull();
     expect(warningLogSpy).toHaveBeenCalledWith(
       "Unauthorized to retrieve UCP access token",

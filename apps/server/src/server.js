@@ -46,8 +46,8 @@ initializeElastic()
       .then(() => {
         info(`Started institution poller for every ${config.INSTITUTION_POLLING_INTERVAL} minutes`)
       })
-      .catch((_error) => {
-        _error('Failed to start institution poller', _error)
+      .catch((error) => {
+        _error('Failed to start institution poller', error)
       })
   })
   .catch((error) => {

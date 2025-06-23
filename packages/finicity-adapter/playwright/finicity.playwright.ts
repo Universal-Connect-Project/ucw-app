@@ -34,53 +34,58 @@ test.describe("Finicity Adapter Tests", () => {
     await authorizeTab.getByLabel("Banking Password").fill("profile_700");
     await authorizeTab.getByLabel("Submit").click();
 
-    const connectedPromise = new Promise<void>((resolve, reject) => {
-      const timer = setTimeout(() => reject("timed out"), 120000);
-
-      page.on("console", async (msg) => {
-        const obj = (await msg.args()[0].jsonValue())?.message;
-        if (obj?.type === "connect/memberConnected") {
-          clearTimeout(timer);
-          expect(obj.metadata.user_guid).not.toBeNull();
-          expect(obj.metadata.member_guid).not.toBeNull();
-          expect(obj.metadata.aggregator).toEqual("finicity_sandbox");
-          expect(obj.metadata.connectionId).not.toBeNull();
-
-          const { connectionId, user_guid, aggregator, ucpInstitutionId } =
-            obj.metadata;
-
-          await testDataEndpoints(request, user_guid, connectionId, aggregator);
-
-          await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
-            timeout: 120000,
-          });
-
-          await page.goto(
-            `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&aggregator=${aggregator}&institutionId=${ucpInstitutionId}&connectionId=${connectionId}`,
-          );
-
-          const popupPromise2 = page.waitForEvent("popup");
-          await page.getByRole("link", { name: "Go to log in" }).click();
-
-          const authorizeTab2 = await popupPromise2;
-          await expect(
-            authorizeTab2.getByText("You're good to go."),
-          ).toBeVisible();
-
-          await authorizeTab2.getByLabel("Exit").click();
-
-          authorizeTab2.getByText("Visit Site").click();
-
-          await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
-            timeout: 120000,
-          });
-
-          resolve();
+    const msg = await page.waitForEvent("console", {
+      timeout: 120000,
+      predicate: async (msg) => {
+        try {
+          const args = msg.args();
+          const obj =
+            args && args.length > 0
+              ? (await args[0].jsonValue())?.message
+              : undefined;
+          return obj?.type === "connect/memberConnected";
+        } catch {
+          return false;
         }
-      });
+      },
     });
 
-    await connectedPromise;
+    const obj = (await msg.args()[0].jsonValue())?.message;
+    expect(obj.metadata.user_guid).not.toBeNull();
+    expect(obj.metadata.member_guid).not.toBeNull();
+    expect(obj.metadata.aggregator).toEqual("finicity_sandbox");
+    expect(obj.metadata.connectionId).not.toBeNull();
+
+    const { connectionId, user_guid, aggregator, ucpInstitutionId } =
+      obj.metadata;
+
+    await testDataEndpoints(request, user_guid, connectionId, aggregator);
+
+    await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
+      timeout: 120000,
+    });
+
+    await page.goto(
+      `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&aggregator=${aggregator}&institutionId=${ucpInstitutionId}&connectionId=${connectionId}`,
+    );
+
+    await expect(page.getByText("Log in at FinBank Profiles - A")).toBeVisible({
+      timeout: 8000,
+    });
+
+    const popupPromise2 = page.waitForEvent("popup");
+    await page.getByRole("link", { name: "Go to log in" }).click();
+
+    const authorizeTab2 = await popupPromise2;
+    await expect(authorizeTab2.getByText("You're good to go.")).toBeVisible();
+
+    await authorizeTab2.getByLabel("Exit").click();
+
+    authorizeTab2.getByText("Visit Site").click();
+
+    await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
+      timeout: 120000,
+    });
 
     await request.delete(
       `http://localhost:8080/api/aggregator/finicity_sandbox/user/${userId}`,
