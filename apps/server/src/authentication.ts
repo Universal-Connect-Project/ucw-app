@@ -1,6 +1,6 @@
 import { auth, requiredScopes } from "express-oauth2-jwt-bearer";
 import he from "he";
-import { getConfig } from "./config";
+import config, { getConfig } from "./config";
 import type {
   Request,
   RequestHandler,
@@ -68,7 +68,7 @@ export const tokenAuthenticationMiddleware = async (
 
     res.cookie(tokenCookieName, authorizationJWT, {
       httpOnly: true,
-      sameSite: "strict",
+      sameSite: config.COOKIE_SETTINGS || "strict",
       secure: true,
     });
   }

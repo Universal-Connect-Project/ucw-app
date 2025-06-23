@@ -72,6 +72,8 @@ const keysToPullFromEnv = [
   "PROXY_PORT",
   "PROXY_USERNAME",
   "PROXY_PASSWORD",
+
+  "COOKIE_SETTINGS",
 ];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
