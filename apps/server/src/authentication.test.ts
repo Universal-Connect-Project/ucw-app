@@ -67,7 +67,7 @@ describe("authentication", () => {
       const userId = "testUserId";
 
       jest.spyOn(config, "getConfig").mockReturnValue({
-        AUTHORIZATION_TOKEN_COOKIE_SAMESITE: "strict",
+        AUTHORIZATION_TOKEN_COOKIE_SAMESITE: "",
       });
 
       const redisKey = `${userId}-${token}`;
@@ -104,7 +104,7 @@ describe("authentication", () => {
       expect(next).toHaveBeenCalled();
     });
 
-    it("pulls the JWT from redis with the given token and userId, adds the bearer token to the request headers, deletes the token from redis, sets a cookie with none, and calls next", async () => {
+    it("uses the AUTHORIZATION_TOKEN_COOKIE_SAMESITE if it's available", async () => {
       const token = "testToken";
       const jwt = "testJwt";
       const userId = "testUserId";
