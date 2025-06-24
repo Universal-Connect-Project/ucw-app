@@ -116,6 +116,40 @@ describe("Performance Resilience", () => {
       expect(cleanedUpObject).toEqual({});
     });
 
+    it("should do nothing if the status is PENDING", async () => {
+      server.use(
+        http.get(READ_MEMBER_STATUS_PATH, () =>
+          HttpResponse.json({
+            member: {
+              guid: "testGuid",
+              connection_status: "PENDING",
+            },
+          }),
+        ),
+      );
+      await createPerformanceObject(basePerformanceObjectParams);
+
+      jest.useFakeTimers();
+      jest.setSystemTime(Date.now() + 8000);
+
+      const recordSuccessSpy = jest.spyOn(
+        performanceTracking,
+        "recordSuccessEvent",
+      );
+
+      await pollConnectionStatusIfNeeded(
+        basePerformanceObjectParams.connectionId,
+      );
+
+      const undeletedObject = await getPerformanceObject(
+        basePerformanceObjectParams.connectionId,
+      );
+      expect(recordSuccessSpy).not.toHaveBeenCalled();
+      expect(undeletedObject.connectionId).toBe(
+        basePerformanceObjectParams.connectionId,
+      );
+    });
+
     it("should not clean up or record event if UI updated recently", async () => {
       await createPerformanceObject(basePerformanceObjectParams);
 
