@@ -66,6 +66,10 @@ describe("authentication", () => {
       const jwt = "testJwt";
       const userId = "testUserId";
 
+      jest.spyOn(config, "getConfig").mockReturnValue({
+        AUTHORIZATION_TOKEN_COOKIE_SAMESITE: "strict",
+      });
+
       const redisKey = `${userId}-${token}`;
 
       await set(redisKey, jwt);
@@ -95,6 +99,49 @@ describe("authentication", () => {
       expect(res.cookie).toHaveBeenCalledWith(tokenCookieName, jwt, {
         httpOnly: true,
         sameSite: "strict",
+        secure: true,
+      });
+      expect(next).toHaveBeenCalled();
+    });
+
+    it("pulls the JWT from redis with the given token and userId, adds the bearer token to the request headers, deletes the token from redis, sets a cookie with none, and calls next", async () => {
+      const token = "testToken";
+      const jwt = "testJwt";
+      const userId = "testUserId";
+
+      jest.spyOn(config, "getConfig").mockReturnValue({
+        AUTHORIZATION_TOKEN_COOKIE_SAMESITE: "none",
+      });
+
+      const redisKey = `${userId}-${token}`;
+
+      await set(redisKey, jwt);
+
+      expect(await get(redisKey)).toEqual(jwt);
+
+      const req = {
+        headers: {},
+        query: {
+          token,
+          userId: userId,
+        },
+      } as unknown as Request;
+
+      const res = {
+        cookie: jest.fn(),
+        send: jest.fn(),
+        status: jest.fn(),
+      } as unknown as Response;
+
+      const next = jest.fn();
+
+      await tokenAuthenticationMiddleware(req, res, next);
+
+      expect(req.headers.authorization).toEqual(`Bearer ${jwt}`);
+      expect(await get(redisKey)).toBeUndefined();
+      expect(res.cookie).toHaveBeenCalledWith(tokenCookieName, jwt, {
+        httpOnly: true,
+        sameSite: "none",
         secure: true,
       });
       expect(next).toHaveBeenCalled();

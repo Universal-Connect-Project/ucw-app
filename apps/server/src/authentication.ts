@@ -1,6 +1,6 @@
 import { auth, requiredScopes } from "express-oauth2-jwt-bearer";
 import he from "he";
-import config, { getConfig } from "./config";
+import { getConfig } from "./config";
 import type {
   Request,
   RequestHandler,
@@ -54,6 +54,7 @@ export const tokenAuthenticationMiddleware = async (
 
   if (token) {
     const authorizationJWT = await get(redisKey);
+    const config = getConfig();
 
     if (!authorizationJWT) {
       res.send("token invalid or expired");
