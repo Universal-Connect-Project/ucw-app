@@ -1,6 +1,64 @@
 import { expect, test } from "@playwright/test";
 import { ComboJobTypes } from "@repo/utils";
 
+const makeAConnection = async (jobTypes: ComboJobTypes[], page) => {
+  const userId = crypto.randomUUID();
+
+  await page.goto(
+    `http://localhost:8080/widget?jobTypes=${jobTypes.join(",")}&userId=${userId}`,
+  );
+
+  page.evaluate(`
+      window.addEventListener('message', (event) => {
+        const message = event.data;
+        console.log({ message });
+      });
+    `);
+
+  await page.getByPlaceholder("Search").fill("finbank");
+  await page.getByLabel("Add account with FinBank Profiles - A").click();
+
+  const popupPromise = page.waitForEvent("popup");
+  await page.getByRole("link", { name: "Go to log in" }).click();
+
+  const authorizeTab = await popupPromise;
+
+  await authorizeTab.getByRole("button", { name: "Next" }).click();
+  await authorizeTab.getByLabel("Banking Userid").fill("sue_wealthy");
+  await authorizeTab.getByLabel("Banking Password").fill("profile_700");
+  await authorizeTab.getByLabel("Submit").click();
+
+  const msg = await page.waitForEvent("console", {
+    timeout: 120000,
+    predicate: async (msg) => {
+      try {
+        const args = msg.args();
+        const obj =
+          args && args.length > 0
+            ? (await args[0].jsonValue())?.message
+            : undefined;
+        return obj?.type === "connect/memberConnected";
+      } catch {
+        return false;
+      }
+    },
+  });
+
+  const obj = (await msg.args()[0].jsonValue())?.message;
+  expect(obj.metadata.user_guid).not.toBeNull();
+  expect(obj.metadata.member_guid).not.toBeNull();
+  expect(obj.metadata.aggregator).toEqual("finicity_sandbox");
+  expect(obj.metadata.connectionId).not.toBeNull();
+
+  await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
+    timeout: 120000,
+  });
+
+  const { connectionId, aggregator, ucpInstitutionId } = obj.metadata;
+
+  return { aggregator, connectionId, ucpInstitutionId, userId };
+};
+
 test.describe("Finicity Adapter Tests", () => {
   test(`makes a connection with ${ComboJobTypes.TRANSACTION_HISTORY} and returns transactions`, () => {});
 
@@ -10,61 +68,10 @@ test.describe("Finicity Adapter Tests", () => {
   }) => {
     test.setTimeout(300000);
 
-    const userId = crypto.randomUUID();
-
-    await page.goto(
-      `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
-    );
-
-    page.evaluate(`
-      window.addEventListener('message', (event) => {
-        const message = event.data;
-        console.log({ message });
-      });
-    `);
-
-    await page.getByPlaceholder("Search").fill("finbank");
-    await page.getByLabel("Add account with FinBank Profiles - A").click();
-
-    const popupPromise = page.waitForEvent("popup");
-    await page.getByRole("link", { name: "Go to log in" }).click();
-
-    const authorizeTab = await popupPromise;
-
-    await authorizeTab.getByRole("button", { name: "Next" }).click();
-    await authorizeTab.getByLabel("Banking Userid").fill("sue_wealthy");
-    await authorizeTab.getByLabel("Banking Password").fill("profile_700");
-    await authorizeTab.getByLabel("Submit").click();
-
-    const msg = await page.waitForEvent("console", {
-      timeout: 120000,
-      predicate: async (msg) => {
-        try {
-          const args = msg.args();
-          const obj =
-            args && args.length > 0
-              ? (await args[0].jsonValue())?.message
-              : undefined;
-          return obj?.type === "connect/memberConnected";
-        } catch {
-          return false;
-        }
-      },
-    });
-
-    const obj = (await msg.args()[0].jsonValue())?.message;
-    expect(obj.metadata.user_guid).not.toBeNull();
-    expect(obj.metadata.member_guid).not.toBeNull();
-    expect(obj.metadata.aggregator).toEqual("finicity_sandbox");
-    expect(obj.metadata.connectionId).not.toBeNull();
-
-    const { connectionId, aggregator, ucpInstitutionId } = obj.metadata;
+    const { aggregator, connectionId, ucpInstitutionId, userId } =
+      await makeAConnection([ComboJobTypes.TRANSACTIONS], page);
 
     await testDataEndpoints(request, userId, connectionId, aggregator);
-
-    await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
-      timeout: 120000,
-    });
 
     await page.goto(
       `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&aggregator=${aggregator}&institutionId=${ucpInstitutionId}&connectionId=${connectionId}`,
