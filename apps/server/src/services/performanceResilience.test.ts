@@ -12,9 +12,7 @@ import {
 } from "@repo/utils-dev-dependency/mx/handlers";
 import { http, HttpResponse } from "msw";
 import * as performanceTracking from "./performanceTracking";
-import { get } from "js-logger";
 import { clearRedisMock } from "../__mocks__/redis";
-import { ConnectionStatus } from "@repo/utils";
 
 describe("Performance Resilience", () => {
   const basePerformanceObjectParams = {
@@ -143,9 +141,7 @@ describe("Performance Resilience", () => {
     it("should not poll if paused by MFA", async () => {
       await createPerformanceObject(basePerformanceObjectParams);
       await setPausedByMfa(basePerformanceObjectParams.connectionId, true);
-      const thing = await getPerformanceObject(
-        basePerformanceObjectParams.connectionId,
-      );
+      await getPerformanceObject(basePerformanceObjectParams.connectionId);
 
       jest.useFakeTimers();
       jest.setSystemTime(Date.now() + 8000);

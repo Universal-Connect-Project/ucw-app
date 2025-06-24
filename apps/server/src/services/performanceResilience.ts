@@ -1,4 +1,5 @@
-import { Connection, ConnectionStatus } from "@repo/utils";
+import type { Connection } from "@repo/utils";
+import { ConnectionStatus } from "@repo/utils";
 import { AggregatorAdapterBase } from "../adapters";
 import { del, get, set } from "./storageClient/redis";
 import { recordSuccessEvent } from "./performanceTracking";
