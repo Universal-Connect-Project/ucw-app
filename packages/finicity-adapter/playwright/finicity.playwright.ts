@@ -2,7 +2,9 @@ import { expect, test } from "@playwright/test";
 import { ComboJobTypes } from "@repo/utils";
 
 test.describe("Finicity Adapter Tests", () => {
-  test("Successful connection and data retrieval and then refresh", async ({
+  test(`makes a connection with ${ComboJobTypes.TRANSACTION_HISTORY} and returns transactions`, () => {});
+
+  test(`Successful ${ComboJobTypes.TRANSACTIONS} connection, data retrieval, and refresh`, async ({
     page,
     request,
   }) => {
@@ -56,10 +58,9 @@ test.describe("Finicity Adapter Tests", () => {
     expect(obj.metadata.aggregator).toEqual("finicity_sandbox");
     expect(obj.metadata.connectionId).not.toBeNull();
 
-    const { connectionId, user_guid, aggregator, ucpInstitutionId } =
-      obj.metadata;
+    const { connectionId, aggregator, ucpInstitutionId } = obj.metadata;
 
-    await testDataEndpoints(request, user_guid, connectionId, aggregator);
+    await testDataEndpoints(request, userId, connectionId, aggregator);
 
     await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
       timeout: 120000,
