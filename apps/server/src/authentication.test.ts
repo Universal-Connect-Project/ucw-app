@@ -66,9 +66,7 @@ describe("authentication", () => {
       const jwt = "testJwt";
       const userId = "testUserId";
 
-      jest.spyOn(config, "getConfig").mockReturnValue({
-        AUTHORIZATION_TOKEN_COOKIE_SAMESITE: "",
-      });
+      jest.spyOn(config, "getConfig").mockReturnValue({});
 
       const redisKey = `${userId}-${token}`;
 
