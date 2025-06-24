@@ -1,9 +1,11 @@
-import { expect, test } from "@playwright/test";
+import { expect, test as base } from "@playwright/test";
 import { ComboJobTypes } from "@repo/utils";
 
-const makeAConnection = async (jobTypes: ComboJobTypes[], page) => {
-  const userId = crypto.randomUUID();
-
+const makeAConnection = async (
+  jobTypes: ComboJobTypes[],
+  page,
+  userId: string,
+) => {
   await page.goto(
     `http://localhost:8080/widget?jobTypes=${jobTypes.join(",")}&userId=${userId}`,
   );
@@ -59,17 +61,50 @@ const makeAConnection = async (jobTypes: ComboJobTypes[], page) => {
   return { aggregator, connectionId, ucpInstitutionId, userId };
 };
 
+type MyFixtures = {
+  userId: string;
+};
+
+const test = base.extend<MyFixtures>({
+  userId: [
+    async ({ request }, use) => {
+      const userId = crypto.randomUUID();
+      await use(userId);
+
+      await request.delete(
+        `http://localhost:8080/api/aggregator/finicity_sandbox/user/${userId}`,
+      );
+    },
+    { scope: "test" },
+  ],
+});
+
 test.describe("Finicity Adapter Tests", () => {
-  test(`makes a connection with ${ComboJobTypes.TRANSACTION_HISTORY} and returns transactions`, () => {});
+  test(`makes a connection with ${ComboJobTypes.TRANSACTION_HISTORY} and returns transactions`, async ({
+    page,
+    request,
+    userId,
+  }) => {
+    test.setTimeout(300000);
+
+    const { aggregator, connectionId } = await makeAConnection(
+      [ComboJobTypes.TRANSACTION_HISTORY],
+      page,
+      userId,
+    );
+
+    await testDataEndpoints(request, userId, connectionId, aggregator);
+  });
 
   test(`Successful ${ComboJobTypes.TRANSACTIONS} connection, data retrieval, and refresh`, async ({
     page,
     request,
+    userId,
   }) => {
     test.setTimeout(300000);
 
-    const { aggregator, connectionId, ucpInstitutionId, userId } =
-      await makeAConnection([ComboJobTypes.TRANSACTIONS], page);
+    const { aggregator, connectionId, ucpInstitutionId } =
+      await makeAConnection([ComboJobTypes.TRANSACTIONS], page, userId);
 
     await testDataEndpoints(request, userId, connectionId, aggregator);
 
@@ -94,16 +129,10 @@ test.describe("Finicity Adapter Tests", () => {
     await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
       timeout: 120000,
     });
-
-    await request.delete(
-      `http://localhost:8080/api/aggregator/finicity_sandbox/user/${userId}`,
-    );
   });
 
-  test("Failed connection", async ({ page, request }) => {
+  test("Failed connection", async ({ page, userId }) => {
     test.setTimeout(300000);
-
-    const userId = crypto.randomUUID();
 
     await page.goto(
       `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
@@ -129,10 +158,6 @@ test.describe("Finicity Adapter Tests", () => {
     });
 
     await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
-
-    await request.delete(
-      `http://localhost:8080/api/aggregator/finicity_sandbox/user/${userId}`,
-    );
   });
 
   async function testDataEndpoints(request, userId, connectionId, aggregator) {
