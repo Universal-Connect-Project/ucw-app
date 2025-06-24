@@ -45,7 +45,6 @@ These are the environment variables that can be set in apps/server/env/(staging|
 | REDIS_CACHE_TIME_SECONDS     | The default expiration of things stored in redis               | 600      | 600             |
 | REDIS_ENABLE_TLS             | Enables TLS (Useful for some deployment platforms like heroku) | true     | false/undefined |
 | ELASTIC_SEARCH_SINGLE_THREAD | Enables single-threaded Elasticsearch indexing/updating        | true     | undefined       |
-| COOKIE_SETTINGS              | Sets cookie settings for the application                       | strict   | strict          |
 
 ## Local development variables
 
@@ -55,13 +54,14 @@ These are the environment variables that can be set in apps/server/env/(staging|
 
 ## Authentication variables
 
-| Variable name                    | Description                                                                                          | Examples    | Default value |
-| -------------------------------- | ---------------------------------------------------------------------------------------------------- | ----------- | ------------- |
-| AUTHENTICATION_ENABLE            | Whether or not to enable our optional authentication on most endpoints other than the data endpoints | true, false | false         |
-| AUTHENTICATION_AUDIENCE          | Authentication variable for our optional authentication                                              |             |               |
-| AUTHENTICATION_ISSUER_BASE_URL   | Authentication variable for our optional authentication                                              |             |               |
-| AUTHENTICATION_TOKEN_SIGNING_ALG | Authentication variable for our optional authentication                                              |             |               |
-| AUTHENTICATION_SCOPES            | Authentication variable for our optional authentication                                              |             |               |
+| Variable name                       | Description                                                                                                                                                                             | Examples    | Default value |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ------------- |
+| AUTHENTICATION_ENABLE               | Whether or not to enable our optional authentication on most endpoints other than the data endpoints                                                                                    | true, false | false         |
+| AUTHENTICATION_AUDIENCE             | Authentication variable for our optional authentication                                                                                                                                 |             |               |
+| AUTHENTICATION_ISSUER_BASE_URL      | Authentication variable for our optional authentication                                                                                                                                 |             |               |
+| AUTHENTICATION_TOKEN_SIGNING_ALG    | Authentication variable for our optional authentication                                                                                                                                 |             |               |
+| AUTHENTICATION_SCOPES               | Authentication variable for our optional authentication                                                                                                                                 |             |               |
+| AUTHORIZATION_TOKEN_COOKIE_SAMESITE | Sets the `sameSite` value for the authorization token cookie. If your widget will be embedded in a domain different from the widget's domain, change this from the default of `strict`. | strict      | strict        |
 
 ## Data endpoint variables
 

@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added an environment variable to change cookie settings for the connect widget. This is useful for testing in environments that don't support cookies. The environment variable is `COOKIE_SETTINGS` and can be set to `none` to disable cookies.
+- Added an environment variable to customize the SameSite attribute of the authorization token cookie
 
 ## [1.7.3]
 

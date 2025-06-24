@@ -73,7 +73,7 @@ const keysToPullFromEnv = [
   "PROXY_USERNAME",
   "PROXY_PASSWORD",
 
-  "COOKIE_SETTINGS",
+  "AUTHORIZATION_TOKEN_COOKIE_SAMESITE",
 ];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -68,7 +68,7 @@ export const tokenAuthenticationMiddleware = async (
 
     res.cookie(tokenCookieName, authorizationJWT, {
       httpOnly: true,
-      sameSite: config.COOKIE_SETTINGS || "strict",
+      sameSite: config.AUTHORIZATION_TOKEN_COOKIE_SAMESITE || "strict",
       secure: true,
     });
   }
