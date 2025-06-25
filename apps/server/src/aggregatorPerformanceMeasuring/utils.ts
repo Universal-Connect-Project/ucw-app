@@ -1,8 +1,8 @@
 import type { Connection } from "@repo/utils";
 import { ConnectionStatus } from "@repo/utils";
 import { AggregatorAdapterBase } from "../adapters";
-import { del, get, set } from "./storageClient/redis";
-import { recordSuccessEvent } from "./performanceTracking";
+import { del, get, set } from "../services/storageClient/redis";
+import { recordSuccessEvent } from "../services/performanceTracking";
 
 interface PerformanceObject {
   userId?: string;
@@ -15,10 +15,14 @@ interface PerformanceObject {
 
 const PERFORMANCE_REDIS_SUBDIRECTORY = "performance";
 
+const performanceRedisKey = (connectionId: string): string => {
+  return `${PERFORMANCE_REDIS_SUBDIRECTORY}:${connectionId}`;
+};
+
 export const getPerformanceObject = async (
   connectionId: string,
 ): Promise<PerformanceObject> => {
-  return (await get(`${PERFORMANCE_REDIS_SUBDIRECTORY}:${connectionId}`)) || {};
+  return (await get(performanceRedisKey(connectionId))) || {};
 };
 
 const updatePerformanceObject = async (
@@ -27,10 +31,7 @@ const updatePerformanceObject = async (
 ): Promise<void> => {
   const performanceObject = await getPerformanceObject(connectionId);
   Object.assign(performanceObject, update);
-  await set(
-    `${PERFORMANCE_REDIS_SUBDIRECTORY}:${connectionId}`,
-    performanceObject,
-  );
+  await set(performanceRedisKey(connectionId), performanceObject);
 };
 
 export const setLastUiUpdateTimestamp = async (
@@ -61,7 +62,7 @@ export const createPerformanceObject = async ({
   performanceSessionId: string;
   aggregatorId: string;
 }): Promise<void> => {
-  await set(`${PERFORMANCE_REDIS_SUBDIRECTORY}:${connectionId}`, {
+  await set(performanceRedisKey(connectionId), {
     userId,
     connectionId,
     performanceSessionId,
@@ -74,7 +75,7 @@ export const createPerformanceObject = async ({
 const cleanupPerformanceObject = async (
   connectionId: string,
 ): Promise<void> => {
-  await del(`${PERFORMANCE_REDIS_SUBDIRECTORY}:${connectionId}`);
+  await del(performanceRedisKey(connectionId));
 };
 
 const getAggregatorConnectionStatus = async (
@@ -116,7 +117,7 @@ export const pollConnectionStatusIfNeeded = async (
     !connectionStatus.is_being_aggregated &&
     !connectionStatus.is_oauth
   ) {
-    recordSuccessEvent(performanceSessionId);
+    await recordSuccessEvent(performanceSessionId);
     cleanupPerformanceObject(connectionId);
   } else if (
     connectionStatus.status === ConnectionStatus.IMPEDED ||

@@ -5,16 +5,18 @@ import {
   pollConnectionStatusIfNeeded,
   setLastUiUpdateTimestamp,
   setPausedByMfa,
-} from "./performanceResilience";
+} from "./utils";
 import {
   CONNECTION_BY_ID_PATH,
   READ_MEMBER_STATUS_PATH,
 } from "@repo/utils-dev-dependency/mx/handlers";
 import { http, HttpResponse } from "msw";
-import * as performanceTracking from "./performanceTracking";
 import { clearRedisMock } from "../__mocks__/redis";
+import { ConnectionStatus } from "@repo/utils";
+import config, { getConfig } from "../config";
 
 describe("Performance Resilience", () => {
+  const { PERFORMANCE_SERVICE_URL } = getConfig();
   const basePerformanceObjectParams = {
     userId: "test-user-id",
     connectionId: "test-connection-id",
@@ -82,6 +84,8 @@ describe("Performance Resilience", () => {
 
   describe("pollConnectionStatusIfNeeded", () => {
     it("should clean up the performance object and record success event upon completion", async () => {
+      let performanceSuccessReceived = false;
+
       server.use(
         http.get(CONNECTION_BY_ID_PATH, () =>
           HttpResponse.json({
@@ -92,16 +96,18 @@ describe("Performance Resilience", () => {
             },
           }),
         ),
+        http.put(
+          `${PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionSuccess`,
+          () => {
+            performanceSuccessReceived = true;
+            return HttpResponse.json({});
+          },
+        ),
       );
       await createPerformanceObject(basePerformanceObjectParams);
 
       jest.useFakeTimers();
       jest.setSystemTime(Date.now() + 8000);
-
-      const recordSuccessSpy = jest.spyOn(
-        performanceTracking,
-        "recordSuccessEvent",
-      );
 
       await pollConnectionStatusIfNeeded(
         basePerformanceObjectParams.connectionId,
@@ -110,32 +116,34 @@ describe("Performance Resilience", () => {
       const cleanedUpObject = await getPerformanceObject(
         basePerformanceObjectParams.connectionId,
       );
-      expect(recordSuccessSpy).toHaveBeenCalledWith(
-        basePerformanceObjectParams.performanceSessionId,
-      );
+      expect(performanceSuccessReceived).toBeTruthy();
       expect(cleanedUpObject).toEqual({});
     });
 
     it("should do nothing if the status is PENDING", async () => {
+      let performanceSuccessReceived = false;
+
       server.use(
         http.get(READ_MEMBER_STATUS_PATH, () =>
           HttpResponse.json({
             member: {
               guid: "testGuid",
-              connection_status: "PENDING",
+              connection_status: ConnectionStatus[ConnectionStatus.PENDING],
             },
           }),
+        ),
+        http.put(
+          `${PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionSuccess`,
+          () => {
+            performanceSuccessReceived = true;
+            return HttpResponse.json({});
+          },
         ),
       );
       await createPerformanceObject(basePerformanceObjectParams);
 
       jest.useFakeTimers();
       jest.setSystemTime(Date.now() + 8000);
-
-      const recordSuccessSpy = jest.spyOn(
-        performanceTracking,
-        "recordSuccessEvent",
-      );
 
       await pollConnectionStatusIfNeeded(
         basePerformanceObjectParams.connectionId,
@@ -144,22 +152,28 @@ describe("Performance Resilience", () => {
       const undeletedObject = await getPerformanceObject(
         basePerformanceObjectParams.connectionId,
       );
-      expect(recordSuccessSpy).not.toHaveBeenCalled();
+      expect(performanceSuccessReceived).toBeFalsy();
       expect(undeletedObject.connectionId).toBe(
         basePerformanceObjectParams.connectionId,
       );
     });
 
     it("should not clean up or record event if UI updated recently", async () => {
+      let performanceSuccessReceived = false;
+      server.use(
+        http.put(
+          `${PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionSuccess`,
+          () => {
+            performanceSuccessReceived = true;
+            return HttpResponse.json({});
+          },
+        ),
+      );
+
       await createPerformanceObject(basePerformanceObjectParams);
 
       jest.useFakeTimers();
       jest.setSystemTime(Date.now() + 1000); // Only 1s later
-
-      const recordSuccessSpy = jest.spyOn(
-        performanceTracking,
-        "recordSuccessEvent",
-      );
 
       await pollConnectionStatusIfNeeded(
         basePerformanceObjectParams.connectionId,
@@ -169,10 +183,21 @@ describe("Performance Resilience", () => {
         basePerformanceObjectParams.connectionId,
       );
       expect(performanceObject).toBeDefined();
-      expect(recordSuccessSpy).not.toHaveBeenCalled();
+      expect(performanceSuccessReceived).toBeFalsy();
     });
 
     it("should not poll if paused by MFA", async () => {
+      let performanceSuccessReceived = false;
+      server.use(
+        http.put(
+          `${PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionSuccess`,
+          () => {
+            performanceSuccessReceived = true;
+            return HttpResponse.json({});
+          },
+        ),
+      );
+
       await createPerformanceObject(basePerformanceObjectParams);
       await setPausedByMfa(basePerformanceObjectParams.connectionId, true);
       await getPerformanceObject(basePerformanceObjectParams.connectionId);
@@ -180,11 +205,6 @@ describe("Performance Resilience", () => {
       jest.useFakeTimers();
       jest.setSystemTime(Date.now() + 8000);
 
-      const recordSuccessSpy = jest.spyOn(
-        performanceTracking,
-        "recordSuccessEvent",
-      );
-
       await pollConnectionStatusIfNeeded(
         basePerformanceObjectParams.connectionId,
       );
@@ -193,18 +213,19 @@ describe("Performance Resilience", () => {
         basePerformanceObjectParams.connectionId,
       );
       expect(performanceObject).toBeDefined();
-      expect(recordSuccessSpy).not.toHaveBeenCalled();
+      expect(performanceSuccessReceived).toBeFalsy();
     });
 
     [
-      "IMPEDED",
-      "DEGRADED",
-      "DISCONNECTED",
-      "DISCONTINUE",
-      "CLOSED",
-      "FAILED",
+      ConnectionStatus[ConnectionStatus.IMPEDED],
+      ConnectionStatus[ConnectionStatus.DEGRADED],
+      ConnectionStatus[ConnectionStatus.DISCONNECTED],
+      ConnectionStatus[ConnectionStatus.DISCONTINUE],
+      ConnectionStatus[ConnectionStatus.CLOSED],
+      ConnectionStatus[ConnectionStatus.FAILED],
     ].forEach((status) => {
       it(`should clean up on ${status} status`, async () => {
+        let performanceSuccessReceived = false;
         server.use(
           http.get(READ_MEMBER_STATUS_PATH, () =>
             HttpResponse.json({
@@ -213,6 +234,13 @@ describe("Performance Resilience", () => {
                 connection_status: status,
               },
             }),
+          ),
+          http.put(
+            `${config.PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionSuccess`,
+            () => {
+              performanceSuccessReceived = true;
+              return HttpResponse.json({});
+            },
           ),
         );
 
@@ -225,12 +253,7 @@ describe("Performance Resilience", () => {
           basePerformanceObjectParams.connectionId,
         );
 
-        const recordSuccessSpy = jest.spyOn(
-          performanceTracking,
-          "recordSuccessEvent",
-        );
-
-        expect(recordSuccessSpy).not.toHaveBeenCalled();
+        expect(performanceSuccessReceived).toBeFalsy();
 
         const cleanedUpObject = await getPerformanceObject(
           basePerformanceObjectParams.connectionId,
