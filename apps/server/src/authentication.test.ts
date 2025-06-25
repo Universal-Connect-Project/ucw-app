@@ -66,6 +66,8 @@ describe("authentication", () => {
       const jwt = "testJwt";
       const userId = "testUserId";
 
+      jest.spyOn(config, "getConfig").mockReturnValue({});
+
       const redisKey = `${userId}-${token}`;
 
       await set(redisKey, jwt);
@@ -95,6 +97,49 @@ describe("authentication", () => {
       expect(res.cookie).toHaveBeenCalledWith(tokenCookieName, jwt, {
         httpOnly: true,
         sameSite: "strict",
+        secure: true,
+      });
+      expect(next).toHaveBeenCalled();
+    });
+
+    it("uses the AUTHORIZATION_TOKEN_COOKIE_SAMESITE if it's available", async () => {
+      const token = "testToken";
+      const jwt = "testJwt";
+      const userId = "testUserId";
+
+      jest.spyOn(config, "getConfig").mockReturnValue({
+        AUTHORIZATION_TOKEN_COOKIE_SAMESITE: "none",
+      });
+
+      const redisKey = `${userId}-${token}`;
+
+      await set(redisKey, jwt);
+
+      expect(await get(redisKey)).toEqual(jwt);
+
+      const req = {
+        headers: {},
+        query: {
+          token,
+          userId: userId,
+        },
+      } as unknown as Request;
+
+      const res = {
+        cookie: jest.fn(),
+        send: jest.fn(),
+        status: jest.fn(),
+      } as unknown as Response;
+
+      const next = jest.fn();
+
+      await tokenAuthenticationMiddleware(req, res, next);
+
+      expect(req.headers.authorization).toEqual(`Bearer ${jwt}`);
+      expect(await get(redisKey)).toBeUndefined();
+      expect(res.cookie).toHaveBeenCalledWith(tokenCookieName, jwt, {
+        httpOnly: true,
+        sameSite: "none",
         secure: true,
       });
       expect(next).toHaveBeenCalled();
