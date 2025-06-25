@@ -93,7 +93,13 @@ test.describe("Finicity Adapter Tests", () => {
       userId,
     );
 
-    await testDataEndpoints(request, userId, connectionId, aggregator, false);
+    await testDataEndpoints({
+      request,
+      userId,
+      connectionId,
+      aggregator,
+      shouldExpectTransactions: false,
+    });
   });
 
   test(`makes a connection with ${ComboJobTypes.TRANSACTION_HISTORY} and returns transactions`, async ({
@@ -109,7 +115,7 @@ test.describe("Finicity Adapter Tests", () => {
       userId,
     );
 
-    await testDataEndpoints(request, userId, connectionId, aggregator);
+    await testDataEndpoints({ request, userId, connectionId, aggregator });
   });
 
   test(`Successful ${ComboJobTypes.TRANSACTIONS} connection, data retrieval, and refresh`, async ({
@@ -122,7 +128,7 @@ test.describe("Finicity Adapter Tests", () => {
     const { aggregator, connectionId, ucpInstitutionId } =
       await makeAConnection([ComboJobTypes.TRANSACTIONS], page, userId);
 
-    await testDataEndpoints(request, userId, connectionId, aggregator);
+    await testDataEndpoints({ request, userId, connectionId, aggregator });
 
     await page.goto(
       `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&aggregator=${aggregator}&institutionId=${ucpInstitutionId}&connectionId=${connectionId}`,
@@ -176,13 +182,13 @@ test.describe("Finicity Adapter Tests", () => {
     await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
   });
 
-  async function testDataEndpoints(
+  async function testDataEndpoints({
     request,
     userId,
     connectionId,
     aggregator,
     shouldExpectTransactions = true,
-  ) {
+  }) {
     let url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/accounts`;
 
     const accountsResponse = await request.get(url);
