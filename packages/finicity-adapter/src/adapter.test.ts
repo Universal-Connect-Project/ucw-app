@@ -18,10 +18,12 @@ import { server } from "./test/testServer";
 
 import {
   DELETE_USER_PATH,
+  FINICITY_HISTORIC_TRANSACTIONS_PATH,
   MOCKED_FIX_OAUTH_URL,
   MOCKED_OAUTH_URL,
 } from "./test/handlers";
 import { BASE_PATH } from "./apiClient";
+import { accountsData } from "./test/testData/accounts";
 
 export const cacheClient = createCacheClient();
 
@@ -314,7 +316,7 @@ describe("finicity aggregator", () => {
   });
 
   describe("HandleOauthResponse", () => {
-    it("handles 'added' event and updates connection status to CONNECTED, triggering account refresh with transactions job type, and calling a success performance event", async () => {
+    it(`handles 'added' event and updates connection status to CONNECTED, triggering account refresh with ${ComboJobTypes.TRANSACTIONS} job type, and calling a success performance event`, async () => {
       const userId = "test-user-id";
       const payload = {
         accounts: [{ institutionLoginId: "test-institution-login-id" }],
@@ -351,6 +353,70 @@ describe("finicity aggregator", () => {
         await finicityAdapter.HandleOauthResponse(request);
 
       expect(accountRefreshCalled).toBe(true); // Verify the API call was made
+      expect(updatedConnection).toEqual(
+        expect.objectContaining({
+          id: "test-institution-login-id",
+          status: ConnectionStatus.CONNECTED,
+          postMessageEventData: expect.objectContaining({
+            memberConnected: expect.objectContaining({
+              connectionId: "test-institution-login-id",
+            }),
+            memberStatusUpdate: expect.objectContaining({
+              connectionId: "test-institution-login-id",
+            }),
+          }),
+        }),
+      );
+      expect(mockPerformanceClient.recordSuccessEvent).toHaveBeenCalledWith(
+        "testPerfomanceSessionId",
+      );
+    });
+
+    it(`handles 'added' event and updates connection status to CONNECTED, triggering transaction history with ${ComboJobTypes.TRANSACTION_HISTORY} job type, and calling a success performance event`, async () => {
+      const userId = "test-user-id";
+      const payload = {
+        accounts: [{ institutionLoginId: "test-institution-login-id" }],
+      };
+
+      const createdConnection = await finicityAdapter.CreateConnection(
+        {
+          institutionId: "testInstitutionId",
+          jobTypes: [ComboJobTypes.TRANSACTION_HISTORY],
+          credentials: [],
+          performanceSessionId: "testPerfomanceSessionId",
+        },
+        userId,
+      );
+
+      const transactionHistoryParams = [];
+
+      server.use(
+        http.post(FINICITY_HISTORIC_TRANSACTIONS_PATH, ({ params }) => {
+          transactionHistoryParams.push({ ...params });
+
+          return HttpResponse.json({});
+        }),
+      );
+
+      const request = {
+        query: { connection_id: createdConnection.id },
+        body: { eventType: "added", payload },
+      };
+
+      const updatedConnection =
+        await finicityAdapter.HandleOauthResponse(request);
+
+      expect(transactionHistoryParams).toEqual([
+        {
+          accountId: accountsData.accounts[0].id,
+          customerId: userId,
+        },
+        {
+          accountId: accountsData.accounts[1].id,
+          customerId: userId,
+        },
+      ]);
+
       expect(updatedConnection).toEqual(
         expect.objectContaining({
           id: "test-institution-login-id",
