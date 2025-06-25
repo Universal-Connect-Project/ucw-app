@@ -80,6 +80,22 @@ const test = base.extend<MyFixtures>({
 });
 
 test.describe("Finicity Adapter Tests", () => {
+  test(`doesn't include transactions if neither ${ComboJobTypes.TRANSACTIONS} nor ${ComboJobTypes.TRANSACTION_HISTORY} is requested`, async ({
+    page,
+    request,
+    userId,
+  }) => {
+    test.setTimeout(300000);
+
+    const { aggregator, connectionId } = await makeAConnection(
+      [ComboJobTypes.ACCOUNT_NUMBER],
+      page,
+      userId,
+    );
+
+    await testDataEndpoints(request, userId, connectionId, aggregator, false);
+  });
+
   test(`makes a connection with ${ComboJobTypes.TRANSACTION_HISTORY} and returns transactions`, async ({
     page,
     request,
@@ -160,7 +176,13 @@ test.describe("Finicity Adapter Tests", () => {
     await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
   });
 
-  async function testDataEndpoints(request, userId, connectionId, aggregator) {
+  async function testDataEndpoints(
+    request,
+    userId,
+    connectionId,
+    aggregator,
+    shouldExpectTransactions = true,
+  ) {
     let url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/accounts`;
 
     const accountsResponse = await request.get(url);
@@ -239,27 +261,35 @@ test.describe("Finicity Adapter Tests", () => {
       const transactionsResponse = await request.get(url);
       const transactions = await transactionsResponse.json();
 
-      expect(transactions).toEqual(
-        expect.objectContaining({
-          transactions: expect.arrayContaining([
-            expect.objectContaining({
-              depositTransaction: expect.objectContaining({
-                amount: expect.any(Number),
-                accountId: expect.any(String),
-                transactionId: expect.any(String),
-                postedTimestamp: expect.any(String),
-                transactionTimestamp: expect.any(String),
-                description: expect.any(String),
-                debitCreditMemo: expect.any(String),
-                memo: expect.any(String),
-                category: expect.any(String),
-                status: "active",
-                payee: expect.any(String),
+      if (shouldExpectTransactions) {
+        expect(transactions).toEqual(
+          expect.objectContaining({
+            transactions: expect.arrayContaining([
+              expect.objectContaining({
+                depositTransaction: expect.objectContaining({
+                  amount: expect.any(Number),
+                  accountId: expect.any(String),
+                  transactionId: expect.any(String),
+                  postedTimestamp: expect.any(String),
+                  transactionTimestamp: expect.any(String),
+                  description: expect.any(String),
+                  debitCreditMemo: expect.any(String),
+                  memo: expect.any(String),
+                  category: expect.any(String),
+                  status: "active",
+                  payee: expect.any(String),
+                }),
               }),
-            }),
-          ]),
-        }),
-      );
+            ]),
+          }),
+        );
+      } else {
+        expect(transactions).toEqual(
+          expect.objectContaining({
+            transactions: [],
+          }),
+        );
+      }
     }
   }
 });
