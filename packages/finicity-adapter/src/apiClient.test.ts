@@ -11,10 +11,14 @@ import { server } from "./test/testServer";
 import { http, HttpResponse } from "msw";
 import {
   CREATE_USER_PATH,
+  FINICITY_HISTORIC_TRANSACTIONS_PATH,
   MOCKED_FIX_OAUTH_URL,
   MOCKED_OAUTH_URL,
 } from "./test/handlers";
-import { accountTransactionsData } from "./test/testData/accounts";
+import {
+  accountsData,
+  accountTransactionsData,
+} from "./test/testData/accounts";
 
 const cacheClient = createCacheClient();
 const logger = createLogClient();
@@ -41,6 +45,38 @@ const apiClient = new FinicityClient(
 );
 
 describe("FinicityClient", () => {
+  describe("aggregateTransactionHistory", () => {
+    it("retrieves the accounts and calls an aggregation endpoint for each of the accounts", async () => {
+      const passedParams = [];
+
+      server.use(
+        http.post(FINICITY_HISTORIC_TRANSACTIONS_PATH, ({ params }) => {
+          passedParams.push({ ...params });
+
+          return HttpResponse.json({});
+        }),
+      );
+
+      const testCustomerId = "testCustomerId";
+
+      await apiClient.aggregateTransactionHistory(
+        testCustomerId,
+        "testInstitutionLoginId",
+      );
+
+      expect(passedParams).toEqual([
+        {
+          customerId: testCustomerId,
+          accountId: accountsData.accounts[0].id,
+        },
+        {
+          customerId: testCustomerId,
+          accountId: accountsData.accounts[1].id,
+        },
+      ]);
+    });
+  });
+
   describe("getAuthToken", () => {
     it("retrieves and caches the token", async () => {
       const token = await apiClient.getAuthToken();
