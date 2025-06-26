@@ -107,6 +107,25 @@ export default class FinicityClient {
     return this.post(`aggregation/v2/customers/${customerId}/accounts`, {});
   }
 
+  aggregateTransactionHistory = async (
+    customerId: string,
+    institutionLoginId: string,
+  ) => {
+    const accounts = await this.getCustomerAccountsByInstitutionLoginId(
+      customerId,
+      institutionLoginId,
+    );
+
+    await Promise.all(
+      accounts.map(({ id }) =>
+        this.post(
+          `aggregation/v1/customers/${customerId}/accounts/${id}/transactions/historic`,
+          {},
+        ),
+      ),
+    );
+  };
+
   getCustomerAccountsByInstitutionLoginId(
     customerId: string,
     institutionLoginId: string,

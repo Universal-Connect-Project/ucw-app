@@ -1,69 +1,134 @@
-import { expect, test } from "@playwright/test";
+import { expect, test as base } from "@playwright/test";
 import { ComboJobTypes } from "@repo/utils";
 
-test.describe("Finicity Adapter Tests", () => {
-  test("Successful connection and data retrieval and then refresh", async ({
-    page,
-    request,
-  }) => {
-    test.setTimeout(300000);
+const makeAConnection = async (
+  jobTypes: ComboJobTypes[],
+  page,
+  userId: string,
+) => {
+  await page.goto(
+    `http://localhost:8080/widget?jobTypes=${jobTypes.join(",")}&userId=${userId}`,
+  );
 
-    const userId = crypto.randomUUID();
-
-    await page.goto(
-      `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
-    );
-
-    page.evaluate(`
+  page.evaluate(`
       window.addEventListener('message', (event) => {
         const message = event.data;
         console.log({ message });
       });
     `);
 
-    await page.getByPlaceholder("Search").fill("finbank");
-    await page.getByLabel("Add account with FinBank Profiles - A").click();
+  await page.getByPlaceholder("Search").fill("finbank");
+  await page.getByLabel("Add account with FinBank Profiles - A").click();
 
-    const popupPromise = page.waitForEvent("popup");
-    await page.getByRole("link", { name: "Go to log in" }).click();
+  const popupPromise = page.waitForEvent("popup");
+  await page.getByRole("link", { name: "Go to log in" }).click();
 
-    const authorizeTab = await popupPromise;
+  const authorizeTab = await popupPromise;
 
-    await authorizeTab.getByRole("button", { name: "Next" }).click();
-    await authorizeTab.getByLabel("Banking Userid").fill("sue_wealthy");
-    await authorizeTab.getByLabel("Banking Password").fill("profile_700");
-    await authorizeTab.getByLabel("Submit").click();
+  await authorizeTab.getByRole("button", { name: "Next" }).click();
+  await authorizeTab.getByLabel("Banking Userid").fill("sue_wealthy");
+  await authorizeTab.getByLabel("Banking Password").fill("profile_700");
+  await authorizeTab.getByLabel("Submit").click();
 
-    const msg = await page.waitForEvent("console", {
-      timeout: 120000,
-      predicate: async (msg) => {
-        try {
-          const args = msg.args();
-          const obj =
-            args && args.length > 0
-              ? (await args[0].jsonValue())?.message
-              : undefined;
-          return obj?.type === "connect/memberConnected";
-        } catch {
-          return false;
-        }
-      },
+  const msg = await page.waitForEvent("console", {
+    timeout: 120000,
+    predicate: async (msg) => {
+      try {
+        const args = msg.args();
+        const obj =
+          args && args.length > 0
+            ? (await args[0].jsonValue())?.message
+            : undefined;
+        return obj?.type === "connect/memberConnected";
+      } catch {
+        return false;
+      }
+    },
+  });
+
+  const obj = (await msg.args()[0].jsonValue())?.message;
+  expect(obj.metadata.user_guid).not.toBeNull();
+  expect(obj.metadata.member_guid).not.toBeNull();
+  expect(obj.metadata.aggregator).toEqual("finicity_sandbox");
+  expect(obj.metadata.connectionId).not.toBeNull();
+
+  await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
+    timeout: 120000,
+  });
+
+  const { connectionId, aggregator, ucpInstitutionId } = obj.metadata;
+
+  return { aggregator, connectionId, ucpInstitutionId, userId };
+};
+
+type MyFixtures = {
+  userId: string;
+};
+
+const test = base.extend<MyFixtures>({
+  userId: [
+    async ({ request }, use) => {
+      const userId = crypto.randomUUID();
+      await use(userId);
+
+      await request.delete(
+        `http://localhost:8080/api/aggregator/finicity_sandbox/user/${userId}`,
+      );
+    },
+    { scope: "test" },
+  ],
+});
+
+test.describe("Finicity Adapter Tests", () => {
+  test(`doesn't include transactions if neither ${ComboJobTypes.TRANSACTIONS} nor ${ComboJobTypes.TRANSACTION_HISTORY} is requested`, async ({
+    page,
+    request,
+    userId,
+  }) => {
+    test.setTimeout(300000);
+
+    const { aggregator, connectionId } = await makeAConnection(
+      [ComboJobTypes.ACCOUNT_NUMBER],
+      page,
+      userId,
+    );
+
+    await testDataEndpoints({
+      request,
+      userId,
+      connectionId,
+      aggregator,
+      shouldExpectTransactions: false,
     });
+  });
 
-    const obj = (await msg.args()[0].jsonValue())?.message;
-    expect(obj.metadata.user_guid).not.toBeNull();
-    expect(obj.metadata.member_guid).not.toBeNull();
-    expect(obj.metadata.aggregator).toEqual("finicity_sandbox");
-    expect(obj.metadata.connectionId).not.toBeNull();
+  test(`makes a connection with ${ComboJobTypes.TRANSACTION_HISTORY} and returns transactions`, async ({
+    page,
+    request,
+    userId,
+  }) => {
+    test.setTimeout(300000);
 
-    const { connectionId, user_guid, aggregator, ucpInstitutionId } =
-      obj.metadata;
+    const { aggregator, connectionId } = await makeAConnection(
+      [ComboJobTypes.TRANSACTION_HISTORY],
+      page,
+      userId,
+    );
 
-    await testDataEndpoints(request, user_guid, connectionId, aggregator);
+    await testDataEndpoints({ request, userId, connectionId, aggregator });
+  });
 
-    await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
-      timeout: 120000,
-    });
+  test(`Successful ${ComboJobTypes.TRANSACTIONS} connection, data retrieval, and refresh`, async ({
+    page,
+    request,
+    userId,
+  }) => {
+    test.setTimeout(300000);
+
+    const { aggregator, connectionId, ucpInstitutionId } =
+      await makeAConnection([ComboJobTypes.TRANSACTIONS], page, userId);
+
+    await testDataEndpoints({ request, userId, connectionId, aggregator });
 
     await page.goto(
       `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&aggregator=${aggregator}&institutionId=${ucpInstitutionId}&connectionId=${connectionId}`,
@@ -86,16 +151,10 @@ test.describe("Finicity Adapter Tests", () => {
     await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
       timeout: 120000,
     });
-
-    await request.delete(
-      `http://localhost:8080/api/aggregator/finicity_sandbox/user/${userId}`,
-    );
   });
 
-  test("Failed connection", async ({ page, request }) => {
+  test("Failed connection", async ({ page, userId }) => {
     test.setTimeout(300000);
-
-    const userId = crypto.randomUUID();
 
     await page.goto(
       `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
@@ -121,13 +180,15 @@ test.describe("Finicity Adapter Tests", () => {
     });
 
     await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
-
-    await request.delete(
-      `http://localhost:8080/api/aggregator/finicity_sandbox/user/${userId}`,
-    );
   });
 
-  async function testDataEndpoints(request, userId, connectionId, aggregator) {
+  async function testDataEndpoints({
+    request,
+    userId,
+    connectionId,
+    aggregator,
+    shouldExpectTransactions = true,
+  }) {
     let url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/accounts`;
 
     const accountsResponse = await request.get(url);
@@ -206,27 +267,35 @@ test.describe("Finicity Adapter Tests", () => {
       const transactionsResponse = await request.get(url);
       const transactions = await transactionsResponse.json();
 
-      expect(transactions).toEqual(
-        expect.objectContaining({
-          transactions: expect.arrayContaining([
-            expect.objectContaining({
-              depositTransaction: expect.objectContaining({
-                amount: expect.any(Number),
-                accountId: expect.any(String),
-                transactionId: expect.any(String),
-                postedTimestamp: expect.any(String),
-                transactionTimestamp: expect.any(String),
-                description: expect.any(String),
-                debitCreditMemo: expect.any(String),
-                memo: expect.any(String),
-                category: expect.any(String),
-                status: "active",
-                payee: expect.any(String),
+      if (shouldExpectTransactions) {
+        expect(transactions).toEqual(
+          expect.objectContaining({
+            transactions: expect.arrayContaining([
+              expect.objectContaining({
+                depositTransaction: expect.objectContaining({
+                  amount: expect.any(Number),
+                  accountId: expect.any(String),
+                  transactionId: expect.any(String),
+                  postedTimestamp: expect.any(String),
+                  transactionTimestamp: expect.any(String),
+                  description: expect.any(String),
+                  debitCreditMemo: expect.any(String),
+                  memo: expect.any(String),
+                  category: expect.any(String),
+                  status: "active",
+                  payee: expect.any(String),
+                }),
               }),
-            }),
-          ]),
-        }),
-      );
+            ]),
+          }),
+        );
+      } else {
+        expect(transactions).toEqual(
+          expect.objectContaining({
+            transactions: [],
+          }),
+        );
+      }
     }
   }
 });

@@ -16,6 +16,8 @@ export const DELETE_USER_PATH = `${FINICITY_BASE_PATH}/aggregation/v1/customers/
 export const MOCKED_OAUTH_URL = "http://example.url";
 export const MOCKED_FIX_OAUTH_URL = "http://fix.example.url";
 
+export const FINICITY_HISTORIC_TRANSACTIONS_PATH = `${FINICITY_BASE_PATH}/aggregation/v1/customers/:customerId/accounts/:accountId/transactions/historic`;
+
 const handlers = [
   http.post(
     `${FINICITY_BASE_PATH}/aggregation/v2/partners/authentication`,
@@ -49,24 +51,27 @@ const handlers = [
   http.get(`${FINICITY_BASE_PATH}/aggregation/v1/customers`, () => {
     return HttpResponse.json(customerData);
   }),
+  http.post(FINICITY_HISTORIC_TRANSACTIONS_PATH, () => {
+    return HttpResponse.json({});
+  }),
   http.get(
     `${FINICITY_BASE_PATH}/aggregation/v1/customers/testCustomerId/accounts`,
     () => HttpResponse.json(accountsData),
   ),
   http.get(
-    `${FINICITY_INT_BASE_PATH}/aggregation/v1/customers/userId/institutionLogins/connectionId/accounts`,
+    `${FINICITY_INT_BASE_PATH}/aggregation/v1/customers/:userId/institutionLogins/:connectionId/accounts`,
     () => HttpResponse.json(accountsData),
   ),
   http.get(
-    `${FINICITY_BASE_PATH}/aggregation/v1/customers/userId/institutionLogins/connectionId/accounts`,
+    `${FINICITY_BASE_PATH}/aggregation/v1/customers/:userId/institutionLogins/:connectionId/accounts`,
     () => HttpResponse.json(accountsData),
   ),
   http.get(
-    `${FINICITY_BASE_PATH}/aggregation/v3/customers/userId/accounts/accountId/owner`,
+    `${FINICITY_BASE_PATH}/aggregation/v3/customers/:userId/accounts/:accountId/owner`,
     () => HttpResponse.json(accountOwnerData),
   ),
   http.get(
-    `${FINICITY_BASE_PATH}/aggregation/v1/customers/userId/accounts/accountId/details`,
+    `${FINICITY_BASE_PATH}/aggregation/v1/customers/:userId/accounts/:accountId/details`,
     () => HttpResponse.json(accountAchData),
   ),
   http.get(

@@ -202,7 +202,7 @@ export class FinicityAdapter implements WidgetAdapter {
   async HandleOauthResponse(request: any): Promise<Connection> {
     const { connection_id, reason, code } = request?.query || {};
     const { eventType, payload } = request?.body || {};
-    let institutionLoginId = false;
+    let institutionLoginId: string | undefined = undefined;
     let redirect_complete = false;
 
     const cachedConnection = (await this.cacheClient.get(
@@ -223,8 +223,12 @@ export class FinicityAdapter implements WidgetAdapter {
         this.performanceClient.recordSuccessEvent(connection_id);
 
         institutionLoginId = payload?.accounts?.[0]?.institutionLoginId;
-
-        if (jobTypes?.includes(ComboJobTypes.TRANSACTIONS)) {
+        if (jobTypes?.includes(ComboJobTypes.TRANSACTION_HISTORY)) {
+          await this.apiClient.aggregateTransactionHistory(
+            connection.userId,
+            institutionLoginId,
+          );
+        } else if (jobTypes?.includes(ComboJobTypes.TRANSACTIONS)) {
           await this.apiClient.refreshAccountsToAggregateTransactions(
             connection.userId,
           );

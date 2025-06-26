@@ -14,6 +14,7 @@ import { http, HttpResponse } from "msw";
 import { server } from "./test/testServer";
 import { BASE_PATH } from "./apiClient";
 import {
+  accountAchData,
   accountsData,
   accountTransactionsData,
 } from "./test/testData/accounts";
@@ -46,20 +47,41 @@ describe("dataAdapter", () => {
         {
           depositAccount: {
             accountCategory: "DEPOSIT_ACCOUNT",
-            accountId: "7079364532",
-            accountNumber: 2345678901,
-            accountNumberDisplay: "8901",
-            accountType: "checking",
-            availableBalance: 14911,
+            accountId: accountsData.accounts[0].id,
+            accountNumber: accountAchData.realAccountNumber,
+            accountNumberDisplay: accountsData.accounts[0].accountNumberDisplay,
+            accountType: accountsData.accounts[0].type,
+            availableBalance:
+              accountsData.accounts[0].detail.availableBalanceAmount,
             balanceAsOf: expect.any(Date),
             balanceType: "ASSET",
             currency: {
-              currencyCode: "USD",
+              currencyCode: accountsData.accounts[0].currency,
             },
-            currentBalance: 14911,
-            nickname: "Checking",
-            routingTransitNumber: "123456789",
-            status: "active",
+            currentBalance: accountsData.accounts[0].balance,
+            nickname: accountsData.accounts[0].accountNickname,
+            routingTransitNumber: accountAchData.routingNumber,
+            status: accountsData.accounts[0].status,
+          },
+        },
+        {
+          depositAccount: {
+            accountCategory: "DEPOSIT_ACCOUNT",
+            accountId: accountsData.accounts[1].id,
+            accountNumber: accountAchData.realAccountNumber,
+            accountNumberDisplay: accountsData.accounts[1].accountNumberDisplay,
+            accountType: accountsData.accounts[1].type,
+            availableBalance:
+              accountsData.accounts[1].detail.availableBalanceAmount,
+            balanceAsOf: expect.any(Date),
+            balanceType: "ASSET",
+            currency: {
+              currencyCode: accountsData.accounts[1].currency,
+            },
+            currentBalance: accountsData.accounts[1].balance,
+            nickname: accountsData.accounts[1].accountNickname,
+            routingTransitNumber: accountAchData.routingNumber,
+            status: accountsData.accounts[1].status,
           },
         },
       ],

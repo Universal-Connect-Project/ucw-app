@@ -1,26 +1,32 @@
+const account = {
+  id: "account1",
+  number: "x0001",
+  accountNumberDisplay: "8901",
+  name: "Checking",
+  balance: 14911,
+  type: "checking",
+  status: "active",
+  customerId: "7044555930",
+  institutionId: "102105",
+  balanceDate: 1746115878,
+  createdDate: 1746115878,
+  linkedAccountDate: 1746115879,
+  currency: "USD",
+  institutionLoginId: 7038438451,
+  detail: {
+    availableBalanceAmount: 14911,
+  },
+  displayPosition: 1,
+  accountNickname: "Checking",
+  marketSegment: "personal",
+};
+
 export const accountsData = {
   accounts: [
+    account,
     {
-      id: "7079364532",
-      number: "x0001",
-      accountNumberDisplay: "8901",
-      name: "Checking",
-      balance: 14911,
-      type: "checking",
-      status: "active",
-      customerId: "7044555930",
-      institutionId: "102105",
-      balanceDate: 1746115878,
-      createdDate: 1746115878,
-      linkedAccountDate: 1746115879,
-      currency: "USD",
-      institutionLoginId: 7038438451,
-      detail: {
-        availableBalanceAmount: 14911,
-      },
-      displayPosition: 1,
-      accountNickname: "Checking",
-      marketSegment: "personal",
+      ...account,
+      id: "account2",
     },
   ],
 };
