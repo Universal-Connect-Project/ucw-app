@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Transaction history support for Finicity.
 
+## [1.7.6]
+
+### Added
+
+- Added height style to html, body, and root elements to ensure the widget is always full height.
+
 ## [1.7.5]
 
 ### Added
