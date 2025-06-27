@@ -53,13 +53,19 @@
             }
           },
           {
-            "description": "The aggregator of the connection to be refreshed. A connectionId and institutionId are required when this is used. Providing these will skip search, go directly to the authorization step for the institution, and hide the back button.",
+            "description": "The aggregator of the connection to be refreshed. Providing an institution id and a connection id will skip search, go directly to the authorization step for the institution, and hide the back button. If using an institution id a connection id is also required.",
             "name": "aggregator",
             "in": "query",
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["mx", "mx_int", "sophtron", "finicity", "finicity_sandbox"]
+              "enum": [
+                "mx",
+                "mx_int",
+                "sophtron",
+                "finicity",
+                "finicity_sandbox"
+              ]
             }
           },
           {
@@ -110,7 +116,13 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["mx", "mx_int", "sophtron", "finicity", "finicity_sandbox"]
+              "enum": [
+                "mx",
+                "mx_int",
+                "sophtron",
+                "finicity",
+                "finicity_sandbox"
+              ]
             }
           },
           {
@@ -436,7 +448,13 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["mx", "mx_int", "sophtron", "finicity", "finicity_sandbox"]
+              "enum": [
+                "mx",
+                "mx_int",
+                "sophtron",
+                "finicity",
+                "finicity_sandbox"
+              ]
             }
           },
           {
@@ -666,7 +684,13 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["mx", "mx_int", "sophtron", "finicity", "finicity_sandbox"]
+              "enum": [
+                "mx",
+                "mx_int",
+                "sophtron",
+                "finicity",
+                "finicity_sandbox"
+              ]
             }
           },
           {

@@ -27,9 +27,7 @@ export const widgetHandler = (req: Request, res: Response) => {
     singleAccountSelect: Joi.bool(),
     userId: Joi.string().required(),
     token: Joi.string(),
-  })
-    .with("aggregator", ["institutionId", "connectionId"])
-    .with("connectionId", ["institutionId", "aggregator"]);
+  }).with("connectionId", ["institutionId", "aggregator"]);
 
   const { error } = schema.validate(req.query);
 

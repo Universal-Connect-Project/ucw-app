@@ -6,6 +6,7 @@ import { mapCachedInstitution } from "./utils";
 export interface GetInstitutionsRequest extends Request {
   context: {
     jobTypes: ComboJobTypes[];
+    aggregator?: string;
   };
   query: {
     page?: string;
@@ -23,6 +24,7 @@ export const getSearchInstitutionsHandler = async (
 
   const jobTypes = req.context?.jobTypes;
   const { routingNumber, search: searchTerm } = req.query;
+  const aggregator = req.context?.aggregator;
 
   const size = parseInt(req.query.pageSize);
   const from = (parseInt(req.query.page) - 1) * size;
@@ -40,6 +42,7 @@ export const getSearchInstitutionsHandler = async (
       jobTypes,
       searchTerm,
       size,
+      aggregator,
     });
   }
 

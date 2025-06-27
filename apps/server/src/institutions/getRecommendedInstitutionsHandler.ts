@@ -7,10 +7,11 @@ export const getRecommendedInstitutionsHandler = async (
   req: Request,
   res: Response,
 ) => {
-  req.context.aggregator = null;
+  // req.context.aggregator = null;
 
   const recommendedInstitutions = await getRecommendedInstitutions({
     jobTypes: req.context.jobTypes,
+    aggregator: req.context.aggregator,
   });
 
   res.send(
