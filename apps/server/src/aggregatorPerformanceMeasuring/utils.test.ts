@@ -27,10 +27,10 @@ describe("Performance Resilience", () => {
     jest.restoreAllMocks();
   });
 
-  it("should create a performance object", async () => {
+  it("should create a performance object which gets deleted after 20 minutes", async () => {
     await createPerformanceObject(basePerformanceObjectParams);
 
-    const performanceObject = await getPerformanceObject(
+    let performanceObject = await getPerformanceObject(
       basePerformanceObjectParams.performanceSessionId,
     );
 
@@ -39,6 +39,14 @@ describe("Performance Resilience", () => {
       lastUiUpdateTimestamp: expect.any(Number),
       pausedByMfa: false,
     });
+
+    jest.useFakeTimers();
+    jest.setSystemTime(Date.now() + 1205000); // ~ 20 minutes later
+
+    performanceObject = await getPerformanceObject(
+      basePerformanceObjectParams.performanceSessionId,
+    );
+    expect(performanceObject).toEqual({});
   });
 
   it("should update the last UI update timestamp", async () => {
