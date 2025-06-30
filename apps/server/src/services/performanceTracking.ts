@@ -2,6 +2,10 @@ import type { ComboJobTypes } from "@repo/utils";
 import { getConfig } from "../config";
 import { debug } from "../infra/logger";
 import { getAccessToken } from "./auth0Service";
+import {
+  cleanupPerformanceObject,
+  setPausedByMfa,
+} from "../aggregatorPerformanceMeasuring/utils";
 
 async function sendPerformanceEvent({
   connectionId,
@@ -82,6 +86,7 @@ export const recordSuccessEvent = async (connectionId: string) => {
     eventType: "connectionSuccess",
     method: "PUT",
   });
+  cleanupPerformanceObject(connectionId);
 };
 
 export const recordConnectionPauseEvent = async (connectionId: string) => {
@@ -90,6 +95,7 @@ export const recordConnectionPauseEvent = async (connectionId: string) => {
     eventType: "connectionPause",
     method: "PUT",
   });
+  setPausedByMfa(connectionId, true);
 };
 export const recordConnectionResumeEvent = async (connectionId: string) => {
   await sendPerformanceEvent({
@@ -97,4 +103,5 @@ export const recordConnectionResumeEvent = async (connectionId: string) => {
     eventType: "connectionResume",
     method: "PUT",
   });
+  setPausedByMfa(connectionId, false);
 };

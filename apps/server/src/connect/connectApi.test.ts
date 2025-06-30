@@ -3,16 +3,30 @@ import { ChallengeType, ComboJobTypes, ConnectionStatus } from "@repo/utils";
 import type { Context } from "../shared/contract";
 import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
 import {
+  ANSWER_CHALLENGE_PATH,
   CONNECTION_BY_ID_PATH,
   mxTestData,
   READ_MEMBER_STATUS_PATH,
+  UPDATE_CONNECTION_PATH,
   waitFor,
 } from "@repo/utils-dev-dependency";
 import { server } from "../test/testServer";
 import { http, HttpResponse } from "msw";
 import setupPerformanceHandlers from "../shared/test/setupPerformanceHandlers";
 import { AKOYA_AGGREGATOR_STRING } from "@repo/akoya-adapter";
-
+import type { PerformanceObject } from "../aggregatorPerformanceMeasuring/utils";
+import {
+  createPerformanceObject,
+  getPerformanceObject,
+  setPausedByMfa,
+} from "../aggregatorPerformanceMeasuring/utils";
+import {
+  answerMfaMemberData,
+  memberCreateData,
+  memberData,
+  memberStatusData,
+} from "@repo/utils-dev-dependency/mx/testData";
+import waitForLocalPerformanceObjectCheck from "../test/waitForLocalPerformanceObjectCheck";
 const {
   connectionByIdMemberData,
   memberStatusData: mxMemberStatusData,
@@ -20,6 +34,7 @@ const {
 } = mxTestData;
 
 const resolvedUserId = "resolvedUserId";
+const performanceSessionId = "aaaa-bbbb-cccc-dddd-eeee";
 
 describe("connectApi", () => {
   let testContext: Context;
@@ -30,6 +45,7 @@ describe("connectApi", () => {
       institutionId: "xxx",
       resolvedUserId,
       jobTypes: [ComboJobTypes.TRANSACTIONS],
+      performanceSessionId,
     } as Context;
 
     connectApi = new ConnectApi({
@@ -37,6 +53,8 @@ describe("connectApi", () => {
     });
 
     connectApi.init();
+    jest.useRealTimers();
+    jest.restoreAllMocks();
   });
 
   describe("addMember", () => {
@@ -101,7 +119,7 @@ describe("connectApi", () => {
       expect(requestLog.length).toBe(0);
     });
 
-    it("returns a member and sends a connection start event on new connection", async () => {
+    it("returns a member, sends a connection start event, and creates a performance object in redis on a new connection", async () => {
       const requestLog = setupPerformanceHandlers([
         "connectionStart",
         "connectionPause",
@@ -165,6 +183,20 @@ describe("connectApi", () => {
             jobTypes: [ComboJobTypes.TRANSACTIONS],
             recordDuration: true,
           },
+        }),
+      );
+
+      const performanceObject = await getPerformanceObject(
+        requestLog[0].connectionId,
+      );
+      expect(performanceObject).toEqual(
+        expect.objectContaining({
+          performanceSessionId: requestLog[0].connectionId,
+          connectionId: "testGuid1",
+          userId: resolvedUserId,
+          aggregatorId: MX_AGGREGATOR_STRING,
+          lastUiUpdateTimestamp: expect.any(Number),
+          pausedByMfa: false,
         }),
       );
     });
@@ -259,6 +291,100 @@ describe("connectApi", () => {
     });
   });
 
+  describe("updateMember", () => {
+    it("answers challenge question with updated credentials and unpauses performance object", async () => {
+      await createPerformanceObject({
+        userId: resolvedUserId,
+        connectionId: "testGuid",
+        performanceSessionId,
+        aggregatorId: MX_AGGREGATOR_STRING,
+      });
+      await setPausedByMfa(performanceSessionId, true);
+
+      await waitForLocalPerformanceObjectCheck(performanceSessionId, {
+        pausedByMfa: true,
+      });
+
+      const customContext = { ...testContext, current_job_id: "testJobGuid" };
+      const customApi = new ConnectApi({ context: customContext });
+      customApi.init();
+
+      let requestBody: unknown;
+
+      server.use(
+        http.put(ANSWER_CHALLENGE_PATH, async ({ request }) => {
+          requestBody = await request.json();
+          return HttpResponse.json({});
+        }),
+      );
+
+      await customApi.updateMember(answerMfaMemberData);
+
+      await waitForLocalPerformanceObjectCheck(performanceSessionId, {
+        pausedByMfa: false,
+      });
+
+      expect(requestBody).toEqual({
+        member: {
+          challenges: [{ guid: "credentialGuid", value: "credentialValue" }],
+        },
+      });
+    });
+
+    it("updates member without challenges and does not pause performance object", async () => {
+      await createPerformanceObject({
+        userId: resolvedUserId,
+        connectionId: "testGuid",
+        performanceSessionId,
+        aggregatorId: MX_AGGREGATOR_STRING,
+      });
+      await setPausedByMfa(performanceSessionId, true);
+
+      let performanceObject = await waitForLocalPerformanceObjectCheck(
+        performanceSessionId,
+        {
+          pausedByMfa: true,
+        },
+      );
+
+      const timeStampBeforeUpdate = performanceObject.lastUiUpdateTimestamp;
+
+      let requestBody: unknown;
+
+      server.use(
+        http.put(UPDATE_CONNECTION_PATH, async ({ request }) => {
+          requestBody = await request.json();
+          return HttpResponse.json(memberData);
+        }),
+      );
+
+      const connection = await connectApi.updateMember({
+        ...memberCreateData,
+        guid: "testGuid1",
+      });
+
+      performanceObject = await waitForLocalPerformanceObjectCheck(
+        performanceSessionId,
+        {
+          pausedByMfa: true,
+        },
+      );
+
+      expect(performanceObject.lastUiUpdateTimestamp).toBe(
+        timeStampBeforeUpdate,
+      );
+
+      expect(requestBody).toEqual({
+        member: {
+          credentials: [
+            { guid: "testCredentialGuid", value: "testCredentialValue" },
+          ],
+        },
+      });
+      expect(connection).not.toBeUndefined();
+    });
+  });
+
   describe("loadMemberByGuid", () => {
     it("returns a member array with a most recent job guid", async () => {
       const response = await connectApi.loadMemberByGuid("testGuid");
@@ -296,14 +422,24 @@ describe("connectApi", () => {
       });
     });
 
-    it("records a pause event when mfa challenges", async () => {
+    it("records a pause event when mfa challenges. Sets performance object to pausedByMfa and updates the lastUiUpdateTimestamp", async () => {
       const requestLog = setupPerformanceHandlers(["connectionPause"]);
+
+      await createPerformanceObject({
+        userId: resolvedUserId,
+        connectionId: "testGuid",
+        performanceSessionId,
+        aggregatorId: MX_AGGREGATOR_STRING,
+      });
+
+      const { lastUiUpdateTimestamp: firstUiUpdateTimestamp } =
+        await getPerformanceObject(performanceSessionId);
 
       server.use(
         http.get(READ_MEMBER_STATUS_PATH, () =>
           HttpResponse.json({
             member: {
-              connection_status: ConnectionStatus.CHALLENGED,
+              connection_status: ConnectionStatus[ConnectionStatus.CHALLENGED],
               guid: "testGuid",
               challenges: [
                 {
@@ -318,6 +454,16 @@ describe("connectApi", () => {
       );
 
       await connectApi.loadMemberByGuid("testGuid");
+
+      const performanceObject = await waitForLocalPerformanceObjectCheck(
+        performanceSessionId,
+        {
+          pausedByMfa: true,
+        },
+      );
+      expect(performanceObject.lastUiUpdateTimestamp).toBeGreaterThan(
+        firstUiUpdateTimestamp,
+      );
 
       await waitFor(() => expect(requestLog.length).toBe(1));
 
@@ -370,5 +516,103 @@ describe("connectApi", () => {
         }),
       );
     });
+  });
+});
+
+describe("performanceResilience life cycle through ConnectApi", () => {
+  let testContext: Context;
+  let connectApi: ConnectApi;
+  let latestUiUpdateTimestamp: number;
+  let answerMfaContextConnectApi: ConnectApi;
+
+  function expectUpdatedUiTimestamp(newPerformanceObject: PerformanceObject) {
+    expect(latestUiUpdateTimestamp).toBeLessThan(
+      newPerformanceObject.lastUiUpdateTimestamp,
+    );
+    latestUiUpdateTimestamp = newPerformanceObject.lastUiUpdateTimestamp;
+  }
+
+  beforeEach(() => {
+    testContext = {
+      aggregator: MX_AGGREGATOR_STRING,
+      institutionId: "xxx",
+      resolvedUserId,
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
+      performanceSessionId,
+    } as Context;
+
+    connectApi = new ConnectApi({
+      context: testContext,
+    });
+    answerMfaContextConnectApi = new ConnectApi({
+      context: { ...testContext, current_job_id: "testJobGuid" },
+    });
+
+    answerMfaContextConnectApi.init();
+    connectApi.init();
+  });
+
+  it("creates, pauses, resumes, completes, deletes a performance object connecting with MFA", async () => {
+    jest.spyOn(crypto, "randomUUID").mockReturnValueOnce(performanceSessionId);
+
+    // Create a member
+    await connectApi.addMember(memberCreateData);
+
+    let performanceObject =
+      await waitForLocalPerformanceObjectCheck(performanceSessionId);
+    latestUiUpdateTimestamp = performanceObject.lastUiUpdateTimestamp;
+
+    // Initiate MFA challenge
+    server.use(
+      http.get(READ_MEMBER_STATUS_PATH, async () => {
+        return HttpResponse.json({
+          member: {
+            ...memberStatusData.member,
+            connection_status: ConnectionStatus[ConnectionStatus.CHALLENGED],
+            challenges: [
+              {
+                id: "testId",
+                question: "testQuestion",
+                type: ChallengeType.QUESTION,
+              },
+            ],
+          },
+        });
+      }),
+    );
+
+    await connectApi.loadMemberByGuid("testGuid");
+
+    performanceObject = await waitForLocalPerformanceObjectCheck(
+      performanceSessionId,
+      {
+        pausedByMfa: true,
+      },
+    );
+
+    expectUpdatedUiTimestamp(performanceObject);
+
+    // Answer MFA challenge
+    await answerMfaContextConnectApi.updateMember(answerMfaMemberData);
+
+    performanceObject = await waitForLocalPerformanceObjectCheck(
+      performanceSessionId,
+      {
+        pausedByMfa: false,
+      },
+    );
+
+    expectUpdatedUiTimestamp(performanceObject);
+
+    // Member connected
+    server.use(
+      http.get(READ_MEMBER_STATUS_PATH, async () => {
+        return HttpResponse.json(memberStatusData);
+      }),
+    );
+
+    await connectApi.loadMemberByGuid("testGuid");
+
+    await waitForLocalPerformanceObjectCheck(performanceSessionId, {});
   });
 });

@@ -1,3 +1,5 @@
+import { ChallengeType } from "@repo/utils/contract";
+
 export const memberData = {
   member: {
     guid: "testGuid1",
@@ -38,6 +40,41 @@ export const membersData = {
     },
     oauthMemberdata.member,
   ],
+};
+
+export const memberCreateData = {
+  institution_guid: "testInstitutionGuid",
+  is_oauth: false,
+  skip_aggregration: false,
+  credentials: [
+    {
+      guid: "testCredentialGuid",
+      value: "testCredentialValue",
+    },
+  ],
+  rawInstitutionData: {
+    ucpInstitutionId: "testUcpInstitutionId",
+  },
+};
+
+export const answerMfaMemberData = {
+  guid: "testGuid",
+  institution_guid: "testInstitutionGuid",
+  credentials: [
+    {
+      guid: "credentialGuid",
+      value: "credentialValue",
+    },
+  ],
+  mfa: {
+    credentials: [
+      {
+        guid: "credentialGuid",
+        label: "testLabel",
+        type: ChallengeType.QUESTION,
+      },
+    ],
+  },
 };
 
 export const memberStatusData = {

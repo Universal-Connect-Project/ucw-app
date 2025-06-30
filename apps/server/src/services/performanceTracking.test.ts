@@ -11,6 +11,22 @@ import { ComboJobTypes } from "@repo/utils";
 import { mockAccessToken } from "../test/testData/auth0";
 import * as logger from "../infra/logger";
 import setupPerformanceHandlers from "../shared/test/setupPerformanceHandlers";
+import {
+  createPerformanceObject,
+  setPausedByMfa,
+} from "../aggregatorPerformanceMeasuring/utils";
+import waitForLocalPerformanceObjectCheck from "../test/waitForLocalPerformanceObjectCheck";
+import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
+
+async function setupLocalPerformanceObject(sessionId: string) {
+  createPerformanceObject({
+    userId: "resolvedUserId",
+    connectionId: "MBR-12345",
+    performanceSessionId: sessionId,
+    aggregatorId: MX_AGGREGATOR_STRING,
+  });
+  await waitForLocalPerformanceObjectCheck(sessionId);
+}
 
 describe("performanceTracking", () => {
   it("calls connectionStart with correct payload and headers", async () => {
@@ -42,10 +58,15 @@ describe("performanceTracking", () => {
     );
   });
 
-  it("calls connectionSuccess with correct method and headers", async () => {
+  it("calls connectionSuccess with correct method and headers and cleans up local performance object", async () => {
+    await setupLocalPerformanceObject("conn2");
+
     const requestLog = setupPerformanceHandlers(["connectionSuccess"]);
 
     await recordSuccessEvent("conn2");
+
+    const emptyObject = {};
+    await waitForLocalPerformanceObjectCheck("conn2", emptyObject);
 
     expect(requestLog.length).toBe(1);
     const req = requestLog[0];
@@ -61,10 +82,15 @@ describe("performanceTracking", () => {
     );
   });
 
-  it("calls connectionPause with correct method and headers", async () => {
+  it("calls connectionPause with correct method and headers, and updates pause on local performance object", async () => {
+    await setupLocalPerformanceObject("conn3");
+
     const requestLog = setupPerformanceHandlers(["connectionPause"]);
 
     await recordConnectionPauseEvent("conn3");
+
+    await waitForLocalPerformanceObjectCheck("conn3", { pausedByMfa: true });
+
     expect(requestLog.length).toBe(1);
     const req = requestLog[0];
     expect(req).toEqual(
@@ -79,10 +105,17 @@ describe("performanceTracking", () => {
     );
   });
 
-  it("calls connectionResume with correct method and headers", async () => {
+  it("calls connectionResume with correct method and headers, and unpauses local performance object", async () => {
+    await setupLocalPerformanceObject("conn4");
+    await setPausedByMfa("conn4", true);
+    await waitForLocalPerformanceObjectCheck("conn4", { pausedByMfa: true });
+
     const requestLog = setupPerformanceHandlers(["connectionResume"]);
 
     await recordConnectionResumeEvent("conn4");
+
+    await waitForLocalPerformanceObjectCheck("conn4", { pausedByMfa: false });
+
     expect(requestLog.length).toBe(1);
     const req = requestLog[0];
     expect(req).toEqual(

@@ -11,7 +11,6 @@ import {
   READ_MEMBER_STATUS_PATH,
 } from "@repo/utils-dev-dependency/mx/handlers";
 import { http, HttpResponse } from "msw";
-import { clearRedisMock } from "../__mocks__/redis";
 import { ConnectionStatus } from "@repo/utils";
 import config, { getConfig } from "../config";
 
@@ -25,8 +24,6 @@ describe("Performance Resilience", () => {
   };
 
   beforeEach(() => {
-    clearRedisMock();
-    jest.useRealTimers();
     jest.restoreAllMocks();
   });
 
@@ -34,7 +31,7 @@ describe("Performance Resilience", () => {
     await createPerformanceObject(basePerformanceObjectParams);
 
     const performanceObject = await getPerformanceObject(
-      basePerformanceObjectParams.connectionId,
+      basePerformanceObjectParams.performanceSessionId,
     );
 
     expect(performanceObject).toEqual({
@@ -48,16 +45,18 @@ describe("Performance Resilience", () => {
     await createPerformanceObject(basePerformanceObjectParams);
 
     const initialPerformanceObject = await getPerformanceObject(
-      basePerformanceObjectParams.connectionId,
+      basePerformanceObjectParams.performanceSessionId,
     );
 
     jest.useFakeTimers();
     jest.setSystemTime(Date.now() + 6000);
 
-    await setLastUiUpdateTimestamp(basePerformanceObjectParams.connectionId);
+    await setLastUiUpdateTimestamp(
+      basePerformanceObjectParams.performanceSessionId,
+    );
 
     const updatedPerformanceObject = await getPerformanceObject(
-      basePerformanceObjectParams.connectionId,
+      basePerformanceObjectParams.performanceSessionId,
     );
 
     expect(
@@ -66,20 +65,29 @@ describe("Performance Resilience", () => {
     ).toBeGreaterThan(5000);
   });
 
-  it("should set paused by MFA", async () => {
+  it("should set paused by MFA and update the last UI update timestamp", async () => {
     await createPerformanceObject(basePerformanceObjectParams);
     const initialPerformanceObject = await getPerformanceObject(
-      basePerformanceObjectParams.connectionId,
+      basePerformanceObjectParams.performanceSessionId,
     );
     expect(initialPerformanceObject.pausedByMfa).toBe(false);
 
-    await setPausedByMfa(basePerformanceObjectParams.connectionId, true);
+    jest.useFakeTimers();
+    jest.setSystemTime(Date.now() + 1000);
+
+    await setPausedByMfa(
+      basePerformanceObjectParams.performanceSessionId,
+      true,
+    );
 
     const performanceObject = await getPerformanceObject(
-      basePerformanceObjectParams.connectionId,
+      basePerformanceObjectParams.performanceSessionId,
     );
 
     expect(performanceObject.pausedByMfa).toBe(true);
+    expect(performanceObject.lastUiUpdateTimestamp).toBeGreaterThan(
+      initialPerformanceObject.lastUiUpdateTimestamp,
+    );
   });
 
   describe("pollConnectionStatusIfNeeded", () => {
@@ -110,11 +118,11 @@ describe("Performance Resilience", () => {
       jest.setSystemTime(Date.now() + 8000);
 
       await pollConnectionStatusIfNeeded(
-        basePerformanceObjectParams.connectionId,
+        basePerformanceObjectParams.performanceSessionId,
       );
 
       const cleanedUpObject = await getPerformanceObject(
-        basePerformanceObjectParams.connectionId,
+        basePerformanceObjectParams.performanceSessionId,
       );
       expect(performanceSuccessReceived).toBeTruthy();
       expect(cleanedUpObject).toEqual({});
@@ -146,15 +154,15 @@ describe("Performance Resilience", () => {
       jest.setSystemTime(Date.now() + 8000);
 
       await pollConnectionStatusIfNeeded(
-        basePerformanceObjectParams.connectionId,
+        basePerformanceObjectParams.performanceSessionId,
       );
 
       const undeletedObject = await getPerformanceObject(
-        basePerformanceObjectParams.connectionId,
+        basePerformanceObjectParams.performanceSessionId,
       );
       expect(performanceSuccessReceived).toBeFalsy();
-      expect(undeletedObject.connectionId).toBe(
-        basePerformanceObjectParams.connectionId,
+      expect(undeletedObject.performanceSessionId).toBe(
+        basePerformanceObjectParams.performanceSessionId,
       );
     });
 
@@ -176,11 +184,11 @@ describe("Performance Resilience", () => {
       jest.setSystemTime(Date.now() + 1000); // Only 1s later
 
       await pollConnectionStatusIfNeeded(
-        basePerformanceObjectParams.connectionId,
+        basePerformanceObjectParams.performanceSessionId,
       );
 
       const performanceObject = await getPerformanceObject(
-        basePerformanceObjectParams.connectionId,
+        basePerformanceObjectParams.performanceSessionId,
       );
       expect(performanceObject).toBeDefined();
       expect(performanceSuccessReceived).toBeFalsy();
@@ -199,18 +207,23 @@ describe("Performance Resilience", () => {
       );
 
       await createPerformanceObject(basePerformanceObjectParams);
-      await setPausedByMfa(basePerformanceObjectParams.connectionId, true);
-      await getPerformanceObject(basePerformanceObjectParams.connectionId);
+      await setPausedByMfa(
+        basePerformanceObjectParams.performanceSessionId,
+        true,
+      );
+      await getPerformanceObject(
+        basePerformanceObjectParams.performanceSessionId,
+      );
 
       jest.useFakeTimers();
       jest.setSystemTime(Date.now() + 8000);
 
       await pollConnectionStatusIfNeeded(
-        basePerformanceObjectParams.connectionId,
+        basePerformanceObjectParams.performanceSessionId,
       );
 
       const performanceObject = await getPerformanceObject(
-        basePerformanceObjectParams.connectionId,
+        basePerformanceObjectParams.performanceSessionId,
       );
       expect(performanceObject).toBeDefined();
       expect(performanceSuccessReceived).toBeFalsy();
@@ -250,13 +263,13 @@ describe("Performance Resilience", () => {
         jest.setSystemTime(Date.now() + 8000);
 
         await pollConnectionStatusIfNeeded(
-          basePerformanceObjectParams.connectionId,
+          basePerformanceObjectParams.performanceSessionId,
         );
 
         expect(performanceSuccessReceived).toBeFalsy();
 
         const cleanedUpObject = await getPerformanceObject(
-          basePerformanceObjectParams.connectionId,
+          basePerformanceObjectParams.performanceSessionId,
         );
         expect(cleanedUpObject).toEqual({});
       });
