@@ -368,6 +368,38 @@ describe("elasticSearchClient", () => {
       expect(results).toEqual([elasticSearchInstitutionData]);
     });
 
+    it("makes expected ES call when aggregatorOverride is present", async () => {
+      ElasticSearchMock.add(
+        {
+          method: ["GET", "POST"],
+          path: ["/_search", "/institutions/_search"],
+          body: {
+            query: searchQuery(),
+            ...pageProps,
+          },
+        },
+        () => {
+          return {
+            hits: {
+              hits: [
+                {
+                  _source: elasticSearchInstitutionData,
+                },
+              ],
+            },
+          };
+        },
+      );
+
+      const results = await search({
+        ...pageProps,
+        searchTerm: "MX Bank",
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        aggregatorOverride: MX_AGGREGATOR_STRING,
+      });
+      expect(results).toEqual([elasticSearchInstitutionData]);
+    });
+
     it("excludes test banks in ES search when ENV is prod", async () => {
       config.ENV = "prod";
       ElasticSearchMock.add(
@@ -687,6 +719,54 @@ describe("elasticSearchClient", () => {
       });
 
       expect(recommendedInstitutions).toEqual([]);
+    });
+    it("returns institutions with aggregatorOverride", async () => {
+      const recommendedInstitutionId = "test";
+
+      jest.spyOn(preferences, "getPreferences").mockResolvedValue({
+        ...testPreferences,
+        supportedAggregators: [MX_AGGREGATOR_STRING],
+        recommendedInstitutions: [recommendedInstitutionId],
+      });
+
+      ElasticSearchMock.clearAll();
+
+      ElasticSearchMock.add(
+        {
+          method: "POST",
+          path: "/_mget",
+          body: {
+            docs: [
+              {
+                _index: "institutions",
+                _id: recommendedInstitutionId,
+              },
+            ],
+          },
+        },
+        () => {
+          return {
+            docs: [
+              {
+                _source: {
+                  ...elasticSearchInstitutionData,
+                  [MX_AGGREGATOR_STRING]: {
+                    id: "test",
+                    supports_aggregation: true,
+                  },
+                },
+              },
+            ],
+          };
+        },
+      );
+
+      const recommendedInstitutions = await getRecommendedInstitutions({
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        aggregatorOverride: MX_AGGREGATOR_STRING,
+      });
+
+      expect(recommendedInstitutions).toEqual([elasticSearchInstitutionData]);
     });
 
     it("filters out test institutions if ENV is 'prod'", async () => {
