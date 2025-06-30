@@ -15,6 +15,7 @@ export interface Context {
   oauth_referral_source?: string;
   scheme?: string;
   performanceSessionId?: string;
+  aggregatorOverride?: string;
 }
 
 export enum ConnectionStatus {
