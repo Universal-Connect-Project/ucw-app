@@ -26,7 +26,7 @@ import {
   memberData,
   memberStatusData,
 } from "@repo/utils-dev-dependency/mx/testData";
-import waitForLocalPerformanceObjectCheck from "../test/waitForLocalPerformanceObjectCheck";
+import expectPerformanceObject from "../test/expectPerformanceObject";
 const {
   connectionByIdMemberData,
   memberStatusData: mxMemberStatusData,
@@ -301,7 +301,7 @@ describe("connectApi", () => {
       });
       await setPausedByMfa(performanceSessionId, true);
 
-      await waitForLocalPerformanceObjectCheck(performanceSessionId, {
+      await expectPerformanceObject(performanceSessionId, {
         pausedByMfa: true,
       });
 
@@ -320,7 +320,7 @@ describe("connectApi", () => {
 
       await customApi.updateMember(answerMfaMemberData);
 
-      await waitForLocalPerformanceObjectCheck(performanceSessionId, {
+      await expectPerformanceObject(performanceSessionId, {
         pausedByMfa: false,
       });
 
@@ -340,7 +340,7 @@ describe("connectApi", () => {
       });
       await setPausedByMfa(performanceSessionId, true);
 
-      let performanceObject = await waitForLocalPerformanceObjectCheck(
+      let performanceObject = await expectPerformanceObject(
         performanceSessionId,
         {
           pausedByMfa: true,
@@ -363,12 +363,9 @@ describe("connectApi", () => {
         guid: "testGuid1",
       });
 
-      performanceObject = await waitForLocalPerformanceObjectCheck(
-        performanceSessionId,
-        {
-          pausedByMfa: true,
-        },
-      );
+      performanceObject = await expectPerformanceObject(performanceSessionId, {
+        pausedByMfa: true,
+      });
 
       expect(performanceObject.lastUiUpdateTimestamp).toBe(
         timeStampBeforeUpdate,
@@ -455,7 +452,7 @@ describe("connectApi", () => {
 
       await connectApi.loadMemberByGuid("testGuid");
 
-      const performanceObject = await waitForLocalPerformanceObjectCheck(
+      const performanceObject = await expectPerformanceObject(
         performanceSessionId,
         {
           pausedByMfa: true,
@@ -558,8 +555,7 @@ describe("performanceResilience life cycle through ConnectApi", () => {
     // Create a member
     await connectApi.addMember(memberCreateData);
 
-    let performanceObject =
-      await waitForLocalPerformanceObjectCheck(performanceSessionId);
+    let performanceObject = await expectPerformanceObject(performanceSessionId);
     latestUiUpdateTimestamp = performanceObject.lastUiUpdateTimestamp;
 
     // Initiate MFA challenge
@@ -583,24 +579,18 @@ describe("performanceResilience life cycle through ConnectApi", () => {
 
     await connectApi.loadMemberByGuid("testGuid");
 
-    performanceObject = await waitForLocalPerformanceObjectCheck(
-      performanceSessionId,
-      {
-        pausedByMfa: true,
-      },
-    );
+    performanceObject = await expectPerformanceObject(performanceSessionId, {
+      pausedByMfa: true,
+    });
 
     expectUpdatedUiTimestamp(performanceObject);
 
     // Answer MFA challenge
     await answerMfaContextConnectApi.updateMember(answerMfaMemberData);
 
-    performanceObject = await waitForLocalPerformanceObjectCheck(
-      performanceSessionId,
-      {
-        pausedByMfa: false,
-      },
-    );
+    performanceObject = await expectPerformanceObject(performanceSessionId, {
+      pausedByMfa: false,
+    });
 
     expectUpdatedUiTimestamp(performanceObject);
 
@@ -613,6 +603,6 @@ describe("performanceResilience life cycle through ConnectApi", () => {
 
     await connectApi.loadMemberByGuid("testGuid");
 
-    await waitForLocalPerformanceObjectCheck(performanceSessionId, {});
+    await expectPerformanceObject(performanceSessionId, {});
   });
 });

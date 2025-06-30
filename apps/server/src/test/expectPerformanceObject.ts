@@ -3,7 +3,7 @@ import type { PerformanceObject } from "../aggregatorPerformanceMeasuring/utils"
 import { getPerformanceObject } from "../aggregatorPerformanceMeasuring/utils";
 import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
 
-export default async function waitForLocalPerformanceObjectCheck(
+export default async function expectPerformanceObject(
   sessionId: string,
   expectedAttributes?: Partial<Record<string, unknown>>,
 ) {
