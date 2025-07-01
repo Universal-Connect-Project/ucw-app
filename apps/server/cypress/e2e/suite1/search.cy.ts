@@ -110,4 +110,44 @@ describe("search", () => {
       cy.findByText(MX_BANK_NAME).should("exist");
     });
   });
+
+  describe("Aggregator override", () => {
+    it("filters recommended institutions by aggregatorOverride", () => {
+      visitAgg();
+
+      const institutionThatIsInFavoriteAndSupportsAll = MX_BANK_NAME;
+
+      cy.visit(
+        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS},${ComboJobTypes.ACCOUNT_NUMBER},${ComboJobTypes.ACCOUNT_OWNER}&userId=${crypto.randomUUID()}&aggregatorOverride=mx`,
+      );
+
+      cy.findByText(institutionThatIsInFavoriteAndSupportsAll).should("exist");
+    });
+
+    it("searches for a sophtron only institution when aggregatorOverride is mx", () => {
+      visitAgg();
+
+      cy.visit(
+        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${crypto.randomUUID()}&aggregatorOverride=mx`,
+      );
+
+      searchByText(SOPHTRON_BANK_NAME);
+      cy.findByText(SOPHTRON_BANK_NAME, {
+        timeout: 45000,
+      }).should("not.exist");
+    });
+
+    it("searches for a mx only institution when aggregatorOverride is mx", () => {
+      visitAgg();
+
+      cy.visit(
+        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${crypto.randomUUID()}&aggregatorOverride=mx`,
+      );
+
+      searchByText(MX_BANK_NAME);
+      cy.findByText(MX_BANK_NAME, {
+        timeout: 45000,
+      }).should("exist");
+    });
+  });
 });
