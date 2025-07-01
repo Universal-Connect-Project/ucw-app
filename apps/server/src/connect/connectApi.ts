@@ -3,7 +3,11 @@ import type { Challenge, Connection } from "@repo/utils";
 import { ChallengeType, ConnectionStatus } from "@repo/utils";
 
 import { AggregatorAdapterBase } from "../adapters";
-import type { Member, MemberResponse } from "../shared/connect/contract";
+import type {
+  Member,
+  MemberResponse,
+  Credential,
+} from "../shared/connect/contract";
 import {
   recordConnectionPauseEvent,
   recordConnectionResumeEvent,
@@ -11,6 +15,10 @@ import {
   recordSuccessEvent,
 } from "../services/performanceTracking";
 import { getAggregatorIdFromTestAggregatorId } from "../adapterIndex";
+import {
+  createPerformanceObject,
+  setLastUiUpdateTimestamp,
+} from "../aggregatorPerformanceMeasuring/utils";
 
 function mapConnection(connection: Connection): Member {
   const userId = connection.userId;
@@ -104,6 +112,47 @@ function mapConnection(connection: Connection): Member {
   } as any;
 }
 
+function mapCredentialToChallenge(
+  credential: Credential,
+  mfaCredentials: Credential[],
+): Challenge {
+  const challenge = mfaCredentials.find((m) => m.guid === credential.guid);
+  let type: number;
+  let response = credential.value;
+
+  if (challenge) {
+    switch (challenge.type) {
+      case 0:
+        type = ChallengeType.QUESTION;
+        break;
+      case 13:
+        type = ChallengeType.IMAGE;
+        break;
+      case 2:
+        type = credential.value ? ChallengeType.OPTIONS : ChallengeType.TOKEN;
+        if (credential.value) {
+          response = challenge.options.find(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (option: any) => option.guid === credential.value,
+          )?.value;
+          if (!response) {
+            logger.error(
+              `Unexpected challenge option: ${credential.value}: `,
+              challenge,
+            );
+          }
+        }
+        break;
+    }
+  }
+
+  return {
+    id: credential.guid,
+    type,
+    response,
+  };
+}
+
 export class ConnectApi extends AggregatorAdapterBase {
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor, @typescript-eslint/no-explicit-any
   constructor(req: any) {
@@ -152,51 +201,30 @@ export class ConnectApi extends AggregatorAdapterBase {
       startEvent.then(() => recordConnectionPauseEvent(performanceSessionId));
     }
 
+    if (!isRefreshConnection) {
+      createPerformanceObject({
+        userId: this.getUserId(),
+        connectionId: connection.id,
+        performanceSessionId,
+        aggregatorId,
+      });
+    }
+
     return { member: mapConnection(connection) };
   }
 
   async updateMember(member: Member): Promise<Member> {
     if (this.context.current_job_id && member.credentials !== undefined) {
       recordConnectionResumeEvent(this.context.performanceSessionId);
-      await this.answerChallenge(
-        member.guid,
-        member.credentials.map((c) => {
-          const ret: Challenge = {
-            id: c.guid,
-            type: c.field_type,
-            response: c.value,
-          };
-          const challenge = member.mfa?.credentials.find(
-            (m) => m.guid === c.guid,
-          ); // widget posts everything back
-          switch (challenge?.type) {
-            case 0:
-              ret.type = ChallengeType.QUESTION;
-              break;
-            case 13:
-              ret.type = ChallengeType.IMAGE;
-              break;
-            case 2:
-              ret.type = c.value ? ChallengeType.OPTIONS : ChallengeType.TOKEN;
-              if (c.value) {
-                ret.response = challenge?.options.find(
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  (o: any) => o.guid === c.value,
-                )?.value;
-                if (!ret.response) {
-                  logger.error(
-                    `Unexpected challege option: ${c.value}: `,
-                    challenge,
-                  );
-                }
-              }
-              break;
-          }
-          return ret;
-        }),
+
+      const challenges = member.credentials.map((credential) =>
+        mapCredentialToChallenge(credential, member.mfa?.credentials ?? []),
       );
+
+      await this.answerChallenge(member.guid, challenges);
       return member;
     } else {
+      setLastUiUpdateTimestamp(this.context.performanceSessionId);
       const connection = await this.updateConnection({
         jobTypes: this.context.jobTypes,
         id: member.guid,
@@ -219,6 +247,8 @@ export class ConnectApi extends AggregatorAdapterBase {
 
   async loadMemberByGuid(memberGuid: string): Promise<Member> {
     const member = await this.getConnectionStatus(memberGuid);
+    setLastUiUpdateTimestamp(this.context.performanceSessionId);
+
     if (member?.challenges?.length > 0) {
       recordConnectionPauseEvent(this.context.performanceSessionId);
     }

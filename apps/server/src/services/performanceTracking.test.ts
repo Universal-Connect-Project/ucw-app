@@ -11,14 +11,31 @@ import { ComboJobTypes } from "@repo/utils";
 import { mockAccessToken } from "../test/testData/auth0";
 import * as logger from "../infra/logger";
 import setupPerformanceHandlers from "../shared/test/setupPerformanceHandlers";
+import {
+  createPerformanceObject,
+  setPausedByMfa,
+} from "../aggregatorPerformanceMeasuring/utils";
+import expectPerformanceObject from "../test/expectPerformanceObject";
+import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
+
+async function setupLocalPerformanceObject(sessionId: string) {
+  createPerformanceObject({
+    userId: "resolvedUserId",
+    connectionId: "MBR-12345",
+    performanceSessionId: sessionId,
+    aggregatorId: MX_AGGREGATOR_STRING,
+  });
+  await expectPerformanceObject(sessionId);
+}
 
 describe("performanceTracking", () => {
   it("calls connectionStart with correct payload and headers", async () => {
+    const connectionId = "conn1";
     const requestLog = setupPerformanceHandlers(["connectionStart"]);
 
     await recordStartEvent({
       aggregatorId: "agg1",
-      connectionId: "conn1",
+      connectionId: connectionId,
       institutionId: "inst1",
       jobTypes: [ComboJobTypes.TRANSACTIONS],
     });
@@ -28,7 +45,7 @@ describe("performanceTracking", () => {
       expect.objectContaining({
         method: "POST",
         eventType: "connectionStart",
-        connectionId: "conn1",
+        connectionId: connectionId,
         body: {
           aggregatorId: "agg1",
           institutionId: "inst1",
@@ -42,10 +59,16 @@ describe("performanceTracking", () => {
     );
   });
 
-  it("calls connectionSuccess with correct method and headers", async () => {
+  it("calls connectionSuccess with correct method and headers and cleans up local performance object", async () => {
+    const connectionId = "conn2";
+    await setupLocalPerformanceObject(connectionId);
+
     const requestLog = setupPerformanceHandlers(["connectionSuccess"]);
 
-    await recordSuccessEvent("conn2");
+    await recordSuccessEvent(connectionId);
+
+    const emptyObject = {};
+    await expectPerformanceObject(connectionId, emptyObject);
 
     expect(requestLog.length).toBe(1);
     const req = requestLog[0];
@@ -53,7 +76,7 @@ describe("performanceTracking", () => {
       expect.objectContaining({
         method: "PUT",
         eventType: "connectionSuccess",
-        connectionId: "conn2",
+        connectionId: connectionId,
         headers: expect.objectContaining({
           authorization: `Bearer ${mockAccessToken}`,
         }),
@@ -61,17 +84,25 @@ describe("performanceTracking", () => {
     );
   });
 
-  it("calls connectionPause with correct method and headers", async () => {
+  it("calls connectionPause with correct method and headers, and updates pause on local performance object", async () => {
+    const connectionId = "conn3";
+    await setupLocalPerformanceObject(connectionId);
+
     const requestLog = setupPerformanceHandlers(["connectionPause"]);
 
-    await recordConnectionPauseEvent("conn3");
+    await recordConnectionPauseEvent(connectionId);
+
+    await expectPerformanceObject(connectionId, {
+      pausedByMfa: true,
+    });
+
     expect(requestLog.length).toBe(1);
     const req = requestLog[0];
     expect(req).toEqual(
       expect.objectContaining({
         method: "PUT",
         eventType: "connectionPause",
-        connectionId: "conn3",
+        connectionId: connectionId,
         headers: expect.objectContaining({
           authorization: `Bearer ${mockAccessToken}`,
         }),
@@ -79,17 +110,29 @@ describe("performanceTracking", () => {
     );
   });
 
-  it("calls connectionResume with correct method and headers", async () => {
+  it("calls connectionResume with correct method and headers, and unpauses local performance object", async () => {
+    const connectionId = "conn4";
+    await setupLocalPerformanceObject(connectionId);
+    await setPausedByMfa(connectionId, true);
+    await expectPerformanceObject(connectionId, {
+      pausedByMfa: true,
+    });
+
     const requestLog = setupPerformanceHandlers(["connectionResume"]);
 
-    await recordConnectionResumeEvent("conn4");
+    await recordConnectionResumeEvent(connectionId);
+
+    await expectPerformanceObject(connectionId, {
+      pausedByMfa: false,
+    });
+
     expect(requestLog.length).toBe(1);
     const req = requestLog[0];
     expect(req).toEqual(
       expect.objectContaining({
         method: "PUT",
         eventType: "connectionResume",
-        connectionId: "conn4",
+        connectionId: connectionId,
         headers: expect.objectContaining({
           authorization: `Bearer ${mockAccessToken}`,
         }),

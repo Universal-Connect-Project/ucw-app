@@ -4,7 +4,7 @@ import { AggregatorAdapterBase } from "../adapters";
 import { del, get, set } from "../services/storageClient/redis";
 import { recordSuccessEvent } from "../services/performanceTracking";
 
-interface PerformanceObject {
+export interface PerformanceObject {
   userId?: string;
   connectionId?: string;
   performanceSessionId?: string;
@@ -15,38 +15,41 @@ interface PerformanceObject {
 
 const PERFORMANCE_REDIS_SUBDIRECTORY = "performance";
 
-const performanceRedisKey = (connectionId: string): string => {
-  return `${PERFORMANCE_REDIS_SUBDIRECTORY}:${connectionId}`;
+const performanceRedisKey = (performanceSessionId: string): string => {
+  return `${PERFORMANCE_REDIS_SUBDIRECTORY}:${performanceSessionId}`;
 };
 
 export const getPerformanceObject = async (
-  connectionId: string,
+  performanceSessionId: string,
 ): Promise<PerformanceObject> => {
-  return (await get(performanceRedisKey(connectionId))) || {};
+  return (await get(performanceRedisKey(performanceSessionId))) || {};
 };
 
 const updatePerformanceObject = async (
-  connectionId: string,
+  performanceSessionId: string,
   update: Partial<PerformanceObject>,
 ): Promise<void> => {
-  const performanceObject = await getPerformanceObject(connectionId);
-  Object.assign(performanceObject, update);
-  await set(performanceRedisKey(connectionId), performanceObject);
+  const performanceObject = await getPerformanceObject(performanceSessionId);
+  Object.assign(performanceObject, {
+    ...update,
+    lastUiUpdateTimestamp: Date.now(),
+  });
+  await set(performanceRedisKey(performanceSessionId), performanceObject);
 };
 
 export const setLastUiUpdateTimestamp = async (
-  connectionId: string,
+  performanceSessionId: string,
 ): Promise<void> => {
-  await updatePerformanceObject(connectionId, {
+  await updatePerformanceObject(performanceSessionId, {
     lastUiUpdateTimestamp: Date.now(),
   });
 };
 
 export const setPausedByMfa = async (
-  connectionId: string,
+  performanceSessionId: string,
   paused: boolean,
 ): Promise<void> => {
-  await updatePerformanceObject(connectionId, {
+  await updatePerformanceObject(performanceSessionId, {
     pausedByMfa: paused,
   });
 };
@@ -62,26 +65,30 @@ export const createPerformanceObject = async ({
   performanceSessionId: string;
   aggregatorId: string;
 }): Promise<void> => {
-  await set(performanceRedisKey(connectionId), {
-    userId,
-    connectionId,
-    performanceSessionId,
-    aggregatorId,
-    lastUiUpdateTimestamp: Date.now(),
-    pausedByMfa: false,
-  });
+  await set(
+    performanceRedisKey(performanceSessionId),
+    {
+      userId,
+      connectionId,
+      performanceSessionId,
+      aggregatorId,
+      lastUiUpdateTimestamp: Date.now(),
+      pausedByMfa: false,
+    },
+    { EX: 1200 }, // Set expiration time to 20 minutes
+  );
 };
 
-const cleanupPerformanceObject = async (
-  connectionId: string,
+export const cleanupPerformanceObject = async (
+  performanceSessionId: string,
 ): Promise<void> => {
-  await del(performanceRedisKey(connectionId));
+  await del(performanceRedisKey(performanceSessionId));
 };
 
 const getAggregatorConnectionStatus = async (
-  connectionId: string,
+  performanceSessionId: string,
 ): Promise<Connection> => {
-  const performanceObject = await getPerformanceObject(connectionId);
+  const performanceObject = await getPerformanceObject(performanceSessionId);
   const aggregatorAdapter = new AggregatorAdapterBase({
     context: {
       aggregator: performanceObject.aggregatorId,
@@ -90,8 +97,9 @@ const getAggregatorConnectionStatus = async (
   });
   await aggregatorAdapter.init();
   const connectionStatus =
-    await aggregatorAdapter.getConnectionStatus(connectionId);
-  const connection = await aggregatorAdapter.getConnection(connectionId);
+    await aggregatorAdapter.getConnectionStatus(performanceSessionId);
+  const connection =
+    await aggregatorAdapter.getConnection(performanceSessionId);
   return {
     ...connection,
     status: connectionStatus.status,
@@ -99,10 +107,10 @@ const getAggregatorConnectionStatus = async (
 };
 
 export const pollConnectionStatusIfNeeded = async (
-  connectionId: string,
+  performanceSessionId: string,
 ): Promise<void> => {
-  const { lastUiUpdateTimestamp, pausedByMfa, performanceSessionId } =
-    await getPerformanceObject(connectionId);
+  const { lastUiUpdateTimestamp, pausedByMfa } =
+    await getPerformanceObject(performanceSessionId);
   if (
     pausedByMfa ||
     (lastUiUpdateTimestamp && Date.now() - lastUiUpdateTimestamp < 1000 * 7) // 7 seconds
@@ -111,14 +119,15 @@ export const pollConnectionStatusIfNeeded = async (
     return;
   }
 
-  const connectionStatus = await getAggregatorConnectionStatus(connectionId);
+  const connectionStatus =
+    await getAggregatorConnectionStatus(performanceSessionId);
   if (
     connectionStatus.status === ConnectionStatus.CONNECTED &&
     !connectionStatus.is_being_aggregated &&
     !connectionStatus.is_oauth
   ) {
     await recordSuccessEvent(performanceSessionId);
-    cleanupPerformanceObject(connectionId);
+    cleanupPerformanceObject(performanceSessionId);
   } else if (
     connectionStatus.status === ConnectionStatus.IMPEDED ||
     connectionStatus.status === ConnectionStatus.DEGRADED ||
@@ -127,6 +136,6 @@ export const pollConnectionStatusIfNeeded = async (
     connectionStatus.status === ConnectionStatus.CLOSED ||
     connectionStatus.status === ConnectionStatus.FAILED
   ) {
-    cleanupPerformanceObject(connectionId);
+    cleanupPerformanceObject(performanceSessionId);
   }
 };
