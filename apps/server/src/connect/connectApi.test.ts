@@ -331,19 +331,18 @@ describe("connectApi", () => {
       });
     });
 
-    it("updates member without challenges and does not pause performance object", async () => {
+    it("updates member without challenges and does not pause performance object, updates lastUiUpdateTimestamp", async () => {
       await createPerformanceObject({
         userId: resolvedUserId,
         connectionId: "testGuid",
         performanceSessionId,
         aggregatorId: MX_AGGREGATOR_STRING,
       });
-      await setPausedByMfa(performanceSessionId, true);
 
       let performanceObject = await expectPerformanceObject(
         performanceSessionId,
         {
-          pausedByMfa: true,
+          pausedByMfa: false,
         },
       );
 
@@ -364,10 +363,10 @@ describe("connectApi", () => {
       });
 
       performanceObject = await expectPerformanceObject(performanceSessionId, {
-        pausedByMfa: true,
+        pausedByMfa: false,
       });
 
-      expect(performanceObject.lastUiUpdateTimestamp).toBe(
+      expect(performanceObject.lastUiUpdateTimestamp).toBeGreaterThan(
         timeStampBeforeUpdate,
       );
 
@@ -517,10 +516,20 @@ describe("connectApi", () => {
 });
 
 describe("performanceResilience life cycle through ConnectApi", () => {
-  let testContext: Context;
-  let connectApi: ConnectApi;
+  const testContext = {
+    aggregator: MX_AGGREGATOR_STRING,
+    institutionId: "xxx",
+    resolvedUserId,
+    jobTypes: [ComboJobTypes.TRANSACTIONS],
+    performanceSessionId,
+  } as Context;
+  const connectApi = new ConnectApi({
+    context: testContext,
+  });
   let latestUiUpdateTimestamp: number;
-  let answerMfaContextConnectApi: ConnectApi;
+  const answerMfaContextConnectApi = new ConnectApi({
+    context: { ...testContext, current_job_id: "testJobGuid" },
+  });
 
   function expectUpdatedUiTimestamp(newPerformanceObject: PerformanceObject) {
     expect(latestUiUpdateTimestamp).toBeLessThan(
@@ -529,27 +538,10 @@ describe("performanceResilience life cycle through ConnectApi", () => {
     latestUiUpdateTimestamp = newPerformanceObject.lastUiUpdateTimestamp;
   }
 
-  beforeEach(() => {
-    testContext = {
-      aggregator: MX_AGGREGATOR_STRING,
-      institutionId: "xxx",
-      resolvedUserId,
-      jobTypes: [ComboJobTypes.TRANSACTIONS],
-      performanceSessionId,
-    } as Context;
-
-    connectApi = new ConnectApi({
-      context: testContext,
-    });
-    answerMfaContextConnectApi = new ConnectApi({
-      context: { ...testContext, current_job_id: "testJobGuid" },
-    });
-
+  it("creates, pauses, resumes, completes, deletes a performance object connecting with MFA", async () => {
     answerMfaContextConnectApi.init();
     connectApi.init();
-  });
 
-  it("creates, pauses, resumes, completes, deletes a performance object connecting with MFA", async () => {
     jest.spyOn(crypto, "randomUUID").mockReturnValueOnce(performanceSessionId);
 
     // Create a member

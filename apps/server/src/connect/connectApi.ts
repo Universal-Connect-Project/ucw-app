@@ -224,6 +224,7 @@ export class ConnectApi extends AggregatorAdapterBase {
       await this.answerChallenge(member.guid, challenges);
       return member;
     } else {
+      setLastUiUpdateTimestamp(this.context.performanceSessionId);
       const connection = await this.updateConnection({
         jobTypes: this.context.jobTypes,
         id: member.guid,
