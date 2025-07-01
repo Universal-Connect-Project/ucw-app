@@ -29,6 +29,18 @@ const handlers = [
     `${config.PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionSuccess`,
     () => HttpResponse.json({}),
   ),
+  http.put(
+    `${config.PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionPause`,
+    () => HttpResponse.json({}),
+  ),
+  http.put(
+    `${config.PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionResume`,
+    () => HttpResponse.json({}),
+  ),
+  http.post(
+    `${config.PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionStart`,
+    () => HttpResponse.json({}),
+  ),
 ];
 
 export default handlers;

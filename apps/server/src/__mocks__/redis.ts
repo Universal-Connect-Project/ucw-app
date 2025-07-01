@@ -2,6 +2,7 @@ import { PREFERENCES_REDIS_KEY } from "../services/storageClient/constants";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let storageObject: Record<string, any> = {};
+let expiryObject: Record<string, number> = {}; // Store expiry timestamps
 
 export const clearRedisMock = () => {
   if (storageObject?.[PREFERENCES_REDIS_KEY]) {
@@ -11,6 +12,7 @@ export const clearRedisMock = () => {
   } else {
     storageObject = {};
   }
+  expiryObject = {};
 };
 
 export const sAdd = jest.fn((key: string, values: string[]) => {
@@ -18,6 +20,7 @@ export const sAdd = jest.fn((key: string, values: string[]) => {
 });
 export const del = jest.fn((key: string) => {
   delete storageObject[key];
+  delete expiryObject[key];
 });
 
 export const sMembers = jest.fn((key: string) => {
@@ -25,13 +28,26 @@ export const sMembers = jest.fn((key: string) => {
 });
 
 export const get = jest.fn((key: string) => {
+  const now = Date.now();
+  const expiry = expiryObject[key];
+  if (expiry && now > expiry) {
+    delete storageObject[key];
+    delete expiryObject[key];
+    return undefined;
+  }
   return storageObject[key];
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const set = jest.fn((key: string, value: any) => {
-  storageObject[key] = value;
-});
+export const set = jest.fn(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (key: string, value: any, options?: { EX?: number }) => {
+    storageObject[key] = value;
+    if (options && typeof options.EX === "number") {
+      expiryObject[key] = Date.now() + options.EX * 1000;
+    }
+  },
+);
 
 export const createClient = () => ({
   connect: async () => {
