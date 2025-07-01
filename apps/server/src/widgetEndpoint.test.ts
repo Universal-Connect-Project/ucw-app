@@ -188,6 +188,29 @@ describe("server", () => {
         );
       });
 
+      it("responds with a 400 if aggregatorOverride is invalid", () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn(),
+        } as unknown as Response;
+
+        widgetHandler(
+          {
+            query: {
+              jobTypes: ComboJobTypes.TRANSACTIONS,
+              aggregatorOverride: "junk",
+              userId: "testUserId",
+            },
+          } as unknown as Request,
+          res,
+        );
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith(
+          "&#x22;aggregatorOverride&#x22; must be one of [akoya, akoya_sandbox, finicity, finicity_sandbox, mx, mx_int, sophtron]",
+        );
+      });
+
       it("responds with a 400 if singleAccountSelect isn't a bool", () => {
         const res = {
           send: jest.fn(),
