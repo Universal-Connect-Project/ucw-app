@@ -207,7 +207,7 @@ describe("server", () => {
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith(
-          "&#x22;aggregatorOverride&#x22; must be one of [akoya, akoya_sandbox, finicity, finicity_sandbox, mx, mx_int, sophtron]",
+          "&#x22;aggregatorOverride&#x22; must be one of [akoya, finicity, mx, sophtron]",
         );
       });
 
