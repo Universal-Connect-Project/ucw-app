@@ -65,6 +65,34 @@ describe("instrumentationEndpoints", () => {
       });
     });
 
+    it("attaches aggregatorOverride to the request context if present", async () => {
+      const body = {
+        ...correctBody,
+        aggregatorOverride: "testAggregatorOverride",
+      };
+      const req = {
+        body,
+        params: correctParams,
+        context: {},
+      } as unknown as Request;
+      const res = {
+        sendStatus: jest.fn(),
+      } as unknown as Response;
+
+      await instrumentationHandler(req, res);
+      expect(res.sendStatus).toHaveBeenCalledWith(200);
+      expect(req.context).toEqual({
+        aggregatorOverride: "testAggregatorOverride",
+        aggregator: "testAggregator",
+        connectionId: "currentMemberGuid",
+        jobTypes: req.body.jobTypes,
+        oauth_referral_source: "BROWSER",
+        scheme: "vcs",
+        singleAccountSelect: req.body.singleAccountSelect,
+        userId: req.params.userId,
+      });
+    });
+
     it("attaches properties to the request context and responds with success on success", async () => {
       const req = {
         body: correctBody,

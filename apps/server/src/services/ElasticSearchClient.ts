@@ -165,17 +165,21 @@ export async function search(
     jobTypes,
     searchTerm,
     size,
+    aggregatorOverride,
   }: {
     from: number;
     jobTypes: ComboJobTypes[];
     searchTerm: string;
     size: number;
+    aggregatorOverride?: string;
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any[]> {
   const preferences = await getPreferences();
   const hiddenInstitutions = preferences?.hiddenInstitutions || [];
-  const supportedAggregators = preferences?.supportedAggregators || [];
+  const supportedAggregators = aggregatorOverride
+    ? [aggregatorOverride]
+    : preferences?.supportedAggregators || [];
   const { body }: { body: SearchResponse } = await ElasticsearchClient.search({
     index: "institutions",
     body: {
@@ -316,13 +320,17 @@ export async function getInstitution(id: string): Promise<CachedInstitution> {
 
 export async function getRecommendedInstitutions({
   jobTypes,
+  aggregatorOverride,
 }: {
   jobTypes: ComboJobTypes[];
+  aggregatorOverride?: string;
 }): Promise<CachedInstitution[]> {
   const config = getConfig();
   const preferences = await getPreferences();
 
-  const supportedAggregators = preferences.supportedAggregators;
+  const supportedAggregators = aggregatorOverride
+    ? [aggregatorOverride]
+    : preferences.supportedAggregators;
   const recommendedInstitutions = preferences?.recommendedInstitutions;
 
   if (!recommendedInstitutions?.length) {

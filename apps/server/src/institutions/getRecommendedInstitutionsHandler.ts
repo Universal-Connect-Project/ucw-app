@@ -11,6 +11,7 @@ export const getRecommendedInstitutionsHandler = async (
 
   const recommendedInstitutions = await getRecommendedInstitutions({
     jobTypes: req.context.jobTypes,
+    aggregatorOverride: req.context.aggregatorOverride,
   });
 
   res.send(

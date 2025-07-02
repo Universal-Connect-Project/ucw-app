@@ -59,7 +59,13 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["mx", "mx_int", "sophtron", "finicity", "finicity_sandbox"]
+              "enum": [
+                "mx",
+                "mx_int",
+                "sophtron",
+                "finicity",
+                "finicity_sandbox"
+              ]
             }
           },
           {
@@ -79,6 +85,16 @@
             "required": false,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "description": "This parameter is for internal use only. It is used to determine which aggregator to use for the connection. ",
+            "name": "aggregatorOverride",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["mx", "sophtron", "finicity"]
             }
           }
         ],
@@ -110,7 +126,13 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["mx", "mx_int", "sophtron", "finicity", "finicity_sandbox"]
+              "enum": [
+                "mx",
+                "mx_int",
+                "sophtron",
+                "finicity",
+                "finicity_sandbox"
+              ]
             }
           },
           {
@@ -436,7 +458,13 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["mx", "mx_int", "sophtron", "finicity", "finicity_sandbox"]
+              "enum": [
+                "mx",
+                "mx_int",
+                "sophtron",
+                "finicity",
+                "finicity_sandbox"
+              ]
             }
           },
           {
@@ -666,7 +694,13 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["mx", "mx_int", "sophtron", "finicity", "finicity_sandbox"]
+              "enum": [
+                "mx",
+                "mx_int",
+                "sophtron",
+                "finicity",
+                "finicity_sandbox"
+              ]
             }
           },
           {

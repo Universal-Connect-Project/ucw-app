@@ -50,6 +50,7 @@ interface searchQueryArgs {
   jobTypeQuery?: any[];
   filterTestBanks?: boolean;
   routingNumber?: string;
+  aggregatorOverride?: string;
 }
 
 function searchQuery(args: searchQueryArgs = {}) {
@@ -67,6 +68,7 @@ function searchQuery(args: searchQueryArgs = {}) {
     })),
     filterTestBanks = false,
     routingNumber,
+    aggregatorOverride,
   } = args;
 
   let mainSearchTerm;
@@ -123,7 +125,10 @@ function searchQuery(args: searchQueryArgs = {}) {
       minimum_should_match: 1,
       must: {
         bool: {
-          should: testPreferences.supportedAggregators.map((aggregator) => ({
+          should: (aggregatorOverride
+            ? [aggregatorOverride]
+            : testPreferences.supportedAggregators
+          ).map((aggregator) => ({
             exists: {
               field: `${aggregator}.id`,
             },
@@ -363,6 +368,54 @@ describe("elasticSearchClient", () => {
         ...pageProps,
         searchTerm: "MX Bank",
         jobTypes: [ComboJobTypes.TRANSACTIONS],
+      });
+      expect(results).toEqual([elasticSearchInstitutionData]);
+    });
+
+    it("makes expected ES call when aggregatorOverride is present", async () => {
+      ElasticSearchMock.add(
+        {
+          method: "POST",
+          path: "/institutions/_search",
+          body: {
+            query: searchQuery({
+              jobTypeQuery: [
+                {
+                  bool: {
+                    must: [
+                      {
+                        term: {
+                          [`${MX_AGGREGATOR_STRING}.supports_aggregation`]:
+                            true,
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+              aggregatorOverride: MX_AGGREGATOR_STRING,
+            }),
+            ...pageProps,
+          },
+        },
+        () => {
+          return {
+            hits: {
+              hits: [
+                {
+                  _source: elasticSearchInstitutionData,
+                },
+              ],
+            },
+          };
+        },
+      );
+
+      const results = await search({
+        ...pageProps,
+        searchTerm: "MX Bank",
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        aggregatorOverride: MX_AGGREGATOR_STRING,
       });
 
       expect(results).toEqual([elasticSearchInstitutionData]);
@@ -687,6 +740,62 @@ describe("elasticSearchClient", () => {
       });
 
       expect(recommendedInstitutions).toEqual([]);
+    });
+
+    it("returns institutions with aggregatorOverride", async () => {
+      const recommendedInstitutionId = "test";
+
+      jest.spyOn(preferences, "getPreferences").mockResolvedValue({
+        ...testPreferences,
+        recommendedInstitutions: [recommendedInstitutionId],
+      });
+
+      ElasticSearchMock.clearAll();
+
+      ElasticSearchMock.add(
+        {
+          method: "POST",
+          path: "/_mget",
+          body: {
+            docs: [
+              {
+                _index: "institutions",
+                _id: recommendedInstitutionId,
+              },
+            ],
+          },
+        },
+        () => {
+          return {
+            docs: [
+              {
+                _source: {
+                  ...elasticSearchInstitutionData,
+                  [MX_AGGREGATOR_STRING]: {
+                    id: "test",
+                    supports_aggregation: true,
+                  },
+                },
+              },
+            ],
+          };
+        },
+      );
+
+      const recommendedInstitutions = await getRecommendedInstitutions({
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        aggregatorOverride: MX_AGGREGATOR_STRING,
+      });
+
+      expect(recommendedInstitutions).toEqual([
+        {
+          ...elasticSearchInstitutionData,
+          [MX_AGGREGATOR_STRING]: {
+            id: "test",
+            supports_aggregation: true,
+          },
+        },
+      ]);
     });
 
     it("filters out test institutions if ENV is 'prod'", async () => {
