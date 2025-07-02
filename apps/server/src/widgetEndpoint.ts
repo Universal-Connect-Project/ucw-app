@@ -48,5 +48,6 @@ export const widgetHandler = (req: Request, res: Response) => {
     path.join(__dirname, "../../ui/dist/index.html"),
     "utf8",
   );
+  console.log(nonTestAggregators);
   res.send(html);
 };

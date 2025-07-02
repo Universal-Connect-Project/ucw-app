@@ -10,7 +10,6 @@ export const getSophtronAdapterMapObject = (
 ) => {
   return {
     sophtron: {
-      testAdapterId: "sophtron_sandbox",
       dataAdapter: createDataAdapter(dependencies),
       vcAdapter: createSophtronVC(dependencies),
       createWidgetAdapter: () =>
