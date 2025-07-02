@@ -1,7 +1,7 @@
 import { ComboJobTypes } from "@repo/utils";
 import type { Request, Response } from "express";
 import Joi from "joi";
-import { aggregators } from "./adapterSetup";
+import { aggregators, nonTestAggregators } from "./adapterSetup";
 import fs from "node:fs";
 
 import he from "he";
@@ -27,7 +27,7 @@ export const widgetHandler = (req: Request, res: Response) => {
     singleAccountSelect: Joi.bool(),
     userId: Joi.string().required(),
     token: Joi.string(),
-    aggregatorOverride: Joi.string().valid(...aggregators),
+    aggregatorOverride: Joi.string().valid(...nonTestAggregators),
   })
     .with("aggregator", ["institutionId", "connectionId"])
     .with("connectionId", ["institutionId", "aggregator"]);
@@ -48,6 +48,5 @@ export const widgetHandler = (req: Request, res: Response) => {
     path.join(__dirname, "../../ui/dist/index.html"),
     "utf8",
   );
-
   res.send(html);
 };

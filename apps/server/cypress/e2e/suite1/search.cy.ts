@@ -112,7 +112,7 @@ describe("search", () => {
   });
 
   describe("Aggregator override", () => {
-    it("filters recommended institutions by aggregatorOverride", () => {
+    it("includes institutions that are only supported by MX in the recommended institution list if the aggregatorOverride is MX", () => {
       visitAgg();
 
       const institutionThatIsInFavoriteAndSupportsAll = MX_BANK_NAME;
@@ -122,9 +122,12 @@ describe("search", () => {
       );
 
       cy.findByText(institutionThatIsInFavoriteAndSupportsAll).should("exist");
+      cy.findByText(SOPHTRON_BANK_NAME, {
+        timeout: 45000,
+      }).should("not.exist");
     });
 
-    it("searches for a sophtron only institution when aggregatorOverride is mx", () => {
+    it("does not find institutions that are only supported by other aggregators (sophtron) when aggregatorOverride is set to MX", () => {
       visitAgg();
 
       cy.visit(
@@ -137,7 +140,7 @@ describe("search", () => {
       }).should("not.exist");
     });
 
-    it("searches for a mx only institution when aggregatorOverride is mx", () => {
+    it("finds institutions that are only supported by MX when aggregatorOverride is set to MX", () => {
       visitAgg();
 
       cy.visit(
