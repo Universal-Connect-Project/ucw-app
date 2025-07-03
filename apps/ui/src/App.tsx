@@ -18,6 +18,7 @@ const App = () => {
   const userId = queryParams.get("userId") as string;
   const singleAccountSelect =
     queryParams.get("singleAccountSelect") !== "false";
+  const targetOrigin = queryParams.get("targetOrigin");
 
   const instrumentationProps = {
     userId: userId,
@@ -49,6 +50,7 @@ const App = () => {
       connectionId={connectionId}
       institutionId={institutionId}
       jobTypes={jobTypes}
+      targetOrigin={targetOrigin}
     />
   );
 };

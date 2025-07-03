@@ -27,6 +27,7 @@ export const widgetHandler = (req: Request, res: Response) => {
     singleAccountSelect: Joi.bool(),
     userId: Joi.string().required(),
     token: Joi.string(),
+    targetOrigin: Joi.string(),
   })
     .with("aggregator", ["institutionId", "connectionId"])
     .with("connectionId", ["institutionId", "aggregator"]);
