@@ -5,11 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.8.3]
+## [1.8.4]
 
 ### Added
 
 - added `aggregatorOverride` query parameter to the widget endpoint to allow searching for institutions by aggregator. This is for internal use only and will not be documented in the public API.
+
+## [1.8.3]
+
+### Fixed
+
+- Issue #248 postMessage doesn't have proper target parameter
 
 ## [1.8.2]
 

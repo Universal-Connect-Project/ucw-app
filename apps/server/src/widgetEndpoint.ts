@@ -28,6 +28,7 @@ export const widgetHandler = (req: Request, res: Response) => {
     userId: Joi.string().required(),
     token: Joi.string(),
     aggregatorOverride: Joi.string().valid(...nonTestAggregators),
+    targetOrigin: Joi.string(),
   })
     .with("aggregator", ["institutionId", "connectionId"])
     .with("connectionId", ["institutionId", "aggregator"]);
