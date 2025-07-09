@@ -59,7 +59,13 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["mx", "mx_int", "sophtron", "finicity", "finicity_sandbox"]
+              "enum": [
+                "mx",
+                "mx_int",
+                "sophtron",
+                "finicity",
+                "finicity_sandbox"
+              ]
             }
           },
           {
@@ -75,6 +81,15 @@
           {
             "description": "A one time use token from the token endpoint. If you're using the built in authentication logic, then you'll need this to be able to put the widget in an iframe.",
             "name": "token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The target origin to be used when posting messages to the parent window.",
+            "name": "targetOrigin",
             "in": "query",
             "required": false,
             "schema": {
@@ -110,7 +125,13 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["mx", "mx_int", "sophtron", "finicity", "finicity_sandbox"]
+              "enum": [
+                "mx",
+                "mx_int",
+                "sophtron",
+                "finicity",
+                "finicity_sandbox"
+              ]
             }
           },
           {
@@ -436,7 +457,13 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["mx", "mx_int", "sophtron", "finicity", "finicity_sandbox"]
+              "enum": [
+                "mx",
+                "mx_int",
+                "sophtron",
+                "finicity",
+                "finicity_sandbox"
+              ]
             }
           },
           {
@@ -666,7 +693,13 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["mx", "mx_int", "sophtron", "finicity", "finicity_sandbox"]
+              "enum": [
+                "mx",
+                "mx_int",
+                "sophtron",
+                "finicity",
+                "finicity_sandbox"
+              ]
             }
           },
           {

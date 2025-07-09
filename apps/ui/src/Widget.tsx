@@ -16,7 +16,7 @@ const Widget = ({
   connectionId: string;
   institutionId: string;
   jobTypes: ComboJobTypes[];
-  targetOrigin: string | null | undefined;
+  targetOrigin: string | undefined;
 }) => {
   const disableInstitutionSearch = !!(institutionId || connectionId);
 
@@ -32,7 +32,7 @@ const Widget = ({
     ui_message_version: 4,
     ui_message_webview_url_scheme: "vcs",
     wait_for_full_aggregation: false,
-    target_origin: targetOrigin
+    target_origin: targetOrigin,
   };
 
   const connectWidgetApiService = createConnectWidgetApiService({
@@ -51,13 +51,12 @@ const Widget = ({
             metadata,
             type,
           };
+
           if (window.parent) {
-            /* eslint-disable @typescript-eslint/no-explicit-any */
-            window.parent.postMessage(payload, targetOrigin as any);
+            window.parent.postMessage(payload, { targetOrigin });
           }
           if (window.opener) {
-            /* eslint-disable @typescript-eslint/no-explicit-any */
-            window.opener.postMessage(payload, targetOrigin as any);
+            window.opener.postMessage(payload, { targetOrigin });
           }
         }}
         postMessageEventOverrides={postMessageEventOverrides}
