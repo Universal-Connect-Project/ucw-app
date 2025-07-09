@@ -18,7 +18,7 @@ const App = () => {
   const userId = queryParams.get("userId") as string;
   const singleAccountSelect =
     queryParams.get("singleAccountSelect") !== "false";
-  const targetOrigin = queryParams.get("targetOrigin");
+  const targetOrigin = queryParams.get("targetOrigin") || undefined;
 
   const instrumentationProps = {
     userId: userId,
