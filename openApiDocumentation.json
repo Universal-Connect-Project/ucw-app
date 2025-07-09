@@ -88,6 +88,15 @@
             }
           },
           {
+            "description": "The target origin to be used when posting messages to the parent window.",
+            "name": "targetOrigin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "description": "This parameter is for internal use only. It is used to determine which aggregator to use for the connection. ",
             "name": "aggregatorOverride",
             "in": "query",

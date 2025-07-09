@@ -19,7 +19,7 @@ const App = () => {
   const singleAccountSelect =
     queryParams.get("singleAccountSelect") !== "false";
   const aggregatorOverride = queryParams.get("aggregatorOverride");
-  const targetOrigin = queryParams.get("targetOrigin");
+  const targetOrigin = queryParams.get("targetOrigin") || undefined;
 
   const instrumentationProps = {
     userId: userId,

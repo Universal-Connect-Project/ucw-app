@@ -5,11 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.8.4]
+## [1.8.5]
 
 ### Added
 
 - added `aggregatorOverride` query parameter to the widget endpoint to allow searching for institutions by aggregator. This is for internal use only and will not be documented in the public API.
+
+## [1.8.4]
+
+### Fixed
+
+- Fixed a potential issue when targetOrigin isn't specified.
+
+### Added
+
+- Documentation for the targetOrigin parameter
 
 ## [1.8.3]
 
