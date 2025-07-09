@@ -42,8 +42,6 @@ export const widgetHandler = (req: Request, res: Response) => {
     return;
   }
 
-  console.log(nonTestAggregators);
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (req as any).metricsPath = "/catchall";
 
