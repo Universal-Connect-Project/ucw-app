@@ -42,6 +42,8 @@ export const widgetHandler = (req: Request, res: Response) => {
     return;
   }
 
+  console.log(nonTestAggregators);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (req as any).metricsPath = "/catchall";
 
@@ -49,6 +51,5 @@ export const widgetHandler = (req: Request, res: Response) => {
     path.join(__dirname, "../../ui/dist/index.html"),
     "utf8",
   );
-  console.log(nonTestAggregators);
   res.send(html);
 };

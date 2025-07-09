@@ -6,7 +6,8 @@ export const getInstitutionHandler = async (req: Request, res: Response) => {
   const ucpInstitutionId = req.params.institution_guid;
 
   const resolvedInstitution = await resolveInstitutionAggregator({
-    aggregatorOverride: req.context.aggregator,
+    aggregatorOverride:
+      req.context.aggregatorOverride || req.context.aggregator,
     ucpInstitutionId: ucpInstitutionId,
     jobTypes: req.context.jobTypes,
   });
