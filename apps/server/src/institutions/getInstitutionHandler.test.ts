@@ -89,4 +89,39 @@ describe("getInstitutionHandler", () => {
       url: ucpInstitution.url,
     });
   });
+
+  it("returns the institution by the aggregator id if it has an aggregatorOverride", async () => {
+    const context = {
+      aggregatorOverride: MX_AGGREGATOR_STRING,
+    };
+
+    const req = {
+      context,
+      params: {
+        institution_guid: ucpInstitutionId,
+      },
+    } as unknown as Request;
+
+    const res = {
+      send: jest.fn(),
+    } as unknown as Response;
+
+    await getInstitutionHandler(req, res);
+
+    const ucpInstitution = elasticSearchInstitutionData;
+    const ucpMXInstitution = ucpInstitution[MX_AGGREGATOR_STRING];
+
+    expect(res.send).toHaveBeenCalledWith({
+      code: mxInstitutionData.institution.code,
+      credentials: [],
+      guid: mxInstitutionData.institution.code,
+      instructional_data: {},
+      logo_url: ucpInstitution.logo,
+      name: ucpInstitution.name,
+      aggregator: MX_AGGREGATOR_STRING,
+      supports_oauth: ucpMXInstitution.supports_oauth,
+      ucpInstitutionId,
+      url: ucpInstitution.url,
+    });
+  });
 });
