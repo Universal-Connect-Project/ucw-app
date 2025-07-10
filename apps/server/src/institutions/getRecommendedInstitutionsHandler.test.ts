@@ -27,4 +27,27 @@ describe("getRecommendedInstitutionsHandler", () => {
 
     expect(res.send).toHaveBeenCalledWith(transformedPopularInstitutionsList);
   });
+
+  it("returns a list of favorite institutions with aggregatorOverride", async () => {
+    jest
+      .spyOn(preferences, "getPreferences")
+      .mockResolvedValue(testPreferences);
+
+    const context = {
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
+      aggregatorOverride: "mx",
+    };
+
+    const req = {
+      context,
+    } as unknown as Request;
+
+    const res = {
+      send: jest.fn(),
+    } as unknown as Response;
+
+    await getRecommendedInstitutionsHandler(req, res);
+
+    expect(res.send).toHaveBeenCalledWith(transformedPopularInstitutionsList);
+  });
 });

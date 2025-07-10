@@ -52,4 +52,28 @@ describe("getSearchInstitutionsHandler", () => {
 
     expect(res.send).toHaveBeenCalledWith(transformedInstitutionList);
   });
+
+  it("returns institutions with aggregatorOverride", async () => {
+    const context = {
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
+      aggregatorOverride: "mx",
+    };
+
+    const req = {
+      context,
+      query: {
+        page: "1",
+        pageSize: "25",
+        search: "MX",
+      },
+    } as unknown as GetInstitutionsRequest;
+
+    const res = {
+      send: jest.fn(),
+    } as unknown as Response;
+
+    await getSearchInstitutionsHandler(req, res);
+
+    expect(res.send).toHaveBeenCalledWith(transformedInstitutionList);
+  });
 });

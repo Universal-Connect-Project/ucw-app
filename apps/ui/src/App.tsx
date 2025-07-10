@@ -18,6 +18,7 @@ const App = () => {
   const userId = queryParams.get("userId") as string;
   const singleAccountSelect =
     queryParams.get("singleAccountSelect") !== "false";
+  const aggregatorOverride = queryParams.get("aggregatorOverride");
   const targetOrigin = queryParams.get("targetOrigin") || undefined;
 
   const instrumentationProps = {
@@ -26,6 +27,7 @@ const App = () => {
     current_aggregator: aggregator,
     jobTypes,
     singleAccountSelect,
+    aggregatorOverride,
   };
 
   const { showBoundary } = useErrorBoundary();

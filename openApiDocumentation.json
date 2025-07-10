@@ -95,6 +95,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "description": "This parameter is for internal use only. It is used to determine which aggregator to use for the connection. ",
+            "name": "aggregatorOverride",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["mx", "sophtron", "finicity"]
+            }
           }
         ],
         "description": "Get the widget html to attach to a browser frame",
