@@ -198,15 +198,17 @@ export class ConnectApi extends AggregatorAdapterBase {
     });
 
     if (!isRefreshConnection && memberData.is_oauth && startEvent) {
-      startEvent.then(() => recordConnectionPauseEvent(performanceSessionId));
+      startEvent.then(() =>
+        recordConnectionPauseEvent(performanceSessionId, false),
+      );
     }
 
-    if (!isRefreshConnection) {
+    if (!isRefreshConnection && this.getNeedsLocalPerformanceResilience()) {
       createPerformanceObject({
         userId: this.getUserId(),
         connectionId: connection.id,
         performanceSessionId,
-        aggregatorId,
+        aggregatorId: this.context.aggregator,
       });
     }
 

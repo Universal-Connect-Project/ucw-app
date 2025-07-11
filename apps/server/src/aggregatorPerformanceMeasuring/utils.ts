@@ -1,8 +1,10 @@
 import type { Connection } from "@repo/utils";
 import { ConnectionStatus } from "@repo/utils";
 import { AggregatorAdapterBase } from "../adapters";
-import { del, get, set } from "../services/storageClient/redis";
+import { del, get, redisClient, set } from "../services/storageClient/redis";
 import { recordSuccessEvent } from "../services/performanceTracking";
+import { setIntervalAsync } from "set-interval-async";
+import { error, info } from "../infra/logger";
 
 export interface PerformanceObject {
   userId?: string;
@@ -30,6 +32,10 @@ const updatePerformanceObject = async (
   update: Partial<PerformanceObject>,
 ): Promise<void> => {
   const performanceObject = await getPerformanceObject(performanceSessionId);
+  if (!performanceObject || Object.keys(performanceObject).length === 0) {
+    error(`Performance object not found for ID: ${performanceSessionId}`);
+    return;
+  }
   Object.assign(performanceObject, {
     ...update,
     lastUiUpdateTimestamp: Date.now(),
@@ -85,46 +91,60 @@ export const cleanupPerformanceObject = async (
   await del(performanceRedisKey(performanceSessionId));
 };
 
-const getAggregatorConnectionStatus = async (
-  performanceSessionId: string,
-): Promise<Connection> => {
-  const performanceObject = await getPerformanceObject(performanceSessionId);
+const getAggregatorConnectionStatus = async ({
+  aggregatorId,
+  userId,
+  connectionId,
+}: PerformanceObject): Promise<Connection> => {
   const aggregatorAdapter = new AggregatorAdapterBase({
     context: {
-      aggregator: performanceObject.aggregatorId,
-      resolvedUserId: performanceObject.userId,
+      aggregator: aggregatorId,
+      resolvedUserId: userId,
     },
   });
   await aggregatorAdapter.init();
   const connectionStatus =
-    await aggregatorAdapter.getConnectionStatus(performanceSessionId);
-  const connection =
-    await aggregatorAdapter.getConnection(performanceSessionId);
+    await aggregatorAdapter.getConnectionStatus(connectionId);
+  const connection = await aggregatorAdapter.getConnection(connectionId);
   return {
     ...connection,
     status: connectionStatus.status,
   };
 };
 
+export const UI_UPDATE_THRESHOLD =
+  process.env.NODE_ENV === "test" ? 1000 : 7000; // 1 second for tests, 7 seconds otherwise
+
 export const pollConnectionStatusIfNeeded = async (
   performanceSessionId: string,
 ): Promise<void> => {
-  const { lastUiUpdateTimestamp, pausedByMfa } =
-    await getPerformanceObject(performanceSessionId);
+  const {
+    lastUiUpdateTimestamp,
+    pausedByMfa,
+    aggregatorId,
+    userId,
+    connectionId,
+  } = await getPerformanceObject(performanceSessionId);
+
   if (
     pausedByMfa ||
-    (lastUiUpdateTimestamp && Date.now() - lastUiUpdateTimestamp < 1000 * 7) // 7 seconds
+    (lastUiUpdateTimestamp &&
+      Date.now() - lastUiUpdateTimestamp < UI_UPDATE_THRESHOLD)
   ) {
-    // do nothing if the last UI update was within 7 seconds or if paused by MFA
+    // do nothing if the last UI update was within the threshold or if paused by MFA
     return;
   }
 
-  const connectionStatus =
-    await getAggregatorConnectionStatus(performanceSessionId);
+  info(`Polling connection status for ${performanceSessionId}`);
+
+  const connectionStatus = await getAggregatorConnectionStatus({
+    aggregatorId,
+    userId,
+    connectionId,
+  });
   if (
     connectionStatus.status === ConnectionStatus.CONNECTED &&
-    !connectionStatus.is_being_aggregated &&
-    !connectionStatus.is_oauth
+    !connectionStatus.is_being_aggregated
   ) {
     await recordSuccessEvent(performanceSessionId);
     cleanupPerformanceObject(performanceSessionId);
@@ -139,3 +159,22 @@ export const pollConnectionStatusIfNeeded = async (
     cleanupPerformanceObject(performanceSessionId);
   }
 };
+
+export async function setPerformanceResiliencePoller(seconds: number = 5) {
+  return setIntervalAsync(
+    async () => {
+      const performanceIds = await redisClient.keys(
+        `${PERFORMANCE_REDIS_SUBDIRECTORY}:*`,
+      );
+
+      if (!performanceIds.length) {
+        return;
+      }
+
+      for (const performanceId of performanceIds) {
+        await pollConnectionStatusIfNeeded(performanceId.split(":")[1]);
+      }
+    },
+    seconds * 1000, // Poll every 5 seconds
+  );
+}

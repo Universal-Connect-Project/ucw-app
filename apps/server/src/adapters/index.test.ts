@@ -49,6 +49,39 @@ describe("AggregatorAdapterBase", () => {
     });
   });
 
+  describe("getNeedsLocalPerformanceResilience", () => {
+    it("returns true if the adapter does not implement getNeedsLocalPerformanceResilience", async () => {
+      await aggregatorAdapterBase.init();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (aggregatorAdapterBase as any).aggregatorAdapter = {};
+      expect(aggregatorAdapterBase.getNeedsLocalPerformanceResilience()).toBe(
+        true,
+      );
+    });
+
+    it("returns the value from the adapter's getNeedsLocalPerformanceResilience if implemented (true)", async () => {
+      await aggregatorAdapterBase.init();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (aggregatorAdapterBase as any).aggregatorAdapter = {
+        getNeedsLocalPerformanceResilience: jest.fn().mockReturnValue(true),
+      };
+      expect(aggregatorAdapterBase.getNeedsLocalPerformanceResilience()).toBe(
+        true,
+      );
+    });
+
+    it("returns the value from the adapter's getNeedsLocalPerformanceResilience if implemented (false)", async () => {
+      await aggregatorAdapterBase.init();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (aggregatorAdapterBase as any).aggregatorAdapter = {
+        getNeedsLocalPerformanceResilience: jest.fn().mockReturnValue(false),
+      };
+      expect(aggregatorAdapterBase.getNeedsLocalPerformanceResilience()).toBe(
+        false,
+      );
+    });
+  });
+
   describe("getOauthStates", () => {
     it("returns a connected state", async () => {
       await aggregatorAdapterBase.init();

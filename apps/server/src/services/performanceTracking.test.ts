@@ -110,6 +110,32 @@ describe("performanceTracking", () => {
     );
   });
 
+  it("calls connectionPause with correct method and headers, and doesn't pause local performance object when pauseLocal is false", async () => {
+    const connectionId = "conn3.5";
+    await setupLocalPerformanceObject(connectionId);
+
+    const requestLog = setupPerformanceHandlers(["connectionPause"]);
+
+    await recordConnectionPauseEvent(connectionId, false);
+
+    await expectPerformanceObject(connectionId, {
+      pausedByMfa: false,
+    });
+
+    expect(requestLog.length).toBe(1);
+    const req = requestLog[0];
+    expect(req).toEqual(
+      expect.objectContaining({
+        method: "PUT",
+        eventType: "connectionPause",
+        connectionId: connectionId,
+        headers: expect.objectContaining({
+          authorization: `Bearer ${mockAccessToken}`,
+        }),
+      }),
+    );
+  });
+
   it("calls connectionResume with correct method and headers, and unpauses local performance object", async () => {
     const connectionId = "conn4";
     await setupLocalPerformanceObject(connectionId);
