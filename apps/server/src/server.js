@@ -16,6 +16,7 @@ import {
   setPerformanceSyncSchedule,
   syncPerformanceData,
 } from "./services/performanceSyncer";
+import { setPerformanceResiliencePoller } from "./aggregatorPerformanceMeasuring/utils"
 import { widgetHandler } from "./widgetEndpoint";
 import { oauthRedirectHandler, webhookHandler } from "./connect/oauthEndpoints";
 import useInstitutionEndpoints from "./institutions/useInstitutionEndpoints";
@@ -63,6 +64,9 @@ syncPerformanceData().then(() => {
   setPerformanceSyncSchedule().then(() => {
     info("Performance based routing data is scheduled to sync");
   });
+  setPerformanceResiliencePoller().then(() => {
+    info("Performance resilience polling enabled")
+  })
 });
 
 app.get("/health", function (req, res) {

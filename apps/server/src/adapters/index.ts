@@ -48,6 +48,17 @@ export class AggregatorAdapterBase {
     return true;
   }
 
+  getNeedsLocalPerformanceResilience() {
+    if (
+      this.aggregatorAdapter &&
+      typeof this.aggregatorAdapter.getNeedsLocalPerformanceResilience ===
+        "function"
+    ) {
+      return this.aggregatorAdapter.getNeedsLocalPerformanceResilience();
+    }
+    return true;
+  }
+
   async getConnection(connectionId: string): Promise<Connection> {
     return await this.aggregatorAdapter.GetConnectionById(
       connectionId,

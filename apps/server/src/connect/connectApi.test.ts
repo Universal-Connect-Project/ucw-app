@@ -119,6 +119,22 @@ describe("connectApi", () => {
       expect(requestLog.length).toBe(0);
     });
 
+    it("does NOT create a performance object when getNeedsLocalPerformanceResilience returns false", async () => {
+      jest
+        .spyOn(connectApi, "getNeedsLocalPerformanceResilience")
+        .mockReturnValue(false);
+
+      const fakeSessionId = "test-session-id-no-resilience";
+      jest
+        .spyOn(globalThis.crypto, "randomUUID")
+        .mockReturnValue(fakeSessionId);
+
+      await connectApi.addMember(memberCreateData);
+
+      const performanceObject = await getPerformanceObject(fakeSessionId);
+      expect(performanceObject).toEqual({});
+    });
+
     it("returns a member, sends a connection start event, and creates a performance object in redis on a new connection", async () => {
       const requestLog = setupPerformanceHandlers([
         "connectionStart",
@@ -245,7 +261,7 @@ describe("connectApi", () => {
       );
     });
 
-    it("calls connectionStart and connectionPause when is_oauth is true", async () => {
+    it("calls connectionStart and connectionPause when is_oauth is true, but doesn't pause the local performance object", async () => {
       const requestLog = setupPerformanceHandlers([
         "connectionStart",
         "connectionPause",
@@ -286,6 +302,19 @@ describe("connectApi", () => {
         expect.objectContaining({
           eventType: "connectionPause",
           connectionId: expect.any(String),
+        }),
+      );
+      const performanceObject = await getPerformanceObject(
+        requestLog[0].connectionId,
+      );
+      expect(performanceObject).toEqual(
+        expect.objectContaining({
+          performanceSessionId: requestLog[0].connectionId,
+          connectionId: "testGuid1",
+          userId: resolvedUserId,
+          aggregatorId: MX_AGGREGATOR_STRING,
+          lastUiUpdateTimestamp: expect.any(Number),
+          pausedByMfa: false,
         }),
       );
     });

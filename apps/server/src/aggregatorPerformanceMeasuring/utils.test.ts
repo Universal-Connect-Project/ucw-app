@@ -5,6 +5,8 @@ import {
   pollConnectionStatusIfNeeded,
   setLastUiUpdateTimestamp,
   setPausedByMfa,
+  setPerformanceResiliencePoller,
+  UI_UPDATE_THRESHOLD,
 } from "./utils";
 import {
   CONNECTION_BY_ID_PATH,
@@ -13,6 +15,8 @@ import {
 import { http, HttpResponse } from "msw";
 import { ConnectionStatus } from "@repo/utils";
 import config, { getConfig } from "../config";
+import * as logger from "../infra/logger"; // Adjust path if needed
+import { clearIntervalAsync } from "set-interval-async";
 
 describe("Performance Resilience", () => {
   const { PERFORMANCE_SERVICE_URL } = getConfig();
@@ -73,6 +77,22 @@ describe("Performance Resilience", () => {
     ).toBeGreaterThan(5000);
   });
 
+  it("logs an error when updating a non-existent performance object", async () => {
+    const spy = jest.spyOn(logger, "error").mockImplementation(() => {});
+
+    const fakeSessionId = "does-not-exist";
+    await setLastUiUpdateTimestamp(fakeSessionId);
+
+    expect(spy).toHaveBeenCalledWith(
+      `Performance object not found for ID: ${fakeSessionId}`,
+    );
+
+    const performanceObject = await getPerformanceObject(fakeSessionId);
+    expect(performanceObject).toEqual({});
+
+    spy.mockRestore();
+  });
+
   it("should set paused by MFA and update the last UI update timestamp", async () => {
     await createPerformanceObject(basePerformanceObjectParams);
     const initialPerformanceObject = await getPerformanceObject(
@@ -99,8 +119,9 @@ describe("Performance Resilience", () => {
   });
 
   describe("pollConnectionStatusIfNeeded", () => {
-    it("should clean up the performance object and record success event upon completion", async () => {
+    it("should clean up the performance object and record success event with the performance session id upon completion", async () => {
       let performanceSuccessReceived = false;
+      let performanceCallId: string | readonly string[];
 
       server.use(
         http.get(CONNECTION_BY_ID_PATH, () =>
@@ -114,8 +135,9 @@ describe("Performance Resilience", () => {
         ),
         http.put(
           `${PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionSuccess`,
-          () => {
+          ({ params }) => {
             performanceSuccessReceived = true;
+            performanceCallId = params.connectionId;
             return HttpResponse.json({});
           },
         ),
@@ -123,7 +145,7 @@ describe("Performance Resilience", () => {
       await createPerformanceObject(basePerformanceObjectParams);
 
       jest.useFakeTimers();
-      jest.setSystemTime(Date.now() + 8000);
+      jest.setSystemTime(Date.now() + UI_UPDATE_THRESHOLD + 1000);
 
       await pollConnectionStatusIfNeeded(
         basePerformanceObjectParams.performanceSessionId,
@@ -134,20 +156,25 @@ describe("Performance Resilience", () => {
       );
       expect(performanceSuccessReceived).toBeTruthy();
       expect(cleanedUpObject).toEqual({});
+      expect(performanceCallId).toBe(
+        basePerformanceObjectParams.performanceSessionId,
+      );
     });
 
-    it("should do nothing if the status is PENDING", async () => {
+    it("should use connectionId to get status and do nothing if the status is PENDING", async () => {
       let performanceSuccessReceived = false;
+      let statusMemberGuid: string | readonly string[];
 
       server.use(
-        http.get(READ_MEMBER_STATUS_PATH, () =>
-          HttpResponse.json({
+        http.get(READ_MEMBER_STATUS_PATH, ({ params }) => {
+          statusMemberGuid = params.id;
+          return HttpResponse.json({
             member: {
               guid: "testGuid",
               connection_status: ConnectionStatus[ConnectionStatus.PENDING],
             },
-          }),
-        ),
+          });
+        }),
         http.put(
           `${PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionSuccess`,
           () => {
@@ -159,7 +186,7 @@ describe("Performance Resilience", () => {
       await createPerformanceObject(basePerformanceObjectParams);
 
       jest.useFakeTimers();
-      jest.setSystemTime(Date.now() + 8000);
+      jest.setSystemTime(Date.now() + UI_UPDATE_THRESHOLD + 1000);
 
       await pollConnectionStatusIfNeeded(
         basePerformanceObjectParams.performanceSessionId,
@@ -172,6 +199,8 @@ describe("Performance Resilience", () => {
       expect(undeletedObject.performanceSessionId).toBe(
         basePerformanceObjectParams.performanceSessionId,
       );
+
+      expect(statusMemberGuid).toBe(basePerformanceObjectParams.connectionId);
     });
 
     it("should not clean up or record event if UI updated recently", async () => {
@@ -189,7 +218,7 @@ describe("Performance Resilience", () => {
       await createPerformanceObject(basePerformanceObjectParams);
 
       jest.useFakeTimers();
-      jest.setSystemTime(Date.now() + 1000); // Only 1s later
+      jest.setSystemTime(Date.now() + UI_UPDATE_THRESHOLD - 500);
 
       await pollConnectionStatusIfNeeded(
         basePerformanceObjectParams.performanceSessionId,
@@ -281,6 +310,108 @@ describe("Performance Resilience", () => {
         );
         expect(cleanedUpObject).toEqual({});
       });
+    });
+  });
+
+  describe("setPerformanceResiliencePoller", () => {
+    const basePerformanceObject = {
+      userId: "test-user-id",
+      connectionId: "test-connection-id",
+      performanceSessionId: "test-session-id",
+      aggregatorId: "mx",
+    };
+    let polledIds: string[];
+
+    beforeEach(() => {
+      jest.restoreAllMocks();
+      jest.useFakeTimers();
+      polledIds = [];
+
+      server.use(
+        http.get(READ_MEMBER_STATUS_PATH, ({ params }) => {
+          polledIds.push(String(params.id));
+          return HttpResponse.json({
+            member: {
+              guid: "testGuid",
+              connection_status: ConnectionStatus[ConnectionStatus.PENDING],
+            },
+          });
+        }),
+      );
+    });
+
+    afterEach(() => {
+      jest.clearAllTimers();
+      jest.useRealTimers();
+    });
+
+    it("should poll for status after UI_UPDATE_THRESHOLD seconds", async () => {
+      await createPerformanceObject(basePerformanceObject);
+
+      const poller = await setPerformanceResiliencePoller(1);
+
+      jest.advanceTimersByTime(UI_UPDATE_THRESHOLD + 1500);
+
+      await clearIntervalAsync(poller);
+
+      expect(polledIds).toContain(basePerformanceObject.connectionId);
+    });
+
+    it("should NOT poll for status before UI_UPDATE_THRESHOLD seconds", async () => {
+      await createPerformanceObject(basePerformanceObject);
+
+      const poller = await setPerformanceResiliencePoller(1);
+
+      jest.advanceTimersByTime(UI_UPDATE_THRESHOLD - 500);
+
+      await clearIntervalAsync(poller);
+
+      expect(polledIds).not.toContain(basePerformanceObject.connectionId);
+    });
+
+    it("should poll for multiple performance objects", async () => {
+      const fakeSessionId1 = "test-session-id";
+      const fakeSessionId2 = "test-session-id2";
+      const fakeConnectionId1 = "conn1";
+      const fakeConnectionId2 = "conn2";
+
+      await createPerformanceObject({
+        ...basePerformanceObject,
+        performanceSessionId: fakeSessionId1,
+        connectionId: fakeConnectionId1,
+      });
+
+      await createPerformanceObject({
+        ...basePerformanceObject,
+        performanceSessionId: fakeSessionId2,
+        connectionId: fakeConnectionId2,
+      });
+
+      const poller = await setPerformanceResiliencePoller(1);
+
+      jest.advanceTimersByTime(UI_UPDATE_THRESHOLD);
+
+      await clearIntervalAsync(poller);
+
+      expect(polledIds).toContain(fakeConnectionId1);
+      expect(polledIds).toContain(fakeConnectionId2);
+    });
+
+    it("should poll repeatedly on interval", async () => {
+      jest.useRealTimers();
+      await createPerformanceObject(basePerformanceObject);
+
+      const poller = await setPerformanceResiliencePoller(1);
+
+      await new Promise((r) => setTimeout(r, UI_UPDATE_THRESHOLD + 3000));
+
+      await clearIntervalAsync(poller);
+
+      console.log("Polled IDs:", polledIds);
+      expect(
+        polledIds.filter((id) => id === basePerformanceObject.connectionId)
+          .length,
+      ).toBeGreaterThan(1);
     });
   });
 });
