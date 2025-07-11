@@ -49,6 +49,12 @@ export const set = jest.fn(
   },
 );
 
+export const keys = jest.fn((key) => {
+  return Object.keys(storageObject).filter((k) =>
+    k.startsWith(key.replace("*", "")),
+  );
+});
+
 export const createClient = () => ({
   connect: async () => {
     return true;
@@ -59,4 +65,5 @@ export const createClient = () => ({
   sAdd,
   sMembers,
   del,
+  keys,
 });

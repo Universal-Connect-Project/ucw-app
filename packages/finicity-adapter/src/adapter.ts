@@ -47,6 +47,8 @@ export class FinicityAdapter implements WidgetAdapter {
     );
   }
 
+  getNeedsLocalPerformanceResilience = () => false;
+
   async DeleteUser(userId: string) {
     return await this.apiClient.deleteCustomer(userId);
   }

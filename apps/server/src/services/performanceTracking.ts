@@ -89,14 +89,20 @@ export const recordSuccessEvent = async (connectionId: string) => {
   cleanupPerformanceObject(connectionId);
 };
 
-export const recordConnectionPauseEvent = async (connectionId: string) => {
+export const recordConnectionPauseEvent = async (
+  connectionId: string,
+  pauseLocal = true,
+) => {
   await sendPerformanceEvent({
     connectionId,
     eventType: "connectionPause",
     method: "PUT",
   });
-  setPausedByMfa(connectionId, true);
+  if (pauseLocal) {
+    setPausedByMfa(connectionId, true);
+  }
 };
+
 export const recordConnectionResumeEvent = async (connectionId: string) => {
   await sendPerformanceEvent({
     connectionId,
