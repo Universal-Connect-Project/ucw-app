@@ -32,7 +32,7 @@ const makeAConnection = async (
   await authorizeTab
     .getByRole("textbox", { name: "Banking Password" })
     .fill("profile_700");
-  await authorizeTab.getByRole("button", { name: "Submit" }).click();
+  await authorizeTab.getByLabel("Submit").click();
 
   const msg = await page.waitForEvent("console", {
     timeout: 120000,
