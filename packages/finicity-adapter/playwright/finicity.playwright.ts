@@ -26,9 +26,13 @@ const makeAConnection = async (
   const authorizeTab = await popupPromise;
 
   await authorizeTab.getByRole("button", { name: "Next" }).click();
-  await authorizeTab.getByLabel("Banking Userid").fill("sue_wealthy");
-  await authorizeTab.getByLabel("Banking Password").fill("profile_700");
-  await authorizeTab.getByLabel("Submit").click();
+  await authorizeTab
+    .getByRole("textbox", { name: "Banking Userid" })
+    .fill("sue_wealthy");
+  await authorizeTab
+    .getByRole("textbox", { name: "Banking Password" })
+    .fill("profile_700");
+  await authorizeTab.getByRole("button", { name: "Submit" }).click();
 
   const msg = await page.waitForEvent("console", {
     timeout: 120000,
