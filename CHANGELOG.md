@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - more E2E tests for aggregatorOverride.
 
+### Fixed
+
+- Issue with not being able to use aggregatorOverride for test institutions.
+
 ### Updated
 
 - Code and E2E improvements for aggregatorOverride.
