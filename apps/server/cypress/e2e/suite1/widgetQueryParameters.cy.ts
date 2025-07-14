@@ -5,11 +5,13 @@ import {
   clearSearch,
   clickContinue,
   enterMxCredentials,
+  enterSophtronCredentials,
   expectConnectionSuccess,
   searchByText,
   visitAgg,
   visitWithPostMessageSpy,
 } from "@repo/utils-cypress";
+import { MX_AND_SOPHTRON_TEST_INSTITUTION_NAME } from "../../../src/testInstitutions/consts";
 
 describe("query parameters", () => {
   it("skips straight to the institution if an institutionId is provided in the query parameters, hides the back button, and completes the connection", () => {
@@ -34,9 +36,7 @@ describe("query parameters", () => {
 
       const institutionThatIsInFavoriteAndSupportsAll = MX_BANK_NAME;
 
-      cy.visit(
-        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${crypto.randomUUID()}&aggregatorOverride=mx`,
-      );
+      visitAgg({ aggregatorOverride: "mx" });
 
       cy.findByText(institutionThatIsInFavoriteAndSupportsAll).should("exist");
       cy.findByText(SOPHTRON_BANK_NAME, {
@@ -51,9 +51,7 @@ describe("query parameters", () => {
 
       cy.findByText(SOPHTRON_BANK_NAME).should("exist");
 
-      cy.visit(
-        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${crypto.randomUUID()}&aggregatorOverride=mx`,
-      );
+      visitAgg({ aggregatorOverride: "mx" });
 
       searchByText(MX_BANK_NAME);
       cy.findByText(MX_BANK_NAME, {
@@ -70,8 +68,29 @@ describe("query parameters", () => {
     });
 
     describe("an institution that supports both sophtron and MX", () => {
-      it("resolves to MX when aggregatorOverride is set to MX", () => {});
-      it("resolves to sophtron when aggregatorOverride is set to sophtron", () => {});
+      it("resolves to MX when aggregatorOverride is set to MX", () => {
+        visitAgg({ aggregatorOverride: "mx" });
+
+        searchByText(MX_AND_SOPHTRON_TEST_INSTITUTION_NAME);
+
+        cy.findByText(MX_AND_SOPHTRON_TEST_INSTITUTION_NAME).click();
+
+        enterMxCredentials();
+
+        expectConnectionSuccess();
+      });
+
+      it("resolves to sophtron when aggregatorOverride is set to sophtron", () => {
+        visitAgg({ aggregatorOverride: "sophtron" });
+
+        searchByText(MX_AND_SOPHTRON_TEST_INSTITUTION_NAME);
+
+        cy.findByText(MX_AND_SOPHTRON_TEST_INSTITUTION_NAME).click();
+
+        enterSophtronCredentials();
+
+        expectConnectionSuccess();
+      });
     });
   });
 });

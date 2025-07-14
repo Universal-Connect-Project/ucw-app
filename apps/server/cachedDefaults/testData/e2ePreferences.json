@@ -1,6 +1,4 @@
 {
-  "defaultAggregator": "mx",
-
   "supportedAggregators": ["mx", "sophtron"],
 
   "defaultAggregatorVolume": {},

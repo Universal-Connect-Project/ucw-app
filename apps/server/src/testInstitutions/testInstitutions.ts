@@ -9,8 +9,10 @@ import {
   testInstitutions as sophtronTestInstitutions,
 } from "@repo/sophtron-adapter";
 import { testInstitutions as akoyaTestInstitutions } from "@repo/akoya-adapter";
-
-export const CHASE_BANK_TEST_FILTER_NAME = "Chase Bank Test Filter";
+import {
+  CHASE_BANK_TEST_FILTER_NAME,
+  MX_AND_SOPHTRON_TEST_INSTITUTION_NAME,
+} from "./consts";
 
 export const testChaseBankToFilter: CachedInstitution = {
   name: CHASE_BANK_TEST_FILTER_NAME,
@@ -33,7 +35,7 @@ export const testChaseBankToFilter: CachedInstitution = {
 };
 
 const mxAndSophtronTestInstitution: CachedInstitution = {
-  name: "MX and Sophtron Test Institution",
+  name: MX_AND_SOPHTRON_TEST_INSTITUTION_NAME,
   id: "mxAndSophtronTestInstitution",
   keywords: ["test"],
   logo: "https://universalconnectproject.org/images/ucp-logo-icon.svg",

@@ -1,12 +1,12 @@
 import { searchByText, visitAgg, visitIdentity } from "@repo/utils-cypress";
 import { ComboJobTypes } from "@repo/utils";
-import { CHASE_BANK_TEST_FILTER_NAME } from "../../../src/testInstitutions/testInstitutions";
 import {
   MX_BANK_NAME,
   MX_BANK_ROUTING_NUMBER,
   MX_BANK_TRANSACTIONS_ONLY_NAME,
 } from "@repo/mx-adapter/src/testInstitutions";
 import { SOPHTRON_BANK_NAME } from "@repo/sophtron-adapter/src/testInstitutions";
+import { CHASE_BANK_TEST_FILTER_NAME } from "../../../src/testInstitutions/consts";
 
 const institutionThatIsInFavoritesButDoesntSupportIdentification =
   MX_BANK_TRANSACTIONS_ONLY_NAME;
