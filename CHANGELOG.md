@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Updated
 
-- Code and E2E improvements for aggregatorOverride
+- Code and E2E improvements for aggregatorOverride.
 
 ## [1.8.5]
 
