@@ -12,6 +12,10 @@ export const searchByText = (text) => {
   cy.findAllByText(/result/).should("exist");
 };
 
+export const clearSearch = () => {
+  cy.findByPlaceholderText("Search").clear();
+};
+
 export const selectInstitutionByName = (name) => {
   cy.findByLabelText(`Add account with ${name}`).first().click();
 };

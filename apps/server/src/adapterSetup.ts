@@ -118,8 +118,12 @@ export const adapterMap: Record<string, AdapterMap> = {
   ...sophtronAdapterMapObject,
 };
 
+const testAdapterKeys = Object.values(adapterMap)
+  .map(({ testAdapterId }) => testAdapterId)
+  .filter(Boolean);
+
 export const nonTestAggregators = Object.keys(adapterMap).filter(
-  (key) => !key.includes("sandbox") && !key.includes("int"),
+  (key) => !testAdapterKeys.includes(key),
 );
 
 export type Aggregator = keyof typeof adapterMap;
