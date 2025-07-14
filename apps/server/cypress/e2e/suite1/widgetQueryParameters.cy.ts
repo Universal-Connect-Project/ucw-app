@@ -77,6 +77,8 @@ describe("query parameters", () => {
 
         enterMxCredentials();
 
+        clickContinue();
+
         expectConnectionSuccess();
       });
 
@@ -88,6 +90,8 @@ describe("query parameters", () => {
         cy.findByText(MX_AND_SOPHTRON_TEST_INSTITUTION_NAME).click();
 
         enterSophtronCredentials();
+
+        clickContinue();
 
         expectConnectionSuccess();
       });
