@@ -10,8 +10,8 @@ export default async function expectPerformanceObject(
   let performanceObject: PerformanceObject | null = null;
   await waitFor(async () => {
     performanceObject = await getPerformanceObject(sessionId);
-    if (expectedAttributes && Object.keys(expectedAttributes).length === 0) {
-      expect(performanceObject).toEqual({});
+    if (expectedAttributes === null) {
+      expect(performanceObject).toBeUndefined();
     } else {
       expect(performanceObject).not.toBeNull();
       expect(performanceObject).toEqual(
@@ -21,7 +21,7 @@ export default async function expectPerformanceObject(
           userId: expect.any(String),
           aggregatorId: MX_AGGREGATOR_STRING,
           lastUiUpdateTimestamp: expect.any(Number),
-          pausedByMfa: false,
+          paused: false,
           ...expectedAttributes,
         }),
       );

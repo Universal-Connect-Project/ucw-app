@@ -29,6 +29,7 @@ export class FinicityAdapter implements WidgetAdapter {
   logger: LogClient;
   envConfig: Record<string, string>;
   performanceClient: PerformanceClient;
+  requiresPollingForPerformance = false;
 
   constructor(args: AdapterConfig) {
     const { sandbox, dependencies } = args;
@@ -46,8 +47,6 @@ export class FinicityAdapter implements WidgetAdapter {
       this.cacheClient,
     );
   }
-
-  getNeedsLocalPerformanceResilience = () => false;
 
   async DeleteUser(userId: string) {
     return await this.apiClient.deleteCustomer(userId);

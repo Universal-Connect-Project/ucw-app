@@ -12,14 +12,14 @@ import { mockAccessToken } from "../test/testData/auth0";
 import * as logger from "../infra/logger";
 import setupPerformanceHandlers from "../shared/test/setupPerformanceHandlers";
 import {
-  createPerformanceObject,
-  setPausedByMfa,
+  createPerformancePollingObject,
+  pausePolling,
 } from "../aggregatorPerformanceMeasuring/utils";
 import expectPerformanceObject from "../test/expectPerformanceObject";
 import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
 
-async function setupLocalPerformanceObject(sessionId: string) {
-  createPerformanceObject({
+async function setupRedisPerformanceObject(sessionId: string) {
+  createPerformancePollingObject({
     userId: "resolvedUserId",
     connectionId: "MBR-12345",
     performanceSessionId: sessionId,
@@ -61,14 +61,13 @@ describe("performanceTracking", () => {
 
   it("calls connectionSuccess with correct method and headers and cleans up local performance object", async () => {
     const connectionId = "conn2";
-    await setupLocalPerformanceObject(connectionId);
+    await setupRedisPerformanceObject(connectionId);
 
     const requestLog = setupPerformanceHandlers(["connectionSuccess"]);
 
     await recordSuccessEvent(connectionId);
 
-    const emptyObject = {};
-    await expectPerformanceObject(connectionId, emptyObject);
+    await expectPerformanceObject(connectionId, null);
 
     expect(requestLog.length).toBe(1);
     const req = requestLog[0];
@@ -86,14 +85,14 @@ describe("performanceTracking", () => {
 
   it("calls connectionPause with correct method and headers, and updates pause on local performance object", async () => {
     const connectionId = "conn3";
-    await setupLocalPerformanceObject(connectionId);
+    await setupRedisPerformanceObject(connectionId);
 
     const requestLog = setupPerformanceHandlers(["connectionPause"]);
 
     await recordConnectionPauseEvent(connectionId);
 
     await expectPerformanceObject(connectionId, {
-      pausedByMfa: true,
+      paused: true,
     });
 
     expect(requestLog.length).toBe(1);
@@ -112,14 +111,14 @@ describe("performanceTracking", () => {
 
   it("calls connectionPause with correct method and headers, and doesn't pause local performance object when pauseLocal is false", async () => {
     const connectionId = "conn3.5";
-    await setupLocalPerformanceObject(connectionId);
+    await setupRedisPerformanceObject(connectionId);
 
     const requestLog = setupPerformanceHandlers(["connectionPause"]);
 
     await recordConnectionPauseEvent(connectionId, false);
 
     await expectPerformanceObject(connectionId, {
-      pausedByMfa: false,
+      paused: false,
     });
 
     expect(requestLog.length).toBe(1);
@@ -138,10 +137,10 @@ describe("performanceTracking", () => {
 
   it("calls connectionResume with correct method and headers, and unpauses local performance object", async () => {
     const connectionId = "conn4";
-    await setupLocalPerformanceObject(connectionId);
-    await setPausedByMfa(connectionId, true);
+    await setupRedisPerformanceObject(connectionId);
+    await pausePolling(connectionId);
     await expectPerformanceObject(connectionId, {
-      pausedByMfa: true,
+      paused: true,
     });
 
     const requestLog = setupPerformanceHandlers(["connectionResume"]);
@@ -149,7 +148,7 @@ describe("performanceTracking", () => {
     await recordConnectionResumeEvent(connectionId);
 
     await expectPerformanceObject(connectionId, {
-      pausedByMfa: false,
+      paused: false,
     });
 
     expect(requestLog.length).toBe(1);

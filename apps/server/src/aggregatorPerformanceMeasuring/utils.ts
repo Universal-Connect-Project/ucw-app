@@ -2,7 +2,10 @@ import type { Connection } from "@repo/utils";
 import { ConnectionStatus } from "@repo/utils";
 import { AggregatorAdapterBase } from "../adapters";
 import { del, get, redisClient, set } from "../services/storageClient/redis";
-import { recordSuccessEvent } from "../services/performanceTracking";
+import {
+  recordConnectionResumeEvent,
+  recordSuccessEvent,
+} from "../services/performanceTracking";
 import { setIntervalAsync } from "set-interval-async";
 import { error, info } from "../infra/logger";
 
@@ -12,7 +15,7 @@ export interface PerformanceObject {
   performanceSessionId?: string;
   aggregatorId?: string;
   lastUiUpdateTimestamp?: number;
-  pausedByMfa?: boolean;
+  paused?: boolean;
 }
 
 const PERFORMANCE_REDIS_SUBDIRECTORY = "performance";
@@ -24,7 +27,7 @@ const performanceRedisKey = (performanceSessionId: string): string => {
 export const getPerformanceObject = async (
   performanceSessionId: string,
 ): Promise<PerformanceObject> => {
-  return (await get(performanceRedisKey(performanceSessionId))) || {};
+  return await get(performanceRedisKey(performanceSessionId));
 };
 
 const updatePerformanceObject = async (
@@ -32,7 +35,7 @@ const updatePerformanceObject = async (
   update: Partial<PerformanceObject>,
 ): Promise<void> => {
   const performanceObject = await getPerformanceObject(performanceSessionId);
-  if (!performanceObject || Object.keys(performanceObject).length === 0) {
+  if (!performanceObject) {
     error(`Performance object not found for ID: ${performanceSessionId}`);
     return;
   }
@@ -51,16 +54,23 @@ export const setLastUiUpdateTimestamp = async (
   });
 };
 
-export const setPausedByMfa = async (
+export const pausePolling = async (
   performanceSessionId: string,
-  paused: boolean,
 ): Promise<void> => {
   await updatePerformanceObject(performanceSessionId, {
-    pausedByMfa: paused,
+    paused: true,
   });
 };
 
-export const createPerformanceObject = async ({
+export const resumePolling = async (
+  performanceSessionId: string,
+): Promise<void> => {
+  await updatePerformanceObject(performanceSessionId, {
+    paused: false,
+  });
+};
+
+export const createPerformancePollingObject = async ({
   connectionId,
   userId,
   performanceSessionId,
@@ -79,7 +89,7 @@ export const createPerformanceObject = async ({
       performanceSessionId,
       aggregatorId,
       lastUiUpdateTimestamp: Date.now(),
-      pausedByMfa: false,
+      paused: false,
     },
     { EX: 1200 }, // Set expiration time to 20 minutes
   );
@@ -118,16 +128,11 @@ export const UI_UPDATE_THRESHOLD =
 export const pollConnectionStatusIfNeeded = async (
   performanceSessionId: string,
 ): Promise<void> => {
-  const {
-    lastUiUpdateTimestamp,
-    pausedByMfa,
-    aggregatorId,
-    userId,
-    connectionId,
-  } = await getPerformanceObject(performanceSessionId);
+  const { lastUiUpdateTimestamp, paused, aggregatorId, userId, connectionId } =
+    await getPerformanceObject(performanceSessionId);
 
   if (
-    pausedByMfa ||
+    paused ||
     (lastUiUpdateTimestamp &&
       Date.now() - lastUiUpdateTimestamp < UI_UPDATE_THRESHOLD)
   ) {
@@ -142,7 +147,13 @@ export const pollConnectionStatusIfNeeded = async (
     userId,
     connectionId,
   });
+
   if (
+    connectionStatus.status === ConnectionStatus.CONNECTED &&
+    connectionStatus.is_being_aggregated
+  ) {
+    await recordConnectionResumeEvent(performanceSessionId);
+  } else if (
     connectionStatus.status === ConnectionStatus.CONNECTED &&
     !connectionStatus.is_being_aggregated
   ) {

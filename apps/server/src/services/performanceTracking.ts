@@ -4,7 +4,8 @@ import { debug } from "../infra/logger";
 import { getAccessToken } from "./auth0Service";
 import {
   cleanupPerformanceObject,
-  setPausedByMfa,
+  pausePolling,
+  resumePolling,
 } from "../aggregatorPerformanceMeasuring/utils";
 
 async function sendPerformanceEvent({
@@ -91,15 +92,15 @@ export const recordSuccessEvent = async (connectionId: string) => {
 
 export const recordConnectionPauseEvent = async (
   connectionId: string,
-  pauseLocal = true,
+  callPausePolling = true,
 ) => {
   await sendPerformanceEvent({
     connectionId,
     eventType: "connectionPause",
     method: "PUT",
   });
-  if (pauseLocal) {
-    setPausedByMfa(connectionId, true);
+  if (callPausePolling) {
+    pausePolling(connectionId);
   }
 };
 
@@ -109,5 +110,5 @@ export const recordConnectionResumeEvent = async (connectionId: string) => {
     eventType: "connectionResume",
     method: "PUT",
   });
-  setPausedByMfa(connectionId, false);
+  resumePolling(connectionId);
 };

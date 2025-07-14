@@ -16,9 +16,9 @@ import setupPerformanceHandlers from "../shared/test/setupPerformanceHandlers";
 import { AKOYA_AGGREGATOR_STRING } from "@repo/akoya-adapter";
 import type { PerformanceObject } from "../aggregatorPerformanceMeasuring/utils";
 import {
-  createPerformanceObject,
+  createPerformancePollingObject,
   getPerformanceObject,
-  setPausedByMfa,
+  pausePolling,
 } from "../aggregatorPerformanceMeasuring/utils";
 import {
   answerMfaMemberData,
@@ -119,9 +119,9 @@ describe("connectApi", () => {
       expect(requestLog.length).toBe(0);
     });
 
-    it("does NOT create a performance object when getNeedsLocalPerformanceResilience returns false", async () => {
+    it("does NOT create a performance object when getRequiresPollingForPerformance returns false", async () => {
       jest
-        .spyOn(connectApi, "getNeedsLocalPerformanceResilience")
+        .spyOn(connectApi, "getRequiresPollingForPerformance")
         .mockReturnValue(false);
 
       const fakeSessionId = "test-session-id-no-resilience";
@@ -132,7 +132,7 @@ describe("connectApi", () => {
       await connectApi.addMember(memberCreateData);
 
       const performanceObject = await getPerformanceObject(fakeSessionId);
-      expect(performanceObject).toEqual({});
+      expect(performanceObject).toBeUndefined();
     });
 
     it("returns a member, sends a connection start event, and creates a performance object in redis on a new connection", async () => {
@@ -212,7 +212,7 @@ describe("connectApi", () => {
           userId: resolvedUserId,
           aggregatorId: MX_AGGREGATOR_STRING,
           lastUiUpdateTimestamp: expect.any(Number),
-          pausedByMfa: false,
+          paused: false,
         }),
       );
     });
@@ -314,7 +314,7 @@ describe("connectApi", () => {
           userId: resolvedUserId,
           aggregatorId: MX_AGGREGATOR_STRING,
           lastUiUpdateTimestamp: expect.any(Number),
-          pausedByMfa: false,
+          paused: false,
         }),
       );
     });
@@ -322,16 +322,16 @@ describe("connectApi", () => {
 
   describe("updateMember", () => {
     it("answers challenge question with updated credentials and unpauses performance object", async () => {
-      await createPerformanceObject({
+      await createPerformancePollingObject({
         userId: resolvedUserId,
         connectionId: "testGuid",
         performanceSessionId,
         aggregatorId: MX_AGGREGATOR_STRING,
       });
-      await setPausedByMfa(performanceSessionId, true);
+      await pausePolling(performanceSessionId);
 
       await expectPerformanceObject(performanceSessionId, {
-        pausedByMfa: true,
+        paused: true,
       });
 
       const customContext = { ...testContext, current_job_id: "testJobGuid" };
@@ -350,7 +350,7 @@ describe("connectApi", () => {
       await customApi.updateMember(answerMfaMemberData);
 
       await expectPerformanceObject(performanceSessionId, {
-        pausedByMfa: false,
+        paused: false,
       });
 
       expect(requestBody).toEqual({
@@ -361,7 +361,7 @@ describe("connectApi", () => {
     });
 
     it("updates member without challenges and does not pause performance object, updates lastUiUpdateTimestamp", async () => {
-      await createPerformanceObject({
+      await createPerformancePollingObject({
         userId: resolvedUserId,
         connectionId: "testGuid",
         performanceSessionId,
@@ -371,7 +371,7 @@ describe("connectApi", () => {
       let performanceObject = await expectPerformanceObject(
         performanceSessionId,
         {
-          pausedByMfa: false,
+          paused: false,
         },
       );
 
@@ -392,7 +392,7 @@ describe("connectApi", () => {
       });
 
       performanceObject = await expectPerformanceObject(performanceSessionId, {
-        pausedByMfa: false,
+        paused: false,
       });
 
       expect(performanceObject.lastUiUpdateTimestamp).toBeGreaterThan(
@@ -447,10 +447,10 @@ describe("connectApi", () => {
       });
     });
 
-    it("records a pause event when mfa challenges. Sets performance object to pausedByMfa and updates the lastUiUpdateTimestamp", async () => {
+    it("records a pause event when mfa challenges. Sets performance object to paused and updates the lastUiUpdateTimestamp", async () => {
       const requestLog = setupPerformanceHandlers(["connectionPause"]);
 
-      await createPerformanceObject({
+      await createPerformancePollingObject({
         userId: resolvedUserId,
         connectionId: "testGuid",
         performanceSessionId,
@@ -483,7 +483,7 @@ describe("connectApi", () => {
       const performanceObject = await expectPerformanceObject(
         performanceSessionId,
         {
-          pausedByMfa: true,
+          paused: true,
         },
       );
       expect(performanceObject.lastUiUpdateTimestamp).toBeGreaterThan(
@@ -601,7 +601,7 @@ describe("performanceResilience life cycle through ConnectApi", () => {
     await connectApi.loadMemberByGuid("testGuid");
 
     performanceObject = await expectPerformanceObject(performanceSessionId, {
-      pausedByMfa: true,
+      paused: true,
     });
 
     expectUpdatedUiTimestamp(performanceObject);
@@ -610,7 +610,7 @@ describe("performanceResilience life cycle through ConnectApi", () => {
     await answerMfaContextConnectApi.updateMember(answerMfaMemberData);
 
     performanceObject = await expectPerformanceObject(performanceSessionId, {
-      pausedByMfa: false,
+      paused: false,
     });
 
     expectUpdatedUiTimestamp(performanceObject);
@@ -624,6 +624,6 @@ describe("performanceResilience life cycle through ConnectApi", () => {
 
     await connectApi.loadMemberByGuid("testGuid");
 
-    await expectPerformanceObject(performanceSessionId, {});
+    await expectPerformanceObject(performanceSessionId, null);
   });
 });

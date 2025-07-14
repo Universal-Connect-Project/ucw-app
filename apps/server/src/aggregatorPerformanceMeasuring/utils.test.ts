@@ -1,12 +1,13 @@
 import { server } from "../test/testServer";
 import {
-  createPerformanceObject,
+  createPerformancePollingObject,
   getPerformanceObject,
   pollConnectionStatusIfNeeded,
   setLastUiUpdateTimestamp,
-  setPausedByMfa,
+  pausePolling,
   setPerformanceResiliencePoller,
   UI_UPDATE_THRESHOLD,
+  resumePolling,
 } from "./utils";
 import {
   CONNECTION_BY_ID_PATH,
@@ -17,6 +18,7 @@ import { ConnectionStatus } from "@repo/utils";
 import config, { getConfig } from "../config";
 import * as logger from "../infra/logger"; // Adjust path if needed
 import { clearIntervalAsync } from "set-interval-async";
+import expectPerformanceObject from "../test/expectPerformanceObject";
 
 describe("Performance Resilience", () => {
   const { PERFORMANCE_SERVICE_URL } = getConfig();
@@ -31,8 +33,30 @@ describe("Performance Resilience", () => {
     jest.restoreAllMocks();
   });
 
+  describe("pausePolling & resumePolling", () => {
+    it("should pause and resume a performance object successfully", async () => {
+      await createPerformancePollingObject(basePerformanceObjectParams);
+      expectPerformanceObject(
+        basePerformanceObjectParams.performanceSessionId,
+        { paused: false },
+      );
+
+      await pausePolling(basePerformanceObjectParams.performanceSessionId);
+      expectPerformanceObject(
+        basePerformanceObjectParams.performanceSessionId,
+        { paused: true },
+      );
+
+      await resumePolling(basePerformanceObjectParams.performanceSessionId);
+      expectPerformanceObject(
+        basePerformanceObjectParams.performanceSessionId,
+        { paused: false },
+      );
+    });
+  });
+
   it("should create a performance object which gets deleted after 20 minutes", async () => {
-    await createPerformanceObject(basePerformanceObjectParams);
+    await createPerformancePollingObject(basePerformanceObjectParams);
 
     let performanceObject = await getPerformanceObject(
       basePerformanceObjectParams.performanceSessionId,
@@ -41,7 +65,7 @@ describe("Performance Resilience", () => {
     expect(performanceObject).toEqual({
       ...basePerformanceObjectParams,
       lastUiUpdateTimestamp: expect.any(Number),
-      pausedByMfa: false,
+      paused: false,
     });
 
     jest.useFakeTimers();
@@ -50,11 +74,11 @@ describe("Performance Resilience", () => {
     performanceObject = await getPerformanceObject(
       basePerformanceObjectParams.performanceSessionId,
     );
-    expect(performanceObject).toEqual({});
+    expect(performanceObject).toBeUndefined();
   });
 
   it("should update the last UI update timestamp", async () => {
-    await createPerformanceObject(basePerformanceObjectParams);
+    await createPerformancePollingObject(basePerformanceObjectParams);
 
     const initialPerformanceObject = await getPerformanceObject(
       basePerformanceObjectParams.performanceSessionId,
@@ -88,31 +112,28 @@ describe("Performance Resilience", () => {
     );
 
     const performanceObject = await getPerformanceObject(fakeSessionId);
-    expect(performanceObject).toEqual({});
+    expect(performanceObject).toBeUndefined();
 
     spy.mockRestore();
   });
 
-  it("should set paused by MFA and update the last UI update timestamp", async () => {
-    await createPerformanceObject(basePerformanceObjectParams);
+  it("should set paused and update the last UI update timestamp", async () => {
+    await createPerformancePollingObject(basePerformanceObjectParams);
     const initialPerformanceObject = await getPerformanceObject(
       basePerformanceObjectParams.performanceSessionId,
     );
-    expect(initialPerformanceObject.pausedByMfa).toBe(false);
+    expect(initialPerformanceObject.paused).toBe(false);
 
     jest.useFakeTimers();
     jest.setSystemTime(Date.now() + 1000);
 
-    await setPausedByMfa(
-      basePerformanceObjectParams.performanceSessionId,
-      true,
-    );
+    await pausePolling(basePerformanceObjectParams.performanceSessionId);
 
     const performanceObject = await getPerformanceObject(
       basePerformanceObjectParams.performanceSessionId,
     );
 
-    expect(performanceObject.pausedByMfa).toBe(true);
+    expect(performanceObject.paused).toBe(true);
     expect(performanceObject.lastUiUpdateTimestamp).toBeGreaterThan(
       initialPerformanceObject.lastUiUpdateTimestamp,
     );
@@ -142,7 +163,7 @@ describe("Performance Resilience", () => {
           },
         ),
       );
-      await createPerformanceObject(basePerformanceObjectParams);
+      await createPerformancePollingObject(basePerformanceObjectParams);
 
       jest.useFakeTimers();
       jest.setSystemTime(Date.now() + UI_UPDATE_THRESHOLD + 1000);
@@ -155,7 +176,52 @@ describe("Performance Resilience", () => {
         basePerformanceObjectParams.performanceSessionId,
       );
       expect(performanceSuccessReceived).toBeTruthy();
-      expect(cleanedUpObject).toEqual({});
+      expect(cleanedUpObject).toBeUndefined();
+      expect(performanceCallId).toBe(
+        basePerformanceObjectParams.performanceSessionId,
+      );
+    });
+
+    it("should call resume performance event if status is connected but it's still aggregating", async () => {
+      let performanceResumeReceived = false;
+      let performanceCallId: string | readonly string[];
+
+      server.use(
+        http.get(CONNECTION_BY_ID_PATH, () =>
+          HttpResponse.json({
+            member: {
+              guid: "testGuid",
+              is_being_aggregated: true,
+              is_oauth: false,
+            },
+          }),
+        ),
+        http.put(
+          `${PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionResume`,
+          ({ params }) => {
+            performanceResumeReceived = true;
+            performanceCallId = params.connectionId;
+            return HttpResponse.json({});
+          },
+        ),
+      );
+      await createPerformancePollingObject(basePerformanceObjectParams);
+
+      jest.useFakeTimers();
+      jest.setSystemTime(Date.now() + UI_UPDATE_THRESHOLD + 1000);
+
+      await pollConnectionStatusIfNeeded(
+        basePerformanceObjectParams.performanceSessionId,
+      );
+
+      expect(performanceResumeReceived).toBeTruthy();
+      const performanceObject = expectPerformanceObject(
+        basePerformanceObjectParams.performanceSessionId,
+        {
+          paused: false,
+        },
+      );
+      expect(performanceObject).toBeDefined();
       expect(performanceCallId).toBe(
         basePerformanceObjectParams.performanceSessionId,
       );
@@ -183,7 +249,7 @@ describe("Performance Resilience", () => {
           },
         ),
       );
-      await createPerformanceObject(basePerformanceObjectParams);
+      await createPerformancePollingObject(basePerformanceObjectParams);
 
       jest.useFakeTimers();
       jest.setSystemTime(Date.now() + UI_UPDATE_THRESHOLD + 1000);
@@ -215,7 +281,7 @@ describe("Performance Resilience", () => {
         ),
       );
 
-      await createPerformanceObject(basePerformanceObjectParams);
+      await createPerformancePollingObject(basePerformanceObjectParams);
 
       jest.useFakeTimers();
       jest.setSystemTime(Date.now() + UI_UPDATE_THRESHOLD - 500);
@@ -231,7 +297,7 @@ describe("Performance Resilience", () => {
       expect(performanceSuccessReceived).toBeFalsy();
     });
 
-    it("should not poll if paused by MFA", async () => {
+    it("should not poll if paused", async () => {
       let performanceSuccessReceived = false;
       server.use(
         http.put(
@@ -243,11 +309,8 @@ describe("Performance Resilience", () => {
         ),
       );
 
-      await createPerformanceObject(basePerformanceObjectParams);
-      await setPausedByMfa(
-        basePerformanceObjectParams.performanceSessionId,
-        true,
-      );
+      await createPerformancePollingObject(basePerformanceObjectParams);
+      await pausePolling(basePerformanceObjectParams.performanceSessionId);
       await getPerformanceObject(
         basePerformanceObjectParams.performanceSessionId,
       );
@@ -294,7 +357,7 @@ describe("Performance Resilience", () => {
           ),
         );
 
-        await createPerformanceObject(basePerformanceObjectParams);
+        await createPerformancePollingObject(basePerformanceObjectParams);
 
         jest.useFakeTimers();
         jest.setSystemTime(Date.now() + 8000);
@@ -308,7 +371,7 @@ describe("Performance Resilience", () => {
         const cleanedUpObject = await getPerformanceObject(
           basePerformanceObjectParams.performanceSessionId,
         );
-        expect(cleanedUpObject).toEqual({});
+        expect(cleanedUpObject).toBeUndefined();
       });
     });
   });
@@ -346,7 +409,7 @@ describe("Performance Resilience", () => {
     });
 
     it("should poll for status after UI_UPDATE_THRESHOLD seconds", async () => {
-      await createPerformanceObject(basePerformanceObject);
+      await createPerformancePollingObject(basePerformanceObject);
 
       const poller = await setPerformanceResiliencePoller(1);
 
@@ -358,7 +421,7 @@ describe("Performance Resilience", () => {
     });
 
     it("should NOT poll for status before UI_UPDATE_THRESHOLD seconds", async () => {
-      await createPerformanceObject(basePerformanceObject);
+      await createPerformancePollingObject(basePerformanceObject);
 
       const poller = await setPerformanceResiliencePoller(1);
 
@@ -375,13 +438,13 @@ describe("Performance Resilience", () => {
       const fakeConnectionId1 = "conn1";
       const fakeConnectionId2 = "conn2";
 
-      await createPerformanceObject({
+      await createPerformancePollingObject({
         ...basePerformanceObject,
         performanceSessionId: fakeSessionId1,
         connectionId: fakeConnectionId1,
       });
 
-      await createPerformanceObject({
+      await createPerformancePollingObject({
         ...basePerformanceObject,
         performanceSessionId: fakeSessionId2,
         connectionId: fakeConnectionId2,
@@ -399,7 +462,7 @@ describe("Performance Resilience", () => {
 
     it("should poll repeatedly on interval", async () => {
       jest.useRealTimers();
-      await createPerformanceObject(basePerformanceObject);
+      await createPerformancePollingObject(basePerformanceObject);
 
       const poller = await setPerformanceResiliencePoller(1);
 

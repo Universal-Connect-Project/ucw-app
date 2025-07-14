@@ -16,7 +16,7 @@ import {
 } from "../services/performanceTracking";
 import { getAggregatorIdFromTestAggregatorId } from "../adapterIndex";
 import {
-  createPerformanceObject,
+  createPerformancePollingObject,
   setLastUiUpdateTimestamp,
 } from "../aggregatorPerformanceMeasuring/utils";
 
@@ -203,12 +203,12 @@ export class ConnectApi extends AggregatorAdapterBase {
       );
     }
 
-    if (!isRefreshConnection && this.getNeedsLocalPerformanceResilience()) {
-      createPerformanceObject({
+    if (!isRefreshConnection && this.getRequiresPollingForPerformance()) {
+      createPerformancePollingObject({
         userId: this.getUserId(),
         connectionId: connection.id,
         performanceSessionId,
-        aggregatorId: this.context.aggregator,
+        aggregatorId: this.context.aggregator, // Must use the original aggregator string to request status from sandbox or prod adapters.
       });
     }
 

@@ -87,12 +87,10 @@ describe("finicity aggregator", () => {
     });
   });
 
-  describe("GetNeedsLocalPerformanceResilience", () => {
+  describe("GetRequiresPollingForPerformance", () => {
     it("returns false", () => {
-      expect(finicityAdapterSandbox.getNeedsLocalPerformanceResilience()).toBe(
-        false,
-      );
-      expect(finicityAdapter.getNeedsLocalPerformanceResilience()).toBe(false);
+      expect(finicityAdapterSandbox.requiresPollingForPerformance).toBe(false);
+      expect(finicityAdapter.requiresPollingForPerformance).toBe(false);
     });
   });
 

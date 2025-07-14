@@ -49,34 +49,34 @@ describe("AggregatorAdapterBase", () => {
     });
   });
 
-  describe("getNeedsLocalPerformanceResilience", () => {
-    it("returns true if the adapter does not implement getNeedsLocalPerformanceResilience", async () => {
+  describe("getRequiresPollingForPerformance", () => {
+    it("returns true if the adapter does not implement getRequiresPollingForPerformance", async () => {
       await aggregatorAdapterBase.init();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (aggregatorAdapterBase as any).aggregatorAdapter = {};
-      expect(aggregatorAdapterBase.getNeedsLocalPerformanceResilience()).toBe(
+      expect(aggregatorAdapterBase.getRequiresPollingForPerformance()).toBe(
         true,
       );
     });
 
-    it("returns the value from the adapter's getNeedsLocalPerformanceResilience if implemented (true)", async () => {
+    it("returns the value from the adapter's getRequiresPollingForPerformance if implemented (true)", async () => {
       await aggregatorAdapterBase.init();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (aggregatorAdapterBase as any).aggregatorAdapter = {
-        getNeedsLocalPerformanceResilience: jest.fn().mockReturnValue(true),
+        requiresPollingForPerformance: true,
       };
-      expect(aggregatorAdapterBase.getNeedsLocalPerformanceResilience()).toBe(
+      expect(aggregatorAdapterBase.getRequiresPollingForPerformance()).toBe(
         true,
       );
     });
 
-    it("returns the value from the adapter's getNeedsLocalPerformanceResilience if implemented (false)", async () => {
+    it("returns the value from the adapter's getRequiresPollingForPerformance if implemented (false)", async () => {
       await aggregatorAdapterBase.init();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (aggregatorAdapterBase as any).aggregatorAdapter = {
-        getNeedsLocalPerformanceResilience: jest.fn().mockReturnValue(false),
+        requiresPollingForPerformance: false,
       };
-      expect(aggregatorAdapterBase.getNeedsLocalPerformanceResilience()).toBe(
+      expect(aggregatorAdapterBase.getRequiresPollingForPerformance()).toBe(
         false,
       );
     });

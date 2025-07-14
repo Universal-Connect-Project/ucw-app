@@ -233,7 +233,7 @@ export interface WidgetAdapter {
   ) => Promise<Connection | undefined>;
   HandleOauthResponse?: (request: any) => Promise<Connection>;
   getShouldRecordPerformanceDuration?: () => boolean;
-  getNeedsLocalPerformanceResilience?: () => boolean;
+  requiresPollingForPerformance?: boolean;
 }
 
 export interface CachedInstitution {
