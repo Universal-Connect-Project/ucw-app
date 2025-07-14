@@ -1,5 +1,7 @@
-import { MX_INT_AGGREGATOR_STRING } from "@repo/mx-adapter";
-import { MX_BANK_UCP_INSTITUTION_ID } from "@repo/mx-adapter/src/testInstitutions";
+import {
+  MX_BANK_UCP_INSTITUTION_ID,
+  MX_INT_AGGREGATOR_STRING,
+} from "@repo/mx-adapter";
 import { ComboJobTypes, MEMBERS_URL } from "@repo/utils";
 
 export const addMember = () => {

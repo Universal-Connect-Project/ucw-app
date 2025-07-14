@@ -1,7 +1,4 @@
-import {
-  MX_BANK_NAME,
-  MX_BANK_TO_HIDE_NAME,
-} from "@repo/mx-adapter/src/testInstitutions";
+import { MX_BANK_NAME, MX_BANK_TO_HIDE_NAME } from "@repo/mx-adapter";
 import { searchByText, visitAgg } from "@repo/utils-cypress";
 
 // These tests expect local preferences to match testPreferences.json

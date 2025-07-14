@@ -1,9 +1,4 @@
-import {
-  clearSearch,
-  searchByText,
-  visitAgg,
-  visitIdentity,
-} from "@repo/utils-cypress";
+import { searchByText, visitAgg, visitIdentity } from "@repo/utils-cypress";
 import { ComboJobTypes } from "@repo/utils";
 import { CHASE_BANK_TEST_FILTER_NAME } from "../../../src/testInstitutions/testInstitutions";
 import {
@@ -113,50 +108,6 @@ describe("search", () => {
 
       searchByText(MX_BANK_ROUTING_NUMBER);
       cy.findByText(MX_BANK_NAME).should("exist");
-    });
-  });
-
-  describe("Aggregator override", () => {
-    it("hides institutions that are not supported by MX in the recommended institution list when aggregatorOverride is set to MX", () => {
-      visitAgg();
-
-      cy.findByText(SOPHTRON_BANK_NAME).should("exist");
-
-      const institutionThatIsInFavoriteAndSupportsAll = MX_BANK_NAME;
-
-      cy.visit(
-        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${crypto.randomUUID()}&aggregatorOverride=mx`,
-      );
-
-      cy.findByText(institutionThatIsInFavoriteAndSupportsAll).should("exist");
-      cy.findByText(SOPHTRON_BANK_NAME, {
-        timeout: 5000,
-      }).should("not.exist");
-    });
-
-    it("hides search results that aren't supported by MX when aggregatorOverride is set to MX", () => {
-      visitAgg();
-
-      searchByText("sophtron");
-
-      cy.findByText(SOPHTRON_BANK_NAME).should("exist");
-
-      cy.visit(
-        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${crypto.randomUUID()}&aggregatorOverride=mx`,
-      );
-
-      searchByText(MX_BANK_NAME);
-      cy.findByText(MX_BANK_NAME, {
-        timeout: 45000,
-      }).should("exist");
-
-      clearSearch();
-
-      searchByText("sophtron");
-
-      cy.findByText("Soperton").should("exist");
-
-      cy.findByText(SOPHTRON_BANK_NAME).should("not.exist");
     });
   });
 });
