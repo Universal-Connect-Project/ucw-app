@@ -59,7 +59,7 @@ describe("connectApi", () => {
     refreshingContextConnectApi = new ConnectApi({
       context: {
         ...testContext,
-        isRefreshConnection: true,
+        connectionId: "testConnectionId",
       },
     });
 
@@ -434,7 +434,7 @@ describe("connectApi", () => {
         const customContext = {
           ...testContext,
           current_job_id: "testJobGuid",
-          isRefreshConnection: true,
+          connectionId: "testConnectionId",
         };
         const customApi = new ConnectApi({ context: customContext });
         customApi.init();

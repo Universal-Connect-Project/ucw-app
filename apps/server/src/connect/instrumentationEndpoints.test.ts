@@ -85,7 +85,6 @@ describe("instrumentationEndpoints", () => {
         aggregatorOverride: "testAggregatorOverride",
         aggregator: "testAggregator",
         connectionId: "currentMemberGuid",
-        isRefreshConnection: true,
         jobTypes: req.body.jobTypes,
         oauth_referral_source: "BROWSER",
         scheme: "vcs",
@@ -111,7 +110,6 @@ describe("instrumentationEndpoints", () => {
       expect(req.context).toEqual({
         aggregator: req.body.current_aggregator,
         connectionId: req.body.current_member_guid,
-        isRefreshConnection: true,
         jobTypes: req.body.jobTypes,
         oauth_referral_source: "BROWSER",
         scheme: "vcs",

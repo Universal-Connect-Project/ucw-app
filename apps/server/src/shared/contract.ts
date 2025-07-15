@@ -16,7 +16,6 @@ export interface Context {
   scheme?: string;
   performanceSessionId?: string;
   aggregatorOverride?: string;
-  isRefreshConnection?: boolean;
 }
 
 export enum ConnectionStatus {
