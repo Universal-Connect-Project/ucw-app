@@ -154,9 +154,9 @@ function mapCredentialToChallenge(
 }
 
 export class ConnectApi extends AggregatorAdapterBase {
-  // eslint-disable-next-line @typescript-eslint/no-useless-constructor, @typescript-eslint/no-explicit-any
   isRefreshConnection?: boolean;
 
+  // eslint-disable-next-line @typescript-eslint/no-useless-constructor, @typescript-eslint/no-explicit-any
   constructor(req: any) {
     super(req);
     this.isRefreshConnection = !!(
