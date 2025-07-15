@@ -49,6 +49,39 @@ describe("AggregatorAdapterBase", () => {
     });
   });
 
+  describe("getRequiresPollingForPerformance", () => {
+    it("returns true if the adapter does not implement getRequiresPollingForPerformance", async () => {
+      await aggregatorAdapterBase.init();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (aggregatorAdapterBase as any).aggregatorAdapter = {};
+      expect(aggregatorAdapterBase.getRequiresPollingForPerformance()).toBe(
+        true,
+      );
+    });
+
+    it("returns the value from the adapter's getRequiresPollingForPerformance if implemented (true)", async () => {
+      await aggregatorAdapterBase.init();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (aggregatorAdapterBase as any).aggregatorAdapter = {
+        requiresPollingForPerformance: true,
+      };
+      expect(aggregatorAdapterBase.getRequiresPollingForPerformance()).toBe(
+        true,
+      );
+    });
+
+    it("returns the value from the adapter's getRequiresPollingForPerformance if implemented (false)", async () => {
+      await aggregatorAdapterBase.init();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (aggregatorAdapterBase as any).aggregatorAdapter = {
+        requiresPollingForPerformance: false,
+      };
+      expect(aggregatorAdapterBase.getRequiresPollingForPerformance()).toBe(
+        false,
+      );
+    });
+  });
+
   describe("getOauthStates", () => {
     it("returns a connected state", async () => {
       await aggregatorAdapterBase.init();

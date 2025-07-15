@@ -87,6 +87,13 @@ describe("finicity aggregator", () => {
     });
   });
 
+  describe("requiresPollingForPerformance", () => {
+    it("returns false", () => {
+      expect(finicityAdapterSandbox.requiresPollingForPerformance).toBe(false);
+      expect(finicityAdapter.requiresPollingForPerformance).toBe(false);
+    });
+  });
+
   describe("GetInsitutionById", () => {
     it("Maps correct fields", async () => {
       const testInstitutionId = "testId";
