@@ -16,14 +16,23 @@ export const visitIdentity = () => {
 };
 
 export const visitAgg = (options?: any) => {
-  const { failOnStatusCode, token, userId: userIdOverride } = options || {};
+  const {
+    aggregatorOverride,
+    failOnStatusCode,
+    token,
+    userId: userIdOverride,
+  } = options || {};
 
   const userId = userIdOverride || crypto.randomUUID();
 
   const tokenString = token ? `&token=${token}` : "";
 
+  const aggregatorOverrideString = aggregatorOverride
+    ? `&aggregatorOverride=${aggregatorOverride}`
+    : "";
+
   cy.visit(
-    `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}${tokenString}`,
+    `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}${tokenString}${aggregatorOverrideString}`,
     {
       failOnStatusCode,
     },

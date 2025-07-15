@@ -35,6 +35,24 @@ const getAggregatorByVolume = (
   })?.[0] as Aggregator;
 };
 
+const getAggregatorName = ({
+  aggregator,
+  institution,
+}: {
+  aggregator: Aggregator;
+  institution: CachedInstitution;
+}) => {
+  const testAdapterName =
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (adapterMap[aggregator as keyof typeof adapterMap] as any)?.testAdapterId;
+
+  if (testAdapterName && institution.is_test_bank) {
+    return testAdapterName;
+  }
+
+  return aggregator;
+};
+
 const resolveAggregator = async ({
   institution,
   jobTypes,
@@ -92,13 +110,10 @@ const resolveAggregator = async ({
     aggregator as keyof CachedInstitution
   ] as InstitutionAggregator;
 
-  const testAdapterName =
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (adapterMap[aggregator as keyof typeof adapterMap] as any)?.testAdapterId;
-
-  if (testAdapterName && institution.is_test_bank) {
-    aggregator = testAdapterName;
-  }
+  aggregator = getAggregatorName({
+    aggregator,
+    institution,
+  });
 
   debug(
     `Resolving institution: ${ucpInstitutionId} to aggregator: ${aggregator} available aggregators: ${JSON.stringify(aggregators)}`,
@@ -119,7 +134,11 @@ const resolveByAggregatorOverride = ({
   institution: CachedInstitution;
   ucpInstitutionId: string;
 }) => {
-  const aggregator = aggregatorOverride;
+  const aggregator = getAggregatorName({
+    aggregator: aggregatorOverride,
+    institution,
+  });
+
   let institutionAggregator;
 
   if (institution.is_test_bank) {

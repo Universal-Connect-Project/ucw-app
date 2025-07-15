@@ -101,7 +101,7 @@ describe("institutionResolver", () => {
       ElasticSearchMock.clearAll();
     });
 
-    it("resolves to the aggregatorOverride with a regular adapter and a non institution", async () => {
+    it("resolves to the aggregatorOverride with a regular adapter and a non test institution", async () => {
       const aggregatorInstitutionId = "testAggregatorInstitutionId";
 
       const institutionData = {
@@ -118,6 +118,7 @@ describe("institutionResolver", () => {
           return {
             _source: {
               ...institutionData,
+              is_test_bank: false,
               [MX_AGGREGATOR_STRING]: {
                 id: aggregatorInstitutionId,
               },
@@ -141,6 +142,42 @@ describe("institutionResolver", () => {
       });
     });
 
+    it("resolves to the aggregatorOverride's test adapter with a regular adapter and a test institution", async () => {
+      const aggregatorInstitutionId = "testAggregatorInstitutionId";
+
+      ElasticSearchMock.add(
+        {
+          method: "GET",
+          path: `/institutions/_doc/${aggregatorInstitutionId}`,
+        },
+        () => {
+          return {
+            _source: {
+              ...elasticSearchInstitutionData,
+              is_test_bank: true,
+              [MX_AGGREGATOR_STRING]: {
+                id: aggregatorInstitutionId,
+              },
+            },
+          };
+        },
+      );
+
+      const institution = await resolveInstitutionAggregator({
+        aggregatorOverride: MX_AGGREGATOR_STRING,
+        ucpInstitutionId: aggregatorInstitutionId,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+      });
+
+      expect(institution).toEqual({
+        aggregator: MX_INT_AGGREGATOR_STRING,
+        id: aggregatorInstitutionId,
+        logo_url: elasticSearchInstitutionData.logo,
+        name: elasticSearchInstitutionData.name,
+        url: elasticSearchInstitutionData.url,
+      });
+    });
+
     it("resolves to the aggregatorOverride with a test adapter and a test institution", async () => {
       const aggregatorInstitutionId = "testAggregatorInstitutionId";
 
@@ -153,6 +190,7 @@ describe("institutionResolver", () => {
           return {
             _source: {
               ...elasticSearchInstitutionData,
+              is_test_bank: true,
               [MX_AGGREGATOR_STRING]: {
                 id: aggregatorInstitutionId,
               },

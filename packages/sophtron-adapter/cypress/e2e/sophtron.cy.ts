@@ -8,9 +8,9 @@ import {
   refreshAConnection,
   visitWithPostMessageSpy,
   MEMBER_STATUS_UPDATE_EVENT_TYPE,
+  enterSophtronCredentials,
 } from "@repo/utils-cypress";
 import {
-  enterSophtronCredentials,
   searchAndSelectSophtron,
   selectSophtronAccount,
 } from "../shared/utils/sophtron";

@@ -1,6 +1,7 @@
 import type { CachedInstitution } from "@repo/utils";
 
 export const MX_BANK_UCP_INSTITUTION_ID = "mxBank";
+export const MX_BANK_MX_INSTITUTION_ID = "mxbank";
 export const MX_BANK_TO_HIDE_NAME = "MX Bank to hide";
 export const MX_BANK_NAME = "MX Bank";
 export const MX_BANK_TRANSACTIONS_ONLY_NAME = "MX Bank transactions only";
@@ -16,7 +17,7 @@ export const testInstitutions: CachedInstitution[] = [
     is_test_bank: true,
     routing_numbers: [],
     mx: {
-      id: "mxbank",
+      id: MX_BANK_MX_INSTITUTION_ID,
       supports_aggregation: true,
       supports_history: false,
       supports_identification: false,

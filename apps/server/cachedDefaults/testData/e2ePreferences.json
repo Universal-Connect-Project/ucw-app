@@ -1,6 +1,4 @@
 {
-  "defaultAggregator": "mx",
-
   "supportedAggregators": ["mx", "sophtron"],
 
   "defaultAggregatorVolume": {},
@@ -9,5 +7,9 @@
 
   "hiddenInstitutions": ["mxBankToHide"],
 
-  "recommendedInstitutions": ["mxBank", "mxBankTransactionsOnly"]
+  "recommendedInstitutions": [
+    "mxBank",
+    "mxBankTransactionsOnly",
+    "sophtronBank"
+  ]
 }

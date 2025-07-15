@@ -2,16 +2,12 @@ import {
   expectConnectionSuccess,
   clickContinue,
   searchByText,
+  enterSophtronCredentials,
 } from "@repo/utils-cypress";
 
 export const searchAndSelectSophtron = () => {
   searchByText("Sophtron Bank NoMFA");
   cy.findByLabelText("Add account with Sophtron Bank NoMFA").first().click();
-};
-
-export const enterSophtronCredentials = () => {
-  cy.findByLabelText("User ID").type("asdf");
-  cy.findByLabelText("Password").type("asdf");
 };
 
 export const selectSophtronAccount = () => {

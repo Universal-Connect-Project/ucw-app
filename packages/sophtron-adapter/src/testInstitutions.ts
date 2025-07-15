@@ -1,6 +1,8 @@
 import type { CachedInstitution } from "@repo/utils";
 
 export const SOPHTRON_BANK_NAME = "Sophtron Bank";
+export const SOPHTRON_BANK_NO_MFA_SOPHTRON_INSTITUTION_ID =
+  "926623ca-5952-4921-8f77-2023f1cdde8e";
 
 export const testInstitutions: CachedInstitution[] = [
   {
@@ -69,7 +71,7 @@ export const testInstitutions: CachedInstitution[] = [
     is_test_bank: true,
     routing_numbers: [],
     sophtron: {
-      id: "926623ca-5952-4921-8f77-2023f1cdde8e",
+      id: SOPHTRON_BANK_NO_MFA_SOPHTRON_INSTITUTION_ID,
       supports_aggregation: true,
       supports_history: true,
       supports_identification: true,

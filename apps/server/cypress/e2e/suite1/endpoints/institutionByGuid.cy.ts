@@ -1,6 +1,6 @@
-import { MX_BANK_UCP_INSTITUTION_ID } from "@repo/mx-adapter/src/testInstitutions";
 import { ComboJobTypes } from "@repo/utils";
 import { getInstitution } from "../../../shared/utils/mx";
+import { MX_BANK_UCP_INSTITUTION_ID } from "@repo/mx-adapter";
 
 describe("institution by guid", () => {
   it("returns an institution when given an aggregator", () => {
