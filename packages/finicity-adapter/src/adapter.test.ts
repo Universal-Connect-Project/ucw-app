@@ -87,7 +87,7 @@ describe("finicity aggregator", () => {
     });
   });
 
-  describe("GetRequiresPollingForPerformance", () => {
+  describe("requiresPollingForPerformance", () => {
     it("returns false", () => {
       expect(finicityAdapterSandbox.requiresPollingForPerformance).toBe(false);
       expect(finicityAdapter.requiresPollingForPerformance).toBe(false);

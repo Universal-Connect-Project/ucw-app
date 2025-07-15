@@ -92,14 +92,14 @@ export const recordSuccessEvent = async (connectionId: string) => {
 
 export const recordConnectionPauseEvent = async (
   connectionId: string,
-  callPausePolling = true,
+  shouldPausePolling = true,
 ) => {
   await sendPerformanceEvent({
     connectionId,
     eventType: "connectionPause",
     method: "PUT",
   });
-  if (callPausePolling) {
+  if (shouldPausePolling) {
     pausePolling(connectionId);
   }
 };
