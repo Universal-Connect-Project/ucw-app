@@ -19,6 +19,7 @@ export const instrumentationHandler = async (req: Request, res: Response) => {
     if (Boolean(current_member_guid) && Boolean(current_aggregator)) {
       req.context.aggregator = current_aggregator;
       req.context.connectionId = current_member_guid;
+      req.context.isRefreshConnection = true;
     }
     if (aggregatorOverride) {
       req.context.aggregatorOverride = aggregatorOverride;

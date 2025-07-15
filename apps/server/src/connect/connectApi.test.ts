@@ -20,6 +20,7 @@ import {
   getPerformanceObject,
   pausePolling,
 } from "../aggregatorPerformanceMeasuring/utils";
+import * as performanceMeasuringUtils from "../aggregatorPerformanceMeasuring/utils";
 import {
   answerMfaMemberData,
   memberCreateData,
@@ -27,6 +28,8 @@ import {
   memberStatusData,
 } from "@repo/utils-dev-dependency/mx/testData";
 import expectPerformanceObject from "../test/expectPerformanceObject";
+import * as performanceTracking from "../services/performanceTracking";
+
 const {
   connectionByIdMemberData,
   memberStatusData: mxMemberStatusData,
@@ -39,6 +42,8 @@ const performanceSessionId = "aaaa-bbbb-cccc-dddd-eeee";
 describe("connectApi", () => {
   let testContext: Context;
   let connectApi: ConnectApi;
+  let refreshingContextConnectApi: ConnectApi;
+
   beforeEach(() => {
     testContext = {
       aggregator: MX_AGGREGATOR_STRING,
@@ -51,14 +56,26 @@ describe("connectApi", () => {
     connectApi = new ConnectApi({
       context: testContext,
     });
+    refreshingContextConnectApi = new ConnectApi({
+      context: {
+        ...testContext,
+        isRefreshConnection: true,
+      },
+    });
 
+    refreshingContextConnectApi.init();
     connectApi.init();
     jest.useRealTimers();
     jest.restoreAllMocks();
   });
 
   describe("addMember", () => {
-    it("returns a member and doesnt send a connection start event on refresh connection", async () => {
+    it("returns a member and doesnt send a connection start event and doesn't create a performance polling object on refresh connection", async () => {
+      const fakeSessionId = "test-session-id-124-123";
+      jest
+        .spyOn(globalThis.crypto, "randomUUID")
+        .mockReturnValue(fakeSessionId);
+
       const requestLog = setupPerformanceHandlers([
         "connectionStart",
         "connectionPause",
@@ -82,7 +99,7 @@ describe("connectApi", () => {
 
       const mxMember = mxOauthMemberData.member;
 
-      const response = await connectApi.addMember(memberData);
+      const response = await refreshingContextConnectApi.addMember(memberData);
 
       expect(response).toEqual({
         member: {
@@ -117,6 +134,9 @@ describe("connectApi", () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       expect(requestLog.length).toBe(0);
+
+      const performanceObject = await getPerformanceObject(fakeSessionId);
+      expect(performanceObject).toBeUndefined();
     });
 
     it("does NOT create a performance object when getRequiresPollingForPerformance returns false", async () => {
@@ -408,6 +428,73 @@ describe("connectApi", () => {
       });
       expect(connection).not.toBeUndefined();
     });
+
+    describe("when refreshing a connection", () => {
+      it("answers challenge question with updated credentials and does NOT call resume connection event", async () => {
+        const customContext = {
+          ...testContext,
+          current_job_id: "testJobGuid",
+          isRefreshConnection: true,
+        };
+        const customApi = new ConnectApi({ context: customContext });
+        customApi.init();
+
+        const recordConnectionResumeEventSpy = jest.spyOn(
+          performanceTracking,
+          "recordConnectionResumeEvent",
+        );
+
+        let requestBody: unknown;
+
+        server.use(
+          http.put(ANSWER_CHALLENGE_PATH, async ({ request }) => {
+            requestBody = await request.json();
+            return HttpResponse.json({});
+          }),
+        );
+
+        await customApi.updateMember(answerMfaMemberData);
+
+        expect(recordConnectionResumeEventSpy).not.toHaveBeenCalled();
+
+        expect(requestBody).toEqual({
+          member: {
+            challenges: [{ guid: "credentialGuid", value: "credentialValue" }],
+          },
+        });
+      });
+
+      it("updates member without challenges and does not call setLastUiUpdateTimestamp", async () => {
+        let requestBody: unknown;
+
+        server.use(
+          http.put(UPDATE_CONNECTION_PATH, async ({ request }) => {
+            requestBody = await request.json();
+            return HttpResponse.json(memberData);
+          }),
+        );
+
+        const setLastUiUpdateTimestampSpy = jest.spyOn(
+          performanceMeasuringUtils,
+          "setLastUiUpdateTimestamp",
+        );
+
+        const connection = await refreshingContextConnectApi.updateMember({
+          ...memberCreateData,
+          guid: "testGuid1",
+        });
+
+        expect(requestBody).toEqual({
+          member: {
+            credentials: [
+              { guid: "testCredentialGuid", value: "testCredentialValue" },
+            ],
+          },
+        });
+        expect(connection).not.toBeUndefined();
+        expect(setLastUiUpdateTimestampSpy).not.toHaveBeenCalled();
+      });
+    });
   });
 
   describe("loadMemberByGuid", () => {
@@ -540,6 +627,51 @@ describe("connectApi", () => {
           connectionId: expect.any(String),
         }),
       );
+    });
+
+    describe("when refreshing a connection", () => {
+      it("does not record a pause event when mfa challenges. Does not pause the performance polling object or update the lastUiUpdateTimestamp", async () => {
+        const recordConnectionPauseEventSpy = jest.spyOn(
+          performanceTracking,
+          "recordConnectionPauseEvent",
+        );
+        const pausePollingSpy = jest.spyOn(
+          performanceMeasuringUtils,
+          "pausePolling",
+        );
+        const setLastUiUpdateTimestampSpy = jest.spyOn(
+          performanceMeasuringUtils,
+          "setLastUiUpdateTimestamp",
+        );
+
+        await refreshingContextConnectApi.loadMemberByGuid("testGuid");
+
+        expect(recordConnectionPauseEventSpy).not.toHaveBeenCalled();
+        expect(pausePollingSpy).not.toHaveBeenCalled();
+        expect(setLastUiUpdateTimestampSpy).not.toHaveBeenCalled();
+      });
+
+      it("does NOT record success event if member is connected and is not being aggregated", async () => {
+        const recordConnectionSuccessEventSpy = jest.spyOn(
+          performanceTracking,
+          "recordSuccessEvent",
+        );
+
+        await refreshingContextConnectApi.loadMemberByGuid("testGuid");
+
+        expect(recordConnectionSuccessEventSpy).not.toHaveBeenCalled();
+      });
+
+      it("does NOT record resume event if member is connected is being aggregated and is Oauth", async () => {
+        const recordConnectionResumeEventSpy = jest.spyOn(
+          performanceTracking,
+          "recordConnectionResumeEvent",
+        );
+
+        await refreshingContextConnectApi.loadMemberByGuid("testGuid");
+
+        expect(recordConnectionResumeEventSpy).not.toHaveBeenCalled();
+      });
     });
   });
 });
