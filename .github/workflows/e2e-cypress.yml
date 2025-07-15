@@ -61,6 +61,8 @@ jobs:
           echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
           echo MX_CLIENT_ID=${{ secrets.MX_CLIENT_ID }} >> ${ENV_FILE_PATH}
           echo MX_API_SECRET=${{ secrets.MX_API_SECRET }} >> ${ENV_FILE_PATH}
+          echo SOPHTRON_API_USER_ID=${{ secrets.SOPHTRON_API_USER_ID }} >> ${ENV_FILE_PATH}
+          echo SOPHTRON_API_USER_SECRET=${{ secrets.SOPHTRON_API_USER_SECRET }} >> ${ENV_FILE_PATH}
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
