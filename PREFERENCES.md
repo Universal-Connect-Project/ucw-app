@@ -21,6 +21,11 @@ Follow these links to sign-up for credentials for each aggregator that the UCW c
 - Sophtron - [Register for a developer account](https://sophtron.com/Account/Register)
   - Once you have created an account, go to [https://sophtron.com/Manage](https://sophtron.com/Manage), and look for your `UserId` and `AccessKey`. Put those values in `./apps/server/env/(staging|production).env`
 
+<!-- TODO: Wait for complete integration before documenting
+- Plaid - [Sign Up](https://dashboard.plaid.com/signup)
+  - Once you have created an account, go to [https://dashboard.plaid.com/developers/keys](https://dashboard.plaid.com/developers/keys), and look for your `Client ID`, `Sandbox` and `Production`. Put those values in `./apps/server/env/(staging|production).env`
+-->
+
 _Note: Aggregators require a contract to access their production APIs._
 
 ## Preference Settings
@@ -33,7 +38,7 @@ Here are details for what each setting means.
 "defaultAggregator": "mx"
 ```
 
-`supportedAggregators` (`string[]`) - Set which aggregators you want to use for connections.
+`supportedAggregators` (`string[]`) - Set which aggregators you want to use for connections. Options are: mx, sophtron, finicity, akoya, plaid
 
 ```
 "supportedAggregators": [

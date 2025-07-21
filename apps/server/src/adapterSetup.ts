@@ -119,6 +119,12 @@ const plaidAdapterMapObject: Record<string, AdapterMap> =
       get: get,
     },
     logClient: logger,
+    performanceClient: {
+      recordStartEvent: recordStartEvent,
+      recordSuccessEvent: recordSuccessEvent,
+      recordConnectionPauseEvent: recordConnectionPauseEvent,
+      recordConnectionResumeEvent: recordConnectionResumeEvent,
+    },
     aggregatorCredentials: {
       plaidSandbox: {
         clientName: config.PLAID_CLIENT_NAME,
@@ -126,8 +132,8 @@ const plaidAdapterMapObject: Record<string, AdapterMap> =
         secret: config.PLAID_SECRET,
       },
       plaidProd: {
-        clientName: config.PLAID_CLIENT_NAME_PROD,
-        clientId: config.PLAID_CLIENT_ID_PROD,
+        clientName: config.PLAID_CLIENT_NAME,
+        clientId: config.PLAID_CLIENT_ID,
         secret: config.PLAID_SECRET_PROD,
       },
     },

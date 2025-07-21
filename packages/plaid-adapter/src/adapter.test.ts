@@ -3,12 +3,14 @@ import "dotenv/config";
 import {
   createClient as createCacheClient,
   createLogClient,
+  createMockPerformanceClient,
 } from "@repo/utils/test";
-import { PLAID_BASE_PATH_PROD, PlaidAdapter } from "./adapter";
+import { PlaidAdapter } from "./adapter";
 import { ComboJobTypes, Connection, ConnectionStatus } from "@repo/utils";
 import { server } from "./test/testServer";
+import { PLAID_BASE_PATH_PROD } from "./apiClient";
 
-server.listen()
+server.listen();
 const cacheClient = createCacheClient();
 const logClient = createLogClient();
 
@@ -27,11 +29,14 @@ const aggregatorCredentials = {
   },
 };
 
+const mockPerformanceClient = createMockPerformanceClient();
+
 const plaidAdapterSandbox = new PlaidAdapter({
   sandbox: true,
   dependencies: {
     cacheClient,
     logClient,
+    performanceClient: mockPerformanceClient,
     aggregatorCredentials,
     getWebhookHostUrl: () => "testWebhookHostUrl",
     envConfig: {
@@ -44,6 +49,7 @@ const plaidAdapter = new PlaidAdapter({
   sandbox: false,
   dependencies: {
     cacheClient,
+    performanceClient: mockPerformanceClient,
     logClient,
     aggregatorCredentials,
     getWebhookHostUrl: () => "testWebhookHostUrl",
@@ -94,12 +100,11 @@ describe("plaid aggregator", () => {
     const baseConnectionRequest = {
       credentials: [],
       institutionId: "testInstitutionId",
-      jobTypes: [ComboJobTypes.TRANSACTIONS]
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
     };
     const testUserId = "test-user-id";
 
     it("creates a connection and gets the connection by id then gets the status", async () => {
-
       const connection = await plaidAdapter.CreateConnection(
         {
           ...baseConnectionRequest,
@@ -165,7 +170,7 @@ describe("plaid aggregator", () => {
   });
 
   describe("HandleOauthResponse", () => {
-    it("returns the updated connection if valid code and connection is found", async () => {
+    it("returns the updated connection if valid code and connection is found and sends performance success event", async () => {
       const requestId = "abc123";
       const connection: Connection = {
         id: requestId,
@@ -181,22 +186,22 @@ describe("plaid aggregator", () => {
           connection_id: requestId,
         },
         body: {
-          webhook_code: "ITEM_ADD_RESULT", 
-          public_token: "fake_public_token", 
-          link_session_id: "link_session_id"
-        }
+          webhook_code: "ITEM_ADD_RESULT",
+          public_token: "fake_public_token",
+          link_session_id: "link_session_id",
+        },
       });
 
       expect(result).toEqual({
         status: ConnectionStatus.CONNECTED,
         institution_code: "inst-001",
-        id: "link_session_id",
+        id: "accessTokenTest",
         postMessageEventData: {
           memberConnected: {
-            plaidAuthCode: "fake_public_token",
+            connectionId: "accessTokenTest",
           },
           memberStatusUpdate: {
-            plaidAuthCode: "fake_public_token",
+            connectionId: "accessTokenTest",
           },
         },
         userId: null,
@@ -204,22 +209,27 @@ describe("plaid aggregator", () => {
 
       const cached = await cacheClient.get(requestId);
       expect(cached).toEqual(result);
+      expect(mockPerformanceClient.recordSuccessEvent).toHaveBeenCalledWith(
+        requestId,
+      );
     });
 
     it("throws if connection not found in cache", async () => {
       const request = {
         query: {
+          connection_id: "junk",
           state: "nonexistent",
           code: "code123",
         },
+        body: {},
       };
 
       await expect(plaidAdapter.HandleOauthResponse(request)).rejects.toThrow(
-        "Connection failed",
+        "Connection not found",
       );
     });
 
-    it("Gets status DENIED if ERROR event from webhook", async () => {
+    it("Logs info and returns the connection if EVENTS webhook is received", async () => {
       const requestId = "abc123";
       await cacheClient.set(requestId, {});
 
@@ -227,74 +237,37 @@ describe("plaid aggregator", () => {
         query: {
           connection_id: requestId,
         },
-        body:{
-          "environment": "sandbox",
-          "link_session_id": "1daca4d5-9a0d-4e85-a2e9-1e905ecaa32e",
-          "link_token": "link-sandbox-79e723b0-0e04-4248-8a33-15ceb6828a45",
-          "webhook_code": "EVENTS",
-          "webhook_type": "LINK",
-          "events": [
+        body: {
+          environment: "sandbox",
+          link_session_id: "1daca4d5-9a0d-4e85-a2e9-1e905ecaa32e",
+          link_token: "link-sandbox-79e723b0-0e04-4248-8a33-15ceb6828a45",
+          webhook_code: "EVENTS",
+          webhook_type: "LINK",
+          events: [
             {
-              "event_id": "4b2390cf-33a2-4078-b933-62468b9e53a5",
-              "event_metadata": {
-                "error_code": "INVALID_CREDENTIALS",
-                "error_message": "the provided credentials were not correct",
-                "error_type": "ITEM_ERROR",
-                "institution_id": "ins_20",
-                "institution_name": "Citizens Bank",
-                "request_id": "ttK0NtGKaVAlbCR"
+              event_id: "978b772c-f2cc-404f-9449-2113e4671c4f",
+              event_metadata: {
+                error_code: "INVALID_CREDENTIALS",
+                error_message: "the provided credentials were not correct",
+                error_type: "ITEM_ERROR",
+                exit_status: "requires_credentials",
+                institution_id: "ins_20",
+                institution_name: "Citizens Bank",
+                request_id: "u1HcAeiCKtz3qmm",
               },
-              "event_name": "ERROR",
-              "timestamp": "2024-05-21T00:18:09Z"
+              event_name: "EXIT",
+              timestamp: "2024-05-21T00:18:13Z",
             },
-          ]
-        }
-      });
-
-      expect(result.status).toEqual(ConnectionStatus.DENIED);
-      expect(result.error_message).toEqual("{\"error_code\":\"INVALID_CREDENTIALS\",\"error_message\":\"the provided credentials were not correct\",\"error_type\":\"ITEM_ERROR\",\"institution_id\":\"ins_20\",\"institution_name\":\"Citizens Bank\",\"request_id\":\"ttK0NtGKaVAlbCR\"}");
-
-      const cached = (await cacheClient.get(requestId)) as { status: string };
-      expect(cached.status).toEqual(ConnectionStatus.DENIED);
-    });
-    it("Gets status DENIED if EXIT event from webhook", async () => {
-      const requestId = "abc123";
-      await cacheClient.set(requestId, {});
-
-      const result = await plaidAdapter.HandleOauthResponse({
-        query: {
-          connection_id: requestId,
+          ],
         },
-        body:{
-          "environment": "sandbox",
-          "link_session_id": "1daca4d5-9a0d-4e85-a2e9-1e905ecaa32e",
-          "link_token": "link-sandbox-79e723b0-0e04-4248-8a33-15ceb6828a45",
-          "webhook_code": "EVENTS",
-          "webhook_type": "LINK",
-          "events": [
-            {
-              "event_id": "978b772c-f2cc-404f-9449-2113e4671c4f",
-              "event_metadata": {
-                "error_code": "INVALID_CREDENTIALS",
-                "error_message": "the provided credentials were not correct",
-                "error_type": "ITEM_ERROR",
-                "exit_status": "requires_credentials",
-                "institution_id": "ins_20",
-                "institution_name": "Citizens Bank",
-                "request_id": "u1HcAeiCKtz3qmm"
-              },
-              "event_name": "EXIT",
-              "timestamp": "2024-05-21T00:18:13Z"
-            },
-          ]
-        }
       });
 
-      expect(result.status).toEqual(ConnectionStatus.DENIED);
-      expect(result.error_message).toEqual("{\"error_code\":\"INVALID_CREDENTIALS\",\"error_message\":\"the provided credentials were not correct\",\"error_type\":\"ITEM_ERROR\",\"exit_status\":\"requires_credentials\",\"institution_id\":\"ins_20\",\"institution_name\":\"Citizens Bank\",\"request_id\":\"u1HcAeiCKtz3qmm\"}");
+      expect(logClient.info).toHaveBeenCalled();
 
-      const cached = (await cacheClient.get(requestId)) as { status: string };
-      expect(cached.status).toEqual(ConnectionStatus.DENIED);
+      const cachedConnection = (await cacheClient.get(requestId)) as {
+        status: string;
+      };
+      expect(result).toEqual(cachedConnection);
     });
   });
 });

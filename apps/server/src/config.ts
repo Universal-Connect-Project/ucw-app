@@ -41,9 +41,7 @@ const keysToPullFromEnv = [
   "AKOYA_SECRET_PROD",
 
   "PLAID_CLIENT_NAME",
-  "PLAID_CLIENT_NAME_PROD",
   "PLAID_CLIENT_ID",
-  "PLAID_CLIENT_ID_PROD",
   "PLAID_SECRET",
   "PLAID_SECRET_PROD",
 
@@ -95,7 +93,6 @@ if (process.env.HEROKU_APP_NAME) {
   config.HOST_URL = `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`;
   config.WEBHOOK_HOST_URL = `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`;
 }
-
 if (config.INSTITUTION_POLLING_INTERVAL === undefined) {
   config.INSTITUTION_POLLING_INTERVAL = 1;
 }

@@ -12,8 +12,8 @@ test("connects to plaid test bank with oAuth", async ({ page }) => {
     `${WIDGET_BASE_URL}?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
   );
 
-  await page.getByPlaceholder("Search").fill("Houndstooth Bank");
-  await page.getByLabel("Add account with Houndstooth Bank").click();
+  await page.getByPlaceholder("Search").fill("Plaid Bank");
+  await page.getByLabel("Add account with Plaid Bank").click();
 
   const popupPromise = page.waitForEvent("popup");
   await page.getByRole("link", { name: "Go to log in" }).click();
@@ -26,13 +26,17 @@ test("connects to plaid test bank with oAuth", async ({ page }) => {
   `);
 
   const authorizeTab = await popupPromise;
-  const frame = authorizeTab.frameLocator("iframe[title='Plaid Link']") //iframe[title="Plaid Link Open"]
+  const frame = authorizeTab.frameLocator("iframe[title='Plaid Link']"); //iframe[title="Plaid Link Open"]
   await frame.getByText("Continue as guest").click();
 
-  await frame.locator("input[id='search-input-input']").fill("Houndstooth Bank");
+  await frame
+    .locator("input[id='search-input-input']")
+    .fill("Houndstooth Bank");
   await frame.getByLabel("Houndstooth Bank").click();
 
-  await frame.locator("input[type='text']:not([name='query'])").fill("user_good");
+  await frame
+    .locator("input[type='text']:not([name='query'])")
+    .fill("user_good");
   await frame.locator("input[type='password']").fill("pass_good");
   await frame.locator("button[type='submit']").click();
 
@@ -41,12 +45,13 @@ test("connects to plaid test bank with oAuth", async ({ page }) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     page.on("console", async (msg: any) => {
       const obj = (await msg.args()[0].jsonValue())?.message;
+      console.log("Received message:", obj);
       if (obj?.type === "connect/memberConnected") {
         clearTimeout(timer);
         expect(obj.metadata.user_guid).toEqual(userId);
-        expect(obj.metadata.member_guid).not.toBeNull();
+        expect(obj.metadata.member_guid).toContain("access-sandbox");
+        expect(obj.metadata.connectionId).toContain("access-sandbox");
         expect(obj.metadata.aggregator).toEqual("plaid_sandbox");
-        expect(obj.metadata.plaidAuthCode).not.toBeNull();
 
         resolve("");
       }
@@ -55,7 +60,6 @@ test("connects to plaid test bank with oAuth", async ({ page }) => {
 
   await frame.getByText("Continue").click();
   await connectedPromise;
-
   await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
     timeout: 120000,
   });

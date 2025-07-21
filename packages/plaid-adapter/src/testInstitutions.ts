@@ -2,10 +2,10 @@ import type { CachedInstitution } from "@repo/utils";
 
 export const testInstitutions: CachedInstitution[] = [
   {
-    name: "Houndstooth Bank",
+    name: "Plaid Bank",
     id: "plaidbank",
     keywords: ["plaid"],
-    logo: "https://plaid.com/",
+    logo: "https://cdn.brandfetch.io/idly0-MZ4j/w/399/h/399/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1668516050085",
     url: "https://plaid.com/",
     is_test_bank: true,
     routing_numbers: [],

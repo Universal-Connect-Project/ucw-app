@@ -1,3 +1,11 @@
-beforeAll(() => {});
+import { server } from "./src/test/testServer";
 
-afterEach(() => {});
+beforeAll(() => {
+  server.listen();
+});
+
+afterEach(() => {
+  server.resetHandlers();
+});
+
+afterAll(() => server.close());

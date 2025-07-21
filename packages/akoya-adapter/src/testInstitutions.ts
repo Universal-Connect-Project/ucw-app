@@ -5,7 +5,7 @@ export const testInstitutions: CachedInstitution[] = [
     name: "Mikomo Bank",
     id: "mikomoBank",
     keywords: ["akoya", "mikomo"],
-    logo: "https://mikomo.ddp.akoya.com/img/default.png",
+    logo: "https://cdn.brandfetch.io/idwKHUTdZK/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1668071436139",
     url: "https://docs.akoya.com/docs/introduction-to-mikomo-and-the-sandbox",
     is_test_bank: true,
     routing_numbers: [],
