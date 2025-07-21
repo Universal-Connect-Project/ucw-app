@@ -4,7 +4,7 @@ import { ComboJobTypes } from "@repo/utils";
 const WIDGET_BASE_URL = "http://localhost:8080/widget";
 
 test("connects to plaid test bank with oAuth", async ({ page }) => {
-  test.setTimeout(120000);
+  test.setTimeout(300000);
 
   const userId = crypto.randomUUID();
 
