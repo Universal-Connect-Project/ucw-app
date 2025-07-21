@@ -3,8 +3,6 @@ import { http, HttpResponse } from "msw";
 
 export const CREATE_USER_PATH = `${PLAID_BASE_PATH}/aggregation/v2/customers/active`;
 export const DELETE_USER_PATH = `${PLAID_BASE_PATH}/aggregation/v1/customers/:customerId`;
-export const MOCKED_OAUTH_URL = "http://example.url";
-export const MOCKED_FIX_OAUTH_URL = "http://fix.example.url";
 
 const handlers = [
   http.post(`${PLAID_BASE_PATH}/link/token/create`, () =>
