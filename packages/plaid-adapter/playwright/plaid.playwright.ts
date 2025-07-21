@@ -45,7 +45,6 @@ test("connects to plaid test bank with oAuth", async ({ page }) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     page.on("console", async (msg: any) => {
       const obj = (await msg.args()[0].jsonValue())?.message;
-      console.log("Received message:", obj);
       if (obj?.type === "connect/memberConnected") {
         clearTimeout(timer);
         expect(obj.metadata.user_guid).toEqual(userId);
