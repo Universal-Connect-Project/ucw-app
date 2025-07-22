@@ -1,4 +1,4 @@
-import type { LogClient } from "../adapterTypes";
+import type { LogClient } from "@repo/utils/adapterTypes";
 
 export const createLogClient = (): LogClient => {
   return {

@@ -15,13 +15,11 @@ import {
   MX_DELETE_USER_PATH,
   READ_MEMBER_STATUS_PATH,
   UPDATE_CONNECTION_PATH,
+  createLogClient,
 } from "@repo/utils-dev-dependency";
 import { mxTestData } from "@repo/utils-dev-dependency";
 import { server } from "./test/testServer";
-import {
-  createClient as createCacheClient,
-  createLogClient,
-} from "@repo/utils/test";
+import { createClient as createCacheClient } from "@repo/utils/test";
 
 const {
   aggregatorCredentials,

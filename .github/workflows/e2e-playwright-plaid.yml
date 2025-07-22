@@ -58,8 +58,6 @@ jobs:
           echo PLAID_CLIENT_ID=${{ secrets.PLAID_CLIENT_ID }} >> ${ENV_FILE_PATH}
           echo PLAID_SECRET=${{ secrets.PLAID_SECRET }} >> ${ENV_FILE_PATH}
           echo NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} >> ${ENV_FILE_PATH}
-          # This fails if using https, so we have to override it
-          echo HOST_URL=http://localhost:8080 >> ${ENV_FILE_PATH}
 
           cat ${ENV_FILE_PATH}
 

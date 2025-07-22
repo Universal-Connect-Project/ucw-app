@@ -3,10 +3,8 @@ import FinicityClient, {
   BASE_PATH,
   FINICITY_TOKEN_REDIS_KEY,
 } from "./apiClient";
-import {
-  createClient as createCacheClient,
-  createLogClient,
-} from "@repo/utils/test";
+import { createClient as createCacheClient } from "@repo/utils/test";
+import { createLogClient } from "@repo/utils-dev-dependency";
 import { server } from "./test/testServer";
 import { http, HttpResponse } from "msw";
 import {

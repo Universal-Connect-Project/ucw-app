@@ -9,8 +9,8 @@ import {
 } from "@repo/utils-dev-dependency";
 import { server } from "./test/testServer";
 
-import { mxTestData } from "@repo/utils-dev-dependency";
-import { createClient, createLogClient } from "@repo/utils/test";
+import { mxTestData, createLogClient } from "@repo/utils-dev-dependency";
+import { createClient } from "@repo/utils/test";
 
 const { aggregatorCredentials, mxVcAccountsData, mxVcTranscationsData } =
   mxTestData;

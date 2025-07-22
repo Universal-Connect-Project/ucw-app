@@ -26,7 +26,7 @@ test("connects to plaid test bank with oAuth", async ({ page }) => {
   `);
 
   const authorizeTab = await popupPromise;
-  const frame = authorizeTab.frameLocator("iframe[title='Plaid Link']"); //iframe[title="Plaid Link Open"]
+  const frame = authorizeTab.frameLocator("iframe[title='Plaid Link']");
   await frame.getByText("Continue as guest").click();
 
   await frame

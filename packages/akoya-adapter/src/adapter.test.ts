@@ -2,12 +2,12 @@ import "dotenv/config";
 
 import {
   createClient as createCacheClient,
-  createLogClient,
   createMockPerformanceClient,
 } from "@repo/utils/test";
 import { AKOYA_BASE_PATH, AKOYA_BASE_PROD_PATH, AkoyaAdapter } from "./adapter";
 import { Connection, ConnectionStatus, PerformanceClient } from "@repo/utils";
 import { AKOYA_AGGREGATOR_STRING } from "./index";
+import { createLogClient } from "@repo/utils-dev-dependency";
 
 const cacheClient = createCacheClient();
 const logClient = createLogClient();

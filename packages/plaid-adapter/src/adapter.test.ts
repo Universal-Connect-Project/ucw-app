@@ -2,15 +2,13 @@ import "dotenv/config";
 
 import {
   createClient as createCacheClient,
-  createLogClient,
   createMockPerformanceClient,
 } from "@repo/utils/test";
+import { createLogClient } from "@repo/utils-dev-dependency";
 import { PlaidAdapter } from "./adapter";
 import { ComboJobTypes, Connection, ConnectionStatus } from "@repo/utils";
-import { server } from "./test/testServer";
 import { PLAID_BASE_PATH_PROD } from "./apiClient";
 
-server.listen();
 const cacheClient = createCacheClient();
 const logClient = createLogClient();
 

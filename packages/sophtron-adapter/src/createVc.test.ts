@@ -1,4 +1,3 @@
-import { createLogClient } from "@repo/utils/test";
 import {
   getDefaultTransactionRequestEndDate,
   getDefaultTransactionRequestStartDate,
@@ -9,6 +8,7 @@ import type { AdapterDependencies } from "./models";
 import {
   SOPHTRON_VC_GET_TRANSACTIONS_PATH,
   sophtronTestData,
+  createLogClient,
 } from "@repo/utils-dev-dependency";
 import { createSophtronVC } from "./createVc";
 import { server } from "./test/testServer";

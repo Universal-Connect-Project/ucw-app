@@ -1,7 +1,7 @@
-import { createLogClient } from "@repo/utils/test";
 import {
   SOPHTRON_VC_GET_TRANSACTIONS_PATH,
   sophtronTestData,
+  createLogClient,
 } from "@repo/utils-dev-dependency";
 import { getVc } from "./getVc";
 import { server } from "./test/testServer";

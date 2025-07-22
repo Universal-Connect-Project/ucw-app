@@ -116,6 +116,7 @@ export class PlaidAdapter implements WidgetAdapter {
   }
 
   async DeleteUser(_aggregatorUserId: string): Promise<unknown> {
+    // Plaid doesn't have external users
     return;
   }
 

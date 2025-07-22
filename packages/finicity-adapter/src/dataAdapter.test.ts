@@ -6,10 +6,8 @@ import {
   createFinicitySandboxDataAdapter,
   createFinicityProdDataAdapter,
 } from "./dataAdapter";
-import {
-  createClient as createCacheClient,
-  createLogClient,
-} from "@repo/utils/test";
+import { createClient as createCacheClient } from "@repo/utils/test";
+import { createLogClient } from "@repo/utils-dev-dependency";
 import { http, HttpResponse } from "msw";
 import { server } from "./test/testServer";
 import { BASE_PATH } from "./apiClient";

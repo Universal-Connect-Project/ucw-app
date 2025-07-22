@@ -1,9 +1,8 @@
 import { VCDataTypes } from "@repo/utils";
 
 import { createDataAdapter } from "./createDataAdapter";
-import { createLogClient } from "@repo/utils/test";
 import type { AdapterDependencies } from "./models";
-import { sophtronTestData } from "@repo/utils-dev-dependency";
+import { sophtronTestData, createLogClient } from "@repo/utils-dev-dependency";
 
 const { aggregatorCredentials } = sophtronTestData;
 
