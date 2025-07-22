@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Basic Plaid Integration: make a connection.
-- Success rate tracking for Plaid.
+- No performance tracking for Plaid.
 
 ## [1.9.2]
 

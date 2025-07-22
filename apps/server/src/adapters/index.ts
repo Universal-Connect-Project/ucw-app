@@ -52,6 +52,10 @@ export class AggregatorAdapterBase {
     return this.aggregatorAdapter.requiresPollingForPerformance ?? true;
   }
 
+  getPerformanceEnabled() {
+    return this.aggregatorAdapter?.performanceEnabled ?? true;
+  }
+
   async getConnection(connectionId: string): Promise<Connection> {
     return await this.aggregatorAdapter.GetConnectionById(
       connectionId,

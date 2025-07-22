@@ -168,7 +168,7 @@ describe("plaid aggregator", () => {
   });
 
   describe("HandleOauthResponse", () => {
-    it("returns the updated connection if valid code and connection is found and sends performance success event", async () => {
+    it("returns the updated connection if valid code and connection is found and doesn't send performance success event", async () => {
       const requestId = "abc123";
       const connection: Connection = {
         id: requestId,
@@ -207,9 +207,7 @@ describe("plaid aggregator", () => {
 
       const cached = await cacheClient.get(requestId);
       expect(cached).toEqual(result);
-      expect(mockPerformanceClient.recordSuccessEvent).toHaveBeenCalledWith(
-        requestId,
-      );
+      expect(mockPerformanceClient.recordSuccessEvent).not.toHaveBeenCalled();
     });
 
     it("throws if connection not found in cache", async () => {

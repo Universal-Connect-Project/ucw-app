@@ -29,6 +29,7 @@ export class PlaidAdapter implements WidgetAdapter {
   sandbox: boolean;
   performanceClient: PerformanceClient;
   requiresPollingForPerformance = false; // The webhook negates the need for polling
+  performanceEnabled = false;
 
   constructor(args: AdapterConfig) {
     const { sandbox, dependencies } = args;
@@ -168,7 +169,7 @@ export class PlaidAdapter implements WidgetAdapter {
 
     const { webhook_code, public_token } = request.body;
     if (webhook_code === "ITEM_ADD_RESULT") {
-      this.performanceClient.recordSuccessEvent(requestId);
+      // this.performanceClient.recordSuccessEvent(requestId); # TODO: implement performance success
       const tokenExchangeRequest = await publicTokenExchange({
         publicToken: public_token,
         clientId: this.credentials.clientId,

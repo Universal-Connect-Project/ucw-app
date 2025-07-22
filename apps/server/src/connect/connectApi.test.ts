@@ -237,6 +237,28 @@ describe("connectApi", () => {
       );
     });
 
+    it("does not create a performance object or send a performance start event when getPerformanceEnabled returns false", async () => {
+      const requestLog = setupPerformanceHandlers([
+        "connectionStart",
+        "connectionPause",
+      ]);
+      jest.spyOn(connectApi, "getPerformanceEnabled").mockReturnValue(false);
+
+      const fakeSessionId = "test-session-id-no-performance";
+      jest
+        .spyOn(globalThis.crypto, "randomUUID")
+        .mockReturnValue(fakeSessionId);
+
+      await connectApi.addMember(memberCreateData);
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      expect(requestLog.length).toBe(0);
+
+      const performanceObject = await getPerformanceObject(fakeSessionId);
+      expect(performanceObject).toBeUndefined();
+    });
+
     it("sends a connection start event with duration disabled for akoya aggregator", async () => {
       connectApi = new ConnectApi({
         context: { ...testContext, aggregator: AKOYA_AGGREGATOR_STRING },
