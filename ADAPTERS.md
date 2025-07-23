@@ -8,11 +8,19 @@ There are aggregator adapter packages for each UCP supported aggregator in this 
 
 Any of the existing adapters in the packages/ folder can be used an example of what needs to be done to create an adapter.
 
-When your adapter package is ready for production use, then you'll need to gain access to the UCP institution list to update the list of institutions you support (This functionality is in progress by the UCP team)
-
 Each adapter needs to export an adapterMapObject. These adapterMapObjects are setup in [adapterSetup.ts](./apps/server/src/adapterSetup.ts).
 
 This repo accesses adapter-specific logic in [adapterIndex.ts](./apps/server/src/adapterIndex.ts)
+
+## Updating the UCP institutions list with an aggregator's institutions
+
+The UCP institution list is available for viewing and modifying [here](https://app.universalconnectproject.org/institutions).
+
+Only aggregator admins have access to modify institutions, so you'll need to request access from the UCP team. You can do so via the "Contact Us" button of the [UCP App](https://app.universalconnectproject.org/)
+
+When an institution is modified the changes are sent to all Universal Connect Widgets that are connected to it. In order for a widget to route to an aggregator it needs to have its properties attached to the various institutions.
+
+Aggregator integrations should be added to the matching institution in the UCP institution list. New institutions should only be created if there isn't an existing institution that matches.
 
 ## Test institutions
 
