@@ -9,6 +9,7 @@ into an iframe.
 - [Documentation](#documentation)
 - [API Documentation](#api-documentation)
 - [Getting Started](#getting-started)
+- [Universal Connect Project Services and API Keys](#universal-connect-project-services-and-api-keys)
 - [Preferences and Aggregator Credentials](#preferences-and-aggregator-credentials)
 - [Environment Variables](#environment-variables)
 - [Authentication](#authentication)
@@ -50,6 +51,23 @@ The API documentation for this service lives in [./openApiDocumentation.json](./
 It can take a minute or so for the server to initialize and set up elasticsearch.
 
 Once the server is running, and you see a message that says, `"Message":"App initialized successfully"`, you can then navigate to [http://localhost:8080/widget?jobTypes=transactions&userId=test-user-id](http://localhost:8080/widget?jobTypes=transactions&userId=test-user-id) in a browser, and you should see the Universal Connect Widget UI load.
+
+## Universal Connect Project Services and API Keys
+
+The Universal Connect Project hosts some services that improve the experience of hosting and maintaining a widget.
+
+1. The [UCP App](https://app.universalconnectproject.org/)
+   1. Aggregators can keep their institutions up to date here
+   1. All users can view available institutions and performance data
+   1. Widget hosters can generate API Keys to allow their widget to stay up to date with the institution list and provide and receive performance data
+1. Institution service
+   1. Widgets with API keys can retrieve the most up to date institution list
+1. Performance service
+   1. Widgets with API keys provide aggregator performance data
+
+Access to generate API keys can be requested [here](https://app.universalconnectproject.org/widget-management).
+
+The required API Key setup can be found [here](ENVIRONMENT.md#suggested-variables).
 
 ## Preferences and Aggregator Credentials
 
