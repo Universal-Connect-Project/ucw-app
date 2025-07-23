@@ -1,10 +1,9 @@
-import { PLAID_BASE_PATH, PLAID_BASE_PATH_PROD } from "../apiClient";
 import { http, HttpResponse } from "msw";
 
-export const CREATE_USER_PATH = `${PLAID_BASE_PATH}/aggregation/v2/customers/active`;
-export const DELETE_USER_PATH = `${PLAID_BASE_PATH}/aggregation/v1/customers/:customerId`;
+const PLAID_BASE_PATH = "https://sandbox.plaid.com";
+const PLAID_BASE_PATH_PROD = "https://production.plaid.com";
 
-const handlers = [
+export const plaidHandlers = [
   http.post(`${PLAID_BASE_PATH}/link/token/create`, () =>
     HttpResponse.json({
       expiration: "2025-06-23T12:54:37Z",
@@ -35,7 +34,4 @@ const handlers = [
       request_id: "requestIdTest",
     }),
   ),
-  http.delete(DELETE_USER_PATH, () => new HttpResponse(null, { status: 200 })),
 ];
-
-export default handlers;

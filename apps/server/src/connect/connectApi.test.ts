@@ -29,6 +29,7 @@ import {
 } from "@repo/utils-dev-dependency/mx/testData";
 import expectPerformanceObject from "../test/expectPerformanceObject";
 import * as performanceTracking from "../services/performanceTracking";
+import { PLAID_AGGREGATOR_STRING } from "@repo/plaid-adapter";
 
 const {
   connectionByIdMemberData,
@@ -237,12 +238,16 @@ describe("connectApi", () => {
       );
     });
 
-    it("does not create a performance object or send a performance start event when getPerformanceEnabled returns false", async () => {
+    it("does not create a performance object or send a performance start event for Plaid because getPerformanceEnabled returns false", async () => {
       const requestLog = setupPerformanceHandlers([
         "connectionStart",
         "connectionPause",
       ]);
-      jest.spyOn(connectApi, "getPerformanceEnabled").mockReturnValue(false);
+      connectApi = new ConnectApi({
+        context: { ...testContext, aggregator: PLAID_AGGREGATOR_STRING },
+      });
+
+      connectApi.init();
 
       const fakeSessionId = "test-session-id-no-performance";
       jest
