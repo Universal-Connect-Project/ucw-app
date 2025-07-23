@@ -1,5 +1,6 @@
 import type {
   AggregatorInstitution,
+  ApiResponse,
   CacheClient,
   Connection,
   CreateConnectionRequest,
@@ -12,7 +13,11 @@ import type {
 import { ConnectionStatus } from "@repo/utils";
 import type { AdapterDependencies, ApiCredentials } from "./models";
 
-import { createPlaidLinkToken, publicTokenExchange } from "./apiClient";
+import {
+  createPlaidLinkToken,
+  publicTokenExchange,
+  removeItem,
+} from "./apiClient";
 
 type AdapterConfig = {
   sandbox: boolean;
@@ -109,14 +114,17 @@ export class PlaidAdapter implements WidgetAdapter {
     return cacheObj;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async DeleteConnection(id: string, userId: string): Promise<void> {
-    await this.cacheClient.set(id, null);
-
-    return;
+  async DeleteConnection(connectionId: string): Promise<ApiResponse> {
+    await this.cacheClient.set(connectionId, null);
+    return await removeItem({
+      accessToken: connectionId,
+      clientId: this.credentials.clientId,
+      secret: this.credentials.secret,
+      sandbox: this.sandbox,
+    });
   }
 
-  async DeleteUser(_aggregatorUserId: string): Promise<unknown> {
+  async DeleteUser(_userId: string): Promise<void> {
     // Plaid doesn't have external users
     return;
   }

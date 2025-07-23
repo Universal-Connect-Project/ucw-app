@@ -1,5 +1,6 @@
 import type {
   AggregatorInstitution,
+  ApiResponse,
   CacheClient,
   Challenge,
   Connection,
@@ -259,8 +260,8 @@ export class MxAdapter implements WidgetAdapter {
     return fromMxMember(member || {}, this.aggregator);
   }
 
-  async DeleteConnection(id: string, userId?: string): Promise<void> {
-    await this.apiClient.deleteManagedMember(id, userId || "");
+  async DeleteConnection(id: string, userId?: string): Promise<ApiResponse> {
+    return await this.apiClient.deleteManagedMember(id, userId || "");
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

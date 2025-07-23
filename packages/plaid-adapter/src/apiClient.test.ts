@@ -5,6 +5,7 @@ import {
   PLAID_BASE_PATH,
   PLAID_BASE_PATH_PROD,
   publicTokenExchange,
+  removeItem,
 } from "./apiClient";
 import { server } from "./test/testServer";
 
@@ -218,5 +219,100 @@ describe("publicTokenExchange", () => {
         sandbox: true,
       }),
     ).rejects.toThrow("Error exchanging public token");
+  });
+});
+
+describe("removeItem", () => {
+  const clientId = "test-client-id";
+  const secret = "test-secret";
+  const accessToken = "access-sample-token";
+
+  it("removes item with expected request body and headers in sandbox env", async () => {
+    const expectedRequestBody = {
+      client_id: clientId,
+      secret,
+      access_token: accessToken,
+    };
+    let receivedBody: unknown;
+    let hitSandbox: boolean;
+
+    server.use(
+      http.post(`${PLAID_BASE_PATH}/item/remove`, async ({ request }) => {
+        hitSandbox = true;
+        receivedBody = await request.json();
+        return HttpResponse.json({ removed: true });
+      }),
+    );
+
+    const result = await removeItem({
+      accessToken,
+      clientId,
+      secret,
+      sandbox: true,
+    });
+
+    expect(result).toEqual({
+      status: 200,
+      data: { removed: true },
+    });
+    expect(receivedBody).toEqual(expectedRequestBody);
+    expect(hitSandbox).toBe(true);
+  });
+
+  it("removes item in production env", async () => {
+    let hitProductionEnv: boolean;
+
+    server.use(
+      http.post(`${PLAID_BASE_PATH_PROD}/item/remove`, async () => {
+        hitProductionEnv = true;
+        return HttpResponse.json({ removed: true });
+      }),
+    );
+
+    const result = await removeItem({
+      accessToken,
+      clientId,
+      secret,
+      sandbox: false,
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.data).toEqual({ removed: true });
+    expect(hitProductionEnv).toBe(true);
+  });
+
+  it("throws an error if response is not ok and includes error message", async () => {
+    server.use(
+      http.post(`${PLAID_BASE_PATH}/item/remove`, () =>
+        HttpResponse.json({ error_message: "Plaid error!" }, { status: 400 }),
+      ),
+    );
+
+    await expect(
+      removeItem({
+        accessToken,
+        clientId,
+        secret,
+        sandbox: true,
+      }),
+    ).rejects.toThrow("Plaid error!");
+  });
+
+  it("throws a generic error if response is not ok and no error message is present", async () => {
+    server.use(
+      http.post(
+        `${PLAID_BASE_PATH}/item/remove`,
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+
+    await expect(
+      removeItem({
+        accessToken,
+        clientId,
+        secret,
+        sandbox: true,
+      }),
+    ).rejects.toThrow("Error removing Item");
   });
 });

@@ -8,6 +8,8 @@ import { createLogClient } from "@repo/utils-dev-dependency";
 import { PlaidAdapter } from "./adapter";
 import { ComboJobTypes, Connection, ConnectionStatus } from "@repo/utils";
 import { PLAID_BASE_PATH_PROD } from "./apiClient";
+import { server } from "./test/testServer";
+import { http, HttpResponse } from "msw";
 
 const cacheClient = createCacheClient();
 const logClient = createLogClient();
@@ -147,9 +149,18 @@ describe("plaid aggregator", () => {
 
   describe("DeleteConnection", () => {
     it("deletes the connection", async () => {
-      await plaidAdapter.DeleteConnection("testId", "test-user-name");
+      let plaidItemRemoveEndpointCalled = false;
+      server.use(
+        http.post(`${PLAID_BASE_PATH_PROD}/item/remove`, async () => {
+          plaidItemRemoveEndpointCalled = true;
+          return HttpResponse.json({});
+        }),
+      );
+
+      await plaidAdapter.DeleteConnection("testId");
       const cached = await cacheClient.get("testId");
       expect(cached).toBe(null);
+      expect(plaidItemRemoveEndpointCalled).toBe(true);
     });
   });
 

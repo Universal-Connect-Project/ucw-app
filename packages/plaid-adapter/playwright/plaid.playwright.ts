@@ -1,12 +1,18 @@
 import { expect, test } from "@playwright/test";
 import { ComboJobTypes } from "@repo/utils";
 
+const PLAID_ITEM_DELETED_ERROR_MSG =
+  "The Item you requested cannot be found. This Item does not exist, has been previously removed via /item/remove, or has had access removed by the user.";
 const WIDGET_BASE_URL = "http://localhost:8080/widget";
 
-test("connects to plaid test bank with oAuth", async ({ page }) => {
+test("connects to plaid test bank with oAuth and deletes connection at end", async ({
+  page,
+  request,
+}) => {
   test.setTimeout(300000);
 
   const userId = crypto.randomUUID();
+  let connectionId: string | undefined;
 
   await page.goto(
     `${WIDGET_BASE_URL}?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
@@ -47,9 +53,11 @@ test("connects to plaid test bank with oAuth", async ({ page }) => {
       const obj = (await msg.args()[0].jsonValue())?.message;
       if (obj?.type === "connect/memberConnected") {
         clearTimeout(timer);
+        connectionId = obj.metadata.connectionId;
+
         expect(obj.metadata.user_guid).toEqual(userId);
         expect(obj.metadata.member_guid).toContain("access-sandbox");
-        expect(obj.metadata.connectionId).toContain("access-sandbox");
+        expect(connectionId).toContain("access-sandbox");
         expect(obj.metadata.aggregator).toEqual("plaid_sandbox");
 
         resolve("");
@@ -62,6 +70,19 @@ test("connects to plaid test bank with oAuth", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
     timeout: 120000,
   });
+
+  if (connectionId) {
+    const endpoint = `http://localhost:8080/api/aggregator/plaid_sandbox/user/${userId}/connection/${connectionId}`;
+    const deleteResponse = await request.delete(endpoint);
+    expect(deleteResponse.ok()).toBeTruthy();
+
+    const secondDelete = await request.delete(endpoint);
+    const errorBody = await secondDelete.json();
+    expect(secondDelete.status()).toBe(400);
+    expect(errorBody.message).toBe(PLAID_ITEM_DELETED_ERROR_MSG);
+  } else {
+    throw new Error("connectionId was not set from connectedPromise");
+  }
 });
 
 test("should return 400 with error message when requesting plaid data", async ({

@@ -2,7 +2,7 @@
   "info": {
     "description": "Universal Connect Widget endpoints",
     "title": "Universal Connect Widget",
-    "version": "1.0.0"
+    "version": "1.10.0"
   },
   "openapi": "3.0.0",
   "servers": [
@@ -6952,6 +6952,56 @@
           }
         },
         "summary": "Delete user"
+      }
+    },
+    "/api/aggregator/{aggregator}/user/{userId}/connection/{connectionId}": {
+      "delete": {
+        "parameters": [
+          {
+            "description": "The id assigned to the user",
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The connection id or access_token recieived from Plaid",
+            "name": "connectionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The aggregator for the connected user. Currently only implemented for Plaid because Plaid doesnt have user delete.",
+            "name": "aggregator",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["plaid", "plaid_sandbox"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Failed to delete connection"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Delete user's connection"
       }
     },
     "/api/token": {

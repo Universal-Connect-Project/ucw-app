@@ -1,4 +1,4 @@
-import { ComboJobTypes } from "@repo/utils";
+import { ApiResponse, ComboJobTypes } from "@repo/utils";
 
 interface CreateGetOauthUrlParams {
   sandbox: boolean;
@@ -124,3 +124,41 @@ export const publicTokenExchange = async ({
 
   return (await response.json()) as { access_token: string; item_id: string };
 };
+
+export async function removeItem({
+  accessToken,
+  clientId,
+  secret,
+  sandbox,
+}: {
+  accessToken: string;
+  clientId: string;
+  secret: string;
+  sandbox: boolean;
+}): Promise<ApiResponse> {
+  const basePath = sandbox ? PLAID_BASE_PATH : PLAID_BASE_PATH_PROD;
+
+  const response = await fetch(basePath + "/item/remove", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      client_id: clientId,
+      secret,
+      access_token: accessToken,
+    }),
+  });
+
+  const json = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const { error_message } = json as { error_message?: string };
+    throw new Error(error_message || "Error removing Item");
+  }
+
+  return {
+    status: response.status,
+    data: json,
+  };
+}
