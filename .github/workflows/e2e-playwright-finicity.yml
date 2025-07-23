@@ -54,7 +54,7 @@ jobs:
           echo FINICITY_PARTNER_ID=${{ secrets.FINICITY_PARTNER_ID }} >> ${ENV_FILE_PATH}
           echo FINICITY_APP_KEY=${{ secrets.FINICITY_APP_KEY }} >> ${ENV_FILE_PATH}
           echo FINICITY_SECRET=${{ secrets.FINICITY_SECRET }} >> ${ENV_FILE_PATH}
-          echo NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} >> ${ENV_FILE_PATH}
+          echo NGROK_AUTHTOKEN=${{ secrets.PLAID_NGROK_AUTH_TOKEN }} >> ${ENV_FILE_PATH}
           # This fails if using https, so we have to override it
           echo HOST_URL=http://localhost:8080 >> ${ENV_FILE_PATH}
 
