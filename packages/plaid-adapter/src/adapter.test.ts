@@ -165,9 +165,10 @@ describe("plaid aggregator", () => {
   });
 
   describe("DeleteUser", () => {
-    it("is not available with plaid", async () => {
-      const ret = await plaidAdapter.DeleteUser("test-user-name");
-      expect(ret).toEqual(undefined);
+    it("throws an error for plaid", async () => {
+      await expect(plaidAdapter.DeleteUser("test-user-name")).rejects.toThrow(
+        "Plaid doesn't support user deletion, you must delete connections instead",
+      );
     });
   });
 

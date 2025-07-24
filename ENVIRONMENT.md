@@ -13,8 +13,8 @@ These are the environment variables that can be set in apps/server/env/(staging|
 | PORT               | The port where the server runs                                                                                                                                                                                                                 | 8080                               |
 | REDIS_SERVER       | The url of the redis server                                                                                                                                                                                                                    | redis://localhost:6379             |
 | WEBHOOK_HOST_URL   | The webhook base url for adapters with webhooks (should be the same as HOST_URL)                                                                                                                                                               |                                    |
-| UCP_CLIENT_ID      | Client ID, available in the (UCP dashboard)[https://app.universalconnectproject.org/widget-management]. Providing these api keys will sync the latest data(institutions, performance, etc.) to the widget and provide performance data to UCP. |
-| UCP_CLIENT_SECRET  | Client Secret, available in the (UCP dashboard)[https://app.universalconnectproject.org/widget-management]                                                                                                                                     |
+| UCP_CLIENT_ID      | Client ID, available in the [UCP dashboard](https://app.universalconnectproject.org/widget-management). Providing these api keys will sync the latest data(institutions, performance, etc.) to the widget and provide performance data to UCP. |
+| UCP_CLIENT_SECRET  | Client Secret, available in the [UCP dashboard](https://app.universalconnectproject.org/widget-management)                                                                                                                                     |
 
 ## Aggregator specific variables
 

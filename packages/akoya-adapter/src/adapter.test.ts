@@ -188,9 +188,15 @@ describe("akoya aggregator", () => {
 
   describe("DeleteConnection", () => {
     it("deletes the connection", async () => {
-      await akoyaAdapter.DeleteConnection("testId", "test-user-name");
+      const response = await akoyaAdapter.DeleteConnection("testId");
       const cached = await cacheClient.get("testId");
       expect(cached).toBe(null);
+      expect(response).toEqual({
+        status: 200,
+        data: {
+          message: "Connection deleted successfully from cache",
+        },
+      });
     });
   });
 

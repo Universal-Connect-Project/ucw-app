@@ -34,4 +34,7 @@ export const plaidHandlers = [
       request_id: "requestIdTest",
     }),
   ),
+  http.post(`${PLAID_BASE_PATH_PROD}/item/remove`, async () =>
+    HttpResponse.json(),
+  ),
 ];

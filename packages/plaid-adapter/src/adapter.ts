@@ -125,8 +125,9 @@ export class PlaidAdapter implements WidgetAdapter {
   }
 
   async DeleteUser(_userId: string): Promise<void> {
-    // Plaid doesn't have external users
-    return;
+    throw new Error(
+      "Plaid doesn't support user deletion, you must delete connections instead",
+    );
   }
 
   async UpdateConnection(
