@@ -29,6 +29,7 @@ import {
 } from "@repo/utils-dev-dependency/mx/testData";
 import expectPerformanceObject from "../test/expectPerformanceObject";
 import * as performanceTracking from "../services/performanceTracking";
+import { PLAID_AGGREGATOR_STRING } from "@repo/plaid-adapter";
 
 const {
   connectionByIdMemberData,
@@ -235,6 +236,32 @@ describe("connectApi", () => {
           paused: false,
         }),
       );
+    });
+
+    it("does not create a performance object or send a performance start event for Plaid because getPerformanceEnabled returns false", async () => {
+      const requestLog = setupPerformanceHandlers([
+        "connectionStart",
+        "connectionPause",
+      ]);
+      connectApi = new ConnectApi({
+        context: { ...testContext, aggregator: PLAID_AGGREGATOR_STRING },
+      });
+
+      connectApi.init();
+
+      const fakeSessionId = "test-session-id-no-performance";
+      jest
+        .spyOn(globalThis.crypto, "randomUUID")
+        .mockReturnValue(fakeSessionId);
+
+      await connectApi.addMember(memberCreateData);
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      expect(requestLog.length).toBe(0);
+
+      const performanceObject = await getPerformanceObject(fakeSessionId);
+      expect(performanceObject).toBeUndefined();
     });
 
     it("sends a connection start event with duration disabled for akoya aggregator", async () => {

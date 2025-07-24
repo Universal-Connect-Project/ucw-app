@@ -2,7 +2,6 @@ import { http, HttpResponse } from "msw";
 
 import {
   createClient as createCacheClient,
-  createLogClient,
   createMockPerformanceClient,
 } from "@repo/utils/test";
 import { FinicityAdapter } from "./adapter";
@@ -12,6 +11,7 @@ import {
   PerformanceClient,
   USER_NOT_RESOLVED_ERROR_TEXT,
 } from "@repo/utils";
+import { createLogClient } from "@repo/utils-dev-dependency";
 
 import { customerData } from "./test/testData/users";
 import { server } from "./test/testServer";
@@ -178,7 +178,13 @@ describe("finicity aggregator", () => {
         }),
       );
 
-      await finicityAdapter.DeleteConnection(connectionById.id);
+      const response = await finicityAdapter.DeleteConnection(
+        connectionById.id,
+      );
+      expect(response).toEqual({
+        status: 200,
+        data: { message: "Connection deleted successfully from cache" },
+      });
 
       const connectionByIdAfterDelete = await finicityAdapter.GetConnectionById(
         createdConnection.id,

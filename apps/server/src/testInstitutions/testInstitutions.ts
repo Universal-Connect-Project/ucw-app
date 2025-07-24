@@ -14,6 +14,8 @@ import {
   MX_AND_SOPHTRON_TEST_INSTITUTION_NAME,
 } from "./consts";
 
+import { testInstitutions as plaidTestInstitutions } from "@repo/plaid-adapter";
+
 export const testChaseBankToFilter: CachedInstitution = {
   name: CHASE_BANK_TEST_FILTER_NAME,
   id: "prodTestBankFilter",
@@ -82,6 +84,7 @@ export const testInstitutions = buildTestInstitutions([
   sophtronTestInstitutions,
   akoyaTestInstitutions,
   [testChaseBankToFilter, mxAndSophtronTestInstitution],
+  plaidTestInstitutions,
 ]);
 
 export const addTestInstitutions = (institutions: CachedInstitution[]) => [

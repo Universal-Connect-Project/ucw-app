@@ -14,7 +14,7 @@ describe("useUserEndpoints", () => {
 
     useUserEndpoints(app);
 
-    expect(app.delete).toHaveBeenCalledTimes(1);
+    expect(app.delete).toHaveBeenCalledTimes(2);
   });
 
   it("doesn't attach anything if the ENV var isn't enabled", () => {

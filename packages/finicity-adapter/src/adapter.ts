@@ -1,5 +1,6 @@
 import type {
   AggregatorInstitution,
+  ApiResponse,
   CacheClient,
   Connection,
   CreateConnectionRequest,
@@ -114,8 +115,12 @@ export class FinicityAdapter implements WidgetAdapter {
     return connection;
   }
 
-  async DeleteConnection(id: string): Promise<void> {
+  async DeleteConnection(id: string): Promise<ApiResponse> {
     await this.cacheClient.set(id, null);
+    return {
+      status: 200,
+      data: { message: "Connection deleted successfully from cache" },
+    };
   }
 
   async UpdateConnection(

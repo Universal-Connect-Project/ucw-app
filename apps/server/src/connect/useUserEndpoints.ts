@@ -1,7 +1,10 @@
 import type { RequestHandler, Application } from "express";
 import { auth, requiredScopes } from "express-oauth2-jwt-bearer";
 
-import { userDeleteHandler } from "./userEndpoints";
+import {
+  userConnectionDeleteHandler,
+  userDeleteHandler,
+} from "./userEndpoints";
 import { getConfig } from "../config";
 
 const useUserEndpoints = (app: Application) => {
@@ -38,6 +41,11 @@ const useUserEndpoints = (app: Application) => {
       "/api/aggregator/:aggregator/user/:userId",
       deleteUserEndpointMiddleware,
       userDeleteHandler,
+    );
+    app.delete(
+      "/api/aggregator/:aggregator/user/:userId/connection/:connectionId",
+      deleteUserEndpointMiddleware,
+      userConnectionDeleteHandler,
     );
   }
 };

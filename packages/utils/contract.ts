@@ -197,6 +197,11 @@ export interface VCAdapterInput {
   userId: string;
 }
 
+export interface ApiResponse {
+  status: number;
+  data: any;
+}
+
 export interface WidgetAdapter {
   ResolveUserId: (id: string, failIfNotFound?: boolean) => Promise<string>;
   GetInstitutionById: (id: string) => Promise<AggregatorInstitution>;
@@ -210,7 +215,10 @@ export interface WidgetAdapter {
     connection: CreateConnectionRequest,
     userId?: string,
   ) => Promise<Connection | undefined>;
-  DeleteConnection: (connectionId: string, userId?: string) => Promise<void>;
+  DeleteConnection: (
+    connectionId: string,
+    userId?: string,
+  ) => Promise<ApiResponse>;
   DeleteUser: (userId: string) => Promise<any>;
   AnswerChallenge: (
     request: UpdateConnectionRequest,
@@ -234,6 +242,7 @@ export interface WidgetAdapter {
   HandleOauthResponse?: (request: any) => Promise<Connection>;
   getShouldRecordPerformanceDuration?: () => boolean;
   requiresPollingForPerformance?: boolean;
+  performanceEnabled?: boolean;
 }
 
 export interface CachedInstitution {

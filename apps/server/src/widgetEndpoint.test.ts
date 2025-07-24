@@ -3,6 +3,7 @@ import { widgetHandler } from "./widgetEndpoint";
 import { ComboJobTypes } from "@repo/utils";
 import { invalidAggregatorString } from "./utils/validators";
 import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
+import { nonTestAggregators } from "./adapterSetup";
 
 /* eslint-disable @typescript-eslint/unbound-method  */
 
@@ -207,7 +208,7 @@ describe("server", () => {
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith(
-          "&#x22;aggregatorOverride&#x22; must be one of [akoya, finicity, mx, sophtron]",
+          `&#x22;aggregatorOverride&#x22; must be one of [${nonTestAggregators.join(", ")}]`,
         );
       });
 

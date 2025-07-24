@@ -116,7 +116,7 @@ app.listen(config.PORT, () => {
   info(message);
 });
 
-// Ngrok is required for Finicity webhooks local and github testing
+// Ngrok is required for local webhooks and github testing
 startNgrok(app);
 
 process.on("SIGINT", () => {

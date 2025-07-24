@@ -1,5 +1,6 @@
 import type {
   AggregatorInstitution,
+  ApiResponse,
   CacheClient,
   Connection,
   CreateConnectionRequest,
@@ -102,11 +103,12 @@ export class AkoyaAdapter implements WidgetAdapter {
     return obj;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async DeleteConnection(id: string, userId: string): Promise<void> {
+  async DeleteConnection(id: string): Promise<ApiResponse> {
     await this.cacheClient.set(id, null);
-
-    return;
+    return {
+      status: 200,
+      data: { message: "Connection deleted successfully from cache" },
+    };
   }
 
   async DeleteUser(_aggregatorUserId: string): Promise<unknown> {

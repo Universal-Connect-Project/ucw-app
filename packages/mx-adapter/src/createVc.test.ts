@@ -11,7 +11,8 @@ import {
   MX_VC_GET_TRANSACTIONS_PATH,
   mxTestData,
 } from "@repo/utils-dev-dependency";
-import { createClient, createLogClient } from "@repo/utils/test";
+import { createLogClient } from "@repo/utils-dev-dependency";
+import { createClient } from "@repo/utils/test";
 import { server } from "./test/testServer";
 import { http, HttpResponse } from "msw";
 

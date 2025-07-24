@@ -82,6 +82,33 @@ describe("AggregatorAdapterBase", () => {
     });
   });
 
+  describe("getPerformanceEnabled", () => {
+    it("returns true if the adapter does not implement getPerformanceEnabled", async () => {
+      await aggregatorAdapterBase.init();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (aggregatorAdapterBase as any).aggregatorAdapter = {};
+      expect(aggregatorAdapterBase.getPerformanceEnabled()).toBe(true);
+    });
+
+    it("returns the value from the adapter's getPerformanceEnabled if implemented (true)", async () => {
+      await aggregatorAdapterBase.init();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (aggregatorAdapterBase as any).aggregatorAdapter = {
+        performanceEnabled: true,
+      };
+      expect(aggregatorAdapterBase.getPerformanceEnabled()).toBe(true);
+    });
+
+    it("returns the value from the adapter's getPerformanceEnabled if implemented (false)", async () => {
+      await aggregatorAdapterBase.init();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (aggregatorAdapterBase as any).aggregatorAdapter = {
+        performanceEnabled: false,
+      };
+      expect(aggregatorAdapterBase.getPerformanceEnabled()).toBe(false);
+    });
+  });
+
   describe("getOauthStates", () => {
     it("returns a connected state", async () => {
       await aggregatorAdapterBase.init();

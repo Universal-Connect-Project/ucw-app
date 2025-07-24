@@ -32,3 +32,32 @@ export const userDeleteHandler = withValidateAggregatorInPath(
     }
   },
 );
+
+interface ConnectionDeleteParameters {
+  aggregator: Aggregator;
+  userId: string;
+  connectionId: string;
+}
+
+export interface ConnectionDeleteRequest {
+  params: ConnectionDeleteParameters;
+}
+
+export const userConnectionDeleteHandler = withValidateAggregatorInPath(
+  async (req: ConnectionDeleteRequest, res: Response) => {
+    const { connectionId, aggregator, userId } = req.params;
+
+    try {
+      const aggregatorAdapter = createAggregatorWidgetAdapter({ aggregator });
+      const resolvedUserId = await aggregatorAdapter.ResolveUserId(userId);
+      const ret = await aggregatorAdapter.DeleteConnection(
+        connectionId,
+        resolvedUserId,
+      );
+      res.status(ret.status);
+      res.send(ret.data);
+    } catch (error) {
+      handleError({ error, res });
+    }
+  },
+);

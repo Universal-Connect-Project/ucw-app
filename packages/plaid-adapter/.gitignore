@@ -1,0 +1,23 @@
+playwright-report
+
+# Node modules/build
+node_modules/
+dist/
+build/
+packed/
+
+# Test pack files
+ucp-npm-*.tgz
+
+# Logs
+logs/
+
+# IDE files
+.idea/
+
+# Jest
+coverage/
+
+# OS files
+.DS_Store
+.Thumbs.db

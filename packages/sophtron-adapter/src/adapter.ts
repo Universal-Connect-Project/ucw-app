@@ -1,5 +1,6 @@
 import type {
   AggregatorInstitution,
+  ApiResponse,
   Challenge,
   Connection,
   CreateConnectionRequest,
@@ -123,7 +124,7 @@ export class SophtronAdapter implements WidgetAdapter {
     return undefined;
   }
 
-  async DeleteConnection(id: string, userId: string): Promise<void> {
+  async DeleteConnection(id: string, userId: string): Promise<ApiResponse> {
     return this.apiClient.deleteMember(userId, id);
   }
 
@@ -238,11 +239,11 @@ export class SophtronAdapter implements WidgetAdapter {
       }
       default:
         if (job.SecurityQuestion) {
-          challenges = JSON.parse(job.SecurityQuestion).map( (q: string) => ({
+          challenges = JSON.parse(job.SecurityQuestion).map((q: string) => ({
             id: `SecurityQuestion`,
             type: ChallengeType.QUESTION,
-            data: [{ key: q, value: q }]
-          }))
+            data: [{ key: q, value: q }],
+          }));
           jobStatus = "SecurityQuestion";
         } else if (job.TokenMethod) {
           challenge.id = "TokenMethod";
@@ -323,7 +324,7 @@ export class SophtronAdapter implements WidgetAdapter {
         answer = true;
         break;
       case "SecurityQuestion":
-        answer = JSON.stringify(request.challenges.map( ch => ch.response));
+        answer = JSON.stringify(request.challenges.map((ch) => ch.response));
         break;
       case "TokenInput":
       case "single_account_select":

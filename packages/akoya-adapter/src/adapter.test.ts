@@ -2,12 +2,12 @@ import "dotenv/config";
 
 import {
   createClient as createCacheClient,
-  createLogClient,
   createMockPerformanceClient,
 } from "@repo/utils/test";
 import { AKOYA_BASE_PATH, AKOYA_BASE_PROD_PATH, AkoyaAdapter } from "./adapter";
 import { Connection, ConnectionStatus, PerformanceClient } from "@repo/utils";
 import { AKOYA_AGGREGATOR_STRING } from "./index";
+import { createLogClient } from "@repo/utils-dev-dependency";
 
 const cacheClient = createCacheClient();
 const logClient = createLogClient();
@@ -188,9 +188,15 @@ describe("akoya aggregator", () => {
 
   describe("DeleteConnection", () => {
     it("deletes the connection", async () => {
-      await akoyaAdapter.DeleteConnection("testId", "test-user-name");
+      const response = await akoyaAdapter.DeleteConnection("testId");
       const cached = await cacheClient.get("testId");
       expect(cached).toBe(null);
+      expect(response).toEqual({
+        status: 200,
+        data: {
+          message: "Connection deleted successfully from cache",
+        },
+      });
     });
   });
 
