@@ -17,10 +17,7 @@ import { AKOYA_AGGREGATOR_STRING } from "./index";
 export const AKOYA_BASE_PATH = "https://sandbox-idp.ddp.akoya.com";
 export const AKOYA_BASE_PROD_PATH = "https://idp.ddp.akoya.com";
 
-type AdapterConfig = {
-  sandbox: boolean;
-  dependencies: AdapterDependencies;
-};
+type AdapterConfig = { sandbox: boolean; dependencies: AdapterDependencies };
 
 export class AkoyaAdapter implements WidgetAdapter {
   aggregator: string;
@@ -54,6 +51,8 @@ export class AkoyaAdapter implements WidgetAdapter {
       id,
       aggregator: this.aggregator,
       supportsOauth: true,
+      aggregatorLogoUrl:
+        "https://cdn.brandfetch.io/idwKHUTdZK/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1668071436139",
     };
   }
 
@@ -168,12 +167,8 @@ export class AkoyaAdapter implements WidgetAdapter {
     connection.status = ConnectionStatus.CONNECTED;
     connection.id = connection.institution_code;
     connection.postMessageEventData = {
-      memberConnected: {
-        akoyaAuthCode: code,
-      },
-      memberStatusUpdate: {
-        akoyaAuthCode: code,
-      },
+      memberConnected: { akoyaAuthCode: code },
+      memberStatusUpdate: { akoyaAuthCode: code },
     };
 
     await this.cacheClient.set(requestId, connection);

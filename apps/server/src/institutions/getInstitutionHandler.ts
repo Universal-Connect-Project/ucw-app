@@ -33,5 +33,6 @@ export const getInstitutionHandler = async (req: Request, res: Response) => {
     aggregator: inst.aggregator,
     ucpInstitutionId,
     url: resolvedInstitution.url,
+    aggregator_logo_url: inst.aggregatorLogoUrl,
   });
 };

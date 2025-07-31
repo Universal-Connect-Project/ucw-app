@@ -58,6 +58,8 @@ export class FinicityAdapter implements WidgetAdapter {
       id,
       aggregator: this.aggregator,
       supportsOauth: true,
+      aggregatorLogoUrl:
+        "https://cdn.brandfetch.io/idKLpTdlu8/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1751141641664",
     };
   }
 
@@ -191,9 +193,7 @@ export class FinicityAdapter implements WidgetAdapter {
       return finicityUser.id;
     } else if (failIfNotFound) {
       throw new Error(USER_NOT_RESOLVED_ERROR_TEXT, {
-        cause: {
-          statusCode: 404,
-        },
+        cause: { statusCode: 404 },
       });
     }
 

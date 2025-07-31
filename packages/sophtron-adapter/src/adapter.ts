@@ -30,6 +30,7 @@ function fromSophtronInstitution(ins: any): AggregatorInstitution | undefined {
     id: ins.InstitutionID,
     aggregator: SOPHTRON_ADAPTER_NAME,
     supportsOauth: false,
+    aggregatorLogoUrl: "https://sophtron.com/_nuxt/img/Logo_Blue_1.f0ad5ae.png",
   } as AggregatorInstitution;
 }
 
@@ -186,10 +187,7 @@ export class SophtronAdapter implements WidgetAdapter {
       return ret;
     }
     const job = await this.apiClient.getJobInfo(jobId);
-    const challenge: Challenge = {
-      id: "",
-      type: ChallengeType.QUESTION,
-    };
+    const challenge: Challenge = { id: "", type: ChallengeType.QUESTION };
     let challenges = [challenge];
     let status = ConnectionStatus.CHALLENGED;
     let jobStatus = job.LastStatus;

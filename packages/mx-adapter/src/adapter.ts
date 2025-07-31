@@ -98,6 +98,8 @@ export class MxAdapter implements WidgetAdapter {
       id: institution?.code || null,
       aggregator: this.aggregator,
       supportsOauth: institution.supports_oauth || false,
+      aggregatorLogoUrl:
+        "https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png",
     };
   }
 
@@ -137,17 +139,11 @@ export class MxAdapter implements WidgetAdapter {
       member: {
         is_oauth: request.is_oauth,
         credentials: request.credentials?.map(
-          (c) =>
-            ({
-              guid: c.id,
-              value: c.value,
-            }) satisfies CredentialRequest,
+          (c) => ({ guid: c.id, value: c.value }) satisfies CredentialRequest,
         ),
         institution_code: request.institutionId,
       },
-      data_request: {
-        products: jobTypes,
-      },
+      data_request: { products: jobTypes },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
   }
@@ -404,9 +400,7 @@ export class MxAdapter implements WidgetAdapter {
     this.logClient.trace(`Creating mx user ${userId}`);
 
     try {
-      ret = await this.apiClient.createUser({
-        user: { id: userId },
-      });
+      ret = await this.apiClient.createUser({ user: { id: userId } });
 
       if (ret?.data?.user != null) {
         return ret.data.user.guid || "";
@@ -427,13 +421,9 @@ export class MxAdapter implements WidgetAdapter {
     const { status } = query;
 
     if (status === "success") {
-      return {
-        status: ConnectionStatus.CONNECTED,
-      } as Connection;
+      return { status: ConnectionStatus.CONNECTED } as Connection;
     }
 
-    return {
-      status: ConnectionStatus.DENIED,
-    } as Connection;
+    return { status: ConnectionStatus.DENIED } as Connection;
   }
 }
