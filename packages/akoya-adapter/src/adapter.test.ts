@@ -15,14 +15,8 @@ const logClient = createLogClient();
 jest.mock("uuid", () => ({ v4: () => "123456789" }));
 
 const aggregatorCredentials = {
-  akoyaSandbox: {
-    clientId: "test-clientId",
-    secret: "test-app-secret",
-  },
-  akoyaProd: {
-    clientId: "prod-test-clientId",
-    secret: "prod-test-app-secret",
-  },
+  akoyaSandbox: { clientId: "test-clientId", secret: "test-app-secret" },
+  akoyaProd: { clientId: "prod-test-clientId", secret: "prod-test-app-secret" },
 };
 
 describe("akoya aggregator", () => {
@@ -40,9 +34,7 @@ describe("akoya aggregator", () => {
         logClient,
         performanceClient: mockPerformanceClient,
         aggregatorCredentials,
-        envConfig: {
-          HostUrl: "http://localhost:8080",
-        },
+        envConfig: { HostUrl: "http://localhost:8080" },
       },
     });
 
@@ -53,9 +45,7 @@ describe("akoya aggregator", () => {
         logClient,
         performanceClient: mockPerformanceClient,
         aggregatorCredentials,
-        envConfig: {
-          HostUrl: "http://localhost:8080",
-        },
+        envConfig: { HostUrl: "http://localhost:8080" },
       },
     });
   });
@@ -66,6 +56,8 @@ describe("akoya aggregator", () => {
       expect(ret).toEqual({
         id: "testId",
         aggregator: "akoya_sandbox",
+        aggregatorLogoUrl:
+          "https://cdn.brandfetch.io/idwKHUTdZK/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1668071436139",
         supportsOauth: true,
       });
     });
@@ -141,10 +133,7 @@ describe("akoya aggregator", () => {
 
     it("gets the proper oauth_window_uri for production", async () => {
       const connection = await akoyaAdapter.CreateConnection(
-        {
-          ...baseConnectionRequest,
-          is_oauth: true,
-        },
+        { ...baseConnectionRequest, is_oauth: true },
         testUserId,
       );
 
@@ -160,10 +149,7 @@ describe("akoya aggregator", () => {
 
     it("gets the proper oauth_window_uri for sandbox", async () => {
       const connection = await akoyaAdapterSandbox.CreateConnection(
-        {
-          ...baseConnectionRequest,
-          is_oauth: true,
-        },
+        { ...baseConnectionRequest, is_oauth: true },
         testUserId,
       );
 
@@ -193,9 +179,7 @@ describe("akoya aggregator", () => {
       expect(cached).toBe(null);
       expect(response).toEqual({
         status: 200,
-        data: {
-          message: "Connection deleted successfully from cache",
-        },
+        data: { message: "Connection deleted successfully from cache" },
       });
     });
   });
@@ -227,10 +211,7 @@ describe("akoya aggregator", () => {
       await cacheClient.set(requestId, connection);
 
       const result = await akoyaAdapter.HandleOauthResponse({
-        query: {
-          state: requestId,
-          code: "fake_oauth_code",
-        },
+        query: { state: requestId, code: "fake_oauth_code" },
       });
 
       expect(result).toEqual({
@@ -238,12 +219,8 @@ describe("akoya aggregator", () => {
         institution_code: "inst-001",
         id: "inst-001",
         postMessageEventData: {
-          memberConnected: {
-            akoyaAuthCode: "fake_oauth_code",
-          },
-          memberStatusUpdate: {
-            akoyaAuthCode: "fake_oauth_code",
-          },
+          memberConnected: { akoyaAuthCode: "fake_oauth_code" },
+          memberStatusUpdate: { akoyaAuthCode: "fake_oauth_code" },
         },
         userId: null,
       });
@@ -257,12 +234,7 @@ describe("akoya aggregator", () => {
     });
 
     it("throws if connection not found in cache", async () => {
-      const request = {
-        query: {
-          state: "nonexistent",
-          code: "code123",
-        },
-      };
+      const request = { query: { state: "nonexistent", code: "code123" } };
 
       expect(mockPerformanceClient.recordSuccessEvent).not.toHaveBeenCalled();
 
@@ -276,9 +248,7 @@ describe("akoya aggregator", () => {
       await cacheClient.set(requestId, {});
 
       const result = await akoyaAdapter.HandleOauthResponse({
-        query: {
-          state: requestId,
-        },
+        query: { state: requestId },
       });
 
       expect(mockPerformanceClient.recordSuccessEvent).not.toHaveBeenCalled();
