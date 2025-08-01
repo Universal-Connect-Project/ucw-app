@@ -22,19 +22,13 @@ describe("getInstitutionHandler", () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
 
-    const context = {
-      jobTypes: [ComboJobTypes.TRANSACTIONS],
-    };
+    const context = { jobTypes: [ComboJobTypes.TRANSACTIONS] };
     const req = {
       context,
-      params: {
-        institution_guid: ucpInstitutionId,
-      },
+      params: { institution_guid: ucpInstitutionId },
     } as unknown as Request;
 
-    const res = {
-      send: jest.fn(),
-    } as unknown as Response;
+    const res = { send: jest.fn() } as unknown as Response;
 
     await getInstitutionHandler(req, res);
 
@@ -52,24 +46,20 @@ describe("getInstitutionHandler", () => {
       supports_oauth: ucpMxInstitution.supports_oauth,
       ucpInstitutionId,
       url: ucpInstitution.url,
+      aggregator_logo_url:
+        "https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png",
     });
   });
 
   it("returns the institution by the aggregator id if it has a aggregator", async () => {
-    const context = {
-      aggregator: MX_AGGREGATOR_STRING,
-    };
+    const context = { aggregator: MX_AGGREGATOR_STRING };
 
     const req = {
       context,
-      params: {
-        institution_guid: ucpInstitutionId,
-      },
+      params: { institution_guid: ucpInstitutionId },
     } as unknown as Request;
 
-    const res = {
-      send: jest.fn(),
-    } as unknown as Response;
+    const res = { send: jest.fn() } as unknown as Response;
 
     await getInstitutionHandler(req, res);
 
@@ -87,24 +77,20 @@ describe("getInstitutionHandler", () => {
       supports_oauth: ucpMXInstitution.supports_oauth,
       ucpInstitutionId,
       url: ucpInstitution.url,
+      aggregator_logo_url:
+        "https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png",
     });
   });
 
   it("returns the institution by the aggregator id if it has an aggregatorOverride", async () => {
-    const context = {
-      aggregatorOverride: MX_AGGREGATOR_STRING,
-    };
+    const context = { aggregatorOverride: MX_AGGREGATOR_STRING };
 
     const req = {
       context,
-      params: {
-        institution_guid: ucpInstitutionId,
-      },
+      params: { institution_guid: ucpInstitutionId },
     } as unknown as Request;
 
-    const res = {
-      send: jest.fn(),
-    } as unknown as Response;
+    const res = { send: jest.fn() } as unknown as Response;
 
     await getInstitutionHandler(req, res);
 
@@ -122,6 +108,8 @@ describe("getInstitutionHandler", () => {
       supports_oauth: ucpMXInstitution.supports_oauth,
       ucpInstitutionId,
       url: ucpInstitution.url,
+      aggregator_logo_url:
+        "https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png",
     });
   });
 });

@@ -45,9 +45,7 @@ const mxAdapterInt = new MxAdapter({
     cacheClient,
     logClient,
     aggregatorCredentials,
-    envConfig: {
-      HOSTURL,
-    },
+    envConfig: { HOSTURL },
   },
 });
 
@@ -57,9 +55,7 @@ const mxAdapter = new MxAdapter({
     cacheClient,
     logClient,
     aggregatorCredentials,
-    envConfig: {
-      HOSTURL,
-    },
+    envConfig: { HOSTURL },
   },
 });
 
@@ -88,6 +84,8 @@ describe("mx aggregator", () => {
     it("works with integration credentials", async () => {
       expect(await mxAdapterInt.GetInstitutionById("testId")).toEqual({
         id: institutionResponse.code,
+        aggregatorLogoUrl:
+          "https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png",
         aggregator: "mx_int",
         supportsOauth: true,
       });
@@ -97,6 +95,8 @@ describe("mx aggregator", () => {
       it("returns an institution", async () => {
         expect(await mxAdapter.GetInstitutionById("testId")).toEqual({
           id: institutionResponse.code,
+          aggregatorLogoUrl:
+            "https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png",
           aggregator: "mx",
           supportsOauth: true,
         });
@@ -219,10 +219,7 @@ describe("mx aggregator", () => {
 
         it("creates member with a client_redirect_url if is_oauth", async () => {
           await mxAdapter.CreateConnection(
-            {
-              ...baseConnectionRequest,
-              is_oauth: true,
-            },
+            { ...baseConnectionRequest, is_oauth: true },
             "testUserId",
           );
 
@@ -233,10 +230,7 @@ describe("mx aggregator", () => {
 
         it("creates member without a client_redirect_url if !is_oauth", async () => {
           await mxAdapter.CreateConnection(
-            {
-              ...baseConnectionRequest,
-              is_oauth: false,
-            },
+            { ...baseConnectionRequest, is_oauth: false },
             "testUserId",
           );
 
@@ -245,10 +239,7 @@ describe("mx aggregator", () => {
 
         it("creates a member with correctly mapped request options and returns the member from that response when is_oauth", async () => {
           await mxAdapter.CreateConnection(
-            {
-              ...baseConnectionRequest,
-              is_oauth: true,
-            },
+            { ...baseConnectionRequest, is_oauth: true },
             "testUserId",
           );
 
@@ -338,10 +329,7 @@ describe("mx aggregator", () => {
 
         it("creates another member when it doesn't conflict", async () => {
           const connection = await mxAdapter.CreateConnection(
-            {
-              ...existingConnectionRequest,
-              institutionId: "insitutionCode1",
-            },
+            { ...existingConnectionRequest, institutionId: "insitutionCode1" },
             userId,
           );
 
@@ -374,10 +362,7 @@ describe("mx aggregator", () => {
           );
 
           const connection = await mxAdapter.CreateConnection(
-            {
-              ...existingConnectionRequest,
-              institutionId: "insitutionCode1",
-            },
+            { ...existingConnectionRequest, institutionId: "insitutionCode1" },
             userId,
           );
 
@@ -400,9 +385,7 @@ describe("mx aggregator", () => {
           server.use(
             http.post(CREATE_MEMBER_PATH, async () => {
               memberCreateAttempted = true;
-              return new HttpResponse("Unknown Error", {
-                status: 400,
-              });
+              return new HttpResponse("Unknown Error", { status: 400 });
             }),
             http.put(UPDATE_CONNECTION_PATH, () => {
               memberUpdateCalled = true;
@@ -435,9 +418,7 @@ describe("mx aggregator", () => {
           http.delete(DELETE_CONNECTION_PATH, () => {
             connectionDeletionAttempted = true;
 
-            return new HttpResponse(null, {
-              status: 200,
-            });
+            return new HttpResponse(null, { status: 200 });
           }),
         );
 
@@ -455,9 +436,7 @@ describe("mx aggregator", () => {
           http.delete(MX_DELETE_USER_PATH, () => {
             userDeletionAttempted = true;
 
-            return new HttpResponse(null, {
-              status: 204,
-            });
+            return new HttpResponse(null, { status: 204 });
           }),
         );
 
@@ -492,10 +471,7 @@ describe("mx aggregator", () => {
         expect(updateConnectionPaylod).toEqual({
           member: {
             credentials: [
-              {
-                guid: testCredential.id,
-                value: testCredential.value,
-              },
+              { guid: testCredential.id, value: testCredential.value },
             ],
           },
         });
@@ -552,27 +528,14 @@ describe("mx aggregator", () => {
 
       it("returns a properly mapped response with TEXT, OPTIONS< TOKEN< IMAGE_DATA, and IMAGE_OPTIONS challenges", async () => {
         const challenges = [
-          {
-            guid: "challengeGuid1",
-            label: "challengeLabel1",
-            type: "TEXT",
-          },
+          { guid: "challengeGuid1", label: "challengeLabel1", type: "TEXT" },
           {
             guid: "challengeGuid2",
             label: "challengeLabel2",
-            options: [
-              {
-                label: "optionLabel1",
-                value: "optionValue1",
-              },
-            ],
+            options: [{ label: "optionLabel1", value: "optionValue1" }],
             type: "OPTIONS",
           },
-          {
-            guid: "challengeGuid3",
-            label: "challengeLabel3",
-            type: "TOKEN",
-          },
+          { guid: "challengeGuid3", label: "challengeLabel3", type: "TOKEN" },
           {
             guid: "challengeGuid4",
             label: "challengeLabel4",
@@ -581,12 +544,7 @@ describe("mx aggregator", () => {
           },
           {
             guid: "challengeGuid5",
-            image_options: [
-              {
-                label: "optionLabel1",
-                value: "optionValue1",
-              },
-            ],
+            image_options: [{ label: "optionLabel1", value: "optionValue1" }],
             label: "challengeLabel5",
             type: "IMAGE_OPTIONS",
           },
@@ -604,10 +562,7 @@ describe("mx aggregator", () => {
           http.get(READ_MEMBER_STATUS_PATH, () =>
             HttpResponse.json({
               ...memberStatusData,
-              member: {
-                ...memberStatusData.member,
-                challenges,
-              },
+              member: { ...memberStatusData.member, challenges },
             }),
           ),
         );
@@ -633,12 +588,7 @@ describe("mx aggregator", () => {
             ],
           challenges: [
             {
-              data: [
-                {
-                  key: "0",
-                  value: textChallenge.label,
-                },
-              ],
+              data: [{ key: "0", value: textChallenge.label }],
               id: textChallenge.guid,
               type: ChallengeType.QUESTION,
               question: textChallenge.label,
@@ -702,10 +652,7 @@ describe("mx aggregator", () => {
           }),
         );
 
-        const challenge = {
-          id: "challengeId",
-          response: "challengeResponse",
-        };
+        const challenge = { id: "challengeId", response: "challengeResponse" };
 
         expect(
           await mxAdapter.AnswerChallenge(
@@ -722,12 +669,7 @@ describe("mx aggregator", () => {
 
         expect(answerChallengePayload).toEqual({
           member: {
-            challenges: [
-              {
-                guid: challenge.id,
-                value: challenge.response,
-              },
-            ],
+            challenges: [{ guid: challenge.id, value: challenge.response }],
           },
         });
       });
@@ -777,23 +719,15 @@ describe("mx aggregator", () => {
     describe("HandleOauthResponse", () => {
       it("responds with success if the status is success", async () => {
         const ret = await mxAdapter.HandleOauthResponse({
-          query: {
-            status: "success",
-          },
+          query: { status: "success" },
         });
 
-        expect(ret).toEqual({
-          status: ConnectionStatus.CONNECTED,
-        });
+        expect(ret).toEqual({ status: ConnectionStatus.CONNECTED });
       });
 
       it("returns with denied if the status is not success", async () => {
-        const ret = await mxAdapter.HandleOauthResponse({
-          query: {},
-        });
-        expect(ret).toEqual({
-          status: ConnectionStatus.DENIED,
-        });
+        const ret = await mxAdapter.HandleOauthResponse({ query: {} });
+        expect(ret).toEqual({ status: ConnectionStatus.DENIED });
       });
     });
   });

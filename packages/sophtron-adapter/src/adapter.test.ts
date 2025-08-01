@@ -43,9 +43,7 @@ const adapter = new SophtronAdapter({
   dependencies: {
     logClient: createLogClient(),
     aggregatorCredentials,
-    envConfig: {
-      HOSTURL: undefined,
-    },
+    envConfig: { HOSTURL: undefined },
   },
 });
 
@@ -64,6 +62,8 @@ describe("sophtron adapter", () => {
 
       expect(response).toEqual({
         id: sophtronInstitutionData.InstitutionID,
+        aggregatorLogoUrl:
+          "https://sophtron.com/_nuxt/img/Logo_Blue_1.f0ad5ae.png",
         aggregator: SOPHTRON_ADAPTER_NAME,
         supportsOauth: false,
       });
@@ -197,11 +197,7 @@ describe("sophtron adapter", () => {
 
       await adapter.CreateConnection(
         {
-          credentials: [
-            {
-              id: "username",
-            },
-          ],
+          credentials: [{ id: "username" }],
           jobTypes: [ComboJobTypes.TRANSACTIONS],
           institutionId: testId,
         } as CreateConnectionRequest,
@@ -226,14 +222,8 @@ describe("sophtron adapter", () => {
       const response = await adapter.CreateConnection(
         {
           credentials: [
-            {
-              id: "username",
-              value: usernameValue,
-            },
-            {
-              id: "password",
-              value: passwordValue,
-            },
+            { id: "username", value: usernameValue },
+            { id: "password", value: passwordValue },
           ],
           jobTypes: [ComboJobTypes.TRANSACTIONS],
           institutionId: testId,
@@ -274,10 +264,7 @@ describe("sophtron adapter", () => {
       await adapter.DeleteConnection(testId, testUserId);
 
       expect(deleteMemberAttempted).toBe(true);
-      expect(requestParams).toEqual({
-        memberId: testId,
-        userId: testUserId,
-      });
+      expect(requestParams).toEqual({ memberId: testId, userId: testUserId });
     });
   });
 
@@ -298,9 +285,7 @@ describe("sophtron adapter", () => {
       await adapter.DeleteUser(testUserId);
 
       expect(deleteUserAttempted).toBe(true);
-      expect(requestParams).toEqual({
-        userId: testUserId,
-      });
+      expect(requestParams).toEqual({ userId: testUserId });
     });
   });
 
@@ -319,14 +304,8 @@ describe("sophtron adapter", () => {
       const response = await adapter.UpdateConnection(
         {
           credentials: [
-            {
-              id: "username",
-              value: usernameValue,
-            },
-            {
-              id: "password",
-              value: passwordValue,
-            },
+            { id: "username", value: usernameValue },
+            { id: "password", value: passwordValue },
           ],
           id: testId,
           jobTypes: [ComboJobTypes.TRANSACTIONS],
@@ -369,10 +348,7 @@ describe("sophtron adapter", () => {
         userId: testUserId,
       });
 
-      expect(getMemberParams).toEqual({
-        memberId: testId,
-        userId: testUserId,
-      });
+      expect(getMemberParams).toEqual({ memberId: testId, userId: testUserId });
     });
   });
 
@@ -383,18 +359,8 @@ describe("sophtron adapter", () => {
       jobId,
       jobLastStep,
     }) => ({
-      memberConnected: {
-        jobId,
-        jobLastStep,
-        rawStatus,
-        selectedAccountId,
-      },
-      memberStatusUpdate: {
-        jobId,
-        jobLastStep,
-        rawStatus,
-        selectedAccountId,
-      },
+      memberConnected: { jobId, jobLastStep, rawStatus, selectedAccountId },
+      memberStatusUpdate: { jobId, jobLastStep, rawStatus, selectedAccountId },
     });
 
     it("returns the connection using the memberId and userId if there is no jobId", async () => {
@@ -602,20 +568,14 @@ describe("sophtron adapter", () => {
             id: "SecurityQuestion",
             type: ChallengeType.QUESTION,
             data: [
-              {
-                key: securityQuestionString1,
-                value: securityQuestionString1,
-              },
+              { key: securityQuestionString1, value: securityQuestionString1 },
             ],
           },
           {
             id: "SecurityQuestion",
             type: ChallengeType.QUESTION,
             data: [
-              {
-                key: securityQuestionString2,
-                value: securityQuestionString2,
-              },
+              { key: securityQuestionString2, value: securityQuestionString2 },
             ],
           },
         ],
@@ -660,12 +620,7 @@ describe("sophtron adapter", () => {
           {
             id: "TokenMethod",
             type: ChallengeType.OPTIONS,
-            data: [
-              {
-                key: tokenMethodString,
-                value: tokenMethodString,
-              },
-            ],
+            data: [{ key: tokenMethodString, value: tokenMethodString }],
             question: "Please select a channel to receive your secure code",
           },
         ],
@@ -712,10 +667,7 @@ describe("sophtron adapter", () => {
             id: "TokenInput",
             type: ChallengeType.QUESTION,
             data: [
-              {
-                key: "ota",
-                value: `Please enter the ${testTokenInputName}`,
-              },
+              { key: "ota", value: `Please enter the ${testTokenInputName}` },
             ],
             question: "ota",
           },
@@ -759,12 +711,7 @@ describe("sophtron adapter", () => {
           {
             id: "TokenInput",
             type: ChallengeType.QUESTION,
-            data: [
-              {
-                key: "ota",
-                value: "Please enter the OTA code",
-              },
-            ],
+            data: [{ key: "ota", value: "Please enter the OTA code" }],
             question: "ota",
           },
         ],
@@ -928,19 +875,11 @@ describe("sophtron adapter", () => {
       );
 
       const response = await adapter.AnswerChallenge(
-        {
-          challenges: [
-            {
-              id: "TokenRead",
-            },
-          ],
-        } as UpdateConnectionRequest,
+        { challenges: [{ id: "TokenRead" }] } as UpdateConnectionRequest,
         testId,
       );
 
-      expect(requestBody).toEqual({
-        AnswerText: true,
-      });
+      expect(requestBody).toEqual({ AnswerText: true });
       expect(requestParams).toEqual({
         challengeId: "TokenRead",
         jobId: testId,
@@ -967,14 +906,8 @@ describe("sophtron adapter", () => {
       const response = await adapter.AnswerChallenge(
         {
           challenges: [
-            {
-              id: "SecurityQuestion",
-              response: testQuestionResponse + 1,
-            },
-            {
-              id: "SecurityQuestion",
-              response: testQuestionResponse + 2,
-            },
+            { id: "SecurityQuestion", response: testQuestionResponse + 1 },
+            { id: "SecurityQuestion", response: testQuestionResponse + 2 },
           ],
         } as UpdateConnectionRequest,
         testId,
@@ -1011,19 +944,12 @@ describe("sophtron adapter", () => {
 
       const response = await adapter.AnswerChallenge(
         {
-          challenges: [
-            {
-              id: "TokenInput",
-              response: testQuestionResponse,
-            },
-          ],
+          challenges: [{ id: "TokenInput", response: testQuestionResponse }],
         } as UpdateConnectionRequest,
         testId,
       );
 
-      expect(requestBody).toEqual({
-        AnswerText: testQuestionResponse,
-      });
+      expect(requestBody).toEqual({ AnswerText: testQuestionResponse });
       expect(requestParams).toEqual({
         challengeId: "TokenInput",
         jobId: testId,
@@ -1034,13 +960,7 @@ describe("sophtron adapter", () => {
 
     it("returns false if the id doesn't match anything", async () => {
       const response = await adapter.AnswerChallenge(
-        {
-          challenges: [
-            {
-              id: "junk",
-            },
-          ],
-        } as UpdateConnectionRequest,
+        { challenges: [{ id: "junk" }] } as UpdateConnectionRequest,
         testId,
       );
 
