@@ -120,7 +120,7 @@ export class FinicityAdapter implements WidgetAdapter {
     await this.DeleteUser(userId);
     return {
       status: 200,
-      data: { message: "Connection deleted successfully from cache" },
+      data: { message: "Connection deleted successfully" },
     };
   }
 

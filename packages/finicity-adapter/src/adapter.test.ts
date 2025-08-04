@@ -196,7 +196,7 @@ describe("finicity aggregator", () => {
       );
       expect(response).toEqual({
         status: 200,
-        data: { message: "Connection deleted successfully from cache" },
+        data: { message: "Connection deleted successfully" },
       });
 
       const connectionByIdAfterDelete = await finicityAdapter.GetConnectionById(
