@@ -115,8 +115,9 @@ export class FinicityAdapter implements WidgetAdapter {
     return connection;
   }
 
-  async DeleteConnection(id: string): Promise<ApiResponse> {
+  async DeleteConnection(id: string, userId: string): Promise<ApiResponse> {
     await this.cacheClient.set(id, null);
+    await this.DeleteUser(userId);
     return {
       status: 200,
       data: { message: "Connection deleted successfully from cache" },
