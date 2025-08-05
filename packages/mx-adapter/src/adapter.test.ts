@@ -84,8 +84,7 @@ describe("mx aggregator", () => {
     it("works with integration credentials", async () => {
       expect(await mxAdapterInt.GetInstitutionById("testId")).toEqual({
         id: institutionResponse.code,
-        aggregatorLogoUrl:
-          "https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png",
+        aggregatorLogoUrl: "/mx-logo.png",
         aggregator: "mx_int",
         supportsOauth: true,
       });
@@ -95,8 +94,7 @@ describe("mx aggregator", () => {
       it("returns an institution", async () => {
         expect(await mxAdapter.GetInstitutionById("testId")).toEqual({
           id: institutionResponse.code,
-          aggregatorLogoUrl:
-            "https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png",
+          aggregatorLogoUrl: "/mx-logo.png",
           aggregator: "mx",
           supportsOauth: true,
         });

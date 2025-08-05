@@ -98,8 +98,7 @@ export class MxAdapter implements WidgetAdapter {
       id: institution?.code || null,
       aggregator: this.aggregator,
       supportsOauth: institution.supports_oauth || false,
-      aggregatorLogoUrl:
-        "https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png",
+      aggregatorLogoUrl: "/mx-logo.png", // TODO: Replace with actual logo URL
     };
   }
 

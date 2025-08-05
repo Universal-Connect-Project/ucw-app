@@ -62,8 +62,7 @@ describe("sophtron adapter", () => {
 
       expect(response).toEqual({
         id: sophtronInstitutionData.InstitutionID,
-        aggregatorLogoUrl:
-          "https://sophtron.com/_nuxt/img/Logo_Blue_1.f0ad5ae.png",
+        aggregatorLogoUrl: "/sophtron-logo.png",
         aggregator: SOPHTRON_ADAPTER_NAME,
         supportsOauth: false,
       });

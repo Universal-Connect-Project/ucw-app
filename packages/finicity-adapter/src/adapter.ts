@@ -58,8 +58,7 @@ export class FinicityAdapter implements WidgetAdapter {
       id,
       aggregator: this.aggregator,
       supportsOauth: true,
-      aggregatorLogoUrl:
-        "https://cdn.brandfetch.io/idKLpTdlu8/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1751141641664",
+      aggregatorLogoUrl: "/finicity-logo.png",
     };
   }
 

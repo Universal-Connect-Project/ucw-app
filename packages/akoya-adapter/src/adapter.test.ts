@@ -56,8 +56,7 @@ describe("akoya aggregator", () => {
       expect(ret).toEqual({
         id: "testId",
         aggregator: "akoya_sandbox",
-        aggregatorLogoUrl:
-          "https://cdn.brandfetch.io/idwKHUTdZK/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1668071436139",
+        aggregatorLogoUrl: "/akoya-logo.png",
         supportsOauth: true,
       });
     });

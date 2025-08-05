@@ -30,7 +30,7 @@ function fromSophtronInstitution(ins: any): AggregatorInstitution | undefined {
     id: ins.InstitutionID,
     aggregator: SOPHTRON_ADAPTER_NAME,
     supportsOauth: false,
-    aggregatorLogoUrl: "https://sophtron.com/_nuxt/img/Logo_Blue_1.f0ad5ae.png",
+    aggregatorLogoUrl: "/sophtron-logo.png",
   } as AggregatorInstitution;
 }
 
