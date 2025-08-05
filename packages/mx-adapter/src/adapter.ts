@@ -255,8 +255,11 @@ export class MxAdapter implements WidgetAdapter {
     return fromMxMember(member || {}, this.aggregator);
   }
 
-  async DeleteConnection(id: string, userId?: string): Promise<ApiResponse> {
-    return await this.apiClient.deleteManagedMember(id, userId || "");
+  async DeleteConnection(
+    memberGuid: string,
+    userId: string,
+  ): Promise<ApiResponse> {
+    return await this.apiClient.deleteMember(memberGuid, userId);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

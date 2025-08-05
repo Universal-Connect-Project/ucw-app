@@ -151,6 +151,18 @@ describe("finicity aggregator", () => {
         { ...baseConnectionRequest },
         testUserId,
       );
+      let userDeletionAttempted = false;
+
+      server.use(
+        http.delete(DELETE_USER_PATH, ({ params }) => {
+          userDeletionAttempted = true;
+          expect(params.customerId).toBe(testUserId);
+
+          return new HttpResponse(null, {
+            status: 204,
+          });
+        }),
+      );
 
       expect(createdConnection).toEqual(
         expect.objectContaining(expectedConnectionObject),
@@ -175,10 +187,11 @@ describe("finicity aggregator", () => {
 
       const response = await finicityAdapter.DeleteConnection(
         connectionById.id,
+        testUserId,
       );
       expect(response).toEqual({
         status: 200,
-        data: { message: "Connection deleted successfully from cache" },
+        data: { message: "Connection deleted successfully" },
       });
 
       const connectionByIdAfterDelete = await finicityAdapter.GetConnectionById(
@@ -186,6 +199,7 @@ describe("finicity aggregator", () => {
       );
 
       expect(connectionByIdAfterDelete).toBeUndefined();
+      expect(userDeletionAttempted).toBe(true);
     });
   });
 
