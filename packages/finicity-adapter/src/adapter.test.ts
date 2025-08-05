@@ -65,9 +65,7 @@ describe("finicity aggregator", () => {
         performanceClient: mockPerformanceClient,
         aggregatorCredentials,
         getWebhookHostUrl: () => "testWebhookHostUrl",
-        envConfig: {
-          HostUrl: "http://test.universalconnect.org",
-        },
+        envConfig: { HostUrl: "http://test.universalconnect.org" },
       },
     });
 
@@ -80,9 +78,7 @@ describe("finicity aggregator", () => {
         performanceClient: mockPerformanceClient,
         aggregatorCredentials,
         getWebhookHostUrl: () => "testWebhookHostUrl",
-        envConfig: {
-          HostUrl: "http://test.universalconnect.org",
-        },
+        envConfig: { HostUrl: "http://test.universalconnect.org" },
       },
     });
   });
@@ -101,6 +97,7 @@ describe("finicity aggregator", () => {
         await finicityAdapterSandbox.GetInstitutionById(testInstitutionId);
       expect(institution).toEqual({
         id: testInstitutionId,
+        aggregatorLogoUrl: "/finicity-logo.png",
         aggregator: "finicity_sandbox",
         supportsOauth: true,
       });
@@ -151,9 +148,7 @@ describe("finicity aggregator", () => {
 
     it("creates a connection then gets connection by Id then gets connection then deletes a connection", async () => {
       const createdConnection = await finicityAdapter.CreateConnection(
-        {
-          ...baseConnectionRequest,
-        },
+        { ...baseConnectionRequest },
         testUserId,
       );
       let userDeletionAttempted = false;
@@ -293,9 +288,7 @@ describe("finicity aggregator", () => {
         http.delete(DELETE_USER_PATH, () => {
           userDeletionAttempted = true;
 
-          return new HttpResponse(null, {
-            status: 204,
-          });
+          return new HttpResponse(null, { status: 204 });
         }),
       );
 
@@ -434,14 +427,8 @@ describe("finicity aggregator", () => {
         await finicityAdapter.HandleOauthResponse(request);
 
       expect(transactionHistoryParams).toEqual([
-        {
-          accountId: accountsData.accounts[0].id,
-          customerId: userId,
-        },
-        {
-          accountId: accountsData.accounts[1].id,
-          customerId: userId,
-        },
+        { accountId: accountsData.accounts[0].id, customerId: userId },
+        { accountId: accountsData.accounts[1].id, customerId: userId },
       ]);
 
       expect(updatedConnection).toEqual(
@@ -640,10 +627,7 @@ describe("finicity aggregator", () => {
       );
 
       const request = {
-        query: {
-          connection_id: createdConnection.id,
-          reason: "complete",
-        },
+        query: { connection_id: createdConnection.id, reason: "complete" },
       };
 
       const updatedConnection =
@@ -660,9 +644,7 @@ describe("finicity aggregator", () => {
     it("returns null if the connection does not exist", async () => {
       const connectionId = "non-existing-connection-id";
 
-      const request = {
-        query: { connection_id: connectionId },
-      };
+      const request = { query: { connection_id: connectionId } };
 
       const updatedConnection =
         await finicityAdapter.HandleOauthResponse(request);

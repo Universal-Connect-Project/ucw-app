@@ -58,6 +58,7 @@ export class FinicityAdapter implements WidgetAdapter {
       id,
       aggregator: this.aggregator,
       supportsOauth: true,
+      aggregatorLogoUrl: "/finicity-logo.png",
     };
   }
 
@@ -192,9 +193,7 @@ export class FinicityAdapter implements WidgetAdapter {
       return finicityUser.id;
     } else if (failIfNotFound) {
       throw new Error(USER_NOT_RESOLVED_ERROR_TEXT, {
-        cause: {
-          statusCode: 404,
-        },
+        cause: { statusCode: 404 },
       });
     }
 

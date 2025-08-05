@@ -71,6 +71,7 @@ export interface AggregatorInstitution {
   aggregator: string;
   id: string;
   supportsOauth: boolean;
+  aggregatorLogoUrl?: string;
 }
 
 export interface KeyValuePair {
