@@ -16,7 +16,7 @@ import {
 import { http, HttpResponse } from "msw";
 import { ConnectionStatus } from "@repo/utils";
 import config, { getConfig } from "../config";
-import * as logger from "../infra/logger"; // Adjust path if needed
+import * as logger from "../infra/logger";
 import { clearIntervalAsync } from "set-interval-async";
 import expectPerformanceObject from "../test/expectPerformanceObject";
 
