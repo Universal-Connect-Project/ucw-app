@@ -46,8 +46,7 @@ describe("getInstitutionHandler", () => {
       supports_oauth: ucpMxInstitution.supports_oauth,
       ucpInstitutionId,
       url: ucpInstitution.url,
-      aggregator_logo_url:
-        "https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png",
+      aggregator_logo_url: "/mx-logo.png",
     });
   });
 
@@ -77,8 +76,7 @@ describe("getInstitutionHandler", () => {
       supports_oauth: ucpMXInstitution.supports_oauth,
       ucpInstitutionId,
       url: ucpInstitution.url,
-      aggregator_logo_url:
-        "https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png",
+      aggregator_logo_url: "/mx-logo.png",
     });
   });
 
@@ -108,8 +106,7 @@ describe("getInstitutionHandler", () => {
       supports_oauth: ucpMXInstitution.supports_oauth,
       ucpInstitutionId,
       url: ucpInstitution.url,
-      aggregator_logo_url:
-        "https://content.moneydesktop.com/storage/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png",
+      aggregator_logo_url: "/mx-logo.png",
     });
   });
 });
