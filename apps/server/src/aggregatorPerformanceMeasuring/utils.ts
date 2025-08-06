@@ -158,7 +158,6 @@ export const pollConnectionStatusIfNeeded = async (
     !connectionStatus.is_being_aggregated
   ) {
     await recordSuccessEvent(performanceSessionId);
-    cleanupPerformanceObject(performanceSessionId);
   } else if (
     connectionStatus.status === ConnectionStatus.IMPEDED ||
     connectionStatus.status === ConnectionStatus.DEGRADED ||
