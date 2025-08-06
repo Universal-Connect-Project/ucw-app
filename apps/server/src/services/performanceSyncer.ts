@@ -1,5 +1,5 @@
 import { setIntervalAsync } from "set-interval-async";
-import { info, warning as logWarning } from "../infra/logger";
+import { info } from "../infra/logger";
 import config from "../config";
 import { getAccessToken } from "./auth0Service";
 import {
@@ -24,25 +24,23 @@ export async function setPerformanceSyncSchedule(minutes: number = 10) {
 }
 
 export const syncPerformanceData = async () => {
-  try {
-    const response = await fetchPerformanceData();
-    if (!response) {
-      logWarning("Performance Service not responding");
-    } else if (response.status === RESPONSE_NOT_MODIFIED) {
-      info("Performance data unchanged. Skipping Update");
-    } else if (response.status === SUCCESS_RESPONSE) {
-      const performanceData = await response.json();
-      await setNoExpiration(PERFORMANCE_DATA_REDIS_KEY, performanceData);
-      info("Updating performance routing data");
-      await setNoExpiration(
-        PERFORMANCE_ETAG_REDIS_KEY,
-        response.headers.get("etag"),
-      );
-    } else if (response.status === UNAUTHORIZED_RESPONSE) {
-      logWarning("Unauthorized access to performance service");
-    }
-  } catch (error) {
-    logWarning(`Unable to get performance data from server: ${error.message}`);
+  const response = await fetchPerformanceData();
+  if (response.status === RESPONSE_NOT_MODIFIED) {
+    info("Performance data unchanged. Skipping Update");
+  } else if (response.status === SUCCESS_RESPONSE) {
+    const performanceData = await response.json();
+    await setNoExpiration(PERFORMANCE_DATA_REDIS_KEY, performanceData);
+    info("Updating performance routing data");
+    await setNoExpiration(
+      PERFORMANCE_ETAG_REDIS_KEY,
+      response.headers.get("etag"),
+    );
+  } else if (response.status === UNAUTHORIZED_RESPONSE) {
+    throw new Error(
+      "Unauthorized access to performance service. Please check your UCP Client ID and secret.",
+    );
+  } else if (!response.ok) {
+    throw new Error(`Failed to fetch performance data: ${response.statusText}`);
   }
 };
 

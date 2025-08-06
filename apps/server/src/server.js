@@ -67,6 +67,8 @@ syncPerformanceData().then(() => {
   setPerformanceResiliencePoller().then(() => {
     info("Performance resilience polling enabled")
   })
+}).catch((error) => {
+  _error("Unable to connect to UCP hosted servers. The UCP Client ID and/or Secret may be invalid. Please check them here: https://app.universalconnectproject.org/widget-management. Performance-based features are disabled until this is resolved.", error)
 });
 
 app.get("/health", function (req, res) {
