@@ -63,8 +63,6 @@ describe("Connection Cleanup Utils", () => {
         CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
       });
 
-      const { initCleanUpConnections } = await import("./utils");
-
       await expect(initCleanUpConnections()).rejects.toThrow(
         "Connection cleanup is disabled in the configuration.",
       );
@@ -77,7 +75,6 @@ describe("Connection Cleanup Utils", () => {
       });
 
       const infoSpy = jest.spyOn(logger, "info").mockImplementation(() => {});
-      const { initCleanUpConnections } = await import("./utils");
 
       const poller = await initCleanUpConnections();
 

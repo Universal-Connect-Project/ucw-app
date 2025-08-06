@@ -97,3 +97,10 @@ These are the environment variables that can be set in apps/server/env/(staging|
 | PROXY_PORT     | The port of your proxy server                          | 80                     | undefined     |
 | PROXY_USERNAME | The username for authentication into your proxy server | userName               | undefined     |
 | PROXY_PASSWORD | The password for authentication into your proxy server | Xdfew643               | undefined     |
+
+## Automatic connection cleanup variables (Optional, defaults to disabled)
+
+| Variable name                               | Description                                                                              | Examples | Default value |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------- | -------- | ------------- |
+| CONNECTION_CLEANUP_INTERVAL_MINUTES         | The number of minutes a new connection will remain before being automatically deleted    | 30       | undefined     |
+| CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES | The interval, in minutes, at which the system checks for and deletes expired connections | 10       | undefined     |
