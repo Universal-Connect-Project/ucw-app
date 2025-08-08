@@ -79,6 +79,9 @@ const keysToPullFromEnv = [
   "PROXY_PASSWORD",
 
   "AUTHORIZATION_TOKEN_COOKIE_SAMESITE",
+
+  "CONNECTION_CLEANUP_INTERVAL_MINUTES",
+  "CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES",
 ];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

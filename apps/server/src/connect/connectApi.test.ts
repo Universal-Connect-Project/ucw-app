@@ -30,6 +30,9 @@ import {
 import expectPerformanceObject from "../test/expectPerformanceObject";
 import * as performanceTracking from "../services/performanceTracking";
 import { PLAID_AGGREGATOR_STRING } from "@repo/plaid-adapter";
+import * as config from "../config";
+import { get } from "../services/storageClient/redis";
+import { keys as _keys } from "../__mocks__/redis";
 
 const {
   connectionByIdMemberData,
@@ -364,6 +367,101 @@ describe("connectApi", () => {
           paused: false,
         }),
       );
+    });
+
+    it("creates a connectionCleanUp object when cleanup feature is enabled", async () => {
+      jest.spyOn(config, "getConfig").mockReturnValue({
+        CONNECTION_CLEANUP_INTERVAL_MINUTES: 30,
+        CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+      });
+
+      const memberData = {
+        institution_guid: "testInstitutionGuid",
+        is_oauth: false,
+        skip_aggregration: false,
+        credentials: [
+          {
+            guid: "testCredentialGuid",
+            value: "testCredentialValue",
+          },
+        ],
+        rawInstitutionData: {
+          ucpInstitutionId: "testUcpInstitutionId",
+        },
+      };
+
+      await connectApi.addMember(memberData);
+
+      const cleanUpObj = await get("cleanup:testGuid1");
+      const cleanUpObjects = await _keys("cleanup:*");
+      expect(cleanUpObjects.length).toBe(1);
+
+      expect(cleanUpObj).toEqual({
+        id: "testGuid1", // This comes from the mocked createConnection response
+        createdAt: expect.any(Number),
+        aggregatorId: MX_AGGREGATOR_STRING,
+        userId: resolvedUserId,
+      });
+    });
+
+    it("does NOT create a connectionCleanUp object when cleanup feature is disabled", async () => {
+      jest.spyOn(config, "getConfig").mockReturnValue({});
+
+      const memberData = {
+        institution_guid: "testInstitutionGuid",
+        is_oauth: false,
+        skip_aggregration: false,
+        credentials: [
+          {
+            guid: "testCredentialGuid",
+            value: "testCredentialValue",
+          },
+        ],
+        rawInstitutionData: {
+          ucpInstitutionId: "testUcpInstitutionId",
+        },
+      };
+
+      await connectApi.addMember(memberData);
+
+      const cleanUpObjects = await _keys("cleanup:*");
+      expect(cleanUpObjects.length).toBe(0);
+    });
+
+    it("creates a connectionCleanUp object when cleanup feature is enabled and is refreshing a connection", async () => {
+      jest.spyOn(config, "getConfig").mockReturnValue({
+        CONNECTION_CLEANUP_INTERVAL_MINUTES: 30,
+        CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+      });
+
+      const memberData = {
+        guid: "testMemberGuid",
+        institution_guid: "testInstitutionGuid",
+        is_oauth: false,
+        skip_aggregration: false,
+        credentials: [
+          {
+            guid: "testCredentialGuid",
+            value: "testCredentialValue",
+          },
+        ],
+        rawInstitutionData: {
+          ucpInstitutionId: "testUcpInstitutionId",
+        },
+      };
+
+      await refreshingContextConnectApi.addMember(memberData);
+
+      const cleanUpObj = await get(`cleanup:${memberData.guid}`);
+      const cleanUpObjects = await _keys("cleanup:*");
+      expect(cleanUpObjects.length).toBe(1);
+
+      expect(cleanUpObj).toEqual({
+        id: memberData.guid,
+        createdAt: expect.any(Number),
+        aggregatorId: MX_AGGREGATOR_STRING,
+        userId: resolvedUserId,
+      });
     });
   });
 

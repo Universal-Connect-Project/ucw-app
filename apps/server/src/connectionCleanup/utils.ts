@@ -1,6 +1,6 @@
 import { setIntervalAsync } from "set-interval-async";
 import { getConfig } from "../config";
-import { info, warning, debug } from "../infra/logger";
+import { info, warning, debug, error } from "../infra/logger";
 import { adapterMap } from "../adapterSetup";
 import { del, set, get, redisClient } from "../services/storageClient/redis";
 
@@ -9,9 +9,14 @@ interface ConnectionCleanUpObj {
   createdAt: number;
   aggregatorId: string;
   userId: string;
+  delayedConnectionId?: string;
+  retryCount?: number;
 }
 
 const CONNECTION_CLEANUP_REDIS_SUBDIRECTORY = "cleanup";
+
+export const getConnectionCleanUpFeatureEnabled = () =>
+  getConfig().CONNECTION_CLEANUP_INTERVAL_MINUTES > 0;
 
 const connectionCleanUpRedisKey = (connectionId: string): string => {
   return `${CONNECTION_CLEANUP_REDIS_SUBDIRECTORY}:${connectionId}`;
@@ -23,6 +28,23 @@ export const setConnectionForCleanup = async (
   const key = connectionCleanUpRedisKey(connection.id);
   await set(key, connection);
   debug(`Connection ${connection.id} set for cleanup.`);
+};
+
+export const updateDelayedConnectionId = async (
+  connectionId: string,
+  delayedConnectionId: string,
+): Promise<void> => {
+  const key = connectionCleanUpRedisKey(connectionId);
+  const connection = await get(key);
+  if (connection) {
+    connection.delayedConnectionId = delayedConnectionId;
+    await set(key, connection);
+    debug(
+      `Updated delayedConnectionId for ${connectionId} to ${delayedConnectionId}`,
+    );
+  } else {
+    warning(`Connection ${connectionId} not found for delayed update.`);
+  }
 };
 
 const getConnectionsForCleanup = async (): Promise<ConnectionCleanUpObj[]> => {
@@ -39,7 +61,7 @@ const getConnectionsForCleanup = async (): Promise<ConnectionCleanUpObj[]> => {
 };
 
 export async function initCleanUpConnections() {
-  if (!getConfig().CONNECTION_CLEANUP_INTERVAL_MINUTES) {
+  if (!getConnectionCleanUpFeatureEnabled()) {
     throw new Error("Connection cleanup is disabled in the configuration.");
   }
   info(
@@ -92,15 +114,30 @@ const cleanUpConnections = async () => {
 const cleanUpConnection = async (connection: ConnectionCleanUpObj) => {
   const aggregatorAdapter =
     adapterMap[connection.aggregatorId].createWidgetAdapter();
+  const connectionId = connection.delayedConnectionId || connection.id;
   await aggregatorAdapter
-    .DeleteConnection(connection.id, connection.userId)
+    .DeleteConnection(connectionId, connection.userId)
     .then(async () => {
-      info(`Connection ${connection.id} cleaned up successfully.`);
+      info(`Connection ${connectionId} cleaned up successfully.`);
       await del(connectionCleanUpRedisKey(connection.id));
     })
-    .catch((error) => {
-      warning(
-        `Failed to clean up connection ${connection.id}: ${error.message}`,
-      );
+    .catch(async (deleteError) => {
+      const currentRetryCount = (connection.retryCount || 0) + 1;
+
+      if (currentRetryCount >= 3) {
+        error(
+          `Failed to clean up connection after 3 attempts. Removing from cleanup queue. Connection details: ${JSON.stringify(connection)}. Final error: ${deleteError.message}`,
+        );
+        await del(connectionCleanUpRedisKey(connection.id));
+      } else {
+        const updatedConnection = {
+          ...connection,
+          retryCount: currentRetryCount,
+        };
+        await set(connectionCleanUpRedisKey(connection.id), updatedConnection);
+        warning(
+          `Failed to clean up connection ${connection.id} (attempt ${currentRetryCount}/3): ${deleteError.message}`,
+        );
+      }
     });
 };

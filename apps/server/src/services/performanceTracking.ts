@@ -7,6 +7,10 @@ import {
   pausePolling,
   resumePolling,
 } from "../aggregatorPerformanceMeasuring/utils";
+import {
+  getConnectionCleanUpFeatureEnabled,
+  updateDelayedConnectionId,
+} from "../connectionCleanup/utils";
 
 async function sendPerformanceEvent({
   connectionId,
@@ -81,13 +85,22 @@ export const recordStartEvent = async ({
   });
 };
 
-export const recordSuccessEvent = async (connectionId: string) => {
+export const recordSuccessEvent = async (
+  performanceSessionId: string,
+  aggregatorConnectionId?: string,
+) => {
+  if (aggregatorConnectionId && getConnectionCleanUpFeatureEnabled()) {
+    await updateDelayedConnectionId(
+      performanceSessionId,
+      aggregatorConnectionId,
+    );
+  }
   await sendPerformanceEvent({
-    connectionId,
+    connectionId: performanceSessionId,
     eventType: "connectionSuccess",
     method: "PUT",
   });
-  cleanupPerformanceObject(connectionId);
+  cleanupPerformanceObject(performanceSessionId);
 };
 
 export const recordConnectionPauseEvent = async (
