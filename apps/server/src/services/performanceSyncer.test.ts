@@ -1,7 +1,7 @@
 import { server } from "../test/testServer";
 import { clearIntervalAsync } from "set-interval-async";
 import { http, HttpResponse } from "msw";
-import config from "../config";
+import { getConfig } from "../config";
 import {
   fetchPerformanceData,
   setPerformanceSyncSchedule,
@@ -12,7 +12,6 @@ import {
   PERFORMANCE_ETAG_REDIS_KEY,
 } from "./storageClient/constants";
 import { get, set } from "./storageClient/redis";
-import * as logger from "../infra/logger";
 import {
   RESPONSE_NOT_MODIFIED,
   UNAUTHORIZED_RESPONSE,
@@ -24,7 +23,7 @@ describe("setPerformanceSyncSchedule", () => {
     let pollerCounter = 0;
     server.use(
       http.get(
-        `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+        `${getConfig().PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
         () => {
           pollerCounter += 1;
           return HttpResponse.json({});
@@ -58,7 +57,7 @@ describe("syncPerformanceData", () => {
 
     server.use(
       http.get(
-        `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+        `${getConfig().PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
         () =>
           new HttpResponse(null, {
             status: RESPONSE_NOT_MODIFIED,
@@ -89,7 +88,7 @@ describe("syncPerformanceData", () => {
 
     server.use(
       http.get(
-        `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+        `${getConfig().PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
         () =>
           HttpResponse.json(performanceRoutingData, {
             headers: {
@@ -107,12 +106,10 @@ describe("syncPerformanceData", () => {
     );
   });
 
-  it("should log warning message when forbidden access", async () => {
-    const warningLogSpy = jest.spyOn(logger, "warning");
-
+  it("should throw error when forbidden access", async () => {
     server.use(
       http.get(
-        `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+        `${getConfig().PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
         () =>
           HttpResponse.json(null, {
             status: UNAUTHORIZED_RESPONSE,
@@ -121,27 +118,42 @@ describe("syncPerformanceData", () => {
       ),
     );
 
-    await syncPerformanceData();
-
-    expect(warningLogSpy).toHaveBeenCalledWith(
-      "Unauthorized access to performance service",
+    await expect(syncPerformanceData()).rejects.toThrow(
+      "Unauthorized access to performance service. Please check your UCP Client ID and secret.",
     );
   });
 
-  it("should fail gracefully when fetch fails", async () => {
-    const warningLogSpy = jest.spyOn(logger, "warning");
-
+  it("should throw error for unexpected non-ok status codes", async () => {
     server.use(
       http.get(
-        `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
-        () => HttpResponse.error(),
+        `${getConfig().PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+        () =>
+          new HttpResponse(null, {
+            status: 500,
+            statusText: "Internal Server Error",
+          }),
       ),
     );
 
-    await syncPerformanceData();
+    await expect(syncPerformanceData()).rejects.toThrow(
+      "Failed to fetch performance data: Internal Server Error",
+    );
+  });
 
-    expect(warningLogSpy).toHaveBeenCalledWith(
-      "Unable to get performance data from server: Failed to fetch",
+  it("should throw error for 404 status code", async () => {
+    server.use(
+      http.get(
+        `${getConfig().PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+        () =>
+          new HttpResponse(null, {
+            status: 404,
+            statusText: "Not Found",
+          }),
+      ),
+    );
+
+    await expect(syncPerformanceData()).rejects.toThrow(
+      "Failed to fetch performance data: Not Found",
     );
   });
 });
@@ -150,7 +162,7 @@ describe("fetchPerformanceData", () => {
   it("returns a response when the server is available", async () => {
     server.use(
       http.get(
-        `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+        `${getConfig().PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
         () =>
           new HttpResponse(null, {
             status: UNAUTHORIZED_RESPONSE,
@@ -166,7 +178,7 @@ describe("fetchPerformanceData", () => {
   it("Throws an error when the server is unavailable", async () => {
     server.use(
       http.get(
-        `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+        `${getConfig().PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
         () => HttpResponse.error(),
       ),
     );

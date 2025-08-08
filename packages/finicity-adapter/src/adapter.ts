@@ -227,9 +227,12 @@ export class FinicityAdapter implements WidgetAdapter {
         this.performanceClient.recordConnectionResumeEvent(connection_id);
         break;
       case "added":
-        this.performanceClient.recordSuccessEvent(connection_id);
-
         institutionLoginId = payload?.accounts?.[0]?.institutionLoginId;
+        this.performanceClient.recordSuccessEvent(
+          connection_id,
+          institutionLoginId,
+        );
+
         if (jobTypes?.includes(ComboJobTypes.TRANSACTION_HISTORY)) {
           await this.apiClient.aggregateTransactionHistory(
             connection.userId,

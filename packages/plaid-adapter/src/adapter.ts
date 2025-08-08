@@ -178,7 +178,6 @@ export class PlaidAdapter implements WidgetAdapter {
 
     const { webhook_code, public_token } = request.body;
     if (webhook_code === "ITEM_ADD_RESULT") {
-      // this.performanceClient.recordSuccessEvent(requestId); # TODO: implement performance success
       const tokenExchangeRequest = await publicTokenExchange({
         publicToken: public_token,
         clientId: this.credentials.clientId,
@@ -186,6 +185,7 @@ export class PlaidAdapter implements WidgetAdapter {
         sandbox: this.sandbox,
       });
       const { access_token } = tokenExchangeRequest;
+      // this.performanceClient.recordSuccessEvent(requestId, access_token); # TODO: implement performance success
       connection.status = ConnectionStatus.CONNECTED;
       connection.id = access_token;
       connection.postMessageEventData = {

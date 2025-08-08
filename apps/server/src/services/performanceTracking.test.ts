@@ -17,6 +17,10 @@ import {
 } from "../aggregatorPerformanceMeasuring/utils";
 import expectPerformanceObject from "../test/expectPerformanceObject";
 import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
+import * as configModule from "../config";
+import { setConnectionForCleanup } from "../connectionCleanup/utils";
+import { get } from "../services/storageClient/redis";
+import { clearRedisMock } from "../__mocks__/redis";
 
 async function setupRedisPerformanceObject(sessionId: string) {
   createPerformancePollingObject({
@@ -29,6 +33,11 @@ async function setupRedisPerformanceObject(sessionId: string) {
 }
 
 describe("performanceTracking", () => {
+  beforeEach(() => {
+    jest.restoreAllMocks();
+    clearRedisMock();
+  });
+
   it("calls connectionStart with correct payload and headers", async () => {
     const connectionId = "conn1";
     const requestLog = setupPerformanceHandlers(["connectionStart"]);
@@ -81,6 +90,137 @@ describe("performanceTracking", () => {
         }),
       }),
     );
+  });
+
+  it("calls updateDelayedConnectionId when aggregatorConnectionId is provided and feature is enabled", async () => {
+    jest.spyOn(configModule, "getConfig").mockReturnValue({
+      ...config,
+      CONNECTION_CLEANUP_INTERVAL_MINUTES: 30,
+      CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+    });
+
+    const connectionId = "conn2a";
+    const aggregatorConnectionId = "aggr-conn-123";
+    await setupRedisPerformanceObject(connectionId);
+
+    await setConnectionForCleanup({
+      id: connectionId,
+      createdAt: Date.now(),
+      aggregatorId: "mx",
+      userId: "test-user-id",
+    });
+
+    const requestLog = setupPerformanceHandlers(["connectionSuccess"]);
+
+    await recordSuccessEvent(connectionId, aggregatorConnectionId);
+
+    await expectPerformanceObject(connectionId, null);
+
+    const storedConnection = await get(`cleanup:${connectionId}`);
+    expect(storedConnection).toEqual(
+      expect.objectContaining({
+        id: connectionId,
+        delayedConnectionId: aggregatorConnectionId,
+      }),
+    );
+
+    expect(requestLog.length).toBe(1);
+  });
+
+  it("does not call updateDelayedConnectionId when aggregatorConnectionId is provided but feature is disabled", async () => {
+    jest.spyOn(configModule, "getConfig").mockReturnValue({
+      ...config,
+      CONNECTION_CLEANUP_INTERVAL_MINUTES: undefined,
+      CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+    });
+
+    const connectionId = "conn2b";
+    const aggregatorConnectionId = "aggr-conn-456";
+    await setupRedisPerformanceObject(connectionId);
+
+    await setConnectionForCleanup({
+      id: connectionId,
+      createdAt: Date.now(),
+      aggregatorId: "mx",
+      userId: "test-user-id",
+    });
+
+    const requestLog = setupPerformanceHandlers(["connectionSuccess"]);
+
+    await recordSuccessEvent(connectionId, aggregatorConnectionId);
+
+    await expectPerformanceObject(connectionId, null);
+
+    const storedConnection = await get(`cleanup:${connectionId}`);
+    expect(storedConnection).toEqual(
+      expect.objectContaining({
+        id: connectionId,
+      }),
+    );
+    expect(storedConnection.delayedConnectionId).toBeUndefined();
+
+    expect(requestLog.length).toBe(1);
+  });
+
+  it("does not call updateDelayedConnectionId when aggregatorConnectionId is not provided", async () => {
+    jest.spyOn(configModule, "getConfig").mockReturnValue({
+      ...config,
+      CONNECTION_CLEANUP_INTERVAL_MINUTES: 30,
+      CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+    });
+
+    const connectionId = "conn2c";
+    await setupRedisPerformanceObject(connectionId);
+
+    await setConnectionForCleanup({
+      id: connectionId,
+      createdAt: Date.now(),
+      aggregatorId: "mx",
+      userId: "test-user-id",
+    });
+
+    const requestLog = setupPerformanceHandlers(["connectionSuccess"]);
+
+    await recordSuccessEvent(connectionId);
+
+    await expectPerformanceObject(connectionId, null);
+
+    const storedConnection = await get(`cleanup:${connectionId}`);
+    expect(storedConnection).toEqual(
+      expect.objectContaining({
+        id: connectionId,
+      }),
+    );
+    expect(storedConnection.delayedConnectionId).toBeUndefined();
+
+    expect(requestLog.length).toBe(1);
+  });
+
+  it("logs warning when trying to update delayedConnectionId for non-existent connection", async () => {
+    jest.spyOn(configModule, "getConfig").mockReturnValue({
+      ...config,
+      CONNECTION_CLEANUP_INTERVAL_MINUTES: 30,
+      CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+    });
+
+    const connectionId = "conn2d-non-existent";
+    const aggregatorConnectionId = "aggr-conn-789";
+    await setupRedisPerformanceObject(connectionId);
+
+    const warningSpy = jest
+      .spyOn(logger, "warning")
+      .mockImplementation(() => {});
+    const requestLog = setupPerformanceHandlers(["connectionSuccess"]);
+
+    await recordSuccessEvent(connectionId, aggregatorConnectionId);
+
+    await expectPerformanceObject(connectionId, null);
+
+    expect(warningSpy).toHaveBeenCalledWith(
+      `Connection ${connectionId} not found for delayed update.`,
+    );
+
+    expect(requestLog.length).toBe(1);
   });
 
   it("calls connectionPause with correct method and headers, and updates pause on local performance object", async () => {

@@ -396,6 +396,7 @@ describe("finicity aggregator", () => {
       );
       expect(mockPerformanceClient.recordSuccessEvent).toHaveBeenCalledWith(
         "testPerfomanceSessionId",
+        "test-institution-login-id",
       );
     });
 
@@ -460,6 +461,7 @@ describe("finicity aggregator", () => {
       );
       expect(mockPerformanceClient.recordSuccessEvent).toHaveBeenCalledWith(
         "testPerfomanceSessionId",
+        "test-institution-login-id",
       );
     });
 
