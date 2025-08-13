@@ -24,7 +24,7 @@ import * as performanceMeasuringUtils from "../aggregatorPerformanceMeasuring/ut
 import {
   answerMfaMemberData,
   memberCreateData,
-  memberData,
+  memberData as mxTestMemberData,
   memberStatusData,
 } from "@repo/utils-dev-dependency/mx/testData";
 import expectPerformanceObject from "../test/expectPerformanceObject";
@@ -186,7 +186,7 @@ describe("connectApi", () => {
         member: {
           aggregator: testContext.aggregator,
           connection_status: ConnectionStatus.CREATED,
-          guid: "testGuid1",
+          guid: mxTestMemberData.member.guid,
           institution_guid: "insitutionCode1",
           is_being_aggregated: false,
           is_oauth: false,
@@ -198,13 +198,13 @@ describe("connectApi", () => {
           postMessageEventData: {
             memberConnected: {
               aggregator: MX_AGGREGATOR_STRING,
-              member_guid: "testGuid1",
+              member_guid: mxTestMemberData.member.guid,
               user_guid: undefined,
             },
             memberStatusUpdate: {
               aggregator: MX_AGGREGATOR_STRING,
               connection_status: 0,
-              member_guid: "testGuid1",
+              member_guid: mxTestMemberData.member.guid,
               user_guid: undefined,
             },
           },
@@ -232,7 +232,7 @@ describe("connectApi", () => {
       expect(performanceObject).toEqual(
         expect.objectContaining({
           performanceSessionId: requestLog[0].connectionId,
-          connectionId: "testGuid1",
+          connectionId: mxTestMemberData.member.guid,
           userId: resolvedUserId,
           aggregatorId: MX_AGGREGATOR_STRING,
           lastUiUpdateTimestamp: expect.any(Number),
@@ -360,7 +360,7 @@ describe("connectApi", () => {
       expect(performanceObject).toEqual(
         expect.objectContaining({
           performanceSessionId: requestLog[0].connectionId,
-          connectionId: "testGuid1",
+          connectionId: mxTestMemberData.member.guid,
           userId: resolvedUserId,
           aggregatorId: MX_AGGREGATOR_STRING,
           lastUiUpdateTimestamp: expect.any(Number),
@@ -399,7 +399,7 @@ describe("connectApi", () => {
 
       expect(cleanUpObj).toEqual({
         id: performanceSessionId,
-        connectionId: "testGuid1", // This comes from the mocked createConnection response
+        connectionId: mxTestMemberData.member.guid,
         createdAt: expect.any(Number),
         aggregatorId: MX_AGGREGATOR_STRING,
         userId: resolvedUserId,
@@ -532,13 +532,15 @@ describe("connectApi", () => {
       server.use(
         http.put(UPDATE_CONNECTION_PATH, async ({ request }) => {
           requestBody = await request.json();
-          return HttpResponse.json(memberData);
+          return HttpResponse.json(mxTestMemberData);
         }),
       );
 
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       const connection = await connectApi.updateMember({
         ...memberCreateData,
-        guid: "testGuid1",
+        guid: mxTestMemberData.member.guid,
       });
 
       performanceObject = await expectPerformanceObject(performanceSessionId, {
@@ -600,7 +602,7 @@ describe("connectApi", () => {
         server.use(
           http.put(UPDATE_CONNECTION_PATH, async ({ request }) => {
             requestBody = await request.json();
-            return HttpResponse.json(memberData);
+            return HttpResponse.json(mxTestMemberData);
           }),
         );
 
@@ -611,7 +613,7 @@ describe("connectApi", () => {
 
         const connection = await refreshingContextConnectApi.updateMember({
           ...memberCreateData,
-          guid: "testGuid1",
+          guid: mxTestMemberData.member.guid,
         });
 
         expect(requestBody).toEqual({
@@ -774,7 +776,7 @@ describe("connectApi", () => {
           createdAt: initialCreatedAt,
           aggregatorId: MX_AGGREGATOR_STRING,
           userId: resolvedUserId,
-          connectionId: "testGuid1", // this is the mocked guid from the handler
+          connectionId: mxTestMemberData.member.guid,
         }),
       );
 

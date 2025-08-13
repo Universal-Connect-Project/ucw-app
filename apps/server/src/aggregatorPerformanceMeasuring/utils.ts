@@ -7,7 +7,7 @@ import {
   recordSuccessEvent,
 } from "../services/performanceTracking";
 import { setIntervalAsync } from "set-interval-async";
-import { error, info } from "../infra/logger";
+import { debug, error, info } from "../infra/logger";
 
 export interface PerformanceObject {
   userId?: string;
@@ -171,6 +171,7 @@ export const pollConnectionStatusIfNeeded = async (
 };
 
 export async function setPerformanceResiliencePoller(seconds: number = 5) {
+  debug(`Performance resilience is enabled. Polling every ${seconds} seconds.`);
   return setIntervalAsync(
     async () => {
       const performanceIds = await redisClient.keys(

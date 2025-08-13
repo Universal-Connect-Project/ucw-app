@@ -37,7 +37,7 @@ export const syncPerformanceData = async () => {
     );
   } else if (response.status === UNAUTHORIZED_RESPONSE) {
     throw new Error(
-      "Unauthorized access to performance service. Please check your UCP Client ID and secret.",
+      "Unable to connect to UCP hosted servers. The UCP Client ID and/or Secret may be invalid. Please check them here: https://app.universalconnectproject.org/widget-management. Performance-based features are disabled until this is resolved.",
     );
   } else if (!response.ok) {
     throw new Error(`Failed to fetch performance data: ${response.statusText}`);

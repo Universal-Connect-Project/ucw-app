@@ -30,7 +30,7 @@ export const setConnectionForCleanup = async (
   debug(`Connection ${connection.id} set for cleanup.`);
 };
 
-export const updateConnectionId = async (
+export const addConnectionIdToCleanupObject = async (
   id: string,
   delayedConnectionId: string,
 ): Promise<void> => {
@@ -60,11 +60,8 @@ const getConnectionsForCleanup = async (): Promise<ConnectionCleanUpObj[]> => {
 };
 
 export async function initCleanUpConnections() {
-  if (!getConnectionCleanUpFeatureEnabled()) {
-    throw new Error("Connection cleanup is disabled in the configuration.");
-  }
   info(
-    `Aggregator connections will be automatically deleted after ${getConfig().CONNECTION_EXPIRATION_MINUTES} minutes to prevent ongoing aggregation and unnecessary billing.`,
+    `Aggregator connections will automatically be deleted after ${getConfig().CONNECTION_EXPIRATION_MINUTES} minutes to prevent ongoing aggregation and unnecessary billing.`,
   );
   return setConnectionCleanUpSchedule(
     getConfig().EXPIRED_CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES,

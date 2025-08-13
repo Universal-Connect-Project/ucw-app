@@ -119,7 +119,7 @@ describe("syncPerformanceData", () => {
     );
 
     await expect(syncPerformanceData()).rejects.toThrow(
-      "Unauthorized access to performance service. Please check your UCP Client ID and secret.",
+      "Unable to connect to UCP hosted servers. The UCP Client ID and/or Secret may be invalid. Please check them here: https://app.universalconnectproject.org/widget-management. Performance-based features are disabled until this is resolved.",
     );
   });
 

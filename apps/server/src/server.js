@@ -17,6 +17,7 @@ import { widgetHandler } from "./widgetEndpoint";
 import { oauthRedirectHandler, webhookHandler } from "./connect/oauthEndpoints";
 import useInstitutionEndpoints from "./institutions/useInstitutionEndpoints";
 import { startNgrok, stopNgrok } from "./webhooks";
+import { setPerformanceSyncSchedule } from "./services/performanceSyncer";
 import cors from "cors";
 
 process.on("unhandledRejection", (error) => {
@@ -55,6 +56,10 @@ initializeElastic()
   .catch((error) => {
     _error(`Failed to initialized: ${error}`);
   });
+
+setPerformanceSyncSchedule().then(() => {
+  info("Performance based routing data is scheduled to sync");
+});
 
 initializePerformanceAndCleanup().catch((error) => {
   _error("Failed to initialize performance and cleanup", error);

@@ -92,7 +92,7 @@ describe("performanceTracking", () => {
     );
   });
 
-  it("calls updateConnectionId when aggregatorConnectionId is provided and feature is enabled", async () => {
+  it("calls addConnectionIdToCleanupObject when aggregatorConnectionId is provided and feature is enabled", async () => {
     jest.spyOn(configModule, "getConfig").mockReturnValue({
       ...config,
       CONNECTION_EXPIRATION_MINUTES: 30,
@@ -127,7 +127,7 @@ describe("performanceTracking", () => {
     expect(requestLog.length).toBe(1);
   });
 
-  it("does not call updateConnectionId when aggregatorConnectionId is provided but feature is disabled", async () => {
+  it("does not call addConnectionIdToCleanupObject when aggregatorConnectionId is provided but feature is disabled", async () => {
     jest.spyOn(configModule, "getConfig").mockReturnValue({
       ...config,
       CONNECTION_EXPIRATION_MINUTES: undefined,
@@ -162,7 +162,7 @@ describe("performanceTracking", () => {
     expect(requestLog.length).toBe(1);
   });
 
-  it("does not call updateConnectionId when aggregatorConnectionId is not provided", async () => {
+  it("does not call addConnectionIdToCleanupObject when aggregatorConnectionId is not provided", async () => {
     jest.spyOn(configModule, "getConfig").mockReturnValue({
       ...config,
       CONNECTION_EXPIRATION_MINUTES: 30,
