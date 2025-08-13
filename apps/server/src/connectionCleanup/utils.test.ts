@@ -3,7 +3,7 @@ import {
   setConnectionForCleanup,
   initCleanUpConnections,
   getConnectionCleanUpFeatureEnabled,
-  updateDelayedConnectionId,
+  updateConnectionId,
 } from "./utils";
 import { http, HttpResponse } from "msw";
 import * as logger from "../infra/logger";
@@ -61,26 +61,24 @@ describe("Connection Cleanup Utils", () => {
     });
   });
 
-  describe("updateDelayedConnectionId", () => {
-    it("should update delayedConnectionId for an existing connection", async () => {
+  describe("updateConnectionId", () => {
+    it("should update connectionId for an existing connection", async () => {
       const debugSpy = jest.spyOn(logger, "debug").mockImplementation(() => {});
 
       await setConnectionForCleanup(baseConnectionParams);
 
-      const delayedConnectionId = "delayed-connection-id-123";
-      await updateDelayedConnectionId(
-        baseConnectionParams.id,
-        delayedConnectionId,
-      );
+      const connectionId = "delayed-connection-id-123";
+      await updateConnectionId(baseConnectionParams.id, connectionId);
 
       const storedConnection = await get(`cleanup:${baseConnectionParams.id}`);
       expect(storedConnection).toEqual({
         ...baseConnectionParams,
-        delayedConnectionId,
+        connectionId,
+        createdAt: expect.any(Number),
       });
 
       expect(debugSpy).toHaveBeenCalledWith(
-        `Updated delayedConnectionId for ${baseConnectionParams.id} to ${delayedConnectionId}`,
+        `Updated connectionId for ${baseConnectionParams.id} to ${connectionId}`,
       );
 
       debugSpy.mockRestore();
@@ -92,12 +90,9 @@ describe("Connection Cleanup Utils", () => {
         .mockImplementation(() => {});
 
       const nonExistentConnectionId = "non-existent-connection";
-      const delayedConnectionId = "delayed-connection-id-456";
+      const connectionId = "delayed-connection-id-456";
 
-      await updateDelayedConnectionId(
-        nonExistentConnectionId,
-        delayedConnectionId,
-      );
+      await updateConnectionId(nonExistentConnectionId, connectionId);
 
       expect(warningSpy).toHaveBeenCalledWith(
         `Connection ${nonExistentConnectionId} not found for delayed update.`,
@@ -106,26 +101,23 @@ describe("Connection Cleanup Utils", () => {
       warningSpy.mockRestore();
     });
 
-    it("should overwrite existing delayedConnectionId", async () => {
+    it("should overwrite existing connectionId", async () => {
       const debugSpy = jest.spyOn(logger, "debug").mockImplementation(() => {});
 
-      const connectionWithDelayed = {
+      const connectionWithExisting = {
         ...baseConnectionParams,
-        delayedConnectionId: "initial-delayed-id",
+        connectionId: "initial-connection-id",
       };
-      await setConnectionForCleanup(connectionWithDelayed);
+      await setConnectionForCleanup(connectionWithExisting);
 
-      const newDelayedConnectionId = "new-delayed-connection-id-789";
-      await updateDelayedConnectionId(
-        baseConnectionParams.id,
-        newDelayedConnectionId,
-      );
+      const newConnectionId = "new-connection-id-789";
+      await updateConnectionId(baseConnectionParams.id, newConnectionId);
 
       const storedConnection = await get(`cleanup:${baseConnectionParams.id}`);
-      expect(storedConnection.delayedConnectionId).toBe(newDelayedConnectionId);
+      expect(storedConnection.connectionId).toBe(newConnectionId);
 
       expect(debugSpy).toHaveBeenCalledWith(
-        `Updated delayedConnectionId for ${baseConnectionParams.id} to ${newDelayedConnectionId}`,
+        `Updated connectionId for ${baseConnectionParams.id} to ${newConnectionId}`,
       );
 
       debugSpy.mockRestore();
@@ -135,8 +127,8 @@ describe("Connection Cleanup Utils", () => {
   describe("initCleanUpConnections", () => {
     it("should throw error when cleanup is disabled", async () => {
       jest.spyOn(config, "getConfig").mockReturnValue({
-        CONNECTION_CLEANUP_INTERVAL_MINUTES: undefined,
-        CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+        CONNECTION_EXPIRATION_MINUTES: undefined,
+        EXPIRED_CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
       });
 
       await expect(initCleanUpConnections()).rejects.toThrow(
@@ -146,8 +138,8 @@ describe("Connection Cleanup Utils", () => {
 
     it("should start cleanup schedule and log info message", async () => {
       jest.spyOn(config, "getConfig").mockReturnValue({
-        CONNECTION_CLEANUP_INTERVAL_MINUTES: 30,
-        CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+        CONNECTION_EXPIRATION_MINUTES: 30,
+        EXPIRED_CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
       });
 
       const infoSpy = jest.spyOn(logger, "info").mockImplementation(() => {});
@@ -170,8 +162,8 @@ describe("Connection Cleanup Utils", () => {
     beforeEach(() => {
       jest.restoreAllMocks();
       jest.spyOn(config, "getConfig").mockReturnValue({
-        CONNECTION_CLEANUP_INTERVAL_MINUTES: 30,
-        CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1 / 60, // 1 second
+        CONNECTION_EXPIRATION_MINUTES: 30,
+        EXPIRED_CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1 / 60, // 1 second
       });
       jest.useFakeTimers();
     });
@@ -219,6 +211,7 @@ describe("Connection Cleanup Utils", () => {
 
       const expiredConnection = {
         ...baseConnectionParams,
+        connectionId: "test-connection-id",
         createdAt: Date.now() - 31 * 60 * 1000, // 31 minutes ago (expired)
       };
 
@@ -229,7 +222,7 @@ describe("Connection Cleanup Utils", () => {
 
       await clearIntervalAsync(poller);
 
-      expect(deletedConnectionId).toBe(expiredConnection.id);
+      expect(deletedConnectionId).toBe(expiredConnection.connectionId);
       expect(debugSpy).toHaveBeenCalledWith(
         "Found 1 expired connections for cleanup.",
       );
@@ -245,7 +238,7 @@ describe("Connection Cleanup Utils", () => {
       debugSpy.mockRestore();
     });
 
-    it("should use delayedConnectionId when cleaning up connections", async () => {
+    it("should use connectionId when cleaning up connections", async () => {
       const infoSpy = jest.spyOn(logger, "info");
       const debugSpy = jest.spyOn(logger, "debug");
       let deletedConnectionId;
@@ -260,7 +253,7 @@ describe("Connection Cleanup Utils", () => {
       const expiredConnection = {
         ...baseConnectionParams,
         createdAt: Date.now() - 31 * 60 * 1000, // 31 minutes ago (expired)
-        delayedConnectionId: "delayed-connection-id-cleanup-test",
+        connectionId: "delayed-connection-id-cleanup-test",
       };
 
       await setConnectionForCleanup(expiredConnection);
@@ -270,9 +263,9 @@ describe("Connection Cleanup Utils", () => {
 
       await clearIntervalAsync(poller);
 
-      expect(deletedConnectionId).toBe(expiredConnection.delayedConnectionId);
+      expect(deletedConnectionId).toBe(expiredConnection.connectionId);
       expect(infoSpy).toHaveBeenCalledWith(
-        `Connection ${expiredConnection.delayedConnectionId} cleaned up successfully.`,
+        `Connection ${expiredConnection.connectionId} cleaned up successfully.`,
       );
 
       const remainingConnection = await get(`cleanup:${expiredConnection.id}`);
@@ -296,6 +289,7 @@ describe("Connection Cleanup Utils", () => {
 
       const expiredConnection = {
         ...baseConnectionParams,
+        connectionId: "test-connection-id",
         createdAt: Date.now() - 31 * 60 * 1000,
       };
 
@@ -306,7 +300,7 @@ describe("Connection Cleanup Utils", () => {
       await clearIntervalAsync(poller);
 
       expect(warningSpy).toHaveBeenCalledWith(
-        `Failed to clean up connection ${expiredConnection.id} (attempt 1/3): Request failed with status code 400`,
+        `Failed to clean up connection ${expiredConnection.connectionId} (attempt 1/3): Request failed with status code 400`,
       );
 
       const remainingConnection = await get(`cleanup:${expiredConnection.id}`);
@@ -370,6 +364,7 @@ describe("Connection Cleanup Utils", () => {
 
       const expiredConnection = {
         ...baseConnectionParams,
+        connectionId: "test-connection-id",
         createdAt: Date.now() - 31 * 60 * 1000,
         retryCount: 1,
       };
@@ -381,7 +376,7 @@ describe("Connection Cleanup Utils", () => {
       await clearIntervalAsync(poller);
 
       expect(warningSpy).toHaveBeenCalledWith(
-        `Failed to clean up connection ${expiredConnection.id} (attempt 2/3): Request failed with status code 500`,
+        `Failed to clean up connection ${expiredConnection.connectionId} (attempt 2/3): Request failed with status code 500`,
       );
 
       const remainingConnection = await get(`cleanup:${expiredConnection.id}`);
@@ -411,11 +406,13 @@ describe("Connection Cleanup Utils", () => {
       const connection1 = {
         ...baseConnectionParams,
         id: "expired-conn-1",
+        connectionId: "expired-conn-1",
         createdAt: Date.now() - 31 * 60 * 1000,
       };
       const connection2 = {
         ...baseConnectionParams,
         id: "expired-conn-2",
+        connectionId: "expired-conn-2",
         aggregatorId: "plaid_sandbox",
         createdAt: Date.now() - 35 * 60 * 1000,
       };
@@ -428,7 +425,10 @@ describe("Connection Cleanup Utils", () => {
       await clearIntervalAsync(poller);
 
       expect(deletedConnectionIds).toEqual(
-        expect.arrayContaining([connection1.id, connection2.id]),
+        expect.arrayContaining([
+          connection1.connectionId,
+          connection2.connectionId,
+        ]),
       );
     });
 
@@ -437,11 +437,13 @@ describe("Connection Cleanup Utils", () => {
       const expiredConnection = {
         ...baseConnectionParams,
         id: "expired-conn",
+        connectionId: "expired-conn",
         createdAt: Date.now() - 31 * 60 * 1000,
       };
       const recentConnection = {
         ...baseConnectionParams,
         id: "recent-conn",
+        connectionId: "recent-conn",
         createdAt: Date.now() - 10 * 60 * 1000, // 10 minutes ago
       };
 
@@ -460,7 +462,7 @@ describe("Connection Cleanup Utils", () => {
       await clearIntervalAsync(poller);
 
       expect(deletedConnectionIds.length).toBe(1);
-      expect(deletedConnectionIds[0]).toBe(expiredConnection.id);
+      expect(deletedConnectionIds[0]).toBe(expiredConnection.connectionId);
 
       // Recent connection should still exist
       const remainingConnection = await get(`cleanup:${recentConnection.id}`);
@@ -482,37 +484,37 @@ describe("Connection Cleanup Utils", () => {
   });
 
   describe("getConnectionCleanUpFeatureEnabled", () => {
-    it("should return true when CONNECTION_CLEANUP_INTERVAL_MINUTES is greater than 0", async () => {
+    it("should return true when CONNECTION_EXPIRATION_MINUTES is greater than 0", async () => {
       jest.spyOn(config, "getConfig").mockReturnValue({
-        CONNECTION_CLEANUP_INTERVAL_MINUTES: 30,
-        CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+        CONNECTION_EXPIRATION_MINUTES: 30,
+        EXPIRED_CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
       });
 
       expect(getConnectionCleanUpFeatureEnabled()).toBe(true);
     });
 
-    it("should return false when CONNECTION_CLEANUP_INTERVAL_MINUTES is 0", async () => {
+    it("should return false when CONNECTION_EXPIRATION_MINUTES is 0", async () => {
       jest.spyOn(config, "getConfig").mockReturnValue({
-        CONNECTION_CLEANUP_INTERVAL_MINUTES: 0,
-        CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+        CONNECTION_EXPIRATION_MINUTES: 0,
+        EXPIRED_CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
       });
 
       expect(getConnectionCleanUpFeatureEnabled()).toBe(false);
     });
 
-    it("should return false when CONNECTION_CLEANUP_INTERVAL_MINUTES is a string", async () => {
+    it("should return false when CONNECTION_EXPIRATION_MINUTES is a string", async () => {
       jest.spyOn(config, "getConfig").mockReturnValue({
-        CONNECTION_CLEANUP_INTERVAL_MINUTES: "abc",
-        CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+        CONNECTION_EXPIRATION_MINUTES: "abc",
+        EXPIRED_CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
       });
 
       expect(getConnectionCleanUpFeatureEnabled()).toBe(false);
     });
 
-    it("should return false when CONNECTION_CLEANUP_INTERVAL_MINUTES is undefined", async () => {
+    it("should return false when CONNECTION_EXPIRATION_MINUTES is undefined", async () => {
       jest.spyOn(config, "getConfig").mockReturnValue({
-        CONNECTION_CLEANUP_INTERVAL_MINUTES: undefined,
-        CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+        CONNECTION_EXPIRATION_MINUTES: undefined,
+        EXPIRED_CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
       });
 
       expect(getConnectionCleanUpFeatureEnabled()).toBe(false);

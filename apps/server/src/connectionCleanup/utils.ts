@@ -9,14 +9,14 @@ interface ConnectionCleanUpObj {
   createdAt: number;
   aggregatorId: string;
   userId: string;
-  delayedConnectionId?: string;
+  connectionId?: string;
   retryCount?: number;
 }
 
 const CONNECTION_CLEANUP_REDIS_SUBDIRECTORY = "cleanup";
 
 export const getConnectionCleanUpFeatureEnabled = () =>
-  getConfig().CONNECTION_CLEANUP_INTERVAL_MINUTES > 0;
+  getConfig().CONNECTION_EXPIRATION_MINUTES > 0;
 
 const connectionCleanUpRedisKey = (connectionId: string): string => {
   return `${CONNECTION_CLEANUP_REDIS_SUBDIRECTORY}:${connectionId}`;
@@ -30,20 +30,19 @@ export const setConnectionForCleanup = async (
   debug(`Connection ${connection.id} set for cleanup.`);
 };
 
-export const updateDelayedConnectionId = async (
-  connectionId: string,
+export const updateConnectionId = async (
+  id: string,
   delayedConnectionId: string,
 ): Promise<void> => {
-  const key = connectionCleanUpRedisKey(connectionId);
+  const key = connectionCleanUpRedisKey(id);
   const connection = await get(key);
   if (connection) {
-    connection.delayedConnectionId = delayedConnectionId;
+    connection.connectionId = delayedConnectionId;
+    connection.createdAt = Date.now();
     await set(key, connection);
-    debug(
-      `Updated delayedConnectionId for ${connectionId} to ${delayedConnectionId}`,
-    );
+    debug(`Updated connectionId for ${id} to ${delayedConnectionId}`);
   } else {
-    warning(`Connection ${connectionId} not found for delayed update.`);
+    warning(`Connection ${id} not found for delayed update.`);
   }
 };
 
@@ -65,10 +64,10 @@ export async function initCleanUpConnections() {
     throw new Error("Connection cleanup is disabled in the configuration.");
   }
   info(
-    `Aggregator connections will be automatically deleted after ${getConfig().CONNECTION_CLEANUP_INTERVAL_MINUTES} minutes to prevent ongoing aggregation and unnecessary billing.`,
+    `Aggregator connections will be automatically deleted after ${getConfig().CONNECTION_EXPIRATION_MINUTES} minutes to prevent ongoing aggregation and unnecessary billing.`,
   );
   return setConnectionCleanUpSchedule(
-    getConfig().CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES,
+    getConfig().EXPIRED_CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES,
   );
 }
 
@@ -90,7 +89,7 @@ const cleanUpConnections = async () => {
   }
 
   const now = Date.now();
-  const threshold = getConfig().CONNECTION_CLEANUP_INTERVAL_MINUTES * 60 * 1000;
+  const threshold = getConfig().CONNECTION_EXPIRATION_MINUTES * 60 * 1000;
 
   const expiredConnections = connections.filter(
     (connection) => now - connection.createdAt > threshold,
@@ -111,32 +110,36 @@ const cleanUpConnections = async () => {
   return;
 };
 
-const cleanUpConnection = async (connection: ConnectionCleanUpObj) => {
+const cleanUpConnection = async (expiredConnection: ConnectionCleanUpObj) => {
   const aggregatorAdapter =
-    adapterMap[connection.aggregatorId].createWidgetAdapter();
-  const connectionId = connection.delayedConnectionId || connection.id;
+    adapterMap[expiredConnection.aggregatorId].createWidgetAdapter();
   await aggregatorAdapter
-    .DeleteConnection(connectionId, connection.userId)
+    .DeleteConnection(expiredConnection.connectionId, expiredConnection.userId)
     .then(async () => {
-      info(`Connection ${connectionId} cleaned up successfully.`);
-      await del(connectionCleanUpRedisKey(connection.id));
+      info(
+        `Connection ${expiredConnection.connectionId} cleaned up successfully.`,
+      );
+      await del(connectionCleanUpRedisKey(expiredConnection.id));
     })
     .catch(async (deleteError) => {
-      const currentRetryCount = (connection.retryCount || 0) + 1;
+      const currentRetryCount = (expiredConnection.retryCount || 0) + 1;
 
       if (currentRetryCount >= 3) {
         error(
-          `Failed to clean up connection after 3 attempts. Removing from cleanup queue. Connection details: ${JSON.stringify(connection)}. Final error: ${deleteError.message}`,
+          `Failed to clean up connection after 3 attempts. Removing from cleanup queue. Connection details: ${JSON.stringify(expiredConnection)}. Final error: ${deleteError.message}`,
         );
-        await del(connectionCleanUpRedisKey(connection.id));
+        await del(connectionCleanUpRedisKey(expiredConnection.id));
       } else {
         const updatedConnection = {
-          ...connection,
+          ...expiredConnection,
           retryCount: currentRetryCount,
         };
-        await set(connectionCleanUpRedisKey(connection.id), updatedConnection);
+        await set(
+          connectionCleanUpRedisKey(expiredConnection.id),
+          updatedConnection,
+        );
         warning(
-          `Failed to clean up connection ${connection.id} (attempt ${currentRetryCount}/3): ${deleteError.message}`,
+          `Failed to clean up connection ${expiredConnection.connectionId || expiredConnection.id} (attempt ${currentRetryCount}/3): ${deleteError.message}`,
         );
       }
     });

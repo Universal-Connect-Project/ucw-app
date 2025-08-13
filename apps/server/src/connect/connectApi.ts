@@ -227,7 +227,8 @@ export class ConnectApi extends AggregatorAdapterBase {
     }
     if (getConnectionCleanUpFeatureEnabled()) {
       setConnectionForCleanup({
-        id: connection.id,
+        id: performanceSessionId,
+        connectionId: connection.id,
         createdAt: Date.now(),
         aggregatorId: this.context.aggregator, // Must use the original aggregator string to delete connection from sandbox or prod adapters.
         userId: this.getUserId(),
@@ -293,7 +294,7 @@ export class ConnectApi extends AggregatorAdapterBase {
             recordConnectionResumeEvent(this.context.performanceSessionId);
           }
         } else {
-          recordSuccessEvent(this.context.performanceSessionId);
+          recordSuccessEvent(this.context.performanceSessionId, connection.id);
         }
       }
 

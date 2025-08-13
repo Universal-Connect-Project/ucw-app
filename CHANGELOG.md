@@ -11,8 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Connection Cleanup Feature see [ENVIRONMENT.md](ENVIRONMENT.md#automatic-connection-cleanup-variables-optional-defaults-to-disabled) for details on environment variables related to connection cleanup.
 
-## [1.10.3]
-
 ### Fixed
 
 - Unneccessary error catching was not preventing the performance polling from starting.

@@ -92,11 +92,11 @@ describe("performanceTracking", () => {
     );
   });
 
-  it("calls updateDelayedConnectionId when aggregatorConnectionId is provided and feature is enabled", async () => {
+  it("calls updateConnectionId when aggregatorConnectionId is provided and feature is enabled", async () => {
     jest.spyOn(configModule, "getConfig").mockReturnValue({
       ...config,
-      CONNECTION_CLEANUP_INTERVAL_MINUTES: 30,
-      CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+      CONNECTION_EXPIRATION_MINUTES: 30,
+      EXPIRED_CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
     });
 
     const connectionId = "conn2a";
@@ -120,18 +120,18 @@ describe("performanceTracking", () => {
     expect(storedConnection).toEqual(
       expect.objectContaining({
         id: connectionId,
-        delayedConnectionId: aggregatorConnectionId,
+        connectionId: aggregatorConnectionId,
       }),
     );
 
     expect(requestLog.length).toBe(1);
   });
 
-  it("does not call updateDelayedConnectionId when aggregatorConnectionId is provided but feature is disabled", async () => {
+  it("does not call updateConnectionId when aggregatorConnectionId is provided but feature is disabled", async () => {
     jest.spyOn(configModule, "getConfig").mockReturnValue({
       ...config,
-      CONNECTION_CLEANUP_INTERVAL_MINUTES: undefined,
-      CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+      CONNECTION_EXPIRATION_MINUTES: undefined,
+      EXPIRED_CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
     });
 
     const connectionId = "conn2b";
@@ -157,16 +157,16 @@ describe("performanceTracking", () => {
         id: connectionId,
       }),
     );
-    expect(storedConnection.delayedConnectionId).toBeUndefined();
+    expect(storedConnection.connectionId).toBeUndefined();
 
     expect(requestLog.length).toBe(1);
   });
 
-  it("does not call updateDelayedConnectionId when aggregatorConnectionId is not provided", async () => {
+  it("does not call updateConnectionId when aggregatorConnectionId is not provided", async () => {
     jest.spyOn(configModule, "getConfig").mockReturnValue({
       ...config,
-      CONNECTION_CLEANUP_INTERVAL_MINUTES: 30,
-      CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+      CONNECTION_EXPIRATION_MINUTES: 30,
+      EXPIRED_CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
     });
 
     const connectionId = "conn2c";
@@ -191,16 +191,16 @@ describe("performanceTracking", () => {
         id: connectionId,
       }),
     );
-    expect(storedConnection.delayedConnectionId).toBeUndefined();
+    expect(storedConnection.connectionId).toBeUndefined();
 
     expect(requestLog.length).toBe(1);
   });
 
-  it("logs warning when trying to update delayedConnectionId for non-existent connection", async () => {
+  it("logs warning when trying to update connectionId for non-existent connection", async () => {
     jest.spyOn(configModule, "getConfig").mockReturnValue({
       ...config,
-      CONNECTION_CLEANUP_INTERVAL_MINUTES: 30,
-      CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+      CONNECTION_EXPIRATION_MINUTES: 30,
+      EXPIRED_CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
     });
 
     const connectionId = "conn2d-non-existent";

@@ -9,7 +9,7 @@ import {
 } from "../aggregatorPerformanceMeasuring/utils";
 import {
   getConnectionCleanUpFeatureEnabled,
-  updateDelayedConnectionId,
+  updateConnectionId,
 } from "../connectionCleanup/utils";
 
 async function sendPerformanceEvent({
@@ -90,10 +90,7 @@ export const recordSuccessEvent = async (
   aggregatorConnectionId?: string,
 ) => {
   if (aggregatorConnectionId && getConnectionCleanUpFeatureEnabled()) {
-    await updateDelayedConnectionId(
-      performanceSessionId,
-      aggregatorConnectionId,
-    );
+    await updateConnectionId(performanceSessionId, aggregatorConnectionId);
   }
   await sendPerformanceEvent({
     connectionId: performanceSessionId,

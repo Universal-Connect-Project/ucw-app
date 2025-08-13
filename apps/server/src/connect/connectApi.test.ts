@@ -371,8 +371,8 @@ describe("connectApi", () => {
 
     it("creates a connectionCleanUp object when cleanup feature is enabled", async () => {
       jest.spyOn(config, "getConfig").mockReturnValue({
-        CONNECTION_CLEANUP_INTERVAL_MINUTES: 30,
-        CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+        CONNECTION_EXPIRATION_MINUTES: 30,
+        EXPIRED_CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
       });
 
       const memberData = {
@@ -392,12 +392,14 @@ describe("connectApi", () => {
 
       await connectApi.addMember(memberData);
 
-      const cleanUpObj = await get("cleanup:testGuid1");
+      const performanceSessionId = connectApi.context.performanceSessionId;
+      const cleanUpObj = await get(`cleanup:${performanceSessionId}`);
       const cleanUpObjects = await _keys("cleanup:*");
       expect(cleanUpObjects.length).toBe(1);
 
       expect(cleanUpObj).toEqual({
-        id: "testGuid1", // This comes from the mocked createConnection response
+        id: performanceSessionId,
+        connectionId: "testGuid1", // This comes from the mocked createConnection response
         createdAt: expect.any(Number),
         aggregatorId: MX_AGGREGATOR_STRING,
         userId: resolvedUserId,
@@ -430,8 +432,8 @@ describe("connectApi", () => {
 
     it("creates a connectionCleanUp object when cleanup feature is enabled and is refreshing a connection", async () => {
       jest.spyOn(config, "getConfig").mockReturnValue({
-        CONNECTION_CLEANUP_INTERVAL_MINUTES: 30,
-        CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+        CONNECTION_EXPIRATION_MINUTES: 30,
+        EXPIRED_CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
       });
 
       const memberData = {
@@ -452,12 +454,15 @@ describe("connectApi", () => {
 
       await refreshingContextConnectApi.addMember(memberData);
 
-      const cleanUpObj = await get(`cleanup:${memberData.guid}`);
+      const performanceSessionId =
+        refreshingContextConnectApi.context.performanceSessionId;
+      const cleanUpObj = await get(`cleanup:${performanceSessionId}`);
       const cleanUpObjects = await _keys("cleanup:*");
       expect(cleanUpObjects.length).toBe(1);
 
       expect(cleanUpObj).toEqual({
-        id: memberData.guid,
+        id: performanceSessionId,
+        connectionId: memberData.guid,
         createdAt: expect.any(Number),
         aggregatorId: MX_AGGREGATOR_STRING,
         userId: resolvedUserId,
@@ -725,6 +730,70 @@ describe("connectApi", () => {
           connectionId: expect.any(String),
         }),
       );
+    });
+
+    it("updates connectionCleanup object with connectionId and new createdAt when recordSuccessEvent is called", async () => {
+      jest.spyOn(config, "getConfig").mockReturnValue({
+        ...config.default,
+        CONNECTION_EXPIRATION_MINUTES: 30,
+        EXPIRED_CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+      });
+
+      const newConnectionId = "newConnectionId123";
+
+      server.use(
+        http.get(CONNECTION_BY_ID_PATH, () =>
+          HttpResponse.json({
+            ...connectionByIdMemberData,
+            member: {
+              ...connectionByIdMemberData.member,
+              guid: newConnectionId,
+            },
+          }),
+        ),
+      );
+      const requestLog = setupPerformanceHandlers(["connectionSuccess"]);
+
+      await connectApi.addMember(memberCreateData);
+
+      const performanceSessionId = connectApi.context.performanceSessionId;
+      const performanceCleanupKey = `cleanup:${performanceSessionId}`;
+
+      const existingCleanupObj = await get(performanceCleanupKey);
+      expect(existingCleanupObj).toBeDefined();
+
+      const initialCreatedAt = existingCleanupObj.createdAt;
+
+      // delay for different timestamp
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      const cleanupObjBefore = await get(performanceCleanupKey);
+      expect(cleanupObjBefore).toEqual(
+        expect.objectContaining({
+          id: performanceSessionId,
+          createdAt: initialCreatedAt,
+          aggregatorId: MX_AGGREGATOR_STRING,
+          userId: resolvedUserId,
+          connectionId: "testGuid1", // this is the mocked guid from the handler
+        }),
+      );
+
+      await connectApi.loadMemberByGuid("testGuid");
+
+      await waitFor(() => expect(requestLog.length).toBe(1));
+
+      const cleanupObjAfter = await get(performanceCleanupKey);
+
+      expect(cleanupObjAfter).toEqual(
+        expect.objectContaining({
+          id: performanceSessionId,
+          connectionId: newConnectionId,
+          aggregatorId: MX_AGGREGATOR_STRING,
+          userId: resolvedUserId,
+        }),
+      );
+
+      expect(cleanupObjAfter.createdAt).toBeGreaterThan(initialCreatedAt);
     });
 
     it("records resume event if member is connected is being aggregated and is Oauth", async () => {
