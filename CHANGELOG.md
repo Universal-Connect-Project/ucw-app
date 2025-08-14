@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.0]
+
+### Added
+
+- Connection Cleanup Feature see [ENVIRONMENT.md](ENVIRONMENT.md#automatic-connection-cleanup-variables-optional-defaults-to-disabled) for details on environment variables related to connection cleanup.
+
+### Fixed
+
+- Unneccessary error catching was not preventing the performance polling from starting.
+- More user friendly error message to help understand why performance is not syncing.
+
 ## [1.10.2]
 
 ### Added

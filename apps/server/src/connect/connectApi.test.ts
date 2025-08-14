@@ -24,12 +24,15 @@ import * as performanceMeasuringUtils from "../aggregatorPerformanceMeasuring/ut
 import {
   answerMfaMemberData,
   memberCreateData,
-  memberData,
+  memberData as mxTestMemberData,
   memberStatusData,
 } from "@repo/utils-dev-dependency/mx/testData";
 import expectPerformanceObject from "../test/expectPerformanceObject";
 import * as performanceTracking from "../services/performanceTracking";
 import { PLAID_AGGREGATOR_STRING } from "@repo/plaid-adapter";
+import * as config from "../config";
+import { get } from "../services/storageClient/redis";
+import { keys as _keys } from "../__mocks__/redis";
 
 const {
   connectionByIdMemberData,
@@ -183,7 +186,7 @@ describe("connectApi", () => {
         member: {
           aggregator: testContext.aggregator,
           connection_status: ConnectionStatus.CREATED,
-          guid: "testGuid1",
+          guid: mxTestMemberData.member.guid,
           institution_guid: "insitutionCode1",
           is_being_aggregated: false,
           is_oauth: false,
@@ -195,13 +198,13 @@ describe("connectApi", () => {
           postMessageEventData: {
             memberConnected: {
               aggregator: MX_AGGREGATOR_STRING,
-              member_guid: "testGuid1",
+              member_guid: mxTestMemberData.member.guid,
               user_guid: undefined,
             },
             memberStatusUpdate: {
               aggregator: MX_AGGREGATOR_STRING,
               connection_status: 0,
-              member_guid: "testGuid1",
+              member_guid: mxTestMemberData.member.guid,
               user_guid: undefined,
             },
           },
@@ -229,7 +232,7 @@ describe("connectApi", () => {
       expect(performanceObject).toEqual(
         expect.objectContaining({
           performanceSessionId: requestLog[0].connectionId,
-          connectionId: "testGuid1",
+          connectionId: mxTestMemberData.member.guid,
           userId: resolvedUserId,
           aggregatorId: MX_AGGREGATOR_STRING,
           lastUiUpdateTimestamp: expect.any(Number),
@@ -357,13 +360,113 @@ describe("connectApi", () => {
       expect(performanceObject).toEqual(
         expect.objectContaining({
           performanceSessionId: requestLog[0].connectionId,
-          connectionId: "testGuid1",
+          connectionId: mxTestMemberData.member.guid,
           userId: resolvedUserId,
           aggregatorId: MX_AGGREGATOR_STRING,
           lastUiUpdateTimestamp: expect.any(Number),
           paused: false,
         }),
       );
+    });
+
+    it("creates a connectionCleanUp object when cleanup feature is enabled", async () => {
+      jest.spyOn(config, "getConfig").mockReturnValue({
+        CONNECTION_EXPIRATION_MINUTES: 30,
+        EXPIRED_CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+      });
+
+      const memberData = {
+        institution_guid: "testInstitutionGuid",
+        is_oauth: false,
+        skip_aggregration: false,
+        credentials: [
+          {
+            guid: "testCredentialGuid",
+            value: "testCredentialValue",
+          },
+        ],
+        rawInstitutionData: {
+          ucpInstitutionId: "testUcpInstitutionId",
+        },
+      };
+
+      await connectApi.addMember(memberData);
+
+      const performanceSessionId = connectApi.context.performanceSessionId;
+      const cleanUpObj = await get(`cleanup:${performanceSessionId}`);
+      const cleanUpObjects = await _keys("cleanup:*");
+      expect(cleanUpObjects.length).toBe(1);
+
+      expect(cleanUpObj).toEqual({
+        id: performanceSessionId,
+        connectionId: mxTestMemberData.member.guid,
+        createdAt: expect.any(Number),
+        aggregatorId: MX_AGGREGATOR_STRING,
+        userId: resolvedUserId,
+      });
+    });
+
+    it("does NOT create a connectionCleanUp object when cleanup feature is disabled", async () => {
+      jest.spyOn(config, "getConfig").mockReturnValue({});
+
+      const memberData = {
+        institution_guid: "testInstitutionGuid",
+        is_oauth: false,
+        skip_aggregration: false,
+        credentials: [
+          {
+            guid: "testCredentialGuid",
+            value: "testCredentialValue",
+          },
+        ],
+        rawInstitutionData: {
+          ucpInstitutionId: "testUcpInstitutionId",
+        },
+      };
+
+      await connectApi.addMember(memberData);
+
+      const cleanUpObjects = await _keys("cleanup:*");
+      expect(cleanUpObjects.length).toBe(0);
+    });
+
+    it("creates a connectionCleanUp object when cleanup feature is enabled and is refreshing a connection", async () => {
+      jest.spyOn(config, "getConfig").mockReturnValue({
+        CONNECTION_EXPIRATION_MINUTES: 30,
+        EXPIRED_CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+      });
+
+      const memberData = {
+        guid: "testMemberGuid",
+        institution_guid: "testInstitutionGuid",
+        is_oauth: false,
+        skip_aggregration: false,
+        credentials: [
+          {
+            guid: "testCredentialGuid",
+            value: "testCredentialValue",
+          },
+        ],
+        rawInstitutionData: {
+          ucpInstitutionId: "testUcpInstitutionId",
+        },
+      };
+
+      await refreshingContextConnectApi.addMember(memberData);
+
+      const performanceSessionId =
+        refreshingContextConnectApi.context.performanceSessionId;
+      const cleanUpObj = await get(`cleanup:${performanceSessionId}`);
+      const cleanUpObjects = await _keys("cleanup:*");
+      expect(cleanUpObjects.length).toBe(1);
+
+      expect(cleanUpObj).toEqual({
+        id: performanceSessionId,
+        connectionId: memberData.guid,
+        createdAt: expect.any(Number),
+        aggregatorId: MX_AGGREGATOR_STRING,
+        userId: resolvedUserId,
+      });
     });
   });
 
@@ -429,13 +532,15 @@ describe("connectApi", () => {
       server.use(
         http.put(UPDATE_CONNECTION_PATH, async ({ request }) => {
           requestBody = await request.json();
-          return HttpResponse.json(memberData);
+          return HttpResponse.json(mxTestMemberData);
         }),
       );
 
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       const connection = await connectApi.updateMember({
         ...memberCreateData,
-        guid: "testGuid1",
+        guid: mxTestMemberData.member.guid,
       });
 
       performanceObject = await expectPerformanceObject(performanceSessionId, {
@@ -497,7 +602,7 @@ describe("connectApi", () => {
         server.use(
           http.put(UPDATE_CONNECTION_PATH, async ({ request }) => {
             requestBody = await request.json();
-            return HttpResponse.json(memberData);
+            return HttpResponse.json(mxTestMemberData);
           }),
         );
 
@@ -508,7 +613,7 @@ describe("connectApi", () => {
 
         const connection = await refreshingContextConnectApi.updateMember({
           ...memberCreateData,
-          guid: "testGuid1",
+          guid: mxTestMemberData.member.guid,
         });
 
         expect(requestBody).toEqual({
@@ -627,6 +732,70 @@ describe("connectApi", () => {
           connectionId: expect.any(String),
         }),
       );
+    });
+
+    it("updates connectionCleanup object with connectionId and new createdAt when recordSuccessEvent is called", async () => {
+      jest.spyOn(config, "getConfig").mockReturnValue({
+        ...config.default,
+        CONNECTION_EXPIRATION_MINUTES: 30,
+        EXPIRED_CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES: 1,
+      });
+
+      const newConnectionId = "newConnectionId123";
+
+      server.use(
+        http.get(CONNECTION_BY_ID_PATH, () =>
+          HttpResponse.json({
+            ...connectionByIdMemberData,
+            member: {
+              ...connectionByIdMemberData.member,
+              guid: newConnectionId,
+            },
+          }),
+        ),
+      );
+      const requestLog = setupPerformanceHandlers(["connectionSuccess"]);
+
+      await connectApi.addMember(memberCreateData);
+
+      const performanceSessionId = connectApi.context.performanceSessionId;
+      const performanceCleanupKey = `cleanup:${performanceSessionId}`;
+
+      const existingCleanupObj = await get(performanceCleanupKey);
+      expect(existingCleanupObj).toBeDefined();
+
+      const initialCreatedAt = existingCleanupObj.createdAt;
+
+      // delay for different timestamp
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      const cleanupObjBefore = await get(performanceCleanupKey);
+      expect(cleanupObjBefore).toEqual(
+        expect.objectContaining({
+          id: performanceSessionId,
+          createdAt: initialCreatedAt,
+          aggregatorId: MX_AGGREGATOR_STRING,
+          userId: resolvedUserId,
+          connectionId: mxTestMemberData.member.guid,
+        }),
+      );
+
+      await connectApi.loadMemberByGuid("testGuid");
+
+      await waitFor(() => expect(requestLog.length).toBe(1));
+
+      const cleanupObjAfter = await get(performanceCleanupKey);
+
+      expect(cleanupObjAfter).toEqual(
+        expect.objectContaining({
+          id: performanceSessionId,
+          connectionId: newConnectionId,
+          aggregatorId: MX_AGGREGATOR_STRING,
+          userId: resolvedUserId,
+        }),
+      );
+
+      expect(cleanupObjAfter.createdAt).toBeGreaterThan(initialCreatedAt);
     });
 
     it("records resume event if member is connected is being aggregated and is Oauth", async () => {

@@ -102,7 +102,7 @@ These are the environment variables that can be set in apps/server/env/(staging|
 
 > **Note:** When this feature is enabled, some aggregators may clean up connections earlier than the specified interval. This is because certain aggregators require deleting the entire user and all their connections together, as they do not support individual connection cleanup.
 
-| Variable name                               | Description                                                                              | Examples | Default value |
-| ------------------------------------------- | ---------------------------------------------------------------------------------------- | -------- | ------------- |
-| CONNECTION_CLEANUP_INTERVAL_MINUTES         | The number of minutes a new connection will remain before being automatically deleted    | 30       | undefined     |
-| CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES | The interval, in minutes, at which the system checks for and deletes expired connections | 10       | undefined     |
+| Variable name                                       | Description                                                                              | Examples | Default value |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------------- | -------- | ------------- |
+| CONNECTION_EXPIRATION_MINUTES                       | The number of minutes a new connection will remain before being automatically deleted    | 30       | undefined     |
+| EXPIRED_CONNECTION_CLEANUP_POLLING_INTERVAL_MINUTES | The interval, in minutes, at which the system checks for and deletes expired connections | 10       | undefined     |

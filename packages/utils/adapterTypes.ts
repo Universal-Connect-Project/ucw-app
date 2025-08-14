@@ -25,7 +25,10 @@ export interface PerformanceClient {
     institutionId: string;
     jobTypes: ComboJobTypes[];
   }) => Promise<void>;
-  recordSuccessEvent: (connectionId: string) => Promise<void>;
+  recordSuccessEvent: (
+    performanceSessionId: string,
+    aggregatorConnectionId?: string,
+  ) => Promise<void>;
   recordConnectionPauseEvent: (connectionId: string) => Promise<void>;
   recordConnectionResumeEvent: (connectionId: string) => Promise<void>;
 }

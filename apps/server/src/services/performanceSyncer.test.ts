@@ -1,30 +1,73 @@
 import { server } from "../test/testServer";
 import { clearIntervalAsync } from "set-interval-async";
 import { http, HttpResponse } from "msw";
-import config from "../config";
+import { getConfig } from "../config";
 import {
   fetchPerformanceData,
   setPerformanceSyncSchedule,
   syncPerformanceData,
+  getPerformanceEnabled,
 } from "./performanceSyncer";
 import {
   PERFORMANCE_DATA_REDIS_KEY,
   PERFORMANCE_ETAG_REDIS_KEY,
 } from "./storageClient/constants";
 import { get, set } from "./storageClient/redis";
-import * as logger from "../infra/logger";
 import {
   RESPONSE_NOT_MODIFIED,
   UNAUTHORIZED_RESPONSE,
 } from "../infra/http/constants";
+import * as logger from "../infra/logger";
+import * as config from "../config";
+
+describe("getPerformanceEnabled", () => {
+  beforeEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it("should return true when both UCP_CLIENT_ID and UCP_CLIENT_SECRET are present", () => {
+    jest.spyOn(config, "getConfig").mockReturnValue({
+      UCP_CLIENT_ID: "test-client-id",
+      UCP_CLIENT_SECRET: "test-client-secret",
+    } as ReturnType<typeof config.getConfig>);
+
+    expect(getPerformanceEnabled()).toBe(true);
+  });
+
+  it("should return false when UCP_CLIENT_ID is missing", () => {
+    jest.spyOn(config, "getConfig").mockReturnValue({
+      UCP_CLIENT_SECRET: "test-client-secret",
+    } as ReturnType<typeof config.getConfig>);
+
+    expect(getPerformanceEnabled()).toBe(false);
+  });
+
+  it("should return false when UCP_CLIENT_SECRET is missing", () => {
+    jest.spyOn(config, "getConfig").mockReturnValue({
+      UCP_CLIENT_ID: "test-client-id",
+    } as ReturnType<typeof config.getConfig>);
+
+    expect(getPerformanceEnabled()).toBe(false);
+  });
+
+  it("should return false when both credentials are missing", () => {
+    jest.spyOn(config, "getConfig").mockReturnValue({} as ReturnType<typeof config.getConfig>);
+
+    expect(getPerformanceEnabled()).toBe(false);
+  });
+});
 
 describe("setPerformanceSyncSchedule", () => {
+  beforeEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it("should call sync over the given interval", async () => {
     jest.useFakeTimers();
     let pollerCounter = 0;
     server.use(
       http.get(
-        `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+        `${getConfig().PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
         () => {
           pollerCounter += 1;
           return HttpResponse.json({});
@@ -47,6 +90,10 @@ describe("setPerformanceSyncSchedule", () => {
 });
 
 describe("syncPerformanceData", () => {
+  beforeEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it("should skip update if response status is 304 (not modified)", async () => {
     const performanceData = {
       test: {
@@ -58,7 +105,7 @@ describe("syncPerformanceData", () => {
 
     server.use(
       http.get(
-        `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+        `${getConfig().PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
         () =>
           new HttpResponse(null, {
             status: RESPONSE_NOT_MODIFIED,
@@ -89,7 +136,7 @@ describe("syncPerformanceData", () => {
 
     server.use(
       http.get(
-        `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+        `${getConfig().PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
         () =>
           HttpResponse.json(performanceRoutingData, {
             headers: {
@@ -107,12 +154,14 @@ describe("syncPerformanceData", () => {
     );
   });
 
-  it("should log warning message when forbidden access", async () => {
-    const warningLogSpy = jest.spyOn(logger, "warning");
+  it("should throw error when forbidden access", async () => {
+    const errorLogSpy = jest
+      .spyOn(logger, "error")
+      .mockImplementation(() => {});
 
     server.use(
       http.get(
-        `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+        `${getConfig().PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
         () =>
           HttpResponse.json(null, {
             status: UNAUTHORIZED_RESPONSE,
@@ -121,36 +170,75 @@ describe("syncPerformanceData", () => {
       ),
     );
 
-    await syncPerformanceData();
+    await expect(syncPerformanceData()).rejects.toThrow(
+      "Unable to connect to UCP hosted servers",
+    );
 
-    expect(warningLogSpy).toHaveBeenCalledWith(
-      "Unauthorized access to performance service",
+    expect(errorLogSpy).toHaveBeenCalledWith(
+      "Unable to connect to UCP hosted servers. The UCP Client ID and/or Secret may be invalid. Please check them here: https://app.universalconnectproject.org/widget-management. Performance-based features are disabled until this is resolved.",
     );
   });
 
-  it("should fail gracefully when fetch fails", async () => {
-    const warningLogSpy = jest.spyOn(logger, "warning");
+  it("should throw error for unexpected non-ok status codes", async () => {
+    const errorLogSpy = jest
+      .spyOn(logger, "error")
+      .mockImplementation(() => {});
 
     server.use(
       http.get(
-        `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
-        () => HttpResponse.error(),
+        `${getConfig().PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+        () =>
+          new HttpResponse(null, {
+            status: 500,
+            statusText: "Internal Server Error",
+          }),
       ),
     );
 
-    await syncPerformanceData();
+    await expect(syncPerformanceData()).rejects.toThrow(
+      "Failed to fetch performance data: Internal Server Error",
+    );
 
-    expect(warningLogSpy).toHaveBeenCalledWith(
-      "Unable to get performance data from server: Failed to fetch",
+    expect(errorLogSpy).toHaveBeenCalledWith(
+      "Failed to fetch performance data: Internal Server Error",
+    );
+  });
+
+  it("should throw error for 404 status code", async () => {
+    const errorLogSpy = jest
+      .spyOn(logger, "error")
+      .mockImplementation(() => {});
+
+    server.use(
+      http.get(
+        `${getConfig().PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+        () =>
+          new HttpResponse(null, {
+            status: 404,
+            statusText: "Not Found",
+          }),
+      ),
+    );
+
+    await expect(syncPerformanceData()).rejects.toThrow(
+      "Failed to fetch performance data: Not Found",
+    );
+
+    expect(errorLogSpy).toHaveBeenCalledWith(
+      "Failed to fetch performance data: Not Found",
     );
   });
 });
 
 describe("fetchPerformanceData", () => {
+  beforeEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it("returns a response when the server is available", async () => {
     server.use(
       http.get(
-        `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+        `${getConfig().PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
         () =>
           new HttpResponse(null, {
             status: UNAUTHORIZED_RESPONSE,
@@ -166,7 +254,7 @@ describe("fetchPerformanceData", () => {
   it("Throws an error when the server is unavailable", async () => {
     server.use(
       http.get(
-        `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+        `${getConfig().PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
         () => HttpResponse.error(),
       ),
     );

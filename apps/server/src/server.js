@@ -12,15 +12,12 @@ import useDataEndpoints from "./dataEndpoints/useDataEndpoints";
 import { error as _error, info } from "./infra/logger";
 import { initialize as initializeElastic } from "./services/ElasticSearchClient";
 import { setInstitutionSyncSchedule } from "./services/institutionSyncer";
-import {
-  setPerformanceSyncSchedule,
-  syncPerformanceData,
-} from "./services/performanceSyncer";
-import { setPerformanceResiliencePoller } from "./aggregatorPerformanceMeasuring/utils"
+import { initializePerformanceAndCleanup } from "./services/appInitializer";
 import { widgetHandler } from "./widgetEndpoint";
 import { oauthRedirectHandler, webhookHandler } from "./connect/oauthEndpoints";
 import useInstitutionEndpoints from "./institutions/useInstitutionEndpoints";
 import { startNgrok, stopNgrok } from "./webhooks";
+import { setPerformanceSyncSchedule } from "./services/performanceSyncer";
 import cors from "cors";
 
 process.on("unhandledRejection", (error) => {
@@ -60,13 +57,12 @@ initializeElastic()
     _error(`Failed to initialized: ${error}`);
   });
 
-syncPerformanceData().then(() => {
-  setPerformanceSyncSchedule().then(() => {
-    info("Performance based routing data is scheduled to sync");
-  });
-  setPerformanceResiliencePoller().then(() => {
-    info("Performance resilience polling enabled")
-  })
+setPerformanceSyncSchedule().then(() => {
+  info("Performance based routing data is scheduled to sync");
+});
+
+initializePerformanceAndCleanup().catch((error) => {
+  _error("Failed to initialize performance and cleanup", error);
 });
 
 app.get("/health", function (req, res) {

@@ -19,6 +19,10 @@ import {
   createPerformancePollingObject,
   setLastUiUpdateTimestamp,
 } from "../aggregatorPerformanceMeasuring/utils";
+import {
+  getConnectionCleanUpFeatureEnabled,
+  setConnectionForCleanup,
+} from "../connectionCleanup/utils";
 
 function mapConnection(connection: Connection): Member {
   const userId = connection.userId;
@@ -221,6 +225,15 @@ export class ConnectApi extends AggregatorAdapterBase {
         aggregatorId: this.context.aggregator, // Must use the original aggregator string to request status from sandbox or prod adapters.
       });
     }
+    if (getConnectionCleanUpFeatureEnabled()) {
+      setConnectionForCleanup({
+        id: performanceSessionId,
+        connectionId: connection.id,
+        createdAt: Date.now(),
+        aggregatorId: this.context.aggregator, // Must use the original aggregator string to delete connection from sandbox or prod adapters.
+        userId: this.getUserId(),
+      });
+    }
 
     return { member: mapConnection(connection) };
   }
@@ -281,7 +294,7 @@ export class ConnectApi extends AggregatorAdapterBase {
             recordConnectionResumeEvent(this.context.performanceSessionId);
           }
         } else {
-          recordSuccessEvent(this.context.performanceSessionId);
+          recordSuccessEvent(this.context.performanceSessionId, connection.id);
         }
       }
 

@@ -470,7 +470,6 @@ describe("Performance Resilience", () => {
 
       await clearIntervalAsync(poller);
 
-      console.log("Polled IDs:", polledIds);
       expect(
         polledIds.filter((id) => id === basePerformanceObject.connectionId)
           .length,
