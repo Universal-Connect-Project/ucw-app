@@ -1,4 +1,7 @@
-import { syncPerformanceData } from "./performanceSyncer";
+import {
+  getPerformanceEnabled,
+  syncPerformanceData,
+} from "./performanceSyncer";
 import {
   getConnectionCleanUpFeatureEnabled,
   initCleanUpConnections,
@@ -7,12 +10,14 @@ import { setPerformanceResiliencePoller } from "../aggregatorPerformanceMeasurin
 
 export async function initializePerformanceAndCleanup(): Promise<void> {
   const cleanupEnabled = getConnectionCleanUpFeatureEnabled();
-  const performanceEnabled = await syncPerformanceData()
-    .then(() => true)
-    .catch(() => false);
+  const performanceEnabled = getPerformanceEnabled();
 
   if (cleanupEnabled) {
     initCleanUpConnections();
+  }
+
+  if (performanceEnabled) {
+    syncPerformanceData();
   }
 
   if (performanceEnabled || cleanupEnabled) {

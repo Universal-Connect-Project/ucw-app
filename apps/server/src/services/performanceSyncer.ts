@@ -1,6 +1,6 @@
 import { setIntervalAsync } from "set-interval-async";
-import { info } from "../infra/logger";
-import config from "../config";
+import { info, error } from "../infra/logger";
+import { getConfig } from "../config";
 import { getAccessToken } from "./auth0Service";
 import {
   RESPONSE_NOT_MODIFIED,
@@ -12,6 +12,11 @@ import {
   PERFORMANCE_ETAG_REDIS_KEY,
 } from "./storageClient/constants";
 import { get, setNoExpiration } from "./storageClient/redis";
+
+export const getPerformanceEnabled = () => {
+  const { UCP_CLIENT_ID, UCP_CLIENT_SECRET } = getConfig();
+  return !!(UCP_CLIENT_ID && UCP_CLIENT_SECRET);
+};
 
 export async function setPerformanceSyncSchedule(minutes: number = 10) {
   return setIntervalAsync(
@@ -36,10 +41,12 @@ export const syncPerformanceData = async () => {
       response.headers.get("etag"),
     );
   } else if (response.status === UNAUTHORIZED_RESPONSE) {
-    throw new Error(
+    error(
       "Unable to connect to UCP hosted servers. The UCP Client ID and/or Secret may be invalid. Please check them here: https://app.universalconnectproject.org/widget-management. Performance-based features are disabled until this is resolved.",
     );
+    throw new Error("Unable to connect to UCP hosted servers");
   } else if (!response.ok) {
+    error(`Failed to fetch performance data: ${response.statusText}`);
     throw new Error(`Failed to fetch performance data: ${response.statusText}`);
   }
 };
@@ -48,7 +55,7 @@ export async function fetchPerformanceData(): Promise<Response> {
   const performanceCacheETag = await get(PERFORMANCE_ETAG_REDIS_KEY);
   const accessToken = await getAccessToken();
   return await fetch(
-    `${config.PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
+    `${getConfig().PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
