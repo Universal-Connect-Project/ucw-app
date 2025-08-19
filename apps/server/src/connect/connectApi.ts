@@ -223,6 +223,7 @@ export class ConnectApi extends AggregatorAdapterBase {
         connectionId: connection.id,
         performanceSessionId,
         aggregatorId: this.context.aggregator, // Must use the original aggregator string to request status from sandbox or prod adapters.
+        jobId: this.context.current_job_id,
       });
     }
     if (getConnectionCleanUpFeatureEnabled()) {
