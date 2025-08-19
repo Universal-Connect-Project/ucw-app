@@ -235,6 +235,7 @@ describe("connectApi", () => {
           connectionId: mxTestMemberData.member.guid,
           userId: resolvedUserId,
           aggregatorId: MX_AGGREGATOR_STRING,
+          jobId: mxTestMemberData.member.guid, // MX adapter returns the member guid as cur_job_id
           lastUiUpdateTimestamp: expect.any(Number),
           paused: false,
         }),

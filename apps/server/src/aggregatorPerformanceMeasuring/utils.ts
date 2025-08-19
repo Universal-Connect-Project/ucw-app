@@ -16,6 +16,7 @@ export interface PerformanceObject {
   aggregatorId?: string;
   lastUiUpdateTimestamp?: number;
   paused?: boolean;
+  jobId?: string;
 }
 
 const PERFORMANCE_REDIS_SUBDIRECTORY = "performance";
@@ -75,11 +76,13 @@ export const createPerformancePollingObject = async ({
   userId,
   performanceSessionId,
   aggregatorId,
+  jobId,
 }: {
   connectionId: string;
   userId: string;
   performanceSessionId: string;
   aggregatorId: string;
+  jobId?: string;
 }): Promise<void> => {
   await set(
     performanceRedisKey(performanceSessionId),
@@ -90,6 +93,7 @@ export const createPerformancePollingObject = async ({
       aggregatorId,
       lastUiUpdateTimestamp: Date.now(),
       paused: false,
+      jobId,
     },
     { EX: 1200 }, // Set expiration time to 20 minutes
   );
@@ -105,11 +109,13 @@ const getAggregatorConnectionStatus = async ({
   aggregatorId,
   userId,
   connectionId,
+  jobId,
 }: PerformanceObject): Promise<Connection> => {
   const aggregatorAdapter = new AggregatorAdapterBase({
     context: {
       aggregator: aggregatorId,
       resolvedUserId: userId,
+      current_job_id: jobId,
     },
   });
   await aggregatorAdapter.init();
@@ -128,8 +134,14 @@ export const UI_UPDATE_THRESHOLD =
 export const pollConnectionStatusIfNeeded = async (
   performanceSessionId: string,
 ): Promise<void> => {
-  const { lastUiUpdateTimestamp, paused, aggregatorId, userId, connectionId } =
-    await getPerformanceObject(performanceSessionId);
+  const {
+    lastUiUpdateTimestamp,
+    paused,
+    aggregatorId,
+    userId,
+    connectionId,
+    jobId,
+  } = await getPerformanceObject(performanceSessionId);
 
   if (
     paused ||
@@ -146,6 +158,7 @@ export const pollConnectionStatusIfNeeded = async (
     aggregatorId,
     userId,
     connectionId,
+    jobId,
   });
 
   if (

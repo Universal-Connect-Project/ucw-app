@@ -27,6 +27,7 @@ describe("Performance Resilience", () => {
     connectionId: "test-connection-id",
     performanceSessionId: "test-session-id",
     aggregatorId: "mx",
+    jobId: "test-job-id",
   };
 
   beforeEach(() => {
@@ -382,6 +383,7 @@ describe("Performance Resilience", () => {
       connectionId: "test-connection-id",
       performanceSessionId: "test-session-id",
       aggregatorId: "mx",
+      jobId: "test-job-id",
     };
     let polledIds: string[];
 
