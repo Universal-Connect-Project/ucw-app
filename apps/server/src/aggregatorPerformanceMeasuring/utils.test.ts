@@ -5,10 +5,11 @@ import {
   pollConnectionStatusIfNeeded,
   setLastUiUpdateTimestamp,
   pausePolling,
-  setPerformanceResiliencePoller,
   UI_UPDATE_THRESHOLD,
   resumePolling,
+  cleanupPerformanceObject,
 } from "./utils";
+import { get } from "../services/storageClient/redis";
 import {
   CONNECTION_BY_ID_PATH,
   READ_MEMBER_STATUS_PATH,
@@ -17,8 +18,11 @@ import { http, HttpResponse } from "msw";
 import { ConnectionStatus } from "@repo/utils";
 import config, { getConfig } from "../config";
 import * as logger from "../infra/logger";
-import { clearIntervalAsync } from "set-interval-async";
 import expectPerformanceObject from "../test/expectPerformanceObject";
+import {
+  performanceResilienceManager,
+  startPerformanceResilience,
+} from "./performanceResilienceManager";
 
 describe("Performance Resilience", () => {
   const { PERFORMANCE_SERVICE_URL } = getConfig();
@@ -32,6 +36,51 @@ describe("Performance Resilience", () => {
 
   beforeEach(() => {
     jest.restoreAllMocks();
+  });
+
+  describe("createPerformancePollingObject", () => {
+    it("should add session to resilience manager when creating performance object and create redis item", async () => {
+      await startPerformanceResilience();
+      await createPerformancePollingObject(basePerformanceObjectParams);
+
+      const stats = performanceResilienceManager.getStats();
+      expect(stats.activeSessions).toBe(1);
+      expect(stats.processorRunning).toBe(true);
+      expect(stats.sessionIds).toContain(
+        basePerformanceObjectParams.performanceSessionId,
+      );
+
+      const createdObj = await get(
+        `performance:${basePerformanceObjectParams.performanceSessionId}`,
+      );
+      expect(createdObj).toEqual(
+        expect.objectContaining({
+          ...basePerformanceObjectParams,
+          lastUiUpdateTimestamp: expect.any(Number),
+          paused: false,
+        }),
+      );
+    });
+  });
+
+  describe("cleanupPerformanceObject", () => {
+    it("should remove session from resilience manager when cleaning up performance object and delete redis item", async () => {
+      await startPerformanceResilience();
+      await createPerformancePollingObject(basePerformanceObjectParams);
+
+      await cleanupPerformanceObject(
+        basePerformanceObjectParams.performanceSessionId,
+      );
+
+      const stats = performanceResilienceManager.getStats();
+      expect(stats.activeSessions).toBe(0);
+      expect(stats.processorRunning).toBe(false);
+
+      const deletedObj = await get(
+        `performance:${basePerformanceObjectParams.performanceSessionId}`,
+      );
+      expect(deletedObj).toBeUndefined();
+    });
   });
 
   describe("pausePolling & resumePolling", () => {
@@ -375,107 +424,41 @@ describe("Performance Resilience", () => {
         expect(cleanedUpObject).toBeUndefined();
       });
     });
-  });
 
-  describe("setPerformanceResiliencePoller", () => {
-    const basePerformanceObject = {
-      userId: "test-user-id",
-      connectionId: "test-connection-id",
-      performanceSessionId: "test-session-id",
-      aggregatorId: "mx",
-      jobId: "test-job-id",
-    };
-    let polledIds: string[];
-
-    beforeEach(() => {
-      jest.restoreAllMocks();
-      jest.useFakeTimers();
-      polledIds = [];
-
+    it("should remove a session from performance resilience and not request status if performance object not found", async () => {
+      await startPerformanceResilience();
+      await performanceResilienceManager.addSession(
+        basePerformanceObjectParams.performanceSessionId,
+      );
+      let statusChecked = false;
       server.use(
-        http.get(READ_MEMBER_STATUS_PATH, ({ params }) => {
-          polledIds.push(String(params.id));
+        http.get(READ_MEMBER_STATUS_PATH, () => {
+          statusChecked = true;
           return HttpResponse.json({
             member: {
               guid: "testGuid",
-              connection_status: ConnectionStatus[ConnectionStatus.PENDING],
+              connection_status: status,
             },
           });
         }),
       );
-    });
 
-    afterEach(() => {
-      jest.clearAllTimers();
-      jest.useRealTimers();
-    });
+      const beforeStats = performanceResilienceManager.getStats();
+      expect(beforeStats.activeSessions).toBe(1);
+      expect(beforeStats.sessionIds).toContain(
+        basePerformanceObjectParams.performanceSessionId,
+      );
 
-    it("should poll for status after UI_UPDATE_THRESHOLD seconds", async () => {
-      await createPerformancePollingObject(basePerformanceObject);
+      await pollConnectionStatusIfNeeded(
+        basePerformanceObjectParams.performanceSessionId,
+      );
 
-      const poller = await setPerformanceResiliencePoller(1);
-
-      jest.advanceTimersByTime(UI_UPDATE_THRESHOLD + 1500);
-
-      await clearIntervalAsync(poller);
-
-      expect(polledIds).toContain(basePerformanceObject.connectionId);
-    });
-
-    it("should NOT poll for status before UI_UPDATE_THRESHOLD seconds", async () => {
-      await createPerformancePollingObject(basePerformanceObject);
-
-      const poller = await setPerformanceResiliencePoller(1);
-
-      jest.advanceTimersByTime(UI_UPDATE_THRESHOLD - 500);
-
-      await clearIntervalAsync(poller);
-
-      expect(polledIds).not.toContain(basePerformanceObject.connectionId);
-    });
-
-    it("should poll for multiple performance objects", async () => {
-      const fakeSessionId1 = "test-session-id";
-      const fakeSessionId2 = "test-session-id2";
-      const fakeConnectionId1 = "conn1";
-      const fakeConnectionId2 = "conn2";
-
-      await createPerformancePollingObject({
-        ...basePerformanceObject,
-        performanceSessionId: fakeSessionId1,
-        connectionId: fakeConnectionId1,
-      });
-
-      await createPerformancePollingObject({
-        ...basePerformanceObject,
-        performanceSessionId: fakeSessionId2,
-        connectionId: fakeConnectionId2,
-      });
-
-      const poller = await setPerformanceResiliencePoller(1);
-
-      jest.advanceTimersByTime(UI_UPDATE_THRESHOLD);
-
-      await clearIntervalAsync(poller);
-
-      expect(polledIds).toContain(fakeConnectionId1);
-      expect(polledIds).toContain(fakeConnectionId2);
-    });
-
-    it("should poll repeatedly on interval", async () => {
-      jest.useRealTimers();
-      await createPerformancePollingObject(basePerformanceObject);
-
-      const poller = await setPerformanceResiliencePoller(1);
-
-      await new Promise((r) => setTimeout(r, UI_UPDATE_THRESHOLD + 3000));
-
-      await clearIntervalAsync(poller);
-
-      expect(
-        polledIds.filter((id) => id === basePerformanceObject.connectionId)
-          .length,
-      ).toBeGreaterThan(1);
+      expect(statusChecked).toBeFalsy();
+      const afterStats = performanceResilienceManager.getStats();
+      expect(afterStats.activeSessions).toBe(0);
+      expect(afterStats.sessionIds).not.toContain(
+        basePerformanceObjectParams.performanceSessionId,
+      );
     });
   });
 });

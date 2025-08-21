@@ -1,13 +1,13 @@
 import type { Connection } from "@repo/utils";
 import { ConnectionStatus } from "@repo/utils";
 import { AggregatorAdapterBase } from "../adapters";
-import { del, get, redisClient, set } from "../services/storageClient/redis";
+import { del, get, set } from "../services/storageClient/redis";
 import {
   recordConnectionResumeEvent,
   recordSuccessEvent,
 } from "../services/performanceTracking";
-import { setIntervalAsync } from "set-interval-async";
 import { debug, error, info } from "../infra/logger";
+import { performanceResilienceManager } from "./performanceResilienceManager";
 
 export interface PerformanceObject {
   userId?: string;
@@ -19,7 +19,7 @@ export interface PerformanceObject {
   jobId?: string;
 }
 
-const PERFORMANCE_REDIS_SUBDIRECTORY = "performance";
+export const PERFORMANCE_REDIS_SUBDIRECTORY = "performance";
 
 const performanceRedisKey = (performanceSessionId: string): string => {
   return `${PERFORMANCE_REDIS_SUBDIRECTORY}:${performanceSessionId}`;
@@ -97,12 +97,16 @@ export const createPerformancePollingObject = async ({
     },
     { EX: 1200 }, // Set expiration time to 20 minutes
   );
+
+  await performanceResilienceManager.addSession(performanceSessionId);
 };
 
 export const cleanupPerformanceObject = async (
   performanceSessionId: string,
 ): Promise<void> => {
   await del(performanceRedisKey(performanceSessionId));
+
+  await performanceResilienceManager.removeSession(performanceSessionId);
 };
 
 const getAggregatorConnectionStatus = async ({
@@ -134,6 +138,16 @@ export const UI_UPDATE_THRESHOLD =
 export const pollConnectionStatusIfNeeded = async (
   performanceSessionId: string,
 ): Promise<void> => {
+  const performanceObject = await getPerformanceObject(performanceSessionId);
+
+  if (!performanceObject) {
+    debug(
+      `Performance object not found for ${performanceSessionId} (likely TTL expired), publishing session_removed event`,
+    );
+    await performanceResilienceManager.removeSession(performanceSessionId);
+    return;
+  }
+
   const {
     lastUiUpdateTimestamp,
     paused,
@@ -141,7 +155,7 @@ export const pollConnectionStatusIfNeeded = async (
     userId,
     connectionId,
     jobId,
-  } = await getPerformanceObject(performanceSessionId);
+  } = performanceObject;
 
   if (
     paused ||
@@ -179,26 +193,6 @@ export const pollConnectionStatusIfNeeded = async (
     connectionStatus.status === ConnectionStatus.CLOSED ||
     connectionStatus.status === ConnectionStatus.FAILED
   ) {
-    cleanupPerformanceObject(performanceSessionId);
+    await cleanupPerformanceObject(performanceSessionId);
   }
 };
-
-export async function setPerformanceResiliencePoller(seconds: number = 5) {
-  debug(`Performance resilience is enabled. Polling every ${seconds} seconds.`);
-  return setIntervalAsync(
-    async () => {
-      const performanceIds = await redisClient.keys(
-        `${PERFORMANCE_REDIS_SUBDIRECTORY}:*`,
-      );
-
-      if (!performanceIds.length) {
-        return;
-      }
-
-      for (const performanceId of performanceIds) {
-        await pollConnectionStatusIfNeeded(performanceId.split(":")[1]);
-      }
-    },
-    seconds * 1000, // Poll every 5 seconds
-  );
-}
