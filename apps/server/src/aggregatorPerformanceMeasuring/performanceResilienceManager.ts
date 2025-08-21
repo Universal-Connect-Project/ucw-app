@@ -10,25 +10,19 @@ export interface PerformanceEvent {
   sessionId: string;
 }
 
-class EventDrivenPerformanceResilienceManager {
-  private performanceResilienceEnabled: boolean = false;
-  private activeSessionsCache = new Set<string>();
-  private processingInterval: NodeJS.Timeout | null = null;
-  private readonly POLL_INTERVAL = 5000; // 5 seconds
+const createEventDrivenPerformanceResilienceManager = () => {
+  let performanceResilienceEnabled: boolean = false;
+  const activeSessionsCache = new Set<string>();
+  let processingInterval: NodeJS.Timeout | null = null;
+  const POLL_INTERVAL = 5000;
 
-  async init() {
-    try {
-      await this.initializeExistingSessions();
-      this.performanceResilienceEnabled = true;
+  const init = async () => {
+    performanceResilienceEnabled = true;
+    await initializeExistingSessions();
+    info("Performance Resilience enabled");
+  };
 
-      info("Event-driven performance resilience enabled");
-    } catch (err) {
-      error("Failed to initialize event-driven performance manager:", err);
-      throw err;
-    }
-  }
-
-  private async initializeExistingSessions() {
+  const initializeExistingSessions = async () => {
     try {
       const performanceKeys = await redisClient.keys(
         `${PERFORMANCE_REDIS_SUBDIRECTORY}:*`,
@@ -40,14 +34,14 @@ class EventDrivenPerformanceResilienceManager {
           .filter((sessionId) => sessionId);
 
         existingSessions.forEach((sessionId) => {
-          this.activeSessionsCache.add(sessionId);
+          activeSessionsCache.add(sessionId);
         });
 
-        if (this.activeSessionsCache.size > 0) {
+        if (activeSessionsCache.size > 0) {
           info(
-            `Found ${this.activeSessionsCache.size} existing performance sessions, starting processor`,
+            `Found ${activeSessionsCache.size} existing performance sessions, starting processor`,
           );
-          this.ensureProcessorRunning();
+          ensureProcessorRunning();
         }
       } else {
         debug("No existing performance sessions found in Redis");
@@ -55,59 +49,39 @@ class EventDrivenPerformanceResilienceManager {
     } catch (err) {
       error("Error initializing existing performance sessions:", err);
     }
-  }
+  };
 
-  async addSession(sessionId: string): Promise<void> {
-    if (!this.performanceResilienceEnabled) return;
-
-    this.activeSessionsCache.add(sessionId);
-    this.ensureProcessorRunning();
-    info(
-      `Added session ${sessionId} to active cache. Total: ${this.activeSessionsCache.size}`,
-    );
-  }
-
-  async removeSession(sessionId: string): Promise<void> {
-    if (!this.performanceResilienceEnabled) return;
-
-    this.activeSessionsCache.delete(sessionId);
-    if (this.activeSessionsCache.size === 0) {
-      this.stopProcessor();
-    }
-    info(`Removed session ${sessionId} from cache`);
-  }
-
-  private ensureProcessorRunning() {
-    if (!this.processingInterval && this.activeSessionsCache.size > 0) {
-      this.processingInterval = setInterval(async () => {
-        await this.processActiveSessions();
-      }, this.POLL_INTERVAL);
+  const ensureProcessorRunning = () => {
+    if (!processingInterval && activeSessionsCache.size > 0) {
+      processingInterval = setInterval(async () => {
+        await processActiveSessions();
+      }, POLL_INTERVAL);
 
       info(
-        `Started session processor - ${this.activeSessionsCache.size} active sessions detected`,
+        `Started session processor - ${activeSessionsCache.size} active sessions detected`,
       );
     }
-  }
+  };
 
-  private stopProcessor() {
-    if (this.processingInterval) {
-      clearInterval(this.processingInterval);
-      this.processingInterval = null;
+  const stopProcessor = () => {
+    if (processingInterval) {
+      clearInterval(processingInterval);
+      processingInterval = null;
       info("Stopped session processor - no active sessions");
     }
-  }
+  };
 
-  private async processActiveSessions() {
-    if (this.activeSessionsCache.size === 0) {
-      this.stopProcessor();
+  const processActiveSessions = async () => {
+    if (activeSessionsCache.size === 0) {
+      stopProcessor();
       return;
     }
 
-    debug(`Processing ${this.activeSessionsCache.size} active sessions`);
+    debug(`Processing ${activeSessionsCache.size} active sessions`);
 
     const sessionsToRemove: string[] = [];
 
-    for (const sessionId of this.activeSessionsCache) {
+    for (const sessionId of activeSessionsCache) {
       try {
         await pollConnectionStatusIfNeeded(sessionId);
       } catch (err) {
@@ -117,34 +91,60 @@ class EventDrivenPerformanceResilienceManager {
     }
 
     sessionsToRemove.forEach((sessionId) => {
-      this.activeSessionsCache.delete(sessionId);
+      activeSessionsCache.delete(sessionId);
       info(`Removed failed session ${sessionId} from cache`);
     });
 
     // Stop processor if no sessions remain
-    if (this.activeSessionsCache.size === 0) {
-      this.stopProcessor();
+    if (activeSessionsCache.size === 0) {
+      stopProcessor();
     }
-  }
+  };
 
-  async shutdown() {
-    this.stopProcessor();
-    this.activeSessionsCache.clear();
-  }
+  const shutdown = () => {
+    stopProcessor();
+    activeSessionsCache.clear();
+  };
 
-  // For testing or logs
-  getStats() {
+  const getStats = () => {
     return {
-      activeSessions: this.activeSessionsCache.size,
-      processorRunning: !!this.processingInterval,
-      sessionIds: Array.from(this.activeSessionsCache),
+      activeSessions: activeSessionsCache.size,
+      processorRunning: !!processingInterval,
+      sessionIds: Array.from(activeSessionsCache),
     };
-  }
-}
+  };
 
-// Singleton instance
+  const addSession = (sessionId: string) => {
+    if (!performanceResilienceEnabled) return;
+
+    activeSessionsCache.add(sessionId);
+    ensureProcessorRunning();
+    info(
+      `Added session ${sessionId} to active cache. Total: ${activeSessionsCache.size}`,
+    );
+  };
+
+  const removeSession = (sessionId: string) => {
+    if (!performanceResilienceEnabled) return;
+
+    activeSessionsCache.delete(sessionId);
+    if (activeSessionsCache.size === 0) {
+      stopProcessor();
+    }
+    info(`Removed session ${sessionId} from cache`);
+  };
+
+  return {
+    shutdown,
+    init,
+    getStats,
+    addSession,
+    removeSession,
+  };
+};
+
 export const performanceResilienceManager =
-  new EventDrivenPerformanceResilienceManager();
+  createEventDrivenPerformanceResilienceManager();
 
 export async function startPerformanceResilience() {
   await performanceResilienceManager.init();
