@@ -81,14 +81,16 @@ const createEventDrivenPerformanceResilienceManager = () => {
 
     const sessionsToRemove: string[] = [];
 
-    for (const sessionId of activeSessionsCache) {
-      try {
-        await pollConnectionStatusIfNeeded(sessionId);
-      } catch (err) {
-        error(`Error processing session ${sessionId}:`, err);
-        sessionsToRemove.push(sessionId);
-      }
-    }
+    await Promise.all(
+      [...activeSessionsCache].map(async (sessionId) => {
+        try {
+          await pollConnectionStatusIfNeeded(sessionId);
+        } catch (err) {
+          error(`Error processing session ${sessionId}:`, err);
+          sessionsToRemove.push(sessionId);
+        }
+      }),
+    );
 
     sessionsToRemove.forEach((sessionId) => {
       activeSessionsCache.delete(sessionId);
