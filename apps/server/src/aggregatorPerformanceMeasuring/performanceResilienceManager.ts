@@ -14,7 +14,6 @@ class EventDrivenPerformanceResilienceManager {
   private performanceResilienceEnabled: boolean = false;
   private activeSessionsCache = new Set<string>();
   private processingInterval: NodeJS.Timeout | null = null;
-  private readonly EVENTS_CHANNEL = "performance:events";
   private readonly POLL_INTERVAL = 5000; // 5 seconds
 
   async init() {
