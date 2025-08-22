@@ -1,4 +1,8 @@
-import { ComboJobTypes, INSTRUMENTATION_URL } from "@repo/utils";
+import {
+  ComboJobTypes,
+  INSTRUMENTATION_URL,
+  OAUTH_START_URL,
+} from "@repo/utils";
 import configuredAxios from "./axios";
 
 interface InstrumentationParameters {
@@ -15,4 +19,14 @@ export const instrumentation = async (
   const { userId, ...rest } = parameters;
 
   return configuredAxios.post(`${INSTRUMENTATION_URL}/userId/${userId}`, rest);
+};
+
+export const startOauthPerformance = async ({
+  institutionId,
+}: {
+  institutionId: string;
+}) => {
+  return configuredAxios.post(`${OAUTH_START_URL}`, {
+    institutionId,
+  });
 };

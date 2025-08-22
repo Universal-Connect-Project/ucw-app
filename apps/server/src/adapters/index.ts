@@ -37,17 +37,6 @@ export class AggregatorAdapterBase {
     return false;
   }
 
-  getShouldRecordPerformanceDuration() {
-    if (
-      this.aggregatorAdapter &&
-      typeof this.aggregatorAdapter.getShouldRecordPerformanceDuration ===
-        "function"
-    ) {
-      return this.aggregatorAdapter.getShouldRecordPerformanceDuration();
-    }
-    return true;
-  }
-
   getRequiresPollingForPerformance() {
     return this.aggregatorAdapter.requiresPollingForPerformance ?? true;
   }

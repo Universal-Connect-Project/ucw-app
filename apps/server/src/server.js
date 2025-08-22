@@ -19,6 +19,8 @@ import useInstitutionEndpoints from "./institutions/useInstitutionEndpoints";
 import { startNgrok, stopNgrok } from "./webhooks";
 import { setPerformanceSyncSchedule } from "./services/performanceSyncer";
 import cors from "cors";
+import usePerformanceEndpoints from "./aggregatorPerformanceMeasuring/usePerformanceEndpoints";
+import { contextHandler } from "./infra/context";
 
 process.on("unhandledRejection", (error) => {
   _error(`unhandledRejection: ${error.message}`, error);
@@ -86,7 +88,10 @@ useAuthentication(app);
 
 app.get("/widget", widgetHandler);
 
+app.use(contextHandler);
+
 useConnect(app);
+usePerformanceEndpoints(app);
 
 useInstitutionEndpoints(app);
 

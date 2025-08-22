@@ -1,6 +1,7 @@
 import * as logger from "../infra/logger";
 import type { Challenge, Connection } from "@repo/utils";
 import { ChallengeType, ConnectionStatus } from "@repo/utils";
+import type { Request } from "express";
 
 import { AggregatorAdapterBase } from "../adapters";
 import type {
@@ -23,6 +24,10 @@ import {
   getConnectionCleanUpFeatureEnabled,
   setConnectionForCleanup,
 } from "../connectionCleanup/utils";
+import {
+  getShouldRecordPerformance,
+  getShouldRecordPerformanceDuration,
+} from "../shared/performance";
 
 function mapConnection(connection: Connection): Member {
   const userId = connection.userId;
@@ -159,6 +164,7 @@ function mapCredentialToChallenge(
 
 export class ConnectApi extends AggregatorAdapterBase {
   isRefreshConnection?: boolean;
+  req: Request;
 
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor, @typescript-eslint/no-explicit-any
   constructor(req: any) {
@@ -166,10 +172,7 @@ export class ConnectApi extends AggregatorAdapterBase {
     this.isRefreshConnection = !!(
       req.context.aggregator && req.context.connectionId
     );
-  }
-
-  #getShouldRecordPerformance() {
-    return !!(!this.isRefreshConnection && this.getPerformanceEnabled());
+    this.req = req;
   }
 
   async addMember(memberData: Member): Promise<MemberResponse> {
@@ -182,13 +185,13 @@ export class ConnectApi extends AggregatorAdapterBase {
 
     let startEvent: Promise<void> | undefined;
 
-    if (this.#getShouldRecordPerformance()) {
+    if (getShouldRecordPerformance(this.req)) {
       startEvent = recordStartEvent({
         aggregatorId,
         connectionId: performanceSessionId,
         institutionId: memberData?.rawInstitutionData?.ucpInstitutionId,
         jobTypes: this.context.jobTypes,
-        recordDuration: this.getShouldRecordPerformanceDuration(),
+        recordDuration: getShouldRecordPerformanceDuration(this.req),
       });
     }
 
@@ -215,7 +218,7 @@ export class ConnectApi extends AggregatorAdapterBase {
     }
 
     if (
-      this.#getShouldRecordPerformance() &&
+      getShouldRecordPerformance(this.req) &&
       this.getRequiresPollingForPerformance()
     ) {
       createPerformancePollingObject({
@@ -241,7 +244,7 @@ export class ConnectApi extends AggregatorAdapterBase {
 
   async updateMember(member: Member): Promise<Member> {
     if (this.context.current_job_id && member.credentials !== undefined) {
-      this.#getShouldRecordPerformance() &&
+      getShouldRecordPerformance(this.req) &&
         recordConnectionResumeEvent(this.context.performanceSessionId);
 
       const challenges = member.credentials.map((credential) =>
@@ -251,7 +254,7 @@ export class ConnectApi extends AggregatorAdapterBase {
       await this.answerChallenge(member.guid, challenges);
       return member;
     } else {
-      this.#getShouldRecordPerformance() &&
+      getShouldRecordPerformance(this.req) &&
         setLastUiUpdateTimestamp(this.context.performanceSessionId);
       const connection = await this.updateConnection({
         jobTypes: this.context.jobTypes,
@@ -275,7 +278,7 @@ export class ConnectApi extends AggregatorAdapterBase {
 
   async loadMemberByGuid(memberGuid: string): Promise<Member> {
     const member = await this.getConnectionStatus(memberGuid);
-    if (this.#getShouldRecordPerformance()) {
+    if (getShouldRecordPerformance(this.req)) {
       if (member?.challenges?.length > 0) {
         recordConnectionPauseEvent(this.context.performanceSessionId);
       } else {
@@ -288,7 +291,7 @@ export class ConnectApi extends AggregatorAdapterBase {
 
       if (
         member?.status === ConnectionStatus.CONNECTED &&
-        this.#getShouldRecordPerformance()
+        getShouldRecordPerformance(this.req)
       ) {
         if (connection?.is_being_aggregated) {
           if (connection?.is_oauth) {

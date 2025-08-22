@@ -16,39 +16,6 @@ const aggregatorAdapterBase = new AggregatorAdapterBase({
 });
 
 describe("AggregatorAdapterBase", () => {
-  describe("getShouldRecordPerformanceDuration", () => {
-    it("returns true if the adapter does not implement getShouldRecordPerformanceDuration", async () => {
-      await aggregatorAdapterBase.init();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (aggregatorAdapterBase as any).aggregatorAdapter = {};
-      expect(aggregatorAdapterBase.getShouldRecordPerformanceDuration()).toBe(
-        true,
-      );
-    });
-
-    it("returns the value from the adapter's getShouldRecordPerformanceDuration if implemented (true)", async () => {
-      await aggregatorAdapterBase.init();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (aggregatorAdapterBase as any).aggregatorAdapter = {
-        getShouldRecordPerformanceDuration: jest.fn().mockReturnValue(true),
-      };
-      expect(aggregatorAdapterBase.getShouldRecordPerformanceDuration()).toBe(
-        true,
-      );
-    });
-
-    it("returns the value from the adapter's getShouldRecordPerformanceDuration if implemented (false)", async () => {
-      await aggregatorAdapterBase.init();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (aggregatorAdapterBase as any).aggregatorAdapter = {
-        getShouldRecordPerformanceDuration: jest.fn().mockReturnValue(false),
-      };
-      expect(aggregatorAdapterBase.getShouldRecordPerformanceDuration()).toBe(
-        false,
-      );
-    });
-  });
-
   describe("getRequiresPollingForPerformance", () => {
     it("returns true if the adapter does not implement getRequiresPollingForPerformance", async () => {
       await aggregatorAdapterBase.init();
