@@ -79,23 +79,16 @@ const createEventDrivenPerformanceResilienceManager = () => {
 
     debug(`Processing ${activeSessionsCache.size} active sessions`);
 
-    const sessionsToRemove: string[] = [];
-
     await Promise.all(
       [...activeSessionsCache].map(async (sessionId) => {
         try {
           await pollConnectionStatusIfNeeded(sessionId);
         } catch (err) {
           error(`Error processing session ${sessionId}:`, err);
-          sessionsToRemove.push(sessionId);
+          activeSessionsCache.delete(sessionId);
         }
       }),
     );
-
-    sessionsToRemove.forEach((sessionId) => {
-      activeSessionsCache.delete(sessionId);
-      info(`Removed failed session ${sessionId} from cache`);
-    });
 
     // Stop processor if no sessions remain
     if (activeSessionsCache.size === 0) {

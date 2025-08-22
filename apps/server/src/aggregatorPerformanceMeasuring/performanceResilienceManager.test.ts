@@ -8,6 +8,11 @@ import {
   pollConnectionStatusIfNeeded,
 } from "./utils";
 import { set } from "../services/storageClient/redis";
+import { memberStatusData } from "@repo/utils-dev-dependency/mx/testData";
+import { getConfig } from "../config";
+import { http, HttpResponse } from "msw";
+import { server } from "../test/testServer";
+import { READ_MEMBER_STATUS_PATH } from "@repo/utils-dev-dependency";
 
 describe("Performance Resilience Manager", () => {
   const basePerformanceObject = {
@@ -157,5 +162,87 @@ describe("Performance Resilience Manager", () => {
       expect(stats.activeSessions).toBe(0);
       expect(stats.processorRunning).toBe(false);
     });
+  });
+
+  it("should poll status and record success to the performance service, then stop polling", async () => {
+    jest.useFakeTimers();
+
+    interface PolledConnectionParams {
+      id: string;
+      userId: string;
+    }
+
+    const statusPolledList: PolledConnectionParams[] = [];
+    const performanceRecordedList: string[] = [];
+    server.use(
+      http.get(READ_MEMBER_STATUS_PATH, ({ params }) => {
+        statusPolledList.push(params as unknown as PolledConnectionParams);
+        return HttpResponse.json(memberStatusData);
+      }),
+      http.put(
+        `${getConfig().PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionSuccess`,
+        ({ params }) => {
+          performanceRecordedList.push(
+            params.connectionId as unknown as string,
+          );
+          return new HttpResponse(null, {
+            status: 500,
+            statusText: "Internal Server Error",
+          });
+        },
+      ),
+    );
+
+    await startPerformanceResilience();
+
+    const perfObj1 = {
+      userId: "test-user-id-1",
+      connectionId: "test-connection-id-1",
+      performanceSessionId: "test-session-id-1",
+      aggregatorId: "mx",
+    };
+    const perfObj2 = {
+      userId: "test-user-id-2",
+      connectionId: "test-connection-id-2",
+      performanceSessionId: "test-session-id-2",
+      aggregatorId: "mx",
+    };
+
+    await createPerformancePollingObject(perfObj1);
+    await createPerformancePollingObject(perfObj2);
+
+    jest.advanceTimersByTime(10000);
+
+    await jest.runAllTimersAsync();
+
+    expect(statusPolledList.length).toBeGreaterThanOrEqual(2);
+    expect(statusPolledList).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: perfObj1.connectionId,
+          userId: perfObj1.userId,
+        }),
+        expect.objectContaining({
+          id: perfObj2.connectionId,
+          userId: perfObj2.userId,
+        }),
+      ]),
+    );
+    expect(performanceRecordedList).toEqual(
+      expect.arrayContaining([
+        perfObj1.performanceSessionId,
+        perfObj2.performanceSessionId,
+      ]),
+    );
+
+    expect(performanceResilienceManager.getStats()).toEqual(
+      expect.objectContaining({
+        activeSessions: 0,
+        sessionIds: [],
+        processorRunning: false,
+      }),
+    );
+
+    jest.useRealTimers();
   });
 });
