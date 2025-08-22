@@ -53,6 +53,8 @@ async function sendPerformanceEvent({
       debug(
         `Performance event (${eventType}) failed: ${response.status} ${response.statusText} - ${text}`,
       );
+    } else {
+      debug(`Performance event (${eventType}) sent successfully`);
     }
   } catch (error) {
     debug(`Performance event (${eventType}) failed with error:`, error);

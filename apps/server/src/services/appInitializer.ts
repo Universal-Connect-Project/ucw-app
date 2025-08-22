@@ -6,7 +6,7 @@ import {
   getConnectionCleanUpFeatureEnabled,
   initCleanUpConnections,
 } from "../connectionCleanup/utils";
-import { setPerformanceResiliencePoller } from "../aggregatorPerformanceMeasuring/utils";
+import { startPerformanceResilience } from "../aggregatorPerformanceMeasuring/performanceResilienceManager";
 
 export async function initializePerformanceAndCleanup(): Promise<void> {
   const cleanupEnabled = getConnectionCleanUpFeatureEnabled();
@@ -21,6 +21,6 @@ export async function initializePerformanceAndCleanup(): Promise<void> {
   }
 
   if (performanceEnabled || cleanupEnabled) {
-    setPerformanceResiliencePoller();
+    await startPerformanceResilience();
   }
 }
