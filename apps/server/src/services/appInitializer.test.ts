@@ -1,8 +1,8 @@
 import { initializePerformanceAndCleanup } from "./appInitializer";
 import * as performanceSyncer from "./performanceSyncer";
 import * as cleanupUtils from "../connectionCleanup/utils";
-import * as perfUtils from "../aggregatorPerformanceMeasuring/utils";
 import * as config from "../config";
+import * as performanceResilienceManagerModule from "../aggregatorPerformanceMeasuring/performanceResilienceManager";
 
 describe("initializePerformanceAndCleanup", () => {
   beforeEach(() => {
@@ -23,15 +23,15 @@ describe("initializePerformanceAndCleanup", () => {
       const syncDataSpy = jest
         .spyOn(performanceSyncer, "syncPerformanceData")
         .mockImplementation();
-      const setPollerSpy = jest
-        .spyOn(perfUtils, "setPerformanceResiliencePoller")
+      const startResilienceSpy = jest
+        .spyOn(performanceResilienceManagerModule, "startPerformanceResilience")
         .mockImplementation();
 
       await initializePerformanceAndCleanup();
 
       expect(initCleanupSpy).toHaveBeenCalledTimes(1);
       expect(syncDataSpy).toHaveBeenCalledTimes(1);
-      expect(setPollerSpy).toHaveBeenCalledTimes(1);
+      expect(startResilienceSpy).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -47,15 +47,15 @@ describe("initializePerformanceAndCleanup", () => {
       const syncDataSpy = jest
         .spyOn(performanceSyncer, "syncPerformanceData")
         .mockImplementation();
-      const setPollerSpy = jest
-        .spyOn(perfUtils, "setPerformanceResiliencePoller")
+      const startResilienceSpy = jest
+        .spyOn(performanceResilienceManagerModule, "startPerformanceResilience")
         .mockImplementation();
 
       await initializePerformanceAndCleanup();
 
       expect(initCleanupSpy).toHaveBeenCalledTimes(1);
       expect(syncDataSpy).not.toHaveBeenCalled();
-      expect(setPollerSpy).toHaveBeenCalledTimes(1);
+      expect(startResilienceSpy).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -71,15 +71,15 @@ describe("initializePerformanceAndCleanup", () => {
       const syncDataSpy = jest
         .spyOn(performanceSyncer, "syncPerformanceData")
         .mockImplementation();
-      const setPollerSpy = jest
-        .spyOn(perfUtils, "setPerformanceResiliencePoller")
+      const startResilienceSpy = jest
+        .spyOn(performanceResilienceManagerModule, "startPerformanceResilience")
         .mockImplementation();
 
       await initializePerformanceAndCleanup();
 
       expect(initCleanupSpy).not.toHaveBeenCalled();
       expect(syncDataSpy).toHaveBeenCalledTimes(1);
-      expect(setPollerSpy).toHaveBeenCalledTimes(1);
+      expect(startResilienceSpy).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -92,15 +92,15 @@ describe("initializePerformanceAndCleanup", () => {
       const syncDataSpy = jest
         .spyOn(performanceSyncer, "syncPerformanceData")
         .mockImplementation();
-      const setPollerSpy = jest
-        .spyOn(perfUtils, "setPerformanceResiliencePoller")
+      const startResilienceSpy = jest
+        .spyOn(performanceResilienceManagerModule, "startPerformanceResilience")
         .mockImplementation();
 
       await initializePerformanceAndCleanup();
 
       expect(initCleanupSpy).not.toHaveBeenCalled();
       expect(syncDataSpy).not.toHaveBeenCalled();
-      expect(setPollerSpy).not.toHaveBeenCalled();
+      expect(startResilienceSpy).not.toHaveBeenCalled();
     });
   });
 });
