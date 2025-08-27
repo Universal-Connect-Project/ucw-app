@@ -76,8 +76,10 @@ export const getInstitutionHandler = async (req: Request, res: Response) => {
     });
   } catch (error) {
     startEvent?.then(() => {
-      recordConnectionPauseEvent({ connectionId: performanceSessionId });
-      // set shouldRecordResult to true
+      recordConnectionPauseEvent({
+        connectionId: performanceSessionId,
+        shouldRecordResult: true,
+      });
     });
 
     res.status(400).send("Something went wrong");

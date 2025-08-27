@@ -56,8 +56,10 @@ export const getInstitutionCredentialsHandler = async (
     );
   } catch (error) {
     resumeEvent?.then(() => {
-      recordConnectionPauseEvent({ connectionId: performanceSessionId });
-      // set shouldRecordResult to true
+      recordConnectionPauseEvent({
+        connectionId: performanceSessionId,
+        shouldRecordResult: true,
+      });
     });
 
     res.status(400).send("Something went wrong");
