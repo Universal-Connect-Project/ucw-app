@@ -5,7 +5,6 @@ import "./App.css";
 import createConnectWidgetApiService from "./api/connectWidgetApiService";
 import { ComboJobTypes } from "@repo/utils";
 import postMessageEventOverrides from "./postMessageEventOverrides";
-import { startOauthPerformance } from "./api/api";
 
 const Widget = ({
   aggregator,
@@ -46,17 +45,7 @@ const Widget = ({
       <ConnectWidget
         clientConfig={clientConfig}
         language={{ locale: "en" }}
-        onAnalyticEvent={(type: string, event: object) => {
-          if (type === "connect_oauth_default_go_to_institution") {
-            const {
-              rawInstitution: { ucpInstitutionId },
-            } = event as { rawInstitution: { ucpInstitutionId: string } };
-
-            startOauthPerformance({
-              institutionId: ucpInstitutionId,
-            });
-          }
-        }}
+        onAnalyticEvent={() => {}}
         onAnalyticPageview={() => {}}
         onPostMessage={(type: string, metadata?: object) => {
           const payload = {

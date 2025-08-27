@@ -27,7 +27,7 @@ import {
 import {
   getShouldRecordPerformance,
   getShouldRecordPerformanceDuration,
-} from "../shared/performance";
+} from "../shared/utils/performance";
 
 function mapConnection(connection: Connection): Member {
   const userId = connection.userId;
@@ -185,7 +185,7 @@ export class ConnectApi extends AggregatorAdapterBase {
 
     let startEvent: Promise<void> | undefined;
 
-    if (getShouldRecordPerformance(this.req)) {
+    if (getShouldRecordPerformance(this.req) && !memberData.is_oauth) {
       startEvent = recordStartEvent({
         aggregatorId,
         connectionId: performanceSessionId,
@@ -211,31 +211,31 @@ export class ConnectApi extends AggregatorAdapterBase {
       performanceSessionId,
     });
 
-    if (startEvent && memberData.is_oauth) {
-      startEvent.then(() =>
-        recordConnectionPauseEvent(performanceSessionId, false),
-      );
-    }
+    if (startEvent) {
+      startEvent.then(() => {
+        // I probably need to abstract this logic because it's identical to what needs to be done after starting oauth
 
-    if (
-      getShouldRecordPerformance(this.req) &&
-      this.getRequiresPollingForPerformance()
-    ) {
-      createPerformancePollingObject({
-        userId: this.getUserId(),
-        connectionId: connection.id,
-        performanceSessionId,
-        aggregatorId: this.context.aggregator, // Must use the original aggregator string to request status from sandbox or prod adapters.
-        jobId: this.context.current_job_id,
-      });
-    }
-    if (getConnectionCleanUpFeatureEnabled()) {
-      setConnectionForCleanup({
-        id: performanceSessionId,
-        connectionId: connection.id,
-        createdAt: Date.now(),
-        aggregatorId: this.context.aggregator, // Must use the original aggregator string to delete connection from sandbox or prod adapters.
-        userId: this.getUserId(),
+        if (
+          getShouldRecordPerformance(this.req) &&
+          this.getRequiresPollingForPerformance()
+        ) {
+          createPerformancePollingObject({
+            userId: this.getUserId(),
+            connectionId: connection.id,
+            performanceSessionId,
+            aggregatorId: this.context.aggregator, // Must use the original aggregator string to request status from sandbox or prod adapters.
+            jobId: this.context.current_job_id,
+          });
+        }
+        if (getConnectionCleanUpFeatureEnabled()) {
+          setConnectionForCleanup({
+            id: performanceSessionId,
+            connectionId: connection.id,
+            createdAt: Date.now(),
+            aggregatorId: this.context.aggregator, // Must use the original aggregator string to delete connection from sandbox or prod adapters.
+            userId: this.getUserId(),
+          });
+        }
       });
     }
 

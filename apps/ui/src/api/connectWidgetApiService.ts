@@ -1,6 +1,7 @@
 import configuredAxios from "./axios";
 import {
   CREATE_MEMBER_URL,
+  OAUTH_START_URL,
   OAUTH_STATES_URL,
   RECOMMENDED_INSTITUTIONS_URL,
   SEARCH_INSTITUTIONS_URL,
@@ -88,6 +89,23 @@ const createConnectWidgetApiService = ({
   loadPopularInstitutions: async () => {
     return configuredAxios
       .get(RECOMMENDED_INSTITUTIONS_URL)
+      .then((response) => response.data);
+  },
+  oAuthStart: async ({
+    institution,
+    member,
+  }: {
+    institution: { ucpInstitutionId: string };
+    member: { guid: string };
+  }) => {
+    const { ucpInstitutionId } = institution;
+    const { guid: connectionId } = member;
+
+    return configuredAxios
+      .post(OAUTH_START_URL, {
+        institutionId: ucpInstitutionId,
+        connectionId,
+      })
       .then((response) => response.data);
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
