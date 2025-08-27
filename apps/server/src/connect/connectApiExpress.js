@@ -9,7 +9,6 @@ import {
   MEMBERS_URL,
   OAUTH_STATES_URL,
 } from "@repo/utils";
-import { getPerformanceSessionIdFromContext } from "../shared/utils/context";
 
 export default function (app) {
   stubs(app);
@@ -29,7 +28,6 @@ export default function (app) {
     const ret = await req.connectApi.addMember({
       ...req.body,
       guid: req.context?.connectionId,
-      performanceSessionId: getPerformanceSessionIdFromContext(req),
     });
     res.send(ret);
   });

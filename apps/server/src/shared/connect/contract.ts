@@ -91,7 +91,6 @@ export interface Member {
   rawInstitutionData?: {
     ucpInstitutionId: string;
   };
-  performanceSessionId: string;
 }
 
 export interface MemberResponse {

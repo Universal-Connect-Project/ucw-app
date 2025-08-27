@@ -55,3 +55,7 @@ export const setCurrentJobIdOnContext = ({
 }) => {
   req.context.current_job_id = currentJobId;
 };
+
+export const getCurrentJobIdFromContext = (req: Request) => {
+  return req.context.current_job_id;
+};

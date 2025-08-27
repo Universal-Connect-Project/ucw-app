@@ -56,7 +56,7 @@ export const getInstitutionHandler = async (req: Request, res: Response) => {
     const inst = await widgetAdapter.GetInstitutionById(resolvedInstitution.id);
 
     startEvent?.then(() => {
-      recordConnectionPauseEvent(performanceSessionId);
+      recordConnectionPauseEvent({ connectionId: performanceSessionId });
     });
 
     const name = resolvedInstitution.name;
@@ -76,7 +76,7 @@ export const getInstitutionHandler = async (req: Request, res: Response) => {
     });
   } catch (error) {
     startEvent?.then(() => {
-      recordConnectionPauseEvent(performanceSessionId);
+      recordConnectionPauseEvent({ connectionId: performanceSessionId });
       // set shouldRecordResult to true
     });
 

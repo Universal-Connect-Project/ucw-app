@@ -32,7 +32,9 @@ export const getInstitutionCredentialsHandler = async (
 
   try {
     if (getShouldRecordPerformance(req)) {
-      resumeEvent = recordConnectionResumeEvent(performanceSessionId);
+      resumeEvent = recordConnectionResumeEvent({
+        connectionId: performanceSessionId,
+      });
     }
 
     const aggregatorAdapter = getAggregatorWidgetAdapter(req);
@@ -42,7 +44,7 @@ export const getInstitutionCredentialsHandler = async (
     );
 
     resumeEvent?.then(() => {
-      recordConnectionPauseEvent(performanceSessionId);
+      recordConnectionPauseEvent({ connectionId: performanceSessionId });
     });
 
     res.send(
@@ -54,7 +56,7 @@ export const getInstitutionCredentialsHandler = async (
     );
   } catch (error) {
     resumeEvent?.then(() => {
-      recordConnectionPauseEvent(performanceSessionId);
+      recordConnectionPauseEvent({ connectionId: performanceSessionId });
       // set shouldRecordResult to true
     });
 

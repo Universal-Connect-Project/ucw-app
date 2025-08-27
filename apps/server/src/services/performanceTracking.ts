@@ -116,11 +116,19 @@ export const recordSuccessEvent = async (
   cleanupPerformanceObject(performanceSessionId);
 };
 
-export const recordConnectionPauseEvent = async (
-  connectionId: string,
-  shouldPausePolling = true,
-) => {
+export const recordConnectionPauseEvent = async ({
+  connectionId,
+  shouldPausePolling,
+  shouldRecordResult,
+}: {
+  connectionId: string;
+  shouldPausePolling?: boolean;
+  shouldRecordResult?: boolean;
+}) => {
   await sendPerformanceEvent({
+    body: JSON.stringify({
+      shouldRecordResult,
+    }),
     connectionId,
     eventType: "connectionPause",
     method: "PUT",
@@ -130,8 +138,17 @@ export const recordConnectionPauseEvent = async (
   }
 };
 
-export const recordConnectionResumeEvent = async (connectionId: string) => {
+export const recordConnectionResumeEvent = async ({
+  connectionId,
+  shouldRecordResult,
+}: {
+  connectionId: string;
+  shouldRecordResult?: boolean;
+}) => {
   await sendPerformanceEvent({
+    body: JSON.stringify({
+      shouldRecordResult,
+    }),
     connectionId,
     eventType: "connectionResume",
     method: "PUT",

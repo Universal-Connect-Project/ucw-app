@@ -1,6 +1,7 @@
 import type { Request } from "express";
 import { getAggregatorWidgetAdapter } from "../../adapters/getAggregatorWidgetAdapter";
 import { createPerformancePollingObject } from "../../aggregatorPerformanceMeasuring/utils";
+import { getCurrentJobIdFromContext } from "./context";
 
 export const getShouldRecordPerformance = (req: Request) => {
   const isRefreshConnection =
@@ -35,7 +36,7 @@ export const initializePerformancePolling = (req: Request) => {
       connectionId: req.context.connectionId,
       performanceSessionId: req.context.performanceSessionId,
       aggregatorId: req.context.aggregator,
-      jobId: req.context.current_job_id,
+      jobId: getCurrentJobIdFromContext(req),
     });
   }
 };
