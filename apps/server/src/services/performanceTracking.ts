@@ -1,4 +1,5 @@
 import type { ComboJobTypes } from "@repo/utils";
+import type { Request } from "express";
 import { getConfig } from "../config";
 import { debug } from "../infra/logger";
 import { getAccessToken } from "./auth0Service";
@@ -11,6 +12,15 @@ import {
   getConnectionCleanUpFeatureEnabled,
   addConnectionIdToCleanupObject,
 } from "../connectionCleanup/utils";
+import { setPerformanceSessionIdOnContext } from "../shared/utils/context";
+
+export const setPerformanceSessionId = (req: Request) => {
+  const performanceSessionId = crypto.randomUUID();
+
+  setPerformanceSessionIdOnContext({ performanceSessionId, req });
+
+  return performanceSessionId;
+};
 
 async function sendPerformanceEvent({
   connectionId,
@@ -83,6 +93,7 @@ export const recordStartEvent = async ({
       institutionId,
       jobTypes,
       recordDuration,
+      shouldRecordResult: false,
     }),
   });
 };

@@ -176,8 +176,7 @@ export class ConnectApi extends AggregatorAdapterBase {
   }
 
   async addMember(memberData: Member): Promise<MemberResponse> {
-    const performanceSessionId = crypto.randomUUID();
-    this.context.performanceSessionId = performanceSessionId;
+    const { performanceSessionId } = memberData;
 
     const aggregatorId = getAggregatorIdFromTestAggregatorId(
       this.context.aggregator,
