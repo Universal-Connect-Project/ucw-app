@@ -32,6 +32,10 @@ export const setResolvedUserIdOnContext = ({
   req.context.resolvedUserId = resolvedUserId;
 };
 
+export const getResolvedUserIdFromContext = (req: Request) => {
+  return req.context.resolvedUserId;
+};
+
 export const setPerformanceSessionIdOnContext = ({
   performanceSessionId,
   req,

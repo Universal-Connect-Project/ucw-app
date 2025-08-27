@@ -12,10 +12,8 @@ import type {
 import {
   recordConnectionPauseEvent,
   recordConnectionResumeEvent,
-  recordStartEvent,
   recordSuccessEvent,
 } from "../services/performanceTracking";
-import { getAggregatorIdFromTestAggregatorId } from "../adapterIndex";
 import {
   createPerformancePollingObject,
   setLastUiUpdateTimestamp,
@@ -25,8 +23,8 @@ import {
   setConnectionForCleanup,
 } from "../connectionCleanup/utils";
 import {
+  getRequiresPollingForPerformance,
   getShouldRecordPerformance,
-  getShouldRecordPerformanceDuration,
 } from "../shared/utils/performance";
 import {
   getAggregatorFromContext,
@@ -218,7 +216,7 @@ export class ConnectApi extends AggregatorAdapterBase {
           });
         }
 
-        if (!isOauth && this.getRequiresPollingForPerformance()) {
+        if (!isOauth && getRequiresPollingForPerformance(this.req)) {
           createPerformancePollingObject({
             userId: this.getUserId(),
             connectionId: connection.id,
