@@ -45,3 +45,13 @@ export const setPerformanceSessionIdOnContext = ({
 export const getPerformanceSessionIdFromContext = (req: Request) => {
   return req.context.performanceSessionId;
 };
+
+export const setCurrentJobIdOnContext = ({
+  currentJobId,
+  req,
+}: {
+  currentJobId: string | null;
+  req: Request;
+}) => {
+  req.context.current_job_id = currentJobId;
+};
