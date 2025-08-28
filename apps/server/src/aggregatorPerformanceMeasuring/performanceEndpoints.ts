@@ -15,7 +15,6 @@ import { createPerformancePollingObject } from "./utils";
 export interface StartOauthPerformanceRequest extends Request {
   body: {
     connectionId: string;
-    institutionId: string;
   };
 }
 

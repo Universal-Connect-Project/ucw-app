@@ -91,19 +91,11 @@ const createConnectWidgetApiService = ({
       .get(RECOMMENDED_INSTITUTIONS_URL)
       .then((response) => response.data);
   },
-  oAuthStart: async ({
-    institution,
-    member,
-  }: {
-    institution: { ucpInstitutionId: string };
-    member: { guid: string };
-  }) => {
-    const { ucpInstitutionId } = institution;
+  oAuthStart: async ({ member }: { member: { guid: string } }) => {
     const { guid: connectionId } = member;
 
     return configuredAxios
       .post(OAUTH_START_URL, {
-        institutionId: ucpInstitutionId,
         connectionId,
       })
       .then((response) => response.data);
