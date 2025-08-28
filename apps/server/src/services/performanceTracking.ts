@@ -118,7 +118,7 @@ export const recordSuccessEvent = async (
 
 export const recordConnectionPauseEvent = async ({
   connectionId,
-  shouldPausePolling,
+  shouldPausePolling = true,
   shouldRecordResult,
 }: {
   connectionId: string;

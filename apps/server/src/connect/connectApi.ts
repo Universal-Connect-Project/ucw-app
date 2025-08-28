@@ -29,8 +29,10 @@ import {
 import {
   getAggregatorFromContext,
   getCurrentJobIdFromContext,
+  getJobTypesFromContext,
   getPerformanceSessionIdFromContext,
 } from "../shared/utils/context";
+import { get } from "js-logger";
 
 function mapConnection(connection: Connection): Member {
   const userId = connection.userId;
@@ -200,7 +202,7 @@ export class ConnectApi extends AggregatorAdapterBase {
         institutionId: memberData.institution_guid,
         is_oauth: isOauth,
         skip_aggregation: (memberData.skip_aggregation ?? false) && isOauth,
-        jobTypes: this.context.jobTypes,
+        jobTypes: getJobTypesFromContext(this.req),
         credentials:
           memberData.credentials?.map((c) => ({
             id: c.guid,
