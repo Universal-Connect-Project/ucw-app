@@ -31,6 +31,17 @@ describe("performance utils", () => {
   });
 
   describe("getShouldRecordPerformance", () => {
+    it("returns false if the adapter doesn't implement shouldRecordPerformanceDuration but it's a refresh", () => {
+      const req = {
+        context: {
+          aggregator: MX_AGGREGATOR_STRING,
+          connectionId: "test",
+        },
+      } as Request;
+
+      expect(getShouldRecordPerformance(req)).toBe(false);
+    });
+
     it("returns true if the adapter does not implement shouldRecordPerformance", async () => {
       const req = {
         context: {

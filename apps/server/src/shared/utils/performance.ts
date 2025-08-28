@@ -1,7 +1,5 @@
 import type { Request } from "express";
 import { getAggregatorWidgetAdapter } from "../../adapters/getAggregatorWidgetAdapter";
-import { createPerformancePollingObject } from "../../aggregatorPerformanceMeasuring/utils";
-import { getCurrentJobIdFromContext } from "./context";
 
 export const getShouldRecordPerformance = (req: Request) => {
   const isRefreshConnection =
@@ -24,19 +22,4 @@ export const getRequiresPollingForPerformance = (req: Request) => {
   const aggregatorAdapter = getAggregatorWidgetAdapter(req);
 
   return aggregatorAdapter.requiresPollingForPerformance ?? true;
-};
-
-export const initializePerformancePolling = (req: Request) => {
-  if (
-    getShouldRecordPerformance(req) &&
-    getRequiresPollingForPerformance(req)
-  ) {
-    createPerformancePollingObject({
-      userId: req.context.userId,
-      connectionId: req.context.connectionId,
-      performanceSessionId: req.context.performanceSessionId,
-      aggregatorId: req.context.aggregator,
-      jobId: getCurrentJobIdFromContext(req),
-    });
-  }
 };
