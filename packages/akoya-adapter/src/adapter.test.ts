@@ -60,6 +60,12 @@ describe("akoya aggregator", () => {
     });
   });
 
+  describe("shouldRecordPerformanceDuration", () => {
+    it("returns false", () => {
+      expect(akoyaAdapterSandbox.shouldRecordPerformanceDuration).toBe(false);
+    });
+  });
+
   describe("GetInsitutionById", () => {
     it("Maps correct fields", async () => {
       const ret = await akoyaAdapterSandbox.GetInstitutionById("testId");

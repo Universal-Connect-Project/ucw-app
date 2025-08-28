@@ -224,7 +224,9 @@ export class FinicityAdapter implements WidgetAdapter {
 
     switch (eventType) {
       case "adding":
-        this.performanceClient.recordConnectionResumeEvent(connection_id);
+        this.performanceClient.recordConnectionResumeEvent({
+          connectionId: connection_id,
+        });
         break;
       case "added":
         institutionLoginId = payload?.accounts?.[0]?.institutionLoginId;
@@ -251,7 +253,9 @@ export class FinicityAdapter implements WidgetAdapter {
         return connection;
       case "invalidCredentials":
       case "mfa":
-        this.performanceClient.recordConnectionPauseEvent(connection_id);
+        this.performanceClient.recordConnectionPauseEvent({
+          connectionId: connection_id,
+        });
         break;
       default:
         switch (reason) {

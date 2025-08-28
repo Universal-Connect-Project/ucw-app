@@ -40,8 +40,10 @@ export default function setupPerformanceHandlers(
           connectionId: String(params.connectionId),
           headers: Object.fromEntries(request.headers.entries()),
         };
-        if (eventType === "connectionStart") {
+        try {
           payload.body = await request.json();
+        } catch (error) {
+          // Handle error
         }
         requestLog.push(payload);
         return HttpResponse.json({});

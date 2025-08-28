@@ -29,6 +29,14 @@ export interface PerformanceClient {
     performanceSessionId: string,
     aggregatorConnectionId?: string,
   ) => Promise<void>;
-  recordConnectionPauseEvent: (connectionId: string) => Promise<void>;
-  recordConnectionResumeEvent: (connectionId: string) => Promise<void>;
+  recordConnectionPauseEvent: ({
+    connectionId,
+  }: {
+    connectionId: string;
+  }) => Promise<void>;
+  recordConnectionResumeEvent: ({
+    connectionId,
+  }: {
+    connectionId: string;
+  }) => Promise<void>;
 }

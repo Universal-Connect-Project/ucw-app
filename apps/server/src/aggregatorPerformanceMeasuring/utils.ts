@@ -179,7 +179,7 @@ export const pollConnectionStatusIfNeeded = async (
     connectionStatus.status === ConnectionStatus.CONNECTED &&
     connectionStatus.is_being_aggregated
   ) {
-    await recordConnectionResumeEvent(performanceSessionId);
+    await recordConnectionResumeEvent({ connectionId: performanceSessionId });
   } else if (
     connectionStatus.status === ConnectionStatus.CONNECTED &&
     !connectionStatus.is_being_aggregated

@@ -35,6 +35,9 @@ export class PlaidAdapter implements WidgetAdapter {
   performanceClient: PerformanceClient;
   requiresPollingForPerformance = false; // The webhook negates the need for polling
   performanceEnabled = false;
+  // TODO: https://universalconnect.atlassian.net/browse/UCP-649
+  // Duration disabled until future support is added.
+  shouldRecordPerformanceDuration = false;
 
   constructor(args: AdapterConfig) {
     const { sandbox, dependencies } = args;
@@ -48,12 +51,6 @@ export class PlaidAdapter implements WidgetAdapter {
       ? dependencies?.aggregatorCredentials.plaidSandbox
       : dependencies?.aggregatorCredentials.plaidProd;
     this.getWebhookHostUrl = dependencies.getWebhookHostUrl;
-  }
-
-  getShouldRecordPerformanceDuration() {
-    // TODO: https://universalconnect.atlassian.net/browse/UCP-649
-    // Duration disabled until future support is added.
-    return false;
   }
 
   async GetInstitutionById(id: string): Promise<AggregatorInstitution> {

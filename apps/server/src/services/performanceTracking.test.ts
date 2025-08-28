@@ -59,6 +59,7 @@ describe("performanceTracking", () => {
           aggregatorId: "agg1",
           institutionId: "inst1",
           jobTypes: [ComboJobTypes.TRANSACTIONS],
+          shouldRecordResult: false,
         },
         headers: expect.objectContaining({
           authorization: `Bearer ${mockAccessToken}`,
@@ -229,7 +230,7 @@ describe("performanceTracking", () => {
 
     const requestLog = setupPerformanceHandlers(["connectionPause"]);
 
-    await recordConnectionPauseEvent(connectionId);
+    await recordConnectionPauseEvent({ connectionId });
 
     await expectPerformanceObject(connectionId, {
       paused: true,
@@ -255,7 +256,10 @@ describe("performanceTracking", () => {
 
     const requestLog = setupPerformanceHandlers(["connectionPause"]);
 
-    await recordConnectionPauseEvent(connectionId, false);
+    await recordConnectionPauseEvent({
+      connectionId,
+      shouldPausePolling: false,
+    });
 
     await expectPerformanceObject(connectionId, {
       paused: false,
@@ -285,7 +289,7 @@ describe("performanceTracking", () => {
 
     const requestLog = setupPerformanceHandlers(["connectionResume"]);
 
-    await recordConnectionResumeEvent(connectionId);
+    await recordConnectionResumeEvent({ connectionId });
 
     await expectPerformanceObject(connectionId, {
       paused: false,

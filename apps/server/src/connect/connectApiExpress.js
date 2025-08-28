@@ -1,5 +1,4 @@
 import * as path from "path";
-import { contextHandler } from "../infra/context.ts";
 import { ApiEndpoints } from "../shared/connect/ApiEndpoint";
 import { ConnectApi } from "./connectApi";
 import stubs from "./instrumentations.js";
@@ -13,7 +12,6 @@ import {
 
 export default function (app) {
   stubs(app);
-  app.use(contextHandler);
   app.use(async (req, res, next) => {
     req.connectApi = new ConnectApi(req);
     if ((await req.connectApi.init()) != null) {
@@ -27,7 +25,10 @@ export default function (app) {
   });
 
   app.post(MEMBERS_URL, async (req, res) => {
-    const ret = await req.connectApi.addMember({...req.body, guid: req.context?.connectionId});
+    const ret = await req.connectApi.addMember({
+      ...req.body,
+      guid: req.context?.connectionId,
+    });
     res.send(ret);
   });
   app.put(`${ApiEndpoints.MEMBERS}/:member_guid`, async (req, res) => {

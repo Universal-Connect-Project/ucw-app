@@ -1,5 +1,6 @@
 // @ts-expect-error import doesn't work
 import { ApiProvider, ConnectWidget } from "@mxenabled/connect-widget";
+import "@mxenabled/connect-widget/dist/style.css";
 import "./App.css";
 import createConnectWidgetApiService from "./api/connectWidgetApiService";
 import { ComboJobTypes } from "@repo/utils";
