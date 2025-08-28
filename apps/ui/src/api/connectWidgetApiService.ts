@@ -94,11 +94,9 @@ const createConnectWidgetApiService = ({
   oAuthStart: async ({ member }: { member: { guid: string } }) => {
     const { guid: connectionId } = member;
 
-    return configuredAxios
-      .post(OAUTH_START_URL, {
-        connectionId,
-      })
-      .then((response) => response.data);
+    return configuredAxios.post(OAUTH_START_URL, {
+      connectionId,
+    });
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   updateMember: async (memberData: any) => {
