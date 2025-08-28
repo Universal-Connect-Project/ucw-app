@@ -59,6 +59,7 @@ describe("performanceTracking", () => {
           aggregatorId: "agg1",
           institutionId: "inst1",
           jobTypes: [ComboJobTypes.TRANSACTIONS],
+          shouldRecordResult: false,
         },
         headers: expect.objectContaining({
           authorization: `Bearer ${mockAccessToken}`,
