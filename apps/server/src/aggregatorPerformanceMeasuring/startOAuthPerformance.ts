@@ -12,14 +12,14 @@ import {
 } from "../shared/utils/context";
 import { createPerformancePollingObject } from "./utils";
 
-export interface StartOauthPerformanceRequest extends Request {
+export interface StartOAuthPerformanceRequest extends Request {
   body: {
     connectionId: string;
   };
 }
 
-export const startOauthPerformance = async (
-  req: StartOauthPerformanceRequest,
+export const startOAuthPerformance = async (
+  req: StartOAuthPerformanceRequest,
   res: Response,
 ) => {
   const {
@@ -43,5 +43,5 @@ export const startOauthPerformance = async (
     });
   }
 
-  res.send({});
+  res.status(201);
 };
