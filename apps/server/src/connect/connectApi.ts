@@ -32,7 +32,6 @@ import {
   getJobTypesFromContext,
   getPerformanceSessionIdFromContext,
 } from "../shared/utils/context";
-import { get } from "js-logger";
 
 function mapConnection(connection: Connection): Member {
   const userId = connection.userId;
