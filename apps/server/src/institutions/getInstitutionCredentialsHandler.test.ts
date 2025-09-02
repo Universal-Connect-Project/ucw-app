@@ -5,11 +5,138 @@ import {
 } from "./getInstitutionCredentialsHandler";
 import type { Response } from "express";
 import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
-import { mxTestData } from "@repo/utils-dev-dependency";
+import {
+  INSTITUTION_CREDENTIALS_BY_ID_PATH,
+  mxTestData,
+  waitFor,
+} from "@repo/utils-dev-dependency";
+import setupPerformanceHandlers from "../shared/test/setupPerformanceHandlers";
+import { setPerformanceSessionId } from "../services/performanceTracking";
+import { server } from "../test/testServer";
+import { http, HttpResponse } from "msw";
 
 const { institutionCredentialsData: mxInstitutionCredentialsData } = mxTestData;
 
 describe("getInstitutionCredentialsHandler", () => {
+  describe("shouldRecordPerformance", () => {
+    describe("success", () => {
+      it("sends resume and pause performance events with the correct props", async () => {
+        const req = {
+          params: {
+            institution_guid: "test",
+          },
+          context: {
+            aggregator: MX_AGGREGATOR_STRING,
+          },
+        } as unknown as GetInstitutionCredentialsRequest;
+
+        const res = {
+          send: jest.fn(),
+        } as unknown as Response;
+
+        const requestLog = setupPerformanceHandlers([
+          "connectionPause",
+          "connectionResume",
+        ]);
+
+        const performanceSessionId = setPerformanceSessionId(req);
+
+        await getInstitutionCredentialsHandler(req, res);
+
+        await waitFor(() => {
+          expect(requestLog).toHaveLength(2);
+        });
+
+        expect(requestLog[0]).toEqual(
+          expect.objectContaining({
+            method: "PUT",
+            eventType: "connectionResume",
+            connectionId: performanceSessionId,
+            body: {},
+          }),
+        );
+
+        expect(requestLog[1]).toEqual(
+          expect.objectContaining({
+            method: "PUT",
+            eventType: "connectionPause",
+            connectionId: performanceSessionId,
+            body: {},
+          }),
+        );
+      });
+    });
+
+    describe("failure", () => {
+      it("sends resume and pause performance events with the correct props and sets shouldRecordResult to true and responds with a 400", async () => {
+        const req = {
+          params: {
+            institution_guid: "test",
+          },
+          context: {
+            aggregator: MX_AGGREGATOR_STRING,
+          },
+        } as unknown as GetInstitutionCredentialsRequest;
+
+        const res = {
+          status: jest.fn().mockReturnThis(),
+          send: jest.fn(),
+        } as unknown as Response;
+
+        const requestLog = setupPerformanceHandlers([
+          "connectionPause",
+          "connectionResume",
+        ]);
+
+        const performanceSessionId = setPerformanceSessionId(req);
+
+        server.use(
+          http.get(
+            INSTITUTION_CREDENTIALS_BY_ID_PATH,
+            () => new HttpResponse(null, { status: 400 }),
+          ),
+        );
+
+        await getInstitutionCredentialsHandler(req, res);
+
+        await waitFor(() => {
+          expect(requestLog).toHaveLength(2);
+        });
+
+        expect(requestLog[0]).toEqual(
+          expect.objectContaining({
+            method: "PUT",
+            eventType: "connectionResume",
+            connectionId: performanceSessionId,
+            body: {},
+          }),
+        );
+
+        expect(requestLog[1]).toEqual(
+          expect.objectContaining({
+            method: "PUT",
+            eventType: "connectionPause",
+            connectionId: performanceSessionId,
+            body: { shouldRecordResult: true },
+          }),
+        );
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith("Something went wrong");
+      });
+    });
+  });
+
+  describe("shouldn't record performance", () => {
+    describe("success", () => {
+      it("doesn't send resume or pause performance events", () => {});
+    });
+
+    describe("failure", () => {
+      it("doesn't send resume or pause performance events and responds with a 400", () => {});
+    });
+  });
+
   it("returns with the institution credentials", async () => {
     const context = {
       jobTypes: [ComboJobTypes.TRANSACTIONS],
