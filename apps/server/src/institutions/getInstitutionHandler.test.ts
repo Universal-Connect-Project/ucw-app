@@ -151,11 +151,78 @@ describe("getInstitutionHandler", () => {
 
   describe("shouldn't record performance", () => {
     describe("success", () => {
-      it("sets a new performanceSessionId on context and doesn't record a start or pause event", () => {});
+      it("sets a new performanceSessionId on context and doesn't record a start or pause event", async () => {
+        const connectionId = crypto.randomUUID();
+
+        jest.spyOn(crypto, "randomUUID").mockReturnValueOnce(connectionId);
+
+        const req = {
+          context: {
+            aggregator: MX_AGGREGATOR_STRING,
+            connectionId: "testRefreshConnectionId",
+            jobTypes: [ComboJobTypes.TRANSACTIONS],
+          },
+          params: {
+            institution_guid: ucpInstitutionId,
+          },
+        } as unknown as Request;
+
+        const res = {
+          send: jest.fn(),
+        } as unknown as Response;
+
+        const requestLog = setupPerformanceHandlers([
+          "connectionStart",
+          "connectionPause",
+        ]);
+
+        await getInstitutionHandler(req, res);
+
+        expect(requestLog).toHaveLength(0);
+      });
     });
 
     describe("failure", () => {
-      it("sets a new performanceSessionId on context, doesn't record start or pause events if the request fails, and responds with a 400", () => {});
+      it("sets a new performanceSessionId on context, doesn't record start or pause events if the request fails, and responds with a 400", async () => {
+        const connectionId = crypto.randomUUID();
+
+        jest.spyOn(crypto, "randomUUID").mockReturnValueOnce(connectionId);
+
+        const req = {
+          context: {
+            aggregator: MX_AGGREGATOR_STRING,
+            connectionId: "refreshConnectionId",
+            jobTypes: [ComboJobTypes.TRANSACTIONS],
+          },
+          params: {
+            institution_guid: ucpInstitutionId,
+          },
+        } as unknown as Request;
+
+        const res = {
+          status: jest.fn().mockReturnThis(),
+          send: jest.fn(),
+        } as unknown as Response;
+
+        server.use(
+          http.get(
+            MX_TEST_INSTITUTION_BY_ID_PATH,
+            () => new HttpResponse(null, { status: 400 }),
+          ),
+        );
+
+        const requestLog = setupPerformanceHandlers([
+          "connectionStart",
+          "connectionPause",
+        ]);
+
+        await getInstitutionHandler(req, res);
+
+        expect(requestLog).toHaveLength(0);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith("Something went wrong");
+      });
     });
   });
 
