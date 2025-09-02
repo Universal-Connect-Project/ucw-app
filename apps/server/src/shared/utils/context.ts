@@ -1,4 +1,27 @@
 import type { Request } from "express";
+import type { Context } from "../contract";
+
+const createContextGetter = (prop: keyof Context) => {
+  return (req: Request) => {
+    return req.context[prop];
+  };
+};
+
+export const getAggregatorFromContext = createContextGetter("aggregator");
+
+export const getJobTypesFromContext = createContextGetter("jobTypes");
+
+export const getAggregatorOverrideFromContext =
+  createContextGetter("aggregatorOverride");
+
+export const getResolvedUserIdFromContext =
+  createContextGetter("resolvedUserId");
+
+export const getPerformanceSessionIdFromContext = createContextGetter(
+  "performanceSessionId",
+);
+
+export const getCurrentJobIdFromContext = createContextGetter("current_job_id");
 
 export const setAggregatorOnContext = ({
   aggregatorId,
@@ -8,18 +31,6 @@ export const setAggregatorOnContext = ({
   req: Request;
 }) => {
   req.context.aggregator = aggregatorId;
-};
-
-export const getAggregatorFromContext = (req: Request) => {
-  return req.context.aggregator;
-};
-
-export const getJobTypesFromContext = (req: Request) => {
-  return req.context.jobTypes;
-};
-
-export const getAggregatorOverrideFromContext = (req: Request) => {
-  return req.context.aggregatorOverride;
 };
 
 export const setResolvedUserIdOnContext = ({
@@ -32,10 +43,6 @@ export const setResolvedUserIdOnContext = ({
   req.context.resolvedUserId = resolvedUserId;
 };
 
-export const getResolvedUserIdFromContext = (req: Request) => {
-  return req.context.resolvedUserId;
-};
-
 export const setPerformanceSessionIdOnContext = ({
   performanceSessionId,
   req,
@@ -46,10 +53,6 @@ export const setPerformanceSessionIdOnContext = ({
   req.context.performanceSessionId = performanceSessionId;
 };
 
-export const getPerformanceSessionIdFromContext = (req: Request) => {
-  return req.context.performanceSessionId;
-};
-
 export const setCurrentJobIdOnContext = ({
   currentJobId,
   req,
@@ -58,8 +61,4 @@ export const setCurrentJobIdOnContext = ({
   req: Request;
 }) => {
   req.context.current_job_id = currentJobId;
-};
-
-export const getCurrentJobIdFromContext = (req: Request) => {
-  return req.context.current_job_id;
 };
