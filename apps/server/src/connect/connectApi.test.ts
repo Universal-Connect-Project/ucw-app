@@ -5,6 +5,7 @@ import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
 import {
   ANSWER_CHALLENGE_PATH,
   CONNECTION_BY_ID_PATH,
+  CREATE_MEMBER_PATH,
   delay,
   mxTestData,
   READ_MEMBER_STATUS_PATH,
@@ -117,11 +118,36 @@ describe("connectApi", () => {
   });
 
   describe("addMember", () => {
+    it("sends a connectionPause event with shouldRecordResult as true when there's a failure", async () => {
+      const requestLog = setupPerformanceHandlers(["connectionPause"]);
+
+      server.use(
+        http.post(
+          CREATE_MEMBER_PATH,
+          () => new HttpResponse(null, { status: 400 }),
+        ),
+      );
+
+      await expect(
+        connectApi.addMember({
+          ...memberCreateData,
+          is_oauth: false,
+        }),
+      ).rejects.toThrow();
+
+      await waitFor(() => expect(requestLog.length).toBe(1));
+
+      expect(requestLog[0]).toEqual(
+        expect.objectContaining({
+          connectionId: connectApiPerformanceSessionId,
+          body: { shouldRecordResult: true },
+          eventType: "connectionPause",
+        }),
+      );
+    });
+
     it("returns a member and doesnt send a connection resume event and doesn't create a performance polling object on refresh connection", async () => {
-      const requestLog = setupPerformanceHandlers([
-        "connectionResume",
-        "connectionPause",
-      ]);
+      const requestLog = setupPerformanceHandlers(["connectionResume"]);
 
       const memberData = {
         guid: "testMemberGuid",
@@ -223,10 +249,7 @@ describe("connectApi", () => {
     });
 
     it("returns a member, sends a connection resume event, and creates a performance object in redis on a new connection", async () => {
-      const requestLog = setupPerformanceHandlers([
-        "connectionResume",
-        "connectionPause",
-      ]);
+      const requestLog = setupPerformanceHandlers(["connectionResume"]);
 
       const memberData = {
         institution_guid: "testInstitutionGuid",
@@ -279,6 +302,7 @@ describe("connectApi", () => {
 
       expect(requestLog[0]).toEqual(
         expect.objectContaining({
+          eventType: "connectionResume",
           connectionId: expect.any(String),
           body: {
             shouldRecordResult: true,
