@@ -52,7 +52,7 @@ describe("getInstitutionCredentialsHandler", () => {
             method: "PUT",
             eventType: "connectionResume",
             connectionId: performanceSessionId,
-            body: {},
+            body: { shouldRecordResult: undefined },
           }),
         );
 
@@ -61,9 +61,11 @@ describe("getInstitutionCredentialsHandler", () => {
             method: "PUT",
             eventType: "connectionPause",
             connectionId: performanceSessionId,
-            body: {},
+            body: { shouldRecordResult: undefined },
           }),
         );
+
+        expect(res.send).toHaveBeenCalled();
       });
     });
 
@@ -108,7 +110,7 @@ describe("getInstitutionCredentialsHandler", () => {
             method: "PUT",
             eventType: "connectionResume",
             connectionId: performanceSessionId,
-            body: {},
+            body: { shouldRecordResult: undefined },
           }),
         );
 
@@ -129,11 +131,74 @@ describe("getInstitutionCredentialsHandler", () => {
 
   describe("shouldn't record performance", () => {
     describe("success", () => {
-      it("doesn't send resume or pause performance events", () => {});
+      it("doesn't send resume or pause performance events", async () => {
+        const req = {
+          params: {
+            institution_guid: "test",
+          },
+          context: {
+            aggregator: MX_AGGREGATOR_STRING,
+            connectionId: "refreshConnectionId",
+          },
+        } as unknown as GetInstitutionCredentialsRequest;
+
+        const res = {
+          send: jest.fn(),
+        } as unknown as Response;
+
+        const requestLog = setupPerformanceHandlers([
+          "connectionPause",
+          "connectionResume",
+        ]);
+
+        setPerformanceSessionId(req);
+
+        await getInstitutionCredentialsHandler(req, res);
+
+        expect(requestLog).toHaveLength(0);
+
+        expect(res.send).toHaveBeenCalled();
+      });
     });
 
     describe("failure", () => {
-      it("doesn't send resume or pause performance events and responds with a 400", () => {});
+      it("doesn't send resume or pause performance events and responds with a 400", async () => {
+        const req = {
+          params: {
+            institution_guid: "test",
+          },
+          context: {
+            aggregator: MX_AGGREGATOR_STRING,
+            connectionId: "refreshConnectionId",
+          },
+        } as unknown as GetInstitutionCredentialsRequest;
+
+        const res = {
+          status: jest.fn().mockReturnThis(),
+          send: jest.fn(),
+        } as unknown as Response;
+
+        const requestLog = setupPerformanceHandlers([
+          "connectionPause",
+          "connectionResume",
+        ]);
+
+        setPerformanceSessionId(req);
+
+        server.use(
+          http.get(
+            INSTITUTION_CREDENTIALS_BY_ID_PATH,
+            () => new HttpResponse(null, { status: 400 }),
+          ),
+        );
+
+        await getInstitutionCredentialsHandler(req, res);
+
+        expect(requestLog).toHaveLength(0);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith("Something went wrong");
+      });
     });
   });
 

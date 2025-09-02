@@ -73,7 +73,7 @@ describe("getInstitutionHandler", () => {
             method: "PUT",
             eventType: "connectionPause",
             connectionId,
-            body: {},
+            body: { shouldRecordResult: undefined },
           }),
         );
       });
