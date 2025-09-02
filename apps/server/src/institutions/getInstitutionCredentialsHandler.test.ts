@@ -206,7 +206,7 @@ describe("getInstitutionCredentialsHandler", () => {
     });
   });
 
-  it("sets the currentjobid as nul and returns with the institution credentials", async () => {
+  it("sets the currentjobid as null and returns with the institution credentials", async () => {
     const context = {
       jobTypes: [ComboJobTypes.TRANSACTIONS],
       aggregator: MX_AGGREGATOR_STRING,
