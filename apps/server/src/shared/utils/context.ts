@@ -1,8 +1,8 @@
 import type { Request } from "express";
 import type { Context } from "../contract";
 
-const createContextGetter = (prop: keyof Context) => {
-  return (req: Request) => {
+const createContextGetter = <K extends keyof Context>(prop: K) => {
+  return (req: Request): Context[K] => {
     return req.context[prop];
   };
 };
