@@ -8,8 +8,14 @@ import {
   MX_AGGREGATOR_STRING,
   MX_INT_AGGREGATOR_STRING,
 } from "@repo/mx-adapter";
-import { mxTestData, waitFor } from "@repo/utils-dev-dependency";
+import {
+  MX_TEST_INSTITUTION_BY_ID_PATH,
+  mxTestData,
+  waitFor,
+} from "@repo/utils-dev-dependency";
 import setupPerformanceHandlers from "../shared/test/setupPerformanceHandlers";
+import { server } from "../test/testServer";
+import { http, HttpResponse } from "msw";
 
 const { institutionData: mxInstitutionData } = mxTestData;
 
@@ -50,7 +56,7 @@ describe("getInstitutionHandler", () => {
             connectionId,
             body: {
               aggregatorId: MX_AGGREGATOR_STRING,
-              institutionId: "testAggregatorInstitutionGuid",
+              institutionId: ucpInstitutionId,
               jobTypes: req.context.jobTypes,
               recordDuration: true,
               shouldRecordResult: false,
@@ -74,7 +80,72 @@ describe("getInstitutionHandler", () => {
     });
 
     describe("failure", () => {
-      it("sets a new performanceSessionId on context, records a start event with the correct props, records a pause event with shouldRecordResult if the request fails, and responds with a 400", () => {});
+      it("sets a new performanceSessionId on context, records a start event with the correct props, records a pause event with shouldRecordResult if the request fails, and responds with a 400", async () => {
+        const connectionId = crypto.randomUUID();
+
+        jest.spyOn(crypto, "randomUUID").mockReturnValueOnce(connectionId);
+
+        const req = {
+          context: {
+            jobTypes: [ComboJobTypes.TRANSACTIONS],
+          },
+          params: {
+            institution_guid: ucpInstitutionId,
+          },
+        } as unknown as Request;
+
+        const res = {
+          status: jest.fn().mockReturnThis(),
+          send: jest.fn(),
+        } as unknown as Response;
+
+        server.use(
+          http.get(
+            MX_TEST_INSTITUTION_BY_ID_PATH,
+            () => new HttpResponse(null, { status: 400 }),
+          ),
+        );
+
+        const requestLog = setupPerformanceHandlers([
+          "connectionStart",
+          "connectionPause",
+        ]);
+
+        await getInstitutionHandler(req, res);
+
+        expect(requestLog[0]).toEqual(
+          expect.objectContaining({
+            method: "POST",
+            eventType: "connectionStart",
+            connectionId,
+            body: {
+              aggregatorId: MX_AGGREGATOR_STRING,
+              institutionId: ucpInstitutionId,
+              jobTypes: req.context.jobTypes,
+              recordDuration: true,
+              shouldRecordResult: false,
+            },
+          }),
+        );
+
+        await waitFor(() => {
+          expect(requestLog.length).toBe(2);
+        });
+
+        expect(requestLog[1]).toEqual(
+          expect.objectContaining({
+            method: "PUT",
+            eventType: "connectionPause",
+            connectionId,
+            body: {
+              shouldRecordResult: true,
+            },
+          }),
+        );
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith("Something went wrong");
+      });
     });
   });
 
