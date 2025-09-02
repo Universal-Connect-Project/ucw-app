@@ -14,6 +14,10 @@ import setupPerformanceHandlers from "../shared/test/setupPerformanceHandlers";
 import { setPerformanceSessionId } from "../services/performanceTracking";
 import { server } from "../test/testServer";
 import { http, HttpResponse } from "msw";
+import {
+  getCurrentJobIdFromContext,
+  setCurrentJobIdOnContext,
+} from "../shared/utils/context";
 
 const { institutionCredentialsData: mxInstitutionCredentialsData } = mxTestData;
 
@@ -202,7 +206,7 @@ describe("getInstitutionCredentialsHandler", () => {
     });
   });
 
-  it("returns with the institution credentials", async () => {
+  it("sets the currentjobid as nul and returns with the institution credentials", async () => {
     const context = {
       jobTypes: [ComboJobTypes.TRANSACTIONS],
       aggregator: MX_AGGREGATOR_STRING,
@@ -221,7 +225,13 @@ describe("getInstitutionCredentialsHandler", () => {
 
     const institutionCredentials = mxInstitutionCredentialsData.credentials;
 
+    setCurrentJobIdOnContext({ currentJobId: "test", req });
+
+    expect(getCurrentJobIdFromContext(req)).toBe("test");
+
     await getInstitutionCredentialsHandler(req, res);
+
+    expect(getCurrentJobIdFromContext(req)).toBe(null);
 
     expect(res.send).toHaveBeenCalledWith([
       {
