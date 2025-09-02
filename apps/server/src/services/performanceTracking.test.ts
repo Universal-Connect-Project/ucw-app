@@ -6,6 +6,7 @@ import {
   recordConnectionResumeEvent,
   recordStartEvent,
   recordSuccessEvent,
+  setPerformanceSessionId,
 } from "./performanceTracking";
 import { ComboJobTypes } from "@repo/utils";
 import { mockAccessToken } from "../test/testData/auth0";
@@ -21,6 +22,8 @@ import * as configModule from "../config";
 import { setConnectionForCleanup } from "../connectionCleanup/utils";
 import { get } from "../services/storageClient/redis";
 import { clearRedisMock } from "../__mocks__/redis";
+import type { Request } from "express";
+import { getPerformanceSessionIdFromContext } from "../shared/utils/context";
 
 async function setupRedisPerformanceObject(sessionId: string) {
   createPerformancePollingObject({
@@ -33,6 +36,23 @@ async function setupRedisPerformanceObject(sessionId: string) {
 }
 
 describe("performanceTracking", () => {
+  describe("setPerformanceSessionId", () => {
+    it("generates a new performanceSessionId, sets it on the request context, and returns the new id", () => {
+      const newPerformanceSessionId = crypto.randomUUID();
+      jest
+        .spyOn(crypto, "randomUUID")
+        .mockReturnValueOnce(newPerformanceSessionId);
+
+      const req = { context: {} } as Request;
+      const response = setPerformanceSessionId(req);
+      expect(getPerformanceSessionIdFromContext(req)).toBe(
+        newPerformanceSessionId,
+      );
+
+      expect(response).toBe(newPerformanceSessionId);
+    });
+  });
+
   beforeEach(() => {
     jest.restoreAllMocks();
     clearRedisMock();
@@ -230,7 +250,10 @@ describe("performanceTracking", () => {
 
     const requestLog = setupPerformanceHandlers(["connectionPause"]);
 
-    await recordConnectionPauseEvent({ connectionId });
+    await recordConnectionPauseEvent({
+      connectionId,
+      shouldRecordResult: true,
+    });
 
     await expectPerformanceObject(connectionId, {
       paused: true,
@@ -240,6 +263,7 @@ describe("performanceTracking", () => {
     const req = requestLog[0];
     expect(req).toEqual(
       expect.objectContaining({
+        body: { shouldRecordResult: true },
         method: "PUT",
         eventType: "connectionPause",
         connectionId: connectionId,
@@ -289,7 +313,10 @@ describe("performanceTracking", () => {
 
     const requestLog = setupPerformanceHandlers(["connectionResume"]);
 
-    await recordConnectionResumeEvent({ connectionId });
+    await recordConnectionResumeEvent({
+      connectionId,
+      shouldRecordResult: true,
+    });
 
     await expectPerformanceObject(connectionId, {
       paused: false,
@@ -299,6 +326,7 @@ describe("performanceTracking", () => {
     const req = requestLog[0];
     expect(req).toEqual(
       expect.objectContaining({
+        body: { shouldRecordResult: true },
         method: "PUT",
         eventType: "connectionResume",
         connectionId: connectionId,
