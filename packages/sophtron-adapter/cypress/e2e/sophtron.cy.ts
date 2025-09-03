@@ -126,12 +126,12 @@ describe("Sophtron aggregator", () => {
     clickContinue();
 
     cy.findByRole("textbox", {
-      name: "Please enter the Captcha code",
+      name: /Please enter the Captcha code/,
       timeout: 45000,
     }).type("asdf");
     clickContinue();
 
-    cy.findByLabelText("What is your favorite color?", { timeout: 45000 }).type(
+    cy.findByLabelText(/What is your favorite color/, { timeout: 45000 }).type(
       "asdf",
     );
     clickContinue();
@@ -140,7 +140,7 @@ describe("Sophtron aggregator", () => {
     clickContinue();
 
     cy.findByRole("textbox", {
-      name: "Please enter the Token",
+      name: /Please enter the Token/,
       timeout: 45000,
     }).type("asdf");
     clickContinue();
