@@ -121,7 +121,7 @@ describe("Sophtron aggregator", () => {
     visitAgg({});
     searchByText("Sophtron Bank");
     cy.findByLabelText("Add account with Sophtron Bank").first().click();
-    cy.findByLabelText("User ID").type("asdfg12X");
+    cy.findByLabelText(/User ID/).type("asdfg12X");
     cy.findByLabelText("Password").type("asdfg12X");
     clickContinue();
 
