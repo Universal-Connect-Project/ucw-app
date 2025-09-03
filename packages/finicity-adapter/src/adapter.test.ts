@@ -490,7 +490,7 @@ describe("finicity aggregator", () => {
 
       expect(
         mockPerformanceClient.recordConnectionResumeEvent,
-      ).toHaveBeenCalledWith("testPerfomanceSessionId");
+      ).toHaveBeenCalledWith({ connectionId: "testPerfomanceSessionId" });
     });
 
     it("handles 'done' eventType and returns the connection", async () => {
