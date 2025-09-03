@@ -43,5 +43,5 @@ export const startOAuthPerformance = async (
     });
   }
 
-  res.status(201);
+  res.sendStatus(201);
 };

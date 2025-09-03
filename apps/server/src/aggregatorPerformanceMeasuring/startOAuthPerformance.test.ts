@@ -19,14 +19,14 @@ describe("startOAuthPerformance", () => {
           aggregator: MX_AGGREGATOR_STRING,
         },
       } as StartOAuthPerformanceRequest;
-      const res = { status: jest.fn() } as unknown as Response;
+      const res = { sendStatus: jest.fn() } as unknown as Response;
 
       const requestLog = setupPerformanceHandlers(["connectionPause"]);
       const performanceSessionId = setPerformanceSessionId(req);
 
       await startOAuthPerformance(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.sendStatus).toHaveBeenCalledWith(201);
 
       await waitFor(() => expect(requestLog).toHaveLength(1));
 
@@ -48,13 +48,13 @@ describe("startOAuthPerformance", () => {
           connectionId: "testConnectionId",
         },
       } as StartOAuthPerformanceRequest;
-      const res = { status: jest.fn() } as unknown as Response;
+      const res = { sendStatus: jest.fn() } as unknown as Response;
 
       const requestLog = setupPerformanceHandlers(["connectionPause"]);
 
       await startOAuthPerformance(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.sendStatus).toHaveBeenCalledWith(201);
 
       await delay(1000);
 
@@ -70,13 +70,13 @@ describe("startOAuthPerformance", () => {
           aggregator: MX_AGGREGATOR_STRING,
         },
       } as StartOAuthPerformanceRequest;
-      const res = { status: jest.fn() } as unknown as Response;
+      const res = { sendStatus: jest.fn() } as unknown as Response;
 
       const performanceSessionId = setPerformanceSessionId(req);
 
       await startOAuthPerformance(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.sendStatus).toHaveBeenCalledWith(201);
 
       expect(await getPerformanceObject(performanceSessionId)).toEqual(
         expect.objectContaining({
@@ -96,13 +96,13 @@ describe("startOAuthPerformance", () => {
           aggregator: FINICITY_AGGREGATOR_STRING,
         },
       } as StartOAuthPerformanceRequest;
-      const res = { status: jest.fn() } as unknown as Response;
+      const res = { sendStatus: jest.fn() } as unknown as Response;
 
       const performanceSessionId = setPerformanceSessionId(req);
 
       await startOAuthPerformance(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.sendStatus).toHaveBeenCalledWith(201);
 
       expect(await getPerformanceObject(performanceSessionId)).toBeUndefined();
     });

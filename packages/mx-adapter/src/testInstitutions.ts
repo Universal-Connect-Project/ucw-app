@@ -1,5 +1,7 @@
 import type { CachedInstitution } from "@repo/utils";
 
+export const MX_BANK_OAUTH_NAME = "MX Bank (Oauth)";
+export const MX_BANK_OAUTH_UCP_INSTITUTION_ID = "mxBankOauth";
 export const MX_BANK_UCP_INSTITUTION_ID = "mxBank";
 export const MX_BANK_MX_INSTITUTION_ID = "mxbank";
 export const MX_BANK_TO_HIDE_NAME = "MX Bank to hide";
@@ -66,8 +68,8 @@ export const testInstitutions: CachedInstitution[] = [
     },
   },
   {
-    name: "MX Bank (Oauth)",
-    id: "mxBankOauth",
+    name: MX_BANK_OAUTH_NAME,
+    id: MX_BANK_OAUTH_UCP_INSTITUTION_ID,
     keywords: ["Gringotts", "MX Bank", "oauth"],
     logo: "https://s3.amazonaws.com/MD_Assets/Ipad%20Logos/100x100/INS-3aeb38da-26e4-3818-e0fa-673315ab7754_100x100.png",
     url: "https://mx.com",
