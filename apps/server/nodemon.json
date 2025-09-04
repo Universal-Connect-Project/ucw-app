@@ -1,5 +1,5 @@
 {
-  "watch": [".", "../../packages/src"],
+  "watch": [".", "../../packages/*/src"],
   "ext": "js,ts,json,env",
   "ignore": [
     "**/cypress/**",
