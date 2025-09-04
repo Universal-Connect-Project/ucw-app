@@ -61,7 +61,7 @@ jobs:
           cat ${ENV_FILE_PATH}
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: npx playwright install --with-deps chromium
       - name: Run Playwright tests
         run: npm run playwright:test --workspace=packages/finicity-adapter
       - uses: actions/upload-artifact@v4
