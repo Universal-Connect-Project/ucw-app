@@ -67,6 +67,11 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
+          CYPRESS_auth_audience: ${{ vars.AUTHENTICATION_AUDIENCE }}
+          CYPRESS_auth_client_id: ${{ vars.AUTHENTICATION_CLIENT_ID }}
+          CYPRESS_auth_domain: ${{ vars.AUTHENTICATION_DOMAIN }}
+          CYPRESS_auth_widget_demo_username: ${{ secrets.AUTHENTICATION_USERNAME }}
+          CYPRESS_auth_widget_demo_password: ${{ secrets.AUTHENTICATION_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           config-file: cypress.config.ts

@@ -55,6 +55,8 @@ jobs:
           # Secrets (can't load these from another job, due to GH security features)
           echo MX_CLIENT_ID=${{ secrets.MX_CLIENT_ID }} >> ${ENV_FILE_PATH}
           echo MX_API_SECRET=${{ secrets.MX_API_SECRET }} >> ${ENV_FILE_PATH}
+          echo UCP_CLIENT_SECRET=${{ secrets.UCP_CLIENT_SECRET }} >> ${ENV_FILE_PATH}
+          echo UCP_CLIENT_ID=${{ secrets.UCP_CLIENT_ID }} >> ${ENV_FILE_PATH}
 
           # This fails if using https, so we have to override it
           echo HOST_URL=http://localhost:8080 >> ${ENV_FILE_PATH}
