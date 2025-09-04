@@ -144,6 +144,12 @@ test("connects to mx bank with oAuth, tracks performance correctly, and does ref
 
   await connectedPromise;
 
+  const performanceEvent = await expectPerformanceEvent({
+    shouldRecordResult: true,
+  });
+
+  expect(performanceEvent.successMetric.isSuccess).toBe(true);
+
   await request.delete(
     `http://localhost:8080/api/aggregator/mx_int/user/${userId}`,
   );
