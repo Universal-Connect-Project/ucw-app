@@ -9,6 +9,7 @@ import {
   MX_INT_AGGREGATOR_STRING,
 } from "@repo/mx-adapter";
 import {
+  delay,
   MX_TEST_INSTITUTION_BY_ID_PATH,
   mxTestData,
   waitFor,
@@ -149,7 +150,7 @@ describe("getInstitutionHandler", () => {
     });
   });
 
-  describe("shouldn't record performance", () => {
+  describe("shouldn't record performance for refresh connections", () => {
     describe("success", () => {
       it("sets a new performanceSessionId on context and doesn't record a start or pause event", async () => {
         const connectionId = crypto.randomUUID();
@@ -177,6 +178,8 @@ describe("getInstitutionHandler", () => {
         ]);
 
         await getInstitutionHandler(req, res);
+
+        await delay(1000);
 
         expect(requestLog).toHaveLength(0);
       });
@@ -217,6 +220,8 @@ describe("getInstitutionHandler", () => {
         ]);
 
         await getInstitutionHandler(req, res);
+
+        await delay(1000);
 
         expect(requestLog).toHaveLength(0);
 

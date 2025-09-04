@@ -133,7 +133,7 @@ describe("getInstitutionCredentialsHandler", () => {
     });
   });
 
-  describe("shouldn't record performance", () => {
+  describe("shouldn't record performance for refresh connections", () => {
     describe("success", () => {
       it("doesn't send resume or pause performance events", async () => {
         const req = {
