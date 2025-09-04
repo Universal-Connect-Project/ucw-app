@@ -44,47 +44,47 @@ const authenticateAndStoreAccessToken = ({
   scopeEnvString: string;
   usernameEnvString: string;
 }) => {
-  cy.request({
-    method: "POST",
-    url: `https://${Cypress.env("auth_domain")}/oauth/token`,
-    body: {
-      audience: Cypress.env("auth_audience"),
-      client_id: Cypress.env("auth_client_id"),
-      grant_type: "password",
-      password: Cypress.env(passwordEnvString) as string,
-      username: Cypress.env(usernameEnvString) as string,
-      scope: Cypress.env(scopeEnvString),
-    },
-  }).then((response: Cypress.Response<JwtPayload>) => {
-    const accessToken = response.body.access_token;
+  if (Cypress.env(usernameEnvString)) {
+    cy.request({
+      method: "POST",
+      url: `https://${Cypress.env("auth_domain")}/oauth/token`,
+      body: {
+        audience: Cypress.env("auth_audience"),
+        client_id: Cypress.env("auth_client_id"),
+        grant_type: "password",
+        password: Cypress.env(passwordEnvString) as string,
+        username: Cypress.env(usernameEnvString) as string,
+        scope: Cypress.env(scopeEnvString),
+      },
+    }).then((response: Cypress.Response<JwtPayload>) => {
+      const accessToken = response.body.access_token;
 
-    Cypress.env(accessTokenEnvString, accessToken);
-  });
+      Cypress.env(accessTokenEnvString, accessToken);
+    });
+  }
 };
 
 before(() => {
-  if (Cypress.env("auth_audience")) {
-    authenticateAndStoreAccessToken({
-      accessTokenEnvString: WIDGET_DEMO_ACCESS_TOKEN_ENV,
-      passwordEnvString: "auth_widget_demo_password",
-      scopeEnvString: "auth_widget_demo_scope",
-      usernameEnvString: "auth_widget_demo_username",
-    });
+  authenticateAndStoreAccessToken({
+    accessTokenEnvString: WIDGET_DEMO_ACCESS_TOKEN_ENV,
+    passwordEnvString: "auth_widget_demo_password",
+    scopeEnvString: "auth_widget_demo_scope",
+    usernameEnvString: "auth_widget_demo_username",
+  });
 
-    authenticateAndStoreAccessToken({
-      accessTokenEnvString: WIDGET_DEMO_DATA_ACCESS_TOKEN_ENV,
-      passwordEnvString: "auth_widget_demo_data_password",
-      scopeEnvString: "auth_widget_demo_data_scope",
-      usernameEnvString: "auth_widget_demo_data_username",
-    });
+  authenticateAndStoreAccessToken({
+    accessTokenEnvString: WIDGET_DEMO_DATA_ACCESS_TOKEN_ENV,
+    passwordEnvString: "auth_widget_demo_data_password",
+    scopeEnvString: "auth_widget_demo_data_scope",
+    usernameEnvString: "auth_widget_demo_data_username",
+  });
 
-    authenticateAndStoreAccessToken({
-      accessTokenEnvString: WIDGET_DEMO_DELETE_USER_ACCESS_TOKEN_ENV,
-      passwordEnvString: "auth_widget_demo_delete_user_password",
-      scopeEnvString: "auth_widget_demo_delete_user_scope",
-      usernameEnvString: "auth_widget_demo_delete_user_username",
-    });
-  }
+  authenticateAndStoreAccessToken({
+    accessTokenEnvString: WIDGET_DEMO_DELETE_USER_ACCESS_TOKEN_ENV,
+    passwordEnvString: "auth_widget_demo_delete_user_password",
+    scopeEnvString: "auth_widget_demo_delete_user_scope",
+    usernameEnvString: "auth_widget_demo_delete_user_username",
+  });
 });
 
 beforeEach(() => {
