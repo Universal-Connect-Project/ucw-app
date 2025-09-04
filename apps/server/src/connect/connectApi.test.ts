@@ -32,10 +32,9 @@ import expectPerformanceObject from "../test/expectPerformanceObject";
 import * as performanceTracking from "../services/performanceTracking";
 import { PLAID_AGGREGATOR_STRING } from "@repo/plaid-adapter";
 import * as config from "../config";
-import { get } from "../services/storageClient/redis";
-import { keys as _keys } from "../__mocks__/redis";
-import { FINICITY_AGGREGATOR_STRING } from "@repo/finicity-adapter";
+import { get, redisClient } from "../services/storageClient/redis";
 import type { Request } from "express";
+import { FINICITY_AGGREGATOR_STRING } from "@repo/finicity-adapter";
 
 const expectCleanupObject = async ({
   connectionId = mxTestMemberData.member.guid,
@@ -251,6 +250,7 @@ describe("connectApi", () => {
     it("returns a member, sends a connection resume event, and creates a performance object in redis on a new connection", async () => {
       const requestLog = setupPerformanceHandlers(["connectionResume"]);
 
+      const ucpInstitutionId = "testUcpInstitutionId";
       const memberData = {
         institution_guid: "testInstitutionGuid",
         is_oauth: false,
@@ -262,7 +262,7 @@ describe("connectApi", () => {
           },
         ],
         rawInstitutionData: {
-          ucpInstitutionId: "testUcpInstitutionId",
+          ucpInstitutionId,
         },
       };
 
@@ -310,8 +310,10 @@ describe("connectApi", () => {
         }),
       );
 
-      // const sessionContext = await get(`context_${fakeSessionId}`);
-      // expect(sessionContext.ucpInstitutionId).toEqual("testUcpInstitutionId");
+      const sessionContext = await get(
+        `context_${mxTestMemberData.member.guid}`,
+      ); // mx connection id is the member guid
+      expect(sessionContext.ucpInstitutionId).toEqual(ucpInstitutionId);
 
       const performanceObject = await getPerformanceObject(
         connectApiPerformanceSessionId,
@@ -329,9 +331,9 @@ describe("connectApi", () => {
       );
     });
 
-    it("does not create a performance object or send a performance start event for Plaid because getPerformanceEnabled returns false", async () => {
+    it("sends a performance resume event for Plaid because getPerformanceEnabled returns true, but doesnt need a performance polling object", async () => {
       const requestLog = setupPerformanceHandlers([
-        "connectionStart",
+        "connectionResume",
         "connectionPause",
       ]);
 
@@ -350,7 +352,16 @@ describe("connectApi", () => {
 
       await delay(1000);
 
-      expect(requestLog.length).toBe(0);
+      expect(requestLog.length).toBe(1);
+      expect(requestLog[0]).toEqual(
+        expect.objectContaining({
+          eventType: "connectionResume",
+          connectionId: expect.any(String),
+          body: {
+            shouldRecordResult: true,
+          },
+        }),
+      );
 
       const performanceObject =
         await getPerformanceObject(performanceSessionId);
@@ -437,7 +448,7 @@ describe("connectApi", () => {
 
       await connectApi.addMember(memberData);
 
-      const cleanUpObjects = await _keys("cleanup:*");
+      const cleanUpObjects = await redisClient.keys("cleanup:*");
       expect(cleanUpObjects.length).toBe(1);
 
       await expectCleanupObject({
@@ -466,7 +477,7 @@ describe("connectApi", () => {
 
       await connectApi.addMember(memberData);
 
-      const cleanUpObjects = await _keys("cleanup:*");
+      const cleanUpObjects = await redisClient.keys("cleanup:*");
       expect(cleanUpObjects.length).toBe(0);
     });
 
@@ -494,7 +505,7 @@ describe("connectApi", () => {
 
       await refreshingContextConnectApi.addMember(memberData);
 
-      const cleanUpObjects = await _keys("cleanup:*");
+      const cleanUpObjects = await redisClient.keys("cleanup:*");
       expect(cleanUpObjects.length).toBe(1);
 
       await expectCleanupObject({

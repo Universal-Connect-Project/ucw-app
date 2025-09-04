@@ -67,3 +67,11 @@ export const createClient = () => ({
   del,
   keys,
 });
+
+export const redisClient = createClient();
+export const overwriteSet = sAdd;
+export const getSet = sMembers;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const setNoExpiration = async (key: string, value: any) => {
+  return set(key, value);
+};

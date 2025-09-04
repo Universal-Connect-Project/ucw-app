@@ -19,5 +19,6 @@ module.exports = {
   },
   moduleNameMapper: {
     "^axios$": require.resolve("axios"),
+    "^../services/storageClient/redis$": "<rootDir>/src/__mocks__/redis.ts",
   },
 };
