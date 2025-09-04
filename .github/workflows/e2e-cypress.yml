@@ -63,6 +63,8 @@ jobs:
           echo MX_API_SECRET=${{ secrets.MX_API_SECRET }} >> ${ENV_FILE_PATH}
           echo SOPHTRON_API_USER_ID=${{ secrets.SOPHTRON_API_USER_ID }} >> ${ENV_FILE_PATH}
           echo SOPHTRON_API_USER_SECRET=${{ secrets.SOPHTRON_API_USER_SECRET }} >> ${ENV_FILE_PATH}
+          echo UCP_CLIENT_SECRET=${{ secrets.UCP_CLIENT_SECRET }} >> ${ENV_FILE_PATH}
+          echo UCP_CLIENT_ID=${{ secrets.UCP_CLIENT_ID }} >> ${ENV_FILE_PATH}
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
