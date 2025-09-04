@@ -5,9 +5,10 @@ import {
   createMockPerformanceClient,
 } from "@repo/utils/test";
 import { createLogClient } from "@repo/utils-dev-dependency";
+import { plaidTestItemResponse } from "@repo/utils-dev-dependency/plaid/testData/items";
 import { PlaidAdapter } from "./adapter";
 import { ComboJobTypes, Connection, ConnectionStatus } from "@repo/utils";
-import { PLAID_BASE_PATH_PROD } from "./apiClient";
+import { PLAID_BASE_PATH, PLAID_BASE_PATH_PROD } from "./apiClient";
 import { server } from "./test/testServer";
 import { http, HttpResponse } from "msw";
 
@@ -31,6 +32,7 @@ const aggregatorCredentials = {
 
 const mockPerformanceClient = createMockPerformanceClient();
 
+const UcpIdFromAggCode = "testUcpId";
 const plaidAdapterSandbox = new PlaidAdapter({
   sandbox: true,
   dependencies: {
@@ -39,6 +41,7 @@ const plaidAdapterSandbox = new PlaidAdapter({
     performanceClient: mockPerformanceClient,
     aggregatorCredentials,
     getWebhookHostUrl: () => "testWebhookHostUrl",
+    getUcpIdFromAggregatorInstitutionCode: async () => UcpIdFromAggCode,
     envConfig: {
       HostUrl: "http://localhost:8080",
     },
@@ -53,6 +56,7 @@ const plaidAdapter = new PlaidAdapter({
     logClient,
     aggregatorCredentials,
     getWebhookHostUrl: () => "testWebhookHostUrl",
+    getUcpIdFromAggregatorInstitutionCode: async () => UcpIdFromAggCode,
     envConfig: {
       HostUrl: "http://localhost:8080",
     },
@@ -186,7 +190,18 @@ describe("plaid aggregator", () => {
   });
 
   describe("HandleOauthResponse", () => {
-    it("returns the updated connection if valid code and connection is found and doesn't send performance success event", async () => {
+    beforeEach(() => {
+      server.use(
+        http.post(`${PLAID_BASE_PATH}/item/get`, () => {
+          return HttpResponse.json(plaidTestItemResponse);
+        }),
+        http.post(`${PLAID_BASE_PATH_PROD}/item/get`, () => {
+          return HttpResponse.json(plaidTestItemResponse);
+        }),
+      );
+    });
+
+    it("returns the updated connection and records performance success event when UCP ID matches", async () => {
       const requestId = "abc123";
       const connection: Connection = {
         id: requestId,
@@ -196,6 +211,9 @@ describe("plaid aggregator", () => {
       };
 
       await cacheClient.set(requestId, connection);
+      await cacheClient.set(`context_${requestId}`, {
+        ucpInstitutionId: UcpIdFromAggCode,
+      });
 
       const result = await plaidAdapter.HandleOauthResponse({
         query: {
@@ -225,6 +243,122 @@ describe("plaid aggregator", () => {
 
       const cached = await cacheClient.get(requestId);
       expect(cached).toEqual(result);
+      expect(
+        mockPerformanceClient.recordConnectionPauseEvent,
+      ).toHaveBeenCalledWith(requestId);
+
+      expect(mockPerformanceClient.recordSuccessEvent).toHaveBeenCalledWith(
+        requestId,
+        "accessTokenTest",
+      );
+    });
+
+    it("returns the updated connection but doesn't record performance success event when UCP ID doesn't match", async () => {
+      const requestId = "abc123";
+      const connection: Connection = {
+        id: requestId,
+        status: ConnectionStatus.PENDING,
+        institution_code: "inst-001",
+        userId: null,
+      };
+
+      await cacheClient.set(requestId, connection);
+      await cacheClient.set(`context_${requestId}`, {
+        ucpInstitutionId: "somethingDifferent",
+      });
+
+      const result = await plaidAdapter.HandleOauthResponse({
+        query: {
+          connection_id: requestId,
+        },
+        body: {
+          webhook_code: "ITEM_ADD_RESULT",
+          public_token: "fake_public_token",
+          link_session_id: "link_session_id",
+        },
+      });
+
+      expect(result).toEqual({
+        status: ConnectionStatus.CONNECTED,
+        institution_code: "inst-001",
+        id: "accessTokenTest",
+        postMessageEventData: {
+          memberConnected: {
+            connectionId: "accessTokenTest",
+          },
+          memberStatusUpdate: {
+            connectionId: "accessTokenTest",
+          },
+        },
+        userId: null,
+      });
+
+      const cached = await cacheClient.get(requestId);
+      expect(cached).toEqual(result);
+      expect(
+        mockPerformanceClient.recordConnectionPauseEvent,
+      ).toHaveBeenCalledWith(requestId);
+      expect(mockPerformanceClient.recordSuccessEvent).not.toHaveBeenCalled();
+    });
+
+    it("handles getUcpIdFromAggregatorInstitutionCode returning null", async () => {
+      const plaidAdapterWithNullUcp = new PlaidAdapter({
+        sandbox: false,
+        dependencies: {
+          cacheClient,
+          performanceClient: mockPerformanceClient,
+          logClient,
+          aggregatorCredentials,
+          getWebhookHostUrl: () => "testWebhookHostUrl",
+          getUcpIdFromAggregatorInstitutionCode: async () => null,
+          envConfig: {
+            HostUrl: "http://localhost:8080",
+          },
+        },
+      });
+
+      const requestId = "abc123";
+      const connection: Connection = {
+        id: requestId,
+        status: ConnectionStatus.PENDING,
+        institution_code: "inst-001",
+        userId: null,
+      };
+
+      await cacheClient.set(requestId, connection);
+      await cacheClient.set(`context_${requestId}`, {
+        ucpInstitutionId: UcpIdFromAggCode,
+      });
+
+      const result = await plaidAdapterWithNullUcp.HandleOauthResponse({
+        query: {
+          connection_id: requestId,
+        },
+        body: {
+          webhook_code: "ITEM_ADD_RESULT",
+          public_token: "fake_public_token",
+          link_session_id: "link_session_id",
+        },
+      });
+
+      expect(result).toEqual({
+        status: ConnectionStatus.CONNECTED,
+        institution_code: "inst-001",
+        id: "accessTokenTest",
+        postMessageEventData: {
+          memberConnected: {
+            connectionId: "accessTokenTest",
+          },
+          memberStatusUpdate: {
+            connectionId: "accessTokenTest",
+          },
+        },
+        userId: null,
+      });
+
+      expect(
+        mockPerformanceClient.recordConnectionPauseEvent,
+      ).toHaveBeenCalledWith(requestId);
       expect(mockPerformanceClient.recordSuccessEvent).not.toHaveBeenCalled();
     });
 

@@ -53,9 +53,13 @@ export class AggregatorAdapterBase {
     );
   }
 
-  async createConnection(
-    connection: CreateConnectionRequest,
-  ): Promise<Connection> {
+  async createConnection({
+    connection,
+    ucpInstitutionId,
+  }: {
+    connection: CreateConnectionRequest;
+    ucpInstitutionId?: string;
+  }): Promise<Connection> {
     this.context.current_job_id = null;
     const ret = await this.aggregatorAdapter.CreateConnection(
       connection,
@@ -66,6 +70,7 @@ export class AggregatorAdapterBase {
       await set(`context_${ret.id}`, {
         oauth_referral_source: this.context.oauth_referral_source,
         scheme: this.context.scheme,
+        ucpInstitutionId,
       });
     }
     return ret;

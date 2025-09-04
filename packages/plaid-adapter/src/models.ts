@@ -11,6 +11,10 @@ export type AdapterDependencies = {
   logClient: LogClient;
   aggregatorCredentials: Record<string, ApiCredentials>;
   performanceClient: PerformanceClient;
+  getUcpIdFromAggregatorInstitutionCode: (
+    aggregator: string,
+    institutionCode: string,
+  ) => Promise<string | null>;
   envConfig: Record<string, string>;
   getWebhookHostUrl: () => string;
 };

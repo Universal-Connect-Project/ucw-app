@@ -14,6 +14,7 @@ import {
   recordStartEvent,
   recordSuccessEvent,
 } from "./services/performanceTracking";
+import { getUcpIdFromAggregatorInstitutionCode } from "./services/ElasticSearchClient";
 
 const mxAdapterMapObject = getMxAdapterMapObject({
   cacheClient: {
@@ -138,6 +139,7 @@ const plaidAdapterMapObject: Record<string, AdapterMap> =
       },
     },
     getWebhookHostUrl: getWebhookHostUrl,
+    getUcpIdFromAggregatorInstitutionCode,
     envConfig: {
       HostUrl: config.HOST_URL,
       WebhookHostUrl: config.WebhookHostUrl,

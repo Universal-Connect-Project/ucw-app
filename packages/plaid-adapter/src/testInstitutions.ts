@@ -10,7 +10,7 @@ export const testInstitutions: CachedInstitution[] = [
     is_test_bank: true,
     routing_numbers: [],
     plaid: {
-      id: "ins_109512",
+      id: "ins_plaid_bank",
       supports_aggregation: true,
       supports_history: true,
       supports_identification: true,

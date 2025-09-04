@@ -310,6 +310,9 @@ describe("connectApi", () => {
         }),
       );
 
+      // const sessionContext = await get(`context_${fakeSessionId}`);
+      // expect(sessionContext.ucpInstitutionId).toEqual("testUcpInstitutionId");
+
       const performanceObject = await getPerformanceObject(
         connectApiPerformanceSessionId,
       );

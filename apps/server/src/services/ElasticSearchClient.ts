@@ -22,6 +22,7 @@ import { fetchInstitutions } from "./institutionSyncer";
 import { INSTITUTION_CURRENT_LIST_IDS } from "./storageClient/constants";
 import { getSet, overwriteSet } from "./storageClient/redis";
 import { addTestInstitutions } from "../testInstitutions/testInstitutions";
+import { getAggregatorIdFromTestAggregatorId } from "../adapterIndex";
 
 function getInstitutionFilePath() {
   return resolve(__dirname, "../../cachedDefaults/ucwInstitutionsMapping.json");
@@ -440,4 +441,26 @@ export async function updateInstitutions(institutions: CachedInstitution[]) {
     const updatePromises = institutions.map(updateInstitution);
     await Promise.all(updatePromises);
   }
+}
+
+export async function getUcpIdFromAggregatorInstitutionCode(
+  aggregator: string,
+  institutionCode: string,
+): Promise<string | null> {
+  const nonSandboxAggregator = getAggregatorIdFromTestAggregatorId(aggregator);
+
+  const { body }: { body: SearchResponse } = await ElasticsearchClient.search({
+    index: "institutions",
+    body: {
+      query: {
+        term: {
+          [`${nonSandboxAggregator}.id.keyword`]: institutionCode,
+        },
+      },
+      size: 1,
+    },
+  });
+
+  const hit = body.hits.hits[0];
+  return hit?._id ?? null;
 }
