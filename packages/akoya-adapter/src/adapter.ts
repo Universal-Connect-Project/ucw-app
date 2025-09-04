@@ -30,6 +30,8 @@ export class AkoyaAdapter implements WidgetAdapter {
   performanceClient: PerformanceClient;
   envConfig: Record<string, string>;
   sandbox: boolean;
+  // Akoya doesn't provide enough visibility to measure duration performance
+  shouldRecordPerformanceDuration = false;
 
   constructor(args: AdapterConfig) {
     const { sandbox, dependencies } = args;
@@ -42,11 +44,6 @@ export class AkoyaAdapter implements WidgetAdapter {
     this.credentials = sandbox
       ? dependencies?.aggregatorCredentials.akoyaSandbox
       : dependencies?.aggregatorCredentials.akoyaProd;
-  }
-
-  getShouldRecordPerformanceDuration() {
-    // Akoya doesn't provide enough visibility to measure duration performance
-    return false;
   }
 
   async GetInstitutionById(id: string): Promise<AggregatorInstitution> {

@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.0]
+
+### Changed
+
+- Improved performance measurement.
+- Performance session ids are now created when loading an institution.
+- Only performance sessions that have been marked with shouldRecordResult will be stored in the performance service.
+- Sessions are marked with shouldRecordResult on fetch institution failure, fetch institution credentials failure, fetch OAuth link failure, credentials submission, and clicking on an OAuth link.
+
 ## [1.11.2]
 
 ### Changed

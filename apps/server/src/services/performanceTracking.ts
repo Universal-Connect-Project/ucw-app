@@ -1,4 +1,5 @@
 import type { ComboJobTypes } from "@repo/utils";
+import type { Request } from "express";
 import { getConfig } from "../config";
 import { debug } from "../infra/logger";
 import { getAccessToken } from "./auth0Service";
@@ -11,6 +12,15 @@ import {
   getConnectionCleanUpFeatureEnabled,
   addConnectionIdToCleanupObject,
 } from "../connectionCleanup/utils";
+import { setPerformanceSessionIdOnContext } from "../shared/utils/context";
+
+export const setPerformanceSessionId = (req: Request) => {
+  const performanceSessionId = crypto.randomUUID();
+
+  setPerformanceSessionIdOnContext({ performanceSessionId, req });
+
+  return performanceSessionId;
+};
 
 async function sendPerformanceEvent({
   connectionId,
@@ -83,6 +93,7 @@ export const recordStartEvent = async ({
       institutionId,
       jobTypes,
       recordDuration,
+      shouldRecordResult: false,
     }),
   });
 };
@@ -105,11 +116,19 @@ export const recordSuccessEvent = async (
   cleanupPerformanceObject(performanceSessionId);
 };
 
-export const recordConnectionPauseEvent = async (
-  connectionId: string,
+export const recordConnectionPauseEvent = async ({
+  connectionId,
   shouldPausePolling = true,
-) => {
+  shouldRecordResult,
+}: {
+  connectionId: string;
+  shouldPausePolling?: boolean;
+  shouldRecordResult?: boolean;
+}) => {
   await sendPerformanceEvent({
+    body: JSON.stringify({
+      shouldRecordResult,
+    }),
     connectionId,
     eventType: "connectionPause",
     method: "PUT",
@@ -119,8 +138,17 @@ export const recordConnectionPauseEvent = async (
   }
 };
 
-export const recordConnectionResumeEvent = async (connectionId: string) => {
+export const recordConnectionResumeEvent = async ({
+  connectionId,
+  shouldRecordResult,
+}: {
+  connectionId: string;
+  shouldRecordResult?: boolean;
+}) => {
   await sendPerformanceEvent({
+    body: JSON.stringify({
+      shouldRecordResult,
+    }),
     connectionId,
     eventType: "connectionResume",
     method: "PUT",

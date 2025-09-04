@@ -9,6 +9,7 @@ import {
   MEMBER_BY_GUID_MOCK_URL,
   MEMBER_CREDENTIALS_MOCK_URL,
   MEMBERS_URL,
+  OAUTH_START_URL,
   OAUTH_STATE_MOCK_URL,
   OAUTH_STATES_URL,
   RECOMMENDED_INSTITUTIONS_URL,
@@ -52,6 +53,7 @@ const handlers = [
   http.put(UPDATE_MFA_MOCK_URL, () => HttpResponse.json(updateMFAResponse)),
   http.get(OAUTH_STATES_URL, () => HttpResponse.json(oauthStatesResponse)),
   http.get(OAUTH_STATE_MOCK_URL, () => HttpResponse.json(oauthStateResponse)),
+  http.get(OAUTH_START_URL, () => HttpResponse.json({})),
 ];
 
 export default handlers;

@@ -1,13 +1,57 @@
 import { expect, test } from "@playwright/test";
 import { ComboJobTypes, SOMETHING_WENT_WRONG_ERROR_TEXT } from "@repo/utils";
+import { MX_BANK_OAUTH_UCP_INSTITUTION_ID } from "../src/testInstitutions";
+import { MX_AGGREGATOR_STRING } from "../src";
+import { getAccessToken } from "./shared/utils/getAccessToken";
 
-test("connects to mx bank with oAuth then does refresh right after", async ({
+const fetchConnectionByPerformanceSessionId = async ({
+  accessToken,
+  performanceSessionId,
+  request,
+}) => {
+  const response = await request.get(
+    `https://api-staging.performance.universalconnectproject.org/metrics/connection/${performanceSessionId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+
+  return await response.json();
+};
+
+const createExpectPerformanceEvent =
+  ({ accessToken, performanceSessionId, request }) =>
+  async (expectedPerformanceObject) => {
+    const performanceEvent = await fetchConnectionByPerformanceSessionId({
+      accessToken,
+      performanceSessionId,
+      request,
+    });
+
+    expect(performanceEvent).toEqual(
+      expect.objectContaining({
+        connectionId: performanceSessionId,
+        jobTypes: ComboJobTypes.TRANSACTIONS,
+        institutionId: MX_BANK_OAUTH_UCP_INSTITUTION_ID,
+        aggregatorId: MX_AGGREGATOR_STRING,
+        ...expectedPerformanceObject,
+      }),
+    );
+
+    return performanceEvent;
+  };
+
+test("connects to mx bank with oAuth, tracks performance correctly, and does refresh right after", async ({
   page,
   request,
 }) => {
   test.setTimeout(240000);
 
   const userId = crypto.randomUUID();
+
+  const accessToken = await getAccessToken(request);
 
   await page.goto(
     `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
@@ -22,13 +66,44 @@ test("connects to mx bank with oAuth then does refresh right after", async ({
 
   await page.getByPlaceholder("Search").fill("MX Bank (Oauth)");
 
+  let performanceSessionId;
+
+  const urlToIntercept = `http://localhost:8080/institutions/${MX_BANK_OAUTH_UCP_INSTITUTION_ID}`;
+
+  page.on("response", async (response) => {
+    if (response.url() === urlToIntercept) {
+      performanceSessionId = JSON.parse(
+        response?.headers()?.meta,
+      )?.performanceSessionId;
+    }
+  });
+
   await page.getByLabel("Add account with MX Bank (Oauth)").click();
+
+  await page.waitForResponse(urlToIntercept);
 
   const popupPromise = page.waitForEvent("popup");
 
-  await page.getByRole("link", { name: "Go to log in" }).click();
+  const loginButton = await page.getByRole("link", { name: "Go to log in" });
+
+  const expectPerformanceEvent = createExpectPerformanceEvent({
+    accessToken,
+    performanceSessionId,
+    request,
+  });
+
+  await expectPerformanceEvent({
+    shouldRecordResult: false,
+  });
+
+  await loginButton.click();
 
   const authorizeTab = await popupPromise;
+
+  await expectPerformanceEvent({
+    shouldRecordResult: true,
+  });
+
   await authorizeTab.getByRole("button", { name: "Authorize" }).click();
   await expect(
     authorizeTab.getByText("Thank you for completing OAuth"),
@@ -68,6 +143,12 @@ test("connects to mx bank with oAuth then does refresh right after", async ({
   });
 
   await connectedPromise;
+
+  const performanceEvent = await expectPerformanceEvent({
+    shouldRecordResult: true,
+  });
+
+  expect(performanceEvent.successMetric.isSuccess).toBe(true);
 
   await request.delete(
     `http://localhost:8080/api/aggregator/mx_int/user/${userId}`,

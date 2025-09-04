@@ -1,6 +1,7 @@
 import * as logger from "../infra/logger";
 import type { Challenge, Connection } from "@repo/utils";
 import { ChallengeType, ConnectionStatus } from "@repo/utils";
+import type { Request } from "express";
 
 import { AggregatorAdapterBase } from "../adapters";
 import type {
@@ -11,10 +12,8 @@ import type {
 import {
   recordConnectionPauseEvent,
   recordConnectionResumeEvent,
-  recordStartEvent,
   recordSuccessEvent,
 } from "../services/performanceTracking";
-import { getAggregatorIdFromTestAggregatorId } from "../adapterIndex";
 import {
   createPerformancePollingObject,
   setLastUiUpdateTimestamp,
@@ -23,6 +22,16 @@ import {
   getConnectionCleanUpFeatureEnabled,
   setConnectionForCleanup,
 } from "../connectionCleanup/utils";
+import {
+  getRequiresPollingForPerformance,
+  getShouldRecordPerformance,
+} from "../shared/utils/performance";
+import {
+  getAggregatorFromContext,
+  getCurrentJobIdFromContext,
+  getJobTypesFromContext,
+  getPerformanceSessionIdFromContext,
+} from "../shared/utils/context";
 
 function mapConnection(connection: Connection): Member {
   const userId = connection.userId;
@@ -159,6 +168,7 @@ function mapCredentialToChallenge(
 
 export class ConnectApi extends AggregatorAdapterBase {
   isRefreshConnection?: boolean;
+  req: Request;
 
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor, @typescript-eslint/no-explicit-any
   constructor(req: any) {
@@ -166,83 +176,87 @@ export class ConnectApi extends AggregatorAdapterBase {
     this.isRefreshConnection = !!(
       req.context.aggregator && req.context.connectionId
     );
-  }
-
-  #getShouldRecordPerformance() {
-    return !!(!this.isRefreshConnection && this.getPerformanceEnabled());
+    this.req = req;
   }
 
   async addMember(memberData: Member): Promise<MemberResponse> {
-    const performanceSessionId = crypto.randomUUID();
-    this.context.performanceSessionId = performanceSessionId;
+    const performanceSessionId = getPerformanceSessionIdFromContext(this.req);
 
-    const aggregatorId = getAggregatorIdFromTestAggregatorId(
-      this.context.aggregator,
-    );
+    const isOauth = !!memberData.is_oauth;
 
-    let startEvent: Promise<void> | undefined;
+    let resumeEvent: Promise<void> | undefined;
 
-    if (this.#getShouldRecordPerformance()) {
-      startEvent = recordStartEvent({
-        aggregatorId,
-        connectionId: performanceSessionId,
-        institutionId: memberData?.rawInstitutionData?.ucpInstitutionId,
-        jobTypes: this.context.jobTypes,
-        recordDuration: this.getShouldRecordPerformanceDuration(),
-      });
-    }
+    const aggregatorId = getAggregatorFromContext(this.req);
 
-    const connection = await this.createConnection({
-      id: memberData.guid,
-      institutionId: memberData.institution_guid,
-      is_oauth: memberData.is_oauth ?? false,
-      skip_aggregation:
-        (memberData.skip_aggregation ?? false) &&
-        (memberData.is_oauth ?? false),
-      jobTypes: this.context.jobTypes,
-      credentials:
-        memberData.credentials?.map((c) => ({
-          id: c.guid,
-          value: c.value,
-        })) ?? [],
-      performanceSessionId,
-    });
+    try {
+      if (getShouldRecordPerformance(this.req)) {
+        resumeEvent = recordConnectionResumeEvent({
+          connectionId: performanceSessionId,
+          shouldRecordResult: !isOauth,
+        });
+      }
 
-    if (startEvent && memberData.is_oauth) {
-      startEvent.then(() =>
-        recordConnectionPauseEvent(performanceSessionId, false),
-      );
-    }
-
-    if (
-      this.#getShouldRecordPerformance() &&
-      this.getRequiresPollingForPerformance()
-    ) {
-      createPerformancePollingObject({
-        userId: this.getUserId(),
-        connectionId: connection.id,
+      const connection = await this.createConnection({
+        id: memberData.guid,
+        institutionId: memberData.institution_guid,
+        is_oauth: isOauth,
+        skip_aggregation: (memberData.skip_aggregation ?? false) && isOauth,
+        jobTypes: getJobTypesFromContext(this.req),
+        credentials:
+          memberData.credentials?.map((c) => ({
+            id: c.guid,
+            value: c.value,
+          })) ?? [],
         performanceSessionId,
-        aggregatorId: this.context.aggregator, // Must use the original aggregator string to request status from sandbox or prod adapters.
-        jobId: this.context.current_job_id,
       });
-    }
-    if (getConnectionCleanUpFeatureEnabled()) {
-      setConnectionForCleanup({
-        id: performanceSessionId,
-        connectionId: connection.id,
-        createdAt: Date.now(),
-        aggregatorId: this.context.aggregator, // Must use the original aggregator string to delete connection from sandbox or prod adapters.
-        userId: this.getUserId(),
-      });
-    }
 
-    return { member: mapConnection(connection) };
+      resumeEvent?.then(() => {
+        if (isOauth) {
+          recordConnectionPauseEvent({
+            connectionId: performanceSessionId,
+          });
+        }
+
+        if (!isOauth && getRequiresPollingForPerformance(this.req)) {
+          createPerformancePollingObject({
+            userId: this.getUserId(),
+            connectionId: connection.id,
+            performanceSessionId,
+            aggregatorId,
+            jobId: getCurrentJobIdFromContext(this.req),
+          });
+        }
+      });
+
+      if (getConnectionCleanUpFeatureEnabled()) {
+        setConnectionForCleanup({
+          id: performanceSessionId,
+          connectionId: connection.id,
+          createdAt: Date.now(),
+          aggregatorId,
+          userId: this.getUserId(),
+        });
+      }
+
+      return { member: mapConnection(connection) };
+    } catch (error) {
+      resumeEvent?.then(() => {
+        recordConnectionPauseEvent({
+          connectionId: performanceSessionId,
+          shouldRecordResult: true,
+        });
+      });
+
+      throw new Error("Failed to add member");
+    }
   }
 
   async updateMember(member: Member): Promise<Member> {
     if (this.context.current_job_id && member.credentials !== undefined) {
-      this.#getShouldRecordPerformance() &&
-        recordConnectionResumeEvent(this.context.performanceSessionId);
+      getShouldRecordPerformance(this.req) &&
+        recordConnectionResumeEvent({
+          connectionId: this.context.performanceSessionId,
+        });
 
       const challenges = member.credentials.map((credential) =>
         mapCredentialToChallenge(credential, member.mfa?.credentials ?? []),
@@ -251,7 +265,7 @@ export class ConnectApi extends AggregatorAdapterBase {
       await this.answerChallenge(member.guid, challenges);
       return member;
     } else {
-      this.#getShouldRecordPerformance() &&
+      getShouldRecordPerformance(this.req) &&
         setLastUiUpdateTimestamp(this.context.performanceSessionId);
       const connection = await this.updateConnection({
         jobTypes: this.context.jobTypes,
@@ -275,9 +289,11 @@ export class ConnectApi extends AggregatorAdapterBase {
 
   async loadMemberByGuid(memberGuid: string): Promise<Member> {
     const member = await this.getConnectionStatus(memberGuid);
-    if (this.#getShouldRecordPerformance()) {
+    if (getShouldRecordPerformance(this.req)) {
       if (member?.challenges?.length > 0) {
-        recordConnectionPauseEvent(this.context.performanceSessionId);
+        recordConnectionPauseEvent({
+          connectionId: this.context.performanceSessionId,
+        });
       } else {
         setLastUiUpdateTimestamp(this.context.performanceSessionId);
       }
@@ -288,11 +304,13 @@ export class ConnectApi extends AggregatorAdapterBase {
 
       if (
         member?.status === ConnectionStatus.CONNECTED &&
-        this.#getShouldRecordPerformance()
+        getShouldRecordPerformance(this.req)
       ) {
         if (connection?.is_being_aggregated) {
           if (connection?.is_oauth) {
-            recordConnectionResumeEvent(this.context.performanceSessionId);
+            recordConnectionResumeEvent({
+              connectionId: this.context.performanceSessionId,
+            });
           }
         } else {
           recordSuccessEvent(this.context.performanceSessionId, connection.id);

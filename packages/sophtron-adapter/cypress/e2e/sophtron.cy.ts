@@ -121,17 +121,17 @@ describe("Sophtron aggregator", () => {
     visitAgg({});
     searchByText("Sophtron Bank");
     cy.findByLabelText("Add account with Sophtron Bank").first().click();
-    cy.findByLabelText("User ID").type("asdfg12X");
+    cy.findByLabelText(/User ID/).type("asdfg12X");
     cy.findByLabelText("Password").type("asdfg12X");
     clickContinue();
 
     cy.findByRole("textbox", {
-      name: "Please enter the Captcha code",
+      name: /Please enter the Captcha code/,
       timeout: 45000,
     }).type("asdf");
     clickContinue();
 
-    cy.findByLabelText("What is your favorite color?", { timeout: 45000 }).type(
+    cy.findByLabelText(/What is your favorite color/, { timeout: 45000 }).type(
       "asdf",
     );
     clickContinue();
@@ -140,7 +140,7 @@ describe("Sophtron aggregator", () => {
     clickContinue();
 
     cy.findByRole("textbox", {
-      name: "Please enter the Token",
+      name: /Please enter the Token/,
       timeout: 45000,
     }).type("asdf");
     clickContinue();

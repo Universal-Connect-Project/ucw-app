@@ -1,5 +1,7 @@
 export const INSTRUMENTATION_URL = "/instrumentation";
 
+export const OAUTH_START_URL = "/performance/oAuthStart";
+
 export const INSTRUMENTATION_MOCK_URL = `${INSTRUMENTATION_URL}/userId/:userId`;
 
 export const MEMBERS_URL = "/members";

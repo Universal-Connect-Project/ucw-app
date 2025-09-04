@@ -60,6 +60,12 @@ const plaidAdapter = new PlaidAdapter({
 });
 
 describe("plaid aggregator", () => {
+  describe("shouldRecordPerformanceDuration", () => {
+    it("returns false", () => {
+      expect(plaidAdapterSandbox.shouldRecordPerformanceDuration).toBe(false);
+    });
+  });
+
   describe("GetInsitutionById", () => {
     it("Maps correct fields", async () => {
       const ret = await plaidAdapterSandbox.GetInstitutionById("testId");

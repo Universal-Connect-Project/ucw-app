@@ -63,10 +63,18 @@ jobs:
           echo MX_API_SECRET=${{ secrets.MX_API_SECRET }} >> ${ENV_FILE_PATH}
           echo SOPHTRON_API_USER_ID=${{ secrets.SOPHTRON_API_USER_ID }} >> ${ENV_FILE_PATH}
           echo SOPHTRON_API_USER_SECRET=${{ secrets.SOPHTRON_API_USER_SECRET }} >> ${ENV_FILE_PATH}
+          echo UCP_CLIENT_SECRET=${{ secrets.UCP_CLIENT_SECRET }} >> ${ENV_FILE_PATH}
+          echo UCP_CLIENT_ID=${{ secrets.UCP_CLIENT_ID }} >> ${ENV_FILE_PATH}
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
+          CYPRESS_auth_audience: ${{ vars.AUTHENTICATION_AUDIENCE }}
+          CYPRESS_auth_client_id: ${{ vars.AUTHENTICATION_CLIENT_ID }}
+          CYPRESS_auth_domain: ${{ vars.AUTHENTICATION_DOMAIN }}
+          CYPRESS_auth_widget_demo_username: ${{ secrets.AUTHENTICATION_USERNAME }}
+          CYPRESS_auth_widget_demo_password: ${{ secrets.AUTHENTICATION_PASSWORD }}
+          CYPRESS_auth_widget_demo_scope: ${{ vars.AUTHENTICATION_SCOPES }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           config-file: cypress.config.ts

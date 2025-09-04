@@ -1,6 +1,7 @@
 import configuredAxios from "./axios";
 import {
   CREATE_MEMBER_URL,
+  OAUTH_START_URL,
   OAUTH_STATES_URL,
   RECOMMENDED_INSTITUTIONS_URL,
   SEARCH_INSTITUTIONS_URL,
@@ -89,6 +90,13 @@ const createConnectWidgetApiService = ({
     return configuredAxios
       .get(RECOMMENDED_INSTITUTIONS_URL)
       .then((response) => response.data);
+  },
+  oAuthStart: async ({ member }: { member: { guid: string } }) => {
+    const { guid: connectionId } = member;
+
+    return configuredAxios.post(OAUTH_START_URL, {
+      connectionId,
+    });
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   updateMember: async (memberData: any) => {

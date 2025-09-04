@@ -8,6 +8,7 @@
     "test:watch": "cross-env DEBUG_PRINT_LIMIT=50000 jest --no-coverage --watch"
   },
   "devDependencies": {
+    "jest": "^30.1.3",
     "typescript": "^5.5.4"
   },
   "dependencies": {

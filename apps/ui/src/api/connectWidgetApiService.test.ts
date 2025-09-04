@@ -7,6 +7,7 @@ import {
   MEMBER_BY_GUID_MOCK_URL,
   MEMBER_CREDENTIALS_MOCK_URL,
   MEMBERS_URL,
+  OAUTH_START_URL,
   OAUTH_STATE_MOCK_URL,
   OAUTH_STATES_URL,
   RECOMMENDED_INSTITUTIONS_URL,
@@ -96,6 +97,24 @@ describe("connectWidgetApiService", () => {
           outbound_member_guid: "test",
         }),
       ).rejects.toThrow();
+    });
+  });
+
+  describe("oAuthStart", () => {
+    it(`calls ${OAUTH_START_URL} with the connectionId`, async () => {
+      let requestBody;
+
+      server.use(
+        http.post(OAUTH_START_URL, async ({ request }) => {
+          requestBody = await request.json();
+
+          return HttpResponse.json({});
+        }),
+      );
+
+      await connectWidgetApiService.oAuthStart({ member: { guid: "test" } });
+
+      expect(requestBody).toEqual({ connectionId: "test" });
     });
   });
 

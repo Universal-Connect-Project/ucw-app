@@ -6,7 +6,7 @@ export const searchAndSelectMx = () => {
 };
 
 export const enterMxCredentials = () => {
-  cy.findByLabelText("Username").type("mxuser");
+  cy.findByLabelText(/Username/).type("mxuser");
   cy.findByLabelText("Password").type("correct");
 };
 
