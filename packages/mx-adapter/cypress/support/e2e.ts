@@ -14,7 +14,7 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import { deleteMxUser } from "@repo/utils-cypress";
+import { deleteMxUser } from "@repo/utils-e2e/cypress";
 import "./commands";
 
 import { configure } from "@testing-library/cypress";

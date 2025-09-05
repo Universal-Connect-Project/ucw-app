@@ -4,7 +4,7 @@ import {
   expectConnectionSuccess,
   searchAndSelectMx,
   visitAgg,
-} from "@repo/utils-cypress";
+} from "@repo/utils-e2e/cypress";
 import { WIDGET_DEMO_ACCESS_TOKEN_ENV } from "../../shared/constants/accessToken";
 import { ComboJobTypes } from "@repo/utils";
 import {

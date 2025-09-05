@@ -2,6 +2,7 @@ import { PlaidAdapter } from "./adapter";
 import type { AdapterDependencies } from "./models";
 
 export const PLAID_AGGREGATOR_STRING = "plaid";
+export const PLAID_BANK_UCP_INSTITUTION_ID = "plaidbank";
 
 export const getPlaidAdapterMapObject = (dependencies: AdapterDependencies) => {
   return {

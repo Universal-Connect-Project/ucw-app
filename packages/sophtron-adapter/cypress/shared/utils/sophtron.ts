@@ -3,7 +3,7 @@ import {
   clickContinue,
   searchByText,
   enterSophtronCredentials,
-} from "@repo/utils-cypress";
+} from "@repo/utils-e2e/cypress";
 
 export const searchAndSelectSophtron = () => {
   searchByText("Sophtron Bank NoMFA");

@@ -3,7 +3,7 @@ import {
   makeAnMXConnection,
   MEMBER_CONNECTED_EVENT_TYPE,
   visitWithPostMessageSpy,
-} from "@repo/utils-cypress";
+} from "@repo/utils-e2e/cypress";
 
 describe("targetOrigin", () => {
   it("uses the targetOrigin if it's provided", () => {
