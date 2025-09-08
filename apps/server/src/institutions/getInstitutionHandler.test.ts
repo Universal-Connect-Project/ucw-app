@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Request, Response } from "express";
 import { getInstitutionHandler } from "./getInstitutionHandler";
 import * as preferences from "../shared/preferences";
@@ -27,11 +26,6 @@ describe("getInstitutionHandler", () => {
   describe("should record performance", () => {
     describe("success", () => {
       it("sets a new performanceSessionId on context, records a start event with the correct props, and records a pause event with the correct props", async () => {
-        jest.spyOn(preferences, "getPreferences").mockResolvedValue({
-          ...testPreferences,
-          supportedAggregators: [MX_AGGREGATOR_STRING],
-        } as any);
-
         const connectionId = crypto.randomUUID();
 
         jest.spyOn(crypto, "randomUUID").mockReturnValueOnce(connectionId);
@@ -88,11 +82,6 @@ describe("getInstitutionHandler", () => {
 
     describe("failure", () => {
       it("sets a new performanceSessionId on context, records a start event with the correct props, records a pause event with shouldRecordResult if the request fails, and responds with a 400", async () => {
-        jest.spyOn(preferences, "getPreferences").mockResolvedValue({
-          ...testPreferences,
-          supportedAggregators: [MX_AGGREGATOR_STRING],
-        } as any);
-
         const connectionId = crypto.randomUUID();
 
         jest.spyOn(crypto, "randomUUID").mockReturnValueOnce(connectionId);
@@ -164,11 +153,6 @@ describe("getInstitutionHandler", () => {
   describe("shouldn't record performance for refresh connections", () => {
     describe("success", () => {
       it("sets a new performanceSessionId on context and doesn't record a start or pause event", async () => {
-        jest.spyOn(preferences, "getPreferences").mockResolvedValue({
-          ...testPreferences,
-          supportedAggregators: [MX_AGGREGATOR_STRING],
-        } as any);
-
         const connectionId = crypto.randomUUID();
 
         jest.spyOn(crypto, "randomUUID").mockReturnValueOnce(connectionId);
@@ -203,11 +187,6 @@ describe("getInstitutionHandler", () => {
 
     describe("failure", () => {
       it("sets a new performanceSessionId on context, doesn't record start or pause events if the request fails, and responds with a 400", async () => {
-        jest.spyOn(preferences, "getPreferences").mockResolvedValue({
-          ...testPreferences,
-          supportedAggregators: [MX_AGGREGATOR_STRING],
-        } as any);
-
         const connectionId = crypto.randomUUID();
 
         jest.spyOn(crypto, "randomUUID").mockReturnValueOnce(connectionId);
@@ -256,6 +235,7 @@ describe("getInstitutionHandler", () => {
     jest.spyOn(preferences, "getPreferences").mockResolvedValue({
       ...testPreferences,
       supportedAggregators: [MX_AGGREGATOR_STRING],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
 
     const context = {
