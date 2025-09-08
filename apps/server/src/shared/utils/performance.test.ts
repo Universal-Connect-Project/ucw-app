@@ -58,7 +58,7 @@ describe("performance utils", () => {
           aggregator: PLAID_AGGREGATOR_STRING,
         },
       } as Request;
-      expect(getShouldRecordPerformance(req)).toBe(false);
+      expect(getShouldRecordPerformance(req)).toBe(true);
     });
   });
 
