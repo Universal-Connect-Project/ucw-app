@@ -65,7 +65,7 @@ jobs:
 
       - name: "Create playwright env file"
         run: |
-          ENV_FILE_PATH=./packages/mx-adapter/playwright/environment/.env
+          ENV_FILE_PATH=./packages/plaid-adapter/playwright/environment/.env
           touch ${ENV_FILE_PATH}
           # Secrets (can't load these from another job, due to GH security features)
           echo UCP_CLIENT_ID=${{ vars.AUTHENTICATION_CLIENT_ID }} >> ${ENV_FILE_PATH}

@@ -245,7 +245,7 @@ describe("plaid aggregator", () => {
       expect(cached).toEqual(result);
       expect(
         mockPerformanceClient.recordConnectionPauseEvent,
-      ).toHaveBeenCalledWith(requestId);
+      ).toHaveBeenCalledWith({ connectionId: requestId });
 
       expect(mockPerformanceClient.recordSuccessEvent).toHaveBeenCalledWith(
         requestId,
@@ -297,7 +297,7 @@ describe("plaid aggregator", () => {
       expect(cached).toEqual(result);
       expect(
         mockPerformanceClient.recordConnectionPauseEvent,
-      ).toHaveBeenCalledWith(requestId);
+      ).toHaveBeenCalledWith({ connectionId: requestId });
       expect(mockPerformanceClient.recordSuccessEvent).not.toHaveBeenCalled();
     });
 
@@ -358,7 +358,7 @@ describe("plaid aggregator", () => {
 
       expect(
         mockPerformanceClient.recordConnectionPauseEvent,
-      ).toHaveBeenCalledWith(requestId);
+      ).toHaveBeenCalledWith({ connectionId: requestId });
       expect(mockPerformanceClient.recordSuccessEvent).not.toHaveBeenCalled();
     });
 
