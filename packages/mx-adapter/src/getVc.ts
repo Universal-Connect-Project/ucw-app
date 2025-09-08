@@ -1,4 +1,4 @@
-import axios from "mx-platform-node/node_modules/axios";
+import axios from "axios";
 
 import { basePathInt, basePathProd } from "./consts";
 import type { VCDependencies } from "./models";

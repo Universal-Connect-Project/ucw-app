@@ -1,4 +1,4 @@
-import axios from "mx-platform-node/node_modules/axios";
+import axios from "axios";
 import { MxProdApiClient } from "./apiClient";
 import type { ApiCredentials } from "./models";
 

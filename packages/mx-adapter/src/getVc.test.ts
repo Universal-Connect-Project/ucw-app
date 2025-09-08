@@ -1,5 +1,5 @@
 import { http, HttpResponse } from "msw";
-import axios from "mx-platform-node/node_modules/axios";
+import axios from "axios";
 import { getVC } from "./getVc";
 import type { AdapterDependencies } from "./models";
 import {
