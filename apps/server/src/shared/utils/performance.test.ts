@@ -6,8 +6,14 @@ import {
   getShouldRecordPerformanceDuration,
 } from "./performance";
 import { PLAID_AGGREGATOR_STRING } from "@repo/plaid-adapter";
+import * as getAggregatorWidgetAdapterModule from "../../adapters/getAggregatorWidgetAdapter";
+import type { WidgetAdapter } from "@repo/utils";
 
 describe("performance utils", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe("getShouldRecordPerformanceDuration", () => {
     it("returns true if the adapter does not implement shouldRecordPerformanceDuration", async () => {
       const req = {
@@ -53,12 +59,21 @@ describe("performance utils", () => {
     });
 
     it("returns the value from the adapter's shouldRecordPerformance if implemented (false)", async () => {
+      const mockAdapter: Partial<WidgetAdapter> = {
+        performanceEnabled: false,
+      };
+
+      jest
+        .spyOn(getAggregatorWidgetAdapterModule, "getAggregatorWidgetAdapter")
+        .mockReturnValueOnce(mockAdapter as WidgetAdapter);
+
       const req = {
         context: {
           aggregator: PLAID_AGGREGATOR_STRING,
         },
       } as Request;
-      expect(getShouldRecordPerformance(req)).toBe(true);
+
+      expect(getShouldRecordPerformance(req)).toBe(false);
     });
   });
 
