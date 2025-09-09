@@ -35,10 +35,6 @@ export class PlaidAdapter implements WidgetAdapter {
   envConfig: Record<string, string>;
   sandbox: boolean;
   performanceClient: PerformanceClient;
-  getUcpIdFromAggregatorInstitutionCode: (
-    aggregator: string,
-    institutionCode: string,
-  ) => Promise<string | null>;
   requiresPollingForPerformance = false; // The webhook negates the need for polling
   // TODO: https://universalconnect.atlassian.net/browse/UCP-649
   // Duration disabled until future support is added.
@@ -56,8 +52,6 @@ export class PlaidAdapter implements WidgetAdapter {
       ? dependencies?.aggregatorCredentials.plaidSandbox
       : dependencies?.aggregatorCredentials.plaidProd;
     this.getWebhookHostUrl = dependencies.getWebhookHostUrl;
-    this.getUcpIdFromAggregatorInstitutionCode =
-      dependencies.getUcpIdFromAggregatorInstitutionCode;
   }
 
   async GetInstitutionById(id: string): Promise<AggregatorInstitution> {
@@ -170,11 +164,11 @@ export class PlaidAdapter implements WidgetAdapter {
   private async recordSuccessIfIntitialInstitutionWasConnected({
     requestId,
     accessToken,
-    initialUcpInstitutionId,
+    initialInstitutionId,
   }: {
     requestId: string;
     accessToken: string;
-    initialUcpInstitutionId: string;
+    initialInstitutionId: string;
   }) {
     this.performanceClient.recordConnectionPauseEvent({
       connectionId: requestId,
@@ -185,12 +179,8 @@ export class PlaidAdapter implements WidgetAdapter {
       secret: this.credentials.secret,
       sandbox: this.sandbox,
     });
-    const ucpId = await this.getUcpIdFromAggregatorInstitutionCode(
-      this.aggregator,
-      getItemReq.data.item.institution_id,
-    );
 
-    if (ucpId === initialUcpInstitutionId) {
+    if (initialInstitutionId === getItemReq.data.item.institution_id) {
       this.performanceClient.recordSuccessEvent(requestId, accessToken);
     }
   }
@@ -224,7 +214,7 @@ export class PlaidAdapter implements WidgetAdapter {
       await this.recordSuccessIfIntitialInstitutionWasConnected({
         requestId,
         accessToken: access_token,
-        initialUcpInstitutionId: connectionContext?.ucpInstitutionId,
+        initialInstitutionId: connectionContext?.aggregatorInstitutionId,
       });
 
       connection.status = ConnectionStatus.CONNECTED;

@@ -197,20 +197,17 @@ export class ConnectApi extends AggregatorAdapterBase {
       }
 
       const connection = await this.createConnection({
-        connection: {
-          id: memberData.guid,
-          institutionId: memberData.institution_guid,
-          is_oauth: isOauth,
-          skip_aggregation: (memberData.skip_aggregation ?? false) && isOauth,
-          jobTypes: getJobTypesFromContext(this.req),
-          credentials:
-            memberData.credentials?.map((c) => ({
-              id: c.guid,
-              value: c.value,
-            })) ?? [],
-          performanceSessionId,
-        },
-        ucpInstitutionId: memberData.rawInstitutionData?.ucpInstitutionId,
+        id: memberData.guid,
+        institutionId: memberData.institution_guid,
+        is_oauth: isOauth,
+        skip_aggregation: (memberData.skip_aggregation ?? false) && isOauth,
+        jobTypes: getJobTypesFromContext(this.req),
+        credentials:
+          memberData.credentials?.map((c) => ({
+            id: c.guid,
+            value: c.value,
+          })) ?? [],
+        performanceSessionId,
       });
 
       resumeEvent?.then(() => {

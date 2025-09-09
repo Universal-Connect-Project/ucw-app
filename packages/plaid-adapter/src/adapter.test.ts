@@ -32,7 +32,6 @@ const aggregatorCredentials = {
 
 const mockPerformanceClient = createMockPerformanceClient();
 
-const UcpIdFromAggCode = "testUcpId";
 const plaidAdapterSandbox = new PlaidAdapter({
   sandbox: true,
   dependencies: {
@@ -41,7 +40,6 @@ const plaidAdapterSandbox = new PlaidAdapter({
     performanceClient: mockPerformanceClient,
     aggregatorCredentials,
     getWebhookHostUrl: () => "testWebhookHostUrl",
-    getUcpIdFromAggregatorInstitutionCode: async () => UcpIdFromAggCode,
     envConfig: {
       HostUrl: "http://localhost:8080",
     },
@@ -56,7 +54,6 @@ const plaidAdapter = new PlaidAdapter({
     logClient,
     aggregatorCredentials,
     getWebhookHostUrl: () => "testWebhookHostUrl",
-    getUcpIdFromAggregatorInstitutionCode: async () => UcpIdFromAggCode,
     envConfig: {
       HostUrl: "http://localhost:8080",
     },
@@ -203,16 +200,17 @@ describe("plaid aggregator", () => {
 
     it("returns the updated connection and records performance success event when UCP ID matches", async () => {
       const requestId = "abc123";
+      const aggregatorInstitutionId = plaidTestItemResponse.item.institution_id;
       const connection: Connection = {
         id: requestId,
         status: ConnectionStatus.PENDING,
-        institution_code: "inst-001",
+        institution_code: aggregatorInstitutionId,
         userId: null,
       };
 
       await cacheClient.set(requestId, connection);
       await cacheClient.set(`context_${requestId}`, {
-        ucpInstitutionId: UcpIdFromAggCode,
+        aggregatorInstitutionId,
       });
 
       const result = await plaidAdapter.HandleOauthResponse({
@@ -228,7 +226,7 @@ describe("plaid aggregator", () => {
 
       expect(result).toEqual({
         status: ConnectionStatus.CONNECTED,
-        institution_code: "inst-001",
+        institution_code: aggregatorInstitutionId,
         id: "accessTokenTest",
         postMessageEventData: {
           memberConnected: {
@@ -295,67 +293,6 @@ describe("plaid aggregator", () => {
 
       const cached = await cacheClient.get(requestId);
       expect(cached).toEqual(result);
-      expect(
-        mockPerformanceClient.recordConnectionPauseEvent,
-      ).toHaveBeenCalledWith({ connectionId: requestId });
-      expect(mockPerformanceClient.recordSuccessEvent).not.toHaveBeenCalled();
-    });
-
-    it("handles getUcpIdFromAggregatorInstitutionCode returning null", async () => {
-      const plaidAdapterWithNullUcp = new PlaidAdapter({
-        sandbox: false,
-        dependencies: {
-          cacheClient,
-          performanceClient: mockPerformanceClient,
-          logClient,
-          aggregatorCredentials,
-          getWebhookHostUrl: () => "testWebhookHostUrl",
-          getUcpIdFromAggregatorInstitutionCode: async () => null,
-          envConfig: {
-            HostUrl: "http://localhost:8080",
-          },
-        },
-      });
-
-      const requestId = "abc123";
-      const connection: Connection = {
-        id: requestId,
-        status: ConnectionStatus.PENDING,
-        institution_code: "inst-001",
-        userId: null,
-      };
-
-      await cacheClient.set(requestId, connection);
-      await cacheClient.set(`context_${requestId}`, {
-        ucpInstitutionId: UcpIdFromAggCode,
-      });
-
-      const result = await plaidAdapterWithNullUcp.HandleOauthResponse({
-        query: {
-          connection_id: requestId,
-        },
-        body: {
-          webhook_code: "ITEM_ADD_RESULT",
-          public_token: "fake_public_token",
-          link_session_id: "link_session_id",
-        },
-      });
-
-      expect(result).toEqual({
-        status: ConnectionStatus.CONNECTED,
-        institution_code: "inst-001",
-        id: "accessTokenTest",
-        postMessageEventData: {
-          memberConnected: {
-            connectionId: "accessTokenTest",
-          },
-          memberStatusUpdate: {
-            connectionId: "accessTokenTest",
-          },
-        },
-        userId: null,
-      });
-
       expect(
         mockPerformanceClient.recordConnectionPauseEvent,
       ).toHaveBeenCalledWith({ connectionId: requestId });

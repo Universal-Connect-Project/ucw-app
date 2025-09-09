@@ -141,7 +141,7 @@ export interface PostMessageEventData {
 export interface ConnectionContext {
   oauth_referral_source: string;
   scheme: string;
-  ucpInstitutionId: string;
+  aggregatorInstitutionId: string;
 }
 
 export interface Connection {

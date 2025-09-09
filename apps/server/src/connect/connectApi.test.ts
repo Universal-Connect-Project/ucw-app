@@ -252,7 +252,7 @@ describe("connectApi", () => {
 
       const ucpInstitutionId = "testUcpInstitutionId";
       const memberData = {
-        institution_guid: "testInstitutionGuid",
+        institution_guid: mxTestMemberData.member.institution_code,
         is_oauth: false,
         skip_aggregration: false,
         credentials: [
@@ -273,7 +273,7 @@ describe("connectApi", () => {
           aggregator: testContext.aggregator,
           connection_status: ConnectionStatus.CREATED,
           guid: mxTestMemberData.member.guid,
-          institution_guid: "insitutionCode1",
+          institution_guid: memberData.institution_guid,
           is_being_aggregated: false,
           is_oauth: false,
           mfa: {
@@ -313,7 +313,9 @@ describe("connectApi", () => {
       const sessionContext = await get(
         `context_${mxTestMemberData.member.guid}`,
       ); // mx connection id is the member guid
-      expect(sessionContext.ucpInstitutionId).toEqual(ucpInstitutionId);
+      expect(sessionContext.aggregatorInstitutionId).toEqual(
+        memberData.institution_guid,
+      );
 
       const performanceObject = await getPerformanceObject(
         connectApiPerformanceSessionId,
