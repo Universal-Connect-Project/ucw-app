@@ -17,7 +17,7 @@ export const MxProdApiClient: any = ({
   const axiosWithProxy = envConfig?.PROXY_HOST
     ? axios.create({
         httpsAgent: new HttpsProxyAgent(
-          `http://${process.env.PROXY_USERNAME}:${process.env.PROXY_PASSWORD}@${process.env.PROXY_HOST}:${process.env.PROXY_PORT}`,
+          `http://${envConfig.PROXY_USERNAME}:${envConfig.PROXY_PASSWORD}@${envConfig.PROXY_HOST}:${envConfig.PROXY_PORT}`,
         ),
       })
     : undefined;

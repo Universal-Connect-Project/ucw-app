@@ -1,6 +1,23 @@
 import axios from "axios";
+import { HttpsProxyAgent } from "https-proxy-agent";
 import { MxProdApiClient } from "./apiClient";
 import type { ApiCredentials } from "./models";
+
+jest.mock("axios", () => ({
+  __esModule: true,
+  default: {
+    create: jest.fn(),
+  },
+}));
+
+jest.mock("https-proxy-agent", () => ({
+  HttpsProxyAgent: jest.fn(),
+}));
+
+const mockAxios = axios as jest.Mocked<typeof axios>;
+const MockHttpsProxyAgent = HttpsProxyAgent as jest.MockedClass<
+  typeof HttpsProxyAgent
+>;
 
 describe("MxProdApiClient", () => {
   const mockAggregatorCredentials: ApiCredentials = {
@@ -17,34 +34,38 @@ describe("MxProdApiClient", () => {
 
   const mockEnvConfigWithoutProxy = {};
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("creates an API client with proxy configuration when PROXY_HOST is defined", () => {
-    const axiosCreateSpy = jest.spyOn(axios, "create");
+    const mockAxiosInstance = { test: "axios-instance" };
+    const mockProxyAgent = { test: "proxy-agent" };
+
+    mockAxios.create.mockReturnValue(mockAxiosInstance as any);
+    MockHttpsProxyAgent.mockImplementation(() => mockProxyAgent as any);
 
     MxProdApiClient({
       aggregatorCredentials: mockAggregatorCredentials,
       envConfig: mockEnvConfigWithProxy,
     });
 
-    expect(axiosCreateSpy).toHaveBeenCalledWith({
-      proxy: {
-        host: mockEnvConfigWithProxy.PROXY_HOST,
-        port: parseInt(mockEnvConfigWithProxy.PROXY_PORT),
-        auth: {
-          username: mockEnvConfigWithProxy.PROXY_USERNAME,
-          password: mockEnvConfigWithProxy.PROXY_PASSWORD,
-        },
-      },
+    expect(MockHttpsProxyAgent).toHaveBeenCalledWith(
+      `http://${mockEnvConfigWithProxy.PROXY_USERNAME}:${mockEnvConfigWithProxy.PROXY_PASSWORD}@${mockEnvConfigWithProxy.PROXY_HOST}:${mockEnvConfigWithProxy.PROXY_PORT}`,
+    );
+
+    expect(mockAxios.create).toHaveBeenCalledWith({
+      httpsAgent: mockProxyAgent,
     });
   });
 
   it("creates an API client without proxy configuration when PROXY_HOST is not defined", () => {
-    const axiosCreateSpy = jest.spyOn(axios, "create");
-
     MxProdApiClient({
       aggregatorCredentials: mockAggregatorCredentials,
       envConfig: mockEnvConfigWithoutProxy,
     });
 
-    expect(axiosCreateSpy).not.toHaveBeenCalled();
+    expect(MockHttpsProxyAgent).not.toHaveBeenCalled();
+    expect(mockAxios.create).not.toHaveBeenCalled();
   });
 });
