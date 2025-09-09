@@ -1,8 +1,8 @@
 import { Configuration, MxPlatformApiFactory } from "mx-platform-node";
-
-import axios from "mx-platform-node/node_modules/axios";
+import { HttpsProxyAgent } from "https-proxy-agent";
 import { basePathInt, basePathProd } from "./consts";
 import type { ApiCredentials } from "./models";
+import axios from "axios";
 
 export const BASE_PATH = "https://api.mx.com";
 
@@ -14,16 +14,11 @@ export const MxProdApiClient: any = ({
   aggregatorCredentials: ApiCredentials;
   envConfig?: Record<string, string>;
 }) => {
-  const axiosWithProxy = envConfig.PROXY_HOST
+  const axiosWithProxy = envConfig?.PROXY_HOST
     ? axios.create({
-        proxy: {
-          host: envConfig.PROXY_HOST,
-          port: parseInt(envConfig.PROXY_PORT),
-          auth: {
-            username: envConfig.PROXY_USERNAME,
-            password: envConfig.PROXY_PASSWORD,
-          },
-        },
+        httpsAgent: new HttpsProxyAgent(
+          `http://${envConfig.PROXY_USERNAME}:${envConfig.PROXY_PASSWORD}@${envConfig.PROXY_HOST}:${envConfig.PROXY_PORT}`,
+        ),
       })
     : undefined;
 

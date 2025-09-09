@@ -1,4 +1,5 @@
-import axios from "mx-platform-node/node_modules/axios";
+import axios from "axios";
+import { HttpsProxyAgent } from "https-proxy-agent";
 
 import { basePathInt, basePathProd } from "./consts";
 import type { VCDependencies } from "./models";
@@ -23,16 +24,11 @@ export const getVC = async (
 
   const url = `${isProd ? basePathProd : basePathInt}/vc/${path}`;
 
-  const axiosConfigured = dependencies?.envConfig.PROXY_HOST
+  const axiosConfigured = envConfig.PROXY_HOST
     ? axios.create({
-        proxy: {
-          host: envConfig.PROXY_HOST,
-          port: parseInt(envConfig.PROXY_PORT),
-          auth: {
-            username: envConfig.PROXY_USERNAME,
-            password: envConfig.PROXY_PASSWORD,
-          },
-        },
+        httpsAgent: new HttpsProxyAgent(
+          `http://${envConfig.PROXY_USERNAME}:${envConfig.PROXY_PASSWORD}@${envConfig.PROXY_HOST}:${envConfig.PROXY_PORT}`,
+        ),
       })
     : axios;
 
