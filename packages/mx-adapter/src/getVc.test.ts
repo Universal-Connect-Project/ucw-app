@@ -1,5 +1,6 @@
 import { http, HttpResponse } from "msw";
 import axios from "axios";
+import { HttpsProxyAgent } from "https-proxy-agent";
 import { getVC } from "./getVc";
 import type { AdapterDependencies } from "./models";
 import {
@@ -11,6 +12,10 @@ import { server } from "./test/testServer";
 
 import { mxTestData, createLogClient } from "@repo/utils-dev-dependency";
 import { createClient } from "@repo/utils/test";
+
+jest.mock("https-proxy-agent", () => ({
+  HttpsProxyAgent: jest.fn(() => ({})),
+}));
 
 const { aggregatorCredentials, mxVcAccountsData, mxVcTranscationsData } =
   mxTestData;
@@ -89,13 +94,6 @@ describe("mx vc", () => {
       ).rejects.toThrow();
     });
 
-    const mockEnvConfigWithProxy = {
-      PROXY_HOST: "fakehost.server.com",
-      PROXY_PORT: "8085",
-      PROXY_USERNAME: "username",
-      PROXY_PASSWORD: "password",
-    };
-
     it("doesn't configure axios proxy when PROXY_HOST is not defined", async () => {
       const axiosCreateSpy = jest.spyOn(axios, "create");
 
@@ -113,7 +111,17 @@ describe("mx vc", () => {
     });
 
     it("configures axios to use proxy server when PROXY_HOST is defined", async () => {
+      const mockEnvConfigWithProxy = {
+        PROXY_HOST: "fakehost.server.com",
+        PROXY_PORT: "8085",
+        PROXY_USERNAME: "username",
+        PROXY_PASSWORD: "password",
+      };
+
       const axiosCreateSpy = jest.spyOn(axios, "create");
+      const MockedHttpsProxyAgent = HttpsProxyAgent as jest.MockedClass<
+        typeof HttpsProxyAgent
+      >;
 
       server.use(
         http.get(MX_INTEGRATION_VC_GET_ACCOUNTS_PATH, () => {
@@ -123,24 +131,20 @@ describe("mx vc", () => {
         }),
       );
 
-      await expect(
-        async () =>
-          await getVC(accountsPath, true, {
-            ...dependencies,
-            envConfig: mockEnvConfigWithProxy,
-          }),
-      ).rejects.toThrow();
+      const response = await getVC(accountsPath, false, {
+        ...dependencies,
+        envConfig: mockEnvConfigWithProxy,
+      });
+
+      expect(MockedHttpsProxyAgent).toHaveBeenCalledWith(
+        "http://username:password@fakehost.server.com:8085",
+      );
 
       expect(axiosCreateSpy).toHaveBeenCalledWith({
-        proxy: {
-          host: mockEnvConfigWithProxy.PROXY_HOST,
-          port: parseInt(mockEnvConfigWithProxy.PROXY_PORT),
-          auth: {
-            username: mockEnvConfigWithProxy.PROXY_USERNAME,
-            password: mockEnvConfigWithProxy.PROXY_PASSWORD,
-          },
-        },
+        httpsAgent: expect.any(Object),
       });
+
+      expect(response).toEqual(mxVcAccountsData);
     });
 
     it("includes date range params in transactions request", async () => {
