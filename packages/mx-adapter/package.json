@@ -19,6 +19,7 @@
     "@types/jest": "^29.5.13",
     "@types/node": "^22.7.6",
     "eslint-config-prettier": "^10.1.1",
+    "https-proxy-agent": "^7.0.6",
     "mx-platform-node": "^1.8.1"
   },
   "devDependencies": {
