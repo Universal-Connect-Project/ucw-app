@@ -198,7 +198,7 @@ describe("plaid aggregator", () => {
       );
     });
 
-    it("returns the updated connection and records performance success event when UCP ID matches", async () => {
+    it("returns the updated connection and records performance success event when aggregatorInstitutionId matches", async () => {
       const requestId = "abc123";
       const aggregatorInstitutionId = plaidTestItemResponse.item.institution_id;
       const connection: Connection = {
@@ -251,7 +251,7 @@ describe("plaid aggregator", () => {
       );
     });
 
-    it("returns the updated connection but doesn't record performance success event when UCP ID doesn't match", async () => {
+    it("returns the updated connection but doesn't record performance success event when aggregatorInstitutionId doesn't match", async () => {
       const requestId = "abc123";
       const connection: Connection = {
         id: requestId,
@@ -262,7 +262,7 @@ describe("plaid aggregator", () => {
 
       await cacheClient.set(requestId, connection);
       await cacheClient.set(`context_${requestId}`, {
-        ucpInstitutionId: "somethingDifferent",
+        aggregatorInstitutionId: "somethingDifferent",
       });
 
       const result = await plaidAdapter.HandleOauthResponse({

@@ -1,2 +1,2 @@
 export * from "./performance";
-export * from "./auth";
+export * from "./getAccessToken";
