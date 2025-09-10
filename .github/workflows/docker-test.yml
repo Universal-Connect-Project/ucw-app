@@ -54,7 +54,7 @@ jobs:
 
       - name: "Build docker images"
         run: |
-          docker compose up --build
+          docker compose up --build --wait --detach
 
       - name: "Check if build passed"
         run: |
