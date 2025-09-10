@@ -138,6 +138,12 @@ export interface PostMessageEventData {
   memberStatusUpdate?: object;
 }
 
+export interface ConnectionContext {
+  oauth_referral_source: string;
+  scheme: string;
+  aggregatorInstitutionId: string;
+}
+
 export interface Connection {
   id: string | null;
   cur_job_id?: string | null;

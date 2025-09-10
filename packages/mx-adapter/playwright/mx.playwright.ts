@@ -1,47 +1,8 @@
 import { expect, test } from "@playwright/test";
 import { ComboJobTypes, SOMETHING_WENT_WRONG_ERROR_TEXT } from "@repo/utils";
+import { createExpectPerformanceEvent, getAccessToken } from "@repo/utils-e2e/playwright";
 import { MX_BANK_OAUTH_UCP_INSTITUTION_ID } from "../src/testInstitutions";
 import { MX_AGGREGATOR_STRING } from "../src";
-import { getAccessToken } from "./shared/utils/getAccessToken";
-
-const fetchConnectionByPerformanceSessionId = async ({
-  accessToken,
-  performanceSessionId,
-  request,
-}) => {
-  const response = await request.get(
-    `https://api-staging.performance.universalconnectproject.org/metrics/connection/${performanceSessionId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    },
-  );
-
-  return await response.json();
-};
-
-const createExpectPerformanceEvent =
-  ({ accessToken, performanceSessionId, request }) =>
-  async (expectedPerformanceObject) => {
-    const performanceEvent = await fetchConnectionByPerformanceSessionId({
-      accessToken,
-      performanceSessionId,
-      request,
-    });
-
-    expect(performanceEvent).toEqual(
-      expect.objectContaining({
-        connectionId: performanceSessionId,
-        jobTypes: ComboJobTypes.TRANSACTIONS,
-        institutionId: MX_BANK_OAUTH_UCP_INSTITUTION_ID,
-        aggregatorId: MX_AGGREGATOR_STRING,
-        ...expectedPerformanceObject,
-      }),
-    );
-
-    return performanceEvent;
-  };
 
 test("connects to mx bank with oAuth, tracks performance correctly, and does refresh right after", async ({
   page,
@@ -94,6 +55,8 @@ test("connects to mx bank with oAuth, tracks performance correctly, and does ref
 
   await expectPerformanceEvent({
     shouldRecordResult: false,
+    institutionId: MX_BANK_OAUTH_UCP_INSTITUTION_ID,
+    aggregatorId: MX_AGGREGATOR_STRING,
   });
 
   await loginButton.click();
@@ -102,6 +65,8 @@ test("connects to mx bank with oAuth, tracks performance correctly, and does ref
 
   await expectPerformanceEvent({
     shouldRecordResult: true,
+    institutionId: MX_BANK_OAUTH_UCP_INSTITUTION_ID,
+    aggregatorId: MX_AGGREGATOR_STRING,
   });
 
   await authorizeTab.getByRole("button", { name: "Authorize" }).click();
@@ -146,6 +111,8 @@ test("connects to mx bank with oAuth, tracks performance correctly, and does ref
 
   const performanceEvent = await expectPerformanceEvent({
     shouldRecordResult: true,
+    institutionId: MX_BANK_OAUTH_UCP_INSTITUTION_ID,
+    aggregatorId: MX_AGGREGATOR_STRING,
   });
 
   expect(performanceEvent.successMetric.isSuccess).toBe(true);

@@ -1,0 +1,13 @@
+{
+  "name": "@repo/utils-e2e",
+  "version": "0.0.1",
+  "main": "index.ts",
+  "type": "commonjs",
+  "scripts": {},
+  "dependencies": {},
+  "devDependencies": {
+    "@testing-library/cypress": "^10.0.1",
+    "@playwright/test": "^1.40.0",
+    "typescript": "^5.5.4"
+  }
+}

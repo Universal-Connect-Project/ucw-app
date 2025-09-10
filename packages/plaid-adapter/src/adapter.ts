@@ -3,6 +3,7 @@ import type {
   ApiResponse,
   CacheClient,
   Connection,
+  ConnectionContext,
   CreateConnectionRequest,
   Credential,
   LogClient,
@@ -17,6 +18,7 @@ import {
   createPlaidLinkToken,
   publicTokenExchange,
   removeItem,
+  getItem,
 } from "./apiClient";
 
 type AdapterConfig = {
@@ -34,7 +36,6 @@ export class PlaidAdapter implements WidgetAdapter {
   sandbox: boolean;
   performanceClient: PerformanceClient;
   requiresPollingForPerformance = false; // The webhook negates the need for polling
-  performanceEnabled = false;
   // TODO: https://universalconnect.atlassian.net/browse/UCP-649
   // Duration disabled until future support is added.
   shouldRecordPerformanceDuration = false;
@@ -160,6 +161,30 @@ export class PlaidAdapter implements WidgetAdapter {
     return id;
   }
 
+  private async recordSuccessIfIntitialInstitutionWasConnected({
+    requestId,
+    accessToken,
+    initialInstitutionId,
+  }: {
+    requestId: string;
+    accessToken: string;
+    initialInstitutionId: string;
+  }) {
+    this.performanceClient.recordConnectionPauseEvent({
+      connectionId: requestId,
+    });
+    const getItemReq = await getItem({
+      accessToken,
+      clientId: this.credentials.clientId,
+      secret: this.credentials.secret,
+      sandbox: this.sandbox,
+    });
+
+    if (initialInstitutionId === getItemReq.data.item.institution_id) {
+      this.performanceClient.recordSuccessEvent(requestId, accessToken);
+    }
+  }
+
   async HandleOauthResponse(request: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     query: Record<string, any>;
@@ -169,6 +194,9 @@ export class PlaidAdapter implements WidgetAdapter {
     const { connection_id: requestId } = request?.query || {};
     this.logger.trace(`Received plaid oauth redirect response ${requestId}`);
     const connection = (await this.cacheClient.get(requestId)) as Connection;
+    const connectionContext = (await this.cacheClient.get(
+      `context_${requestId}`,
+    )) as ConnectionContext;
     if (!connection) {
       throw new Error("Connection not found");
     }
@@ -182,7 +210,13 @@ export class PlaidAdapter implements WidgetAdapter {
         sandbox: this.sandbox,
       });
       const { access_token } = tokenExchangeRequest;
-      // this.performanceClient.recordSuccessEvent(requestId, access_token); # TODO: implement performance success
+
+      await this.recordSuccessIfIntitialInstitutionWasConnected({
+        requestId,
+        accessToken: access_token,
+        initialInstitutionId: connectionContext?.aggregatorInstitutionId,
+      });
+
       connection.status = ConnectionStatus.CONNECTED;
       connection.id = access_token;
       connection.postMessageEventData = {

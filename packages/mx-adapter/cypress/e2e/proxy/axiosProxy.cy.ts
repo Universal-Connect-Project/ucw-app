@@ -5,7 +5,7 @@ import {
   verifyAccountsAndReturnAccountId,
   visitAgg,
   visitWithPostMessageSpy,
-} from "@repo/utils-cypress";
+} from "@repo/utils-e2e/cypress";
 import { ComboJobTypes } from "@repo/utils";
 
 describe("mx aggregator using axios proxy", () => {

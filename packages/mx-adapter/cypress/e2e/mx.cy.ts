@@ -4,7 +4,7 @@ import {
   makeAnMXConnection,
   refreshAConnection,
   searchAndSelectMx,
-} from "@repo/utils-cypress";
+} from "@repo/utils-e2e/cypress";
 
 const oneMonthAgoIso = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
   .toISOString()

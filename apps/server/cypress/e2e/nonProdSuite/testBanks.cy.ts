@@ -1,4 +1,4 @@
-import { visitAgg } from "@repo/utils-cypress";
+import { visitAgg } from "@repo/utils-e2e/cypress";
 import { testChaseBankToFilter } from "../../../src/testInstitutions/testInstitutions";
 
 const prodBank = "Chase Bank";

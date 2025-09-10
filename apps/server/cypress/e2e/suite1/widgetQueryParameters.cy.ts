@@ -10,7 +10,7 @@ import {
   searchByText,
   visitAgg,
   visitWithPostMessageSpy,
-} from "@repo/utils-cypress";
+} from "@repo/utils-e2e/cypress";
 import { MX_AND_SOPHTRON_TEST_INSTITUTION_NAME } from "../../../src/testInstitutions/consts";
 
 describe("query parameters", () => {

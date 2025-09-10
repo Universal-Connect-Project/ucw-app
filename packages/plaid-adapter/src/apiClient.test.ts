@@ -2,12 +2,14 @@ import { ComboJobTypes } from "@repo/utils";
 import { http, HttpResponse } from "msw";
 import {
   createPlaidLinkToken,
+  getItem,
   PLAID_BASE_PATH,
   PLAID_BASE_PATH_PROD,
   publicTokenExchange,
   removeItem,
 } from "./apiClient";
 import { server } from "./test/testServer";
+import { plaidTestItemResponse } from "@repo/utils-dev-dependency/plaid/testData";
 
 describe("createPlaidLinkToken", () => {
   const userId = "test-user-id";
@@ -314,5 +316,83 @@ describe("removeItem", () => {
         sandbox: true,
       }),
     ).rejects.toThrow("Error removing Item");
+  });
+});
+
+describe("getItem", () => {
+  const clientId = "test-client-id";
+  const secret = "test-secret";
+  const accessToken = "access-sample-token";
+
+  it("gets item with expected request body and headers in sandbox env", async () => {
+    const expectedRequestBody = {
+      client_id: clientId,
+      secret,
+      access_token: accessToken,
+    };
+    let receivedBody: unknown;
+    let hitSandbox: boolean;
+
+    server.use(
+      http.post(`${PLAID_BASE_PATH}/item/get`, async ({ request }) => {
+        hitSandbox = true;
+        receivedBody = await request.json();
+        return HttpResponse.json(plaidTestItemResponse);
+      }),
+    );
+
+    const result = await getItem({
+      accessToken,
+      clientId,
+      secret,
+      sandbox: true,
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.data).toEqual(plaidTestItemResponse);
+    expect(receivedBody).toEqual(expectedRequestBody);
+    expect(hitSandbox).toBe(true);
+  });
+
+  it("gets item in production env", async () => {
+    let hitProductionEnv: boolean;
+
+    server.use(
+      http.post(`${PLAID_BASE_PATH_PROD}/item/get`, async () => {
+        hitProductionEnv = true;
+        return HttpResponse.json(plaidTestItemResponse);
+      }),
+    );
+
+    const result = await getItem({
+      accessToken,
+      clientId,
+      secret,
+      sandbox: false,
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.data).toEqual(plaidTestItemResponse);
+    expect(hitProductionEnv).toBe(true);
+  });
+
+  it("throws an error if response is not ok and includes error message", async () => {
+    server.use(
+      http.post(`${PLAID_BASE_PATH}/item/get`, () =>
+        HttpResponse.json(
+          { error_message: "Item not found!" },
+          { status: 404 },
+        ),
+      ),
+    );
+
+    await expect(
+      getItem({
+        accessToken,
+        clientId,
+        secret,
+        sandbox: true,
+      }),
+    ).rejects.toThrow("Item not found!");
   });
 });

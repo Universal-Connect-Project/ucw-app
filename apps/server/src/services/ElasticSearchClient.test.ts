@@ -385,8 +385,7 @@ describe("elasticSearchClient", () => {
                     must: [
                       {
                         term: {
-                          [`${MX_AGGREGATOR_STRING}.supports_aggregation`]:
-                            true,
+                          [`${MX_AGGREGATOR_STRING}.supports_aggregation`]: true,
                         },
                       },
                     ],

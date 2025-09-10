@@ -9,7 +9,7 @@ import {
   visitWithPostMessageSpy,
   MEMBER_STATUS_UPDATE_EVENT_TYPE,
   enterSophtronCredentials,
-} from "@repo/utils-cypress";
+} from "@repo/utils-e2e/cypress";
 import {
   searchAndSelectSophtron,
   selectSophtronAccount,

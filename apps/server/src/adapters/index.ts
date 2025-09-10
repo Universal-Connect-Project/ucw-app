@@ -66,6 +66,7 @@ export class AggregatorAdapterBase {
       await set(`context_${ret.id}`, {
         oauth_referral_source: this.context.oauth_referral_source,
         scheme: this.context.scheme,
+        aggregatorInstitutionId: connection.institutionId,
       });
     }
     return ret;

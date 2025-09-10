@@ -1,4 +1,4 @@
-import { searchByText, visitAgg, visitIdentity } from "@repo/utils-cypress";
+import { searchByText, visitAgg, visitIdentity } from "@repo/utils-e2e/cypress";
 import { ComboJobTypes } from "@repo/utils";
 import {
   MX_BANK_NAME,
