@@ -1,4 +1,6 @@
 name: NPM Audit Check
+permissions:
+  contents: read
 
 on:
   push:
