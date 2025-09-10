@@ -1,7 +1,7 @@
 import { OAuthStatus, ComboJobTypes } from "@repo/utils";
 import { ConnectionStatus } from "../shared/contract";
 import { AggregatorAdapterBase } from "./index";
-import * as redisClient from "../services/storageClient/redis";
+import { get } from "../services/storageClient/redis";
 
 const testConnectionId = "testConnectionId";
 jest.mock("uuid", () => ({ v4: () => "adfd01fb-309b-4e1c-9117-44d003f5d7fc" }));
@@ -104,8 +104,6 @@ describe("AggregatorAdapterBase", () => {
   });
 
   describe("createConnection", () => {
-    const mockSet = jest.spyOn(redisClient, "set");
-
     const mockCreateConnectionRequest = {
       institutionId: "testInstitutionId",
       credentials: [
@@ -149,7 +147,9 @@ describe("AggregatorAdapterBase", () => {
 
       expect(result).toEqual(mockConnection);
       expect(aggregatorAdapterBase.context.current_job_id).toBe("testJobId");
-      expect(mockSet).toHaveBeenCalledWith("context_testConnectionId", {
+
+      const connectionContext = await get("context_testConnectionId");
+      expect(connectionContext).toEqual({
         oauth_referral_source: "test_source",
         scheme: "test_scheme",
         aggregatorInstitutionId: "testInstitutionId",
@@ -188,7 +188,8 @@ describe("AggregatorAdapterBase", () => {
       );
 
       expect(result).toEqual(connectionWithoutId);
-      expect(mockSet).not.toHaveBeenCalled();
+      const connectionContext = await get("context_testConnectionId");
+      expect(connectionContext).toBeUndefined();
     });
 
     it("stores correct context data in redis", async () => {
@@ -205,7 +206,8 @@ describe("AggregatorAdapterBase", () => {
         institutionId: "customInstitutionId",
       });
 
-      expect(mockSet).toHaveBeenCalledWith("context_testConnectionId", {
+      const connectionContext = await get("context_testConnectionId");
+      expect(connectionContext).toEqual({
         oauth_referral_source: "custom_source",
         scheme: "custom_scheme",
         aggregatorInstitutionId: "customInstitutionId",
