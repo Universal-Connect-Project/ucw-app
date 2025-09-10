@@ -26,6 +26,7 @@
     "clean": "npx rimraf {apps,packages}/**/{node_modules,dist,.turbo} -g && npx rimraf node_modules"
   },
   "devDependencies": {
+    "handlebars": "4.6.0",
     "husky": "^9.1.6",
     "prettier": "^3.3.3",
     "turbo": "^2.1.3"
