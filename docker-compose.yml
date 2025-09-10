@@ -12,7 +12,7 @@ services:
       start_period: 60s
       interval: 30s
       timeout: 10s
-      retries: 6
+      retries: 10
     build:
       context: .
       dockerfile: ./Dockerfile
