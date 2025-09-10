@@ -44,41 +44,99 @@ const createExpectPerformanceEvent =
     );
 
 describe("performance measurement", () => {
-  it("records an credentials connection correctly using shouldRecordResult", () => {
-    cy.intercept("GET", `/institutions/${MX_BANK_UCP_INSTITUTION_ID}`).as(
-      "getInstitution",
-    );
-
-    visitAgg();
-
-    searchAndSelectMx();
-
-    cy.wait("@getInstitution").then((interception) => {
-      const { performanceSessionId } = JSON.parse(
-        interception.response?.headers?.meta as string,
+  describe("credentials connection", () => {
+    it("records an connection correctly using shouldRecordResult", () => {
+      cy.intercept("GET", `/institutions/${MX_BANK_UCP_INSTITUTION_ID}`).as(
+        "getInstitution",
       );
 
-      const expectPerformanceEvent =
-        createExpectPerformanceEvent(performanceSessionId);
+      visitAgg();
 
-      expectPerformanceEvent({
-        isProcessed: false,
-        shouldRecordResult: false,
-      }).then(() => {
-        enterMxCredentials();
+      searchAndSelectMx();
 
-        clickContinue();
+      cy.wait("@getInstitution").then((interception) => {
+        const { performanceSessionId } = JSON.parse(
+          interception.response?.headers?.meta as string,
+        );
+
+        const expectPerformanceEvent =
+          createExpectPerformanceEvent(performanceSessionId);
 
         expectPerformanceEvent({
           isProcessed: false,
-          shouldRecordResult: true,
+          shouldRecordResult: false,
         }).then(() => {
-          expectConnectionSuccess();
+          enterMxCredentials();
+
+          clickContinue();
 
           expectPerformanceEvent({
+            isProcessed: false,
             shouldRecordResult: true,
-          }).then((performanceEvent) => {
-            expect(performanceEvent.successMetric.isSuccess).to.be.true;
+          }).then(() => {
+            expectConnectionSuccess();
+
+            expectPerformanceEvent({
+              shouldRecordResult: true,
+            }).then((performanceEvent) => {
+              expect(performanceEvent.successMetric.isSuccess).to.be.true;
+            });
+          });
+        });
+      });
+    });
+
+    describe("performance polling", () => {
+      it("records a successful event even if the user leaves the screen before the connection is complete", () => {
+        cy.intercept("GET", `/institutions/${MX_BANK_UCP_INSTITUTION_ID}`).as(
+          "getInstitution",
+        );
+
+        visitAgg();
+
+        searchAndSelectMx();
+
+        cy.wait("@getInstitution").then((interception) => {
+          const { performanceSessionId } = JSON.parse(
+            interception.response?.headers?.meta as string,
+          );
+
+          const expectPerformanceEvent =
+            createExpectPerformanceEvent(performanceSessionId);
+
+          expectPerformanceEvent({
+            isProcessed: false,
+            shouldRecordResult: false,
+          }).then(() => {
+            enterMxCredentials();
+
+            clickContinue();
+
+            visitAgg();
+
+            let retryCount = 0;
+
+            const pollForSuccessfulPerformanceEvent = () => {
+              if (retryCount > 5) {
+                return false;
+              }
+
+              retryCount++;
+
+              cy.wait(25000);
+
+              expectPerformanceEvent({}).then((performanceEvent) => {
+                if (performanceEvent.successMetric.isSuccess) {
+                  return true;
+                } else {
+                  cy.then(pollForSuccessfulPerformanceEvent);
+                }
+              });
+            };
+
+            cy.then(pollForSuccessfulPerformanceEvent).then((isSuccessful) => {
+              expect(isSuccessful).to.be.true;
+            });
           });
         });
       });
