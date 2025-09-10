@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- E2E tests for performance polling
+
+### Fixed
+
+- Issue with performance polling for oAuth connections caused by a race condition
+
+## [1.13.0]
+
+### Added
+
 - Success Rate performance tracking for Plaid
 
 ### Changed
