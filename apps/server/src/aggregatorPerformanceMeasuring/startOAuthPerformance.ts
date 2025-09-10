@@ -30,6 +30,7 @@ export const startOAuthPerformance = async (
     recordConnectionPauseEvent({
       connectionId: getPerformanceSessionIdFromContext(req),
       shouldRecordResult: true,
+      shouldPausePolling: false,
     });
   }
 
