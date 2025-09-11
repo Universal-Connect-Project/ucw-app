@@ -7,6 +7,7 @@ if (process.env.ENV === "prod" || process.env.PRODUCTION === "true") {
       path.join(__dirname, "../env/production.env"),
       path.join(__dirname, "../env/sharedProduction.env"),
     ],
+    override: true,
   });
 } else {
   dotenv.config({
@@ -14,5 +15,6 @@ if (process.env.ENV === "prod" || process.env.PRODUCTION === "true") {
       path.join(__dirname, "../env/staging.env"),
       path.join(__dirname, "../env/sharedStaging.env"),
     ],
+    override: true,
   });
 }
