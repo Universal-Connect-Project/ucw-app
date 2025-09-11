@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.1]
+
+### Added
+
+- E2E tests for performance polling
+
+### Fixed
+
+- Issue with performance polling for oAuth connections caused by a race condition
+
 ## [1.13.0]
 
 ### Added

@@ -1,6 +1,9 @@
 import { expect, test } from "@playwright/test";
 import { ComboJobTypes, SOMETHING_WENT_WRONG_ERROR_TEXT } from "@repo/utils";
-import { createExpectPerformanceEvent, getAccessToken } from "@repo/utils-e2e/playwright";
+import {
+  createExpectPerformanceEvent,
+  getAccessToken,
+} from "@repo/utils-e2e/playwright";
 import { MX_BANK_OAUTH_UCP_INSTITUTION_ID } from "../src/testInstitutions";
 import { MX_AGGREGATOR_STRING } from "../src";
 
@@ -116,6 +119,89 @@ test("connects to mx bank with oAuth, tracks performance correctly, and does ref
   });
 
   expect(performanceEvent.successMetric.isSuccess).toBe(true);
+
+  await request.delete(
+    `http://localhost:8080/api/aggregator/mx_int/user/${userId}`,
+  );
+});
+
+test("results in a successful performance event even if you close the tab", async ({
+  page,
+  request,
+}) => {
+  test.setTimeout(240000);
+
+  const userId = crypto.randomUUID();
+
+  const accessToken = await getAccessToken(request);
+
+  await page.goto(
+    `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
+  );
+
+  page.evaluate(`
+      window.addEventListener('message', (event) => {
+        const message = event.data;
+        console.log({ message });
+      });
+    `);
+
+  await page.getByPlaceholder("Search").fill("MX Bank (Oauth)");
+
+  let performanceSessionId;
+
+  const urlToIntercept = `http://localhost:8080/institutions/${MX_BANK_OAUTH_UCP_INSTITUTION_ID}`;
+
+  page.on("response", async (response) => {
+    if (response.url() === urlToIntercept) {
+      performanceSessionId = JSON.parse(
+        response?.headers()?.meta,
+      )?.performanceSessionId;
+    }
+  });
+
+  await page.getByLabel("Add account with MX Bank (Oauth)").click();
+
+  await page.waitForResponse(urlToIntercept);
+
+  const popupPromise = page.waitForEvent("popup");
+
+  const loginButton = await page.getByRole("link", { name: "Go to log in" });
+
+  const expectPerformanceEvent = createExpectPerformanceEvent({
+    accessToken,
+    performanceSessionId,
+    request,
+  });
+
+  await loginButton.click();
+
+  const authorizeTab = await popupPromise;
+
+  await page.close();
+
+  await authorizeTab.getByRole("button", { name: "Authorize" }).click();
+  await expect(
+    authorizeTab.getByText("Thank you for completing OAuth"),
+  ).toBeVisible();
+
+  let retryCount = 0;
+  let isSuccess = false;
+
+  while (retryCount < 5) {
+    retryCount++;
+
+    await authorizeTab.waitForTimeout(25000);
+
+    const performanceEvent = await expectPerformanceEvent({});
+
+    if (performanceEvent.successMetric.isSuccess) {
+      isSuccess = true;
+      break;
+    }
+  }
+
+  expect(isSuccess).toBe(true);
 
   await request.delete(
     `http://localhost:8080/api/aggregator/mx_int/user/${userId}`,
