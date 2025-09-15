@@ -60,6 +60,16 @@ jobs:
 
           cat ${ENV_FILE_PATH}
 
+      - name: "Create playwright env file"
+        run: |
+          ENV_FILE_PATH=./packages/finicity-adapter/playwright/environment/.env
+          touch ${ENV_FILE_PATH}
+          # Secrets (can't load these from another job, due to GH security features)
+          echo UCP_CLIENT_ID=${{ vars.AUTHENTICATION_CLIENT_ID }} >> ${ENV_FILE_PATH}
+          echo UCP_USERNAME=${{ secrets.AUTHENTICATION_USERNAME }} >> ${ENV_FILE_PATH}
+          echo UCP_PASSWORD=${{ secrets.AUTHENTICATION_PASSWORD }} >> ${ENV_FILE_PATH}
+          cat ${ENV_FILE_PATH}
+
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
       - name: Run Playwright tests

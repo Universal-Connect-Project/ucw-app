@@ -1,5 +1,11 @@
 import { expect, test as base } from "@playwright/test";
 import { ComboJobTypes } from "@repo/utils";
+import {
+  createExpectPerformanceEvent,
+  getAccessToken,
+} from "@repo/utils-e2e/playwright";
+import { FINICITY_PROFILES_A_UCP_INSTITUTION_ID } from "../src/testInstitutions";
+import { FINICITY_AGGREGATOR_STRING } from "../src";
 
 const makeAConnection = async (
   jobTypes: ComboJobTypes[],
@@ -106,18 +112,45 @@ test.describe("Finicity Adapter Tests", () => {
     });
   });
 
-  test(`makes a connection with ${ComboJobTypes.TRANSACTION_HISTORY} and returns transactions`, async ({
+  test(`makes a connection with ${ComboJobTypes.TRANSACTION_HISTORY}, records a successful event, and returns transactions`, async ({
     page,
     request,
     userId,
   }) => {
     test.setTimeout(300000);
 
+    const urlToIntercept = `http://localhost:8080/institutions/${FINICITY_PROFILES_A_UCP_INSTITUTION_ID}`;
+    let performanceSessionId;
+
+    const accessToken = await getAccessToken(request);
+
+    page.on("response", async (response) => {
+      if (response.url() === urlToIntercept) {
+        performanceSessionId = JSON.parse(
+          response?.headers()?.meta,
+        )?.performanceSessionId;
+      }
+    });
+
     const { aggregator, connectionId } = await makeAConnection(
       [ComboJobTypes.TRANSACTION_HISTORY],
       page,
       userId,
     );
+
+    const expectPerformanceEvent = createExpectPerformanceEvent({
+      accessToken,
+      performanceSessionId,
+      request,
+    });
+
+    const performanceEvent = await expectPerformanceEvent({
+      shouldRecordResult: true,
+      institutionId: FINICITY_PROFILES_A_UCP_INSTITUTION_ID,
+      aggregatorId: FINICITY_AGGREGATOR_STRING,
+    });
+
+    expect(performanceEvent.successMetric.isSuccess).toBe(true);
 
     await testDataEndpoints({ request, userId, connectionId, aggregator });
   });
