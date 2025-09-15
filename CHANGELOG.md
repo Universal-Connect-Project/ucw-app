@@ -5,11 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.13.3]
+## [1.13.4]
 
 ### Added
 
 - E2E tests for finicity performance measurement
+
+## [1.13.3]
+
+### Added
+
+- Debug logging when retrieving an institution fails
 
 ## [1.13.2]
 

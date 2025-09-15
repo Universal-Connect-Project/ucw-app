@@ -18,6 +18,7 @@ import {
   setAggregatorOnContext,
   setResolvedUserIdOnContext,
 } from "../shared/utils/context";
+import { debug } from "../infra/logger";
 
 export const getInstitutionHandler = async (req: Request, res: Response) => {
   const ucpInstitutionId = req.params.institution_guid;
@@ -75,6 +76,11 @@ export const getInstitutionHandler = async (req: Request, res: Response) => {
       url: resolvedInstitution.url,
     });
   } catch (error) {
+    debug(
+      `Error in getInstitutionHandler with ucp institutionid: ${ucpInstitutionId}`,
+      error,
+    );
+
     startEvent?.then(() => {
       recordConnectionPauseEvent({
         connectionId: performanceSessionId,
