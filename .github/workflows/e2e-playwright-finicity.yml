@@ -77,9 +77,3 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Run Playwright tests
         run: npm run playwright:test --workspace=packages/finicity-adapter
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: packages/finicity-adapter/playwright-report/
-          retention-days: 30
