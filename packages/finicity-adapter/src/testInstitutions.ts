@@ -1,5 +1,7 @@
 import type { CachedInstitution } from "@repo/utils";
 
+export const FINICITY_PROFILES_A_UCP_INSTITUTION_ID = "finbankProfilesA";
+
 export const testInstitutions: CachedInstitution[] = [
   {
     name: "FinBank",
@@ -231,7 +233,7 @@ export const testInstitutions: CachedInstitution[] = [
   },
   {
     name: "FinBank Profiles - A",
-    id: "finbankProfilesA",
+    id: FINICITY_PROFILES_A_UCP_INSTITUTION_ID,
     keywords: ["finbank", "finicity"],
     logo: "https://prod-carpintero-branding.s3.us-west-2.amazonaws.com/102105/icon.svg",
     url: "http://www.finbank.com",

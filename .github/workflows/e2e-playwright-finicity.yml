@@ -55,18 +55,25 @@ jobs:
           echo FINICITY_APP_KEY=${{ secrets.FINICITY_APP_KEY }} >> ${ENV_FILE_PATH}
           echo FINICITY_SECRET=${{ secrets.FINICITY_SECRET }} >> ${ENV_FILE_PATH}
           echo NGROK_AUTHTOKEN=${{ secrets.PLAID_NGROK_AUTH_TOKEN }} >> ${ENV_FILE_PATH}
+          echo UCP_CLIENT_SECRET=${{ secrets.UCP_CLIENT_SECRET }} >> ${ENV_FILE_PATH}
+          echo UCP_CLIENT_ID=${{ secrets.UCP_CLIENT_ID }} >> ${ENV_FILE_PATH}
+
           # This fails if using https, so we have to override it
           echo HOST_URL=http://localhost:8080 >> ${ENV_FILE_PATH}
 
+          cat ${ENV_FILE_PATH}
+
+      - name: "Create playwright env file"
+        run: |
+          ENV_FILE_PATH=./packages/finicity-adapter/playwright/environment/.env
+          touch ${ENV_FILE_PATH}
+          # Secrets (can't load these from another job, due to GH security features)
+          echo UCP_CLIENT_ID=${{ vars.AUTHENTICATION_CLIENT_ID }} >> ${ENV_FILE_PATH}
+          echo UCP_USERNAME=${{ secrets.AUTHENTICATION_USERNAME }} >> ${ENV_FILE_PATH}
+          echo UCP_PASSWORD=${{ secrets.AUTHENTICATION_PASSWORD }} >> ${ENV_FILE_PATH}
           cat ${ENV_FILE_PATH}
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
       - name: Run Playwright tests
         run: npm run playwright:test --workspace=packages/finicity-adapter
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: packages/finicity-adapter/playwright-report/
-          retention-days: 30
