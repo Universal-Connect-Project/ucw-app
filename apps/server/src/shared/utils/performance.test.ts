@@ -25,7 +25,15 @@ describe("performance utils", () => {
       expect(getShouldRecordPerformanceDuration(req)).toBe(true);
     });
 
-    it("returns the value from the adapter's shouldRecordPerformanceDuration if implemented", async () => {
+    it("returns the value from the adapter's shouldRecordPerformanceDuration if implemented (false)", async () => {
+      const mockAdapter: Partial<WidgetAdapter> = {
+        shouldRecordPerformanceDuration: false,
+      };
+
+      jest
+        .spyOn(getAggregatorWidgetAdapterModule, "getAggregatorWidgetAdapter")
+        .mockReturnValueOnce(mockAdapter as WidgetAdapter);
+
       const req = {
         context: {
           aggregator: PLAID_AGGREGATOR_STRING,
