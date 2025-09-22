@@ -33,7 +33,8 @@ async function sendPerformanceEvent({
     | "connectionStart"
     | "connectionSuccess"
     | "connectionPause"
-    | "connectionResume";
+    | "connectionResume"
+    | "updateDuration";
   method?: "POST" | "PUT";
   body?: string;
 }) {
@@ -154,4 +155,21 @@ export const recordConnectionResumeEvent = async ({
     method: "PUT",
   });
   resumePolling(connectionId);
+};
+
+export const updateConnectionDuration = async ({
+  connectionId,
+  additionalDuration,
+}: {
+  connectionId: string;
+  additionalDuration: number;
+}) => {
+  await sendPerformanceEvent({
+    body: JSON.stringify({
+      additionalDuration,
+    }),
+    connectionId,
+    eventType: "updateDuration",
+    method: "PUT",
+  });
 };

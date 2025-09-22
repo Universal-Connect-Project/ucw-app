@@ -39,4 +39,11 @@ export interface PerformanceClient {
   }: {
     connectionId: string;
   }) => Promise<void>;
+  updateConnectionDuration?: ({
+    connectionId,
+    additionalDuration,
+  }: {
+    connectionId: string;
+    additionalDuration: number;
+  }) => Promise<void>;
 }

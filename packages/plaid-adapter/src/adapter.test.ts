@@ -11,6 +11,10 @@ import { ComboJobTypes, Connection, ConnectionStatus } from "@repo/utils";
 import { PLAID_BASE_PATH, PLAID_BASE_PATH_PROD } from "./apiClient";
 import { server } from "./test/testServer";
 import { http, HttpResponse } from "msw";
+import {
+  sampleCredentialEvents,
+  sampleOAuthEvents,
+} from "./durationRecording/calculateDurationFromEvents.test";
 
 const cacheClient = createCacheClient();
 const logClient = createLogClient();
@@ -61,12 +65,6 @@ const plaidAdapter = new PlaidAdapter({
 });
 
 describe("plaid aggregator", () => {
-  describe("shouldRecordPerformanceDuration", () => {
-    it("returns false", () => {
-      expect(plaidAdapterSandbox.shouldRecordPerformanceDuration).toBe(false);
-    });
-  });
-
   describe("GetInsitutionById", () => {
     it("Maps correct fields", async () => {
       const ret = await plaidAdapterSandbox.GetInstitutionById("testId");
@@ -225,7 +223,7 @@ describe("plaid aggregator", () => {
       });
 
       expect(result).toEqual({
-        status: ConnectionStatus.CONNECTED,
+        status: expect.any(Number),
         institution_code: aggregatorInstitutionId,
         id: "accessTokenTest",
         postMessageEventData: {
@@ -236,6 +234,7 @@ describe("plaid aggregator", () => {
             connectionId: "accessTokenTest",
           },
         },
+        successWebhookReceivedAt: expect.any(String),
         userId: null,
       });
 
@@ -277,7 +276,7 @@ describe("plaid aggregator", () => {
       });
 
       expect(result).toEqual({
-        status: ConnectionStatus.CONNECTED,
+        status: expect.any(Number),
         institution_code: "inst-001",
         id: "accessTokenTest",
         postMessageEventData: {
@@ -288,6 +287,7 @@ describe("plaid aggregator", () => {
             connectionId: "accessTokenTest",
           },
         },
+        successWebhookReceivedAt: expect.any(String),
         userId: null,
       });
 
@@ -353,6 +353,176 @@ describe("plaid aggregator", () => {
         status: string;
       };
       expect(result).toEqual(cachedConnection);
+    });
+
+    describe("EVENTS webhook duration calculation", () => {
+      it("should calculate duration and record performance event when EVENTS webhook with HANDOFF is received", async () => {
+        const requestId = "test-connection-123";
+        const linkSessionId = "link-session-456";
+
+        await cacheClient.set(requestId, {
+          id: requestId,
+          status: ConnectionStatus.PENDING,
+        });
+
+        const eventsWebhookRequest = {
+          query: {
+            connection_id: requestId,
+          },
+          body: {
+            environment: "sandbox",
+            link_session_id: linkSessionId,
+            link_token: "link-sandbox-79e723b0-0e04-4248-8a33-15ceb6828a45",
+            webhook_code: "EVENTS",
+            webhook_type: "LINK",
+            events: sampleCredentialEvents,
+          },
+        };
+
+        const result =
+          await plaidAdapter.HandleOauthResponse(eventsWebhookRequest);
+
+        expect(result).toEqual({
+          id: requestId,
+          status: ConnectionStatus.CONNECTED,
+        });
+
+        expect(
+          mockPerformanceClient.updateConnectionDuration,
+        ).toHaveBeenCalledWith({
+          connectionId: requestId,
+          additionalDuration: 7000, // Expected duration from sampleCredentialEvents
+        });
+      });
+
+      it("should calculate duration with successAt fallback when no HANDOFF in EVENTS webhook", async () => {
+        const requestId = "test-connection-789";
+        const linkSessionId = "link-session-987";
+
+        // Events without HANDOFF
+        const eventsWithoutHandoff = sampleCredentialEvents.filter(
+          (e) => e.event_name !== "HANDOFF",
+        );
+
+        await cacheClient.set(requestId, {
+          id: requestId,
+          status: ConnectionStatus.PENDING,
+        });
+
+        // Mock Date.prototype.toISOString to control the successWebhookReceivedAt timestamp
+        const mockSuccessTimestamp = "2025-07-18T16:44:28Z"; // 3s after final phone event for 9s total
+        jest
+          .spyOn(Date.prototype, "toISOString")
+          .mockReturnValueOnce(mockSuccessTimestamp);
+
+        // First call HandleOauthResponse with ITEM_ADD_RESULT to set successWebhookReceivedAt
+        await plaidAdapter.HandleOauthResponse({
+          query: { connection_id: requestId },
+          body: {
+            environment: "sandbox",
+            public_token: "fakePublicToken",
+            webhook_code: "ITEM_ADD_RESULT",
+            webhook_type: "LINK",
+          },
+        });
+
+        const connection = await cacheClient.get(requestId);
+        expect(connection.successWebhookReceivedAt).toBe(mockSuccessTimestamp);
+
+        // Then call with EVENTS webhook (without HANDOFF) to trigger successAt fallback
+        const eventsWebhookRequest = {
+          query: {
+            connection_id: requestId,
+          },
+          body: {
+            environment: "sandbox",
+            link_session_id: linkSessionId,
+            link_token: "link-sandbox-79e723b0-0e04-4248-8a33-15ceb6828a45",
+            webhook_code: "EVENTS",
+            webhook_type: "LINK",
+            events: eventsWithoutHandoff,
+          },
+        };
+
+        await plaidAdapter.HandleOauthResponse(eventsWebhookRequest);
+
+        // Verify duration was calculated using successAt fallback
+        expect(
+          mockPerformanceClient.updateConnectionDuration,
+        ).toHaveBeenCalledWith({
+          connectionId: requestId,
+          additionalDuration: 9000, // Expected duration with successAt fallback (3s additional)
+        });
+
+        // Restore Date mock
+        jest.restoreAllMocks();
+      });
+
+      it("should calculate duration for OAuth flow in EVENTS webhook", async () => {
+        const requestId = "oauth-connection-456";
+        const linkSessionId = "oauth-link-session-654";
+
+        await cacheClient.set(requestId, {
+          id: requestId,
+          status: ConnectionStatus.PENDING,
+          successWebhookReceivedAt: "2025-09-10T17:24:19Z", // Set for potential successAt fallback
+        });
+
+        const oauthEventsWebhookRequest = {
+          query: {
+            connection_id: requestId,
+          },
+          body: {
+            environment: "sandbox",
+            link_session_id: linkSessionId,
+            link_token: "link-sandbox-oauth-token",
+            webhook_code: "EVENTS",
+            webhook_type: "LINK",
+            events: sampleOAuthEvents,
+          },
+        };
+
+        await plaidAdapter.HandleOauthResponse(oauthEventsWebhookRequest);
+
+        // Verify OAuth flow duration was calculated
+        expect(
+          mockPerformanceClient.updateConnectionDuration,
+        ).toHaveBeenCalledWith({
+          connectionId: requestId,
+          additionalDuration: 6000, // Expected OAuth flow duration
+        });
+      });
+
+      it("should not record duration event when no events are provided", async () => {
+        const requestId = "no-events-connection";
+        const linkSessionId = "no-events-session";
+
+        await cacheClient.set(requestId, {
+          id: requestId,
+          status: ConnectionStatus.PENDING,
+        });
+
+        const eventsWebhookRequest = {
+          query: {
+            connection_id: requestId,
+          },
+          body: {
+            environment: "sandbox",
+            link_session_id: linkSessionId,
+            link_token: "link-sandbox-no-events",
+            webhook_code: "EVENTS",
+            webhook_type: "LINK",
+            events: [],
+          },
+        };
+
+        await plaidAdapter.HandleOauthResponse(eventsWebhookRequest);
+
+        // Verify no duration event was recorded for empty events
+        expect(
+          mockPerformanceClient.updateConnectionDuration,
+        ).not.toHaveBeenCalled();
+      });
     });
   });
 });

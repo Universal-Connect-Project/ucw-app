@@ -20,6 +20,7 @@ import {
   removeItem,
   getItem,
 } from "./apiClient";
+import { calculateDurationFromEvents } from "./durationRecording/calculateDurationFromEvents";
 
 type AdapterConfig = {
   sandbox: boolean;
@@ -36,9 +37,6 @@ export class PlaidAdapter implements WidgetAdapter {
   sandbox: boolean;
   performanceClient: PerformanceClient;
   requiresPollingForPerformance = false; // The webhook negates the need for polling
-  // TODO: https://universalconnect.atlassian.net/browse/UCP-649
-  // Duration disabled until future support is added.
-  shouldRecordPerformanceDuration = false;
 
   constructor(args: AdapterConfig) {
     const { sandbox, dependencies } = args;
@@ -192,7 +190,9 @@ export class PlaidAdapter implements WidgetAdapter {
     body: Record<string, any>;
   }): Promise<Connection> {
     const { connection_id: requestId } = request?.query || {};
-    this.logger.trace(`Received plaid oauth redirect response ${requestId}`);
+    this.logger.trace(
+      `Received plaid oauth redirect response ${requestId}, type: ${request.body.webhook_code}`,
+    );
     const connection = (await this.cacheClient.get(requestId)) as Connection;
     const connectionContext = (await this.cacheClient.get(
       `context_${requestId}`,
@@ -211,13 +211,13 @@ export class PlaidAdapter implements WidgetAdapter {
       });
       const { access_token } = tokenExchangeRequest;
 
+      connection.successWebhookReceivedAt = new Date().toISOString();
       await this.recordSuccessIfIntitialInstitutionWasConnected({
         requestId,
         accessToken: access_token,
         initialInstitutionId: connectionContext?.aggregatorInstitutionId,
       });
 
-      connection.status = ConnectionStatus.CONNECTED;
       connection.id = access_token;
       connection.postMessageEventData = {
         memberConnected: {
@@ -228,9 +228,18 @@ export class PlaidAdapter implements WidgetAdapter {
         },
       };
     } else if (webhook_code === "EVENTS") {
-      // TODO: implement performance duration - https://universalconnect.atlassian.net/browse/UCP-649
-      // This webhook doesn't get called until after the plaid link widget has been closed and could
-      // potentially be called as late as 10 minutes after the user has closed the widget.
+      // https://plaid.com/docs/api/link/#events
+      connection.status = ConnectionStatus.CONNECTED;
+      const connectionDuration = calculateDurationFromEvents(
+        request.body.events,
+        connection.successWebhookReceivedAt, // this is a fallback in case the link widget gets closed before HANDOFF happens
+      );
+      if (connectionDuration) {
+        this.performanceClient.updateConnectionDuration({
+          connectionId: requestId,
+          additionalDuration: connectionDuration,
+        });
+      }
 
       this.logger.info(
         `Received webhook event for connection ${requestId} with data: ${JSON.stringify(
