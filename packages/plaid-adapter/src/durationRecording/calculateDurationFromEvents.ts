@@ -185,7 +185,7 @@ function calculateCredentialFlowDuration(
     "SKIP_SUBMIT_PHONE",
     "SUBMIT_PHONE",
   ]);
-  if (finalPhoneEvents.length > 1) {
+  if (finalPhoneEvents?.length > 1) {
     // Try to use HANDOFF first
     const handoffDuration = calculateSegmentDuration({
       fromEvents: finalPhoneEvents,
