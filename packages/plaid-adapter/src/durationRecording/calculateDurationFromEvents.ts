@@ -26,12 +26,13 @@ const findEventsByName = (
   events: WebhookEvent[],
   eventNames: string[],
   viewName?: string,
-): WebhookEvent[] => {
-  return events.filter(
+): WebhookEvent[] | null => {
+  const filteredEvents = events.filter(
     (event) =>
       eventNames.includes(event.event_name) &&
       (!viewName || event.event_metadata.view_name === viewName),
   );
+  return filteredEvents.length ? filteredEvents : null;
 };
 
 const findNextEvent = ({
@@ -44,25 +45,23 @@ const findNextEvent = ({
   afterTimestamp: string;
   eventNames: string[];
   viewName?: string;
-}): WebhookEvent | null => {
+}): WebhookEvent | undefined => {
   const afterTime = new Date(afterTimestamp).getTime();
-  const matchingEvents = events.filter(
+  return events.find(
     (event) =>
       eventNames.includes(event.event_name) &&
       (!viewName || event.event_metadata.view_name === viewName) &&
       getTimeFromEvent(event) > afterTime,
   );
-
-  return matchingEvents.length > 0 ? matchingEvents[0] : null;
 };
 
-const addSegmentDuration = ({
+const calculateSegmentDuration = ({
   fromEvents,
   toEventConfig,
   sortedEvents,
   useLastFromEvent = false,
 }: {
-  fromEvents: WebhookEvent[];
+  fromEvents: WebhookEvent[] | null;
   toEventConfig: {
     eventNames: string[];
     viewName?: string;
@@ -70,7 +69,7 @@ const addSegmentDuration = ({
   sortedEvents: WebhookEvent[];
   useLastFromEvent?: boolean;
 }): number => {
-  if (!fromEvents.length) return 0;
+  if (!fromEvents) return 0;
 
   const fromEvent = useLastFromEvent
     ? fromEvents[fromEvents.length - 1]
@@ -103,7 +102,7 @@ function calculateCredentialFlowDuration(
     "SKIP_SUBMIT_PHONE",
     "SUBMIT_PHONE",
   ]);
-  totalDuration += addSegmentDuration({
+  totalDuration += calculateSegmentDuration({
     fromEvents: phoneEvents,
     toEventConfig: {
       eventNames: ["TRANSITION_VIEW"],
@@ -116,7 +115,7 @@ function calculateCredentialFlowDuration(
   const selectInstitutionEvents = findEventsByName(sortedEvents, [
     "SELECT_INSTITUTION",
   ]);
-  totalDuration += addSegmentDuration({
+  totalDuration += calculateSegmentDuration({
     fromEvents: selectInstitutionEvents,
     toEventConfig: {
       eventNames: ["TRANSITION_VIEW"],
@@ -129,7 +128,7 @@ function calculateCredentialFlowDuration(
   const submitCredentialsEvents = findEventsByName(sortedEvents, [
     "SUBMIT_CREDENTIALS",
   ]);
-  totalDuration += addSegmentDuration({
+  totalDuration += calculateSegmentDuration({
     fromEvents: submitCredentialsEvents,
     toEventConfig: {
       eventNames: ["TRANSITION_VIEW"],
@@ -141,7 +140,7 @@ function calculateCredentialFlowDuration(
 
   // Segment 3b: SUBMIT_MFA to SELECT_ACCOUNT transition (after user MFA interaction)
   const submitMfaEvents = findEventsByName(sortedEvents, ["SUBMIT_MFA"]);
-  totalDuration += addSegmentDuration({
+  totalDuration += calculateSegmentDuration({
     fromEvents: submitMfaEvents,
     toEventConfig: {
       eventNames: ["TRANSITION_VIEW"],
@@ -152,11 +151,10 @@ function calculateCredentialFlowDuration(
   });
 
   // Segment 3c: SUBMIT_CREDENTIALS to SELECT_ACCOUNT transition (when no MFA required)
-  const hasMfaFlow =
-    findEventsByName(sortedEvents, ["TRANSITION_VIEW"], "MFA").length > 0;
+  const hasMfaFlow = findEventsByName(sortedEvents, ["TRANSITION_VIEW"], "MFA");
 
   if (!hasMfaFlow) {
-    totalDuration += addSegmentDuration({
+    totalDuration += calculateSegmentDuration({
       fromEvents: submitCredentialsEvents,
       toEventConfig: {
         eventNames: ["TRANSITION_VIEW"],
@@ -173,7 +171,7 @@ function calculateCredentialFlowDuration(
     ["TRANSITION_VIEW"],
     "CONNECTED",
   );
-  totalDuration += addSegmentDuration({
+  totalDuration += calculateSegmentDuration({
     fromEvents: connectedTransitions,
     toEventConfig: {
       eventNames: ["TRANSITION_VIEW"],
@@ -189,7 +187,7 @@ function calculateCredentialFlowDuration(
   ]);
   if (finalPhoneEvents.length > 1) {
     // Try to use HANDOFF first
-    const handoffDuration = addSegmentDuration({
+    const handoffDuration = calculateSegmentDuration({
       fromEvents: finalPhoneEvents,
       toEventConfig: {
         eventNames: ["HANDOFF"],
@@ -198,7 +196,7 @@ function calculateCredentialFlowDuration(
       useLastFromEvent: true, // Use the last phone event
     });
 
-    if (handoffDuration > 0) {
+    if (handoffDuration) {
       totalDuration += handoffDuration;
     } else if (successAt) {
       // Fallback to successAt if no HANDOFF
@@ -209,7 +207,7 @@ function calculateCredentialFlowDuration(
     }
   }
 
-  return totalDuration > 0 ? totalDuration : null;
+  return totalDuration || null;
 }
 
 function calculateOAuthFlowDuration(
@@ -227,7 +225,7 @@ function calculateOAuthFlowDuration(
     "SKIP_SUBMIT_PHONE",
     "SUBMIT_PHONE",
   ]);
-  totalDuration += addSegmentDuration({
+  totalDuration += calculateSegmentDuration({
     fromEvents: phoneEvents,
     toEventConfig: {
       eventNames: ["TRANSITION_VIEW"],
@@ -240,7 +238,7 @@ function calculateOAuthFlowDuration(
   const selectInstitutionEvents = findEventsByName(sortedEvents, [
     "SELECT_INSTITUTION",
   ]);
-  totalDuration += addSegmentDuration({
+  totalDuration += calculateSegmentDuration({
     fromEvents: selectInstitutionEvents,
     toEventConfig: {
       eventNames: ["TRANSITION_VIEW"],
@@ -256,7 +254,7 @@ function calculateOAuthFlowDuration(
   ]);
   if (finalPhoneEvents.length > 1) {
     // Try to use HANDOFF first
-    const handoffDuration = addSegmentDuration({
+    const handoffDuration = calculateSegmentDuration({
       fromEvents: finalPhoneEvents,
       toEventConfig: {
         eventNames: ["HANDOFF"],
@@ -265,7 +263,7 @@ function calculateOAuthFlowDuration(
       useLastFromEvent: true, // Use the last phone event
     });
 
-    if (handoffDuration > 0) {
+    if (handoffDuration) {
       totalDuration += handoffDuration;
     } else if (successAt) {
       // Fallback to successAt if no HANDOFF
@@ -276,7 +274,7 @@ function calculateOAuthFlowDuration(
     }
   }
 
-  return totalDuration > 0 ? totalDuration : null;
+  return totalDuration || null;
 }
 
 export function calculateDurationFromEvents(

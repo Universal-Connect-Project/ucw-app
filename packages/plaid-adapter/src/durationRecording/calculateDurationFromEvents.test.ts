@@ -215,18 +215,4 @@ describe("calculateDurationFromEvents", () => {
       expect(duration).toBe(6000);
     });
   });
-
-  describe("Flow type detection", () => {
-    it("should detect OAuth flow when OPEN_OAUTH event is present", () => {
-      // This is implicitly tested by the OAuth flow tests above
-      const duration = calculateDurationFromEvents(sampleOAuthEvents);
-      expect(duration).not.toBeNull();
-    });
-
-    it("should treat as regular flow when no OPEN_OAUTH event is present", () => {
-      // This is implicitly tested by the regular flow tests above
-      const duration = calculateDurationFromEvents(sampleCredentialEvents);
-      expect(duration).not.toBeNull();
-    });
-  });
 });
