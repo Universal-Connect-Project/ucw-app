@@ -14,7 +14,7 @@ import { http, HttpResponse } from "msw";
 import {
   sampleCredentialEvents,
   sampleOAuthEvents,
-} from "./durationRecording/calculateDurationFromEvents.test";
+} from "@repo/utils-dev-dependency/plaid/testData";
 
 const cacheClient = createCacheClient();
 const logClient = createLogClient();
