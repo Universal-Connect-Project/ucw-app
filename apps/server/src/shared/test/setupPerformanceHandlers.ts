@@ -18,11 +18,13 @@ export default function setupPerformanceHandlers(
     | "connectionPause"
     | "connectionSuccess"
     | "connectionResume"
+    | "updateDuration"
   > = [
     "connectionStart",
     "connectionPause",
     "connectionSuccess",
     "connectionResume",
+    "updateDuration",
   ],
 ): RequestLogEntry[] {
   const requestLog: RequestLogEntry[] = [];

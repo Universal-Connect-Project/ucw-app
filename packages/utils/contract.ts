@@ -166,6 +166,7 @@ export interface Connection {
   oauth_window_uri?: string | null;
   error_message?: string | null;
   postMessageEventData?: PostMessageEventData;
+  successWebhookReceivedAt?: string | null;
 }
 
 export interface Connections {

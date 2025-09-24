@@ -3,4 +3,5 @@ export const createMockPerformanceClient = () => ({
   recordSuccessEvent: jest.fn(),
   recordConnectionPauseEvent: jest.fn(),
   recordConnectionResumeEvent: jest.fn(),
+  updateConnectionDuration: jest.fn(),
 });

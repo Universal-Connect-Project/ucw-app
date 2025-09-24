@@ -13,6 +13,7 @@ import {
   recordConnectionResumeEvent,
   recordStartEvent,
   recordSuccessEvent,
+  updateConnectionDuration,
 } from "./services/performanceTracking";
 
 const mxAdapterMapObject = getMxAdapterMapObject({
@@ -120,10 +121,11 @@ const plaidAdapterMapObject: Record<string, AdapterMap> =
     },
     logClient: logger,
     performanceClient: {
-      recordStartEvent: recordStartEvent,
-      recordSuccessEvent: recordSuccessEvent,
-      recordConnectionPauseEvent: recordConnectionPauseEvent,
-      recordConnectionResumeEvent: recordConnectionResumeEvent,
+      recordStartEvent,
+      recordSuccessEvent,
+      recordConnectionPauseEvent,
+      recordConnectionResumeEvent,
+      updateConnectionDuration,
     },
     aggregatorCredentials: {
       plaidSandbox: {

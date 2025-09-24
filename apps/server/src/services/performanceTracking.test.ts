@@ -7,6 +7,7 @@ import {
   recordStartEvent,
   recordSuccessEvent,
   setPerformanceSessionId,
+  updateConnectionDuration,
 } from "./performanceTracking";
 import { ComboJobTypes } from "@repo/utils";
 import { mockAccessToken } from "../test/testData/auth0";
@@ -394,5 +395,32 @@ describe("performanceTracking", () => {
     );
 
     fetchSpy.mockRestore();
+  });
+
+  it("calls updateDuration with correct payload and headers", async () => {
+    const connectionId = "conn8";
+    const additionalDuration = 5000;
+    const requestLog = setupPerformanceHandlers(["updateDuration"]);
+
+    await updateConnectionDuration({
+      connectionId,
+      additionalDuration,
+    });
+
+    expect(requestLog.length).toBe(1);
+    expect(requestLog[0]).toEqual(
+      expect.objectContaining({
+        method: "PUT",
+        eventType: "updateDuration",
+        connectionId: connectionId,
+        body: {
+          additionalDuration,
+        },
+        headers: expect.objectContaining({
+          authorization: `Bearer ${mockAccessToken}`,
+          "content-type": expect.stringContaining("application/json"),
+        }),
+      }),
+    );
   });
 });
