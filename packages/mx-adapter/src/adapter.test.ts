@@ -550,7 +550,25 @@ describe("mx aggregator", () => {
         expect(connectionStatus.status).toEqual(ConnectionStatus.REJECTED);
       });
 
-      it("returns a properly mapped response with TEXT, OPTIONS< TOKEN< IMAGE_DATA, and IMAGE_OPTIONS challenges", async () => {
+      it("throws and error if readMemberStatus is 404", async () => {
+        server.use(
+          http.get(READ_MEMBER_STATUS_PATH, () => {
+            return new HttpResponse("Not Found", { status: 404 });
+          }),
+        );
+
+        await expect(
+          async () =>
+            await mxAdapter.GetConnectionStatus(
+              "testMemberId",
+              "testJobId",
+              false,
+              "testUserId",
+            ),
+        ).rejects.toThrow("Request failed with status code 404");
+      });
+
+      it("returns a properly mapped response with TEXT, OPTIONS, TOKEN, IMAGE_DATA, and IMAGE_OPTIONS challenges", async () => {
         const challenges = [
           {
             guid: "challengeGuid1",

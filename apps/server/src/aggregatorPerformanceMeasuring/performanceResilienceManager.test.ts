@@ -245,4 +245,60 @@ describe("Performance Resilience Manager", () => {
 
     jest.useRealTimers();
   });
+
+  it("should remove session from active cache when 404 is received from read member status", async () => {
+    jest.useFakeTimers();
+
+    interface PolledConnectionParams {
+      id: string;
+      userId: string;
+    }
+
+    const statusPolledList: PolledConnectionParams[] = [];
+    server.use(
+      http.get(READ_MEMBER_STATUS_PATH, ({ params }) => {
+        statusPolledList.push(params as unknown as PolledConnectionParams);
+        return new HttpResponse(null, {
+          status: 404,
+          statusText: "Not Found",
+        });
+      }),
+    );
+
+    await startPerformanceResilience();
+
+    const perfObj = {
+      userId: "test-user-id-404",
+      connectionId: "test-connection-id-404",
+      performanceSessionId: "test-session-id-404",
+      aggregatorId: "mx",
+    };
+
+    await createPerformancePollingObject(perfObj);
+
+    expect(performanceResilienceManager.getStats().activeSessions).toBe(1);
+    expect(performanceResilienceManager.getStats().sessionIds).toContain(
+      perfObj.performanceSessionId,
+    );
+
+    jest.advanceTimersByTime(10000);
+    await jest.runAllTimersAsync();
+
+    expect(statusPolledList.length).toBeGreaterThanOrEqual(1);
+    expect(statusPolledList).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: perfObj.connectionId,
+          userId: perfObj.userId,
+        }),
+      ]),
+    );
+
+    const stats = performanceResilienceManager.getStats();
+    expect(stats.activeSessions).toBe(0);
+    expect(stats.sessionIds).not.toContain(perfObj.performanceSessionId);
+    expect(stats.processorRunning).toBe(false);
+
+    jest.useRealTimers();
+  });
 });
