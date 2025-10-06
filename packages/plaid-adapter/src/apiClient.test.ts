@@ -2,6 +2,8 @@ import { ComboJobTypes } from "@repo/utils";
 import { http, HttpResponse } from "msw";
 import {
   createPlaidLinkToken,
+  getAccounts,
+  getAuth,
   getItem,
   PLAID_BASE_PATH,
   PLAID_BASE_PATH_PROD,
@@ -9,7 +11,11 @@ import {
   removeItem,
 } from "./apiClient";
 import { server } from "./test/testServer";
-import { plaidTestItemResponse } from "@repo/utils-dev-dependency/plaid/testData";
+import {
+  plaidTestItemResponse,
+  authResponse,
+  accountsResponse,
+} from "@repo/utils-dev-dependency/plaid/testData";
 
 describe("createPlaidLinkToken", () => {
   const userId = "test-user-id";
@@ -394,5 +400,198 @@ describe("getItem", () => {
         sandbox: true,
       }),
     ).rejects.toThrow("Item not found!");
+  });
+});
+
+describe("getAuth", () => {
+  const clientId = "test-client-id";
+  const secret = "test-secret";
+  const accessToken = "access-sample-token";
+
+  it("gets auth data with expected request body and headers in sandbox env", async () => {
+    const expectedRequestBody = {
+      client_id: clientId,
+      secret,
+      access_token: accessToken,
+    };
+    let receivedBody: unknown;
+    let hitSandbox: boolean;
+
+    server.use(
+      http.post(`${PLAID_BASE_PATH}/auth/get`, async ({ request }) => {
+        hitSandbox = true;
+        receivedBody = await request.json();
+        return HttpResponse.json(authResponse);
+      }),
+    );
+
+    const result = await getAuth({
+      accessToken,
+      clientId,
+      secret,
+      sandbox: true,
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.data).toEqual(authResponse);
+    expect(receivedBody).toEqual(expectedRequestBody);
+    expect(hitSandbox).toBe(true);
+  });
+
+  it("gets auth data in production env", async () => {
+    let hitProductionEnv: boolean;
+
+    server.use(
+      http.post(`${PLAID_BASE_PATH_PROD}/auth/get`, async () => {
+        hitProductionEnv = true;
+        return HttpResponse.json(authResponse);
+      }),
+    );
+
+    const result = await getAuth({
+      accessToken,
+      clientId,
+      secret,
+      sandbox: false,
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.data).toEqual(authResponse);
+    expect(hitProductionEnv).toBe(true);
+  });
+
+  it("throws an error if response is not ok and includes error message", async () => {
+    server.use(
+      http.post(`${PLAID_BASE_PATH}/auth/get`, () =>
+        HttpResponse.json(
+          { error_message: "Invalid access token!" },
+          { status: 400 },
+        ),
+      ),
+    );
+
+    await expect(
+      getAuth({
+        accessToken,
+        clientId,
+        secret,
+        sandbox: true,
+      }),
+    ).rejects.toThrow("Invalid access token!");
+  });
+
+  it("throws a generic error if response is not ok and no error message is present", async () => {
+    server.use(
+      http.post(
+        `${PLAID_BASE_PATH}/auth/get`,
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+
+    await expect(
+      getAuth({
+        accessToken,
+        clientId,
+        secret,
+        sandbox: true,
+      }),
+    ).rejects.toThrow("Error getting account numbers");
+  });
+});
+
+describe("getAccounts", () => {
+  const clientId = "test-client-id";
+  const secret = "test-secret";
+  const accessToken = "access-sample-token";
+
+  it("gets accounts data with expected request body and headers in sandbox env", async () => {
+    const expectedRequestBody = {
+      client_id: clientId,
+      secret,
+      access_token: accessToken,
+    };
+    let receivedBody: unknown;
+    let hitSandbox: boolean;
+
+    server.use(
+      http.post(`${PLAID_BASE_PATH}/accounts/get`, async ({ request }) => {
+        hitSandbox = true;
+        receivedBody = await request.json();
+        return HttpResponse.json(accountsResponse);
+      }),
+    );
+
+    const result = await getAccounts({
+      accessToken,
+      clientId,
+      secret,
+      sandbox: true,
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.data).toEqual(accountsResponse);
+    expect(result.data.accounts).toHaveLength(12);
+    expect(receivedBody).toEqual(expectedRequestBody);
+    expect(hitSandbox).toBe(true);
+  });
+
+  it("gets accounts data in production env", async () => {
+    let hitProductionEnv: boolean;
+
+    server.use(
+      http.post(`${PLAID_BASE_PATH_PROD}/accounts/get`, async () => {
+        hitProductionEnv = true;
+        return HttpResponse.json(accountsResponse);
+      }),
+    );
+
+    const result = await getAccounts({
+      accessToken,
+      clientId,
+      secret,
+      sandbox: false,
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.data).toEqual(accountsResponse);
+    expect(hitProductionEnv).toBe(true);
+  });
+
+  it("throws an error if response is not ok and includes error message", async () => {
+    server.use(
+      http.post(`${PLAID_BASE_PATH}/accounts/get`, () =>
+        HttpResponse.json(
+          { error_message: "Invalid access token for accounts!" },
+          { status: 400 },
+        ),
+      ),
+    );
+
+    await expect(
+      getAccounts({
+        accessToken,
+        clientId,
+        secret,
+        sandbox: true,
+      }),
+    ).rejects.toThrow("Invalid access token for accounts!");
+  });
+
+  it("throws a generic error if response is not ok and no error message is present", async () => {
+    server.use(
+      http.post(
+        `${PLAID_BASE_PATH}/accounts/get`,
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+
+    await expect(
+      getAccounts({
+        accessToken,
+        clientId,
+        secret,
+        sandbox: true,
+      }),
+    ).rejects.toThrow("Error getting accounts");
   });
 });

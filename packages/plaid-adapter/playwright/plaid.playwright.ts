@@ -50,7 +50,7 @@ test("connects to plaid test bank through credential flow and deletes connection
 
   const expectPerformanceEvent = createExpectPerformanceEvent({
     accessToken,
-    performanceSessionId,
+    performanceSessionId: performanceSessionId!,
     request,
   });
 
@@ -170,7 +170,7 @@ test(
 
     const expectPerformanceEvent = createExpectPerformanceEvent({
       accessToken,
-      performanceSessionId,
+      performanceSessionId: performanceSessionId!,
       request,
     });
 

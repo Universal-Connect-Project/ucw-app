@@ -200,3 +200,80 @@ export async function getItem({
     data: json,
   };
 }
+
+export async function getAuth({
+  accessToken,
+  clientId,
+  secret,
+  sandbox,
+}: {
+  accessToken: string;
+  clientId: string;
+  secret: string;
+  sandbox: boolean;
+}): Promise<ApiResponse> {
+  const basePath = sandbox ? PLAID_BASE_PATH : PLAID_BASE_PATH_PROD;
+
+  // This endpoint only returns depository accounts
+  const response = await fetch(basePath + "/auth/get", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      client_id: clientId,
+      secret,
+      access_token: accessToken,
+    }),
+  });
+
+  const json = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const { error_message } = json as { error_message?: string };
+    throw new Error(error_message || "Error getting account numbers");
+  }
+
+  return {
+    status: response.status,
+    data: json,
+  };
+}
+
+export async function getAccounts({
+  accessToken,
+  clientId,
+  secret,
+  sandbox,
+}: {
+  accessToken: string;
+  clientId: string;
+  secret: string;
+  sandbox: boolean;
+}): Promise<ApiResponse> {
+  const basePath = sandbox ? PLAID_BASE_PATH : PLAID_BASE_PATH_PROD;
+
+  const response = await fetch(basePath + "/accounts/get", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      client_id: clientId,
+      secret,
+      access_token: accessToken,
+    }),
+  });
+
+  const json = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const { error_message } = json as { error_message?: string };
+    throw new Error(error_message || "Error getting accounts");
+  }
+
+  return {
+    status: response.status,
+    data: json,
+  };
+}

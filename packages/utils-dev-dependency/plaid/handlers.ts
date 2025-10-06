@@ -1,4 +1,5 @@
 import { http, HttpResponse } from "msw";
+import { accountsResponse, authResponse } from "./testData";
 
 const PLAID_BASE_PATH = "https://sandbox.plaid.com";
 const PLAID_BASE_PATH_PROD = "https://production.plaid.com";
@@ -37,5 +38,11 @@ export const plaidHandlers = [
   http.post(`${PLAID_BASE_PATH}/item/remove`, async () => HttpResponse.json()),
   http.post(`${PLAID_BASE_PATH_PROD}/item/remove`, async () =>
     HttpResponse.json(),
+  ),
+  http.post(`${PLAID_BASE_PATH}/auth/get`, () =>
+    HttpResponse.json(authResponse),
+  ),
+  http.post(`${PLAID_BASE_PATH}/accounts/get`, () =>
+    HttpResponse.json(accountsResponse),
   ),
 ];
