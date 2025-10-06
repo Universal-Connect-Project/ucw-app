@@ -80,5 +80,4 @@ export async function testAccountsData({
   );
 
   expect(accountId).not.toBeNull();
-  return accountId;
 }
