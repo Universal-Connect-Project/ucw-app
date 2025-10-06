@@ -270,6 +270,6 @@ test("should return 400 with error message when requesting plaid data", async ({
 
   const body = await response.json();
   expect(body).toEqual({
-    message: "Data adapter not implemented for Plaid",
+    message: "Transactions data type not implemented yet",
   });
 });
