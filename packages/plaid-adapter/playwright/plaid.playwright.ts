@@ -263,7 +263,7 @@ test("should return 400 with error message when requesting plaid data", async ({
   request,
 }) => {
   const response = await request.get(
-    "http://localhost:8080/api/data/aggregator/plaid/user/USR-234/account/abcd/transactions",
+    "http://localhost:8080/api/data/aggregator/plaid_sandbox/user/USR-234/account/abcd/transactions",
   );
 
   expect(response.status()).toBe(400);

@@ -1,4 +1,7 @@
-import type { PlaidAccountsResponse } from "@repo/plaid-adapter/src/fdxDataTransforming/accounts";
+import type {
+  PlaidAccount,
+  PlaidAccountsResponse,
+} from "@repo/plaid-adapter/src/fdxDataTransforming/accounts";
 
 export const checkingAccount = {
   account_id: "MMNXZ6j8ZXIrxlvGqqa8Fq7E6XeNeBSLWWjvw",
@@ -15,7 +18,7 @@ export const checkingAccount = {
   official_name: "Plaid Gold Standard 0% Interest Checking",
   subtype: "checking" as const,
   type: "depository" as const,
-};
+} as PlaidAccount;
 
 export const savingsAccount = {
   account_id: "1pM8w54Rw8IonZyWppaxTpNwDV9B9qupkknRn",
@@ -32,7 +35,7 @@ export const savingsAccount = {
   official_name: "Plaid Silver Standard 0.1% Interest Saving",
   subtype: "savings" as const,
   type: "depository" as const,
-};
+} as PlaidAccount;
 
 export const cdAccount = {
   account_id: "XMJWb68RkaI7Z87BkrngcgLBaem7qZIbmrxDD",
@@ -48,7 +51,7 @@ export const cdAccount = {
   official_name: "Plaid Bronze Standard 0.2% Interest CD",
   subtype: "cd" as const,
   type: "depository" as const,
-};
+} as PlaidAccount;
 
 export const creditCardAccount = {
   account_id: "DWXDn68GQMubeVbNnjBLueXNrbmqjGI35rXZd",
@@ -64,7 +67,7 @@ export const creditCardAccount = {
   official_name: "Plaid Diamond 12.5% APR Interest Credit Card",
   subtype: "credit card" as const,
   type: "credit" as const,
-};
+} as PlaidAccount;
 
 export const moneyMarketAccount = {
   account_id: "VQJDZ6WmKxiPegPXvbxWTkWBrE6yJlc9BvnDN",
@@ -80,7 +83,7 @@ export const moneyMarketAccount = {
   official_name: "Plaid Platinum Standard 1.85% Interest Money Market",
   subtype: "money market" as const,
   type: "depository" as const,
-};
+} as PlaidAccount;
 
 export const iraAccount = {
   account_id: "wpZmRwK1rNIy1Zy7BKmatbvjV91RPgfPbalQd",
@@ -96,7 +99,7 @@ export const iraAccount = {
   official_name: null,
   subtype: "ira" as const,
   type: "investment" as const,
-};
+} as PlaidAccount;
 
 export const investment401kAccount = {
   account_id: "5N8mnRoaqrUAnmALQ3gvudbR8MapZGi51Ep6e",
@@ -112,7 +115,7 @@ export const investment401kAccount = {
   official_name: null,
   subtype: "401k" as const,
   type: "investment" as const,
-};
+} as PlaidAccount;
 
 export const studentLoanAccount = {
   account_id: "JzXDw6EWo8IlrmlZWzBoHjkdG6VKXpuBDG5nl",
@@ -129,7 +132,7 @@ export const studentLoanAccount = {
   official_name: null,
   subtype: "student" as const,
   type: "loan" as const,
-};
+} as PlaidAccount;
 
 export const mortgageAccount = {
   account_id: "kaBWMPyogGUMxdMKR8pNCG7BP1JRmEuLl38my",
@@ -145,7 +148,7 @@ export const mortgageAccount = {
   official_name: null,
   subtype: "mortgage" as const,
   type: "loan" as const,
-};
+} as PlaidAccount;
 
 export const hsaAccount = {
   account_id: "l43nmjZo8lUDdgDvye7PH5BXRDx9qMSpV5rMP",
@@ -161,7 +164,7 @@ export const hsaAccount = {
   official_name: "Plaid Cares Health Savings Account",
   subtype: "hsa" as const,
   type: "depository" as const,
-};
+} as PlaidAccount;
 
 export const authResponse: PlaidAccountsResponse = {
   accounts: [
