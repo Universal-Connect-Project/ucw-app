@@ -286,12 +286,12 @@ const mapPlaidAccountTypeToFdx = ({
     case "payroll":
       return {
         accountCategory: AccountCategory.DEPOSIT_ACCOUNT,
-        accountType: AccountSubType.CHECKING,
+        accountType,
       };
     default:
       return {
         accountCategory: AccountCategory.DEPOSIT_ACCOUNT,
-        accountType: AccountSubType.OTHERDEPOSIT,
+        accountType,
       };
   }
 };
@@ -392,7 +392,7 @@ const transformPlaidAccountToFdx = ({
     accountType,
     accountNumber,
     accountNumberDisplay: `****${plaidAccount.mask}`,
-    productName: plaidAccount.official_name || undefined,
+    productName: plaidAccount.official_name,
     routingTransitNumber,
     nickname: plaidAccount.name,
     status: AccountStatus.OPEN, // Plaid doesn't return closed accounts

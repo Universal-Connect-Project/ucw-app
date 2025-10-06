@@ -214,7 +214,6 @@ export async function getAuth({
 }): Promise<ApiResponse> {
   const basePath = sandbox ? PLAID_BASE_PATH : PLAID_BASE_PATH_PROD;
 
-  // This endpoint only returns depository accounts
   const response = await fetch(basePath + "/auth/get", {
     method: "POST",
     headers: {

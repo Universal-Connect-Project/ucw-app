@@ -275,35 +275,13 @@ describe("dataAdapter", () => {
   });
 
   describe("request validation", () => {
-    it("sends correct request parameters for accounts", async () => {
-      let requestBody: unknown = null;
+    it("sends correct request parameters for accounts and auth endpoints", async () => {
+      let accountsRequestBody: unknown = null;
+      let authRequestBody: unknown = null;
+
       server.use(
         http.post(`${PLAID_BASE_PATH}/accounts/get`, async ({ request }) => {
-          requestBody = await request.json();
-          return HttpResponse.json(authResponse);
-        }),
-        http.post(`${PLAID_BASE_PATH}/auth/get`, () => {
-          return HttpResponse.json(authResponse);
-        }),
-      );
-
-      await sandboxDataAdapter({
-        connectionId,
-        type: VCDataTypes.ACCOUNTS,
-        userId,
-      });
-
-      expect(requestBody).toEqual({
-        access_token: connectionId,
-        client_id: aggregatorCredentials.plaidSandbox.clientId,
-        secret: aggregatorCredentials.plaidSandbox.secret,
-      });
-    });
-
-    it("sends correct request parameters for auth", async () => {
-      let authRequestBody: unknown = null;
-      server.use(
-        http.post(`${PLAID_BASE_PATH}/accounts/get`, () => {
+          accountsRequestBody = await request.json();
           return HttpResponse.json(authResponse);
         }),
         http.post(`${PLAID_BASE_PATH}/auth/get`, async ({ request }) => {
@@ -318,6 +296,11 @@ describe("dataAdapter", () => {
         userId,
       });
 
+      expect(accountsRequestBody).toEqual({
+        access_token: connectionId,
+        client_id: aggregatorCredentials.plaidSandbox.clientId,
+        secret: aggregatorCredentials.plaidSandbox.secret,
+      });
       expect(authRequestBody).toEqual({
         access_token: connectionId,
         client_id: aggregatorCredentials.plaidSandbox.clientId,

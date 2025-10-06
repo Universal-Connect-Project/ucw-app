@@ -224,6 +224,7 @@ describe("transformPlaidAccountsToFdx", () => {
 
       expect(account.loanAccount).toEqual(
         expect.objectContaining({
+          accountCategory: AccountCategory.LOAN_ACCOUNT,
           accountType: AccountSubType.MORTGAGE,
           principalBalance: mortgageAccount.balances.current,
         }),
@@ -239,6 +240,7 @@ describe("transformPlaidAccountsToFdx", () => {
 
       expect(account.depositAccount).toEqual(
         expect.objectContaining({
+          accountCategory: AccountCategory.DEPOSIT_ACCOUNT,
           accountType: AccountSubType.SAVINGS,
           nickname: "Plaid HSA",
         }),
@@ -323,8 +325,7 @@ describe("transformPlaidAccountsToFdx", () => {
         accounts: [
           {
             ...authResponse.accounts[0],
-            subtype:
-              "unknown_subtype" as PlaidAccountsResponse["accounts"][0]["subtype"],
+            subtype: "unknown_subtype" as PlaidAccount["subtype"],
           },
         ],
       };
@@ -372,7 +373,7 @@ describe("transformPlaidAccountsToFdx", () => {
         expect.objectContaining({
           currentBalance: 0,
           availableBalance: 0,
-          productName: undefined,
+          productName: null,
           accountNumber: undefined,
           routingTransitNumber: undefined,
         }),
