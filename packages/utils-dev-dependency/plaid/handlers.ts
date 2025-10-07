@@ -35,9 +35,11 @@ export const plaidHandlers = [
       request_id: "requestIdTest",
     }),
   ),
-  http.post(`${PLAID_BASE_PATH}/item/remove`, async () => HttpResponse.json()),
+  http.post(`${PLAID_BASE_PATH}/item/remove`, async () =>
+    HttpResponse.json({}),
+  ),
   http.post(`${PLAID_BASE_PATH_PROD}/item/remove`, async () =>
-    HttpResponse.json(),
+    HttpResponse.json({}),
   ),
   http.post(`${PLAID_BASE_PATH}/auth/get`, () =>
     HttpResponse.json(authResponse),
