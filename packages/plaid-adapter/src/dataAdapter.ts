@@ -13,9 +13,6 @@ const createDataAdapter = (
     connectionId,
     type,
     userId: _userId,
-    // accountId,
-    // startDate,
-    // endDate,
   }: DataAdapterRequestParams): Promise<FdxAccountsResponse | void> => {
     const { logClient, aggregatorCredentials } = dependencies;
 

@@ -594,4 +594,28 @@ describe("getAccounts", () => {
       }),
     ).rejects.toThrow("Error getting accounts");
   });
+
+  it("throws an error if response is ok but contains invalid JSON", async () => {
+    server.use(
+      http.post(
+        `${PLAID_BASE_PATH}/accounts/get`,
+        () =>
+          new HttpResponse("invalid json content", {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }),
+      ),
+    );
+
+    await expect(
+      getAccounts({
+        accessToken,
+        clientId,
+        secret,
+        sandbox: true,
+      }),
+    ).rejects.toThrow(
+      "Response was successful but contained invalid JSON. Error getting accounts",
+    );
+  });
 });
