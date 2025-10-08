@@ -50,9 +50,12 @@ test("connects to plaid test bank through credential flow and deletes connection
 
   const expectPerformanceEvent = createExpectPerformanceEvent({
     accessToken,
-    performanceSessionId,
+    performanceSessionId: performanceSessionId!,
     request,
   });
+
+  // Wait for performance service to process events
+  await page.waitForTimeout(3000);
 
   await expectPerformanceEvent({
     shouldRecordResult: true,
@@ -102,12 +105,20 @@ test("connects to plaid test bank through credential flow and deletes connection
   });
 
   await frame.getByText("Continue").click({ timeout: 60000 });
-  await frame.getByText("Finish without saving").click({ timeout: 80000 });
+  await expect(frame.getByText("Finish without saving")).toBeEnabled({
+    timeout: 120000,
+  });
+  await frame
+    .getByText("Finish without saving", { exact: false })
+    .click({ timeout: 10000 });
 
   await connectedPromise;
   await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
-    timeout: 120000,
+    timeout: 200000,
   });
+
+  // Wait for performance service to process events
+  await page.waitForTimeout(3000);
 
   const performanceEvent = await expectPerformanceEvent({
     shouldRecordResult: true,
@@ -161,18 +172,28 @@ test(
       }
     });
 
+    await expect(
+      page.getByLabel("Add account with Houndstooth Bank"),
+    ).toBeVisible({ timeout: 10000 });
     await page.getByLabel("Add account with Houndstooth Bank").click();
 
-    await page.waitForResponse(urlToIntercept);
+    await page.waitForResponse(urlToIntercept, { timeout: 30000 });
 
-    const popupPromise = page.waitForEvent("popup");
+    const popupPromise = page.waitForEvent("popup", { timeout: 30000 });
+
+    await expect(page.getByRole("link", { name: "Go to log in" })).toBeVisible({
+      timeout: 10000,
+    });
     await page.getByRole("link", { name: "Go to log in" }).click();
 
     const expectPerformanceEvent = createExpectPerformanceEvent({
       accessToken,
-      performanceSessionId,
+      performanceSessionId: performanceSessionId!,
       request,
     });
+
+    // Wait for performance service to process events
+    await page.waitForTimeout(3000);
 
     const beforeCompletePerformance = await expectPerformanceEvent({
       shouldRecordResult: true,
@@ -224,12 +245,20 @@ test(
     });
 
     await frame.getByText("Continue").click({ timeout: 60000 });
-    await frame.getByText("Finish without saving").click({ timeout: 80000 });
+    await expect(frame.getByText("Finish without saving")).toBeEnabled({
+      timeout: 120000,
+    });
+    await frame
+      .getByText("Finish without saving", { exact: false })
+      .click({ timeout: 10000 });
 
     await connectedPromise;
     await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
-      timeout: 120000,
+      timeout: 200000,
     });
+
+    // Wait for performance service to process events
+    await page.waitForTimeout(4000);
 
     const performanceEvent = await expectPerformanceEvent({
       shouldRecordResult: true,
@@ -263,13 +292,13 @@ test("should return 400 with error message when requesting plaid data", async ({
   request,
 }) => {
   const response = await request.get(
-    "http://localhost:8080/api/data/aggregator/plaid/user/USR-234/account/abcd/transactions",
+    "http://localhost:8080/api/data/aggregator/plaid_sandbox/user/USR-234/account/abcd/transactions",
   );
 
   expect(response.status()).toBe(400);
 
   const body = await response.json();
   expect(body).toEqual({
-    message: "Data adapter not implemented for Plaid",
+    message: "Transactions data type not implemented yet",
   });
 });

@@ -1,4 +1,8 @@
 import { PlaidAdapter } from "./adapter";
+import {
+  createPlaidProdDataAdapter,
+  createPlaidSandboxDataAdapter,
+} from "./dataAdapter";
 import type { AdapterDependencies } from "./models";
 
 export const PLAID_AGGREGATOR_STRING = "plaid";
@@ -8,9 +12,7 @@ export const getPlaidAdapterMapObject = (dependencies: AdapterDependencies) => {
   return {
     plaid: {
       testAdapterId: "plaid_sandbox",
-      dataAdapter: () => {
-        throw new Error("Data adapter not implemented for Plaid");
-      },
+      dataAdapter: createPlaidProdDataAdapter(dependencies),
       createWidgetAdapter: () =>
         new PlaidAdapter({
           sandbox: false,
@@ -18,9 +20,7 @@ export const getPlaidAdapterMapObject = (dependencies: AdapterDependencies) => {
         }),
     },
     plaid_sandbox: {
-      dataAdapter: () => {
-        throw new Error("Data adapter not implemented for Plaid");
-      },
+      dataAdapter: createPlaidSandboxDataAdapter(dependencies),
       createWidgetAdapter: () =>
         new PlaidAdapter({
           sandbox: true,
