@@ -21,6 +21,37 @@ interface PlaidToken {
 export const PLAID_BASE_PATH = "https://sandbox.plaid.com";
 export const PLAID_BASE_PATH_PROD = "https://production.plaid.com";
 
+const handleApiResponse = async (
+  response: Response,
+  genericErrorMsg: string,
+) => {
+  if (!response.ok) {
+    let errorMessage = genericErrorMsg;
+    try {
+      const errorJson = (await response.json()) as { error_message?: string };
+      errorMessage = errorJson.error_message || genericErrorMsg;
+    } catch {
+      // JSON parsing failed, but we already know the response was not ok
+      // Keep the default error message
+    }
+    throw new Error(errorMessage);
+  }
+
+  let json;
+  try {
+    json = await response.json();
+  } catch (error) {
+    throw new Error(
+      `Response was successful but contained invalid JSON. ${genericErrorMsg}`,
+    );
+  }
+
+  return {
+    status: response.status,
+    data: json,
+  };
+};
+
 export async function createPlaidLinkToken({
   sandbox,
   clientName,
@@ -150,17 +181,7 @@ export async function removeItem({
     }),
   });
 
-  const json = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    const { error_message } = json as { error_message?: string };
-    throw new Error(error_message || "Error removing Item");
-  }
-
-  return {
-    status: response.status,
-    data: json,
-  };
+  return await handleApiResponse(response, "Error removing Item");
 }
 
 export async function getItem({
@@ -188,15 +209,61 @@ export async function getItem({
     }),
   });
 
-  const json = await response.json().catch(() => ({}));
+  return await handleApiResponse(response, "Error getting Item");
+}
 
-  if (!response.ok) {
-    const { error_message } = json as { error_message?: string };
-    throw new Error(error_message || "Error getting Item");
-  }
+export async function getAuth({
+  accessToken,
+  clientId,
+  secret,
+  sandbox,
+}: {
+  accessToken: string;
+  clientId: string;
+  secret: string;
+  sandbox: boolean;
+}): Promise<ApiResponse> {
+  const basePath = sandbox ? PLAID_BASE_PATH : PLAID_BASE_PATH_PROD;
 
-  return {
-    status: response.status,
-    data: json,
-  };
+  const response = await fetch(basePath + "/auth/get", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      client_id: clientId,
+      secret,
+      access_token: accessToken,
+    }),
+  });
+
+  return await handleApiResponse(response, "Error getting account numbers");
+}
+
+export async function getAccounts({
+  accessToken,
+  clientId,
+  secret,
+  sandbox,
+}: {
+  accessToken: string;
+  clientId: string;
+  secret: string;
+  sandbox: boolean;
+}): Promise<ApiResponse> {
+  const basePath = sandbox ? PLAID_BASE_PATH : PLAID_BASE_PATH_PROD;
+
+  const response = await fetch(basePath + "/accounts/get", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      client_id: clientId,
+      secret,
+      access_token: accessToken,
+    }),
+  });
+
+  return await handleApiResponse(response, "Error getting accounts");
 }

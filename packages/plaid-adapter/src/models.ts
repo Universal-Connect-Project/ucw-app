@@ -14,3 +14,11 @@ export type AdapterDependencies = {
   envConfig: Record<string, string>;
   getWebhookHostUrl: () => string;
 };
+
+export type DataAdapterDependencies = {
+  logClient: LogClient;
+  aggregatorCredentials: Record<string, ApiCredentials>;
+  envConfig: Record<string, string>;
+  getWebhookHostUrl: () => string;
+  cacheClient: CacheClient;
+};
