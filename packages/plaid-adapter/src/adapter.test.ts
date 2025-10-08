@@ -70,7 +70,6 @@ describe("plaid aggregator", () => {
       const ret = await plaidAdapterSandbox.GetInstitutionById("testId");
       expect(ret).toEqual({
         id: "testId",
-        aggregator: "plaid_sandbox",
         supportsOauth: true,
       });
     });
