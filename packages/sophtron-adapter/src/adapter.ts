@@ -35,6 +35,7 @@ function fromSophtronInstitution(ins: any): AggregatorInstitution | undefined {
 
 export class SophtronAdapter implements WidgetAdapter {
   aggregator = SOPHTRON_ADAPTER_NAME;
+  aggregatorDisplayName = "Sophtron";
   apiClient: SophtronClient;
   apiClientV1: SophtronClientV1;
   logClient: LogClient;

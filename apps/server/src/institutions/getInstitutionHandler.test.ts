@@ -18,6 +18,8 @@ import setupPerformanceHandlers from "../shared/test/setupPerformanceHandlers";
 import { server } from "../test/testServer";
 import { http, HttpResponse } from "msw";
 
+const mxAggregatorDisplayName = "MX";
+
 const { institutionData: mxInstitutionData } = mxTestData;
 
 const ucpInstitutionId = "testAggregatorInstitutionGuid";
@@ -265,6 +267,7 @@ describe("getInstitutionHandler", () => {
       logo_url: ucpInstitution.logo,
       name: ucpInstitution.name,
       aggregator: MX_INT_AGGREGATOR_STRING,
+      aggregatorDisplayName: mxAggregatorDisplayName,
       supports_oauth: ucpMxInstitution.supports_oauth,
       ucpInstitutionId,
       url: ucpInstitution.url,
@@ -300,6 +303,7 @@ describe("getInstitutionHandler", () => {
       logo_url: ucpInstitution.logo,
       name: ucpInstitution.name,
       aggregator: MX_INT_AGGREGATOR_STRING,
+      aggregatorDisplayName: mxAggregatorDisplayName,
       supports_oauth: ucpMXInstitution.supports_oauth,
       ucpInstitutionId,
       url: ucpInstitution.url,
@@ -335,6 +339,7 @@ describe("getInstitutionHandler", () => {
       logo_url: ucpInstitution.logo,
       name: ucpInstitution.name,
       aggregator: MX_INT_AGGREGATOR_STRING,
+      aggregatorDisplayName: mxAggregatorDisplayName,
       supports_oauth: ucpMXInstitution.supports_oauth,
       ucpInstitutionId,
       url: ucpInstitution.url,

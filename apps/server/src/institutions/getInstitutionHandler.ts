@@ -72,6 +72,7 @@ export const getInstitutionHandler = async (req: Request, res: Response) => {
       credentials: [] as any[],
       supports_oauth: inst.supportsOauth,
       aggregator: inst.aggregator,
+      aggregatorDisplayName: widgetAdapter.aggregatorDisplayName,
       ucpInstitutionId,
       url: resolvedInstitution.url,
     });

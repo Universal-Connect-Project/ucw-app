@@ -25,6 +25,7 @@ interface CachedConnection {
 
 export class FinicityAdapter implements WidgetAdapter {
   aggregator: string;
+  aggregatorDisplayName = "Finicity";
   apiClient: FinicityClient;
   cacheClient: CacheClient;
   logger: LogClient;

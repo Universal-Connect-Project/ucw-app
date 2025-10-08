@@ -29,6 +29,7 @@ type AdapterConfig = {
 
 export class PlaidAdapter implements WidgetAdapter {
   aggregator: string;
+  aggregatorDisplayName = "Plaid";
   getWebhookHostUrl: () => string;
   credentials: ApiCredentials;
   cacheClient: CacheClient;

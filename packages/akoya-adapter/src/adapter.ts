@@ -24,6 +24,7 @@ type AdapterConfig = {
 
 export class AkoyaAdapter implements WidgetAdapter {
   aggregator: string;
+  aggregatorDisplayName = "Akoya";
   credentials: ApiCredentials;
   cacheClient: CacheClient;
   logger: LogClient;
