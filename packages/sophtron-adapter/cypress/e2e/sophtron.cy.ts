@@ -136,7 +136,7 @@ describe("Sophtron aggregator", () => {
     );
     clickContinue();
 
-    cy.findByText("xxx-xxx-1234", { timeout: 45000 }).click();
+    cy.findByText("Text message 1 (•••) •••-0102", { timeout: 45000 }).click();
     clickContinue();
 
     cy.findByRole("textbox", {
