@@ -43,14 +43,17 @@ jobs:
         with:
           node-version: "20.x"
 
-      - name: Cache Playwright browsers
+      - name: Cache Playwright browsers and dependencies
         uses: actions/cache@v4
         id: playwright-cache
         with:
           path: |
             ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+            /usr/lib/x86_64-linux-gnu
+            /usr/share/
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/playwright.config.*') }}
           restore-keys: |
+            ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}-
             ${{ runner.os }}-playwright-
 
       - name: Install dependencies
@@ -85,13 +88,13 @@ jobs:
           echo UCP_PASSWORD=${{ secrets.AUTHENTICATION_PASSWORD }} >> ${ENV_FILE_PATH}
           cat ${ENV_FILE_PATH}
 
-      - name: Install Playwright Browsers
+      - name: Install Playwright Browsers and Dependencies
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
 
-      - name: Install Playwright dependencies only
+      - name: Skip Playwright installation (using cache)
         if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+        run: echo "Using cached Playwright browsers and dependencies"
 
       - name: Run Playwright tests
         run: npm run playwright:test --workspace=packages/plaid-adapter
