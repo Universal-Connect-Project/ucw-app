@@ -151,7 +151,9 @@ export const adapterMap: Record<string, AdapterMap> = {
   ...finicityAdapterMapObject,
   ...mxAdapterMapObject,
   ...sophtronAdapterMapObject,
-  ...plaidAdapterMapObject,
+  ...(config.ENABLE_INSECURE_PLAID_ADAPTER === "true"
+    ? plaidAdapterMapObject
+    : {}),
 };
 
 const testAdapterKeys = Object.values(adapterMap)
