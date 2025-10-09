@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Flakey Plaid tests
+- Flaky Plaid tests
 - Faster Plaid github actions by cacheing dependencies.
 
 ### Disabled
