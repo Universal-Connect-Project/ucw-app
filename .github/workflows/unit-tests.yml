@@ -38,6 +38,7 @@ jobs:
 
           # Vars
           echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
+          echo ENABLE_INSECURE_PLAID_ADAPTER=true >> ${ENV_FILE_PATH}
 
           # Secrets (can't load these from another job, due to GH security features)
 
