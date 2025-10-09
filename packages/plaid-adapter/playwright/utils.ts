@@ -1,4 +1,4 @@
-import type { Expect } from "@playwright/test";
+import type { Expect, Page } from "@playwright/test";
 import {
   AccountCategory,
   AccountStatus,
@@ -80,4 +80,56 @@ export async function testAccountsData({
   );
 
   expect(accountId).not.toBeNull();
+}
+
+interface CreateConnectedPromiseParams {
+  page: Page;
+  userId: string;
+  expect: Expect;
+  timeoutMs?: number;
+}
+
+/**
+ * Creates a promise that resolves when the Plaid connection is successful
+ * and returns the connectionId. Includes proper cleanup and error handling.
+ */
+export function createConnectedPromise({
+  page,
+  userId,
+  expect,
+  timeoutMs = 30000,
+}: CreateConnectedPromiseParams): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(`timed out after ${timeoutMs / 1000} seconds waiting for connected`),
+      timeoutMs,
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const messageHandler = async (msg: any) => {
+      try {
+        const obj = (await msg.args()[0].jsonValue())?.message;
+        if (obj?.type === "connect/memberConnected") {
+          clearTimeout(timer);
+          page.off("console", messageHandler); // Clean up listener
+          
+          const connectionId = obj.metadata.connectionId;
+
+          expect(obj.metadata.user_guid).toEqual(userId);
+          expect(obj.metadata.member_guid).toContain("access-sandbox");
+          expect(connectionId).toContain("access-sandbox");
+          expect(obj.metadata.aggregator).toEqual("plaid_sandbox");
+
+          resolve(connectionId);
+        }
+      } catch (error) {
+        // Ignore JSON parsing errors for non-relevant console messages
+      }
+    };
+
+    // Add a small delay before setting up the listener to avoid race conditions
+    setTimeout(() => {
+      page.on("console", messageHandler);
+    }, 100);
+  });
 }

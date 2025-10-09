@@ -42,6 +42,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20.x"
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/playwright.config.*') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}-
+            ${{ runner.os }}-playwright-
+
       - name: Install dependencies
         run: npm ci
 
@@ -60,6 +71,7 @@ jobs:
           echo NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} >> ${ENV_FILE_PATH}
           echo UCP_CLIENT_SECRET=${{ secrets.UCP_CLIENT_SECRET }} >> ${ENV_FILE_PATH}
           echo UCP_CLIENT_ID=${{ secrets.UCP_CLIENT_ID }} >> ${ENV_FILE_PATH}
+          echo ENABLE_INSECURE_PLAID_ADAPTER=true >> ${ENV_FILE_PATH}
 
           cat ${ENV_FILE_PATH}
 
@@ -73,7 +85,13 @@ jobs:
           echo UCP_PASSWORD=${{ secrets.AUTHENTICATION_PASSWORD }} >> ${ENV_FILE_PATH}
           cat ${ENV_FILE_PATH}
 
-      - name: Install Playwright Browsers
+      - name: Install Playwright Browsers and Dependencies
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright dependencies only (from cache)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
       - name: Run Playwright tests
         run: npm run playwright:test --workspace=packages/plaid-adapter

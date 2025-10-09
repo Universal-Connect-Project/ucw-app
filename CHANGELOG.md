@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.15.1]
+
+### Fixed
+
+- Flaky Plaid tests
+- Faster Plaid github actions by cacheing dependencies.
+
+### Disabled
+
+- Plaid adapter by default due to security risk
+
 ## [1.15.0]
 
 ### Added
