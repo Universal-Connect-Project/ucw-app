@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.15.1]
 
+### Fixed
+
+- Flakey Plaid tests
+- Faster Plaid github actions by cacheing dependencies.
+
 ### Disabled
 
 - Plaid adapter by default due to security risk
