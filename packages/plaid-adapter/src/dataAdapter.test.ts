@@ -8,6 +8,7 @@ import {
 import {
   AccountStatus,
   type FdxAccountsResponse,
+  type FdxIdentityResponse,
 } from "@repo/utils-dev-dependency/shared/FdxDataTypes";
 import { createClient as createCacheClient } from "@repo/utils/test";
 import { createLogClient } from "@repo/utils-dev-dependency";
@@ -21,6 +22,7 @@ import {
   creditCardAccount,
   iraAccount,
 } from "@repo/utils-dev-dependency/plaid/testData/accounts";
+import { identityResponse } from "@repo/utils-dev-dependency/plaid/testData";
 
 const aggregatorCredentials = {
   plaidSandbox: {
@@ -232,6 +234,139 @@ describe("dataAdapter", () => {
     });
   });
 
+  describe("IDENTITY data type", () => {
+    it("retrieves identity data and transforms to FDX customers (sandbox)", async () => {
+      const data = await sandboxDataAdapter({
+        connectionId,
+        type: VCDataTypes.IDENTITY,
+        userId,
+      });
+
+      expect(data).toBeDefined();
+      expect(data).toHaveProperty("customers");
+      expect(Array.isArray((data as FdxIdentityResponse).customers)).toBe(true);
+
+      const response = data as FdxIdentityResponse;
+      expect(response.customers).toHaveLength(1);
+
+      const customer = response.customers[0];
+      expect(customer).toEqual({
+        customerId: expect.stringContaining("owner_0"),
+        type: "CONSUMER",
+        name: {
+          first: "Alberta",
+          middle: "Bobbeth",
+          last: "Charleson",
+        },
+        email: [
+          "accountholder0@example.com",
+          "accountholder1@example.com",
+          "extraordinarily.long.email.username.123456@reallylonghostname.com",
+        ],
+        addresses: [
+          {
+            type: "HOME",
+            line1: "2992 Cameron Road",
+            city: "Malakoff",
+            region: "NY",
+            postalCode: "14236",
+            country: "US",
+          },
+          {
+            type: "MAILING",
+            line1: "2493 Leisure Lane",
+            city: "San Matias",
+            region: "CA",
+            postalCode: "93405-2255",
+            country: "US",
+          },
+        ],
+        telephones: [
+          {
+            type: "HOME",
+            number: "1112223333",
+          },
+          {
+            type: "BUSINESS",
+            number: "1112224444",
+          },
+          {
+            type: "CELL",
+            number: "1112225555",
+          },
+        ],
+        accounts: expect.arrayContaining([
+          expect.objectContaining({
+            accountId: expect.any(String),
+            relationship: "PRIMARY",
+            links: expect.arrayContaining([]),
+          }),
+        ]),
+      });
+
+      expect(customer.accounts).toHaveLength(12);
+    });
+
+    it("uses production endpoint for prod adapter", async () => {
+      let requestPath = "";
+      server.use(
+        http.post(`${PLAID_BASE_PATH_PROD}/identity/get`, ({ request }) => {
+          requestPath = request.url;
+          return HttpResponse.json(identityResponse);
+        }),
+      );
+
+      await prodDataAdapter({
+        connectionId,
+        type: VCDataTypes.IDENTITY,
+        userId,
+      });
+
+      expect(requestPath).toContain(PLAID_BASE_PATH_PROD);
+    });
+
+    it("logs debug messages for identity fetching", async () => {
+      server.use(
+        http.post(`${PLAID_BASE_PATH}/identity/get`, () => {
+          return HttpResponse.json(identityResponse);
+        }),
+      );
+
+      await sandboxDataAdapter({
+        connectionId,
+        type: VCDataTypes.IDENTITY,
+        userId,
+      });
+
+      expect(mockLogClient.debug).toHaveBeenCalledWith(
+        `Fetching identity data for connection: ${connectionId}`,
+      );
+    });
+
+    it("sends correct request parameters to identity endpoint", async () => {
+      let identityRequestBody: unknown = null;
+
+      server.use(
+        http.post(`${PLAID_BASE_PATH}/identity/get`, async ({ request }) => {
+          identityRequestBody = await request.json();
+          return HttpResponse.json(identityResponse);
+        }),
+      );
+
+      await sandboxDataAdapter({
+        connectionId,
+        type: VCDataTypes.IDENTITY,
+        userId,
+      });
+
+      expect(identityRequestBody).toEqual({
+        access_token: connectionId,
+        client_id: aggregatorCredentials.plaidSandbox.clientId,
+        secret: aggregatorCredentials.plaidSandbox.secret,
+      });
+    });
+  });
+
   describe("error handling", () => {
     it("throws error when credentials are missing", async () => {
       const badDependencies: DataAdapterDependencies = {
@@ -252,16 +387,6 @@ describe("dataAdapter", () => {
       ).rejects.toThrow("Plaid credentials not found");
     });
 
-    it("throws error for unimplemented IDENTITY data type", async () => {
-      await expect(
-        sandboxDataAdapter({
-          connectionId,
-          type: VCDataTypes.IDENTITY,
-          userId,
-        }),
-      ).rejects.toThrow("Identity data type not implemented yet");
-    });
-
     it("throws error for unimplemented TRANSACTIONS data type", async () => {
       await expect(
         sandboxDataAdapter({
@@ -271,6 +396,29 @@ describe("dataAdapter", () => {
           accountId,
         }),
       ).rejects.toThrow("Transactions data type not implemented yet");
+    });
+
+    it("handles API errors properly", async () => {
+      server.use(
+        http.post(`${PLAID_BASE_PATH}/identity/get`, () => {
+          return HttpResponse.json(
+            {
+              error_type: "INVALID_REQUEST",
+              error_code: "INVALID_ACCESS_TOKEN",
+              error_message: "Invalid access token",
+            },
+            { status: 400 },
+          );
+        }),
+      );
+
+      await expect(
+        sandboxDataAdapter({
+          connectionId,
+          type: VCDataTypes.IDENTITY,
+          userId,
+        }),
+      ).rejects.toThrow("Invalid access token");
     });
   });
 

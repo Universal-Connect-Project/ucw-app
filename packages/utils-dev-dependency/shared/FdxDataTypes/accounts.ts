@@ -1,4 +1,4 @@
-import { SecurityIdType } from "./common";
+import { Iso3166CountryCode, SecurityIdType } from "./common";
 
 interface FdxCurrency {
   currencyRate?: number;
@@ -132,7 +132,7 @@ export interface FdxAccountBase {
   rewardProgramId?: string;
   transactionsIncluded?: boolean;
   domicile?: {
-    countryCode?: string;
+    countryCode?: Iso3166CountryCode;
     region?: string;
   };
 }

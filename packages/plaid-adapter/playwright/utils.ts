@@ -4,6 +4,7 @@ import {
   AccountStatus,
   AccountSubType,
   BalanceType,
+  FdxIdentityResponse,
 } from "@repo/utils-dev-dependency/shared/FdxDataTypes";
 
 interface TestDataParams {
@@ -82,6 +83,68 @@ export async function testAccountsData({
   expect(accountId).not.toBeNull();
 }
 
+export async function testIdentityData({
+  request,
+  userId,
+  connectionId,
+  aggregator,
+  expect,
+}: TestDataParams) {
+  const url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/identity`;
+
+  const identityResponse = await request.get(url);
+  const identityJson = (await identityResponse.json()) as FdxIdentityResponse;
+
+  expect(identityJson).toHaveProperty("customers");
+  expect(identityJson.customers).toHaveLength(1);
+
+  const customer = identityJson.customers[0];
+
+  expect(customer).toEqual(
+    expect.objectContaining({
+      customerId: expect.stringMatching(/_owner_0$/),
+      type: "CONSUMER",
+      name: expect.objectContaining({
+        first: expect.any(String),
+        middle: expect.any(String),
+        last: expect.any(String),
+      }),
+      email: expect.arrayContaining([expect.any(String)]),
+      addresses: expect.arrayContaining([
+        expect.objectContaining({
+          type: expect.stringMatching(/^(HOME|MAILING)$/),
+          line1: expect.any(String),
+          city: expect.any(String),
+          region: expect.any(String),
+          postalCode: expect.any(String),
+          country: "US",
+        }),
+      ]),
+      telephones: expect.arrayContaining([
+        expect.objectContaining({
+          type: expect.stringMatching(/^(HOME|BUSINESS|CELL)$/),
+          number: expect.any(String),
+        }),
+      ]),
+      accounts: expect.arrayContaining([
+        expect.objectContaining({
+          accountId: expect.any(String),
+          relationship: expect.stringMatching(/^(PRIMARY|BUSINESS)$/),
+          links: expect.any(Array),
+        }),
+      ]),
+    }),
+  );
+
+  expect(customer.accounts.length).toBeGreaterThanOrEqual(3);
+
+  customer.accounts.forEach((account) => {
+    expect(account.accountId).toBeTruthy();
+    expect(account.relationship).toMatch(/^(PRIMARY|BUSINESS)$/);
+    expect(account.links).toEqual([]);
+  });
+}
+
 interface CreateConnectedPromiseParams {
   page: Page;
   userId: string;
@@ -101,7 +164,10 @@ export function createConnectedPromise({
 }: CreateConnectedPromiseParams): Promise<string> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(
-      () => reject(`timed out after ${timeoutMs / 1000} seconds waiting for connected`),
+      () =>
+        reject(
+          `timed out after ${timeoutMs / 1000} seconds waiting for connected`,
+        ),
       timeoutMs,
     );
 
@@ -111,8 +177,8 @@ export function createConnectedPromise({
         const obj = (await msg.args()[0].jsonValue())?.message;
         if (obj?.type === "connect/memberConnected") {
           clearTimeout(timer);
-          page.off("console", messageHandler); // Clean up listener
-          
+          page.off("console", messageHandler);
+
           const connectionId = obj.metadata.connectionId;
 
           expect(obj.metadata.user_guid).toEqual(userId);
