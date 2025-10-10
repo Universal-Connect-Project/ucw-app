@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Connecting screen now shows which aggregator is being used for the connection instead of the MX logo
 
+## [1.15.1]
+
+### Fixed
+
+- Flaky Plaid tests
+- Faster Plaid github actions by cacheing dependencies.
+
+### Disabled
+
+- Plaid adapter by default due to security risk
+
 ## [1.15.0]
 
 ### Added

@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { ComboJobTypes } from "@repo/utils";
-import { testAccountsData } from "./utils";
+import { testAccountsData, createConnectedPromise } from "./utils";
 
 const WIDGET_BASE_URL = "http://localhost:8080/widget";
 
@@ -11,7 +11,6 @@ test("connects to plaid's First Platypus Bank and gets account numbers", async (
   test.setTimeout(300000);
 
   const userId = crypto.randomUUID();
-  let connectionId: string | undefined;
 
   await page.goto(
     `${WIDGET_BASE_URL}?jobTypes=${ComboJobTypes.ACCOUNT_NUMBER}&userId=${userId}`,
@@ -23,6 +22,13 @@ test("connects to plaid's First Platypus Bank and gets account numbers", async (
 
   const popupPromise = page.waitForEvent("popup");
   await page.getByRole("link", { name: "Go to log in" }).click();
+
+  const connectedPromise = createConnectedPromise({
+    page,
+    userId,
+    expect,
+    timeoutMs: 30000,
+  });
 
   await page.evaluate(`
       window.addEventListener('message', (event) => {
@@ -48,29 +54,10 @@ test("connects to plaid's First Platypus Bank and gets account numbers", async (
   await frame.locator("input[type='password']").fill("pass_good");
   await frame.locator("button[type='submit']").click();
 
-  const connectedPromise = new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject("timed out"), 12000);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    page.on("console", async (msg: any) => {
-      const obj = (await msg.args()[0].jsonValue())?.message;
-      if (obj?.type === "connect/memberConnected") {
-        clearTimeout(timer);
-        connectionId = obj.metadata.connectionId;
-
-        expect(obj.metadata.user_guid).toEqual(userId);
-        expect(obj.metadata.member_guid).toContain("access-sandbox");
-        expect(connectionId).toContain("access-sandbox");
-        expect(obj.metadata.aggregator).toEqual("plaid_sandbox");
-
-        resolve("");
-      }
-    });
-  });
-
   await frame.getByText("Continue").click({ timeout: 60000 });
   await frame.getByText("Finish without saving").click({ timeout: 120000 });
 
-  await connectedPromise;
+  const connectionId = await connectedPromise;
   await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
     timeout: 120000,
   });

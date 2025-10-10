@@ -5,6 +5,7 @@ import {
   getAccessToken,
 } from "@repo/utils-e2e/playwright";
 import { PLAID_AGGREGATOR_STRING, PLAID_BANK_UCP_INSTITUTION_ID } from "../src";
+import { createConnectedPromise } from "./utils";
 const PLAID_TEST_BANK_HOUNDSTOOTH_INSTITUTION_ID =
   "3d104b00-7f6a-4a7d-bf29-34049214e846";
 
@@ -19,7 +20,6 @@ test("connects to plaid test bank through credential flow and deletes connection
   test.setTimeout(300000);
 
   const userId = crypto.randomUUID();
-  let connectionId: string | undefined;
 
   const accessToken = await getAccessToken(request);
 
@@ -63,6 +63,13 @@ test("connects to plaid test bank through credential flow and deletes connection
     aggregatorId: PLAID_AGGREGATOR_STRING,
   });
 
+  const connectedPromise = createConnectedPromise({
+    page,
+    userId,
+    expect,
+    timeoutMs: 50000,
+  });
+
   await page.evaluate(`
       window.addEventListener('message', (event) => {
         const message = event.data
@@ -85,25 +92,6 @@ test("connects to plaid test bank through credential flow and deletes connection
   await frame.locator("input[type='password']").fill("pass_good");
   await frame.locator("button[type='submit']").click();
 
-  const connectedPromise = new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject("timed out"), 12000);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    page.on("console", async (msg: any) => {
-      const obj = (await msg.args()[0].jsonValue())?.message;
-      if (obj?.type === "connect/memberConnected") {
-        clearTimeout(timer);
-        connectionId = obj.metadata.connectionId;
-
-        expect(obj.metadata.user_guid).toEqual(userId);
-        expect(obj.metadata.member_guid).toContain("access-sandbox");
-        expect(connectionId).toContain("access-sandbox");
-        expect(obj.metadata.aggregator).toEqual("plaid_sandbox");
-
-        resolve("");
-      }
-    });
-  });
-
   await frame.getByText("Continue").click({ timeout: 60000 });
   await expect(frame.getByText("Finish without saving")).toBeEnabled({
     timeout: 120000,
@@ -112,7 +100,7 @@ test("connects to plaid test bank through credential flow and deletes connection
     .getByText("Finish without saving", { exact: false })
     .click({ timeout: 10000 });
 
-  await connectedPromise;
+  const connectionId = await connectedPromise;
   await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
     timeout: 200000,
   });
@@ -150,7 +138,6 @@ test(
     test.setTimeout(300000);
 
     const userId = crypto.randomUUID();
-    let connectionId: string | undefined;
 
     const accessToken = await getAccessToken(request);
 
@@ -203,6 +190,13 @@ test(
 
     expect(beforeCompletePerformance.durationMetric).toBeUndefined();
 
+    const connectedPromise = createConnectedPromise({
+      page,
+      userId,
+      expect,
+      timeoutMs: 50000,
+    });
+
     await page.evaluate(`
         window.addEventListener('message', (event) => {
           const message = event.data
@@ -225,25 +219,6 @@ test(
     await frame.locator("input[type='password']").fill("pass_good");
     await frame.locator("button[type='submit']").click();
 
-    const connectedPromise = new Promise((resolve, reject) => {
-      const timer = setTimeout(() => reject("timed out"), 12000);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      page.on("console", async (msg: any) => {
-        const obj = (await msg.args()[0].jsonValue())?.message;
-        if (obj?.type === "connect/memberConnected") {
-          clearTimeout(timer);
-          connectionId = obj.metadata.connectionId;
-
-          expect(obj.metadata.user_guid).toEqual(userId);
-          expect(obj.metadata.member_guid).toContain("access-sandbox");
-          expect(connectionId).toContain("access-sandbox");
-          expect(obj.metadata.aggregator).toEqual("plaid_sandbox");
-
-          resolve("");
-        }
-      });
-    });
-
     await frame.getByText("Continue").click({ timeout: 60000 });
     await expect(frame.getByText("Finish without saving")).toBeEnabled({
       timeout: 120000,
@@ -252,7 +227,7 @@ test(
       .getByText("Finish without saving", { exact: false })
       .click({ timeout: 10000 });
 
-    await connectedPromise;
+    const connectionId = await connectedPromise;
     await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
       timeout: 200000,
     });
