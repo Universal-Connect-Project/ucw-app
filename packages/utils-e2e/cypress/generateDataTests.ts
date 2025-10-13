@@ -166,12 +166,12 @@ export const generateDataTests = ({
   makeAConnection,
   shouldTestVcEndpoint,
   transactionsAccountSelector,
-  transactionsQueryStrings = [""],
+  transactionsQueryString = "",
 }: {
   makeAConnection: (jobTypes: ComboJobTypes[]) => void;
   shouldTestVcEndpoint: boolean;
   transactionsAccountSelector?: (accounts: any) => any;
-  transactionsQueryStrings?: string[];
+  transactionsQueryString?: string;
 }) =>
   jobTypesTestMap.map(
     ({ jobTypes, shouldExpectAccountOwners, shouldExpectTransactions }) =>
@@ -209,15 +209,13 @@ export const generateDataTests = ({
                   userId,
                 });
 
-                transactionsQueryStrings.forEach((transactionsQueryString) => {
-                  verifyTransactions({
-                    accountId,
-                    aggregator,
-                    shouldExpectTransactions,
-                    shouldTestVcEndpoint,
-                    userId,
-                    transactionsQueryString,
-                  });
+                verifyTransactions({
+                  accountId,
+                  aggregator,
+                  shouldExpectTransactions,
+                  shouldTestVcEndpoint,
+                  userId,
+                  transactionsQueryString,
                 });
               });
             });

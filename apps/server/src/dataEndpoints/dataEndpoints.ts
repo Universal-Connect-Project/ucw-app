@@ -107,8 +107,6 @@ export const createIdentityDataHandler = (isVc: boolean) =>
 export interface TransactionsDataQueryParameters {
   endDate?: string;
   startDate?: string;
-  start_time?: string;
-  end_time?: string;
   connectionId?: string;
 }
 
@@ -119,8 +117,6 @@ export interface TransactionsDataPathParameters {
 }
 
 const transactionsQuerySchema = Joi.object({
-  end_time: Joi.string(),
-  start_time: Joi.string(),
   startDate: Joi.string().isoDate(),
   endDate: Joi.string().isoDate(),
 });
@@ -129,8 +125,7 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
   withValidateAggregatorInPath(
     async (req: TransactionsRequest, res: Response) => {
       const { accountId, aggregator, userId } = req.params;
-      const { startDate, endDate, connectionId, start_time, end_time } =
-        req.query;
+      const { startDate, endDate, connectionId } = req.query;
 
       const { error } = transactionsQuerySchema.validate(req.query);
       if (error) {
@@ -152,8 +147,8 @@ export const createTransactionsDataHandler = (isVc: boolean) =>
           userId: aggregatorUserId,
           accountId,
           connectionId: connectionId,
-          startDate: startDate || start_time,
-          endDate: endDate || end_time,
+          startDate: startDate,
+          endDate: endDate,
         };
 
         if (isVc) {

@@ -13,7 +13,7 @@ import type { Aggregator } from "../shared/contract";
 import { invalidAggregatorString } from "../utils/validators";
 import { getDataFromVCJwt, USER_NOT_RESOLVED_ERROR_TEXT } from "@repo/utils";
 import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
-import { mxTestData, sophtronTestData } from "@repo/utils-dev-dependency";
+import { mxTestData } from "@repo/utils-dev-dependency";
 import { SOPHTRON_ADAPTER_NAME } from "@repo/sophtron-adapter/src/constants";
 
 const {
@@ -245,8 +245,8 @@ describe("dataEndpoints", () => {
             userId: "testUserId",
           },
           query: {
-            start_time: undefined,
-            end_time: undefined,
+            startDate: undefined,
+            endDate: undefined,
           },
         };
 
@@ -300,7 +300,7 @@ describe("dataEndpoints", () => {
         );
       });
 
-      it("succeeds if using deprecated start_time/end_time as supported by sophtron", async () => {
+      it("fails if using deprecated start_time/end_time", async () => {
         const req = {
           params: {
             aggregator: SOPHTRON_ADAPTER_NAME,
@@ -319,9 +319,10 @@ describe("dataEndpoints", () => {
 
         await createTransactionsDataHandler(true)(req, res);
 
-        expect(res.json).toHaveBeenCalledWith({
-          jwt: sophtronTestData.sophtronVcTranscationsData,
-        });
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith(
+          expect.stringMatching(/start_time/),
+        );
       });
 
       it("accepts valid ISO 8601 startDate and endDate", async () => {
