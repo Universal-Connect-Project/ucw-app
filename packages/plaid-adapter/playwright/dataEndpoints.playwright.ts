@@ -1,6 +1,10 @@
 import { expect, test } from "@playwright/test";
 import { ComboJobTypes } from "@repo/utils";
-import { testAccountsData, createConnectedPromise } from "./utils";
+import {
+  testAccountsData,
+  createConnectedPromise,
+  testIdentityData,
+} from "./utils";
 
 const WIDGET_BASE_URL = "http://localhost:8080/widget";
 
@@ -63,6 +67,14 @@ test("connects to plaid's First Platypus Bank and gets account numbers", async (
   });
 
   await testAccountsData({
+    request,
+    userId,
+    connectionId: connectionId!,
+    aggregator: "plaid_sandbox",
+    expect,
+  });
+
+  await testIdentityData({
     request,
     userId,
     connectionId: connectionId!,

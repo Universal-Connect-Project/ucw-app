@@ -267,3 +267,31 @@ export async function getAccounts({
 
   return await handleApiResponse(response, "Error getting accounts");
 }
+
+export async function getIdentity({
+  accessToken,
+  clientId,
+  secret,
+  sandbox,
+}: {
+  accessToken: string;
+  clientId: string;
+  secret: string;
+  sandbox: boolean;
+}): Promise<ApiResponse> {
+  const basePath = sandbox ? PLAID_BASE_PATH : PLAID_BASE_PATH_PROD;
+
+  const response = await fetch(basePath + "/identity/get", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      client_id: clientId,
+      secret,
+      access_token: accessToken,
+    }),
+  });
+
+  return await handleApiResponse(response, "Error getting identity");
+}
