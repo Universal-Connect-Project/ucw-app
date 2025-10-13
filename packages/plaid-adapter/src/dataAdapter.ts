@@ -1,9 +1,13 @@
 import type { DataAdapterDependencies } from "./models";
 
-import { getAuth, getAccounts } from "./apiClient";
+import { getAuth, getAccounts, getIdentity } from "./apiClient";
 import { DataAdapterRequestParams, VCDataTypes } from "@repo/utils";
 import { transformPlaidAccountsToFdx } from "./fdxDataTransforming/accounts";
-import type { FdxAccountsResponse } from "@repo/utils-dev-dependency/shared/FdxDataTypes";
+import type {
+  FdxAccountsResponse,
+  FdxIdentityResponse,
+} from "@repo/utils-dev-dependency/shared/FdxDataTypes";
+import { transformPlaidIdentityToFdxCustomers } from "./fdxDataTransforming/identity";
 
 const createDataAdapter = (
   sandbox: boolean,
@@ -13,7 +17,9 @@ const createDataAdapter = (
     connectionId,
     type,
     userId: _userId,
-  }: DataAdapterRequestParams): Promise<FdxAccountsResponse | void> => {
+  }: DataAdapterRequestParams): Promise<
+    FdxAccountsResponse | FdxIdentityResponse | void
+  > => {
     const { logClient, aggregatorCredentials } = dependencies;
 
     const credentials = sandbox
@@ -33,7 +39,12 @@ const createDataAdapter = (
 
     switch (type) {
       case VCDataTypes.IDENTITY: {
-        throw new Error("Identity data type not implemented yet");
+        logClient.debug(
+          `Fetching identity data for connection: ${connectionId}`,
+        );
+        const identity = await getIdentity(commonParams);
+
+        return transformPlaidIdentityToFdxCustomers(identity.data || []);
       }
 
       case VCDataTypes.ACCOUNTS: {

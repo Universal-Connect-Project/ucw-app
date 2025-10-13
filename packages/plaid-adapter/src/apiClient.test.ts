@@ -4,6 +4,7 @@ import {
   createPlaidLinkToken,
   getAccounts,
   getAuth,
+  getIdentity,
   getItem,
   PLAID_BASE_PATH,
   PLAID_BASE_PATH_PROD,
@@ -15,6 +16,7 @@ import {
   plaidTestItemResponse,
   authResponse,
   accountsResponse,
+  identityResponse,
 } from "@repo/utils-dev-dependency/plaid/testData";
 
 describe("createPlaidLinkToken", () => {
@@ -616,6 +618,127 @@ describe("getAccounts", () => {
       }),
     ).rejects.toThrow(
       "Response was successful but contained invalid JSON. Error getting accounts",
+    );
+  });
+});
+
+describe("getIdentity", () => {
+  const clientId = "test-client-id";
+  const secret = "test-secret";
+  const accessToken = "access-sample-token";
+
+  it("gets identity data with expected request body and headers in sandbox env", async () => {
+    const expectedRequestBody = {
+      client_id: clientId,
+      secret,
+      access_token: accessToken,
+    };
+    let receivedBody: unknown;
+    let hitSandbox: boolean;
+
+    server.use(
+      http.post(`${PLAID_BASE_PATH}/identity/get`, async ({ request }) => {
+        hitSandbox = true;
+        receivedBody = await request.json();
+        return HttpResponse.json(identityResponse);
+      }),
+    );
+
+    const result = await getIdentity({
+      accessToken,
+      clientId,
+      secret,
+      sandbox: true,
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.data).toEqual(identityResponse);
+    expect(result.data.accounts).toHaveLength(12);
+    expect(receivedBody).toEqual(expectedRequestBody);
+    expect(hitSandbox).toBe(true);
+  });
+
+  it("gets identity data in production env", async () => {
+    let hitProductionEnv: boolean;
+
+    server.use(
+      http.post(`${PLAID_BASE_PATH_PROD}/identity/get`, async () => {
+        hitProductionEnv = true;
+        return HttpResponse.json(identityResponse);
+      }),
+    );
+
+    const result = await getIdentity({
+      accessToken,
+      clientId,
+      secret,
+      sandbox: false,
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.data).toEqual(identityResponse);
+    expect(hitProductionEnv).toBe(true);
+  });
+
+  it("throws an error if response is not ok and includes error message", async () => {
+    server.use(
+      http.post(`${PLAID_BASE_PATH}/identity/get`, () =>
+        HttpResponse.json(
+          { error_message: "Invalid access token for identity!" },
+          { status: 400 },
+        ),
+      ),
+    );
+
+    await expect(
+      getIdentity({
+        accessToken,
+        clientId,
+        secret,
+        sandbox: true,
+      }),
+    ).rejects.toThrow("Invalid access token for identity!");
+  });
+
+  it("throws a generic error if response is not ok and no error message is present", async () => {
+    server.use(
+      http.post(
+        `${PLAID_BASE_PATH}/identity/get`,
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+
+    await expect(
+      getIdentity({
+        accessToken,
+        clientId,
+        secret,
+        sandbox: true,
+      }),
+    ).rejects.toThrow("Error getting identity");
+  });
+
+  it("throws an error if response is ok but contains invalid JSON", async () => {
+    server.use(
+      http.post(
+        `${PLAID_BASE_PATH}/identity/get`,
+        () =>
+          new HttpResponse("invalid json content", {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }),
+      ),
+    );
+
+    await expect(
+      getIdentity({
+        accessToken,
+        clientId,
+        secret,
+        sandbox: true,
+      }),
+    ).rejects.toThrow(
+      "Response was successful but contained invalid JSON. Error getting identity",
     );
   });
 });
