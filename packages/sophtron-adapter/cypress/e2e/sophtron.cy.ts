@@ -37,10 +37,7 @@ describe("Sophtron aggregator", () => {
     shouldTestVcEndpoint: true,
     // Can't test passing nothing to Sophtron because even though it's valid, the default time frame wont work because
     // Sophtron's test transaction dates are hardcoded to start in 2021 and end before the default startDate begins.
-    transactionsQueryStrings: [
-      "?start_time=2021/1/1&end_time=2099/12/31",
-      "?startDate=2021-01-01&endDate=2099-12-31",
-    ],
+    transactionsQueryString: "?startDate=2021-01-01&endDate=2099-12-31",
   });
 
   it("shows single account select if no parameter is passed, and skips single account select if singleAccountSelect=false", () => {
