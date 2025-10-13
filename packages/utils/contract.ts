@@ -68,7 +68,6 @@ export interface Institution {
 }
 
 export interface AggregatorInstitution {
-  aggregator: string;
   id: string;
   supportsOauth: boolean;
 }
@@ -247,9 +246,10 @@ export interface WidgetAdapter {
     userId?: string,
   ) => Promise<Connection | undefined>;
   HandleOauthResponse?: (request: any) => Promise<Connection>;
-  shouldRecordPerformanceDuration?: boolean;
-  requiresPollingForPerformance?: boolean;
+  aggregatorDisplayName: string;
   performanceEnabled?: boolean;
+  requiresPollingForPerformance?: boolean;
+  shouldRecordPerformanceDuration?: boolean;
 }
 
 export interface CachedInstitution {

@@ -101,7 +101,6 @@ describe("finicity aggregator", () => {
         await finicityAdapterSandbox.GetInstitutionById(testInstitutionId);
       expect(institution).toEqual({
         id: testInstitutionId,
-        aggregator: "finicity_sandbox",
         supportsOauth: true,
       });
     });

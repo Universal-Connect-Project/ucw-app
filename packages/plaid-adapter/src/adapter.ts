@@ -29,6 +29,7 @@ type AdapterConfig = {
 
 export class PlaidAdapter implements WidgetAdapter {
   aggregator: string;
+  aggregatorDisplayName = "Plaid";
   getWebhookHostUrl: () => string;
   credentials: ApiCredentials;
   cacheClient: CacheClient;
@@ -55,7 +56,6 @@ export class PlaidAdapter implements WidgetAdapter {
   async GetInstitutionById(id: string): Promise<AggregatorInstitution> {
     return {
       id,
-      aggregator: this.aggregator,
       supportsOauth: true,
     };
   }

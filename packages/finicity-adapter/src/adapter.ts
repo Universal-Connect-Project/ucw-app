@@ -25,6 +25,7 @@ interface CachedConnection {
 
 export class FinicityAdapter implements WidgetAdapter {
   aggregator: string;
+  aggregatorDisplayName = "Finicity";
   apiClient: FinicityClient;
   cacheClient: CacheClient;
   logger: LogClient;
@@ -56,7 +57,6 @@ export class FinicityAdapter implements WidgetAdapter {
   async GetInstitutionById(id: string): Promise<AggregatorInstitution> {
     return {
       id,
-      aggregator: this.aggregator,
       supportsOauth: true,
     };
   }

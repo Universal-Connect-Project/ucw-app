@@ -72,6 +72,7 @@ const fromMxMember = (
 
 export class MxAdapter implements WidgetAdapter {
   aggregator: string;
+  aggregatorDisplayName = "MX";
   apiClient: ReturnType<typeof MxPlatformApiFactory>;
   cacheClient: CacheClient;
   logClient: LogClient;
@@ -96,7 +97,6 @@ export class MxAdapter implements WidgetAdapter {
     const institution = res.data?.institution;
     return {
       id: institution?.code || null,
-      aggregator: this.aggregator,
       supportsOauth: institution.supports_oauth || false,
     };
   }
