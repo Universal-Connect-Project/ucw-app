@@ -34,19 +34,19 @@ import {
 } from "../shared/utils/context";
 
 function mapConnection(connection: Connection): Member {
-  const userId = connection.userId;
-  const memberGuid = connection.id;
+  const aggregatorUserId = connection.userId;
+  const connectionId = connection.id;
   const connectionStatus = connection.status ?? ConnectionStatus.CREATED;
 
   const sharedEventData = {
     aggregator: connection.aggregator,
-    member_guid: memberGuid,
-    user_guid: userId,
+    connectionId,
+    aggregatorUserId,
   };
 
   return {
     institution_guid: connection.institution_code,
-    guid: memberGuid,
+    guid: connectionId,
     connection_status: connectionStatus,
     most_recent_job_guid:
       connection.status === ConnectionStatus.CONNECTED
@@ -63,11 +63,11 @@ function mapConnection(connection: Connection): Member {
       memberStatusUpdate: {
         ...(connection.postMessageEventData?.memberStatusUpdate || {}),
         ...sharedEventData,
-        connection_status: connectionStatus,
+        connectionStatus,
       },
     },
     is_being_aggregated: connection.is_being_aggregated,
-    user_guid: userId,
+    user_guid: aggregatorUserId,
     mfa: {
       credentials: connection.challenges?.map((c) => {
         const ret = {

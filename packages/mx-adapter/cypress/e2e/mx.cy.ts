@@ -15,10 +15,7 @@ describe("mx aggregator", () => {
   generateDataTests({
     makeAConnection: makeAnMXConnection,
     shouldTestVcEndpoint: true,
-    transactionsQueryStrings: [
-      "",
-      `?startDate=${oneMonthAgoIso}&endDate=${todayIso}`,
-    ],
+    transactionsQueryString: `?startDate=${oneMonthAgoIso}&endDate=${todayIso}`,
   });
 
   it("refreshes an mx connection if given the correct parameters and hides the back button", () => {

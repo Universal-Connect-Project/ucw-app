@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - start_time and end_time are no longer valid query params for the transactions data endpoint. Use startDate/endDate.
+- postmessage fields
+  - `member_guid` -> `connectionId`
+  - `user_guid` -> `aggregatorUserId`
+  - `connection_status` -> `connectionStatus`
 
 ## [1.16.0]
 

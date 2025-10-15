@@ -57,10 +57,11 @@ const makeAConnection = async (
   });
 
   const obj = (await msg.args()[0].jsonValue())?.message;
-  expect(obj.metadata.user_guid).not.toBeNull();
-  expect(obj.metadata.member_guid).not.toBeNull();
-  expect(obj.metadata.aggregator).toEqual("finicity_sandbox");
+  expect(obj.metadata.user_guid).toBeUndefined();
+  expect(obj.metadata.aggregatorUserId).not.toBeNull();
+  expect(obj.metadata.member_guid).toBeUndefined();
   expect(obj.metadata.connectionId).not.toBeNull();
+  expect(obj.metadata.aggregator).toEqual("finicity_sandbox");
 
   await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
     timeout: 120000,

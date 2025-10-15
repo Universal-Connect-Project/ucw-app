@@ -73,7 +73,7 @@ describe("authentication", () => {
                 (call) => call.args[0].type === MEMBER_CONNECTED_EVENT_TYPE,
               );
             const { metadata } = connection?.args[0];
-            const connectionId = metadata.member_guid;
+            const connectionId = metadata.connectionId;
             const aggregator = metadata.aggregator;
 
             const widgetDemoDataAccessToken = Cypress.env(

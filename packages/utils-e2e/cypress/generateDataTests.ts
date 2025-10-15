@@ -31,12 +31,12 @@ const decodeVcDataFromResponse = (response) => {
 
 export const verifyAccountsAndReturnAccountId = ({
   aggregator,
-  memberGuid,
+  connectionId,
   shouldTestVcEndpoint,
   transactionsAccountSelector,
   userId,
 }) => {
-  const url = `/data/aggregator/${aggregator}/user/${userId}/connection/${memberGuid}/accounts`;
+  const url = `/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/accounts`;
 
   return cy.request("get", `/api${url}`).then((dataResponse) => {
     expect(dataResponse.status).to.equal(200);
@@ -73,12 +73,12 @@ export const verifyAccountsAndReturnAccountId = ({
 
 const verifyIdentity = ({
   aggregator,
-  memberGuid,
+  connectionId,
   userId,
   shouldExpectAccountOwners,
   shouldTestVcEndpoint,
 }) => {
-  const url = `/data/aggregator/${aggregator}/user/${userId}/connection/${memberGuid}/identity`;
+  const url = `/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/identity`;
 
   return cy.request("get", `/api${url}`).then((dataResponse) => {
     expect(dataResponse.status).to.equal(200);
@@ -176,7 +176,7 @@ export const generateDataTests = ({
   jobTypesTestMap.map(
     ({ jobTypes, shouldExpectAccountOwners, shouldExpectTransactions }) =>
       it(`makes a connection with jobTypes: ${jobTypes}, gets the accounts, identity, and transaction data from the data${shouldTestVcEndpoint ? " and vc" : ""} endpoints`, () => {
-        let memberGuid: string;
+        let connectionId: string;
         let aggregator: string;
         const userId = Cypress.env("userId");
 
@@ -191,18 +191,18 @@ export const generateDataTests = ({
                   (call) => call.args[0].type === MEMBER_CONNECTED_EVENT_TYPE,
                 );
               const { metadata } = connection?.args[0];
-              memberGuid = metadata.member_guid;
+              connectionId = metadata.connectionId;
               aggregator = metadata.aggregator;
 
               verifyAccountsAndReturnAccountId({
                 transactionsAccountSelector,
-                memberGuid,
+                connectionId,
                 aggregator,
                 shouldTestVcEndpoint,
                 userId,
               }).then((accountId) => {
                 verifyIdentity({
-                  memberGuid,
+                  connectionId,
                   aggregator,
                   shouldExpectAccountOwners,
                   shouldTestVcEndpoint,

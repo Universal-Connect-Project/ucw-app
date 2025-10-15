@@ -84,15 +84,16 @@ test("connects to mx bank with oAuth, tracks performance correctly, and does ref
       const obj = (await msg.args()[0].jsonValue())?.message;
       if (obj?.type === "connect/memberConnected") {
         clearTimeout(timer);
-        expect(obj.metadata.user_guid).not.toBeNull();
-        expect(obj.metadata.member_guid).not.toBeNull();
-        expect(obj.metadata.aggregator).toEqual("mx_int");
+        expect(obj.metadata.user_guid).toBeUndefined();
+        expect(obj.metadata.aggregatorUserId).not.toBeNull();
         expect(obj.metadata.connectionId).not.toBeNull();
+        expect(obj.metadata.member_guid).toBeUndefined();
+        expect(obj.metadata.aggregator).toEqual("mx_int");
 
-        const { member_guid, aggregator, ucpInstitutionId } = obj.metadata;
+        const { connectionId, aggregator, ucpInstitutionId } = obj.metadata;
 
         await page.goto(
-          `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&aggregator=${aggregator}&institutionId=${ucpInstitutionId}&connectionId=${member_guid}`,
+          `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&aggregator=${aggregator}&institutionId=${ucpInstitutionId}&connectionId=${connectionId}`,
         );
 
         const popupPromise2 = page.waitForEvent("popup");

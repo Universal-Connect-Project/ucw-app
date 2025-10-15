@@ -22,7 +22,7 @@ describe("targetOrigin", () => {
           const { metadata } = connection?.args[0];
           const { targetOrigin } = connection?.args[1];
 
-          expect(metadata).to.have.property("member_guid");
+          expect(metadata).to.have.property("connectionId");
           expect(metadata).to.have.property("aggregator");
           expect(targetOrigin).to.equal(window.location.origin);
         });
@@ -45,7 +45,7 @@ describe("targetOrigin", () => {
           const { metadata } = connection?.args[0];
           const { targetOrigin } = connection?.args[1];
 
-          expect(metadata).to.have.property("member_guid");
+          expect(metadata).to.have.property("connectionId");
           expect(metadata).to.have.property("aggregator");
           expect(targetOrigin).to.be.undefined;
         });
