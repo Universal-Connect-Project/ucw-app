@@ -51,7 +51,7 @@ const Widget = ({
           if (!targetOrigin) {
             console.warn(
               "🚨 SECURITY WARNING: targetOrigin is not defined. " +
-                "This could allow sensitive data to be stolen via cross-site scripting. " +
+                "This could allow sensitive data to be stolen. " +
                 "Always specify a targetOrigin when embedding this widget.",
             );
           }
