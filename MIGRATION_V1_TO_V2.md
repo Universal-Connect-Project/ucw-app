@@ -7,6 +7,10 @@
 
 ## Postmessages
 
+### Security
+
+- Because Plaid sends an access_token in the memberConnected postmessage it's strongly encouraged to pass targetOrigin into the widget url request. A console warning will be triggered as a reminder when a targetOrigin is not specified.
+
 ### Response object name changes
 
 - `member_guid` -> `connectionId`

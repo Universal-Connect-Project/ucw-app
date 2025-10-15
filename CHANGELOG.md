@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `user_guid` -> `aggregatorUserId`
   - `connection_status` -> `connectionStatus`
 
+### Added
+
+- console warning when targetOrigin is not specified.
+
 ## [1.16.0]
 
 ### Added

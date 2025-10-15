@@ -48,16 +48,24 @@ const Widget = ({
         onAnalyticEvent={() => {}}
         onAnalyticPageview={() => {}}
         onPostMessage={(type: string, metadata?: object) => {
+          if (!targetOrigin) {
+            console.warn(
+              "🚨 SECURITY WARNING: targetOrigin is not defined. " +
+                "This could allow sensitive data to be stolen via cross-site scripting. " +
+                "Always specify a targetOrigin when embedding this widget.",
+            );
+          }
+
           const payload = {
             metadata,
             type,
           };
 
           if (window.parent) {
-            window.parent.postMessage(payload, { targetOrigin });
+            window.parent.postMessage(payload, targetOrigin || "*");
           }
           if (window.opener) {
-            window.opener.postMessage(payload, { targetOrigin });
+            window.opener.postMessage(payload, targetOrigin || "*");
           }
         }}
         postMessageEventOverrides={postMessageEventOverrides}

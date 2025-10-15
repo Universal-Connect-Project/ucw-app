@@ -181,8 +181,8 @@ export function createConnectedPromise({
 
           const connectionId = obj.metadata.connectionId;
 
-          expect(obj.metadata.user_guid).toEqual(userId);
-          expect(obj.metadata.member_guid).toContain("access-sandbox");
+          expect(obj.metadata.aggregatorUserId).toEqual(userId);
+          expect(obj.metadata.member_guid).toBeUndefined();
           expect(connectionId).toContain("access-sandbox");
           expect(obj.metadata.aggregator).toEqual("plaid_sandbox");
 

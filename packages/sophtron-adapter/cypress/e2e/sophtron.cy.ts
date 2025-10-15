@@ -104,9 +104,9 @@ describe("Sophtron aggregator", () => {
             "rawStatus",
             "selectedAccountId",
             "aggregator",
-            "member_guid",
-            "user_guid",
-            "connection_status",
+            "connectionId",
+            "aggregatorUserId",
+            "connectionStatus",
           ].forEach((prop) => {
             expect(!!metadata[prop]).to.be.true;
           });
