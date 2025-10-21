@@ -9,7 +9,7 @@ test("connects to mikomo bank with oAuth", async ({ page }) => {
   const userId = crypto.randomUUID();
 
   await page.goto(
-    `${WIDGET_BASE_URL}?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
+    `${WIDGET_BASE_URL}?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
   );
 
   page.evaluate(`

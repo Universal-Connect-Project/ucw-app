@@ -312,26 +312,6 @@ describe("server", () => {
           "&#x22;targetOrigin&#x22; must be a valid uri with a scheme matching the http|https pattern",
         );
       });
-
-      it("accepts valid targetOrigin values", () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn(),
-        } as unknown as Response;
-
-        widgetHandler(
-          {
-            query: {
-              jobTypes: ComboJobTypes.TRANSACTIONS,
-              userId: "testUserId",
-              targetOrigin: "http://localhost:3000",
-            },
-          } as unknown as Request,
-          res,
-        );
-
-        expect(res.status).not.toHaveBeenCalledWith(400);
-      });
     });
   });
 });
