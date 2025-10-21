@@ -39,7 +39,7 @@ describe("targetOrigin", () => {
       failOnStatusCode: false,
     }).then((response) => {
       expect(response.status).to.equal(400);
-      expect(response.body).to.include('"targetOrigin" is required');
+      expect(response.body).to.include("&#x22;targetOrigin&#x22; is required");
     });
   });
 
