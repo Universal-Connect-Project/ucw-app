@@ -17,7 +17,7 @@ const Widget = ({
   connectionId: string;
   institutionId: string;
   jobTypes: ComboJobTypes[];
-  targetOrigin: string | undefined;
+  targetOrigin: string;
 }) => {
   const disableInstitutionSearch = !!(institutionId || connectionId);
 
@@ -54,10 +54,10 @@ const Widget = ({
           };
 
           if (window.parent) {
-            window.parent.postMessage(payload, { targetOrigin });
+            window.parent.postMessage(payload, targetOrigin);
           }
           if (window.opener) {
-            window.opener.postMessage(payload, { targetOrigin });
+            window.opener.postMessage(payload, targetOrigin);
           }
         }}
         postMessageEventOverrides={postMessageEventOverrides}

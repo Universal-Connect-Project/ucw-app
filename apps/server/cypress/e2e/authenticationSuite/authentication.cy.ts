@@ -56,7 +56,7 @@ describe("authentication", () => {
       });
 
       visitWithPostMessageSpy(
-        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
+        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
       )
         .then(() => {
           searchAndSelectMx();
@@ -73,7 +73,7 @@ describe("authentication", () => {
                 (call) => call.args[0].type === MEMBER_CONNECTED_EVENT_TYPE,
               );
             const { metadata } = connection?.args[0];
-            const connectionId = metadata.member_guid;
+            const connectionId = metadata.connectionId;
             const aggregator = metadata.aggregator;
 
             const widgetDemoDataAccessToken = Cypress.env(

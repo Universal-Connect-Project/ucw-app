@@ -24,7 +24,7 @@ test("connects to plaid test bank through credential flow and deletes connection
   const accessToken = await getAccessToken(request);
 
   await page.goto(
-    `${WIDGET_BASE_URL}?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
+    `${WIDGET_BASE_URL}?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
   );
 
   await page.getByPlaceholder("Search").fill("Plaid Bank");
@@ -142,7 +142,7 @@ test(
     const accessToken = await getAccessToken(request);
 
     await page.goto(
-      `${WIDGET_BASE_URL}?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
+      `${WIDGET_BASE_URL}?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
     );
 
     await page.getByPlaceholder("Search").fill("Houndstooth");

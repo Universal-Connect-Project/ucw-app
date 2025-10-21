@@ -184,14 +184,14 @@ describe("connectApi", () => {
           postMessageEventData: {
             memberConnected: {
               aggregator: MX_AGGREGATOR_STRING,
-              member_guid: memberData.guid,
-              user_guid: resolvedUserId,
+              connectionId: memberData.guid,
+              aggregatorUserId: resolvedUserId,
             },
             memberStatusUpdate: {
               aggregator: MX_AGGREGATOR_STRING,
-              connection_status: 0,
-              member_guid: memberData.guid,
-              user_guid: resolvedUserId,
+              connectionStatus: 0,
+              connectionId: memberData.guid,
+              aggregatorUserId: resolvedUserId,
             },
           },
           user_guid: resolvedUserId,
@@ -284,14 +284,14 @@ describe("connectApi", () => {
           postMessageEventData: {
             memberConnected: {
               aggregator: MX_AGGREGATOR_STRING,
-              member_guid: mxTestMemberData.member.guid,
-              user_guid: undefined,
+              connectionId: mxTestMemberData.member.guid,
+              aggregatorUserId: undefined,
             },
             memberStatusUpdate: {
               aggregator: MX_AGGREGATOR_STRING,
-              connection_status: 0,
-              member_guid: mxTestMemberData.member.guid,
-              user_guid: undefined,
+              connectionStatus: 0,
+              connectionId: mxTestMemberData.member.guid,
+              aggregatorUserId: undefined,
             },
           },
           user_guid: undefined,
@@ -709,14 +709,14 @@ describe("connectApi", () => {
         postMessageEventData: {
           memberConnected: {
             aggregator: MX_AGGREGATOR_STRING,
-            member_guid: mxConnectionByIdMember.guid,
-            user_guid: resolvedUserId,
+            connectionId: mxConnectionByIdMember.guid,
+            aggregatorUserId: resolvedUserId,
           },
           memberStatusUpdate: {
             aggregator: MX_AGGREGATOR_STRING,
-            connection_status: 6,
-            member_guid: mxConnectionByIdMember.guid,
-            user_guid: resolvedUserId,
+            connectionStatus: 6,
+            connectionId: mxConnectionByIdMember.guid,
+            aggregatorUserId: resolvedUserId,
           },
         },
         user_guid: resolvedUserId,

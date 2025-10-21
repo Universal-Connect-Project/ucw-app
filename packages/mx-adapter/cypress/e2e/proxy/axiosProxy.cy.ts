@@ -10,13 +10,13 @@ import { ComboJobTypes } from "@repo/utils";
 
 describe("mx aggregator using axios proxy", () => {
   it("gets data through the proxy server", () => {
-    let memberGuid: string;
+    let connectionId: string;
     let aggregator: string;
     const shouldTestVcEndpoint = false;
     const userId = Cypress.env("userId");
 
     visitWithPostMessageSpy(
-      `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
+      `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
     )
       .then(() => makeAnMXConnection())
       .then(() => {
@@ -26,11 +26,11 @@ describe("mx aggregator using axios proxy", () => {
             .getCalls()
             .find((call) => call.args[0].type === MEMBER_CONNECTED_EVENT_TYPE);
           const { metadata } = connection?.args[0];
-          memberGuid = metadata.member_guid;
+          connectionId = metadata.connectionId;
           aggregator = metadata.aggregator;
 
           verifyAccountsAndReturnAccountId({
-            memberGuid,
+            connectionId,
             aggregator,
             shouldTestVcEndpoint,
             transactionsAccountSelector: undefined,

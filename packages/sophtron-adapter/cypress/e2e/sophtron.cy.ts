@@ -44,7 +44,7 @@ describe("Sophtron aggregator", () => {
     const userId = Cypress.env("userId");
 
     cy.visit(
-      `/widget?jobTypes=${ComboJobTypes.ACCOUNT_NUMBER}&userId=${userId}`,
+      `/widget?jobTypes=${ComboJobTypes.ACCOUNT_NUMBER}&userId=${userId}&targetOrigin=http://localhost:8080`,
     );
 
     searchAndSelectSophtron();
@@ -59,7 +59,7 @@ describe("Sophtron aggregator", () => {
     expectConnectionSuccess();
 
     cy.visit(
-      `/widget?jobTypes=${ComboJobTypes.ACCOUNT_NUMBER}&userId=${userId}&singleAccountSelect=false`,
+      `/widget?jobTypes=${ComboJobTypes.ACCOUNT_NUMBER}&userId=${userId}&singleAccountSelect=false&targetOrigin=http://localhost:8080`,
     );
 
     searchAndSelectSophtron();
@@ -83,7 +83,9 @@ describe("Sophtron aggregator", () => {
 
     const userId = Cypress.env("userId");
 
-    visitWithPostMessageSpy(`/widget?jobTypes=${jobTypes}&userId=${userId}`)
+    visitWithPostMessageSpy(
+      `/widget?jobTypes=${jobTypes}&userId=${userId}&targetOrigin=http://localhost:8080`,
+    )
       .then(() => makeAConnection(jobTypes))
       .then(() => {
         // Capture postmessages into variables
@@ -104,9 +106,9 @@ describe("Sophtron aggregator", () => {
             "rawStatus",
             "selectedAccountId",
             "aggregator",
-            "member_guid",
-            "user_guid",
-            "connection_status",
+            "connectionId",
+            "aggregatorUserId",
+            "connectionStatus",
           ].forEach((prop) => {
             expect(!!metadata[prop]).to.be.true;
           });

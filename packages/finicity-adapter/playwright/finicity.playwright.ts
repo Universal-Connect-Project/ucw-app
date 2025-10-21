@@ -13,7 +13,7 @@ const makeAConnection = async (
   userId: string,
 ) => {
   await page.goto(
-    `http://localhost:8080/widget?jobTypes=${jobTypes.join(",")}&userId=${userId}`,
+    `http://localhost:8080/widget?jobTypes=${jobTypes.join(",")}&userId=${userId}&targetOrigin=http://localhost:8080`,
   );
 
   page.evaluate(`
@@ -57,10 +57,11 @@ const makeAConnection = async (
   });
 
   const obj = (await msg.args()[0].jsonValue())?.message;
-  expect(obj.metadata.user_guid).not.toBeNull();
-  expect(obj.metadata.member_guid).not.toBeNull();
-  expect(obj.metadata.aggregator).toEqual("finicity_sandbox");
+  expect(obj.metadata.user_guid).toBeUndefined();
+  expect(obj.metadata.aggregatorUserId).not.toBeNull();
+  expect(obj.metadata.member_guid).toBeUndefined();
   expect(obj.metadata.connectionId).not.toBeNull();
+  expect(obj.metadata.aggregator).toEqual("finicity_sandbox");
 
   await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
     timeout: 120000,
@@ -168,7 +169,7 @@ test.describe("Finicity Adapter Tests", () => {
     await testDataEndpoints({ request, userId, connectionId, aggregator });
 
     await page.goto(
-      `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&aggregator=${aggregator}&institutionId=${ucpInstitutionId}&connectionId=${connectionId}`,
+      `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&aggregator=${aggregator}&institutionId=${ucpInstitutionId}&connectionId=${connectionId}&targetOrigin=http://localhost:8080`,
     );
 
     await expect(page.getByText("Log in at FinBank Profiles - A")).toBeVisible({
@@ -194,7 +195,7 @@ test.describe("Finicity Adapter Tests", () => {
     test.setTimeout(300000);
 
     await page.goto(
-      `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
+      `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
     );
 
     await page.getByPlaceholder("Search").fill("finbank");

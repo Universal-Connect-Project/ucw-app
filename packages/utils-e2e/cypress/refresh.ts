@@ -7,7 +7,7 @@ export const refreshAConnection = ({ enterCredentials, selectInstitution }) => {
   const userId = Cypress.env("userId");
 
   visitWithPostMessageSpy(
-    `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
+    `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
   ).then(() => {
     // Make the initial connection
     selectInstitution();
@@ -25,13 +25,13 @@ export const refreshAConnection = ({ enterCredentials, selectInstitution }) => {
         .find((call) => call.args[0].type === MEMBER_CONNECTED_EVENT_TYPE);
 
       const { metadata } = connection?.args[0];
-      const memberGuid = metadata.member_guid;
+      const connectionId = metadata.connectionId;
       const aggregator = metadata.aggregator;
       const ucpInstitutionId = metadata.ucpInstitutionId;
 
       //Refresh the connection
       cy.visit(
-        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&connectionId=${memberGuid}&aggregator=${aggregator}&userId=${userId}&institutionId=${ucpInstitutionId}`,
+        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&connectionId=${connectionId}&aggregator=${aggregator}&userId=${userId}&institutionId=${ucpInstitutionId}&targetOrigin=http://localhost:8080`,
       );
 
       enterCredentials();
