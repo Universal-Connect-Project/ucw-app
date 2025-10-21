@@ -18,7 +18,7 @@ test("connects to mx bank with oAuth, tracks performance correctly, and does ref
   const accessToken = await getAccessToken(request);
 
   await page.goto(
-    `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
+    `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
   );
 
   page.evaluate(`
@@ -93,7 +93,7 @@ test("connects to mx bank with oAuth, tracks performance correctly, and does ref
         const { connectionId, aggregator, ucpInstitutionId } = obj.metadata;
 
         await page.goto(
-          `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&aggregator=${aggregator}&institutionId=${ucpInstitutionId}&connectionId=${connectionId}`,
+          `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&aggregator=${aggregator}&institutionId=${ucpInstitutionId}&connectionId=${connectionId}&targetOrigin=http://localhost:8080`,
         );
 
         const popupPromise2 = page.waitForEvent("popup");
@@ -137,7 +137,7 @@ test("results in a successful performance event even if you close the tab", asyn
   const accessToken = await getAccessToken(request);
 
   await page.goto(
-    `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
+    `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
   );
 
   page.evaluate(`
@@ -217,7 +217,7 @@ test("shows an error page if you deny an mx bank oauth connection", async ({
   const userId = crypto.randomUUID();
 
   await page.goto(
-    `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
+    `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
   );
 
   await page.getByPlaceholder("Search").fill("MX Bank (Oauth)");

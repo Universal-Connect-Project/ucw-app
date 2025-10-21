@@ -56,7 +56,7 @@ describe("authentication", () => {
       });
 
       visitWithPostMessageSpy(
-        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
+        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
       )
         .then(() => {
           searchAndSelectMx();

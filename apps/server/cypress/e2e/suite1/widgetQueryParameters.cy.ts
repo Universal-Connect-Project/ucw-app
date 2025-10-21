@@ -18,7 +18,7 @@ describe("query parameters", () => {
     const userId = Cypress.env("userId");
 
     visitWithPostMessageSpy(
-      `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&institutionId=${MX_BANK_UCP_INSTITUTION_ID}&userId=${userId}`,
+      `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&institutionId=${MX_BANK_UCP_INSTITUTION_ID}&userId=${userId}&targetOrigin=http://localhost:8080`,
     ).then(() => {
       enterMxCredentials();
 

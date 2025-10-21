@@ -16,7 +16,7 @@ describe("mx aggregator using axios proxy", () => {
     const userId = Cypress.env("userId");
 
     visitWithPostMessageSpy(
-      `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
+      `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
     )
       .then(() => makeAnMXConnection())
       .then(() => {

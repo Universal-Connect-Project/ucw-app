@@ -50,7 +50,7 @@ The API documentation for this service lives in [./openApiDocumentation.json](./
 
 It can take a minute or so for the server to initialize and set up elasticsearch.
 
-Once the server is running, and you see a message that says, `"Message":"App initialized successfully"`, you can then navigate to [http://localhost:8080/widget?jobTypes=transactions&userId=test-user-id](http://localhost:8080/widget?jobTypes=transactions&userId=test-user-id) in a browser, and you should see the Universal Connect Widget UI load.
+Once the server is running, and you see a message that says, `"Message":"App initialized successfully"`, you can then navigate to [http://localhost:8080/widget?jobTypes=transactions&userId=test-user-id&targetOrigin=http://localhost:8080](http://localhost:8080/widget?jobTypes=transactions&userId=test-user-id&targetOrigin=http://localhost:8080) in a browser, and you should see the Universal Connect Widget UI load.
 
 ## Universal Connect Project Services and API Keys
 

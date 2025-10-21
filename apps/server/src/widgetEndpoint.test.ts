@@ -20,6 +20,7 @@ describe("server", () => {
           {
             query: {
               userId: "testUserId",
+              targetOrigin: "https://example.com",
             },
           } as unknown as Request,
           res,
@@ -42,6 +43,7 @@ describe("server", () => {
             query: {
               jobTypes: "junk",
               userId: "testUserId",
+              targetOrigin: "https://example.com",
             },
           } as unknown as Request,
           res,
@@ -63,6 +65,7 @@ describe("server", () => {
           {
             query: {
               jobTypes: ComboJobTypes.TRANSACTIONS,
+              targetOrigin: "https://example.com",
             },
           } as unknown as Request,
           res,
@@ -84,6 +87,7 @@ describe("server", () => {
               jobTypes: ComboJobTypes.TRANSACTIONS,
               aggregator: "junk",
               userId: "testUserId",
+              targetOrigin: "https://example.com",
             },
           } as unknown as Request,
           res,
@@ -106,6 +110,7 @@ describe("server", () => {
               jobTypes: ComboJobTypes.TRANSACTIONS,
               aggregator: MX_AGGREGATOR_STRING,
               userId: "testUserId",
+              targetOrigin: "https://example.com",
             },
           } as unknown as Request,
           res,
@@ -130,6 +135,7 @@ describe("server", () => {
               jobTypes: ComboJobTypes.TRANSACTIONS,
               aggregator: MX_AGGREGATOR_STRING,
               userId: "testUserId",
+              targetOrigin: "https://example.com",
             },
           } as unknown as Request,
           res,
@@ -154,6 +160,7 @@ describe("server", () => {
               institutionId: "testInstitutionId",
               jobTypes: ComboJobTypes.TRANSACTIONS,
               userId: "testUserId",
+              targetOrigin: "https://example.com",
             },
           } as unknown as Request,
           res,
@@ -178,6 +185,7 @@ describe("server", () => {
               connectionId: "testConnectionId",
               jobTypes: ComboJobTypes.TRANSACTIONS,
               userId: "testUserId",
+              targetOrigin: "https://example.com",
             },
           } as unknown as Request,
           res,
@@ -201,6 +209,7 @@ describe("server", () => {
               jobTypes: ComboJobTypes.TRANSACTIONS,
               aggregatorOverride: "junk",
               userId: "testUserId",
+              targetOrigin: "https://example.com",
             },
           } as unknown as Request,
           res,
@@ -224,6 +233,7 @@ describe("server", () => {
               jobTypes: ComboJobTypes.TRANSACTIONS,
               singleAccountSelect: "junk",
               userId: "testUserId",
+              targetOrigin: "https://example.com",
             },
           } as unknown as Request,
           res,
@@ -233,6 +243,94 @@ describe("server", () => {
         expect(res.send).toHaveBeenCalledWith(
           "&#x22;singleAccountSelect&#x22; must be a boolean",
         );
+      });
+
+      it("responds with a 400 if targetOrigin is missing", () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn(),
+        } as unknown as Response;
+
+        widgetHandler(
+          {
+            query: {
+              jobTypes: ComboJobTypes.TRANSACTIONS,
+              userId: "testUserId",
+            },
+          } as unknown as Request,
+          res,
+        );
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith(
+          "&#x22;targetOrigin&#x22; is required",
+        );
+      });
+
+      it("responds with a 400 if targetOrigin is empty string", () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn(),
+        } as unknown as Response;
+
+        widgetHandler(
+          {
+            query: {
+              jobTypes: ComboJobTypes.TRANSACTIONS,
+              userId: "testUserId",
+              targetOrigin: "",
+            },
+          } as unknown as Request,
+          res,
+        );
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith(
+          "&#x22;targetOrigin&#x22; is not allowed to be empty",
+        );
+      });
+
+      it("responds with a 400 if targetOrigin is not a valid URL", () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn(),
+        } as unknown as Response;
+
+        widgetHandler(
+          {
+            query: {
+              jobTypes: ComboJobTypes.TRANSACTIONS,
+              userId: "testUserId",
+              targetOrigin: "not-a-valid-url",
+            },
+          } as unknown as Request,
+          res,
+        );
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith(
+          "&#x22;targetOrigin&#x22; must be a valid uri with a scheme matching the http|https pattern",
+        );
+      });
+
+      it("accepts valid targetOrigin values", () => {
+        const res = {
+          send: jest.fn(),
+          status: jest.fn(),
+        } as unknown as Response;
+
+        widgetHandler(
+          {
+            query: {
+              jobTypes: ComboJobTypes.TRANSACTIONS,
+              userId: "testUserId",
+              targetOrigin: "http://localhost:3000",
+            },
+          } as unknown as Request,
+          res,
+        );
+
+        expect(res.status).not.toHaveBeenCalledWith(400);
       });
     });
   });

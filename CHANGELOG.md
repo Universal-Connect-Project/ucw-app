@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `member_guid` -> `connectionId`
   - `user_guid` -> `aggregatorUserId`
   - `connection_status` -> `connectionStatus`
+- `targetOrigin` is required on the widget request
 
 ### Added
 
