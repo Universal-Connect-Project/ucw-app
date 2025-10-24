@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `user_guid` -> `aggregatorUserId`
   - `connection_status` -> `connectionStatus`
 - `targetOrigin` is required on the widget request
+- Data Endpoints
+  - connectionId can be sensitive so it's in the header now
+  - all other params have been moved into query params
 
 ### Added
 

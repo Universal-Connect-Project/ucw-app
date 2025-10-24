@@ -42,6 +42,7 @@ export type AdapterMap = {
   testAdapterId?: string;
   vcAdapter?: Function;
   createWidgetAdapter: () => WidgetAdapter;
+  userless?: boolean;
 };
 
 export interface Credential {

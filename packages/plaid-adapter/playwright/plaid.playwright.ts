@@ -263,11 +263,16 @@ test(
   },
 );
 
-test("should return 400 with error message when requesting plaid data", async ({
+test("should return 400 with error message when requesting plaid transaction data", async ({
   request,
 }) => {
   const response = await request.get(
-    "http://localhost:8080/api/data/aggregator/plaid_sandbox/user/USR-234/account/abcd/transactions",
+    "http://localhost:8080/api/data/transactions?accountId=someAccountId&aggregator=plaid_sandbox",
+    {
+      headers: {
+        "UCW-Connection-Id": "someConnectionId",
+      },
+    },
   );
 
   expect(response.status()).toBe(400);

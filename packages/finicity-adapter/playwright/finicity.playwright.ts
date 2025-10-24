@@ -227,9 +227,14 @@ test.describe("Finicity Adapter Tests", () => {
     aggregator,
     shouldExpectTransactions = true,
   }) {
-    let url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/accounts`;
+    let url = `http://localhost:8080/api/data/accounts?aggregator=${aggregator}&userId=${userId}`;
 
-    const accountsResponse = await request.get(url);
+    const accountsResponse = await request.get(url, {
+      headers: {
+        "UCW-Connection-Id": connectionId,
+      },
+    });
+
     const accountsJson = await accountsResponse.json();
     expect(accountsJson?.accounts?.length).toBeGreaterThanOrEqual(1);
 
@@ -262,9 +267,13 @@ test.describe("Finicity Adapter Tests", () => {
 
     expect(accountId).not.toBeNull();
 
-    url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/identity`;
+    url = `http://localhost:8080/api/data/identity?aggregator=${aggregator}&userId=${userId}`;
 
-    const identityResponse = await request.get(url);
+    const identityResponse = await request.get(url, {
+      headers: {
+        "UCW-Connection-Id": connectionId,
+      },
+    });
     const customers = await identityResponse.json();
     expect(customers).toEqual(
       expect.objectContaining({
@@ -297,12 +306,20 @@ test.describe("Finicity Adapter Tests", () => {
     const todayIso = new Date().toISOString().slice(0, 10);
 
     for (const dateRangeQueryParams of [
-      `?startDate=${oneMonthAgoIso}&endDate=${todayIso}`,
+      `startDate=${oneMonthAgoIso}&endDate=${todayIso}`,
       "",
     ]) {
-      url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions${dateRangeQueryParams}`;
+      const queryParams = dateRangeQueryParams
+        ? `?aggregator=${aggregator}&userId=${userId}&accountId=${accountId}&${dateRangeQueryParams}`
+        : `?aggregator=${aggregator}&userId=${userId}&accountId=${accountId}`;
 
-      const transactionsResponse = await request.get(url);
+      url = `http://localhost:8080/api/data/transactions${queryParams}`;
+
+      const transactionsResponse = await request.get(url, {
+        headers: {
+          "UCW-Connection-Id": connectionId,
+        },
+      });
       const transactions = await transactionsResponse.json();
 
       if (shouldExpectTransactions) {
