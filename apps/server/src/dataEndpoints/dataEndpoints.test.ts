@@ -191,6 +191,7 @@ describe("dataEndpoints", () => {
 
     it("responds with a success when userId is missing for plaid aggregators", async () => {
       const res = {
+        status: jest.fn().mockReturnThis(),
         json: jest.fn(),
       } as unknown as Response;
 
