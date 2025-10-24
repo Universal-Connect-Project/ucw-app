@@ -36,36 +36,34 @@ const useDataEndpoints = (app: Express) => {
   }
 
   if (config.DATA_ENDPOINTS_ENABLE === "true") {
-    // Data Endpoints
     app.get(
-      "/api/data/aggregator/:aggregator/user/:userId/connection/:connectionId/accounts",
+      "/api/data/accounts",
       dataEndpointMiddleware,
       createAccountsDataHandler(false),
     );
     app.get(
-      "/api/data/aggregator/:aggregator/user/:userId/connection/:connectionId/identity",
+      "/api/data/identity",
       dataEndpointMiddleware,
       createIdentityDataHandler(false),
     );
     app.get(
-      "/api/data/aggregator/:aggregator/user/:userId/account/:accountId/transactions",
+      "/api/data/transactions",
       dataEndpointMiddleware,
       createTransactionsDataHandler(false),
     );
 
-    // VC Data Endpoints
     app.get(
-      "/api/vc/data/aggregator/:aggregator/user/:userId/connection/:connectionId/accounts",
+      "/api/vc/data/accounts",
       dataEndpointMiddleware,
       createAccountsDataHandler(true),
     );
     app.get(
-      "/api/vc/data/aggregator/:aggregator/user/:userId/connection/:connectionId/identity",
+      "/api/vc/data/identity",
       dataEndpointMiddleware,
       createIdentityDataHandler(true),
     );
     app.get(
-      "/api/vc/data/aggregator/:aggregator/user/:userId/account/:accountId/transactions",
+      "/api/vc/data/transactions",
       dataEndpointMiddleware,
       createTransactionsDataHandler(true),
     );
