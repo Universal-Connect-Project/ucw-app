@@ -59,22 +59,30 @@ export const verifyAccountsAndReturnAccountId = ({
       ).depositAccount.accountId;
 
       if (shouldTestVcEndpoint) {
-        return cy.request("GET", `/api/vc${url}`).then((vcResponse) => {
-          expect(vcResponse.status).to.equal(200);
-          expect(vcResponse.body).to.haveOwnProperty("jwt");
-          expect(vcResponse.body.jwt).not.to.haveOwnProperty("error");
+        return cy
+          .request({
+            method: "GET",
+            url: `/api/vc${url}`,
+            headers: {
+              "UCW-Connection-Id": connectionId,
+            },
+          })
+          .then((vcResponse) => {
+            expect(vcResponse.status).to.equal(200);
+            expect(vcResponse.body).to.haveOwnProperty("jwt");
+            expect(vcResponse.body.jwt).not.to.haveOwnProperty("error");
 
-          const decodedVcData = decodeVcDataFromResponse(vcResponse);
-          // Verify the proper VC came back
-          expect(decodedVcData.vc.type).to.include(
-            "FinancialAccountCredential",
-          );
-          expect(
-            decodedVcData.vc.credentialSubject.accounts.length,
-          ).to.be.greaterThan(0);
+            const decodedVcData = decodeVcDataFromResponse(vcResponse);
+            // Verify the proper VC came back
+            expect(decodedVcData.vc.type).to.include(
+              "FinancialAccountCredential",
+            );
+            expect(
+              decodedVcData.vc.credentialSubject.accounts.length,
+            ).to.be.greaterThan(0);
 
-          return accountId;
-        });
+            return accountId;
+          });
       }
 
       return accountId;
@@ -112,7 +120,13 @@ const verifyIdentity = ({
       expectCustomersLength(dataResponse.body.customers);
 
       if (shouldTestVcEndpoint) {
-        cy.request("GET", `/api/vc${url}`).should((response) => {
+        cy.request({
+          method: "GET",
+          url: `/api/vc${url}`,
+          headers: {
+            "UCW-Connection-Id": connectionId,
+          },
+        }).should((response) => {
           expect(response.status).to.equal(200);
           expect(response.body).to.haveOwnProperty("jwt");
           expect(response.body.jwt).not.to.haveOwnProperty("error");
