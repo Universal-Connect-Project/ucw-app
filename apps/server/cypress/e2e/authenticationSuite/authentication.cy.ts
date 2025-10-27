@@ -84,7 +84,7 @@ describe("authentication", () => {
             cy.request({
               failOnStatusCode: false,
               method: "get",
-              url: `/api/data/aggregator/accounts?aggregator=${aggregator}&userId=${userId}`,
+              url: `/api/data/accounts?aggregator=${aggregator}&userId=${userId}`,
               headers: {
                 authorization: `Bearer ${widgetDemoDataAccessToken}`,
                 "ucw-connection-id": connectionId,

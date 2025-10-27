@@ -1,7 +1,7 @@
 {
   "defaultAggregator": "mx",
 
-  "supportedAggregators": ["mx", "sophtron"],
+  "supportedAggregators": ["mx", "sophtron", "plaid"],
 
   "defaultAggregatorVolume": {
     "mx": 50,

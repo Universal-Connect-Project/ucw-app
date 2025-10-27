@@ -178,7 +178,11 @@ export const createIdentityDataHandler = (isVc: boolean) =>
 const transactionsParamsSchema = Joi.object({
   accountId: Joi.string().required(),
   aggregator: Joi.string().required(),
-  userId: Joi.string().required(),
+  userId: Joi.when("aggregator", {
+    is: Joi.string().valid(...userlessAggregatorIds),
+    then: Joi.string().optional(),
+    otherwise: Joi.string().required(),
+  }),
   connectionId: Joi.string().optional(),
   startDate: Joi.string().isoDate(),
   endDate: Joi.string().isoDate(),
