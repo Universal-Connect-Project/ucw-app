@@ -83,7 +83,7 @@ For **userless aggregators** (currently `plaid` and `plaid_sandbox`):
 - The `userId` parameter is **optional** for all endpoints
 - This allows accessing data using only the connection ID without requiring a user ID
 
-For **traditional aggregators** (MX, Sophtron, Finicity, Akoya):
+For **traditional aggregators** (MX, Sophtron, Finicity):
 
 - The `userId` parameter remains **required** for all endpoints
 

@@ -40,6 +40,7 @@ jobs:
           echo -e "${{ env.env_vars }}" >> ${ENV_FILE_PATH}
           # The plaid adapter needs these vars set or it will error on init
           echo PLAID_CLIENT_ID=junk >> ${ENV_FILE_PATH}
+          echo PLAID_SECRET=junk >> ${ENV_FILE_PATH}
           echo PLAID_SECRET_PROD=junk >> ${ENV_FILE_PATH}
 
           # Secrets (can't load these from another job, due to GH security features)
