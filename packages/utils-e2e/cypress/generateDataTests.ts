@@ -36,39 +36,57 @@ export const verifyAccountsAndReturnAccountId = ({
   transactionsAccountSelector,
   userId,
 }) => {
-  const url = `/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/accounts`;
+  const url = `/data/accounts?aggregator=${aggregator}&userId=${userId}`;
 
-  return cy.request("get", `/api${url}`).then((dataResponse) => {
-    expect(dataResponse.status).to.equal(200);
-    expect(dataResponse.body.accounts.length).to.be.greaterThan(0);
+  return cy
+    .request({
+      method: "get",
+      url: `/api${url}`,
+      headers: {
+        "UCW-Connection-Id": connectionId,
+      },
+    })
+    .then((dataResponse) => {
+      expect(dataResponse.status).to.equal(200);
+      expect(dataResponse.body.accounts.length).to.be.greaterThan(0);
 
-    const accountId = (
-      transactionsAccountSelector
-        ? transactionsAccountSelector(dataResponse.body.accounts)
-        : dataResponse.body.accounts.find(
-            (acc) => Object.keys(acc)[0] === "depositAccount",
-          )
-    ).depositAccount.accountId;
+      const accountId = (
+        transactionsAccountSelector
+          ? transactionsAccountSelector(dataResponse.body.accounts)
+          : dataResponse.body.accounts.find(
+              (acc) => Object.keys(acc)[0] === "depositAccount",
+            )
+      ).depositAccount.accountId;
 
-    if (shouldTestVcEndpoint) {
-      return cy.request("GET", `/api/vc${url}`).then((vcResponse) => {
-        expect(vcResponse.status).to.equal(200);
-        expect(vcResponse.body).to.haveOwnProperty("jwt");
-        expect(vcResponse.body.jwt).not.to.haveOwnProperty("error");
+      if (shouldTestVcEndpoint) {
+        return cy
+          .request({
+            method: "GET",
+            url: `/api/vc${url}`,
+            headers: {
+              "UCW-Connection-Id": connectionId,
+            },
+          })
+          .then((vcResponse) => {
+            expect(vcResponse.status).to.equal(200);
+            expect(vcResponse.body).to.haveOwnProperty("jwt");
+            expect(vcResponse.body.jwt).not.to.haveOwnProperty("error");
 
-        const decodedVcData = decodeVcDataFromResponse(vcResponse);
-        // Verify the proper VC came back
-        expect(decodedVcData.vc.type).to.include("FinancialAccountCredential");
-        expect(
-          decodedVcData.vc.credentialSubject.accounts.length,
-        ).to.be.greaterThan(0);
+            const decodedVcData = decodeVcDataFromResponse(vcResponse);
+            // Verify the proper VC came back
+            expect(decodedVcData.vc.type).to.include(
+              "FinancialAccountCredential",
+            );
+            expect(
+              decodedVcData.vc.credentialSubject.accounts.length,
+            ).to.be.greaterThan(0);
 
-        return accountId;
-      });
-    }
+            return accountId;
+          });
+      }
 
-    return accountId;
-  });
+      return accountId;
+    });
 };
 
 const verifyIdentity = ({
@@ -78,34 +96,50 @@ const verifyIdentity = ({
   shouldExpectAccountOwners,
   shouldTestVcEndpoint,
 }) => {
-  const url = `/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/identity`;
+  const url = `/data/identity?aggregator=${aggregator}&userId=${userId}`;
 
-  return cy.request("get", `/api${url}`).then((dataResponse) => {
-    expect(dataResponse.status).to.equal(200);
+  return cy
+    .request({
+      method: "get",
+      url: `/api${url}`,
+      headers: {
+        "UCW-Connection-Id": connectionId,
+      },
+    })
+    .then((dataResponse) => {
+      expect(dataResponse.status).to.equal(200);
 
-    const expectCustomersLength = (customers) => {
-      if (shouldExpectAccountOwners) {
-        expect(customers.length).to.be.greaterThan(0);
-      } else {
-        expect(customers.length).to.be.gte(0);
+      const expectCustomersLength = (customers) => {
+        if (shouldExpectAccountOwners) {
+          expect(customers.length).to.be.greaterThan(0);
+        } else {
+          expect(customers.length).to.be.gte(0);
+        }
+      };
+
+      expectCustomersLength(dataResponse.body.customers);
+
+      if (shouldTestVcEndpoint) {
+        cy.request({
+          method: "GET",
+          url: `/api/vc${url}`,
+          headers: {
+            "UCW-Connection-Id": connectionId,
+          },
+        }).should((response) => {
+          expect(response.status).to.equal(200);
+          expect(response.body).to.haveOwnProperty("jwt");
+          expect(response.body.jwt).not.to.haveOwnProperty("error");
+
+          const decodedVcData = decodeVcDataFromResponse(response);
+          // Verify the proper VC came back
+          expect(decodedVcData.vc.type).to.include(
+            "FinancialIdentityCredential",
+          );
+          expectCustomersLength(decodedVcData.vc.credentialSubject.customers);
+        });
       }
-    };
-
-    expectCustomersLength(dataResponse.body.customers);
-
-    if (shouldTestVcEndpoint) {
-      cy.request("GET", `/api/vc${url}`).should((response) => {
-        expect(response.status).to.equal(200);
-        expect(response.body).to.haveOwnProperty("jwt");
-        expect(response.body.jwt).not.to.haveOwnProperty("error");
-
-        const decodedVcData = decodeVcDataFromResponse(response);
-        // Verify the proper VC came back
-        expect(decodedVcData.vc.type).to.include("FinancialIdentityCredential");
-        expectCustomersLength(decodedVcData.vc.credentialSubject.customers);
-      });
-    }
-  });
+    });
 };
 
 const verifyTransactions = ({
@@ -123,7 +157,7 @@ const verifyTransactions = ({
   userId: string;
   transactionsQueryString?: string;
 }) => {
-  const url = `/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions${transactionsQueryString}`;
+  const url = `/data/transactions?aggregator=${aggregator}&userId=${userId}&accountId=${accountId}${transactionsQueryString}`;
 
   const expectTransactionsLength = (transactions) => {
     if (shouldExpectTransactions) {

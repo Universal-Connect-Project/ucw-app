@@ -27,9 +27,10 @@ describe("authentication", () => {
     cy.request({
       failOnStatusCode: false,
       method: "get",
-      url: "/api/data/aggregator/mx/user/userId/connection/connectionId/accounts",
+      url: "/api/data/accounts?aggregator=mx&userId=userId",
       headers: {
         authorization: `Bearer ${widgetDemoAccessToken}`,
+        "ucw-connection-id": "connectionId",
       },
     }).then((dataResponse) => {
       expect(dataResponse.status).to.eq(403);
@@ -83,9 +84,10 @@ describe("authentication", () => {
             cy.request({
               failOnStatusCode: false,
               method: "get",
-              url: `/api/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/accounts`,
+              url: `/api/data/accounts?aggregator=${aggregator}&userId=${userId}`,
               headers: {
                 authorization: `Bearer ${widgetDemoDataAccessToken}`,
+                "ucw-connection-id": connectionId,
               },
             }).then((dataResponseWithAccess) => {
               expect(dataResponseWithAccess.status).to.eq(200);

@@ -9,7 +9,10 @@ import {
 
 interface TestDataParams {
   request: {
-    get: (url: string) => Promise<{ json: () => Promise<unknown> }>;
+    get: (
+      url: string,
+      options?: { headers?: Record<string, string> },
+    ) => Promise<{ json: () => Promise<unknown> }>;
   };
   userId: string;
   connectionId: string;
@@ -24,9 +27,13 @@ export async function testAccountsData({
   aggregator,
   expect,
 }: TestDataParams) {
-  const url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/accounts`;
+  const url = `http://localhost:8080/api/data/accounts?aggregator=${aggregator}&userId=${userId}`;
 
-  const accountsResponse = await request.get(url);
+  const accountsResponse = await request.get(url, {
+    headers: {
+      "ucw-connection-id": connectionId,
+    },
+  });
   const accountsJson = (await accountsResponse.json()) as {
     accounts: { depositAccount?: unknown }[];
   };
@@ -90,9 +97,13 @@ export async function testIdentityData({
   aggregator,
   expect,
 }: TestDataParams) {
-  const url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/identity`;
+  const url = `http://localhost:8080/api/data/identity?aggregator=${aggregator}&userId=${userId}`;
 
-  const identityResponse = await request.get(url);
+  const identityResponse = await request.get(url, {
+    headers: {
+      "ucw-connection-id": connectionId,
+    },
+  });
   const identityJson = (await identityResponse.json()) as FdxIdentityResponse;
 
   expect(identityJson).toHaveProperty("customers");

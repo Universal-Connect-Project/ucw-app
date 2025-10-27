@@ -64,7 +64,7 @@ test("should return 400 with error message when requesting akoya data", async ({
   request,
 }) => {
   const response = await request.get(
-    "http://localhost:8080/api/data/aggregator/akoya/user/USR-234/account/abcd/transactions",
+    "http://localhost:8080/api/data/transactions?aggregator=akoya&userId=someUserId&accountId=someAccountId",
   );
 
   expect(response.status()).toBe(400);
