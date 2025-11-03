@@ -8,8 +8,7 @@ import { ComboJobTypes } from "@repo/utils";
 import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
 import { nonTestAggregators } from "./adapterSetup";
 import { get, set } from "./services/storageClient/redis";
-
-/* eslint-disable @typescript-eslint/unbound-method  */
+import fs from "node:fs";
 
 describe("server", () => {
   describe("validateWidgetParams", () => {
@@ -193,6 +192,9 @@ describe("server", () => {
         const userId = "testUserId";
         const preSetConnectionId = "testConnectionId123";
         const connectionToken = "testConnectionToken";
+        jest
+          .spyOn(fs, "readFileSync")
+          .mockReturnValueOnce("<html><body>Mock HTML content</body></html>");
 
         const res = {
           send: jest.fn(),
