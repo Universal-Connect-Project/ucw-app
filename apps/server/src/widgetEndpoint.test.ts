@@ -279,7 +279,7 @@ describe("server", () => {
 
       const widgetUrl = new URL(response.widgetUrl);
 
-      expect(widgetUrl.protocol).toBe("http:");
+      expect(["http:", "https:"]).toContain(widgetUrl.protocol);
       expect(widgetUrl.hostname).toBe("localhost");
       expect(widgetUrl.port).toBe("8080");
       expect(widgetUrl.pathname).toBe("/widget");

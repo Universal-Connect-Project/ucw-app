@@ -62,6 +62,7 @@ jobs:
 
           # Vars
           echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
+          echo HOST_URL=https://localhost:8080 >> ${ENV_FILE_PATH}
 
           # Secrets (can't load these from another job, due to GH security features)
           echo MX_CLIENT_ID=${{ secrets.MX_CLIENT_ID }} >> ${ENV_FILE_PATH}
