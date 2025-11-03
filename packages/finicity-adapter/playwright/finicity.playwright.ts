@@ -83,7 +83,7 @@ const test = base.extend<MyFixtures>({
       await use(userId);
 
       await request.delete(
-        `http://localhost:8080/api/aggregator/finicity_sandbox/user/${userId}`,
+        `http://localhost:8080/api/user?userId=${userId}&aggregator=finicity_sandbox`,
       );
     },
     { scope: "test" },

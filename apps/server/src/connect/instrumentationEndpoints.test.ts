@@ -6,7 +6,6 @@ describe("instrumentationEndpoints", () => {
   describe("instrumentationHandler", () => {
     const correctBody = {
       current_aggregator: "testAggregator",
-      current_member_guid: "currentMemberGuid",
       jobTypes: [ComboJobTypes.TRANSACTION_HISTORY],
       singleAccountSelect: false,
     };
@@ -15,9 +14,8 @@ describe("instrumentationEndpoints", () => {
       userId: "userId",
     };
 
-    it("doesn't return aggregator or connectionId if current_member_guid isn't present", async () => {
+    it("doesn't set aggregator if connectionId isn't present in context", async () => {
       const body = { ...correctBody };
-      delete body.current_member_guid;
       const req = {
         body,
         params: correctParams,
@@ -40,13 +38,15 @@ describe("instrumentationEndpoints", () => {
       });
     });
 
-    it("doesn't return aggregator or connectionId if current_aggregator isn't present", async () => {
+    it("doesn't set aggregator if current_aggregator isn't present", async () => {
       const body = { ...correctBody };
       delete body.current_aggregator;
       const req = {
         body,
         params: correctParams,
-        context: {},
+        context: {
+          connectionId: "existingConnectionId",
+        },
       } as unknown as Request;
 
       const res = {
@@ -57,6 +57,7 @@ describe("instrumentationEndpoints", () => {
 
       expect(res.sendStatus).toHaveBeenCalledWith(200);
       expect(req.context).toEqual({
+        connectionId: "existingConnectionId",
         jobTypes: req.body.jobTypes,
         oauth_referral_source: "BROWSER",
         scheme: "vcs",
@@ -73,7 +74,9 @@ describe("instrumentationEndpoints", () => {
       const req = {
         body,
         params: correctParams,
-        context: {},
+        context: {
+          connectionId: "MBR-12345", // connectionId must exist for aggregator to be set
+        },
       } as unknown as Request;
       const res = {
         sendStatus: jest.fn(),
@@ -84,7 +87,7 @@ describe("instrumentationEndpoints", () => {
       expect(req.context).toEqual({
         aggregatorOverride: "testAggregatorOverride",
         aggregator: "testAggregator",
-        connectionId: "currentMemberGuid",
+        connectionId: "MBR-12345",
         jobTypes: req.body.jobTypes,
         oauth_referral_source: "BROWSER",
         scheme: "vcs",
@@ -97,7 +100,9 @@ describe("instrumentationEndpoints", () => {
       const req = {
         body: correctBody,
         params: correctParams,
-        context: {},
+        context: {
+          connectionId: "existingConnectionId",
+        },
       } as unknown as Request;
 
       const res = {
@@ -109,7 +114,7 @@ describe("instrumentationEndpoints", () => {
       expect(res.sendStatus).toHaveBeenCalledWith(200);
       expect(req.context).toEqual({
         aggregator: req.body.current_aggregator,
-        connectionId: req.body.current_member_guid,
+        connectionId: "existingConnectionId",
         jobTypes: req.body.jobTypes,
         oauth_referral_source: "BROWSER",
         scheme: "vcs",

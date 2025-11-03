@@ -8,7 +8,6 @@ export const instrumentationHandler = async (req: Request, res: Response) => {
 
     const {
       current_aggregator,
-      current_member_guid,
       jobTypes,
       singleAccountSelect,
       aggregatorOverride,
@@ -16,9 +15,8 @@ export const instrumentationHandler = async (req: Request, res: Response) => {
 
     req.context.userId = userId;
 
-    if (Boolean(current_member_guid) && Boolean(current_aggregator)) {
+    if (Boolean(req.context.connectionId) && Boolean(current_aggregator)) {
       req.context.aggregator = current_aggregator;
-      req.context.connectionId = current_member_guid;
     }
     if (aggregatorOverride) {
       req.context.aggregatorOverride = aggregatorOverride;

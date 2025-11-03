@@ -46,19 +46,17 @@ describe("authentication", () => {
       headers: {
         authorization: `Bearer ${widgetDemoAccessToken}`,
       },
-      method: "GET",
-      url: `/api/token?userId=${userId}`,
-    }).then((response) => {
-      const token = response.body.token;
-
-      visitAgg({
+      method: "POST",
+      url: `/widgetUrl`,
+      body: {
         userId,
-        token,
-      });
+        jobTypes: ComboJobTypes.TRANSACTIONS,
+        targetOrigin: "http://localhost:8080",
+      },
+    }).then((response) => {
+      const widgetUrl = response.body.widgetUrl;
 
-      visitWithPostMessageSpy(
-        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
-      )
+      visitWithPostMessageSpy(widgetUrl)
         .then(() => {
           searchAndSelectMx();
           enterMxCredentials();
@@ -98,7 +96,7 @@ describe("authentication", () => {
 
               cy.request({
                 method: "DELETE",
-                url: `/api/aggregator/${aggregator}/user/${userId}`,
+                url: `/api/user?aggregator=${aggregator}&userId=${userId}`,
                 headers: {
                   authorization: `Bearer ${widgetDemoDeleteUserAccessToken}`,
                 },
@@ -118,7 +116,7 @@ describe("authentication", () => {
     cy.request({
       failOnStatusCode: false,
       method: "DELETE",
-      url: `/api/aggregator/mx/user/${userId}`,
+      url: `/api/user?aggregator=mx&userId=${userId}`,
       headers: {
         authorization: `Bearer ${widgetDemoAccessToken}`,
       },
@@ -133,7 +131,7 @@ describe("authentication", () => {
     cy.request({
       failOnStatusCode: false,
       method: "DELETE",
-      url: `/api/aggregator/mx/user/${userId}`,
+      url: `/api/user?aggregator=mx&userId=${userId}`,
       headers: {
         authorization: `Bearer fakeToken`,
       },

@@ -72,7 +72,7 @@ The endpoints have changed to improve security and to be more compatible with di
 - `/api/vc/data/identity`
 - `/api/vc/data/transactions`
 
-**Security Enhancement**: The sensitive `connectionId` has been moved from the URL path to a secure HTTP header (`UCW-Connection-Id`) to prevent it from appearing in server logs, browser history, or referrer headers.
+**Security Enhancement**: The sensitive `connectionId` has been moved from the URL path to a secure HTTP header (`UCW-Connection-Id`) to prevent it from appearing in server logs, browser history, or referrer headers. Any requests found with a `connectionId` included in the query params will throw an error.
 
 #### Userless Aggregator Support
 
@@ -132,3 +132,48 @@ UCW-Connection-Id: conn456
 GET /api/data/accounts?aggregator=plaid
 UCW-Connection-Id: access-sandbox-111111-22222-33333-44444-555555
 ```
+
+## User/Connection Delete endpoints
+
+Url params are moved to the query params for user delete and the ucw-connection-id header for connection delete.
+
+```http
+DELETE /api/user?userId=user123
+```
+
+```http
+DELETE /api/connection
+UCW-Connection-Id: access-sandbox-111111-22222-33333-44444-555555
+```
+
+## New create widget Url endpoint
+
+Example Request
+
+```bash
+POST /widgetUrl
+  --header 'authorization: Bearer bearer-token-123'
+  --header 'content-type: application/json'
+  --data '{
+    "jobTypes": "transactions",
+    "userId": "tester101",
+    "targetOrigin": "http://localhost:8080",
+    "connectionId": "MBR-84da3ce4-033d-4fb4-903f-d9de44f8b7dd",
+    "institutionId": "mxBank",
+    "aggregator": "mx_int"
+}'
+```
+
+Example Response
+
+```json
+{
+  "widgetUrl": "http://localhost:8080/widget?connectionToken=1197a55e-74ba-4b78-acc8-952f12d4d1e9&token=3cc8bc93-d537-4d57-bb1d-0a401341c245&jobTypes=transactions&userId=tester101&targetOrigin=http%3A%2F%2Flocalhost%3A8080&institutionId=mxBank&aggregator=mx_int"
+}
+```
+
+**Api Token Removed** - The `/api/token` endpoint which was used for authentication is removed. Now when authentication is enabled you need to pass the authorization header into the create widgetUrl request and that will append a token onto the `widgetUrl` and handle the widget authentication.
+
+**Connection Refresh** - This new endpoint is also to be used for refreshing a connection. Pass all the params into the body of the request and it will safely pass the sensitive `connectionId` to the server and handle the refresh connection scenario as you load the returned `widgetUrl`.
+
+**Loading the widget** - You can still construct the widget url manually for basic connection scenarios or you can use the new create widgetUrl endpoint. But refresh and authentication scenarios require the new endpoint to create a `widgetUrl`.

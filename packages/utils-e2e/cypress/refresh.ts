@@ -30,9 +30,23 @@ export const refreshAConnection = ({ enterCredentials, selectInstitution }) => {
       const ucpInstitutionId = metadata.ucpInstitutionId;
 
       //Refresh the connection
-      cy.visit(
-        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&connectionId=${connectionId}&aggregator=${aggregator}&userId=${userId}&institutionId=${ucpInstitutionId}&targetOrigin=http://localhost:8080`,
-      );
+      cy.request({
+        method: "POST",
+        url: "/widgetUrl",
+        body: {
+          jobTypes: ComboJobTypes.TRANSACTIONS,
+          aggregator: aggregator,
+          userId: userId,
+          institutionId: ucpInstitutionId,
+          connectionId: connectionId,
+          targetOrigin: "http://localhost:8080",
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(200);
+        expect(response.body).to.have.property("widgetUrl");
+
+        cy.visit(response.body.widgetUrl);
+      });
 
       enterCredentials();
 

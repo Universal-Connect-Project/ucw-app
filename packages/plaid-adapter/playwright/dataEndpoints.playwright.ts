@@ -83,8 +83,12 @@ test("connects to plaid's First Platypus Bank and gets account numbers", async (
   });
 
   if (connectionId) {
-    const endpoint = `http://localhost:8080/api/aggregator/plaid_sandbox/user/${userId}/connection/${connectionId}`;
-    const deleteResponse = await request.delete(endpoint);
+    const endpoint = `http://localhost:8080/api/connection?aggregator=plaid_sandbox`;
+    const deleteResponse = await request.delete(endpoint, {
+      headers: {
+        "UCW-Connection-Id": connectionId,
+      },
+    });
     expect(deleteResponse.ok()).toBeTruthy();
 
     const secondDelete = await request.delete(endpoint);

@@ -1,21 +1,66 @@
 import type { Response } from "express";
+import Joi from "joi";
+import he from "he";
 import { createAggregatorWidgetAdapter } from "../adapterIndex";
-import { withValidateAggregatorInPath } from "../utils/validators";
-import type { Aggregator } from "../adapterSetup";
+import { withValidateAggregatorInQueryParams } from "../utils/validators";
+import { userlessAggregatorIds, type Aggregator } from "../adapterSetup";
 import handleError from "../utils/errorHandler";
 
-interface UserDeleteParameters {
+const UserDeleteParamsSchema = Joi.object({
+  aggregator: Joi.string().required(),
+  userId: Joi.string().required(),
+});
+
+const ConnectionDeleteParamsSchema = Joi.object({
+  aggregator: Joi.string().required(),
+  userId: Joi.when("aggregator", {
+    is: Joi.string().valid(...userlessAggregatorIds),
+    then: Joi.string().optional(),
+    otherwise: Joi.string().required(),
+  }),
+  connectionId: Joi.string().required(),
+});
+
+const validateRequestParams = <T extends Record<string, unknown>>(
+  req: { query: T; headers?: { [key: string]: string } },
+  res: Response,
+  schema: Joi.ObjectSchema,
+): { isValid: boolean; connectionId?: string } => {
+  const connectionId =
+    req.headers?.["UCW-Connection-Id"] || req.headers?.["ucw-connection-id"];
+
+  const { error } = schema.validate({
+    ...req.query,
+    ...(connectionId && { connectionId }),
+  });
+
+  if (error) {
+    res.status(400);
+    res.send(he.encode(error.details[0].message));
+    return { isValid: false };
+  }
+
+  return { isValid: true, connectionId };
+};
+
+interface UserDeleteParameters extends Record<string, unknown> {
   aggregator: Aggregator;
   userId: string;
 }
 
 export interface UserDeleteRequest {
-  params: UserDeleteParameters;
+  query: UserDeleteParameters;
+  headers?: { [key: string]: string };
 }
 
-export const userDeleteHandler = withValidateAggregatorInPath(
+export const userDeleteHandler = withValidateAggregatorInQueryParams(
   async (req: UserDeleteRequest, res: Response) => {
-    const { userId, aggregator } = req.params;
+    const validation = validateRequestParams(req, res, UserDeleteParamsSchema);
+    if (!validation.isValid) {
+      return;
+    }
+
+    const { userId, aggregator } = req.query;
 
     try {
       const aggregatorAdapter = createAggregatorWidgetAdapter({ aggregator });
@@ -33,25 +78,35 @@ export const userDeleteHandler = withValidateAggregatorInPath(
   },
 );
 
-interface ConnectionDeleteParameters {
+interface ConnectionDeleteParameters extends Record<string, unknown> {
   aggregator: Aggregator;
   userId: string;
   connectionId: string;
 }
 
 export interface ConnectionDeleteRequest {
-  params: ConnectionDeleteParameters;
+  query: ConnectionDeleteParameters;
+  headers?: { [key: string]: string };
 }
 
-export const userConnectionDeleteHandler = withValidateAggregatorInPath(
+export const userConnectionDeleteHandler = withValidateAggregatorInQueryParams(
   async (req: ConnectionDeleteRequest, res: Response) => {
-    const { connectionId, aggregator, userId } = req.params;
+    const validation = validateRequestParams(
+      req,
+      res,
+      ConnectionDeleteParamsSchema,
+    );
+    if (!validation.isValid) {
+      return;
+    }
+
+    const { aggregator, userId } = req.query;
 
     try {
       const aggregatorAdapter = createAggregatorWidgetAdapter({ aggregator });
       const resolvedUserId = await aggregatorAdapter.ResolveUserId(userId);
       const ret = await aggregatorAdapter.DeleteConnection(
-        connectionId,
+        validation.connectionId!,
         resolvedUserId,
       );
       res.status(ret.status);

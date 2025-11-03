@@ -122,7 +122,7 @@ test("connects to mx bank with oAuth, tracks performance correctly, and does ref
   expect(performanceEvent.successMetric.isSuccess).toBe(true);
 
   await request.delete(
-    `http://localhost:8080/api/aggregator/mx_int/user/${userId}`,
+    `http://localhost:8080/api/user?userId=${userId}&aggregator=mx_int`,
   );
 });
 
@@ -205,7 +205,7 @@ test("results in a successful performance event even if you close the tab", asyn
   expect(isSuccess).toBe(true);
 
   await request.delete(
-    `http://localhost:8080/api/aggregator/mx_int/user/${userId}`,
+    `http://localhost:8080/api/user?userId=${userId}&aggregator=mx_int`,
   );
 });
 
@@ -238,6 +238,6 @@ test("shows an error page if you deny an mx bank oauth connection", async ({
 
   const apiRequest = page.context().request;
   await apiRequest.delete(
-    `http://localhost:8080/api/aggregator/mx_int/user/${userId}`,
+    `http://localhost:8080/api/user?userId=${userId}&aggregator=mx_int`,
   );
 });

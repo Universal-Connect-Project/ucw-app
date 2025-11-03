@@ -29,10 +29,41 @@ describe("handleError", () => {
     });
   });
 
-  it("should return the status code from error.cause if provided", () => {
+  it("should return the status code from error.status if provided", () => {
     const error = {
       name: "Error",
       message: "Custom error message",
+      status: 500,
+    };
+
+    handleError({ error, res: mockResponse });
+
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      message: "Custom error message",
+    });
+  });
+
+  it("should return the status code from error.cause if provided and no error.status", () => {
+    const error = {
+      name: "Error",
+      message: "Custom error message",
+      cause: { statusCode: 500 },
+    };
+
+    handleError({ error, res: mockResponse });
+
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      message: "Custom error message",
+    });
+  });
+
+  it("should prioritize error.cause.statusCode over error.status", () => {
+    const error = {
+      name: "Error",
+      message: "Custom error message",
+      status: 422,
       cause: { statusCode: 500 },
     };
 

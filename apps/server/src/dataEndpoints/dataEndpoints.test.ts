@@ -1,4 +1,4 @@
-import type { Response } from "express";
+import type { Request, Response } from "express";
 import {
   createAccountsDataHandler,
   createIdentityDataHandler,
@@ -48,7 +48,7 @@ describe("dataEndpoints", () => {
           headers: {
             "UCW-Connection-Id": "testConnectionId",
           },
-        },
+        } as unknown as Request,
         res,
       );
 
@@ -73,7 +73,7 @@ describe("dataEndpoints", () => {
           headers: {
             "UCW-Connection-Id": "testConnectionId",
           },
-        },
+        } as unknown as Request,
         res,
       );
 
@@ -94,7 +94,7 @@ describe("dataEndpoints", () => {
         headers: {
           "UCW-Connection-Id": "testConnectionId",
         },
-      };
+      } as unknown as Request;
 
       await vcAccountsDataHandler(req, res);
 
@@ -115,7 +115,7 @@ describe("dataEndpoints", () => {
           userId: userIdThatExists,
         },
         headers: {},
-      };
+      } as unknown as Request;
 
       await createAccountsDataHandler(false)(req, res);
 
@@ -138,7 +138,7 @@ describe("dataEndpoints", () => {
         headers: {
           "UCW-Connection-Id": "testConnectionId",
         },
-      };
+      } as unknown as Request;
 
       await createAccountsDataHandler(false)(req, res);
 
@@ -157,7 +157,7 @@ describe("dataEndpoints", () => {
           userId: userIdThatExists,
         },
         headers: {},
-      };
+      } as unknown as Request;
 
       await createAccountsDataHandler(false)(req, res);
 
@@ -179,7 +179,7 @@ describe("dataEndpoints", () => {
         headers: {
           "UCW-Connection-Id": "testConnectionId",
         },
-      };
+      } as unknown as Request;
 
       await createAccountsDataHandler(false)(req, res);
 
@@ -202,7 +202,7 @@ describe("dataEndpoints", () => {
         headers: {
           "UCW-Connection-Id": "testConnectionId",
         },
-      };
+      } as unknown as Request;
 
       await createAccountsDataHandler(false)(req, res);
 
@@ -230,7 +230,7 @@ describe("dataEndpoints", () => {
           headers: {
             "UCW-Connection-Id": "testConnectionId",
           },
-        },
+        } as unknown as Request,
         res,
       );
 
@@ -255,7 +255,7 @@ describe("dataEndpoints", () => {
           headers: {
             "UCW-Connection-Id": "testConnectionId",
           },
-        },
+        } as unknown as Request,
         res,
       );
 
@@ -277,7 +277,7 @@ describe("dataEndpoints", () => {
         headers: {
           "UCW-Connection-Id": "testConnectionId",
         },
-      };
+      } as unknown as Request;
 
       await vcIdentityDataHandler(req, res);
 
@@ -300,7 +300,7 @@ describe("dataEndpoints", () => {
         headers: {
           "UCW-Connection-Id": "testConnectionId",
         },
-      };
+      } as unknown as Request;
 
       await createIdentityDataHandler(false)(req, res);
 
@@ -319,7 +319,7 @@ describe("dataEndpoints", () => {
           userId: userIdThatExists,
         },
         headers: {},
-      };
+      } as unknown as Request;
 
       await createIdentityDataHandler(false)(req, res);
 
@@ -340,7 +340,7 @@ describe("dataEndpoints", () => {
         headers: {
           "UCW-Connection-Id": "testConnectionId",
         },
-      };
+      } as unknown as Request;
 
       await createIdentityDataHandler(false)(req, res);
 
@@ -362,7 +362,7 @@ describe("dataEndpoints", () => {
         headers: {
           "UCW-Connection-Id": "testConnectionId",
         },
-      };
+      } as unknown as Request;
 
       await createIdentityDataHandler(false)(req, res);
 
@@ -392,7 +392,7 @@ describe("dataEndpoints", () => {
             headers: {
               "UCW-Connection-Id": "testConnectionId",
             },
-          },
+          } as unknown as Request,
           res,
         );
 
@@ -417,7 +417,7 @@ describe("dataEndpoints", () => {
           headers: {
             "UCW-Connection-Id": "testConnectionId",
           },
-        };
+        } as unknown as Request;
 
         await vcTransactionsDataHandler(req, res);
 
@@ -440,7 +440,7 @@ describe("dataEndpoints", () => {
           headers: {
             "UCW-Connection-Id": "testConnectionId",
           },
-        };
+        } as unknown as Request;
 
         await vcTransactionsDataHandler(req, res);
 
@@ -464,7 +464,7 @@ describe("dataEndpoints", () => {
           headers: {
             "UCW-Connection-Id": "testConnectionId",
           },
-        };
+        } as unknown as Request;
 
         await createTransactionsDataHandler(false)(req, res);
 
@@ -482,7 +482,7 @@ describe("dataEndpoints", () => {
           headers: {
             "UCW-Connection-Id": "testConnectionId",
           },
-        };
+        } as unknown as Request;
 
         const res = {
           json: jest.fn(),
@@ -510,7 +510,7 @@ describe("dataEndpoints", () => {
           headers: {
             "UCW-Connection-Id": "testConnectionId",
           },
-        };
+        } as unknown as Request;
 
         const res = {
           json: jest.fn(),
@@ -532,7 +532,7 @@ describe("dataEndpoints", () => {
           headers: {
             "UCW-Connection-Id": "testConnectionId",
           },
-        };
+        } as unknown as Request;
 
         const res = {
           json: jest.fn(),
@@ -554,7 +554,7 @@ describe("dataEndpoints", () => {
           headers: {
             "UCW-Connection-Id": "testConnectionId",
           },
-        };
+        } as unknown as Request;
 
         const res = {
           json: jest.fn(),
@@ -577,7 +577,7 @@ describe("dataEndpoints", () => {
           headers: {
             "UCW-Connection-Id": "testConnectionId",
           },
-        };
+        } as unknown as Request;
 
         const res = {
           json: jest.fn(),
@@ -603,7 +603,7 @@ describe("dataEndpoints", () => {
           headers: {
             "UCW-Connection-Id": "testConnectionId",
           },
-        };
+        } as unknown as Request;
 
         const res = {
           json: jest.fn(),
@@ -627,7 +627,7 @@ describe("dataEndpoints", () => {
           headers: {
             "UCW-Connection-Id": "testConnectionId",
           },
-        };
+        } as unknown as Request;
 
         const res = {
           json: jest.fn(),
@@ -651,7 +651,7 @@ describe("dataEndpoints", () => {
           headers: {
             "UCW-Connection-Id": "testConnectionId",
           },
-        };
+        } as unknown as Request;
 
         const res = {
           json: jest.fn(),
@@ -674,7 +674,7 @@ describe("dataEndpoints", () => {
           headers: {
             "UCW-Connection-Id": "testConnectionId",
           },
-        };
+        } as unknown as Request;
 
         const res = {
           json: jest.fn(),
@@ -700,7 +700,7 @@ describe("dataEndpoints", () => {
           headers: {
             "UCW-Connection-Id": "testConnectionId",
           },
-        };
+        } as unknown as Request;
 
         const res = {
           json: jest.fn(),

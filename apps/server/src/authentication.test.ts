@@ -1,8 +1,6 @@
 import type { Request, Response } from "express";
-import { set as mockSet } from "./__mocks__/redis";
 import useAuthentication, {
   cookieAuthenticationMiddleware,
-  getTokenHandler,
   tokenAuthenticationMiddleware,
   tokenCookieName,
 } from "./authentication";
@@ -14,52 +12,6 @@ import * as config from "./config";
 jest.mock("./config");
 
 describe("authentication", () => {
-  describe("getTokenHandler", () => {
-    it("stores the authorization header token in redis and responds with the redis key token", async () => {
-      const authorizationToken = "test";
-      const userId = "testUserId";
-
-      const req = {
-        headers: {
-          authorization: `Bearer ${authorizationToken}`,
-        },
-        query: { userId },
-      } as unknown as Request;
-      const res = {
-        json: jest.fn(),
-      } as unknown as Response;
-
-      await getTokenHandler(req, res);
-
-      const token = mockSet.mock.calls[0][0];
-
-      expect(res.json).toHaveBeenCalledWith({
-        token: token.replace(`${userId}-`, ""),
-      });
-      expect(token).toBeDefined();
-    });
-
-    it("fails if there's no userId", async () => {
-      const authorizationToken = "test";
-
-      const req = {
-        headers: {
-          authorization: `Bearer ${authorizationToken}`,
-        },
-        query: {},
-      } as unknown as Request;
-      const res = {
-        send: jest.fn(),
-        status: jest.fn(),
-      } as unknown as Response;
-
-      await getTokenHandler(req, res);
-
-      expect(res.send).toHaveBeenCalledWith("&#x22;userId&#x22; is required");
-      expect(res.status).toHaveBeenCalledWith(400);
-    });
-  });
-
   describe("tokenAuthenticationMiddleware", () => {
     it("pulls the JWT from redis with the given token and userId, adds the bearer token to the request headers, deletes the token from redis, sets a cookie, and calls next", async () => {
       const token = "testToken";
@@ -265,7 +217,7 @@ describe("authentication", () => {
       useAuthentication(app);
 
       expect(app.use).toHaveBeenCalledTimes(4);
-      expect(app.get).toHaveBeenCalledTimes(1);
+      expect(app.get).toHaveBeenCalledTimes(0);
     });
 
     it("calls app.use with 2 of the middleware if there are missing variables", () => {
@@ -281,7 +233,7 @@ describe("authentication", () => {
       useAuthentication(app);
 
       expect(app.use).toHaveBeenCalledTimes(2);
-      expect(app.get).toHaveBeenCalledTimes(1);
+      expect(app.get).toHaveBeenCalledTimes(0);
     });
 
     it("doesn't add any middleware or endpoints if authentication is not enabled", () => {

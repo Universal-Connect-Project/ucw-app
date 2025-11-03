@@ -85,7 +85,7 @@ We have an optional [authentication](./apps/server/src/authentication.ts) system
 
 When authentication is enabled, the `/widget` endpoint will require authorization.
 
-There is a token endpoint (`/api/token`) that can be used to retrieve a one-time-use token that can then be passed into the widget url for use in an iframe. When this is used the server will set an authorization cookie that the widget UI will pass to the server for all of its requests.
+There is a widget URL endpoint (`/api/widgetUrl`) that can be used to retrieve a secure, one-time-use widget URL. To get a secure widget URL, make a POST request to `/widgetUrl` with an authorization header containing a Bearer token and all the widget parameters included in the request body. The response will include a `widgetUrl` property that can only be accessed once and includes a secure token for use in an iframe. When this URL is accessed, the server will set an authorization cookie that the widget UI will pass to the server for all of its requests.
 
 Variables for our optional authentication are found [here](ENVIRONMENT.md#authentication-variables)
 
