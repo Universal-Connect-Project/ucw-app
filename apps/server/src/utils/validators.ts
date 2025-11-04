@@ -36,19 +36,19 @@ export const connectionIdNotInQueryMiddleware = (
   res: Response,
   next: NextFunction,
 ) => {
-  if (req.query.connectionId) {
-    _error(`connectionId found in query params for ${req.method} ${req.path}`, {
-      query: req.query,
-      path: req.path,
-      method: req.method,
-    });
+  // if (req.query.connectionId) {
+  //   _error(`connectionId found in query params for ${req.method} ${req.path}`, {
+  //     query: req.query,
+  //     path: req.path,
+  //     method: req.method,
+  //   });
 
-    res.status(400);
-    res.send(
-      "connectionId is not allowed in query parameters, add it in the UCW-Connection-Id header",
-    );
-    return;
-  }
+  //   res.status(400);
+  //   res.send(
+  //     "connectionId is not allowed in query parameters, add it in the UCW-Connection-Id header",
+  //   );
+  //   return;
+  // }
 
   next();
 };
