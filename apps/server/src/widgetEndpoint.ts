@@ -7,7 +7,6 @@ import { get, set, del } from "./services/storageClient/redis";
 
 import he from "he";
 import path from "path";
-import { getConfig } from "./config";
 
 const widgetSchema = Joi.object({
   connectionId: Joi.string(),
@@ -134,7 +133,10 @@ export const createWidgetUrlHandler = async (req: Request, res: Response) => {
     }
   });
 
-  const baseUrl = `${getConfig().HOST_URL}/widget`;
+  const protocol = req.protocol;
+  const host = req.get("host");
+  const baseUrl = `${protocol}://${host}/widget`;
+
   const widgetUrl = `${baseUrl}?${queryParams.toString()}`;
 
   res.json({ widgetUrl });

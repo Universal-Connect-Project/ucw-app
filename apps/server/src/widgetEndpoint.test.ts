@@ -265,6 +265,8 @@ describe("server", () => {
           aggregator: MX_AGGREGATOR_STRING,
           institutionId: "testInstitutionId",
         },
+        get: (): string | undefined => "localhost:8080",
+        protocol: "http",
       } as unknown as Request;
 
       const res = {
@@ -281,7 +283,7 @@ describe("server", () => {
 
       const widgetUrl = new URL(response.widgetUrl);
 
-      expect(["http:", "https:"]).toContain(widgetUrl.protocol);
+      expect(["http:"]).toContain(widgetUrl.protocol);
       expect(widgetUrl.hostname).toBe("localhost");
       expect(widgetUrl.port).toBe("8080");
       expect(widgetUrl.pathname).toBe("/widget");
@@ -318,6 +320,8 @@ describe("server", () => {
           userId,
           targetOrigin: "https://example.com",
         },
+        get: (): string | undefined => "localhost:8080",
+        protocol: "http",
       } as unknown as Request;
       const res = {
         json: jest.fn(),
@@ -334,6 +338,33 @@ describe("server", () => {
       expect(widgetUrl.searchParams.get("token")).toBe(randomUUID);
       const token = await get(`${userId}-${randomUUID}`);
       expect(token).toEqual(authorizationToken);
+    });
+
+    it("creates the widget url from the requested host", async () => {
+      const req = {
+        body: {
+          jobTypes: ComboJobTypes.TRANSACTIONS,
+          userId: "testUserId",
+          targetOrigin: "https://example.com",
+        },
+        get: (): string | undefined => "example",
+        protocol: "http",
+      } as unknown as Request;
+      const res = {
+        json: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+      } as unknown as Response;
+
+      await createWidgetUrlHandler(req, res);
+
+      expect(res.json).toHaveBeenCalled();
+
+      const response = (res.json as jest.Mock).mock.calls[0][0];
+      const { widgetUrl } = response;
+
+      expect(widgetUrl).toEqual(
+        "http://example/widget?jobTypes=transactions&userId=testUserId&targetOrigin=https%3A%2F%2Fexample.com",
+      );
     });
   });
 });
