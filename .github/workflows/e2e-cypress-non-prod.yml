@@ -58,13 +58,15 @@ jobs:
           touch ${ENV_FILE_PATH}
 
           # Vars
-          echo DELETE_USER_ENDPOINT_AUTHENTICATION_ENABLE=false >> ${ENV_FILE_PATH}
           echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CYPRESS_auth_widget_demo_delete_user_username: ${{ secrets.DELETE_USER_ENDPOINT_AUTHENTICATION_USERNAME }}
+          CYPRESS_auth_widget_demo_delete_user_password: ${{ secrets.DELETE_USER_ENDPOINT_AUTHENTICATION_PASSWORD }}
+
         with:
           config-file: cypress.config.nonProd.ts
           project: apps/server

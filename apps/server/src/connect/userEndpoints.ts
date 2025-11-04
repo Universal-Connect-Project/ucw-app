@@ -55,10 +55,10 @@ export interface UserDeleteRequest {
 
 export const userDeleteHandler = withValidateAggregatorInQueryParams(
   async (req: UserDeleteRequest, res: Response) => {
-    // const validation = validateRequestParams(req, res, UserDeleteParamsSchema);
-    // if (!validation.isValid) {
-    //   return;
-    // }
+    const validation = validateRequestParams(req, res, UserDeleteParamsSchema);
+    if (!validation.isValid) {
+      return;
+    }
 
     const { userId, aggregator } = req.query;
 
@@ -91,17 +91,14 @@ export interface ConnectionDeleteRequest {
 
 export const userConnectionDeleteHandler = withValidateAggregatorInQueryParams(
   async (req: ConnectionDeleteRequest, res: Response) => {
-    // const validation = validateRequestParams(
-    //   req,
-    //   res,
-    //   ConnectionDeleteParamsSchema,
-    // );
-    // if (!validation.isValid) {
-    //   return;
-    // }
-
-    const connectionId =
-      req.headers?.["UCW-Connection-Id"] || req.headers?.["ucw-connection-id"];
+    const validation = validateRequestParams(
+      req,
+      res,
+      ConnectionDeleteParamsSchema,
+    );
+    if (!validation.isValid) {
+      return;
+    }
 
     const { aggregator, userId } = req.query;
 
@@ -109,7 +106,7 @@ export const userConnectionDeleteHandler = withValidateAggregatorInQueryParams(
       const aggregatorAdapter = createAggregatorWidgetAdapter({ aggregator });
       const resolvedUserId = await aggregatorAdapter.ResolveUserId(userId);
       const ret = await aggregatorAdapter.DeleteConnection(
-        connectionId,
+        validation.connectionId!,
         resolvedUserId,
       );
       res.status(ret.status);
