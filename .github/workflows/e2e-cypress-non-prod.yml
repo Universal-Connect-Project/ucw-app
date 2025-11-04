@@ -58,6 +58,7 @@ jobs:
           touch ${ENV_FILE_PATH}
 
           # Vars
+          echo DELETE_USER_ENDPOINT_AUTHENTICATION_ENABLE=false >> ${ENV_FILE_PATH}
           echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
 
       - name: Cypress run
