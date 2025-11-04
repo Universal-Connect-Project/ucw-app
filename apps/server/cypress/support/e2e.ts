@@ -91,14 +91,14 @@ beforeEach(() => {
   Cypress.env("userId", crypto.randomUUID());
 });
 
-afterEach(() => {
-  const widgetDemoAccessToken = Cypress.env(
-    WIDGET_DEMO_DELETE_USER_ACCESS_TOKEN_ENV,
-  );
+// // afterEach(() => {
+// //   const widgetDemoAccessToken = Cypress.env(
+// //     WIDGET_DEMO_DELETE_USER_ACCESS_TOKEN_ENV,
+// //   );
 
-  deleteMxUser({
-    headers: {
-      authorization: `Bearer ${widgetDemoAccessToken}`,
-    },
-  });
-});
+// //   deleteMxUser({
+// //     headers: {
+// //       authorization: `Bearer ${widgetDemoAccessToken}`,
+// //     },
+// //   });
+// });

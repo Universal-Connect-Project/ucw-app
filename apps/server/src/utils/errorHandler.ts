@@ -25,7 +25,7 @@ export default function handleError({
     statusCode = 404;
     message = USER_NOT_RESOLVED_ERROR_TEXT;
   } else if (error.message) {
-    statusCode = error.status || error.cause?.statusCode || 400;
+    statusCode = error.cause?.statusCode || error.status || 400;
     message = error.message;
   } else {
     statusCode = 400;
