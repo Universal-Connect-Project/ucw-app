@@ -363,7 +363,7 @@ describe("server", () => {
       const { widgetUrl } = response;
 
       expect(widgetUrl).toEqual(
-        "http://example/widget?jobTypes=transactions&userId=testUserId&targetOrigin=https%3A%2F%2Fexample.com",
+        "http://localhost:8080/widget?jobTypes=transactions&userId=testUserId&targetOrigin=https%3A%2F%2Fexample.com",
       );
     });
   });
