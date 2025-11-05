@@ -59,17 +59,20 @@ jobs:
 
           # Vars
           echo -e "${{ needs.setup-env.outputs.env_vars }}" >> ${ENV_FILE_PATH}
+          echo DELETE_USER_ENDPOINT_AUTHENTICATION_ENABLE=true >> ${ENV_FILE_PATH}
+          echo MX_CLIENT_ID=${{ secrets.MX_CLIENT_ID }} >> ${ENV_FILE_PATH}
+          echo MX_API_SECRET=${{ secrets.MX_API_SECRET }} >> ${ENV_FILE_PATH}
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # CYPRESS_auth_widget_demo_delete_user_username: ${{ secrets.DELETE_USER_ENDPOINT_AUTHENTICATION_USERNAME }}
-          # CYPRESS_auth_widget_demo_delete_user_password: ${{ secrets.DELETE_USER_ENDPOINT_AUTHENTICATION_PASSWORD }}
-          # CYPRESS_auth_widget_demo_delete_user_scope: ${{ vars.DELETE_USER_ENDPOINT_AUTHENTICATION_SCOPES }}
-          # CYPRESS_auth_client_id: ${{ vars.AUTHENTICATION_CLIENT_ID }}
-          # CYPRESS_auth_audience: ${{ vars.AUTHENTICATION_AUDIENCE }}
-          # CYPRESS_auth_domain: ${{ vars.AUTHENTICATION_DOMAIN }}
+          CYPRESS_auth_widget_demo_delete_user_username: ${{ secrets.DELETE_USER_ENDPOINT_AUTHENTICATION_USERNAME }}
+          CYPRESS_auth_widget_demo_delete_user_password: ${{ secrets.DELETE_USER_ENDPOINT_AUTHENTICATION_PASSWORD }}
+          CYPRESS_auth_widget_demo_delete_user_scope: ${{ vars.DELETE_USER_ENDPOINT_AUTHENTICATION_SCOPES }}
+          CYPRESS_auth_client_id: ${{ vars.AUTHENTICATION_CLIENT_ID }}
+          CYPRESS_auth_audience: ${{ vars.AUTHENTICATION_AUDIENCE }}
+          CYPRESS_auth_domain: ${{ vars.AUTHENTICATION_DOMAIN }}
 
         with:
           config-file: cypress.config.nonProd.ts
