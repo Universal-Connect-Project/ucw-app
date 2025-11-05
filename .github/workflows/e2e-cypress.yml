@@ -75,6 +75,7 @@ jobs:
           CYPRESS_auth_widget_demo_username: ${{ secrets.AUTHENTICATION_USERNAME }}
           CYPRESS_auth_widget_demo_password: ${{ secrets.AUTHENTICATION_PASSWORD }}
           CYPRESS_auth_widget_demo_scope: ${{ vars.AUTHENTICATION_SCOPES }}
+          CYPRESS_delete_mx_user_after_test: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           config-file: cypress.config.ts
