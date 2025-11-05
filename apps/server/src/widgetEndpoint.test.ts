@@ -7,7 +7,7 @@ import {
 import { ComboJobTypes } from "@repo/utils";
 import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
 import { nonTestAggregators } from "./adapterSetup";
-import { get, set } from "./services/storageClient/redis";
+import { get } from "./services/storageClient/redis";
 import fs from "node:fs";
 
 describe("server", () => {

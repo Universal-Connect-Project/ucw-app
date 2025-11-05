@@ -3,7 +3,7 @@ import type { Request, Response } from "express";
 import Joi from "joi";
 import { aggregators, nonTestAggregators } from "./adapterSetup";
 import fs from "node:fs";
-import { get, set, del } from "./services/storageClient/redis";
+import { set } from "./services/storageClient/redis";
 
 import he from "he";
 import path from "path";
