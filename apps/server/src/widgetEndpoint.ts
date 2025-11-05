@@ -140,21 +140,6 @@ export const createWidgetUrlHandler = async (req: Request, res: Response) => {
   res.json({ widgetUrl });
 };
 
-const setConnectionIdOnContext = async (
-  req: Request,
-): Promise<{ error?: string; connectionId?: string }> => {
-  const connectionToken = req.query.connectionToken as string;
-  const redisKey = `connection-${connectionToken}`;
-  const storedConnectionId = await get(redisKey);
-  if (storedConnectionId) {
-    await del(redisKey);
-    req.context.connectionId = storedConnectionId;
-    return {};
-  } else {
-    return { error: "Invalid or expired connectionToken" };
-  }
-};
-
 export const widgetHandler = async (req: Request, res: Response) => {
   const validation = validateWidgetParams({
     ...req.query,
@@ -164,14 +149,6 @@ export const widgetHandler = async (req: Request, res: Response) => {
     res.status(400);
     res.send(validation.error);
     return;
-  }
-
-  if (req.query.connectionToken) {
-    const { error } = await setConnectionIdOnContext(req);
-    if (error) {
-      res.status(400).send(error);
-      return;
-    }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

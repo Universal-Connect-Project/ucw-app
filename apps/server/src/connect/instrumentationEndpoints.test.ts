@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { instrumentationHandler } from "./instrumentationEndpoints";
 import { ComboJobTypes } from "@repo/utils";
+import { get, set } from "../services/storageClient/redis";
 
 describe("instrumentationEndpoints", () => {
   describe("instrumentationHandler", () => {
@@ -86,7 +87,6 @@ describe("instrumentationEndpoints", () => {
       expect(res.sendStatus).toHaveBeenCalledWith(200);
       expect(req.context).toEqual({
         aggregatorOverride: "testAggregatorOverride",
-        aggregator: "testAggregator",
         connectionId: "MBR-12345",
         jobTypes: req.body.jobTypes,
         oauth_referral_source: "BROWSER",
@@ -96,25 +96,32 @@ describe("instrumentationEndpoints", () => {
       });
     });
 
-    it("attaches properties to the request context and responds with success on success", async () => {
+    it("attaches properties to the request context and responds with connectionId and deletes redis token on success", async () => {
+      const connectionToken = "validToken";
+      const connectionId = "existingConnectionId";
+      set(`connection-${connectionToken}`, connectionId);
+
       const req = {
-        body: correctBody,
+        body: { ...correctBody, connectionToken },
         params: correctParams,
-        context: {
-          connectionId: "existingConnectionId",
-        },
+        context: {},
       } as unknown as Request;
 
       const res = {
         sendStatus: jest.fn(),
+        json: jest.fn(),
       } as unknown as Response;
 
       await instrumentationHandler(req, res);
 
+      const deletedConnectionId = await get(`connection-${connectionToken}`);
+      expect(deletedConnectionId).toBeUndefined();
+
+      expect(res.json).toHaveBeenCalledWith({ connectionId });
       expect(res.sendStatus).toHaveBeenCalledWith(200);
       expect(req.context).toEqual({
         aggregator: req.body.current_aggregator,
-        connectionId: "existingConnectionId",
+        connectionId,
         jobTypes: req.body.jobTypes,
         oauth_referral_source: "BROWSER",
         scheme: "vcs",

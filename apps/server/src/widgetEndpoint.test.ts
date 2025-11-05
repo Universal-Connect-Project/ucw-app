@@ -187,66 +187,54 @@ describe("server", () => {
   });
 
   describe("widgetHandler", () => {
-    describe("refresh scenario", () => {
-      it("sets the connectionId in the request context and deletes the connectionToken from Redis", async () => {
-        const userId = "testUserId";
-        const preSetConnectionId = "testConnectionId123";
-        const connectionToken = "testConnectionToken";
-        jest
-          .spyOn(fs, "readFileSync")
-          .mockReturnValueOnce("<html><body>Mock HTML content</body></html>");
+    it("doesnt fail when params are valid", async () => {
+      jest
+        .spyOn(fs, "readFileSync")
+        .mockReturnValueOnce("<html><body>Mock HTML content</body></html>");
 
-        const res = {
-          send: jest.fn(),
-        } as unknown as Response;
+      const res = {
+        send: jest.fn(),
+      } as unknown as Response;
 
-        const req = {
+      const req = {
+        query: {
+          institutionId: "testInstitutionId",
+          jobTypes: ComboJobTypes.TRANSACTIONS,
+          userId: "testUserId",
+          targetOrigin: "https://example.com",
+          connectionToken: "testConnectionToken",
+          aggregator: MX_AGGREGATOR_STRING,
+        },
+        context: {},
+      } as unknown as Request;
+
+      await widgetHandler(req, res);
+
+      expect(res.send).toHaveBeenCalled();
+    });
+
+    it("responds with a 400 if validation fails", async () => {
+      const res = {
+        send: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+      } as unknown as Response;
+
+      await widgetHandler(
+        {
           query: {
             institutionId: "testInstitutionId",
             jobTypes: ComboJobTypes.TRANSACTIONS,
-            userId,
             targetOrigin: "https://example.com",
-            connectionToken,
+            connectionToken: "testConnectionToken",
             aggregator: MX_AGGREGATOR_STRING,
           },
           context: {},
-        } as unknown as Request;
+        } as unknown as Request,
+        res,
+      );
 
-        await set(`connection-${connectionToken}`, preSetConnectionId);
-
-        await widgetHandler(req, res);
-
-        expect(res.send).toHaveBeenCalled();
-        expect(req.context.connectionId).toEqual(preSetConnectionId);
-        expect(await get(`connection-${connectionToken}`)).toBeUndefined();
-      });
-
-      it("responds with a 400 if connectionToken is invalid or expired", async () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn().mockReturnThis(),
-        } as unknown as Response;
-
-        await widgetHandler(
-          {
-            query: {
-              institutionId: "testInstitutionId",
-              jobTypes: ComboJobTypes.TRANSACTIONS,
-              userId: "testUserId",
-              targetOrigin: "https://example.com",
-              connectionToken: "testConnectionToken",
-              aggregator: MX_AGGREGATOR_STRING,
-            },
-            context: {},
-          } as unknown as Request,
-          res,
-        );
-
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith(
-          "Invalid or expired connectionToken",
-        );
-      });
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith("&#x22;userId&#x22; is required");
     });
   });
 

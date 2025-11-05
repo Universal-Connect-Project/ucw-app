@@ -8,10 +8,11 @@ import { ComboJobTypes } from "@repo/utils";
 // eslint-disable-next-line react-refresh/only-export-components
 const App = () => {
   const [instrumentationFinished, setInstrumentationFinished] = useState(false);
+  const [connectionId, setConnectionId] = useState<string>("");
 
   const queryParams = new URLSearchParams(window.location.search);
 
-  const connectionId = queryParams.get("connectionId") as string;
+  const connectionToken = queryParams.get("connectionToken") as string;
   const aggregator = queryParams.get("aggregator") as string;
   const jobTypes = queryParams.get("jobTypes")?.split(",") as ComboJobTypes[];
   const institutionId = queryParams.get("institutionId") as string;
@@ -23,7 +24,7 @@ const App = () => {
 
   const instrumentationProps = {
     userId: userId,
-    current_member_guid: connectionId,
+    connectionToken,
     current_aggregator: aggregator,
     jobTypes,
     singleAccountSelect,
@@ -34,7 +35,10 @@ const App = () => {
 
   useEffect(() => {
     instrumentation(instrumentationProps)
-      .then(() => {
+      .then((response) => {
+        if (response?.data?.connectionId) {
+          setConnectionId(response.data.connectionId);
+        }
         setInstrumentationFinished(true);
       })
       .catch((error) => {

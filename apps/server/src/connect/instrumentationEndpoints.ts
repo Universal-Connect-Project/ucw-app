@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import { del, get } from "../services/storageClient/redis";
 
 export const instrumentationHandler = async (req: Request, res: Response) => {
   try {
@@ -11,12 +12,22 @@ export const instrumentationHandler = async (req: Request, res: Response) => {
       jobTypes,
       singleAccountSelect,
       aggregatorOverride,
+      connectionToken,
     } = body;
 
     req.context.userId = userId;
 
-    if (Boolean(req.context.connectionId) && Boolean(current_aggregator)) {
-      req.context.aggregator = current_aggregator;
+    if (Boolean(connectionToken) && Boolean(current_aggregator)) {
+      const redisKey = `connection-${connectionToken}`;
+      const storedConnectionId = await get(redisKey);
+      if (storedConnectionId) {
+        await del(redisKey); // one time use
+        req.context.connectionId = storedConnectionId;
+        req.context.aggregator = current_aggregator;
+        res.json({ connectionId: storedConnectionId });
+      } else {
+        throw new Error("Invalid or expired connectionToken");
+      }
     }
     if (aggregatorOverride) {
       req.context.aggregatorOverride = aggregatorOverride;
