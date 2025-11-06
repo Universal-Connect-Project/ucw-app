@@ -44,7 +44,8 @@ const App = () => {
       .catch((error) => {
         showBoundary(error);
       });
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!instrumentationFinished) {
     return null;

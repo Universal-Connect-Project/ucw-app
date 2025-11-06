@@ -129,5 +129,25 @@ describe("instrumentationEndpoints", () => {
         userId: req.params.userId,
       });
     });
+
+    it("throws an error if the connectionToken is invalid", async () => {
+      const req = {
+        body: { ...correctBody, connectionToken: "invalidToken" },
+        params: correctParams,
+        context: {},
+      } as unknown as Request;
+
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      } as unknown as Response;
+
+      await instrumentationHandler(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        error: "Invalid or expired connectionToken",
+      });
+    });
   });
 });

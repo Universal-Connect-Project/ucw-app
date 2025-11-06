@@ -125,7 +125,11 @@ test("connects to plaid test bank through credential flow and deletes connection
     });
     expect(deleteResponse.ok()).toBeTruthy();
 
-    const secondDelete = await request.delete(endpoint);
+    const secondDelete = await request.delete(endpoint, {
+      headers: {
+        "UCW-Connection-Id": connectionId,
+      },
+    });
     const errorBody = await secondDelete.json();
     expect(secondDelete.status()).toBe(400);
     expect(errorBody.message).toBe(PLAID_ITEM_DELETED_ERROR_MSG);
@@ -261,7 +265,11 @@ test(
       });
       expect(deleteResponse.ok()).toBeTruthy();
 
-      const secondDelete = await request.delete(endpoint);
+      const secondDelete = await request.delete(endpoint, {
+        headers: {
+          "UCW-Connection-Id": connectionId,
+        },
+      });
       const errorBody = await secondDelete.json();
       expect(secondDelete.status()).toBe(400);
       expect(errorBody.message).toBe(PLAID_ITEM_DELETED_ERROR_MSG);

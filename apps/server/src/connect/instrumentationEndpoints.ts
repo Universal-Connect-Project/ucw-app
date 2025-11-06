@@ -40,6 +40,6 @@ export const instrumentationHandler = async (req: Request, res: Response) => {
 
     res.sendStatus(200);
   } catch (error) {
-    res.sendStatus(400);
+    res.status(400).json({ error: error.message });
   }
 };
