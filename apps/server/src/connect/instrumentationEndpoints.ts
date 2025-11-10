@@ -16,6 +16,10 @@ export const instrumentationHandler = async (req: Request, res: Response) => {
     } = body;
 
     req.context.userId = userId;
+    req.context.jobTypes = jobTypes;
+    req.context.scheme = "vcs";
+    req.context.oauth_referral_source = "BROWSER";
+    req.context.singleAccountSelect = singleAccountSelect;
 
     if (Boolean(connectionToken) && Boolean(current_aggregator)) {
       const redisKey = `connection-${connectionToken}`;
@@ -25,6 +29,7 @@ export const instrumentationHandler = async (req: Request, res: Response) => {
         req.context.connectionId = storedConnectionId;
         req.context.aggregator = current_aggregator;
         res.json({ connectionId: storedConnectionId });
+        return;
       } else {
         throw new Error("Invalid or expired connectionToken");
       }
@@ -32,11 +37,6 @@ export const instrumentationHandler = async (req: Request, res: Response) => {
     if (aggregatorOverride) {
       req.context.aggregatorOverride = aggregatorOverride;
     }
-
-    req.context.jobTypes = jobTypes;
-    req.context.scheme = "vcs";
-    req.context.oauth_referral_source = "BROWSER";
-    req.context.singleAccountSelect = singleAccountSelect;
 
     res.sendStatus(200);
   } catch (error) {

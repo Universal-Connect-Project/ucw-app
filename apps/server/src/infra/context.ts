@@ -26,6 +26,7 @@ export function contextHandler(
   req.context = context;
 
   const { send } = res;
+  const { json } = res;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   res.send = function (...args: any): any {
@@ -34,6 +35,15 @@ export function contextHandler(
     res.set("meta", JSON.stringify(res.context));
 
     send.apply(res, args);
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  res.json = function (...args: any): any {
+    res.json = json;
+
+    res.set("meta", JSON.stringify(res.context));
+
+    json.apply(res, args);
   };
 
   next();
