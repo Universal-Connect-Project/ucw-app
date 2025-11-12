@@ -88,13 +88,14 @@
             }
           }
         ],
-        "description": "Get the widget html to attach to a browser frame",
+        "description": "This is the endpoint to render the Universal Connect Widget. Set this in the src attribute of your iframe.",
         "responses": {
           "200": {
             "description": "The widget page"
           }
         },
-        "summary": "Widget webpage"
+        "summary": "Render a widget",
+        "tags": ["Widget"]
       }
     },
     "/api/data/aggregator/{aggregator}/user/{user_id}/connection/{connection_id}/accounts": {
@@ -420,7 +421,8 @@
             }
           }
         },
-        "summary": "Accounts data"
+        "summary": "Accounts data",
+        "tags": ["Data"]
       }
     },
     "/api/data/aggregator/{aggregator}/user/{user_id}/connection/{connection_id}/identity": {
@@ -628,7 +630,8 @@
             }
           }
         },
-        "summary": "Identity data"
+        "summary": "Identity data",
+        "tags": ["Data"]
       }
     },
     "/api/data/aggregator/{aggregator}/user/{user_id}/account/{account_id}/transactions": {
@@ -6711,7 +6714,8 @@
             }
           }
         },
-        "summary": "Transactions data"
+        "summary": "Transactions data",
+        "tags": ["Data"]
       }
     },
     "/api/vc/data/aggregator/{aggregator}/user/{user_id}/connection/{connection_id}/accounts": {
@@ -6761,7 +6765,8 @@
             }
           }
         },
-        "summary": "Accounts data"
+        "summary": "Accounts data",
+        "tags": ["VC Data"]
       }
     },
     "/api/vc/data/aggregator/{aggregator}/user/{user_id}/connection/{connection_id}/identity": {
@@ -6811,7 +6816,8 @@
             }
           }
         },
-        "summary": "Identity data"
+        "summary": "Identity data",
+        "tags": ["VC Data"]
       }
     },
     "/api/vc/data/aggregator/{aggregator}/user/{user_id}/account/{account_id}/transactions": {
@@ -6877,7 +6883,8 @@
             }
           }
         },
-        "summary": "Transactions data"
+        "summary": "Transactions data",
+        "tags": ["VC Data"]
       }
     },
     "/api/aggregator/{aggregator}/user/{user_id}": {
@@ -6911,7 +6918,8 @@
             "description": "Success"
           }
         },
-        "summary": "Delete user"
+        "summary": "Delete user",
+        "tags": ["Deletion"]
       }
     },
     "/api/token": {
@@ -6946,7 +6954,8 @@
             "description": "Unauthorized"
           }
         },
-        "summary": "Widget token"
+        "summary": "Widget token",
+        "tags": ["Deletion"]
       }
     }
   }

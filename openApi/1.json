@@ -22,6 +22,12 @@
             "required": true,
             "schema": {
               "type": "string",
+              "enum": [
+                "accountNumber",
+                "accountOwner",
+                "transactions",
+                "transactionHistory"
+              ],
               "example": "accountNumber,accountOwner,transactions,transactionHistory"
             }
           },
@@ -107,13 +113,14 @@
             }
           }
         ],
-        "description": "Get the widget html to attach to a browser frame",
+        "description": "This is the endpoint to render the Universal Connect Widget. Set this in the src attribute of your iframe.",
         "responses": {
           "200": {
             "description": "The widget page"
           }
         },
-        "summary": "Widget webpage"
+        "summary": "Render a widget",
+        "tags": ["Widget"]
       }
     },
     "/api/data/aggregator/{aggregator}/user/{userId}/connection/{connectionId}/accounts": {
@@ -445,7 +452,8 @@
             }
           }
         },
-        "summary": "Accounts data"
+        "summary": "Accounts data",
+        "tags": ["Data"]
       }
     },
     "/api/data/aggregator/{aggregator}/user/{userId}/connection/{connectionId}/identity": {
@@ -659,7 +667,8 @@
             }
           }
         },
-        "summary": "Identity data"
+        "summary": "Identity data",
+        "tags": ["Data"]
       }
     },
     "/api/data/aggregator/{aggregator}/user/{userId}/account/{accountId}/transactions": {
@@ -6745,7 +6754,8 @@
             }
           }
         },
-        "summary": "Transactions data"
+        "summary": "Transactions data",
+        "tags": ["Data"]
       }
     },
     "/api/vc/data/aggregator/{aggregator}/user/{userId}/connection/{connectionId}/accounts": {
@@ -6795,7 +6805,8 @@
             }
           }
         },
-        "summary": "Accounts data"
+        "summary": "Accounts data",
+        "tags": ["VC Data"]
       }
     },
     "/api/vc/data/aggregator/{aggregator}/user/{userId}/connection/{connectionId}/identity": {
@@ -6845,7 +6856,8 @@
             }
           }
         },
-        "summary": "Identity data"
+        "summary": "Identity data",
+        "tags": ["VC Data"]
       }
     },
     "/api/vc/data/aggregator/{aggregator}/user/{userId}/account/{accountId}/transactions": {
@@ -6917,7 +6929,8 @@
             }
           }
         },
-        "summary": "Transactions data"
+        "summary": "Transactions data",
+        "tags": ["VC Data"]
       }
     },
     "/api/aggregator/{aggregator}/user/{userId}": {
@@ -6951,7 +6964,8 @@
             "description": "Success"
           }
         },
-        "summary": "Delete user"
+        "summary": "Delete user",
+        "tags": ["Deletion"]
       }
     },
     "/api/aggregator/{aggregator}/user/{userId}/connection/{connectionId}": {
@@ -7001,7 +7015,8 @@
             }
           }
         },
-        "summary": "Delete user's connection"
+        "summary": "Delete user's connection",
+        "tags": ["Deletion"]
       }
     },
     "/api/token": {
@@ -7036,7 +7051,8 @@
             "description": "Unauthorized"
           }
         },
-        "summary": "Widget token"
+        "summary": "Widget token",
+        "tags": ["Widget"]
       }
     }
   }
