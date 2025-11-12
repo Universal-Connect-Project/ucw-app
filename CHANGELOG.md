@@ -19,9 +19,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - connectionId can be sensitive so it's in the header now
   - all other params have been moved into query params
 
+## [1.17.2]
+
 ### Added
 
-- console warning when targetOrigin is not specified.
+- Versioned API docs
+
+## [1.17.1]
+
+### Added
+
+- Plaid to demo preferences
+
+## [1.17.0]
+
+### Changed
+
+- Connecting screen now shows which aggregator is being used for the connection instead of the MX logo
 
 ## [1.16.0]
 

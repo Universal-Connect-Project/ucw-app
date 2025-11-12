@@ -5,7 +5,6 @@ import {
   expectConnectionSuccess,
   MEMBER_CONNECTED_EVENT_TYPE,
   searchAndSelectMx,
-  visitAgg,
   visitWithPostMessageSpy,
 } from "@repo/utils-e2e/cypress";
 import {
@@ -31,6 +30,11 @@ describe("authentication", () => {
     }).then((response) => {
       expect(response.status).to.eq(401);
     });
+  });
+
+  it("fails to load widget if token is invalid", () => {
+    cy.visit("/widget?token=invalid-token");
+    cy.findByText("A valid token is required").should("be.visible");
   });
 
   it("can't access the data endpoints without the right access", () => {
