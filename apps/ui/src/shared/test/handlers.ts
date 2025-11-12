@@ -4,7 +4,7 @@ import {
   CREATE_MEMBER_URL,
   INSTITUTION_BY_GUID_MOCK_URL,
   INSTITUTION_CREDENTIALS_MOCK_URL,
-  INSTRUMENTATION_MOCK_URL,
+  INSTRUMENTATION_URL,
   JOB_BY_GUID_MOCK_URL,
   MEMBER_BY_GUID_MOCK_URL,
   MEMBER_CREDENTIALS_MOCK_URL,
@@ -28,7 +28,7 @@ import { oauthStatesResponse } from "./testData/oauthStates";
 import { oauthStateResponse } from "./testData/oauthState";
 
 const handlers = [
-  http.post(INSTRUMENTATION_MOCK_URL, () => HttpResponse.json({})),
+  http.post(`${INSTRUMENTATION_URL}/:token`, () => HttpResponse.json({})),
   http.get(RECOMMENDED_INSTITUTIONS_URL, () =>
     HttpResponse.json(recommendedInstitutions),
   ),

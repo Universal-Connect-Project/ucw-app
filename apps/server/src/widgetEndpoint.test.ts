@@ -7,8 +7,9 @@ import {
 import { ComboJobTypes } from "@repo/utils";
 import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
 import { nonTestAggregators } from "./adapterSetup";
-import { get } from "./services/storageClient/redis";
+import { get, set } from "./services/storageClient/redis";
 import fs from "node:fs";
+import type { UUID } from "node:crypto";
 
 describe("server", () => {
   describe("validateWidgetParams", () => {
@@ -187,10 +188,19 @@ describe("server", () => {
   });
 
   describe("widgetHandler", () => {
-    it("doesnt fail when params are valid", async () => {
+    it("returns HTML when a valid token is provided", async () => {
       jest
         .spyOn(fs, "readFileSync")
         .mockReturnValueOnce("<html><body>Mock HTML content</body></html>");
+
+      const token = "validToken123";
+      const widgetParams = {
+        jobTypes: ComboJobTypes.TRANSACTIONS,
+        userId: "testUserId",
+        targetOrigin: "https://example.com",
+      };
+
+      await set(`token-${token}`, widgetParams);
 
       const res = {
         send: jest.fn(),
@@ -198,22 +208,37 @@ describe("server", () => {
 
       const req = {
         query: {
-          institutionId: "testInstitutionId",
-          jobTypes: ComboJobTypes.TRANSACTIONS,
-          userId: "testUserId",
-          targetOrigin: "https://example.com",
-          connectionToken: "testConnectionToken",
-          aggregator: MX_AGGREGATOR_STRING,
+          token,
         },
         context: {},
       } as unknown as Request;
 
       await widgetHandler(req, res);
 
-      expect(res.send).toHaveBeenCalled();
+      expect(res.send).toHaveBeenCalledWith(
+        "<html><body>Mock HTML content</body></html>",
+      );
     });
 
-    it("responds with a 400 if validation fails", async () => {
+    it("responds with a 400 if token is missing", async () => {
+      const res = {
+        send: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+      } as unknown as Response;
+
+      await widgetHandler(
+        {
+          query: {},
+          context: {},
+        } as unknown as Request,
+        res,
+      );
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith("A valid token is required");
+    });
+
+    it("responds with a 400 if token is invalid", async () => {
       const res = {
         send: jest.fn(),
         status: jest.fn().mockReturnThis(),
@@ -222,11 +247,7 @@ describe("server", () => {
       await widgetHandler(
         {
           query: {
-            institutionId: "testInstitutionId",
-            jobTypes: ComboJobTypes.TRANSACTIONS,
-            targetOrigin: "https://example.com",
-            connectionToken: "testConnectionToken",
-            aggregator: MX_AGGREGATOR_STRING,
+            token: "invalidToken",
           },
           context: {},
         } as unknown as Request,
@@ -234,14 +255,14 @@ describe("server", () => {
       );
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.send).toHaveBeenCalledWith("&#x22;userId&#x22; is required");
+      expect(res.send).toHaveBeenCalledWith("A valid token is required");
     });
   });
 
   describe("createWidgetUrlHandler", () => {
-    it("stores connectionId in redis and returns a widget URL", async () => {
-      const hiddenConnectionId = "111-222-333-444-555";
-      jest.spyOn(crypto, "randomUUID").mockReturnValueOnce(hiddenConnectionId);
+    it("stores widget params in redis and returns a widget URL with token", async () => {
+      const randomUUID = "111-222-333-444-555";
+      jest.spyOn(crypto, "randomUUID").mockReturnValueOnce(randomUUID);
 
       const connectionId = "testConnectionId123";
       const req = {
@@ -253,6 +274,7 @@ describe("server", () => {
           aggregator: MX_AGGREGATOR_STRING,
           institutionId: "testInstitutionId",
         },
+        headers: {},
         get: (): string | undefined => "localhost:8080",
         protocol: "http",
       } as unknown as Request;
@@ -271,32 +293,27 @@ describe("server", () => {
 
       const widgetUrl = new URL(response.widgetUrl);
 
-      expect(["http:"]).toContain(widgetUrl.protocol);
-      expect(widgetUrl.hostname).toBe("localhost");
-      expect(widgetUrl.port).toBe("8080");
       expect(widgetUrl.pathname).toBe("/widget");
 
       const params = widgetUrl.searchParams;
-      expect(params.get("jobTypes")).toBe("transactions");
-      expect(params.get("userId")).toBe("testUserId");
-      expect(params.get("targetOrigin")).toBe("https://example.com");
-      expect(params.get("aggregator")).toBe("mx");
-      expect(params.get("institutionId")).toBe("testInstitutionId");
-      expect(params.get("connectionToken")).toBe(hiddenConnectionId);
+      expect(params.get("token")).toBe(randomUUID);
 
-      expect(params.get("connectionId")).toBeNull();
-
-      const redisStoredConnectionId = await get(
-        `connection-${hiddenConnectionId}`,
-      );
-      expect(redisStoredConnectionId).toBe(connectionId);
+      const storedData = await get(`token-${randomUUID}`);
+      expect(storedData).toMatchObject({
+        jobTypes: ComboJobTypes.TRANSACTIONS,
+        userId: "testUserId",
+        targetOrigin: "https://example.com",
+        connectionId,
+        aggregator: MX_AGGREGATOR_STRING,
+        institutionId: "testInstitutionId",
+      });
     });
 
-    it("stores the authorization header token in redis and responds with the redis key token", async () => {
+    it("stores the authorization JWT and widget params in redis", async () => {
       const randomUUID = "111-111-111-111-111";
       jest.spyOn(crypto, "randomUUID").mockReturnValueOnce(randomUUID);
 
-      const authorizationToken = "test";
+      const authorizationToken = "test-jwt-token";
       const userId = "testUserId";
 
       const req = {
@@ -324,17 +341,27 @@ describe("server", () => {
       const widgetUrl = new URL(response.widgetUrl);
 
       expect(widgetUrl.searchParams.get("token")).toBe(randomUUID);
-      const token = await get(`${userId}-${randomUUID}`);
-      expect(token).toEqual(authorizationToken);
+
+      const storedData = await get(`token-${randomUUID}`);
+      expect(storedData).toMatchObject({
+        authorizationJwt: authorizationToken,
+        jobTypes: ComboJobTypes.TRANSACTIONS,
+        userId,
+        targetOrigin: "https://example.com",
+      });
     });
 
-    it("creates the widget url from the requested host", async () => {
+    it("creates the widget url with only token parameter", async () => {
+      const randomUUID = "test-uuid-1-2-3-4-5";
+      jest.spyOn(crypto, "randomUUID").mockReturnValueOnce(randomUUID as UUID);
+
       const req = {
         body: {
           jobTypes: ComboJobTypes.TRANSACTIONS,
           userId: "testUserId",
           targetOrigin: "https://example.com",
         },
+        headers: {},
         get: (): string | undefined => "example",
         protocol: "http",
       } as unknown as Request;
@@ -351,7 +378,7 @@ describe("server", () => {
       const { widgetUrl } = response;
 
       expect(widgetUrl).toEqual(
-        "http://localhost:8080/widget?jobTypes=transactions&userId=testUserId&targetOrigin=https%3A%2F%2Fexample.com",
+        `http://localhost:8080/widget?token=${randomUUID}`,
       );
     });
   });

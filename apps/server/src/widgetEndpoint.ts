@@ -3,7 +3,7 @@ import type { Request, Response } from "express";
 import Joi from "joi";
 import { aggregators, nonTestAggregators } from "./adapterSetup";
 import fs from "node:fs";
-import { set } from "./services/storageClient/redis";
+import { get, set } from "./services/storageClient/redis";
 
 import he from "he";
 import path from "path";
@@ -49,22 +49,6 @@ const widgetSchema = Joi.object({
       }),
   });
 
-const setSecureToken = async ({
-  prefix,
-  token,
-}: {
-  prefix?: string;
-  token?: string;
-}): Promise<string | undefined> => {
-  if (!token) {
-    return undefined;
-  }
-  const uuid = crypto.randomUUID();
-  const redisKey = `${prefix || "secured"}-${uuid}`;
-  await set(redisKey, token, { EX: 60 * 5 });
-  return uuid;
-};
-
 export interface WidgetParams {
   connectionId?: string;
   institutionId?: string;
@@ -72,16 +56,30 @@ export interface WidgetParams {
   aggregator?: string;
   singleAccountSelect?: boolean;
   userId: string;
-  token?: string;
-  connectionToken?: string;
   aggregatorOverride?: string;
   targetOrigin: string;
 }
 
+const setToken = async ({
+  widgetParams,
+  authorizationJwt,
+}: {
+  widgetParams: WidgetParams;
+  authorizationJwt?: string;
+}): Promise<string> => {
+  const uuid = crypto.randomUUID();
+  const redisKey = `token-${uuid}`;
+  const dataToStore = authorizationJwt
+    ? { authorizationJwt, ...widgetParams }
+    : widgetParams;
+  await set(redisKey, dataToStore, { EX: 60 * 5 });
+  return uuid;
+};
+
 export const validateWidgetParams = (
   params: unknown,
 ): { isValid: boolean; error?: string; validatedParams?: WidgetParams } => {
-  const { error, value } = widgetSchema.validate(params);
+  const { error, value: validatedParams } = widgetSchema.validate(params);
 
   if (error) {
     return {
@@ -92,7 +90,7 @@ export const validateWidgetParams = (
 
   return {
     isValid: true,
-    validatedParams: value as WidgetParams,
+    validatedParams,
   };
 };
 
@@ -105,34 +103,13 @@ export const createWidgetUrlHandler = async (req: Request, res: Response) => {
     return;
   }
 
-  const params = validation.validatedParams!;
+  const token = await setToken({
+    widgetParams: validation.validatedParams!,
+    authorizationJwt: req.headers?.authorization?.split(" ")?.[1],
+  });
 
-  const { connectionId, userId } = params;
   const queryParams = new URLSearchParams();
-
-  const connectionToken = await setSecureToken({
-    prefix: "connection",
-    token: connectionId,
-  });
-
-  if (connectionToken) {
-    queryParams.append("connectionToken", connectionToken);
-  }
-
-  const authorizationHeaderToken = await setSecureToken({
-    prefix: userId,
-    token: req.headers?.authorization?.split(" ")?.[1],
-  });
-
-  if (authorizationHeaderToken) {
-    queryParams.append("token", authorizationHeaderToken);
-  }
-
-  Object.entries(params).forEach(([key, value]) => {
-    if (key !== "connectionId" && value !== undefined) {
-      queryParams.append(key, String(value));
-    }
-  });
+  queryParams.append("token", token);
 
   const baseUrl = `${getConfig().HOST_URL}/widget`;
   const widgetUrl = `${baseUrl}?${queryParams.toString()}`;
@@ -141,13 +118,11 @@ export const createWidgetUrlHandler = async (req: Request, res: Response) => {
 };
 
 export const widgetHandler = async (req: Request, res: Response) => {
-  const validation = validateWidgetParams({
-    ...req.query,
-  });
-
-  if (!validation.isValid) {
+  const token = req.query.token as string;
+  const validatedWidgetParams = await get(`token-${token}`);
+  if (!validatedWidgetParams) {
     res.status(400);
-    res.send(validation.error);
+    res.send("A valid token is required");
     return;
   }
 

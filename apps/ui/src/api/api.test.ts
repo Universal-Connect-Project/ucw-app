@@ -2,11 +2,10 @@ import { describe, expect, it } from "vitest";
 import { instrumentation } from "./api";
 import server from "../shared/test/testServer";
 import { http, HttpResponse } from "msw";
-import { ComboJobTypes, INSTRUMENTATION_MOCK_URL } from "@repo/utils";
+import { INSTRUMENTATION_URL } from "@repo/utils";
 
 const instrumentationProps = {
-  jobTypes: [ComboJobTypes.TRANSACTIONS],
-  userId: "test",
+  token: "test-token",
 };
 
 describe("api", () => {
@@ -18,7 +17,7 @@ describe("api", () => {
     it("throws an error on failure", async () => {
       server.use(
         http.post(
-          INSTRUMENTATION_MOCK_URL,
+          `${INSTRUMENTATION_URL}/${instrumentationProps.token}`,
           () => new HttpResponse(null, { status: 400 }),
         ),
       );

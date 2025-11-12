@@ -148,6 +148,10 @@ UCW-Connection-Id: access-sandbox-111111-22222-33333-44444-555555
 
 ## New create widget Url endpoint
 
+> **Breaking Change**: As of version 2.0, using this create widget method is now required. It is no longer possible to load the widget with tokenized parameters like in version 1 of UCW. All widget initialization must go through this creation method.
+
+**One-Time Use**: The returned `widgetUrl` is for single use only and will expire after being accessed once.
+
 Example Request
 
 ```bash
@@ -168,12 +172,10 @@ Example Response
 
 ```json
 {
-  "widgetUrl": "http://localhost:8080/widget?connectionToken=1197a55e-74ba-4b78-acc8-952f12d4d1e9&token=3cc8bc93-d537-4d57-bb1d-0a401341c245&jobTypes=transactions&userId=tester101&targetOrigin=http%3A%2F%2Flocalhost%3A8080&institutionId=mxBank&aggregator=mx_int"
+  "widgetUrl": "http://localhost:8080/widget?token=abc-123-efg-456-hijk"
 }
 ```
 
 **Api Token Removed** - The `/api/token` endpoint which was used for authentication is removed. Now when authentication is enabled you need to pass the authorization header into the create widgetUrl request and that will append a token onto the `widgetUrl` and handle the widget authentication.
 
-**Connection Refresh** - This new endpoint is also to be used for refreshing a connection. Pass all the params into the body of the request and it will safely pass the sensitive `connectionId` to the server and handle the refresh connection scenario as you load the returned `widgetUrl`.
-
-**Loading the widget** - You can still construct the widget url manually for basic connection scenarios or you can use the new create widgetUrl endpoint. But refresh and authentication scenarios require the new endpoint to create a `widgetUrl`.
+**Connection Refresh** - This new endpoint is to be used for refreshing a connection. Pass all the params into the body of the request and it will safely pass the sensitive `connectionId` to the server and handle the refresh connection scenario as you load the returned `widgetUrl`.

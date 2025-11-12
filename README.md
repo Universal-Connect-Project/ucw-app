@@ -50,7 +50,19 @@ The API documentation for this service lives in [./openApiDocumentation.json](./
 
 It can take a minute or so for the server to initialize and set up elasticsearch.
 
-Once the server is running, and you see a message that says, `"Message":"App initialized successfully"`, you can then navigate to [http://localhost:8080/widget?jobTypes=transactions&userId=test-user-id&targetOrigin=http://localhost:8080](http://localhost:8080/widget?jobTypes=transactions&userId=test-user-id&targetOrigin=http://localhost:8080) in a browser, and you should see the Universal Connect Widget UI load.
+Once the server is running and you see `"Message":"App initialized successfully"`, create a widget URL by making a POST request to the `/widgetUrl` endpoint:
+
+```bash
+curl -X POST http://localhost:8080/widgetUrl \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jobTypes": "transactions",
+    "userId": "test-user-id",
+    "targetOrigin": "http://localhost:8080"
+  }'
+```
+
+The response contains a `widgetUrl` that you can open in your browser to see the Universal Connect Widget UI. This URL includes a secure token that expires in 5 minutes.
 
 ## Universal Connect Project Services and API Keys
 
@@ -85,7 +97,11 @@ We have an optional [authentication](./apps/server/src/authentication.ts) system
 
 When authentication is enabled, the `/widget` endpoint will require authorization.
 
-There is a widget URL endpoint (`/api/widgetUrl`) that can be used to retrieve a secure, one-time-use widget URL. To get a secure widget URL, make a POST request to `/widgetUrl` with an authorization header containing a Bearer token and all the widget parameters included in the request body. The response will include a `widgetUrl` property that can only be accessed once and includes a secure token for use in an iframe. When this URL is accessed, the server will set an authorization cookie that the widget UI will pass to the server for all of its requests.
+Use the `/widgetUrl` endpoint to create secure widget URLs. POST your widget parameters (jobTypes, userId, targetOrigin, etc.) with an optional Bearer token in the Authorization header. The response contains a `widgetUrl` with a secure token that:
+
+- Stores all widget parameters in Redis with a 5-minute expiration
+- Extracts and stores your authorization JWT (if provided) as a cookie when the widget loads
+- Can only be used once for authentication, then the JWT is removed from storage
 
 Variables for our optional authentication are found [here](ENVIRONMENT.md#authentication-variables)
 

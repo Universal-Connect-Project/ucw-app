@@ -13,24 +13,30 @@ jest.mock("./config");
 
 describe("authentication", () => {
   describe("tokenAuthenticationMiddleware", () => {
-    it("pulls the JWT from redis with the given token and userId, adds the bearer token to the request headers, deletes the token from redis, sets a cookie, and calls next", async () => {
+    it("pulls the JWT from redis with the given token, adds the bearer token to the request headers, removes JWT from redis, sets a cookie, and calls next", async () => {
       const token = "testToken";
       const jwt = "testJwt";
       const userId = "testUserId";
+      const jobTypes = "transactions";
 
       jest.spyOn(config, "getConfig").mockReturnValue({});
 
-      const redisKey = `${userId}-${token}`;
+      const redisKey = `token-${token}`;
+      const widgetParams = {
+        authorizationJwt: jwt,
+        userId,
+        jobTypes,
+        targetOrigin: "https://example.com",
+      };
 
-      await set(redisKey, jwt);
+      await set(redisKey, widgetParams);
 
-      expect(await get(redisKey)).toEqual(jwt);
+      expect(await get(redisKey)).toEqual(widgetParams);
 
       const req = {
         headers: {},
         query: {
           token,
-          userId: userId,
         },
       } as unknown as Request;
 
@@ -45,7 +51,15 @@ describe("authentication", () => {
       await tokenAuthenticationMiddleware(req, res, next);
 
       expect(req.headers.authorization).toEqual(`Bearer ${jwt}`);
-      expect(await get(redisKey)).toBeUndefined();
+
+      const updatedParams = await get(redisKey);
+      expect(updatedParams).toEqual({
+        userId,
+        jobTypes,
+        targetOrigin: "https://example.com",
+      });
+      expect(updatedParams.authorizationJwt).toBeUndefined();
+
       expect(res.cookie).toHaveBeenCalledWith(tokenCookieName, jwt, {
         httpOnly: true,
         sameSite: "strict",
@@ -63,17 +77,22 @@ describe("authentication", () => {
         AUTHORIZATION_TOKEN_COOKIE_SAMESITE: "none",
       });
 
-      const redisKey = `${userId}-${token}`;
+      const redisKey = `token-${token}`;
+      const widgetParams = {
+        authorizationJwt: jwt,
+        userId,
+        jobTypes: "transactions",
+        targetOrigin: "https://example.com",
+      };
 
-      await set(redisKey, jwt);
+      await set(redisKey, widgetParams);
 
-      expect(await get(redisKey)).toEqual(jwt);
+      expect(await get(redisKey)).toEqual(widgetParams);
 
       const req = {
         headers: {},
         query: {
           token,
-          userId: userId,
         },
       } as unknown as Request;
 
@@ -88,7 +107,10 @@ describe("authentication", () => {
       await tokenAuthenticationMiddleware(req, res, next);
 
       expect(req.headers.authorization).toEqual(`Bearer ${jwt}`);
-      expect(await get(redisKey)).toBeUndefined();
+
+      const updatedParams = await get(redisKey);
+      expect(updatedParams.authorizationJwt).toBeUndefined();
+
       expect(res.cookie).toHaveBeenCalledWith(tokenCookieName, jwt, {
         httpOnly: true,
         sameSite: "none",
@@ -97,8 +119,20 @@ describe("authentication", () => {
       expect(next).toHaveBeenCalled();
     });
 
-    it("responds with a 401 if there is no JWT in redis", async () => {
+    it("responds with a 401 if there is no JWT in the widget params", async () => {
       const token = "testToken";
+
+      jest.spyOn(config, "getConfig").mockReturnValue({});
+
+      const redisKey = `token-${token}`;
+      const widgetParams = {
+        userId: "testUserId",
+        jobTypes: "transactions",
+        targetOrigin: "https://example.com",
+        // No authorizationJwt
+      };
+
+      await set(redisKey, widgetParams);
 
       const req = {
         headers: {},
@@ -119,6 +153,7 @@ describe("authentication", () => {
 
       expect(res.status).toHaveBeenLastCalledWith(401);
       expect(res.send).toHaveBeenLastCalledWith("token invalid or expired");
+      expect(next).not.toHaveBeenCalled();
     });
 
     it("just calls next if there's no token", async () => {

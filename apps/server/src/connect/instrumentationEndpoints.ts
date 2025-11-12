@@ -3,42 +3,26 @@ import { del, get } from "../services/storageClient/redis";
 
 export const instrumentationHandler = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params;
+    const { token } = req.params;
 
-    const { body } = req;
+    const widgetParams = await get(`token-${token}`);
 
-    const {
-      current_aggregator,
-      jobTypes,
-      singleAccountSelect,
-      aggregatorOverride,
-      connectionToken,
-    } = body;
+    const { jobTypes, singleAccountSelect, aggregatorOverride, userId } =
+      widgetParams;
 
     req.context.userId = userId;
-    req.context.jobTypes = jobTypes;
+    req.context.jobTypes = jobTypes.split(",");
     req.context.scheme = "vcs";
     req.context.oauth_referral_source = "BROWSER";
-    req.context.singleAccountSelect = singleAccountSelect;
+    req.context.singleAccountSelect = singleAccountSelect !== "false";
 
-    if (Boolean(connectionToken) && Boolean(current_aggregator)) {
-      const redisKey = `connection-${connectionToken}`;
-      const storedConnectionId = await get(redisKey);
-      if (storedConnectionId) {
-        await del(redisKey); // one time use
-        req.context.connectionId = storedConnectionId;
-        req.context.aggregator = current_aggregator;
-        res.json({ connectionId: storedConnectionId });
-        return;
-      } else {
-        throw new Error("Invalid or expired connectionToken");
-      }
-    }
+    await del(`token-${token}`); // one time use
+
     if (aggregatorOverride) {
       req.context.aggregatorOverride = aggregatorOverride;
     }
 
-    res.sendStatus(200);
+    res.status(200).json(widgetParams);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

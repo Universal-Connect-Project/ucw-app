@@ -12,105 +12,142 @@
     }
   ],
   "paths": {
+    "/widgetUrl": {
+      "post": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["jobTypes", "userId", "targetOrigin"],
+                "properties": {
+                  "jobTypes": {
+                    "type": "string",
+                    "description": "The types of jobs to be performed",
+                    "example": "accountNumber,accountOwner,transactions,transactionHistory"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "description": "The user id to make or refresh a connection with."
+                  },
+                  "targetOrigin": {
+                    "type": "string",
+                    "description": "The target origin to be used when posting messages to the parent window.",
+                    "example": "https://example.com"
+                  },
+                  "institutionId": {
+                    "type": "string",
+                    "description": "The UCP id of the institution. Providing this id will skip search, go directly to the authorization step for the institution, and hide the back button."
+                  },
+                  "connectionId": {
+                    "type": "string",
+                    "description": "The connection id of the connection to be refreshed. An aggregator and institutionId are required when this is used. Providing these will skip search, go directly to the authorization step for the institution, and hide the back button."
+                  },
+                  "aggregator": {
+                    "type": "string",
+                    "enum": [
+                      "mx",
+                      "mx_int",
+                      "sophtron",
+                      "finicity",
+                      "finicity_sandbox",
+                      "plaid",
+                      "plaid_sandbox"
+                    ],
+                    "description": "The aggregator of the connection to be refreshed. A connectionId and institutionId are required when this is used. Providing these will skip search, go directly to the authorization step for the institution, and hide the back button."
+                  },
+                  "singleAccountSelect": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "This parameter is only supported by Sophtron. When doing a verification job you can pass this parameter as false if you'd like to skip the step that selects an account. For this same behavior using MX you'll need to reach out to MX support to change a setting."
+                  },
+                  "token": {
+                    "type": "string",
+                    "description": "A one time use token from the token endpoint. If you're using the built in authentication logic, then you'll need this to be able to put the widget in an iframe."
+                  },
+                  "connectionToken": {
+                    "type": "string",
+                    "description": "A one time use token for the connection id."
+                  },
+                  "aggregatorOverride": {
+                    "type": "string",
+                    "enum": ["mx", "sophtron", "finicity"],
+                    "description": "This parameter is for internal use only. It is used to determine which aggregator to use for the connection."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Creates a secure widget URL with a single token parameter. This endpoint stores all widget parameters (including connectionId, institutionId, aggregator, jobTypes, userId, targetOrigin, and optionally the authorization JWT) in Redis with a 5-minute expiration, and returns a URL containing only a secure token that references this stored data.",
+        "responses": {
+          "200": {
+            "description": "Successfully created widget URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "widgetUrl": {
+                      "type": "string",
+                      "description": "The secure widget URL with a single token parameter that references all widget parameters stored in Redis",
+                      "example": "http://localhost:8080/widget?token=abc123-def456-789"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid parameters",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "\"jobTypes\" is required"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create secure widget URL",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/widget": {
       "get": {
         "parameters": [
           {
-            "description": "The types of jobs to be performed",
-            "name": "jobTypes",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "example": "accountNumber,accountOwner,transactions,transactionHistory"
-            }
-          },
-          {
-            "description": "The user id to make or refresh a connection with.",
-            "name": "userId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "The UCP id of the institution. Providing this id will skip search, go directly to the authorization step for the institution, and hide the back button.",
-            "name": "institutionId",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "The connection id of the connection to be refreshed. An aggregator and institutionId are required when this is used. Providing these will skip search, go directly to the authorization step for the institution, and hide the back button.",
-            "name": "connectionId",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "The aggregator of the connection to be refreshed. A connectionId and institutionId are required when this is used. Providing these will skip search, go directly to the authorization step for the institution, and hide the back button.",
-            "name": "aggregator",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "mx",
-                "mx_int",
-                "sophtron",
-                "finicity",
-                "finicity_sandbox"
-              ]
-            }
-          },
-          {
-            "description": "This parameter is only supported by Sophtron. When doing a verification job you can pass this parameter as false if you'd like to skip the step that selects an account. For this same behavior using MX you'll need to reach out to MX support to change a setting.",
-            "name": "singleAccountSelect",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "default": true,
-              "type": "boolean"
-            }
-          },
-          {
-            "description": "A one time use token from the token endpoint. If you're using the built in authentication logic, then you'll need this to be able to put the widget in an iframe.",
+            "description": "A secure token that references all widget parameters stored in Redis. This token is obtained from the /widgetUrl endpoint and contains all configuration including jobTypes, userId, targetOrigin, institutionId, connectionId, aggregator, singleAccountSelect, and aggregatorOverride.",
             "name": "token",
             "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "The target origin to be used when posting messages to the parent window.",
-            "name": "targetOrigin",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "This parameter is for internal use only. It is used to determine which aggregator to use for the connection. ",
-            "name": "aggregatorOverride",
-            "in": "query",
-            "required": false,
+            "required": true,
             "schema": {
               "type": "string",
-              "enum": ["mx", "sophtron", "finicity"]
+              "example": "abc123-def456-789"
             }
           }
         ],
-        "description": "Get the widget html to attach to a browser frame",
+        "description": "Get the widget HTML to attach to a browser frame. The token parameter must be obtained from the /widgetUrl endpoint and contains references to all widget configuration stored in Redis with a 5-minute expiration.",
         "responses": {
           "200": {
-            "description": "The widget page"
+            "description": "The widget page HTML"
+          },
+          "400": {
+            "description": "Bad Request - Invalid or expired token",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "A valid token is required"
+                }
+              }
+            }
           }
         },
         "summary": "Widget webpage"
@@ -1117,40 +1154,15 @@
         },
         "summary": "Delete user's connection"
       }
-    },
-    "/api/token": {
-      "get": {
-        "parameters": [
-          {
-            "description": "The id assigned to the user",
-            "name": "userId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "description": "Get a token to pass into the widget endpoint for authentication. This endpoint only exists if you configure the widget to use the built in authentication.",
-        "responses": {
-          "200": {
-            "description": "A token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "example": {
-                    "token": "b3555f3e-ef53-4182-bc6b-a7bc0fa3767d"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "summary": "Widget token"
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT Authorization header using the Bearer scheme."
       }
     }
   }

@@ -10,7 +10,7 @@ vi.mock("./Widget", () => ({
 import App from "./App";
 import { http, HttpResponse } from "msw";
 import {
-  INSTRUMENTATION_MOCK_URL,
+  INSTRUMENTATION_URL,
   SOMETHING_WENT_WRONG_ERROR_TEXT,
 } from "@repo/utils";
 
@@ -26,7 +26,7 @@ describe("<App />", () => {
   it("shows the error boundary if instrumentation fails", async () => {
     server.use(
       http.post(
-        INSTRUMENTATION_MOCK_URL,
+        `${INSTRUMENTATION_URL}/:token`,
         () => new HttpResponse(null, { status: 400 }),
       ),
     );

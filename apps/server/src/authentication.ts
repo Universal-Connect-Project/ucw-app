@@ -1,7 +1,7 @@
 import { auth, requiredScopes } from "express-oauth2-jwt-bearer";
 import { getConfig } from "./config";
 import type { Request, Response, Express, NextFunction } from "express";
-import { del, get } from "./services/storageClient/redis";
+import { get, set } from "./services/storageClient/redis";
 
 export const tokenCookieName = "authorizationToken";
 
@@ -11,26 +11,24 @@ export const tokenAuthenticationMiddleware = async (
   next: NextFunction,
 ) => {
   const token = req.query?.token as string;
-  const userId = req.query?.userId as string;
-
-  const redisKey = `${userId}-${token}`;
 
   if (token) {
-    const authorizationJWT = await get(redisKey);
+    const redisKey = `token-${token}`;
+    const { authorizationJwt, ...widgetParams } = await get(redisKey);
+    await set(redisKey, widgetParams);
+
     const config = getConfig();
 
-    if (!authorizationJWT) {
+    if (!authorizationJwt) {
       res.send("token invalid or expired");
       res.status(401);
 
       return;
     }
 
-    await del(redisKey);
+    req.headers.authorization = `Bearer ${authorizationJwt}`;
 
-    req.headers.authorization = `Bearer ${authorizationJWT}`;
-
-    res.cookie(tokenCookieName, authorizationJWT, {
+    res.cookie(tokenCookieName, authorizationJwt, {
       httpOnly: true,
       sameSite: config.AUTHORIZATION_TOKEN_COOKIE_SAMESITE || "strict",
       secure: true,
