@@ -2,7 +2,7 @@
   "info": {
     "description": "Universal Connect Widget endpoints",
     "title": "Universal Connect Widget",
-    "version": "1.10.0"
+    "version": "beta"
   },
   "openapi": "3.0.0",
   "servers": [
@@ -16,18 +16,24 @@
       "get": {
         "parameters": [
           {
-            "description": "The types of jobs to be performed",
-            "name": "jobTypes",
+            "description": "The type of the job to be performed",
+            "name": "job_type",
             "in": "query",
             "required": true,
             "schema": {
               "type": "string",
-              "example": "accountNumber,accountOwner,transactions,transactionHistory"
+              "enum": [
+                "aggregate",
+                "all",
+                "fullhistory",
+                "verification",
+                "identity"
+              ]
             }
           },
           {
             "description": "The user id to make or refresh a connection with.",
-            "name": "userId",
+            "name": "user_id",
             "in": "query",
             "required": true,
             "schema": {
@@ -36,7 +42,7 @@
           },
           {
             "description": "The UCP id of the institution. Providing this id will skip search, go directly to the authorization step for the institution, and hide the back button.",
-            "name": "institutionId",
+            "name": "institution_id",
             "in": "query",
             "required": false,
             "schema": {
@@ -44,8 +50,8 @@
             }
           },
           {
-            "description": "The connection id of the connection to be refreshed. An aggregator and institutionId are required when this is used. Providing these will skip search, go directly to the authorization step for the institution, and hide the back button.",
-            "name": "connectionId",
+            "description": "The connection id of the connection to be refreshed. A aggregator is required when this is used. Providing these will skip search, go directly to the authorization step for the institution, and hide the back button.",
+            "name": "connection_id",
             "in": "query",
             "required": false,
             "schema": {
@@ -53,24 +59,18 @@
             }
           },
           {
-            "description": "The aggregator of the connection to be refreshed. A connectionId and institutionId are required when this is used. Providing these will skip search, go directly to the authorization step for the institution, and hide the back button.",
+            "description": "The aggregator of the connection to be refreshed. A connection_id is required when this is used. Providing these will skip search, go directly to the authorization step for the institution, and hide the back button.",
             "name": "aggregator",
             "in": "query",
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "mx",
-                "mx_int",
-                "sophtron",
-                "finicity",
-                "finicity_sandbox"
-              ]
+              "enum": ["mx", "mx_int", "sophtron"]
             }
           },
           {
             "description": "This parameter is only supported by Sophtron. When doing a verification job you can pass this parameter as false if you'd like to skip the step that selects an account. For this same behavior using MX you'll need to reach out to MX support to change a setting.",
-            "name": "singleAccountSelect",
+            "name": "single_account_select",
             "in": "query",
             "required": false,
             "schema": {
@@ -86,25 +86,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "The target origin to be used when posting messages to the parent window.",
-            "name": "targetOrigin",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "This parameter is for internal use only. It is used to determine which aggregator to use for the connection. ",
-            "name": "aggregatorOverride",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": ["mx", "sophtron", "finicity"]
-            }
           }
         ],
         "description": "Get the widget html to attach to a browser frame",
@@ -116,12 +97,12 @@
         "summary": "Widget webpage"
       }
     },
-    "/api/data/aggregator/{aggregator}/user/{userId}/connection/{connectionId}/accounts": {
+    "/api/data/aggregator/{aggregator}/user/{user_id}/connection/{connection_id}/accounts": {
       "get": {
         "parameters": [
           {
             "description": "The connection id",
-            "name": "connectionId",
+            "name": "connection_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -135,18 +116,12 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": [
-                "mx",
-                "mx_int",
-                "sophtron",
-                "finicity",
-                "finicity_sandbox"
-              ]
+              "enum": ["mx", "mx_int", "sophtron"]
             }
           },
           {
             "description": "The user id for the connection",
-            "name": "userId",
+            "name": "user_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -448,12 +423,12 @@
         "summary": "Accounts data"
       }
     },
-    "/api/data/aggregator/{aggregator}/user/{userId}/connection/{connectionId}/identity": {
+    "/api/data/aggregator/{aggregator}/user/{user_id}/connection/{connection_id}/identity": {
       "get": {
         "parameters": [
           {
             "description": "The connection id",
-            "name": "connectionId",
+            "name": "connection_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -467,18 +442,12 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": [
-                "mx",
-                "mx_int",
-                "sophtron",
-                "finicity",
-                "finicity_sandbox"
-              ]
+              "enum": ["mx", "mx_int", "sophtron"]
             }
           },
           {
             "description": "The user id for the connection",
-            "name": "userId",
+            "name": "user_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -662,12 +631,12 @@
         "summary": "Identity data"
       }
     },
-    "/api/data/aggregator/{aggregator}/user/{userId}/account/{accountId}/transactions": {
+    "/api/data/aggregator/{aggregator}/user/{user_id}/account/{account_id}/transactions": {
       "get": {
         "parameters": [
           {
             "description": "The account id",
-            "name": "accountId",
+            "name": "account_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -675,25 +644,20 @@
             }
           },
           {
-            "description": "Period start of the transactions to return. Must be in ISO 8601 format (YYYY-MM-DD), timestamp not allowed. Defaults to 120 days ago if not provided.",
-            "name": "startDate",
+            "description": "The connection id, returns accounts of specific connection_id if provided, depends on adapter implementation",
+            "name": "connection_id",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-              "example": "2025-01-01"
+              "type": "string"
             }
           },
           {
-            "description": "Period end of the transactions to return. Must be in ISO 8601 format (YYYY-MM-DD), timestamp not allowed. Defaults to 5 days in the future if not provided.",
-            "name": "endDate",
+            "description": "Period end of the transactions to return. This is only used for Sophtron, and it is required for Sophtron. ex: 1/1/2024",
+            "name": "end_time",
             "in": "query",
-            "required": false,
             "schema": {
-              "type": "string",
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-              "example": "2025-05-20"
+              "type": "string"
             }
           },
           {
@@ -703,18 +667,20 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": [
-                "mx",
-                "mx_int",
-                "sophtron",
-                "finicity",
-                "finicity_sandbox"
-              ]
+              "enum": ["mx", "mx_int", "sophtron"]
+            }
+          },
+          {
+            "description": "Period start of the transactions to return. This is only used for Sophtron, and it is required for Sophtron. ex: 1/1/2024",
+            "name": "start_time",
+            "in": "query",
+            "schema": {
+              "type": "string"
             }
           },
           {
             "description": "The user id for the connection",
-            "name": "userId",
+            "name": "user_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6748,12 +6714,12 @@
         "summary": "Transactions data"
       }
     },
-    "/api/vc/data/aggregator/{aggregator}/user/{userId}/connection/{connectionId}/accounts": {
+    "/api/vc/data/aggregator/{aggregator}/user/{user_id}/connection/{connection_id}/accounts": {
       "get": {
         "parameters": [
           {
             "description": "The connection id",
-            "name": "connectionId",
+            "name": "connection_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6772,7 +6738,7 @@
           },
           {
             "description": "The user id for the connection",
-            "name": "userId",
+            "name": "user_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6798,12 +6764,12 @@
         "summary": "Accounts data"
       }
     },
-    "/api/vc/data/aggregator/{aggregator}/user/{userId}/connection/{connectionId}/identity": {
+    "/api/vc/data/aggregator/{aggregator}/user/{user_id}/connection/{connection_id}/identity": {
       "get": {
         "parameters": [
           {
             "description": "The connection id",
-            "name": "connectionId",
+            "name": "connection_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6822,7 +6788,7 @@
           },
           {
             "description": "The user id for the connection",
-            "name": "userId",
+            "name": "user_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6848,12 +6814,12 @@
         "summary": "Identity data"
       }
     },
-    "/api/vc/data/aggregator/{aggregator}/user/{userId}/account/{accountId}/transactions": {
+    "/api/vc/data/aggregator/{aggregator}/user/{user_id}/account/{account_id}/transactions": {
       "get": {
         "parameters": [
           {
             "description": "The account id",
-            "name": "accountId",
+            "name": "account_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6861,25 +6827,11 @@
             }
           },
           {
-            "description": "Period start of the transactions to return. Must be in ISO 8601 format (YYYY-MM-DD), timestamp not allowed. Defaults to 120 days ago if not provided.",
-            "name": "startDate",
+            "description": "Period end of the transactions to return. This is only used for Sophtron, and it is required for Sophtron. ex: 1/1/2024",
+            "name": "end_time",
             "in": "query",
-            "required": false,
             "schema": {
-              "type": "string",
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-              "example": "2025-01-01"
-            }
-          },
-          {
-            "description": "Period end of the transactions to return. Must be in ISO 8601 format (YYYY-MM-DD), timestamp not allowed. Defaults to 5 days in the future if not provided.",
-            "name": "endDate",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-              "example": "2025-05-20"
+              "type": "string"
             }
           },
           {
@@ -6893,8 +6845,16 @@
             }
           },
           {
+            "description": "Period start of the transactions to return. This is only used for Sophtron, and it is required for Sophtron. ex: 1/1/2024",
+            "name": "start_time",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "description": "The user id for the connection",
-            "name": "userId",
+            "name": "user_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6920,12 +6880,12 @@
         "summary": "Transactions data"
       }
     },
-    "/api/aggregator/{aggregator}/user/{userId}": {
+    "/api/aggregator/{aggregator}/user/{user_id}": {
       "delete": {
         "parameters": [
           {
             "description": "The id assigned to the user",
-            "name": "userId",
+            "name": "user_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6952,56 +6912,6 @@
           }
         },
         "summary": "Delete user"
-      }
-    },
-    "/api/aggregator/{aggregator}/user/{userId}/connection/{connectionId}": {
-      "delete": {
-        "parameters": [
-          {
-            "description": "The id assigned to the user",
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "The connection id or access_token recieived from Plaid",
-            "name": "connectionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "The aggregator for the connected user. Currently only implemented for Plaid because Plaid doesnt have user delete.",
-            "name": "aggregator",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": ["plaid", "plaid_sandbox"]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "Failed to delete connection"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Delete user's connection"
       }
     },
     "/api/token": {
