@@ -2,7 +2,7 @@
   "info": {
     "description": "Universal Connect Widget endpoints",
     "title": "Universal Connect Widget",
-    "version": "1.10.0"
+    "version": "1"
   },
   "openapi": "3.0.0",
   "servers": [
