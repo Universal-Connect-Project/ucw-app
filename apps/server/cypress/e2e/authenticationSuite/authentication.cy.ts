@@ -1,5 +1,6 @@
 import {
   clickContinue,
+  createWidgetUrl,
   enterMxCredentials,
   expectConnectionSuccess,
   MEMBER_CONNECTED_EVENT_TYPE,
@@ -42,20 +43,12 @@ describe("authentication", () => {
 
     const userId = crypto.randomUUID();
 
-    cy.request({
-      headers: {
-        authorization: `Bearer ${widgetDemoAccessToken}`,
-      },
-      method: "POST",
-      url: `/widgetUrl`,
-      body: {
-        userId,
-        jobTypes: ComboJobTypes.TRANSACTIONS,
-        targetOrigin: "http://localhost:8080",
-      },
-    }).then((response) => {
-      const widgetUrl = response.body.widgetUrl;
-
+    createWidgetUrl({
+      userId,
+      jobTypes: ComboJobTypes.TRANSACTIONS,
+      targetOrigin: "http://localhost:8080",
+      authToken: widgetDemoAccessToken,
+    }).then((widgetUrl) => {
       visitWithPostMessageSpy(widgetUrl)
         .then(() => {
           searchAndSelectMx();

@@ -214,47 +214,58 @@ export const generateDataTests = ({
         let aggregator: string;
         const userId = Cypress.env("userId");
 
-        visitWithPostMessageSpy(
-          `/widget?jobTypes=${jobTypes}&userId=${userId}&targetOrigin=http://localhost:8080`,
-        )
-          .then(() => makeAConnection(jobTypes))
-          .then(() => {
-            // Capture postmessages into variables
-            cy.get("@postMessage", { timeout: 90000 }).then((mySpy) => {
-              const connection = (mySpy as any)
-                .getCalls()
-                .find(
-                  (call) => call.args[0].type === MEMBER_CONNECTED_EVENT_TYPE,
-                );
-              const { metadata } = connection?.args[0];
-              connectionId = metadata.connectionId;
-              aggregator = metadata.aggregator;
+        cy.request({
+          method: "POST",
+          url: "/widgetUrl",
+          body: {
+            jobTypes,
+            userId,
+            targetOrigin: "http://localhost:8080",
+          },
+        }).then((response) => {
+          expect(response.status).to.eq(200);
+          expect(response.body).to.have.property("widgetUrl");
 
-              verifyAccountsAndReturnAccountId({
-                transactionsAccountSelector,
-                connectionId,
-                aggregator,
-                shouldTestVcEndpoint,
-                userId,
-              }).then((accountId) => {
-                verifyIdentity({
+          visitWithPostMessageSpy(response.body.widgetUrl)
+            .then(() => makeAConnection(jobTypes))
+            .then(() => {
+              // Capture postmessages into variables
+              cy.get("@postMessage", { timeout: 90000 }).then((mySpy) => {
+                const connection = (mySpy as any)
+                  .getCalls()
+                  .find(
+                    (call) => call.args[0].type === MEMBER_CONNECTED_EVENT_TYPE,
+                  );
+                const { metadata } = connection?.args[0];
+                connectionId = metadata.connectionId;
+                aggregator = metadata.aggregator;
+
+                verifyAccountsAndReturnAccountId({
+                  transactionsAccountSelector,
                   connectionId,
                   aggregator,
-                  shouldExpectAccountOwners,
                   shouldTestVcEndpoint,
                   userId,
-                });
+                }).then((accountId) => {
+                  verifyIdentity({
+                    connectionId,
+                    aggregator,
+                    shouldExpectAccountOwners,
+                    shouldTestVcEndpoint,
+                    userId,
+                  });
 
-                verifyTransactions({
-                  accountId,
-                  aggregator,
-                  shouldExpectTransactions,
-                  shouldTestVcEndpoint,
-                  userId,
-                  transactionsQueryString,
+                  verifyTransactions({
+                    accountId,
+                    aggregator,
+                    shouldExpectTransactions,
+                    shouldTestVcEndpoint,
+                    userId,
+                    transactionsQueryString,
+                  });
                 });
               });
             });
-          });
+        });
       }),
   );

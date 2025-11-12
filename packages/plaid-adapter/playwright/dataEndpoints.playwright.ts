@@ -1,12 +1,11 @@
 import { expect, test } from "@playwright/test";
 import { ComboJobTypes } from "@repo/utils";
+import { createWidgetUrl } from "@repo/utils-e2e/playwright";
 import {
   testAccountsData,
   createConnectedPromise,
   testIdentityData,
 } from "./utils";
-
-const WIDGET_BASE_URL = "http://localhost:8080/widget";
 
 test("connects to plaid's First Platypus Bank and gets account numbers", async ({
   page,
@@ -16,9 +15,12 @@ test("connects to plaid's First Platypus Bank and gets account numbers", async (
 
   const userId = crypto.randomUUID();
 
-  await page.goto(
-    `${WIDGET_BASE_URL}?jobTypes=${ComboJobTypes.ACCOUNT_NUMBER}&userId=${userId}&targetOrigin=http://localhost:8080`,
-  );
+  const widgetUrl = await createWidgetUrl(request, {
+    jobTypes: ComboJobTypes.ACCOUNT_NUMBER,
+    userId,
+  });
+
+  await page.goto(widgetUrl);
 
   await page.getByPlaceholder("Search").fill("Plaid Bank");
 

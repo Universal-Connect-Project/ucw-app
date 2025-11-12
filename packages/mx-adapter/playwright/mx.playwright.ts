@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import { ComboJobTypes, SOMETHING_WENT_WRONG_ERROR_TEXT } from "@repo/utils";
 import {
   createExpectPerformanceEvent,
+  createWidgetUrl,
   getAccessToken,
 } from "@repo/utils-e2e/playwright";
 import { MX_BANK_OAUTH_UCP_INSTITUTION_ID } from "../src/testInstitutions";
@@ -17,9 +18,12 @@ test("connects to mx bank with oAuth, tracks performance correctly, and does ref
 
   const accessToken = await getAccessToken(request);
 
-  await page.goto(
-    `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
-  );
+  const widgetUrl = await createWidgetUrl(request, {
+    jobTypes: ComboJobTypes.TRANSACTIONS,
+    userId,
+  });
+
+  await page.goto(widgetUrl);
 
   page.evaluate(`
       window.addEventListener('message', (event) => {
@@ -92,9 +96,15 @@ test("connects to mx bank with oAuth, tracks performance correctly, and does ref
 
         const { connectionId, aggregator, ucpInstitutionId } = obj.metadata;
 
-        await page.goto(
-          `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&aggregator=${aggregator}&institutionId=${ucpInstitutionId}&connectionId=${connectionId}&targetOrigin=http://localhost:8080`,
-        );
+        const refreshWidgetUrl = await createWidgetUrl(request, {
+          jobTypes: ComboJobTypes.TRANSACTIONS,
+          userId,
+          aggregator,
+          institutionId: ucpInstitutionId,
+          connectionId,
+        });
+
+        await page.goto(refreshWidgetUrl);
 
         const popupPromise2 = page.waitForEvent("popup");
         await page.getByRole("link", { name: "Go to log in" }).click();
@@ -136,9 +146,12 @@ test("results in a successful performance event even if you close the tab", asyn
 
   const accessToken = await getAccessToken(request);
 
-  await page.goto(
-    `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
-  );
+  const widgetUrl = await createWidgetUrl(request, {
+    jobTypes: ComboJobTypes.TRANSACTIONS,
+    userId,
+  });
+
+  await page.goto(widgetUrl);
 
   page.evaluate(`
       window.addEventListener('message', (event) => {
@@ -211,14 +224,18 @@ test("results in a successful performance event even if you close the tab", asyn
 
 test("shows an error page if you deny an mx bank oauth connection", async ({
   page,
+  request,
 }) => {
   test.setTimeout(240000);
 
   const userId = crypto.randomUUID();
 
-  await page.goto(
-    `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
-  );
+  const widgetUrl = await createWidgetUrl(request, {
+    jobTypes: ComboJobTypes.TRANSACTIONS,
+    userId,
+  });
+
+  await page.goto(widgetUrl);
 
   await page.getByPlaceholder("Search").fill("MX Bank (Oauth)");
 

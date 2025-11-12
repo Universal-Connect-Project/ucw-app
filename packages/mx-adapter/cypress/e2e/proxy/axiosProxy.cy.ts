@@ -1,4 +1,5 @@
 import {
+  createWidgetUrl,
   MEMBER_CONNECTED_EVENT_TYPE,
   makeAnMXConnection,
   searchByText,
@@ -15,29 +16,35 @@ describe("mx aggregator using axios proxy", () => {
     const shouldTestVcEndpoint = false;
     const userId = Cypress.env("userId");
 
-    visitWithPostMessageSpy(
-      `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
-    )
-      .then(() => makeAnMXConnection())
-      .then(() => {
-        // Capture postmessages into variables
-        cy.get("@postMessage", { timeout: 90000 }).then((mySpy) => {
-          const connection = (mySpy as any)
-            .getCalls()
-            .find((call) => call.args[0].type === MEMBER_CONNECTED_EVENT_TYPE);
-          const { metadata } = connection?.args[0];
-          connectionId = metadata.connectionId;
-          aggregator = metadata.aggregator;
+    createWidgetUrl({
+      jobTypes: ComboJobTypes.TRANSACTIONS,
+      userId,
+      targetOrigin: "http://localhost:8080",
+    }).then((widgetUrl) => {
+      visitWithPostMessageSpy(widgetUrl)
+        .then(() => makeAnMXConnection())
+        .then(() => {
+          // Capture postmessages into variables
+          cy.get("@postMessage", { timeout: 90000 }).then((mySpy) => {
+            const connection = (mySpy as any)
+              .getCalls()
+              .find(
+                (call) => call.args[0].type === MEMBER_CONNECTED_EVENT_TYPE,
+              );
+            const { metadata } = connection?.args[0];
+            connectionId = metadata.connectionId;
+            aggregator = metadata.aggregator;
 
-          verifyAccountsAndReturnAccountId({
-            connectionId,
-            aggregator,
-            shouldTestVcEndpoint,
-            transactionsAccountSelector: undefined,
-            userId,
+            verifyAccountsAndReturnAccountId({
+              connectionId,
+              aggregator,
+              shouldTestVcEndpoint,
+              transactionsAccountSelector: undefined,
+              userId,
+            });
           });
         });
-      });
+    });
   });
 
   it("gets institution credentials from Prod institution through the proxy server", () => {

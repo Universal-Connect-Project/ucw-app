@@ -2,6 +2,7 @@ import { expect, test as base } from "@playwright/test";
 import { ComboJobTypes } from "@repo/utils";
 import {
   createExpectPerformanceEvent,
+  createWidgetUrl,
   getAccessToken,
 } from "@repo/utils-e2e/playwright";
 import { FINICITY_PROFILES_A_UCP_INSTITUTION_ID } from "../src/testInstitutions";
@@ -11,10 +12,14 @@ const makeAConnection = async (
   jobTypes: ComboJobTypes[],
   page,
   userId: string,
+  request,
 ) => {
-  await page.goto(
-    `http://localhost:8080/widget?jobTypes=${jobTypes.join(",")}&userId=${userId}&targetOrigin=http://localhost:8080`,
-  );
+  const widgetUrl = await createWidgetUrl(request, {
+    jobTypes: jobTypes.join(","),
+    userId,
+  });
+
+  await page.goto(widgetUrl);
 
   page.evaluate(`
       window.addEventListener('message', (event) => {
@@ -102,6 +107,7 @@ test.describe("Finicity Adapter Tests", () => {
       [ComboJobTypes.ACCOUNT_NUMBER],
       page,
       userId,
+      request,
     );
 
     await testDataEndpoints({
@@ -137,6 +143,7 @@ test.describe("Finicity Adapter Tests", () => {
       [ComboJobTypes.TRANSACTION_HISTORY],
       page,
       userId,
+      request,
     );
 
     const expectPerformanceEvent = createExpectPerformanceEvent({
@@ -164,7 +171,12 @@ test.describe("Finicity Adapter Tests", () => {
     test.setTimeout(300000);
 
     const { aggregator, connectionId, ucpInstitutionId } =
-      await makeAConnection([ComboJobTypes.TRANSACTIONS], page, userId);
+      await makeAConnection(
+        [ComboJobTypes.TRANSACTIONS],
+        page,
+        userId,
+        request,
+      );
 
     await testDataEndpoints({ request, userId, connectionId, aggregator });
 
@@ -207,12 +219,15 @@ test.describe("Finicity Adapter Tests", () => {
     });
   });
 
-  test("Failed connection", async ({ page, userId }) => {
+  test("Failed connection", async ({ page, userId, request }) => {
     test.setTimeout(300000);
 
-    await page.goto(
-      `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
-    );
+    const widgetUrl = await createWidgetUrl(request, {
+      jobTypes: ComboJobTypes.TRANSACTIONS,
+      userId,
+    });
+
+    await page.goto(widgetUrl);
 
     await page.getByPlaceholder("Search").fill("finbank");
     await page.getByLabel("Add account with FinBank Profiles - A").click();

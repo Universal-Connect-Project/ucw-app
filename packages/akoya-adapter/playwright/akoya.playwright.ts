@@ -1,16 +1,19 @@
 import { expect, test } from "@playwright/test";
 import { ComboJobTypes } from "@repo/utils";
+import { createWidgetUrl } from "@repo/utils-e2e/playwright";
 
-const WIDGET_BASE_URL = "http://localhost:8080/widget";
-
-test("connects to mikomo bank with oAuth", async ({ page }) => {
+test("connects to mikomo bank with oAuth", async ({ page, request }) => {
   test.setTimeout(240000);
 
   const userId = crypto.randomUUID();
 
-  await page.goto(
-    `${WIDGET_BASE_URL}?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
-  );
+  const widgetUrl = await createWidgetUrl(request, {
+    jobTypes: ComboJobTypes.TRANSACTIONS,
+    userId,
+    targetOrigin: "http://localhost:8080",
+  });
+
+  await page.goto(widgetUrl);
 
   page.evaluate(`
       window.addEventListener('message', (event) => {

@@ -5,3 +5,4 @@ export * from "./visit";
 export * from "./postMessageEvents";
 export * from "./mx";
 export * from "./sophtron";
+export * from "./createWidgetUrl";
