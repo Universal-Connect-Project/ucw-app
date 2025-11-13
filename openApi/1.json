@@ -116,7 +116,15 @@
         "description": "This is the endpoint to render the Universal Connect Widget. Set this in the src attribute of your iframe.",
         "responses": {
           "200": {
-            "description": "The widget page"
+            "description": "Success",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string",
+                  "example": "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\" /><link rel=\"icon\" type=\"image/svg+xml\" href=\"/ucp-logo.svg\" /><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /><title>Universal Connect Widget</title><script type=\"module\" crossorigin src=\"/assets/index-DtnY0TQo.js\"></script><link rel=\"stylesheet\" crossorigin href=\"/assets/index-CBFfkBLP.css\"></head><body><div id=\"root\"></div></body></html>"
+                }
+              }
+            }
           }
         },
         "summary": "Render a widget",
