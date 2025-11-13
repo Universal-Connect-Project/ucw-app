@@ -8,7 +8,7 @@ describe("instrumentationEndpoints", () => {
     const userId = "testUserId";
     const token = "validToken";
 
-    it("retrieves widget params from Redis, sets context, and returns params", async () => {
+    it("retrieves widget params from Redis, sets context, and returns params with parsed jobTypes", async () => {
       const widgetParams = {
         jobTypes: `${ComboJobTypes.TRANSACTION_HISTORY},${ComboJobTypes.TRANSACTIONS}`,
         singleAccountSelect: "true",
@@ -30,7 +30,13 @@ describe("instrumentationEndpoints", () => {
       await instrumentationHandler(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(widgetParams);
+      expect(res.json).toHaveBeenCalledWith({
+        ...widgetParams,
+        jobTypes: [
+          ComboJobTypes.TRANSACTION_HISTORY,
+          ComboJobTypes.TRANSACTIONS,
+        ],
+      });
       expect(req.context).toEqual({
         jobTypes: [
           ComboJobTypes.TRANSACTION_HISTORY,

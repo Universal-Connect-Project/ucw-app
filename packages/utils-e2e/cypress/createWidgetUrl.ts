@@ -41,7 +41,7 @@ export const createWidgetUrl = (
 
   const headers: any = {};
   if (authToken) {
-    headers.authorization = `Bearer ${authToken}`;
+    headers.Authorization = `Bearer ${authToken}`;
   }
 
   return cy
