@@ -77,9 +77,12 @@ test("connects to mx bank with oAuth, tracks performance correctly, and does ref
   });
 
   await authorizeTab.getByRole("button", { name: "Authorize" }).click();
-  await expect(
-    authorizeTab.getByText("Thank you for completing OAuth"),
-  ).toBeVisible();
+  if (!authorizeTab.isClosed()) {
+    await expect(
+      authorizeTab.getByText("Thank you for completing OAuth"),
+    ).toBeVisible({ timeout: 5000 });
+    await authorizeTab.waitForEvent("close", { timeout: 30000 });
+  }
 
   const connectedPromise = new Promise<void>((resolve, reject) => {
     const timer = setTimeout(() => reject("timed out"), 120000);

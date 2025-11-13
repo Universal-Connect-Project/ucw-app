@@ -180,25 +180,15 @@ test.describe("Finicity Adapter Tests", () => {
 
     await testDataEndpoints({ request, userId, connectionId, aggregator });
 
-    const widgetUrlResponse = await request.post(
-      "http://localhost:8080/widgetUrl",
-      {
-        data: {
-          jobTypes: ComboJobTypes.TRANSACTIONS,
-          aggregator: aggregator,
-          userId: userId,
-          institutionId: ucpInstitutionId,
-          connectionId: connectionId,
-          targetOrigin: "http://localhost:8080",
-        },
-      },
-    );
+    const widgetUrl = await createWidgetUrl(request, {
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
+      aggregator: aggregator,
+      userId: userId,
+      institutionId: ucpInstitutionId,
+      connectionId: connectionId,
+    });
 
-    expect(widgetUrlResponse.status()).toBe(200);
-    const widgetUrlData = await widgetUrlResponse.json();
-    expect(widgetUrlData).toHaveProperty("widgetUrl");
-
-    await page.goto(widgetUrlData.widgetUrl);
+    await page.goto(widgetUrl);
 
     await expect(page.getByText("Log in at FinBank Profiles - A")).toBeVisible({
       timeout: 8000,
