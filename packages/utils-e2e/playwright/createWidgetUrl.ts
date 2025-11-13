@@ -1,7 +1,7 @@
 import type { APIRequestContext } from "@playwright/test";
 
 export interface CreateWidgetUrlOptions {
-  jobTypes: string[];
+  jobTypes?: string[];
   userId: string;
   targetOrigin?: string;
   institutionId?: string;

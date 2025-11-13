@@ -73,7 +73,7 @@ describe("server", () => {
 
       expect(validation.isValid).toBeFalsy();
       expect(validation.error).toEqual(
-        "aggregator missing required peer either connectionToken or connectionId",
+        "aggregator missing required peer connectionId",
       );
     });
 

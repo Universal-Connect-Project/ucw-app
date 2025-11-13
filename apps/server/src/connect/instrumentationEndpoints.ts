@@ -7,14 +7,24 @@ export const instrumentationHandler = async (req: Request, res: Response) => {
 
     const widgetParams = await get(`token-${token}`);
 
-    const { jobTypes, singleAccountSelect, aggregatorOverride, userId } =
-      widgetParams;
+    const {
+      jobTypes,
+      singleAccountSelect,
+      aggregatorOverride,
+      userId,
+      aggregator,
+      connectionId,
+    } = widgetParams;
 
     req.context.userId = userId;
     req.context.jobTypes = jobTypes;
     req.context.scheme = "vcs";
     req.context.oauth_referral_source = "BROWSER";
     req.context.singleAccountSelect = singleAccountSelect !== "false";
+    if (Boolean(aggregator) && Boolean(connectionId)) {
+      req.context.aggregator = aggregator;
+      req.context.connectionId = connectionId;
+    }
 
     await del(`token-${token}`); // one time use
 

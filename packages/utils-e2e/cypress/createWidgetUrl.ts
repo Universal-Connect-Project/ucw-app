@@ -14,30 +14,12 @@ export interface CreateWidgetUrlOptions {
 export const createWidgetUrl = (
   options: CreateWidgetUrlOptions,
 ): Cypress.Chainable<string> => {
-  const {
-    jobTypes,
-    userId,
-    targetOrigin,
-    authToken,
-    aggregatorOverride,
-    ...rest
-  } = options;
+  const { authToken, targetOrigin, ...rest } = options;
 
   const body: any = {
-    jobTypes,
-    userId,
+    ...rest,
     targetOrigin: targetOrigin || "http://localhost:8080",
   };
-
-  if (aggregatorOverride) {
-    body.aggregatorOverride = aggregatorOverride;
-  }
-
-  Object.keys(rest).forEach((key) => {
-    if (rest[key] !== undefined) {
-      body[key] = rest[key];
-    }
-  });
 
   const headers: any = {};
   if (authToken) {

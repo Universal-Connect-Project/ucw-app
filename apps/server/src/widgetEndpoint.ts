@@ -20,25 +20,21 @@ const widgetSchema = Joi.object({
   singleAccountSelect: Joi.bool(),
   userId: Joi.string().required(), // Plaid doesn't need this but it's still required for securing the widget request
   token: Joi.string(),
-  connectionToken: Joi.string(),
   aggregatorOverride: Joi.string().valid(...nonTestAggregators),
   targetOrigin: Joi.string()
     .uri({ scheme: ["http", "https"] })
     .required(),
 })
   .with("connectionId", ["institutionId", "aggregator"])
-  .with("connectionToken", ["institutionId", "aggregator"])
   .when(Joi.object({ aggregator: Joi.exist() }).unknown(), {
     then: Joi.object({
       institutionId: Joi.required().messages({
         "any.required": "aggregator missing required peer institutionId",
       }),
-    })
-      .or("connectionToken", "connectionId")
-      .messages({
-        "object.missing":
-          "aggregator missing required peer either connectionToken or connectionId",
+      connectionId: Joi.required().messages({
+        "any.required": "aggregator missing required peer connectionId",
       }),
+    }),
   });
 
 export interface WidgetParams {
