@@ -15,7 +15,7 @@ const makeAConnection = async (
   request,
 ) => {
   const widgetUrl = await createWidgetUrl(request, {
-    jobTypes: jobTypes.join(","),
+    jobTypes,
     userId,
   });
 
@@ -223,7 +223,7 @@ test.describe("Finicity Adapter Tests", () => {
     test.setTimeout(300000);
 
     const widgetUrl = await createWidgetUrl(request, {
-      jobTypes: ComboJobTypes.TRANSACTIONS,
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
       userId,
     });
 

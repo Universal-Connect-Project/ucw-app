@@ -1,5 +1,5 @@
 export interface CreateWidgetUrlOptions {
-  jobTypes: string;
+  jobTypes: string[];
   userId: string;
   targetOrigin?: string;
   authToken?: string;

@@ -19,7 +19,7 @@ describe("query parameters", () => {
     const userId = Cypress.env("userId");
 
     createWidgetUrl({
-      jobTypes: ComboJobTypes.TRANSACTIONS,
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
       institutionId: MX_BANK_UCP_INSTITUTION_ID,
       userId,
       targetOrigin: "http://localhost:8080",

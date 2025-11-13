@@ -12,7 +12,7 @@ export const visitIdentity = () => {
   const userId = crypto.randomUUID();
 
   createWidgetUrl({
-    jobTypes: ComboJobTypes.ACCOUNT_OWNER,
+    jobTypes: [ComboJobTypes.ACCOUNT_OWNER],
     userId,
     targetOrigin: "http://localhost:8080",
   }).then((widgetUrl) => {
@@ -33,7 +33,7 @@ export const visitAgg = (options?: any) => {
   const userId = userIdOverride || crypto.randomUUID();
 
   createWidgetUrl({
-    jobTypes: ComboJobTypes.TRANSACTIONS,
+    jobTypes: [ComboJobTypes.TRANSACTIONS],
     userId,
     targetOrigin: "http://localhost:8080",
     authToken,

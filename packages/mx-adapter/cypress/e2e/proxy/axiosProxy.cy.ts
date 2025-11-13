@@ -17,7 +17,7 @@ describe("mx aggregator using axios proxy", () => {
     const userId = Cypress.env("userId");
 
     createWidgetUrl({
-      jobTypes: ComboJobTypes.TRANSACTIONS,
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
       userId,
       targetOrigin: "http://localhost:8080",
     }).then((widgetUrl) => {

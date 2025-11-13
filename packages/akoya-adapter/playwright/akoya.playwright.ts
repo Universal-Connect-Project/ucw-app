@@ -8,7 +8,7 @@ test("connects to mikomo bank with oAuth", async ({ page, request }) => {
   const userId = crypto.randomUUID();
 
   const widgetUrl = await createWidgetUrl(request, {
-    jobTypes: ComboJobTypes.TRANSACTIONS,
+    jobTypes: [ComboJobTypes.TRANSACTIONS],
     userId,
     targetOrigin: "http://localhost:8080",
   });

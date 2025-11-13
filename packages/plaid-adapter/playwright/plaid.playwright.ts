@@ -24,7 +24,7 @@ test("connects to plaid test bank through credential flow and deletes connection
   const accessToken = await getAccessToken(request);
 
   const widgetUrl = await createWidgetUrl(request, {
-    jobTypes: ComboJobTypes.TRANSACTIONS,
+    jobTypes: [ComboJobTypes.TRANSACTIONS],
     userId,
   });
 
@@ -153,7 +153,7 @@ test(
     const accessToken = await getAccessToken(request);
 
     const widgetUrl = await createWidgetUrl(request, {
-      jobTypes: ComboJobTypes.TRANSACTIONS,
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
       userId,
     });
 

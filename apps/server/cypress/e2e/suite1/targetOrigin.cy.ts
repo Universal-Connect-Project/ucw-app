@@ -12,7 +12,7 @@ describe("targetOrigin", () => {
     const correctTargetOrigin = "http://localhost:8080";
 
     createWidgetUrl({
-      jobTypes: ComboJobTypes.ACCOUNT_OWNER,
+      jobTypes: [ComboJobTypes.ACCOUNT_OWNER],
       userId,
       targetOrigin: correctTargetOrigin,
     }).then((widgetUrl) => {
@@ -45,7 +45,7 @@ describe("targetOrigin", () => {
       method: "POST",
       url: "/widgetUrl",
       body: {
-        jobTypes: ComboJobTypes.ACCOUNT_OWNER,
+        jobTypes: [ComboJobTypes.ACCOUNT_OWNER],
         userId,
       },
       failOnStatusCode: false,
@@ -60,7 +60,7 @@ describe("targetOrigin", () => {
     const wrongTargetOrigin = "https://wrong-origin.example.com";
 
     createWidgetUrl({
-      jobTypes: ComboJobTypes.ACCOUNT_OWNER,
+      jobTypes: [ComboJobTypes.ACCOUNT_OWNER],
       userId,
       targetOrigin: wrongTargetOrigin,
     }).then((widgetUrl) => {

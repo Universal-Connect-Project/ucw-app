@@ -19,7 +19,7 @@ test("connects to mx bank with oAuth, tracks performance correctly, and does ref
   const accessToken = await getAccessToken(request);
 
   const widgetUrl = await createWidgetUrl(request, {
-    jobTypes: ComboJobTypes.TRANSACTIONS,
+    jobTypes: [ComboJobTypes.TRANSACTIONS],
     userId,
   });
 
@@ -97,7 +97,7 @@ test("connects to mx bank with oAuth, tracks performance correctly, and does ref
         const { connectionId, aggregator, ucpInstitutionId } = obj.metadata;
 
         const refreshWidgetUrl = await createWidgetUrl(request, {
-          jobTypes: ComboJobTypes.TRANSACTIONS,
+          jobTypes: [ComboJobTypes.TRANSACTIONS],
           userId,
           aggregator,
           institutionId: ucpInstitutionId,
@@ -147,7 +147,7 @@ test("results in a successful performance event even if you close the tab", asyn
   const accessToken = await getAccessToken(request);
 
   const widgetUrl = await createWidgetUrl(request, {
-    jobTypes: ComboJobTypes.TRANSACTIONS,
+    jobTypes: [ComboJobTypes.TRANSACTIONS],
     userId,
   });
 
@@ -231,7 +231,7 @@ test("shows an error page if you deny an mx bank oauth connection", async ({
   const userId = crypto.randomUUID();
 
   const widgetUrl = await createWidgetUrl(request, {
-    jobTypes: ComboJobTypes.TRANSACTIONS,
+    jobTypes: [ComboJobTypes.TRANSACTIONS],
     userId,
   });
 

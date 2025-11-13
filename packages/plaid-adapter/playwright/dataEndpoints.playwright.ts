@@ -16,7 +16,7 @@ test("connects to plaid's First Platypus Bank and gets account numbers", async (
   const userId = crypto.randomUUID();
 
   const widgetUrl = await createWidgetUrl(request, {
-    jobTypes: ComboJobTypes.ACCOUNT_NUMBER,
+    jobTypes: [ComboJobTypes.ACCOUNT_NUMBER],
     userId,
   });
 

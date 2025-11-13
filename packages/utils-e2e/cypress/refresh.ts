@@ -8,7 +8,7 @@ export const refreshAConnection = ({ enterCredentials, selectInstitution }) => {
   const userId = Cypress.env("userId");
 
   createWidgetUrl({
-    jobTypes: ComboJobTypes.TRANSACTIONS,
+    jobTypes: [ComboJobTypes.TRANSACTIONS],
     userId,
     targetOrigin: "http://localhost:8080",
   }).then((widgetUrl) => {
@@ -35,7 +35,7 @@ export const refreshAConnection = ({ enterCredentials, selectInstitution }) => {
 
         //Refresh the connection
         createWidgetUrl({
-          jobTypes: ComboJobTypes.TRANSACTIONS,
+          jobTypes: [ComboJobTypes.TRANSACTIONS],
           aggregator: aggregator,
           userId: userId,
           institutionId: ucpInstitutionId,

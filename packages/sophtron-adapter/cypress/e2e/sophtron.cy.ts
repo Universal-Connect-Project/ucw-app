@@ -45,7 +45,7 @@ describe("Sophtron aggregator", () => {
     const userId = Cypress.env("userId");
 
     createWidgetUrl({
-      jobTypes: ComboJobTypes.ACCOUNT_NUMBER,
+      jobTypes: [ComboJobTypes.ACCOUNT_NUMBER],
       userId,
       targetOrigin: "http://localhost:8080",
     }).then((widgetUrl) => {
@@ -64,7 +64,7 @@ describe("Sophtron aggregator", () => {
     expectConnectionSuccess();
 
     createWidgetUrl({
-      jobTypes: ComboJobTypes.ACCOUNT_NUMBER,
+      jobTypes: [ComboJobTypes.ACCOUNT_NUMBER],
       userId,
       singleAccountSelect: false,
       targetOrigin: "http://localhost:8080",
@@ -94,7 +94,7 @@ describe("Sophtron aggregator", () => {
     const userId = Cypress.env("userId");
 
     createWidgetUrl({
-      jobTypes: jobTypes.join(","),
+      jobTypes,
       userId,
       targetOrigin: "http://localhost:8080",
     }).then((widgetUrl) => {

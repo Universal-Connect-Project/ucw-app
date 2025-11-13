@@ -23,7 +23,7 @@ describe("authentication", () => {
       method: "POST",
       url: "/widgetUrl",
       body: {
-        jobTypes: ComboJobTypes.TRANSACTIONS,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
         userId,
         targetOrigin: "http://localhost:8080",
       },
@@ -56,7 +56,7 @@ describe("authentication", () => {
 
     createWidgetUrl({
       userId,
-      jobTypes: ComboJobTypes.TRANSACTIONS,
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
       targetOrigin: "http://localhost:8080",
       authToken: widgetDemoAccessToken,
     }).then((widgetUrl) => {

@@ -42,7 +42,11 @@ describe("search", () => {
 
     const userId = crypto.randomUUID();
     createWidgetUrl({
-      jobTypes: `${ComboJobTypes.TRANSACTIONS},${ComboJobTypes.ACCOUNT_NUMBER},${ComboJobTypes.ACCOUNT_OWNER}`,
+      jobTypes: [
+        ComboJobTypes.TRANSACTIONS,
+        ComboJobTypes.ACCOUNT_NUMBER,
+        ComboJobTypes.ACCOUNT_OWNER,
+      ],
       userId,
       targetOrigin: "http://localhost:8080",
     }).then((widgetUrl) => {
