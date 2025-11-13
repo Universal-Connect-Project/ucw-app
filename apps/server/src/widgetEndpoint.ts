@@ -12,17 +12,9 @@ import { getConfig } from "./config";
 const widgetSchema = Joi.object({
   connectionId: Joi.string(),
   institutionId: Joi.string(),
-  jobTypes: Joi.string()
-    .custom((value, helpers) => {
-      const items = value.split(",") as ComboJobTypes[];
-      const invalidItems = items.filter(
-        (item) => !Object.values(ComboJobTypes).includes(item),
-      );
-      if (invalidItems.length > 0) {
-        return helpers.error("any.invalid", { invalid: invalidItems });
-      }
-      return value;
-    })
+  jobTypes: Joi.array()
+    .items(Joi.string().valid(...Object.values(ComboJobTypes)))
+    .min(1)
     .required(),
   aggregator: Joi.string().valid(...aggregators),
   singleAccountSelect: Joi.bool(),
@@ -52,7 +44,7 @@ const widgetSchema = Joi.object({
 export interface WidgetParams {
   connectionId?: string;
   institutionId?: string;
-  jobTypes: string;
+  jobTypes: string[];
   aggregator?: string;
   singleAccountSelect?: boolean;
   userId: string;

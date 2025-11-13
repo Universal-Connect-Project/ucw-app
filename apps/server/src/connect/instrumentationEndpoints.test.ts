@@ -10,7 +10,10 @@ describe("instrumentationEndpoints", () => {
 
     it("retrieves widget params from Redis, sets context, and returns params with parsed jobTypes", async () => {
       const widgetParams = {
-        jobTypes: `${ComboJobTypes.TRANSACTION_HISTORY},${ComboJobTypes.TRANSACTIONS}`,
+        jobTypes: [
+          ComboJobTypes.TRANSACTION_HISTORY,
+          ComboJobTypes.TRANSACTIONS,
+        ],
         singleAccountSelect: "true",
         userId,
       };
@@ -51,7 +54,7 @@ describe("instrumentationEndpoints", () => {
 
     it("handles singleAccountSelect as false when set to 'false'", async () => {
       const widgetParams = {
-        jobTypes: ComboJobTypes.TRANSACTIONS,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
         singleAccountSelect: "false",
         userId,
       };
@@ -76,7 +79,7 @@ describe("instrumentationEndpoints", () => {
 
     it("attaches aggregatorOverride to the request context if present", async () => {
       const widgetParams = {
-        jobTypes: ComboJobTypes.TRANSACTIONS,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
         singleAccountSelect: "true",
         aggregatorOverride: "testAggregatorOverride",
         userId,
@@ -102,7 +105,7 @@ describe("instrumentationEndpoints", () => {
 
     it("deletes the token from Redis after successful retrieval", async () => {
       const widgetParams = {
-        jobTypes: ComboJobTypes.TRANSACTIONS,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
         singleAccountSelect: "true",
         userId,
       };

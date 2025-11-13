@@ -25,20 +25,20 @@ describe("server", () => {
 
     it("is invalid if jobTypes is invalid", () => {
       const validation = validateWidgetParams({
-        jobTypes: "junk",
+        jobTypes: ["junk"],
         userId: "testUserId",
         targetOrigin: "https://example.com",
       });
 
       expect(validation.isValid).toBeFalsy();
       expect(validation.error).toEqual(
-        "&#x22;jobTypes&#x22; contains an invalid value",
+        "&#x22;jobTypes[0]&#x22; must be one of [accountNumber, accountOwner, transactions, transactionHistory]",
       );
     });
 
     it("is invalid if userId is missing", () => {
       const validation = validateWidgetParams({
-        jobTypes: ComboJobTypes.TRANSACTIONS,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
         targetOrigin: "https://example.com",
       });
 
@@ -48,7 +48,7 @@ describe("server", () => {
 
     it("is invalid if aggregator is invalid", () => {
       const validation = validateWidgetParams({
-        jobTypes: ComboJobTypes.TRANSACTIONS,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
         aggregator: "junk",
         institutionId: "testInstitutionId",
         connectionId: "testConnectionId",
@@ -65,7 +65,7 @@ describe("server", () => {
     it("is invalid if aggregator is provided with an institutionId and without a connectionId", () => {
       const validation = validateWidgetParams({
         institutionId: "testInstitutionId",
-        jobTypes: ComboJobTypes.TRANSACTIONS,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
         aggregator: MX_AGGREGATOR_STRING,
         userId: "testUserId",
         targetOrigin: "https://example.com",
@@ -80,7 +80,7 @@ describe("server", () => {
     it("is invalid if aggregator is provided with a connectionId and without an institutionId", () => {
       const validation = validateWidgetParams({
         connectionId: "testConnectionId",
-        jobTypes: ComboJobTypes.TRANSACTIONS,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
         aggregator: MX_AGGREGATOR_STRING,
         userId: "testUserId",
         targetOrigin: "https://example.com",
@@ -96,7 +96,7 @@ describe("server", () => {
       const validation = validateWidgetParams({
         aggregator: MX_AGGREGATOR_STRING,
         connectionId: "testConnectionId",
-        jobTypes: ComboJobTypes.TRANSACTIONS,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
         userId: "testUserId",
         targetOrigin: "https://example.com",
       });
@@ -110,7 +110,7 @@ describe("server", () => {
     it("is invalid if connectionId is provided without an aggregator", () => {
       const validation = validateWidgetParams({
         connectionId: "testConnectionId",
-        jobTypes: ComboJobTypes.TRANSACTIONS,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
         institutionId: "testInstitutionId",
         userId: "testUserId",
         targetOrigin: "https://example.com",
@@ -124,7 +124,7 @@ describe("server", () => {
 
     it("is invalid if aggregatorOverride is invalid", () => {
       const validation = validateWidgetParams({
-        jobTypes: ComboJobTypes.TRANSACTIONS,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
         aggregatorOverride: "junk",
         userId: "testUserId",
         targetOrigin: "https://example.com",
@@ -138,7 +138,7 @@ describe("server", () => {
 
     it("is invalid if singleAccountSelect isn't a bool", () => {
       const validation = validateWidgetParams({
-        jobTypes: ComboJobTypes.TRANSACTIONS,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
         singleAccountSelect: "junk",
         userId: "testUserId",
         targetOrigin: "https://example.com",
@@ -152,7 +152,7 @@ describe("server", () => {
 
     it("is invalid if targetOrigin is missing", () => {
       const validation = validateWidgetParams({
-        jobTypes: ComboJobTypes.TRANSACTIONS,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
         userId: "testUserId",
       });
 
@@ -162,7 +162,7 @@ describe("server", () => {
 
     it("is invalid if targetOrigin is empty string", () => {
       const validation = validateWidgetParams({
-        jobTypes: ComboJobTypes.TRANSACTIONS,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
         userId: "testUserId",
         targetOrigin: "",
       });
@@ -175,7 +175,7 @@ describe("server", () => {
 
     it("is invalid if targetOrigin is not a valid URL", () => {
       const validation = validateWidgetParams({
-        jobTypes: ComboJobTypes.TRANSACTIONS,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
         userId: "testUserId",
         targetOrigin: "not-a-valid-url",
       });
@@ -195,7 +195,7 @@ describe("server", () => {
 
       const token = "validToken123";
       const widgetParams = {
-        jobTypes: ComboJobTypes.TRANSACTIONS,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
         userId: "testUserId",
         targetOrigin: "https://example.com",
       };
@@ -267,7 +267,7 @@ describe("server", () => {
       const connectionId = "testConnectionId123";
       const req = {
         body: {
-          jobTypes: ComboJobTypes.TRANSACTIONS,
+          jobTypes: [ComboJobTypes.TRANSACTIONS],
           userId: "testUserId",
           targetOrigin: "https://example.com",
           connectionId,
@@ -300,7 +300,7 @@ describe("server", () => {
 
       const storedData = await get(`token-${randomUUID}`);
       expect(storedData).toMatchObject({
-        jobTypes: ComboJobTypes.TRANSACTIONS,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
         userId: "testUserId",
         targetOrigin: "https://example.com",
         connectionId,
@@ -321,7 +321,7 @@ describe("server", () => {
           authorization: `Bearer ${authorizationToken}`,
         },
         body: {
-          jobTypes: ComboJobTypes.TRANSACTIONS,
+          jobTypes: [ComboJobTypes.TRANSACTIONS],
           userId,
           targetOrigin: "https://example.com",
         },
@@ -345,7 +345,7 @@ describe("server", () => {
       const storedData = await get(`token-${randomUUID}`);
       expect(storedData).toMatchObject({
         authorizationJwt: authorizationToken,
-        jobTypes: ComboJobTypes.TRANSACTIONS,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
         userId,
         targetOrigin: "https://example.com",
       });
@@ -357,7 +357,7 @@ describe("server", () => {
 
       const req = {
         body: {
-          jobTypes: ComboJobTypes.TRANSACTIONS,
+          jobTypes: [ComboJobTypes.TRANSACTIONS],
           userId: "testUserId",
           targetOrigin: "https://example.com",
         },

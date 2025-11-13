@@ -17,9 +17,20 @@ import { ComboJobTypes } from "@repo/utils";
 
 describe("authentication", () => {
   it("fails if not authorized to make a connection", () => {
-    visitAgg({ failOnStatusCode: false });
+    const userId = crypto.randomUUID();
 
-    cy.findByText("Unauthorized").should("exist");
+    cy.request({
+      method: "POST",
+      url: "/widgetUrl",
+      body: {
+        jobTypes: ComboJobTypes.TRANSACTIONS,
+        userId,
+        targetOrigin: "http://localhost:8080",
+      },
+      failOnStatusCode: false,
+    }).then((response) => {
+      expect(response.status).to.eq(401);
+    });
   });
 
   it("can't access the data endpoints without the right access", () => {
