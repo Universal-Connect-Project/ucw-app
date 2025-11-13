@@ -51,6 +51,59 @@
                   }
                 }
               }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "jobTypes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "accountNumber",
+                          "accountOwner",
+                          "transactions",
+                          "transactionHistory"
+                        ]
+                      }
+                    },
+                    "userId": {
+                      "type": "string"
+                    },
+                    "targetOrigin": {
+                      "type": "string"
+                    },
+                    "connectionId": {
+                      "type": "string"
+                    },
+                    "institutionId": {
+                      "type": "string"
+                    },
+                    "aggregator": {
+                      "type": "string"
+                    },
+                    "singleAccountSelect": {
+                      "type": "boolean"
+                    },
+                    "aggregatorOverride": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["userId", "targetOrigin", "jobTypes"],
+                  "example": {
+                    "jobTypes": ["transactions"],
+                    "userId": "testUserId",
+                    "targetOrigin": "http://localhost:8080",
+                    "connectionId": "testConnectionId",
+                    "institutionId": "testInstitutionId",
+                    "aggregator": "mx",
+                    "singleAccountSelect": true,
+                    "aggregatorOverride": "finicity"
+                  }
+                }
+              }
             }
           }
         }
