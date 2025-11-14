@@ -34,7 +34,7 @@ describe("authentication", () => {
 
   it("fails to load widget if token is invalid", () => {
     cy.visit("/widget?token=invalid-token", { failOnStatusCode: false });
-    cy.findByText("A valid token is required").should("be.visible");
+    cy.findByText("token invalid or expired").should("be.visible");
   });
 
   it("can't access the data endpoints without the right access", () => {
