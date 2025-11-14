@@ -31,7 +31,7 @@ Please refer to the [UCP documentation](https://universalconnectproject.org/docs
 
 ### API Documentation
 
-The API documentation for this service lives in [./openApi/1.json](./openApi/1.json) and uses the [OpenAPI spec](https://swagger.io/specification/). You can open it in your preferred tool. You may copy the file into [swagger editor](https://editor.swagger.io/) and edit the local file with updates when complete.
+The API documentation for this service lives in [./openApi/2.json](./openApi/2.json) and uses the [OpenAPI spec](https://swagger.io/specification/). You can open it in your preferred tool. You may copy the file into [swagger editor](https://editor.swagger.io/) and edit the local file with updates when complete.
 
 ## Getting Started
 

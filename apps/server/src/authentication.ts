@@ -14,10 +14,7 @@ export const tokenAuthenticationMiddleware = async (
 
   if (token) {
     const redisKey = `token-${token}`;
-    const { authorizationJwt, ...widgetParams } = await get(redisKey);
-    await set(redisKey, widgetParams);
-
-    const config = getConfig();
+    const { authorizationJwt, ...widgetParams } = (await get(redisKey)) || {};
 
     if (!authorizationJwt) {
       res.send("token invalid or expired");
@@ -26,8 +23,11 @@ export const tokenAuthenticationMiddleware = async (
       return;
     }
 
-    req.headers.authorization = `Bearer ${authorizationJwt}`;
+    await set(redisKey, widgetParams);
 
+    const config = getConfig();
+
+    req.headers.authorization = `Bearer ${authorizationJwt}`;
     res.cookie(tokenCookieName, authorizationJwt, {
       httpOnly: true,
       sameSite: config.AUTHORIZATION_TOKEN_COOKIE_SAMESITE || "strict",

@@ -112,6 +112,7 @@
           }
         },
         "summary": "Create secure widget URL",
+        "tags": ["Widget"],
         "security": [
           {
             "bearerAuth": []
@@ -133,24 +134,22 @@
             }
           }
         ],
-        "description": "Get the widget HTML to attach to a browser frame. The token parameter must be obtained from the /widgetUrl endpoint and contains references to all widget configuration stored in Redis with a 5-minute expiration.",
+        "description": "This is the endpoint to render the Universal Connect Widget. Set this in the src attribute of your iframe.",
         "responses": {
           "200": {
-            "description": "The widget page HTML"
-          },
-          "400": {
-            "description": "Bad Request - Invalid or expired token",
+            "description": "Success",
             "content": {
-              "text/plain": {
+              "text/html": {
                 "schema": {
                   "type": "string",
-                  "example": "A valid token is required"
+                  "example": "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\" /><link rel=\"icon\" type=\"image/svg+xml\" href=\"/ucp-logo.svg\" /><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /><title>Universal Connect Widget</title><script type=\"module\" crossorigin src=\"/assets/index-DtnY0TQo.js\"></script><link rel=\"stylesheet\" crossorigin href=\"/assets/index-CBFfkBLP.css\"></head><body><div id=\"root\"></div></body></html>"
                 }
               }
             }
           }
         },
-        "summary": "Widget webpage"
+        "summary": "Render a widget",
+        "tags": ["Widget"]
       }
     },
     "/api/data/accounts": {
@@ -484,7 +483,8 @@
             }
           }
         },
-        "summary": "Accounts data"
+        "summary": "Accounts data",
+        "tags": ["Data"]
       }
     },
     "/api/data/identity": {
@@ -698,7 +698,8 @@
             }
           }
         },
-        "summary": "Identity data"
+        "summary": "Identity data",
+        "tags": ["Data"]
       }
     },
     "/api/data/transactions": {
@@ -852,7 +853,8 @@
             }
           }
         },
-        "summary": "Transactions data"
+        "summary": "Transactions data",
+        "tags": ["Data"]
       }
     },
     "/api/vc/data/accounts": {
@@ -913,7 +915,8 @@
             }
           }
         },
-        "summary": "Accounts data as Verifiable Credential"
+        "summary": "Accounts data as Verifiable Credential",
+        "tags": ["VC Data"]
       }
     },
     "/api/vc/data/identity": {
@@ -975,7 +978,8 @@
             }
           }
         },
-        "summary": "Identity data as Verifiable Credential"
+        "summary": "Identity data as Verifiable Credential",
+        "tags": ["VC Data"]
       }
     },
     "/api/vc/data/transactions": {
@@ -1068,7 +1072,8 @@
             }
           }
         },
-        "summary": "Transactions data as Verifiable Credential"
+        "summary": "Transactions data as Verifiable Credential",
+        "tags": ["VC Data"]
       }
     },
     "/api/aggregator/{aggregator}/user/{userId}": {
@@ -1102,38 +1107,38 @@
             "description": "Success"
           }
         },
-        "summary": "Delete user"
+        "summary": "Delete user",
+        "tags": ["Deletion"]
       }
     },
-    "/api/aggregator/{aggregator}/user/{userId}/connection/{connectionId}": {
+    "/api/connection": {
       "delete": {
         "parameters": [
           {
-            "description": "The id assigned to the user",
+            "description": "The id assigned to the user. Optional for userless aggregators (plaid, plaid_sandbox)",
             "name": "userId",
-            "in": "path",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The connection id",
+            "name": "UCW-Connection-Id",
+            "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             }
           },
           {
-            "description": "The connection id or access_token recieived from Plaid",
-            "name": "connectionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "The aggregator for the connected user. Currently only implemented for Plaid because Plaid doesnt have user delete.",
+            "description": "The aggregator for the connected user",
             "name": "aggregator",
-            "in": "path",
+            "in": "query",
             "required": true,
             "schema": {
-              "type": "string",
-              "enum": ["plaid", "plaid_sandbox"]
+              "type": "string"
             }
           }
         ],
@@ -1152,7 +1157,8 @@
             }
           }
         },
-        "summary": "Delete user's connection"
+        "summary": "Delete user's connection",
+        "tags": ["Deletion"]
       }
     }
   },

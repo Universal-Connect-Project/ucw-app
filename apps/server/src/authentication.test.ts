@@ -156,6 +156,35 @@ describe("authentication", () => {
       expect(next).not.toHaveBeenCalled();
     });
 
+    it("responds with a 401 if redis returns nothing for the token", async () => {
+      const token = "nonExistentToken";
+
+      jest.spyOn(config, "getConfig").mockReturnValue({});
+
+      // Don't set anything in redis, so get will return null
+
+      const req = {
+        headers: {},
+        query: {
+          token,
+        },
+      } as unknown as Request;
+
+      const res = {
+        cookie: jest.fn(),
+        send: jest.fn(),
+        status: jest.fn(),
+      } as unknown as Response;
+
+      const next = jest.fn();
+
+      await tokenAuthenticationMiddleware(req, res, next);
+
+      expect(res.status).toHaveBeenLastCalledWith(401);
+      expect(res.send).toHaveBeenLastCalledWith("token invalid or expired");
+      expect(next).not.toHaveBeenCalled();
+    });
+
     it("just calls next if there's no token", async () => {
       const req = {
         headers: {},
