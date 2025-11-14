@@ -20,7 +20,7 @@ export const instrumentationHandler = async (req: Request, res: Response) => {
     req.context.jobTypes = jobTypes;
     req.context.scheme = "vcs";
     req.context.oauth_referral_source = "BROWSER";
-    req.context.singleAccountSelect = singleAccountSelect !== "false";
+    req.context.singleAccountSelect = singleAccountSelect !== false;
     if (Boolean(aggregator) && Boolean(connectionId)) {
       req.context.aggregator = aggregator;
       req.context.connectionId = connectionId;

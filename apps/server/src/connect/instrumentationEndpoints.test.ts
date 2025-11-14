@@ -52,10 +52,10 @@ describe("instrumentationEndpoints", () => {
       });
     });
 
-    it("handles singleAccountSelect as false when set to 'false'", async () => {
+    it("handles singleAccountSelect as false when set to false", async () => {
       const widgetParams = {
         jobTypes: [ComboJobTypes.TRANSACTIONS],
-        singleAccountSelect: "false",
+        singleAccountSelect: false,
         userId,
       };
 
