@@ -1,8 +1,6 @@
 import type { Request, Response } from "express";
-import { set as mockSet } from "./__mocks__/redis";
 import useAuthentication, {
   cookieAuthenticationMiddleware,
-  getTokenHandler,
   tokenAuthenticationMiddleware,
   tokenCookieName,
 } from "./authentication";
@@ -14,71 +12,31 @@ import * as config from "./config";
 jest.mock("./config");
 
 describe("authentication", () => {
-  describe("getTokenHandler", () => {
-    it("stores the authorization header token in redis and responds with the redis key token", async () => {
-      const authorizationToken = "test";
-      const userId = "testUserId";
-
-      const req = {
-        headers: {
-          authorization: `Bearer ${authorizationToken}`,
-        },
-        query: { userId },
-      } as unknown as Request;
-      const res = {
-        json: jest.fn(),
-      } as unknown as Response;
-
-      await getTokenHandler(req, res);
-
-      const token = mockSet.mock.calls[0][0];
-
-      expect(res.json).toHaveBeenCalledWith({
-        token: token.replace(`${userId}-`, ""),
-      });
-      expect(token).toBeDefined();
-    });
-
-    it("fails if there's no userId", async () => {
-      const authorizationToken = "test";
-
-      const req = {
-        headers: {
-          authorization: `Bearer ${authorizationToken}`,
-        },
-        query: {},
-      } as unknown as Request;
-      const res = {
-        send: jest.fn(),
-        status: jest.fn(),
-      } as unknown as Response;
-
-      await getTokenHandler(req, res);
-
-      expect(res.send).toHaveBeenCalledWith("&#x22;userId&#x22; is required");
-      expect(res.status).toHaveBeenCalledWith(400);
-    });
-  });
-
   describe("tokenAuthenticationMiddleware", () => {
-    it("pulls the JWT from redis with the given token and userId, adds the bearer token to the request headers, deletes the token from redis, sets a cookie, and calls next", async () => {
+    it("pulls the JWT from redis with the given token, adds the bearer token to the request headers, removes JWT from redis, sets a cookie, and calls next", async () => {
       const token = "testToken";
       const jwt = "testJwt";
       const userId = "testUserId";
+      const jobTypes = "transactions";
 
       jest.spyOn(config, "getConfig").mockReturnValue({});
 
-      const redisKey = `${userId}-${token}`;
+      const redisKey = `token-${token}`;
+      const widgetParams = {
+        authorizationJwt: jwt,
+        userId,
+        jobTypes,
+        targetOrigin: "https://example.com",
+      };
 
-      await set(redisKey, jwt);
+      await set(redisKey, widgetParams);
 
-      expect(await get(redisKey)).toEqual(jwt);
+      expect(await get(redisKey)).toEqual(widgetParams);
 
       const req = {
         headers: {},
         query: {
           token,
-          userId: userId,
         },
       } as unknown as Request;
 
@@ -93,7 +51,15 @@ describe("authentication", () => {
       await tokenAuthenticationMiddleware(req, res, next);
 
       expect(req.headers.authorization).toEqual(`Bearer ${jwt}`);
-      expect(await get(redisKey)).toBeUndefined();
+
+      const updatedParams = await get(redisKey);
+      expect(updatedParams).toEqual({
+        userId,
+        jobTypes,
+        targetOrigin: "https://example.com",
+      });
+      expect(updatedParams.authorizationJwt).toBeUndefined();
+
       expect(res.cookie).toHaveBeenCalledWith(tokenCookieName, jwt, {
         httpOnly: true,
         sameSite: "strict",
@@ -111,17 +77,22 @@ describe("authentication", () => {
         AUTHORIZATION_TOKEN_COOKIE_SAMESITE: "none",
       });
 
-      const redisKey = `${userId}-${token}`;
+      const redisKey = `token-${token}`;
+      const widgetParams = {
+        authorizationJwt: jwt,
+        userId,
+        jobTypes: "transactions",
+        targetOrigin: "https://example.com",
+      };
 
-      await set(redisKey, jwt);
+      await set(redisKey, widgetParams);
 
-      expect(await get(redisKey)).toEqual(jwt);
+      expect(await get(redisKey)).toEqual(widgetParams);
 
       const req = {
         headers: {},
         query: {
           token,
-          userId: userId,
         },
       } as unknown as Request;
 
@@ -136,7 +107,10 @@ describe("authentication", () => {
       await tokenAuthenticationMiddleware(req, res, next);
 
       expect(req.headers.authorization).toEqual(`Bearer ${jwt}`);
-      expect(await get(redisKey)).toBeUndefined();
+
+      const updatedParams = await get(redisKey);
+      expect(updatedParams.authorizationJwt).toBeUndefined();
+
       expect(res.cookie).toHaveBeenCalledWith(tokenCookieName, jwt, {
         httpOnly: true,
         sameSite: "none",
@@ -145,8 +119,20 @@ describe("authentication", () => {
       expect(next).toHaveBeenCalled();
     });
 
-    it("responds with a 401 if there is no JWT in redis", async () => {
+    it("responds with a 401 if there is no JWT in the widget params", async () => {
       const token = "testToken";
+
+      jest.spyOn(config, "getConfig").mockReturnValue({});
+
+      const redisKey = `token-${token}`;
+      const widgetParams = {
+        userId: "testUserId",
+        jobTypes: "transactions",
+        targetOrigin: "https://example.com",
+        // No authorizationJwt
+      };
+
+      await set(redisKey, widgetParams);
 
       const req = {
         headers: {},
@@ -167,6 +153,36 @@ describe("authentication", () => {
 
       expect(res.status).toHaveBeenLastCalledWith(401);
       expect(res.send).toHaveBeenLastCalledWith("token invalid or expired");
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it("responds with a 401 if redis returns nothing for the token", async () => {
+      const token = "nonExistentToken";
+
+      jest.spyOn(config, "getConfig").mockReturnValue({});
+
+      // Don't set anything in redis, so get will return null
+
+      const req = {
+        headers: {},
+        query: {
+          token,
+        },
+      } as unknown as Request;
+
+      const res = {
+        cookie: jest.fn(),
+        send: jest.fn(),
+        status: jest.fn(),
+      } as unknown as Response;
+
+      const next = jest.fn();
+
+      await tokenAuthenticationMiddleware(req, res, next);
+
+      expect(res.status).toHaveBeenLastCalledWith(401);
+      expect(res.send).toHaveBeenLastCalledWith("token invalid or expired");
+      expect(next).not.toHaveBeenCalled();
     });
 
     it("just calls next if there's no token", async () => {
@@ -265,7 +281,7 @@ describe("authentication", () => {
       useAuthentication(app);
 
       expect(app.use).toHaveBeenCalledTimes(4);
-      expect(app.get).toHaveBeenCalledTimes(1);
+      expect(app.get).toHaveBeenCalledTimes(0);
     });
 
     it("calls app.use with 2 of the middleware if there are missing variables", () => {
@@ -281,7 +297,7 @@ describe("authentication", () => {
       useAuthentication(app);
 
       expect(app.use).toHaveBeenCalledTimes(2);
-      expect(app.get).toHaveBeenCalledTimes(1);
+      expect(app.get).toHaveBeenCalledTimes(0);
     });
 
     it("doesn't add any middleware or endpoints if authentication is not enabled", () => {

@@ -3,44 +3,114 @@ import type { Request, Response } from "express";
 import Joi from "joi";
 import { aggregators, nonTestAggregators } from "./adapterSetup";
 import fs from "node:fs";
+import { get, set } from "./services/storageClient/redis";
 
 import he from "he";
 import path from "path";
+import { getConfig } from "./config";
 
-export const widgetHandler = (req: Request, res: Response) => {
-  const schema = Joi.object({
-    connectionId: Joi.string(),
-    institutionId: Joi.string(),
-    jobTypes: Joi.string()
-      .custom((value, helpers) => {
-        const items = value.split(",") as ComboJobTypes[];
-        const invalidItems = items.filter(
-          (item) => !Object.values(ComboJobTypes).includes(item),
-        );
-        if (invalidItems.length > 0) {
-          return helpers.error("any.invalid", { invalid: invalidItems });
-        }
-        return value;
-      })
-      .required(),
-    aggregator: Joi.string().valid(...aggregators),
-    singleAccountSelect: Joi.bool(),
-    userId: Joi.string().required(),
-    token: Joi.string(),
-    aggregatorOverride: Joi.string().valid(...nonTestAggregators),
-    targetOrigin: Joi.string()
-      .uri({ scheme: ["http", "https"] })
-      .required(),
-  })
-    .with("aggregator", ["institutionId", "connectionId"])
-    .with("connectionId", ["institutionId", "aggregator"]);
+const widgetSchema = Joi.object({
+  connectionId: Joi.string(),
+  institutionId: Joi.string(),
+  jobTypes: Joi.array()
+    .items(Joi.string().valid(...Object.values(ComboJobTypes)))
+    .min(1)
+    .required(),
+  aggregator: Joi.string().valid(...aggregators),
+  singleAccountSelect: Joi.bool(),
+  userId: Joi.string().required(), // Plaid doesn't need this but it's still required for securing the widget request
+  token: Joi.string(),
+  aggregatorOverride: Joi.string().valid(...nonTestAggregators),
+  targetOrigin: Joi.string()
+    .uri({ scheme: ["http", "https"] })
+    .required(),
+})
+  .with("connectionId", ["institutionId", "aggregator"])
+  .when(Joi.object({ aggregator: Joi.exist() }).unknown(), {
+    then: Joi.object({
+      institutionId: Joi.required().messages({
+        "any.required": "aggregator missing required peer institutionId",
+      }),
+      connectionId: Joi.required().messages({
+        "any.required": "aggregator missing required peer connectionId",
+      }),
+    }),
+  });
 
-  const { error } = schema.validate(req.query);
+export interface WidgetParams {
+  connectionId?: string;
+  institutionId?: string;
+  jobTypes: string[];
+  aggregator?: string;
+  singleAccountSelect?: boolean;
+  userId: string;
+  aggregatorOverride?: string;
+  targetOrigin: string;
+}
+
+const setToken = async ({
+  widgetParams,
+  authorizationJwt,
+}: {
+  widgetParams: WidgetParams;
+  authorizationJwt?: string;
+}): Promise<string> => {
+  const uuid = crypto.randomUUID();
+  const redisKey = `token-${uuid}`;
+  const dataToStore = authorizationJwt
+    ? { authorizationJwt, ...widgetParams }
+    : widgetParams;
+  await set(redisKey, dataToStore, { EX: 60 * 5 });
+  return uuid;
+};
+
+export const validateWidgetParams = (
+  params: unknown,
+): { isValid: boolean; error?: string; validatedParams?: WidgetParams } => {
+  const { error, value: validatedParams } = widgetSchema.validate(params);
 
   if (error) {
-    res.status(400);
-    res.send(he.encode(error.details[0].message));
+    return {
+      isValid: false,
+      error: he.encode(error.details[0].message),
+    };
+  }
 
+  return {
+    isValid: true,
+    validatedParams,
+  };
+};
+
+export const createWidgetUrlHandler = async (req: Request, res: Response) => {
+  const validation = validateWidgetParams(req.body);
+
+  if (!validation.isValid) {
+    res.status(400);
+    res.send(validation.error);
+    return;
+  }
+
+  const token = await setToken({
+    widgetParams: validation.validatedParams!,
+    authorizationJwt: req.headers?.authorization?.split(" ")?.[1],
+  });
+
+  const queryParams = new URLSearchParams();
+  queryParams.append("token", token);
+
+  const baseUrl = `${getConfig().HOST_URL}/widget`;
+  const widgetUrl = `${baseUrl}?${queryParams.toString()}`;
+
+  res.json({ widgetUrl });
+};
+
+export const widgetHandler = async (req: Request, res: Response) => {
+  const token = req.query.token as string;
+  const validatedWidgetParams = await get(`token-${token}`);
+  if (!validatedWidgetParams) {
+    res.status(400);
+    res.send("A valid token is required");
     return;
   }
 

@@ -37,13 +37,9 @@ const useUserEndpoints = (app: Application) => {
   }
 
   if (config.DELETE_USER_ENDPOINT_ENABLE === "true") {
+    app.delete("/api/user", deleteUserEndpointMiddleware, userDeleteHandler);
     app.delete(
-      "/api/aggregator/:aggregator/user/:userId",
-      deleteUserEndpointMiddleware,
-      userDeleteHandler,
-    );
-    app.delete(
-      "/api/aggregator/:aggregator/user/:userId/connection/:connectionId",
+      "/api/connection",
       deleteUserEndpointMiddleware,
       userConnectionDeleteHandler,
     );

@@ -1,18 +1,14 @@
-import { ComboJobTypes, INSTRUMENTATION_URL } from "@repo/utils";
+import { INSTRUMENTATION_URL } from "@repo/utils";
 import configuredAxios from "./axios";
 
 interface InstrumentationParameters {
-  userId: string;
-  current_member_guid?: string;
-  current_aggregator?: string;
-  jobTypes: ComboJobTypes[];
-  singleAccountSelect?: boolean;
+  token: string;
 }
 
 export const instrumentation = async (
   parameters: InstrumentationParameters,
 ) => {
-  const { userId, ...rest } = parameters;
+  const { token } = parameters;
 
-  return configuredAxios.post(`${INSTRUMENTATION_URL}/userId/${userId}`, rest);
+  return configuredAxios.post(`${INSTRUMENTATION_URL}/${token}`);
 };

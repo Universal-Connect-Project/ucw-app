@@ -71,5 +71,5 @@ export default function (app) {
     res.send(ret);
   });
 
-  app.post(`${INSTRUMENTATION_URL}/userId/:userId`, instrumentationHandler);
+  app.post(`${INSTRUMENTATION_URL}/:token`, instrumentationHandler);
 }

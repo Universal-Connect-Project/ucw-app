@@ -1,8 +1,7 @@
-import type { Response } from "express";
+import type { Request, Response } from "express";
 import type { Aggregator } from "../shared/contract";
 import { listUsersData } from "../test/testData/users";
 import { invalidAggregatorString } from "../utils/validators";
-import type { UserDeleteRequest } from "./userEndpoints";
 import {
   userDeleteHandler,
   userConnectionDeleteHandler,
@@ -18,18 +17,37 @@ const user = listUsersData.users[0];
 
 describe("userEndpoints", () => {
   describe("userDeleteHandler", () => {
+    it("responds with a 400 when userId is missing", async () => {
+      const res = {
+        send: jest.fn(),
+        status: jest.fn(),
+      } as unknown as Response;
+
+      const req = {
+        query: {
+          aggregator: MX_AGGREGATOR_STRING,
+          // userId missing
+        },
+      } as unknown as Request;
+
+      await userDeleteHandler(req, res);
+
+      expect(res.send).toHaveBeenCalledWith("&#x22;userId&#x22; is required");
+      expect(res.status).toHaveBeenCalledWith(400);
+    });
+
     it("responds with a 400 on unsupported aggregator", async () => {
       const res = {
         send: jest.fn(),
         status: jest.fn(),
       } as unknown as Response;
 
-      const req: UserDeleteRequest = {
-        params: {
+      const req = {
+        query: {
           aggregator: "unsupportedAggregator" as Aggregator,
           userId: "testUserIdWhichDoesntExist",
         },
-      };
+      } as unknown as Request;
 
       await userDeleteHandler(req, res);
 
@@ -44,12 +62,12 @@ describe("userEndpoints", () => {
         status: jest.fn(),
       } as unknown as Response;
 
-      const req: UserDeleteRequest = {
-        params: {
+      const req = {
+        query: {
           aggregator: MX_AGGREGATOR_STRING,
           userId: user.id,
         },
-      };
+      } as unknown as Request;
 
       await userDeleteHandler(req, res);
 
@@ -68,15 +86,16 @@ describe("userEndpoints", () => {
 
       const res = {
         json: jest.fn(),
+        send: jest.fn(),
         status: jest.fn().mockReturnThis(),
       } as unknown as Response;
 
-      const req: UserDeleteRequest = {
-        params: {
+      const req = {
+        query: {
           aggregator: MX_AGGREGATOR_STRING,
           userId: user.id,
         },
-      };
+      } as unknown as Request;
 
       await userDeleteHandler(req, res);
 
@@ -91,6 +110,70 @@ describe("userEndpoints", () => {
   describe("userConnectionDeleteHandler", () => {
     const connectionId = "test-connection-id";
 
+    it("responds with a 400 when connectionId is missing", async () => {
+      const res = {
+        send: jest.fn(),
+        status: jest.fn(),
+      } as unknown as Response;
+
+      const req = {
+        query: {
+          aggregator: PLAID_AGGREGATOR_STRING,
+          userId: user.id,
+        },
+        // connectionId missing
+      } as unknown as Request;
+
+      await userConnectionDeleteHandler(req, res);
+
+      expect(res.send).toHaveBeenCalledWith(
+        "&#x22;connectionId&#x22; is required",
+      );
+      expect(res.status).toHaveBeenCalledWith(400);
+    });
+
+    it("allows missing userId for userless aggregators like Plaid", async () => {
+      const res = {
+        send: jest.fn(),
+        status: jest.fn(),
+      } as unknown as Response;
+
+      const req = {
+        query: {
+          aggregator: PLAID_AGGREGATOR_STRING,
+          // userId missing - this should be OK for userless aggregators
+        },
+        headers: {
+          "UCW-Connection-Id": connectionId,
+        },
+      } as unknown as Request;
+
+      await userConnectionDeleteHandler(req, res);
+
+      expect(res.send).toHaveBeenCalledWith({});
+      expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    it("requires userId for non-userless aggregators like MX", async () => {
+      const res = {
+        send: jest.fn(),
+        status: jest.fn(),
+      } as unknown as Response;
+
+      const req = {
+        query: {
+          aggregator: MX_AGGREGATOR_STRING,
+          // userId missing - this should fail for non-userless aggregators
+        },
+        headers: { "UCW-Connection-Id": connectionId },
+      } as unknown as Request;
+
+      await userConnectionDeleteHandler(req, res);
+
+      expect(res.send).toHaveBeenCalledWith("&#x22;userId&#x22; is required");
+      expect(res.status).toHaveBeenCalledWith(400);
+    });
+
     it("responds with a 400 on unsupported aggregator", async () => {
       const res = {
         send: jest.fn(),
@@ -98,12 +181,12 @@ describe("userEndpoints", () => {
       } as unknown as Response;
 
       const req = {
-        params: {
+        query: {
           aggregator: "unsupportedAggregator" as Aggregator,
           userId: "testUserIdWhichDoesntExist",
-          connectionId,
         },
-      };
+        headers: { "UCW-Connection-Id": connectionId },
+      } as unknown as Request;
 
       await userConnectionDeleteHandler(req, res);
 
@@ -118,12 +201,12 @@ describe("userEndpoints", () => {
       } as unknown as Response;
 
       const req = {
-        params: {
+        query: {
           aggregator: PLAID_AGGREGATOR_STRING,
           userId: user.id,
-          connectionId,
         },
-      };
+        headers: { "UCW-Connection-Id": connectionId },
+      } as unknown as Request;
 
       await userConnectionDeleteHandler(req, res);
 
@@ -145,12 +228,12 @@ describe("userEndpoints", () => {
       } as unknown as Response;
 
       const req = {
-        params: {
+        query: {
           aggregator: PLAID_AGGREGATOR_STRING,
           userId: user.id,
-          connectionId,
         },
-      };
+        headers: { "UCW-Connection-Id": connectionId },
+      } as unknown as Request;
 
       await userConnectionDeleteHandler(req, res);
 

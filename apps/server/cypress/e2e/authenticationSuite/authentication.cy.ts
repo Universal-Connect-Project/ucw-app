@@ -1,10 +1,10 @@
 import {
   clickContinue,
+  createWidgetUrl,
   enterMxCredentials,
   expectConnectionSuccess,
   MEMBER_CONNECTED_EVENT_TYPE,
   searchAndSelectMx,
-  visitAgg,
   visitWithPostMessageSpy,
 } from "@repo/utils-e2e/cypress";
 import {
@@ -16,9 +16,25 @@ import { ComboJobTypes } from "@repo/utils";
 
 describe("authentication", () => {
   it("fails if not authorized to make a connection", () => {
-    visitAgg({ failOnStatusCode: false });
+    const userId = crypto.randomUUID();
 
-    cy.findByText("Unauthorized").should("exist");
+    cy.request({
+      method: "POST",
+      url: "/widgetUrl",
+      body: {
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        userId,
+        targetOrigin: "http://localhost:8080",
+      },
+      failOnStatusCode: false,
+    }).then((response) => {
+      expect(response.status).to.eq(401);
+    });
+  });
+
+  it("fails to load widget if token is invalid", () => {
+    cy.visit("/widget?token=invalid-token", { failOnStatusCode: false });
+    cy.findByText("token invalid or expired").should("be.visible");
   });
 
   it("can't access the data endpoints without the right access", () => {
@@ -42,23 +58,13 @@ describe("authentication", () => {
 
     const userId = crypto.randomUUID();
 
-    cy.request({
-      headers: {
-        authorization: `Bearer ${widgetDemoAccessToken}`,
-      },
-      method: "GET",
-      url: `/api/token?userId=${userId}`,
-    }).then((response) => {
-      const token = response.body.token;
-
-      visitAgg({
-        userId,
-        token,
-      });
-
-      visitWithPostMessageSpy(
-        `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
-      )
+    createWidgetUrl({
+      userId,
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
+      targetOrigin: "http://localhost:8080",
+      authToken: widgetDemoAccessToken,
+    }).then((widgetUrl) => {
+      visitWithPostMessageSpy(widgetUrl)
         .then(() => {
           searchAndSelectMx();
           enterMxCredentials();
@@ -98,7 +104,7 @@ describe("authentication", () => {
 
               cy.request({
                 method: "DELETE",
-                url: `/api/aggregator/${aggregator}/user/${userId}`,
+                url: `/api/user?aggregator=${aggregator}&userId=${userId}`,
                 headers: {
                   authorization: `Bearer ${widgetDemoDeleteUserAccessToken}`,
                 },
@@ -118,7 +124,7 @@ describe("authentication", () => {
     cy.request({
       failOnStatusCode: false,
       method: "DELETE",
-      url: `/api/aggregator/mx/user/${userId}`,
+      url: `/api/user?aggregator=mx&userId=${userId}`,
       headers: {
         authorization: `Bearer ${widgetDemoAccessToken}`,
       },
@@ -133,7 +139,7 @@ describe("authentication", () => {
     cy.request({
       failOnStatusCode: false,
       method: "DELETE",
-      url: `/api/aggregator/mx/user/${userId}`,
+      url: `/api/user?aggregator=mx&userId=${userId}`,
       headers: {
         authorization: `Bearer fakeToken`,
       },

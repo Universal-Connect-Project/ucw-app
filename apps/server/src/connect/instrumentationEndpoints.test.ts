@@ -1,120 +1,149 @@
 import type { Request, Response } from "express";
 import { instrumentationHandler } from "./instrumentationEndpoints";
 import { ComboJobTypes } from "@repo/utils";
+import { get, set } from "../services/storageClient/redis";
 
 describe("instrumentationEndpoints", () => {
   describe("instrumentationHandler", () => {
-    const correctBody = {
-      current_aggregator: "testAggregator",
-      current_member_guid: "currentMemberGuid",
-      jobTypes: [ComboJobTypes.TRANSACTION_HISTORY],
-      singleAccountSelect: false,
-    };
+    const userId = "testUserId";
+    const token = "validToken";
 
-    const correctParams = {
-      userId: "userId",
-    };
+    it("retrieves widget params from Redis, sets context, and returns params with parsed jobTypes", async () => {
+      const widgetParams = {
+        jobTypes: [
+          ComboJobTypes.TRANSACTION_HISTORY,
+          ComboJobTypes.TRANSACTIONS,
+        ],
+        singleAccountSelect: "true",
+        userId,
+      };
 
-    it("doesn't return aggregator or connectionId if current_member_guid isn't present", async () => {
-      const body = { ...correctBody };
-      delete body.current_member_guid;
+      await set(`token-${token}`, widgetParams);
+
       const req = {
-        body,
-        params: correctParams,
+        params: { token },
         context: {},
       } as unknown as Request;
 
       const res = {
-        sendStatus: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
       } as unknown as Response;
 
       await instrumentationHandler(req, res);
 
-      expect(res.sendStatus).toHaveBeenCalledWith(200);
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        ...widgetParams,
+        jobTypes: [
+          ComboJobTypes.TRANSACTION_HISTORY,
+          ComboJobTypes.TRANSACTIONS,
+        ],
+      });
       expect(req.context).toEqual({
-        jobTypes: req.body.jobTypes,
+        jobTypes: [
+          ComboJobTypes.TRANSACTION_HISTORY,
+          ComboJobTypes.TRANSACTIONS,
+        ],
         oauth_referral_source: "BROWSER",
         scheme: "vcs",
-        singleAccountSelect: req.body.singleAccountSelect,
-        userId: req.params.userId,
+        singleAccountSelect: true,
+        userId,
       });
     });
 
-    it("doesn't return aggregator or connectionId if current_aggregator isn't present", async () => {
-      const body = { ...correctBody };
-      delete body.current_aggregator;
+    it("handles singleAccountSelect as false when set to false", async () => {
+      const widgetParams = {
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        singleAccountSelect: false,
+        userId,
+      };
+
+      await set(`token-${token}`, widgetParams);
+
       const req = {
-        body,
-        params: correctParams,
+        params: { token },
         context: {},
       } as unknown as Request;
 
       const res = {
-        sendStatus: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
       } as unknown as Response;
 
       await instrumentationHandler(req, res);
 
-      expect(res.sendStatus).toHaveBeenCalledWith(200);
-      expect(req.context).toEqual({
-        jobTypes: req.body.jobTypes,
-        oauth_referral_source: "BROWSER",
-        scheme: "vcs",
-        singleAccountSelect: req.body.singleAccountSelect,
-        userId: req.params.userId,
-      });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(req.context.singleAccountSelect).toBe(false);
     });
 
     it("attaches aggregatorOverride to the request context if present", async () => {
-      const body = {
-        ...correctBody,
+      const widgetParams = {
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        singleAccountSelect: "true",
         aggregatorOverride: "testAggregatorOverride",
+        userId,
       };
+
+      await set(`token-${token}`, widgetParams);
+
       const req = {
-        body,
-        params: correctParams,
+        params: { token },
         context: {},
       } as unknown as Request;
+
       const res = {
-        sendStatus: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
       } as unknown as Response;
 
       await instrumentationHandler(req, res);
-      expect(res.sendStatus).toHaveBeenCalledWith(200);
-      expect(req.context).toEqual({
-        aggregatorOverride: "testAggregatorOverride",
-        aggregator: "testAggregator",
-        connectionId: "currentMemberGuid",
-        jobTypes: req.body.jobTypes,
-        oauth_referral_source: "BROWSER",
-        scheme: "vcs",
-        singleAccountSelect: req.body.singleAccountSelect,
-        userId: req.params.userId,
-      });
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(req.context.aggregatorOverride).toBe("testAggregatorOverride");
     });
 
-    it("attaches properties to the request context and responds with success on success", async () => {
+    it("deletes the token from Redis after successful retrieval", async () => {
+      const widgetParams = {
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        singleAccountSelect: "true",
+        userId,
+      };
+
+      await set(`token-${token}`, widgetParams);
+
       const req = {
-        body: correctBody,
-        params: correctParams,
+        params: { token },
         context: {},
       } as unknown as Request;
 
       const res = {
-        sendStatus: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
       } as unknown as Response;
 
       await instrumentationHandler(req, res);
 
-      expect(res.sendStatus).toHaveBeenCalledWith(200);
-      expect(req.context).toEqual({
-        aggregator: req.body.current_aggregator,
-        connectionId: req.body.current_member_guid,
-        jobTypes: req.body.jobTypes,
-        oauth_referral_source: "BROWSER",
-        scheme: "vcs",
-        singleAccountSelect: req.body.singleAccountSelect,
-        userId: req.params.userId,
+      const deletedToken = await get(`token-${token}`);
+      expect(deletedToken).toBeUndefined();
+    });
+
+    it("returns a 400 error if the token is invalid or missing", async () => {
+      const req = {
+        params: { token: "invalidToken" },
+        context: {},
+      } as unknown as Request;
+
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      } as unknown as Response;
+
+      await instrumentationHandler(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        error: expect.any(String),
       });
     });
   });

@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import { ComboJobTypes } from "@repo/utils";
 import {
   createExpectPerformanceEvent,
+  createWidgetUrl,
   getAccessToken,
 } from "@repo/utils-e2e/playwright";
 import { PLAID_AGGREGATOR_STRING, PLAID_BANK_UCP_INSTITUTION_ID } from "../src";
@@ -11,7 +12,6 @@ const PLAID_TEST_BANK_HOUNDSTOOTH_INSTITUTION_ID =
 
 const PLAID_ITEM_DELETED_ERROR_MSG =
   "The Item you requested cannot be found. This Item does not exist, has been previously removed via /item/remove, or has had access removed by the user.";
-const WIDGET_BASE_URL = "http://localhost:8080/widget";
 
 test("connects to plaid test bank through credential flow and deletes connection at end, doesnt record success because initial selection was Plaid Bank and final connection was Houndstooth Bank", async ({
   page,
@@ -23,9 +23,12 @@ test("connects to plaid test bank through credential flow and deletes connection
 
   const accessToken = await getAccessToken(request);
 
-  await page.goto(
-    `${WIDGET_BASE_URL}?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
-  );
+  const widgetUrl = await createWidgetUrl(request, {
+    jobTypes: [ComboJobTypes.TRANSACTIONS],
+    userId,
+  });
+
+  await page.goto(widgetUrl);
 
   await page.getByPlaceholder("Search").fill("Plaid Bank");
 
@@ -117,11 +120,19 @@ test("connects to plaid test bank through credential flow and deletes connection
   expect(performanceEvent.successMetric.isSuccess).toBe(false);
 
   if (connectionId) {
-    const endpoint = `http://localhost:8080/api/aggregator/plaid_sandbox/user/${userId}/connection/${connectionId}`;
-    const deleteResponse = await request.delete(endpoint);
+    const endpoint = `http://localhost:8080/api/connection?aggregator=plaid_sandbox`;
+    const deleteResponse = await request.delete(endpoint, {
+      headers: {
+        "UCW-Connection-Id": connectionId,
+      },
+    });
     expect(deleteResponse.ok()).toBeTruthy();
 
-    const secondDelete = await request.delete(endpoint);
+    const secondDelete = await request.delete(endpoint, {
+      headers: {
+        "UCW-Connection-Id": connectionId,
+      },
+    });
     const errorBody = await secondDelete.json();
     expect(secondDelete.status()).toBe(400);
     expect(errorBody.message).toBe(PLAID_ITEM_DELETED_ERROR_MSG);
@@ -141,9 +152,12 @@ test(
 
     const accessToken = await getAccessToken(request);
 
-    await page.goto(
-      `${WIDGET_BASE_URL}?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
-    );
+    const widgetUrl = await createWidgetUrl(request, {
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
+      userId,
+    });
+
+    await page.goto(widgetUrl);
 
     await page.getByPlaceholder("Search").fill("Houndstooth");
 
@@ -249,11 +263,19 @@ test(
     expect(performanceEvent.successMetric.isSuccess).toBe(true);
 
     if (connectionId) {
-      const endpoint = `http://localhost:8080/api/aggregator/plaid_sandbox/user/${userId}/connection/${connectionId}`;
-      const deleteResponse = await request.delete(endpoint);
+      const endpoint = `http://localhost:8080/api/connection?aggregator=plaid_sandbox`;
+      const deleteResponse = await request.delete(endpoint, {
+        headers: {
+          "UCW-Connection-Id": connectionId,
+        },
+      });
       expect(deleteResponse.ok()).toBeTruthy();
 
-      const secondDelete = await request.delete(endpoint);
+      const secondDelete = await request.delete(endpoint, {
+        headers: {
+          "UCW-Connection-Id": connectionId,
+        },
+      });
       const errorBody = await secondDelete.json();
       expect(secondDelete.status()).toBe(400);
       expect(errorBody.message).toBe(PLAID_ITEM_DELETED_ERROR_MSG);

@@ -2,6 +2,7 @@ import { expect, test as base } from "@playwright/test";
 import { ComboJobTypes } from "@repo/utils";
 import {
   createExpectPerformanceEvent,
+  createWidgetUrl,
   getAccessToken,
 } from "@repo/utils-e2e/playwright";
 import { FINICITY_PROFILES_A_UCP_INSTITUTION_ID } from "../src/testInstitutions";
@@ -11,10 +12,14 @@ const makeAConnection = async (
   jobTypes: ComboJobTypes[],
   page,
   userId: string,
+  request,
 ) => {
-  await page.goto(
-    `http://localhost:8080/widget?jobTypes=${jobTypes.join(",")}&userId=${userId}&targetOrigin=http://localhost:8080`,
-  );
+  const widgetUrl = await createWidgetUrl(request, {
+    jobTypes,
+    userId,
+  });
+
+  await page.goto(widgetUrl);
 
   page.evaluate(`
       window.addEventListener('message', (event) => {
@@ -83,7 +88,7 @@ const test = base.extend<MyFixtures>({
       await use(userId);
 
       await request.delete(
-        `http://localhost:8080/api/aggregator/finicity_sandbox/user/${userId}`,
+        `http://localhost:8080/api/user?userId=${userId}&aggregator=finicity_sandbox`,
       );
     },
     { scope: "test" },
@@ -102,6 +107,7 @@ test.describe("Finicity Adapter Tests", () => {
       [ComboJobTypes.ACCOUNT_NUMBER],
       page,
       userId,
+      request,
     );
 
     await testDataEndpoints({
@@ -137,6 +143,7 @@ test.describe("Finicity Adapter Tests", () => {
       [ComboJobTypes.TRANSACTION_HISTORY],
       page,
       userId,
+      request,
     );
 
     const expectPerformanceEvent = createExpectPerformanceEvent({
@@ -164,13 +171,24 @@ test.describe("Finicity Adapter Tests", () => {
     test.setTimeout(300000);
 
     const { aggregator, connectionId, ucpInstitutionId } =
-      await makeAConnection([ComboJobTypes.TRANSACTIONS], page, userId);
+      await makeAConnection(
+        [ComboJobTypes.TRANSACTIONS],
+        page,
+        userId,
+        request,
+      );
 
     await testDataEndpoints({ request, userId, connectionId, aggregator });
 
-    await page.goto(
-      `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&aggregator=${aggregator}&institutionId=${ucpInstitutionId}&connectionId=${connectionId}&targetOrigin=http://localhost:8080`,
-    );
+    const widgetUrl = await createWidgetUrl(request, {
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
+      aggregator: aggregator,
+      userId: userId,
+      institutionId: ucpInstitutionId,
+      connectionId: connectionId,
+    });
+
+    await page.goto(widgetUrl);
 
     await expect(page.getByText("Log in at FinBank Profiles - A")).toBeVisible({
       timeout: 8000,
@@ -191,12 +209,15 @@ test.describe("Finicity Adapter Tests", () => {
     });
   });
 
-  test("Failed connection", async ({ page, userId }) => {
+  test("Failed connection", async ({ page, userId, request }) => {
     test.setTimeout(300000);
 
-    await page.goto(
-      `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&targetOrigin=http://localhost:8080`,
-    );
+    const widgetUrl = await createWidgetUrl(request, {
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
+      userId,
+    });
+
+    await page.goto(widgetUrl);
 
     await page.getByPlaceholder("Search").fill("finbank");
     await page.getByLabel("Add account with FinBank Profiles - A").click();
