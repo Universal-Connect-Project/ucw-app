@@ -1,13 +1,9 @@
 import { expect, test } from "@playwright/test";
 import { ComboJobTypes } from "@repo/utils";
 import { createWidgetUrl } from "@repo/utils-e2e/playwright";
-import {
-  testAccountsData,
-  createConnectedPromise,
-  testIdentityData,
-} from "./utils";
+import { createConnectedPromise, testDataEndpoints } from "./utils";
 
-test("connects to plaid's First Platypus Bank and gets account numbers", async ({
+test("connects to plaid's First Platypus Bank and gets data", async ({
   page,
   request,
 }) => {
@@ -16,7 +12,11 @@ test("connects to plaid's First Platypus Bank and gets account numbers", async (
   const userId = crypto.randomUUID();
 
   const widgetUrl = await createWidgetUrl(request, {
-    jobTypes: [ComboJobTypes.ACCOUNT_NUMBER],
+    jobTypes: [
+      ComboJobTypes.ACCOUNT_NUMBER,
+      ComboJobTypes.ACCOUNT_OWNER,
+      ComboJobTypes.TRANSACTIONS,
+    ],
     userId,
   });
 
@@ -68,15 +68,7 @@ test("connects to plaid's First Platypus Bank and gets account numbers", async (
     timeout: 120000,
   });
 
-  await testAccountsData({
-    request,
-    userId,
-    connectionId: connectionId!,
-    aggregator: "plaid_sandbox",
-    expect,
-  });
-
-  await testIdentityData({
+  await testDataEndpoints({
     request,
     userId,
     connectionId: connectionId!,

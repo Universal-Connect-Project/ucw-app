@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.0.0]
 
+### Added
+
+- Plaid Transaction Data endpoint
+
 ### Changed
 
 - start_time and end_time are no longer valid query params for the transactions data endpoint. Use startDate/endDate.

@@ -1,5 +1,10 @@
 import { http, HttpResponse } from "msw";
-import { accountsResponse, authResponse, identityResponse } from "./testData";
+import {
+  accountsResponse,
+  authResponse,
+  identityResponse,
+  plaidTransactionsResponseExample,
+} from "./testData";
 
 const PLAID_BASE_PATH = "https://sandbox.plaid.com";
 const PLAID_BASE_PATH_PROD = "https://production.plaid.com";
@@ -49,5 +54,8 @@ export const plaidHandlers = [
   ),
   http.post(`${PLAID_BASE_PATH}/accounts/get`, () =>
     HttpResponse.json(accountsResponse),
+  ),
+  http.post(`${PLAID_BASE_PATH}/transactions/get`, () =>
+    HttpResponse.json(plaidTransactionsResponseExample),
   ),
 ];

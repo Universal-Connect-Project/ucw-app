@@ -20,13 +20,13 @@ interface TestDataParams {
   expect: Expect;
 }
 
-export async function testAccountsData({
+async function testAccountsData({
   request,
   userId,
   connectionId,
   aggregator,
   expect,
-}: TestDataParams) {
+}: TestDataParams): Promise<string> {
   const url = `http://localhost:8080/api/data/accounts?aggregator=${aggregator}&userId=${userId}`;
 
   const accountsResponse = await request.get(url, {
@@ -88,9 +88,12 @@ export async function testAccountsData({
   );
 
   expect(accountId).not.toBeNull();
+  expect(accountId).toBeTruthy();
+
+  return accountId;
 }
 
-export async function testIdentityData({
+async function testIdentityData({
   request,
   userId,
   connectionId,
@@ -153,6 +156,106 @@ export async function testIdentityData({
     expect(account.accountId).toBeTruthy();
     expect(account.relationship).toMatch(/^(PRIMARY|BUSINESS)$/);
     expect(account.links).toEqual([]);
+  });
+}
+
+interface TestTransactionsDataParams extends TestDataParams {
+  accountId: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+async function testTransactionsData({
+  request,
+  userId,
+  connectionId,
+  aggregator,
+  accountId,
+  startDate,
+  endDate,
+  expect,
+}: TestTransactionsDataParams) {
+  let url = `http://localhost:8080/api/data/transactions?aggregator=${aggregator}&userId=${userId}&accountId=${accountId}`;
+
+  if (startDate) {
+    url += `&startDate=${startDate}`;
+  }
+  if (endDate) {
+    url += `&endDate=${endDate}`;
+  }
+
+  const transactionsResponse = await request.get(url, {
+    headers: {
+      "ucw-connection-id": connectionId,
+    },
+  });
+  const transactionsJson = (await transactionsResponse.json()) as {
+    transactions: unknown[];
+  };
+
+  expect(transactionsJson).toHaveProperty("transactions");
+  expect(Array.isArray(transactionsJson.transactions)).toBe(true);
+  expect(transactionsJson.transactions.length).toBeGreaterThan(0);
+
+  const firstTransaction = transactionsJson.transactions[0] as Record<
+    string,
+    unknown
+  >;
+
+  const hasTransactionType =
+    "depositTransaction" in firstTransaction ||
+    "locTransaction" in firstTransaction ||
+    "loanTransaction" in firstTransaction ||
+    "investmentTransaction" in firstTransaction;
+
+  expect(hasTransactionType).toBe(true);
+
+  const transaction =
+    (firstTransaction.depositTransaction as Record<string, unknown>) ||
+    (firstTransaction.locTransaction as Record<string, unknown>) ||
+    (firstTransaction.loanTransaction as Record<string, unknown>) ||
+    (firstTransaction.investmentTransaction as Record<string, unknown>);
+
+  expect(transaction.transactionId).toBeTruthy();
+  expect(transaction.accountId).toBe(accountId);
+  expect(typeof transaction.amount).toBe("number");
+  expect(transaction.description).toBeTruthy();
+  expect(transaction.status).toBeTruthy();
+  expect(transaction.transactionType).toBeTruthy();
+  expect(transaction.postedTimestamp).toBeTruthy();
+  expect(transaction.transactionTimestamp).toBeTruthy();
+}
+
+export async function testDataEndpoints({
+  request,
+  userId,
+  connectionId,
+  aggregator,
+  expect,
+}: TestDataParams): Promise<void> {
+  const accountId = await testAccountsData({
+    request,
+    userId,
+    connectionId,
+    aggregator,
+    expect,
+  });
+
+  await testIdentityData({
+    request,
+    userId,
+    connectionId,
+    aggregator,
+    expect,
+  });
+
+  await testTransactionsData({
+    request,
+    userId,
+    connectionId,
+    aggregator,
+    accountId,
+    expect,
   });
 }
 

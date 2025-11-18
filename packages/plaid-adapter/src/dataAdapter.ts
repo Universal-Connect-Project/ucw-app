@@ -1,13 +1,28 @@
 import type { DataAdapterDependencies } from "./models";
 
-import { getAuth, getAccounts, getIdentity } from "./apiClient";
-import { DataAdapterRequestParams, VCDataTypes } from "@repo/utils";
+import {
+  getAuth,
+  getAccounts,
+  getIdentity,
+  getTransactions,
+} from "./apiClient";
+import {
+  DataAdapterRequestParams,
+  getPreparedDateRangeParams,
+  VCDataTypes,
+} from "@repo/utils";
 import { transformPlaidAccountsToFdx } from "./fdxDataTransforming/accounts";
 import type {
   FdxAccountsResponse,
   FdxIdentityResponse,
+  FdxTransactionsResponse,
 } from "@repo/utils-dev-dependency/shared/FdxDataTypes";
 import { transformPlaidIdentityToFdxCustomers } from "./fdxDataTransforming/identity";
+import {
+  formatDateForPlaid,
+  mapPlaidTransactionToFdx,
+  PlaidTransaction,
+} from "./fdxDataTransforming/transactions";
 
 const createDataAdapter = (
   sandbox: boolean,
@@ -17,8 +32,11 @@ const createDataAdapter = (
     connectionId,
     type,
     userId: _userId,
+    accountId,
+    startDate,
+    endDate,
   }: DataAdapterRequestParams): Promise<
-    FdxAccountsResponse | FdxIdentityResponse | void
+    FdxAccountsResponse | FdxIdentityResponse | FdxTransactionsResponse | void
   > => {
     const { logClient, aggregatorCredentials } = dependencies;
 
@@ -75,7 +93,32 @@ const createDataAdapter = (
       }
 
       case VCDataTypes.TRANSACTIONS: {
-        throw new Error("Transactions data type not implemented yet");
+        const { preparedStartDate, preparedEndDate } =
+          getPreparedDateRangeParams({
+            startDate,
+            endDate,
+            defaultEndOverride: new Date(),
+          });
+
+        const formattedStartDate = formatDateForPlaid(preparedStartDate);
+        const formattedEndDate = formatDateForPlaid(preparedEndDate);
+
+        const transactionsResponse = await getTransactions({
+          ...commonParams,
+          accountIds: [accountId],
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+        });
+
+        const transactions = (transactionsResponse.data.transactions ||
+          []) as PlaidTransaction[];
+        const accountType = transactionsResponse.data.accounts[0]?.type;
+
+        return {
+          transactions: transactions.map((transaction) =>
+            mapPlaidTransactionToFdx({ transaction, accountId, accountType }),
+          ),
+        };
       }
     }
   };

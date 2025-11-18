@@ -9,6 +9,7 @@ import {
   AccountStatus,
   type FdxAccountsResponse,
   type FdxIdentityResponse,
+  type FdxTransactionsResponse,
 } from "@repo/utils-dev-dependency/shared/FdxDataTypes";
 import { createClient as createCacheClient } from "@repo/utils/test";
 import { createLogClient } from "@repo/utils-dev-dependency";
@@ -22,7 +23,10 @@ import {
   creditCardAccount,
   iraAccount,
 } from "@repo/utils-dev-dependency/plaid/testData/accounts";
-import { identityResponse } from "@repo/utils-dev-dependency/plaid/testData";
+import {
+  identityResponse,
+  plaidTransactionsResponseExample,
+} from "@repo/utils-dev-dependency/plaid/testData";
 
 const aggregatorCredentials = {
   plaidSandbox: {
@@ -367,6 +371,252 @@ describe("dataAdapter", () => {
     });
   });
 
+  describe("TRANSACTIONS data type", () => {
+    it("retrieves transactions data and transforms to FDX (sandbox)", async () => {
+      const startDate = "2025-10-01";
+      const endDate = "2025-11-30";
+
+      const data = await sandboxDataAdapter({
+        connectionId,
+        type: VCDataTypes.TRANSACTIONS,
+        userId,
+        accountId,
+        startDate,
+        endDate,
+      });
+
+      expect(data).toBeDefined();
+      expect(data).toHaveProperty("transactions");
+      const transactionData = data as FdxTransactionsResponse;
+      expect(Array.isArray(transactionData.transactions)).toBe(true);
+      expect(transactionData.transactions.length).toBeGreaterThan(0);
+
+      const firstTransaction = transactionData.transactions[0];
+      expect(firstTransaction).toHaveProperty("locTransaction");
+      if ("locTransaction" in firstTransaction) {
+        expect(firstTransaction.locTransaction).toMatchObject({
+          accountId: expect.any(String),
+          transactionId: expect.any(String),
+          amount: expect.any(Number),
+          description: expect.any(String),
+          status: expect.any(String),
+          transactionType: expect.any(String),
+        });
+      }
+    });
+
+    it("sends correct request parameters to transactions endpoint and uses provided date range for transaction requests", async () => {
+      let transactionsRequestBody: unknown = null;
+
+      server.use(
+        http.post(
+          `${PLAID_BASE_PATH}/transactions/get`,
+          async ({ request }) => {
+            transactionsRequestBody = await request.json();
+            return HttpResponse.json({
+              ...plaidTransactionsResponseExample,
+              transactions: [plaidTransactionsResponseExample.transactions[0]],
+            });
+          },
+        ),
+      );
+
+      const startDate = "2025-10-15";
+      const endDate = "2025-11-15";
+
+      await sandboxDataAdapter({
+        connectionId,
+        type: VCDataTypes.TRANSACTIONS,
+        userId,
+        accountId,
+        startDate,
+        endDate,
+      });
+
+      expect(transactionsRequestBody).toEqual({
+        access_token: connectionId,
+        client_id: aggregatorCredentials.plaidSandbox.clientId,
+        secret: aggregatorCredentials.plaidSandbox.secret,
+        start_date: startDate,
+        end_date: endDate,
+        options: {
+          count: 500,
+          account_ids: [accountId],
+        },
+      });
+    });
+
+    it("defaults to current date as endDate when not provided", async () => {
+      let transactionsRequestBody: unknown = null;
+
+      server.use(
+        http.post(
+          `${PLAID_BASE_PATH}/transactions/get`,
+          async ({ request }) => {
+            transactionsRequestBody = await request.json();
+            return HttpResponse.json({
+              ...plaidTransactionsResponseExample,
+              transactions: [],
+            });
+          },
+        ),
+      );
+
+      const startDate = "2025-10-01";
+
+      await sandboxDataAdapter({
+        connectionId,
+        type: VCDataTypes.TRANSACTIONS,
+        userId,
+        accountId,
+        startDate,
+      });
+
+      const today = new Date().toISOString().split("T")[0];
+      expect((transactionsRequestBody as Record<string, string>).end_date).toBe(
+        today,
+      );
+    });
+
+    it("passes accountId to transaction mapper", async () => {
+      const customAccountId = "custom-account-123";
+
+      const data = await sandboxDataAdapter({
+        connectionId,
+        type: VCDataTypes.TRANSACTIONS,
+        userId,
+        accountId: customAccountId,
+        startDate: "2025-10-01",
+        endDate: "2025-11-30",
+      });
+
+      const transactions = (data as FdxTransactionsResponse).transactions;
+      transactions.forEach((txn) => {
+        expect(txn).toHaveProperty("locTransaction");
+        if ("locTransaction" in txn) {
+          expect(txn.locTransaction.accountId).toBe(customAccountId);
+        }
+      });
+    });
+
+    it("handles empty transaction list", async () => {
+      server.use(
+        http.post(`${PLAID_BASE_PATH}/transactions/get`, () => {
+          return HttpResponse.json({
+            ...plaidTransactionsResponseExample,
+            transactions: [],
+            total_transactions: 0,
+          });
+        }),
+      );
+
+      const data = await sandboxDataAdapter({
+        connectionId,
+        type: VCDataTypes.TRANSACTIONS,
+        userId,
+        accountId,
+        startDate: "2025-10-01",
+        endDate: "2025-11-30",
+      });
+
+      expect((data as FdxTransactionsResponse).transactions).toEqual([]);
+    });
+
+    it("uses production endpoint for prod adapter", async () => {
+      let requestPath = "";
+      server.use(
+        http.post(`${PLAID_BASE_PATH_PROD}/transactions/get`, ({ request }) => {
+          requestPath = request.url;
+          return HttpResponse.json({
+            ...plaidTransactionsResponseExample,
+            transactions: [plaidTransactionsResponseExample.transactions[0]],
+          });
+        }),
+      );
+
+      await prodDataAdapter({
+        connectionId,
+        type: VCDataTypes.TRANSACTIONS,
+        userId,
+        accountId,
+        startDate: "2025-10-01",
+        endDate: "2025-11-30",
+      });
+
+      expect(requestPath).toContain(PLAID_BASE_PATH_PROD);
+    });
+
+    it("includes all transactions from response", async () => {
+      const data = await sandboxDataAdapter({
+        connectionId,
+        type: VCDataTypes.TRANSACTIONS,
+        userId,
+        accountId,
+        startDate: "2025-10-01",
+        endDate: "2025-11-30",
+      });
+
+      const transactions = (data as FdxTransactionsResponse).transactions;
+      // plaidTransactionsResponseExample has 7 transactions
+      expect(transactions).toHaveLength(7);
+    });
+
+    it("preserves transaction details through transformation", async () => {
+      const data = await sandboxDataAdapter({
+        connectionId,
+        type: VCDataTypes.TRANSACTIONS,
+        userId,
+        accountId,
+        startDate: "2025-10-01",
+        endDate: "2025-11-30",
+      });
+
+      const transactions = (data as FdxTransactionsResponse).transactions;
+      const firstPlaidTransaction =
+        plaidTransactionsResponseExample.transactions[0];
+      const firstTransaction = transactions[0];
+
+      expect(firstTransaction).toHaveProperty("locTransaction");
+      if ("locTransaction" in firstTransaction) {
+        expect(firstTransaction.locTransaction.transactionId).toBe(
+          firstPlaidTransaction.transaction_id,
+        );
+        expect(firstTransaction.locTransaction.amount).toBe(
+          firstPlaidTransaction.amount,
+        );
+        expect(firstTransaction.locTransaction.description).toBe(
+          firstPlaidTransaction.name,
+        );
+      }
+    });
+
+    it("handles API errors properly", async () => {
+      server.use(
+        http.post(`${PLAID_BASE_PATH}/transactions/get`, () => {
+          return HttpResponse.json(
+            {
+              error_type: "INVALID_REQUEST",
+              error_code: "INVALID_ACCESS_TOKEN",
+              error_message: "Invalid access token",
+            },
+            { status: 400 },
+          );
+        }),
+      );
+
+      await expect(
+        sandboxDataAdapter({
+          connectionId,
+          type: VCDataTypes.TRANSACTIONS,
+          userId,
+          accountId,
+          startDate: "2025-10-01",
+          endDate: "2025-11-30",
+        }),
+      ).rejects.toThrow("Invalid access token");
+    });
+  });
+
   describe("error handling", () => {
     it("throws error when credentials are missing", async () => {
       const badDependencies: DataAdapterDependencies = {
@@ -385,17 +635,6 @@ describe("dataAdapter", () => {
           userId,
         }),
       ).rejects.toThrow("Plaid credentials not found");
-    });
-
-    it("throws error for unimplemented TRANSACTIONS data type", async () => {
-      await expect(
-        sandboxDataAdapter({
-          connectionId,
-          type: VCDataTypes.TRANSACTIONS,
-          userId,
-          accountId,
-        }),
-      ).rejects.toThrow("Transactions data type not implemented yet");
     });
 
     it("handles API errors properly", async () => {
