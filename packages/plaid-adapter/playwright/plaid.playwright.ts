@@ -284,23 +284,3 @@ test(
     }
   },
 );
-
-test("should return 400 with error message when requesting plaid transaction data", async ({
-  request,
-}) => {
-  const response = await request.get(
-    "http://localhost:8080/api/data/transactions?accountId=someAccountId&aggregator=plaid_sandbox",
-    {
-      headers: {
-        "UCW-Connection-Id": "someConnectionId",
-      },
-    },
-  );
-
-  expect(response.status()).toBe(400);
-
-  const body = await response.json();
-  expect(body).toEqual({
-    message: "Transactions data type not implemented yet",
-  });
-});
