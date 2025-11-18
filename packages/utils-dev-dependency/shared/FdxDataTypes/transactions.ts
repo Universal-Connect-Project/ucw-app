@@ -187,9 +187,16 @@ export enum PositionType {
   SHORT = "SHORT",
 }
 
-export enum CommercialCode {
-  // Define specific commercial codes here based on treasury management requirements
-  // This would need to be populated based on specific business requirements
+export enum TreasuryManagementType {
+  BAI = "BAI",
+  BTRS = "BTRS",
+  ISO = "ISO",
+  SWIFT = "SWIFT",
+}
+
+export interface CommercialCode {
+  type: TreasuryManagementType;
+  code: string;
 }
 
 export interface LineItem {
@@ -369,26 +376,4 @@ export function isCommercialTransaction(
   item: TransactionItem,
 ): item is { commercialTransaction: CommercialTransaction } {
   return "commercialTransaction" in item;
-}
-
-// ===== Utility Functions =====
-
-export function getTransactionFromItem(item: TransactionItem): TransactionBase {
-  if (isDepositTransaction(item)) return item.depositTransaction;
-  if (isLoanTransaction(item)) return item.loanTransaction;
-  if (isLocTransaction(item)) return item.locTransaction;
-  if (isInvestmentTransaction(item)) return item.investmentTransaction;
-  if (isInsuranceTransaction(item)) return item.insuranceTransaction;
-  if (isCommercialTransaction(item)) return item.commercialTransaction;
-  throw new Error("Unknown transaction type");
-}
-
-export function getTransactionType(item: TransactionItem): string {
-  if (isDepositTransaction(item)) return "deposit";
-  if (isLoanTransaction(item)) return "loan";
-  if (isLocTransaction(item)) return "loc";
-  if (isInvestmentTransaction(item)) return "investment";
-  if (isInsuranceTransaction(item)) return "insurance";
-  if (isCommercialTransaction(item)) return "commercial";
-  return "unknown";
 }
