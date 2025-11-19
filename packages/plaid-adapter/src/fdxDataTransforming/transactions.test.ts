@@ -25,12 +25,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       expect(result.depositTransaction.transactionType).toBe(
         DepositTransactionType.DEPOSIT,
       );
@@ -52,12 +49,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       expect(result.depositTransaction.transactionType).toBe(
         DepositTransactionType.CHECK,
       );
@@ -78,12 +72,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       expect(result.depositTransaction.transactionType).toBe(
         DepositTransactionType.INTEREST,
       );
@@ -104,12 +95,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       expect(result.depositTransaction.transactionType).toBe(
         DepositTransactionType.DIVIDEND,
       );
@@ -129,12 +117,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       expect(result.depositTransaction.transactionType).toBe(
         DepositTransactionType.DIRECTDEPOSIT,
       );
@@ -155,12 +140,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       expect(result.depositTransaction.transactionType).toBe(
         DepositTransactionType.ATMDEPOSIT,
       );
@@ -181,12 +163,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       expect(result.depositTransaction.transactionType).toBe(
         DepositTransactionType.ATMWITHDRAWAL,
       );
@@ -206,12 +185,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       expect(result.depositTransaction.transactionType).toBe(
         DepositTransactionType.TRANSFER,
       );
@@ -231,12 +207,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       expect(result.depositTransaction.transactionType).toBe(
         DepositTransactionType.BILLPAYMENT,
       );
@@ -256,12 +229,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       expect(result.depositTransaction.transactionType).toBe(
         DepositTransactionType.FEE,
       );
@@ -282,12 +252,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       expect(result.depositTransaction.transactionType).toBe(
         DepositTransactionType.POSDEBIT,
       );
@@ -305,12 +272,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       expect(result.depositTransaction.payee).toBe("Test Payee");
     });
 
@@ -323,12 +287,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       expect(result.depositTransaction.payee).toBe("United Airlines");
     });
   });
@@ -348,12 +309,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "credit",
-      });
+      }) as unknown as { locTransaction: { [key: string]: unknown } };
 
-      if (!("locTransaction" in result)) {
-        throw new Error("Expected locTransaction in result");
-      }
-
+      expect(result).toHaveProperty("locTransaction");
       expect(result.locTransaction.transactionType).toBe(
         LocTransactionType.PURCHASE,
       );
@@ -375,12 +333,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "credit",
-      });
+      }) as unknown as { locTransaction: { [key: string]: unknown } };
 
-      if (!("locTransaction" in result)) {
-        throw new Error("Expected locTransaction in result");
-      }
-
+      expect(result).toHaveProperty("locTransaction");
       expect(result.locTransaction.transactionType).toBe(
         LocTransactionType.PAYMENT,
       );
@@ -396,12 +351,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "credit",
-      });
+      }) as unknown as { locTransaction: { [key: string]: unknown } };
 
-      if (!("locTransaction" in result)) {
-        throw new Error("Expected locTransaction in result");
-      }
-
+      expect(result).toHaveProperty("locTransaction");
       expect(result.locTransaction.transactionType).toBe(
         LocTransactionType.CHECK,
       );
@@ -422,12 +374,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "credit",
-      });
+      }) as unknown as { locTransaction: { [key: string]: unknown } };
 
-      if (!("locTransaction" in result)) {
-        throw new Error("Expected locTransaction in result");
-      }
-
+      expect(result).toHaveProperty("locTransaction");
       expect(result.locTransaction.transactionType).toBe(
         LocTransactionType.WITHDRAWAL,
       );
@@ -447,12 +396,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "credit",
-      });
+      }) as unknown as { locTransaction: { [key: string]: unknown } };
 
-      if (!("locTransaction" in result)) {
-        throw new Error("Expected locTransaction in result");
-      }
-
+      expect(result).toHaveProperty("locTransaction");
       expect(result.locTransaction.transactionType).toBe(
         LocTransactionType.INTEREST,
       );
@@ -472,12 +418,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "credit",
-      });
+      }) as unknown as { locTransaction: { [key: string]: unknown } };
 
-      if (!("locTransaction" in result)) {
-        throw new Error("Expected locTransaction in result");
-      }
-
+      expect(result).toHaveProperty("locTransaction");
       expect(result.locTransaction.transactionType).toBe(
         LocTransactionType.FEE,
       );
@@ -499,12 +442,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "loan",
-      });
+      }) as unknown as { loanTransaction: { [key: string]: unknown } };
 
-      if (!("loanTransaction" in result)) {
-        throw new Error("Expected loanTransaction in result");
-      }
-
+      expect(result).toHaveProperty("loanTransaction");
       expect(result.loanTransaction.transactionType).toBe(
         LoanTransactionType.PAYMENT,
       );
@@ -528,12 +468,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "loan",
-      });
+      }) as unknown as { loanTransaction: { [key: string]: unknown } };
 
-      if (!("loanTransaction" in result)) {
-        throw new Error("Expected loanTransaction in result");
-      }
-
+      expect(result).toHaveProperty("loanTransaction");
       expect(result.loanTransaction.transactionType).toBe(
         LoanTransactionType.INTEREST,
       );
@@ -553,12 +490,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "loan",
-      });
+      }) as unknown as { loanTransaction: { [key: string]: unknown } };
 
-      if (!("loanTransaction" in result)) {
-        throw new Error("Expected loanTransaction in result");
-      }
-
+      expect(result).toHaveProperty("loanTransaction");
       expect(result.loanTransaction.transactionType).toBe(
         LoanTransactionType.FEE,
       );
@@ -578,12 +512,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "loan",
-      });
+      }) as unknown as { loanTransaction: { [key: string]: unknown } };
 
-      if (!("loanTransaction" in result)) {
-        throw new Error("Expected loanTransaction in result");
-      }
-
+      expect(result).toHaveProperty("loanTransaction");
       expect(result.loanTransaction.transactionType).toBe(
         LoanTransactionType.PAYMENT,
       );
@@ -605,12 +536,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "investment",
-      });
+      }) as unknown as { investmentTransaction: { [key: string]: unknown } };
 
-      if (!("investmentTransaction" in result)) {
-        throw new Error("Expected investmentTransaction in result");
-      }
-
+      expect(result).toHaveProperty("investmentTransaction");
       expect(result.investmentTransaction.transactionType).toBe(
         InvestmentTransactionType.DIVIDEND,
       );
@@ -631,12 +559,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "investment",
-      });
+      }) as unknown as { investmentTransaction: { [key: string]: unknown } };
 
-      if (!("investmentTransaction" in result)) {
-        throw new Error("Expected investmentTransaction in result");
-      }
-
+      expect(result).toHaveProperty("investmentTransaction");
       expect(result.investmentTransaction.transactionType).toBe(
         InvestmentTransactionType.INTEREST,
       );
@@ -656,12 +581,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "investment",
-      });
+      }) as unknown as { investmentTransaction: { [key: string]: unknown } };
 
-      if (!("investmentTransaction" in result)) {
-        throw new Error("Expected investmentTransaction in result");
-      }
-
+      expect(result).toHaveProperty("investmentTransaction");
       expect(result.investmentTransaction.transactionType).toBe(
         InvestmentTransactionType.CONTRIBUTION,
       );
@@ -681,12 +603,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "investment",
-      });
+      }) as unknown as { investmentTransaction: { [key: string]: unknown } };
 
-      if (!("investmentTransaction" in result)) {
-        throw new Error("Expected investmentTransaction in result");
-      }
-
+      expect(result).toHaveProperty("investmentTransaction");
       expect(result.investmentTransaction.transactionType).toBe(
         InvestmentTransactionType.TRANSFER,
       );
@@ -706,12 +625,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "investment",
-      });
+      }) as unknown as { investmentTransaction: { [key: string]: unknown } };
 
-      if (!("investmentTransaction" in result)) {
-        throw new Error("Expected investmentTransaction in result");
-      }
-
+      expect(result).toHaveProperty("investmentTransaction");
       expect(result.investmentTransaction.transactionType).toBe(
         InvestmentTransactionType.FEE,
       );
@@ -731,12 +647,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "investment",
-      });
+      }) as unknown as { investmentTransaction: { [key: string]: unknown } };
 
-      if (!("investmentTransaction" in result)) {
-        throw new Error("Expected investmentTransaction in result");
-      }
-
+      expect(result).toHaveProperty("investmentTransaction");
       expect(result.investmentTransaction.transactionType).toBe(
         InvestmentTransactionType.INCOME,
       );
@@ -753,12 +666,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       expect(result.depositTransaction.status).toBe(TransactionStatus.PENDING);
     });
 
@@ -771,12 +681,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       expect(result.depositTransaction.status).toBe(TransactionStatus.POSTED);
     });
 
@@ -790,12 +697,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       expect(result.depositTransaction.postedTimestamp).toBe(
         "2025-11-15T14:30:00Z",
       );
@@ -815,12 +719,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       expect(result.depositTransaction.postedTimestamp).toBe(
         "2025-11-15T12:00:00Z",
       );
@@ -843,11 +744,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
+      expect(result).toHaveProperty("depositTransaction");
 
       const fiAttributes = result.depositTransaction.fiAttributes || [];
       expect(fiAttributes).toContainEqual({
@@ -881,12 +780,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       const fiAttributes = result.depositTransaction.fiAttributes || [];
       expect(fiAttributes).toContainEqual({
         name: "plaid_category_primary",
@@ -907,11 +803,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
+      expect(result).toHaveProperty("depositTransaction");
 
       const fiAttributes = result.depositTransaction.fiAttributes || [];
       expect(fiAttributes).toContainEqual({
@@ -935,12 +829,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       expect(result.depositTransaction.category).toBe("TRAVEL");
       expect(result.depositTransaction.subCategory).toBe("TRAVEL_FLIGHTS");
     });
@@ -961,12 +852,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       expect(result.depositTransaction.description).toBe(
         "Coffee Shop Purchase",
       );
@@ -986,12 +874,9 @@ describe("mapPlaidTransactionToFdx", () => {
         transaction: plaidTransaction,
         accountId: "custom-account-id",
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       expect(result.depositTransaction.accountId).toBe("custom-account-id");
     });
 
@@ -1004,12 +889,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
         accountType: "depository",
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
-
+      expect(result).toHaveProperty("depositTransaction");
       expect(result.depositTransaction.accountId).toBe("original-account-id");
     });
   });
@@ -1022,11 +904,9 @@ describe("mapPlaidTransactionToFdx", () => {
 
       const result = mapPlaidTransactionToFdx({
         transaction: plaidTransaction,
-      });
+      }) as unknown as { depositTransaction: { [key: string]: unknown } };
 
-      if (!("depositTransaction" in result)) {
-        throw new Error("Expected depositTransaction in result");
-      }
+      expect(result).toHaveProperty("depositTransaction");
     });
   });
 
@@ -1037,12 +917,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: transaction as PlaidTransaction,
         accountType: "credit",
-      });
+      }) as unknown as { locTransaction: { [key: string]: unknown } };
 
-      if (!("locTransaction" in result)) {
-        throw new Error("Expected locTransaction in result");
-      }
-
+      expect(result).toHaveProperty("locTransaction");
       expect(result.locTransaction.transactionId).toBe(
         "5vVN5waoqofVALBQJKVeIq18AyWrXgc51apax",
       );
@@ -1060,12 +937,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: transaction as PlaidTransaction,
         accountType: "credit",
-      });
+      }) as unknown as { locTransaction: { [key: string]: unknown } };
 
-      if (!("locTransaction" in result)) {
-        throw new Error("Expected locTransaction in result");
-      }
-
+      expect(result).toHaveProperty("locTransaction");
       expect(result.locTransaction.transactionId).toBe(
         "JMbzVGWEoEI6lZ7W8Q6nSAPG5NqRwaSBDl5ld",
       );
@@ -1080,12 +954,9 @@ describe("mapPlaidTransactionToFdx", () => {
       const result = mapPlaidTransactionToFdx({
         transaction: transaction as PlaidTransaction,
         accountType: "credit",
-      });
+      }) as unknown as { locTransaction: { [key: string]: unknown } };
 
-      if (!("locTransaction" in result)) {
-        throw new Error("Expected locTransaction in result");
-      }
-
+      expect(result).toHaveProperty("locTransaction");
       expect(result.locTransaction.amount).toBe(2078.5);
       expect(result.locTransaction.description).toBe(
         "AUTOMATIC PAYMENT - THANK",
