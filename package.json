@@ -34,9 +34,9 @@
     "node": "20.x"
   },
   "optionalDependencies": {
-    "@ngrok/ngrok-linux-x64-musl": "^1.5.2",
     "@ngrok/ngrok-linux-arm64-musl": "^1.5.2",
     "@ngrok/ngrok-linux-x64-gnu": "^1.5.2",
+    "@ngrok/ngrok-linux-x64-musl": "^1.5.2",
     "@rollup/rollup-linux-x64-gnu": "^4.9.5"
   },
   "packageManager": "npm@10.7.0",

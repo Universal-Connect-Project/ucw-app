@@ -11,6 +11,7 @@ describe("institution by guid", () => {
 
       const expectedProperties = [
         "aggregator",
+        "aggregatorDisplayName",
         "guid",
         "name",
         "url",
@@ -39,6 +40,7 @@ describe("institution by guid", () => {
 
       const expectedProperties = [
         "aggregator",
+        "aggregatorDisplayName",
         "guid",
         "name",
         "url",

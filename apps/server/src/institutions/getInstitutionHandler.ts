@@ -71,7 +71,8 @@ export const getInstitutionHandler = async (req: Request, res: Response) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       credentials: [] as any[],
       supports_oauth: inst.supportsOauth,
-      aggregator: inst.aggregator,
+      aggregator: resolvedAggregatorId,
+      aggregatorDisplayName: widgetAdapter.aggregatorDisplayName,
       ucpInstitutionId,
       url: resolvedInstitution.url,
     });

@@ -161,7 +161,8 @@
                     "instructional_data": {},
                     "credentials": [],
                     "supports_oauth": false,
-                    "aggregator": "testExampleC"
+                    "aggregator": "mx",
+                    "aggregatorDisplayName": "MX"
                   }
                 }
               }

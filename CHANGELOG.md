@@ -24,6 +24,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - connectionId can be sensitive so it's in the header now
   - all other params have been moved into query params
 
+## [1.17.4]
+
+### Changed
+
+- Improved API docs
+
+## [1.17.3]
+
+### Changed
+
+- Improved API docs
+
 ## [1.17.2]
 
 ### Added

@@ -24,6 +24,7 @@ type AdapterConfig = {
 
 export class AkoyaAdapter implements WidgetAdapter {
   aggregator: string;
+  aggregatorDisplayName = "Akoya";
   credentials: ApiCredentials;
   cacheClient: CacheClient;
   logger: LogClient;
@@ -49,7 +50,6 @@ export class AkoyaAdapter implements WidgetAdapter {
   async GetInstitutionById(id: string): Promise<AggregatorInstitution> {
     return {
       id,
-      aggregator: this.aggregator,
       supportsOauth: true,
     };
   }
