@@ -378,7 +378,7 @@ export async function makeAConnection({
   `);
 
   await page.getByPlaceholder("Search").fill(institutionSearchText);
-  await page.getByLabel(`Add account with ${institutionName}`).click();
+  await page.getByLabel(`Add account with ${institutionSearchText}`).click();
 
   const popupPromise = page.waitForEvent("popup");
   await page.getByRole("link", { name: "Go to log in" }).click();
