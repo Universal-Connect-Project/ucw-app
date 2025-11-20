@@ -23,9 +23,17 @@
                 "required": ["jobTypes", "userId", "targetOrigin"],
                 "properties": {
                   "jobTypes": {
-                    "type": "string",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
                     "description": "The types of jobs to be performed",
-                    "example": "accountNumber,accountOwner,transactions,transactionHistory"
+                    "example": [
+                      "accountNumber",
+                      "accountOwner",
+                      "transactions",
+                      "transactionHistory"
+                    ]
                   },
                   "userId": {
                     "type": "string",
