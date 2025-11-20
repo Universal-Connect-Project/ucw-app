@@ -227,4 +227,92 @@ describe("AggregatorAdapterBase", () => {
       ).rejects.toThrow("Connection creation failed");
     });
   });
+
+  describe("answerChallenge", () => {
+    const mockChallenges = [
+      {
+        id: "challenge1",
+        type: 0,
+        question: "What is your favorite color?",
+        response: "Blue",
+      },
+      {
+        id: "challenge2",
+        type: 1,
+        question: "Enter the code",
+        response: "123456",
+      },
+    ];
+
+    beforeAll(async () => {
+      await aggregatorAdapterBase.init();
+    });
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+      aggregatorAdapterBase.context.current_job_id = "testJobId";
+      aggregatorAdapterBase.context.connectionId = "contextConnectionId";
+      aggregatorAdapterBase.context.userId = "test_user_id";
+    });
+
+    it("successfully answers challenges with provided connectionId and current_job_id from context", async () => {
+      const mockAnswerChallenge = jest.fn().mockResolvedValue(true);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (aggregatorAdapterBase as any).aggregatorAdapter = {
+        AnswerChallenge: mockAnswerChallenge,
+      };
+
+      const result = await aggregatorAdapterBase.answerChallenge(
+        "providedConnectionId",
+        mockChallenges,
+      );
+
+      expect(result).toBe(true);
+      expect(mockAnswerChallenge).toHaveBeenCalledWith(
+        {
+          connectionId: "providedConnectionId",
+          challenges: mockChallenges,
+        },
+        "testJobId",
+        "test_user_id",
+      );
+    });
+
+    it("uses context connectionId when connectionId is null", async () => {
+      const mockAnswerChallenge = jest.fn().mockResolvedValue(true);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (aggregatorAdapterBase as any).aggregatorAdapter = {
+        AnswerChallenge: mockAnswerChallenge,
+      };
+
+      await aggregatorAdapterBase.answerChallenge(null, mockChallenges);
+
+      expect(mockAnswerChallenge).toHaveBeenCalledWith(
+        {
+          connectionId: "contextConnectionId",
+          challenges: mockChallenges,
+        },
+        "testJobId",
+        "test_user_id",
+      );
+    });
+
+    it("propagates errors from aggregatorAdapter.AnswerChallenge", async () => {
+      const error = new Error("Failed to answer challenge");
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (aggregatorAdapterBase as any).aggregatorAdapter = {
+        AnswerChallenge: jest.fn().mockRejectedValue(error),
+      };
+
+      await expect(
+        aggregatorAdapterBase.answerChallenge(
+          "testConnectionId",
+          mockChallenges,
+        ),
+      ).rejects.toThrow("Failed to answer challenge");
+    });
+  });
 });
