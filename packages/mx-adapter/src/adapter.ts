@@ -190,7 +190,7 @@ export class MxAdapter implements WidgetAdapter {
       ) {
         return this.UpdateConnection(
           {
-            id: memberGuid,
+            connectionId: memberGuid,
             credentials: newMemberProperties.member.credentials,
           },
           userId,
@@ -217,7 +217,7 @@ export class MxAdapter implements WidgetAdapter {
     request: CreateConnectionRequest,
     userId?: string,
   ): Promise<Connection> {
-    const connectionId = request.id;
+    const connectionId = request.connectionId;
 
     if (connectionId && userId) {
       // Refreshing non-oauth connections don't go through `CreateConnection`
@@ -276,17 +276,21 @@ export class MxAdapter implements WidgetAdapter {
     request: UpdateConnectionRequest,
     userId?: string,
   ): Promise<Connection> {
-    const ret = await this.apiClient.updateMember(request.id || "", userId, {
-      member: {
-        credentials: request.credentials?.map(
-          (credential) =>
-            ({
-              guid: credential.guid || credential.id,
-              value: credential.value,
-            }) satisfies CredentialRequest,
-        ),
+    const ret = await this.apiClient.updateMember(
+      request.connectionId || "",
+      userId,
+      {
+        member: {
+          credentials: request.credentials?.map(
+            (credential) =>
+              ({
+                guid: credential.guid || credential.id,
+                value: credential.value,
+              }) satisfies CredentialRequest,
+          ),
+        },
       },
-    });
+    );
     const member = ret.data.member;
     return fromMxMember(member || {}, this.aggregator);
   }
@@ -295,17 +299,21 @@ export class MxAdapter implements WidgetAdapter {
     connectionId: string,
     userId?: string,
   ): Promise<Connection> {
-    const res = await this.apiClient.readMember(connectionId, userId || "");
-    const member = res.data.member;
-    return {
-      id: member?.guid || "",
-      institution_code: member?.institution_code,
-      is_oauth: member?.is_oauth,
-      is_being_aggregated: member?.is_being_aggregated,
-      oauth_window_uri: member?.oauth_window_uri,
-      aggregator: this.aggregator,
-      userId: userId,
-    };
+    try {
+      const res = await this.apiClient.readMember(connectionId, userId || "");
+      const member = res.data.member;
+      return {
+        id: member?.guid || "",
+        institution_code: member?.institution_code,
+        is_oauth: member?.is_oauth,
+        is_being_aggregated: member?.is_being_aggregated,
+        oauth_window_uri: member?.oauth_window_uri,
+        aggregator: this.aggregator,
+        userId: userId,
+      };
+    } catch {
+      return null;
+    }
   }
 
   async GetConnectionStatus(
@@ -376,14 +384,18 @@ export class MxAdapter implements WidgetAdapter {
     jobId: string,
     userId?: string,
   ): Promise<boolean> {
-    await this.apiClient.resumeAggregation(request.id || "", userId || "", {
-      member: {
-        challenges: request.challenges?.map((item, idx) => ({
-          guid: item.id ?? `${idx}`,
-          value: item.response as string,
-        })),
+    await this.apiClient.resumeAggregation(
+      request.connectionId || "",
+      userId || "",
+      {
+        member: {
+          challenges: request.challenges?.map((item, idx) => ({
+            guid: item.id ?? `${idx}`,
+            value: item.response as string,
+          })),
+        },
       },
-    });
+    );
     return true;
   }
 

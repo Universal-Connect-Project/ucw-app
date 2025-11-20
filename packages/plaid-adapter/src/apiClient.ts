@@ -9,6 +9,7 @@ interface CreateGetOauthUrlParams {
   webhookHostUrl: string;
   jobTypes: ComboJobTypes[];
   state: string;
+  accessToken?: string;
 }
 
 interface PlaidToken {
@@ -61,6 +62,7 @@ export async function createPlaidLinkToken({
   webhookHostUrl,
   jobTypes,
   state,
+  accessToken,
 }: CreateGetOauthUrlParams): Promise<PlaidToken> {
   const basePath = sandbox ? PLAID_BASE_PATH : PLAID_BASE_PATH_PROD;
   const aggregator = sandbox ? "plaid_sandbox" : "plaid";
@@ -77,6 +79,7 @@ export async function createPlaidLinkToken({
     },
     webhook,
     products: [],
+    ...(accessToken && { access_token: accessToken }),
     hosted_link: {
       completion_redirect_uri,
     },

@@ -1,7 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { ComboJobTypes } from "@repo/utils";
-import { createWidgetUrl } from "@repo/utils-e2e/playwright";
-import { createConnectedPromise, testDataEndpoints } from "./utils";
+import { makeAConnection, testDataEndpoints } from "./utils";
 
 test("connects to plaid's First Platypus Bank and gets data", async ({
   page,
@@ -11,68 +10,25 @@ test("connects to plaid's First Platypus Bank and gets data", async ({
 
   const userId = crypto.randomUUID();
 
-  const widgetUrl = await createWidgetUrl(request, {
+  const { connectionId, aggregator } = await makeAConnection({
     jobTypes: [
       ComboJobTypes.ACCOUNT_NUMBER,
       ComboJobTypes.ACCOUNT_OWNER,
       ComboJobTypes.TRANSACTIONS,
     ],
-    userId,
-  });
-
-  await page.goto(widgetUrl);
-
-  await page.getByPlaceholder("Search").fill("Plaid Bank");
-
-  await page.getByLabel("Add account with Plaid Bank").click();
-
-  const popupPromise = page.waitForEvent("popup");
-  await page.getByRole("link", { name: "Go to log in" }).click();
-
-  const connectedPromise = createConnectedPromise({
     page,
     userId,
+    request,
     expect,
-    timeoutMs: 30000,
-  });
-
-  await page.evaluate(`
-      window.addEventListener('message', (event) => {
-        const message = event.data
-        console.log({message})
-    })
-  `);
-
-  const authorizeTab = await popupPromise;
-  const frame = authorizeTab.frameLocator("iframe[title='Plaid Link']");
-  await frame.getByText("Continue as guest").click();
-
-  await frame.locator("input[id='search-input-input']").fill("First Platypus");
-  await frame.getByLabel("First Platypus Bank").click();
-  // have to click again because there are multiple options
-  await frame
-    .getByRole("button", { name: "First Platypus Bank", exact: true })
-    .click();
-
-  await frame
-    .locator("input[type='text']:not([name='query'])")
-    .fill("user_good");
-  await frame.locator("input[type='password']").fill("pass_good");
-  await frame.locator("button[type='submit']").click();
-
-  await frame.getByText("Continue").click({ timeout: 60000 });
-  await frame.getByText("Finish without saving").click({ timeout: 120000 });
-
-  const connectionId = await connectedPromise;
-  await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
-    timeout: 120000,
+    institutionSearchText: "Plaid Bank",
+    institutionName: "First Platypus Bank",
   });
 
   await testDataEndpoints({
     request,
     userId,
-    connectionId: connectionId!,
-    aggregator: "plaid_sandbox",
+    connectionId,
+    aggregator,
     expect,
   });
 

@@ -81,7 +81,7 @@ export class FinicityAdapter implements WidgetAdapter {
     userId: string,
   ): Promise<Connection | undefined> {
     const connectSessionId = request.performanceSessionId;
-    const connectionId = request.id;
+    const connectionId = request.connectionId;
     let oauthWindowUri: string;
     if (connectionId) {
       oauthWindowUri = await this.apiClient.generateConnectFixUrl(

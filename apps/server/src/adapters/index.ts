@@ -92,7 +92,7 @@ export class AggregatorAdapterBase {
   async answerChallenge(connectionId: string, challenges: Challenge[]) {
     return await this.aggregatorAdapter.AnswerChallenge(
       {
-        id: connectionId ?? this.context.connectionId,
+        connectionId: connectionId ?? this.context.connectionId,
         challenges,
       },
       this.context.current_job_id,

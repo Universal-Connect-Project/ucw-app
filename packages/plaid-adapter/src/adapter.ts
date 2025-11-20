@@ -80,6 +80,7 @@ export class PlaidAdapter implements WidgetAdapter {
     userId: string,
   ): Promise<Connection | undefined> {
     const connectSessionId = request.performanceSessionId;
+    const connectionId = request.connectionId;
     const tokenObj = await createPlaidLinkToken({
       sandbox: this.sandbox,
       clientName: this.credentials.clientName,
@@ -89,6 +90,7 @@ export class PlaidAdapter implements WidgetAdapter {
       webhookHostUrl: this.getWebhookHostUrl(),
       jobTypes: request.jobTypes,
       state: connectSessionId,
+      accessToken: connectionId,
     });
     const cacheObj = {
       id: connectSessionId,
@@ -141,6 +143,9 @@ export class PlaidAdapter implements WidgetAdapter {
     _jobId: string,
   ): Promise<Connection> {
     const connection = await this.cacheClient.get(connectionId);
+    if (!connection) {
+      return null;
+    }
     if (connection.status === ConnectionStatus.CREATED) {
       connection.status = ConnectionStatus.PENDING;
     }
