@@ -142,6 +142,64 @@ describe("plaid aggregator", () => {
 
       expect(connectionStatus.status).toEqual(ConnectionStatus.PENDING);
     });
+
+    it("creates a connection with existing connectionId for refresh flow", async () => {
+      const existingConnectionId = "existing-access-token-123";
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let capturedRequestBody: any = null;
+      server.use(
+        http.post(
+          `${PLAID_BASE_PATH_PROD}/link/token/create`,
+          async ({ request }) => {
+            capturedRequestBody = await request.json();
+            return HttpResponse.json({
+              link_token: "link-prod-test-token",
+              expiration: new Date().toISOString(),
+              request_id: "test-request-id",
+              hosted_link_url: PLAID_BASE_PATH_PROD,
+            });
+          },
+        ),
+      );
+
+      const connection = await plaidAdapter.CreateConnection(
+        {
+          ...baseConnectionRequest,
+          is_oauth: true,
+          connectionId: existingConnectionId,
+        },
+        testUserId,
+      );
+      const connectionId = connection.id;
+
+      // Verify the access_token was passed to Plaid API
+      expect(capturedRequestBody).not.toBeNull();
+      expect(capturedRequestBody?.access_token).toBe(existingConnectionId);
+
+      const expectedConnectionObj = {
+        id: connectionId,
+        institution_code: "testInstitutionId",
+        is_oauth: true,
+        oauth_window_uri: PLAID_BASE_PATH_PROD,
+        aggregator: "plaid",
+        credentials: [],
+        status: ConnectionStatus.CREATED,
+        userId: testUserId,
+      };
+
+      expect(connection).toEqual(expectedConnectionObj);
+    });
+  });
+
+  describe("GetConnectionStatus when connection does not exist", () => {
+    it("returns null", async () => {
+      const status = await plaidAdapter.GetConnectionStatus(
+        "non-existent-connection-id",
+        "",
+      );
+      expect(status).toBeNull();
+    });
   });
 
   describe("ResolveUserId", () => {

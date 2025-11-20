@@ -213,7 +213,7 @@ describe("finicity aggregator", () => {
       const connectionId = "testConnectionId";
       const institutionId = "testInstitutionId";
       const request = {
-        id: connectionId,
+        connectionId,
         institution_code: "junk",
         credentials: [],
         institutionId,

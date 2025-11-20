@@ -1,4 +1,6 @@
-import type { Expect, Page } from "@playwright/test";
+import type { APIRequestContext, Expect, Page } from "@playwright/test";
+import { ComboJobTypes } from "@repo/utils";
+import { createWidgetUrl } from "@repo/utils-e2e/playwright";
 import {
   AccountCategory,
   AccountStatus,
@@ -268,14 +270,19 @@ interface CreateConnectedPromiseParams {
 
 /**
  * Creates a promise that resolves when the Plaid connection is successful
- * and returns the connectionId. Includes proper cleanup and error handling.
+ * and returns the full metadata. Includes proper cleanup and error handling.
  */
 export function createConnectedPromise({
   page,
   userId,
   expect,
   timeoutMs = 30000,
-}: CreateConnectedPromiseParams): Promise<string> {
+}: CreateConnectedPromiseParams): Promise<{
+  connectionId: string;
+  aggregator: string;
+  ucpInstitutionId: string;
+  aggregatorUserId: string;
+}> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(
       () =>
@@ -293,14 +300,24 @@ export function createConnectedPromise({
           clearTimeout(timer);
           page.off("console", messageHandler);
 
-          const connectionId = obj.metadata.connectionId;
+          const {
+            connectionId,
+            aggregator,
+            ucpInstitutionId,
+            aggregatorUserId,
+          } = obj.metadata;
 
-          expect(obj.metadata.aggregatorUserId).toEqual(userId);
+          expect(aggregatorUserId).toEqual(userId);
           expect(obj.metadata.member_guid).toBeUndefined();
           expect(connectionId).toContain("access-sandbox");
-          expect(obj.metadata.aggregator).toEqual("plaid_sandbox");
+          expect(aggregator).toEqual("plaid_sandbox");
 
-          resolve(connectionId);
+          resolve({
+            connectionId,
+            aggregator,
+            ucpInstitutionId,
+            aggregatorUserId,
+          });
         }
       } catch (error) {
         // Ignore JSON parsing errors for non-relevant console messages
@@ -312,4 +329,99 @@ export function createConnectedPromise({
       page.on("console", messageHandler);
     }, 100);
   });
+}
+
+interface MakeAConnectionParams {
+  jobTypes: ComboJobTypes[];
+  page: Page;
+  userId: string;
+  request: APIRequestContext;
+  expect: Expect;
+  institutionSearchText: string;
+  institutionName: string;
+  username?: string;
+  password?: string;
+}
+
+/**
+ * Helper function to connect to a Plaid institution through the widget flow.
+ * Returns connection metadata including connectionId, aggregator, and ucpInstitutionId.
+ */
+export async function makeAConnection({
+  jobTypes,
+  page,
+  userId,
+  request,
+  expect,
+  institutionSearchText,
+  institutionName,
+  username = "user_good",
+  password = "pass_good",
+}: MakeAConnectionParams): Promise<{
+  aggregator: string;
+  connectionId: string;
+  ucpInstitutionId: string;
+  userId: string;
+}> {
+  const widgetUrl = await createWidgetUrl(request, {
+    jobTypes,
+    userId,
+  });
+
+  await page.goto(widgetUrl);
+
+  page.evaluate(`
+    window.addEventListener('message', (event) => {
+      const message = event.data;
+      console.log({ message });
+    });
+  `);
+
+  await page.getByPlaceholder("Search").fill(institutionSearchText);
+  await page.getByLabel(`Add account with ${institutionName}`).click();
+
+  const popupPromise = page.waitForEvent("popup");
+  await page.getByRole("link", { name: "Go to log in" }).click();
+
+  const connectedPromise = createConnectedPromise({
+    page,
+    userId,
+    expect,
+    timeoutMs: 50000,
+  });
+
+  const authorizeTab = await popupPromise;
+  const frame = authorizeTab.frameLocator("iframe[title='Plaid Link']");
+  await frame.getByText("Continue as guest").click();
+
+  await frame.locator("input[id='search-input-input']").fill(institutionName);
+  await frame.getByLabel(institutionName).click();
+
+  // Some institutions have multiple options and require clicking the exact match button
+  try {
+    await frame
+      .getByRole("button", { name: institutionName, exact: true })
+      .click({ timeout: 2000 });
+  } catch {
+    // Button doesn't exist, which is fine - continue with login
+  }
+
+  await frame.locator("input[type='text']:not([name='query'])").fill(username);
+  await frame.locator("input[type='password']").fill(password);
+  await frame.locator("button[type='submit']").click();
+
+  await frame.getByText("Continue").click({ timeout: 60000 });
+  await expect(frame.getByText("Finish without saving")).toBeEnabled({
+    timeout: 120000,
+  });
+  await frame
+    .getByText("Finish without saving", { exact: false })
+    .click({ timeout: 10000 });
+
+  const { connectionId, aggregator, ucpInstitutionId } = await connectedPromise;
+  await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
+    timeout: 200000,
+  });
+
+  return { aggregator, connectionId, ucpInstitutionId, userId };
 }

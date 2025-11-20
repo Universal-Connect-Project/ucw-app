@@ -8,6 +8,7 @@ import { http, HttpResponse } from "msw";
 import { MxAdapter } from "./adapter";
 import {
   ANSWER_CHALLENGE_PATH,
+  CONNECTION_BY_ID_PATH,
   CREATE_MEMBER_PATH,
   CREATE_USER_PATH,
   DELETE_CONNECTION_PATH,
@@ -319,7 +320,7 @@ describe("mx aggregator", () => {
             {
               ...existingConnectionRequest,
               is_oauth: true,
-              id: "testConnectionId",
+              connectionId: "testConnectionId",
               institutionId: oauthMemberdata.member.institution_code,
             },
             userId,
@@ -481,7 +482,7 @@ describe("mx aggregator", () => {
 
         const member = await mxAdapter.UpdateConnection(
           {
-            id: "updateConnectionId",
+            connectionId: "updateConnectionId",
             job_type: "testJobType",
             credentials: [testCredential],
             challenges: [testChallenge],
@@ -533,6 +534,21 @@ describe("mx aggregator", () => {
           aggregator: "mx",
           userId: testUserId,
         });
+      });
+
+      it("returns null when readMember fails", async () => {
+        server.use(
+          http.get(CONNECTION_BY_ID_PATH, () => {
+            return new HttpResponse("Not Found", { status: 404 });
+          }),
+        );
+
+        const member = await mxAdapter.GetConnectionById(
+          "nonexistentConnectionId",
+          "userId",
+        );
+
+        expect(member).toBeNull();
       });
     });
 
@@ -728,7 +744,7 @@ describe("mx aggregator", () => {
         expect(
           await mxAdapter.AnswerChallenge(
             {
-              id: "requestId",
+              connectionId: "requestId",
               job_type: "auth",
               credentials: [],
               challenges: [challenge],

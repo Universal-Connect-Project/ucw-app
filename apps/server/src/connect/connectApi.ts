@@ -197,7 +197,7 @@ export class ConnectApi extends AggregatorAdapterBase {
       }
 
       const connection = await this.createConnection({
-        id: memberData.guid,
+        connectionId: memberData.guid,
         institutionId: memberData.institution_guid,
         is_oauth: isOauth,
         skip_aggregation: (memberData.skip_aggregation ?? false) && isOauth,
@@ -269,7 +269,7 @@ export class ConnectApi extends AggregatorAdapterBase {
         setLastUiUpdateTimestamp(this.context.performanceSessionId);
       const connection = await this.updateConnection({
         jobTypes: this.context.jobTypes,
-        id: member.guid,
+        connectionId: member.guid,
         credentials: member.credentials?.map((c) => ({
           id: c.guid,
           value: c.value,
@@ -282,6 +282,9 @@ export class ConnectApi extends AggregatorAdapterBase {
   async loadMembers(): Promise<Member[]> {
     if (this.context.connectionId != null && this.context.connectionId !== "") {
       const focusedMember = await this.getConnection(this.context.connectionId);
+      if (focusedMember == null) {
+        return [];
+      }
       return [mapConnection(focusedMember)];
     }
     return [];

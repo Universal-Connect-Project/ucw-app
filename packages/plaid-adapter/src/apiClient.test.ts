@@ -134,6 +134,20 @@ describe("createPlaidLinkToken", () => {
     });
   });
 
+  it("includes access_token if accessToken is present", async () => {
+    const result = await createPlaidLinkToken({
+      ...baseParams,
+      accessToken: "test-access-token",
+    });
+
+    expect(result.link_token).toMatch(/^link-sandbox-/);
+    expect(result.hosted_link_url).toBe(PLAID_BASE_PATH);
+    expect(receivedBody).toEqual({
+      ...expectedPlaidRequestBody,
+      access_token: "test-access-token",
+    });
+  });
+
   it("includes auth if ACCOUNT_NUMBER is present", async () => {
     const result = await createPlaidLinkToken({
       ...baseParams,
