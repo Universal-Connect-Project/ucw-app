@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.0.0]
 
+See the [migration guide](MIGRATION_V1_TO_V2.md) if migrating from 1.x to 2.x
+
 ### Added
 
 - Plaid Transaction Data endpoint
