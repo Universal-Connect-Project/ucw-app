@@ -71,7 +71,6 @@ jobs:
           echo NGROK_AUTHTOKEN=${{ secrets.NGROK_AUTHTOKEN }} >> ${ENV_FILE_PATH}
           echo UCP_CLIENT_SECRET=${{ secrets.UCP_CLIENT_SECRET }} >> ${ENV_FILE_PATH}
           echo UCP_CLIENT_ID=${{ secrets.UCP_CLIENT_ID }} >> ${ENV_FILE_PATH}
-          echo ENABLE_INSECURE_PLAID_ADAPTER=true >> ${ENV_FILE_PATH}
 
           cat ${ENV_FILE_PATH}
 

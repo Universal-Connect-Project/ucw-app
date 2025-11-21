@@ -70,14 +70,6 @@
                     "default": true,
                     "description": "This parameter is only supported by Sophtron. When doing a verification job you can pass this parameter as false if you'd like to skip the step that selects an account. For this same behavior using MX you'll need to reach out to MX support to change a setting."
                   },
-                  "token": {
-                    "type": "string",
-                    "description": "A one time use token from the token endpoint. If you're using the built in authentication logic, then you'll need this to be able to put the widget in an iframe."
-                  },
-                  "connectionToken": {
-                    "type": "string",
-                    "description": "A one time use token for the connection id."
-                  },
                   "aggregatorOverride": {
                     "type": "string",
                     "enum": ["mx", "sophtron", "finicity"],
