@@ -13,6 +13,7 @@ export const getPlaidAdapterMapObject = (dependencies: AdapterDependencies) => {
     plaid: {
       testAdapterId: "plaid_sandbox",
       dataAdapter: createPlaidProdDataAdapter(dependencies),
+      userless: true,
       createWidgetAdapter: () =>
         new PlaidAdapter({
           sandbox: false,
@@ -21,6 +22,7 @@ export const getPlaidAdapterMapObject = (dependencies: AdapterDependencies) => {
     },
     plaid_sandbox: {
       dataAdapter: createPlaidSandboxDataAdapter(dependencies),
+      userless: true,
       createWidgetAdapter: () =>
         new PlaidAdapter({
           sandbox: true,

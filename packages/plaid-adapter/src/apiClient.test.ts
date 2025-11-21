@@ -6,6 +6,7 @@ import {
   getAuth,
   getIdentity,
   getItem,
+  getTransactions,
   PLAID_BASE_PATH,
   PLAID_BASE_PATH_PROD,
   publicTokenExchange,
@@ -17,6 +18,7 @@ import {
   authResponse,
   accountsResponse,
   identityResponse,
+  plaidTransactionsResponseExample,
 } from "@repo/utils-dev-dependency/plaid/testData";
 
 describe("createPlaidLinkToken", () => {
@@ -129,6 +131,20 @@ describe("createPlaidLinkToken", () => {
     expect(receivedBody).toEqual({
       ...expectedPlaidRequestBody,
       products: ["identity"],
+    });
+  });
+
+  it("includes access_token if accessToken is present", async () => {
+    const result = await createPlaidLinkToken({
+      ...baseParams,
+      accessToken: "test-access-token",
+    });
+
+    expect(result.link_token).toMatch(/^link-sandbox-/);
+    expect(result.hosted_link_url).toBe(PLAID_BASE_PATH);
+    expect(receivedBody).toEqual({
+      ...expectedPlaidRequestBody,
+      access_token: "test-access-token",
     });
   });
 
@@ -739,6 +755,173 @@ describe("getIdentity", () => {
       }),
     ).rejects.toThrow(
       "Response was successful but contained invalid JSON. Error getting identity",
+    );
+  });
+});
+
+describe("getTransactions", () => {
+  const clientId = "test-client-id";
+  const secret = "test-secret";
+  const accessToken = "access-sample-token";
+  const startDate = "2025-10-01";
+  const endDate = "2025-11-30";
+  const accountIds = ["account-id-1", "account-id-2"];
+
+  it("gets transactions data with expected request body in sandbox env", async () => {
+    const expectedRequestBody = {
+      client_id: clientId,
+      secret,
+      access_token: accessToken,
+      start_date: startDate,
+      end_date: endDate,
+      options: {
+        count: 500,
+        account_ids: accountIds,
+      },
+    };
+    let receivedBody: unknown;
+    let hitSandbox: boolean;
+
+    server.use(
+      http.post(`${PLAID_BASE_PATH}/transactions/get`, async ({ request }) => {
+        hitSandbox = true;
+        receivedBody = await request.json();
+        return HttpResponse.json(plaidTransactionsResponseExample);
+      }),
+    );
+
+    const result = await getTransactions({
+      accessToken,
+      clientId,
+      secret,
+      sandbox: true,
+      startDate,
+      endDate,
+      accountIds,
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.data).toEqual(plaidTransactionsResponseExample);
+    expect(result.data.transactions).toHaveLength(7);
+    expect(receivedBody).toEqual(expectedRequestBody);
+    expect(hitSandbox).toBe(true);
+  });
+
+  it("gets transactions data in production env", async () => {
+    let hitProductionEnv: boolean;
+
+    server.use(
+      http.post(`${PLAID_BASE_PATH_PROD}/transactions/get`, async () => {
+        hitProductionEnv = true;
+        return HttpResponse.json(plaidTransactionsResponseExample);
+      }),
+    );
+
+    const result = await getTransactions({
+      accessToken,
+      clientId,
+      secret,
+      sandbox: false,
+      startDate,
+      endDate,
+      accountIds,
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.data).toEqual(plaidTransactionsResponseExample);
+    expect(hitProductionEnv).toBe(true);
+  });
+
+  it("throws an error if response is not ok and includes error message", async () => {
+    server.use(
+      http.post(`${PLAID_BASE_PATH}/transactions/get`, () =>
+        HttpResponse.json(
+          { error_message: "Invalid access token for transactions!" },
+          { status: 400 },
+        ),
+      ),
+    );
+
+    await expect(
+      getTransactions({
+        accessToken,
+        clientId,
+        secret,
+        sandbox: true,
+        startDate,
+        endDate,
+      }),
+    ).rejects.toThrow("Invalid access token for transactions!");
+  });
+
+  it("throws a generic error if response is not ok and no error message is present", async () => {
+    server.use(
+      http.post(
+        `${PLAID_BASE_PATH}/transactions/get`,
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+
+    await expect(
+      getTransactions({
+        accessToken,
+        clientId,
+        secret,
+        sandbox: true,
+        startDate,
+        endDate,
+      }),
+    ).rejects.toThrow("Error getting transactions");
+  });
+
+  it("handles empty transactions array", async () => {
+    server.use(
+      http.post(`${PLAID_BASE_PATH}/transactions/get`, () =>
+        HttpResponse.json({
+          ...plaidTransactionsResponseExample,
+          transactions: [],
+          total_transactions: 0,
+        }),
+      ),
+    );
+
+    const result = await getTransactions({
+      accessToken,
+      clientId,
+      secret,
+      sandbox: true,
+      startDate,
+      endDate,
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.data.transactions).toEqual([]);
+    expect(result.data.total_transactions).toBe(0);
+  });
+
+  it("returns error when response contains invalid JSON", async () => {
+    server.use(
+      http.post(
+        `${PLAID_BASE_PATH}/transactions/get`,
+        () =>
+          new HttpResponse("invalid json content", {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }),
+      ),
+    );
+
+    await expect(
+      getTransactions({
+        accessToken,
+        clientId,
+        secret,
+        sandbox: true,
+        startDate,
+        endDate,
+      }),
+    ).rejects.toThrow(
+      "Response was successful but contained invalid JSON. Error getting transactions",
     );
   });
 });

@@ -4,6 +4,7 @@ import { ComboJobTypes } from "@repo/utils";
 import {
   clearSearch,
   clickContinue,
+  createWidgetUrl,
   enterMxCredentials,
   enterSophtronCredentials,
   expectConnectionSuccess,
@@ -17,14 +18,19 @@ describe("query parameters", () => {
   it("skips straight to the institution if an institutionId is provided in the query parameters, hides the back button, and completes the connection", () => {
     const userId = Cypress.env("userId");
 
-    visitWithPostMessageSpy(
-      `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&institutionId=${MX_BANK_UCP_INSTITUTION_ID}&userId=${userId}`,
-    ).then(() => {
-      enterMxCredentials();
+    createWidgetUrl({
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
+      institutionId: MX_BANK_UCP_INSTITUTION_ID,
+      userId,
+      targetOrigin: "http://localhost:8080",
+    }).then((widgetUrl) => {
+      visitWithPostMessageSpy(widgetUrl).then(() => {
+        enterMxCredentials();
 
-      clickContinue();
+        clickContinue();
 
-      expectConnectionSuccess();
+        expectConnectionSuccess();
+      });
     });
   });
 

@@ -1,46 +1,9 @@
 import { auth, requiredScopes } from "express-oauth2-jwt-bearer";
-import he from "he";
 import { getConfig } from "./config";
-import type {
-  Request,
-  RequestHandler,
-  Response,
-  Express,
-  NextFunction,
-} from "express";
-import { del, get, set } from "./services/storageClient/redis";
-import Joi from "joi";
+import type { Request, Response, Express, NextFunction } from "express";
+import { get, set } from "./services/storageClient/redis";
 
 export const tokenCookieName = "authorizationToken";
-
-export const getTokenHandler = async (req: Request, res: Response) => {
-  const schema = Joi.object({
-    userId: Joi.string().required(),
-  });
-
-  const { error } = schema.validate(req.query);
-
-  if (error) {
-    res.status(400);
-    res.send(he.encode(error.details[0].message));
-
-    return;
-  }
-
-  const authorizationHeaderToken = req.headers.authorization?.split(
-    " ",
-  )?.[1] as string;
-
-  const uuid = crypto.randomUUID();
-
-  const redisKey = `${req.query.userId}-${uuid}`;
-
-  await set(redisKey, authorizationHeaderToken, { EX: 60 * 5 });
-
-  res.json({
-    token: uuid,
-  });
-};
 
 export const tokenAuthenticationMiddleware = async (
   req: Request,
@@ -48,26 +11,24 @@ export const tokenAuthenticationMiddleware = async (
   next: NextFunction,
 ) => {
   const token = req.query?.token as string;
-  const userId = req.query?.userId as string;
-
-  const redisKey = `${userId}-${token}`;
 
   if (token) {
-    const authorizationJWT = await get(redisKey);
-    const config = getConfig();
+    const redisKey = `token-${token}`;
+    const { authorizationJwt, ...widgetParams } = (await get(redisKey)) || {};
 
-    if (!authorizationJWT) {
+    if (!authorizationJwt) {
       res.send("token invalid or expired");
       res.status(401);
 
       return;
     }
 
-    await del(redisKey);
+    await set(redisKey, widgetParams);
 
-    req.headers.authorization = `Bearer ${authorizationJWT}`;
+    const config = getConfig();
 
-    res.cookie(tokenCookieName, authorizationJWT, {
+    req.headers.authorization = `Bearer ${authorizationJwt}`;
+    res.cookie(tokenCookieName, authorizationJwt, {
       httpOnly: true,
       sameSite: config.AUTHORIZATION_TOKEN_COOKIE_SAMESITE || "strict",
       secure: true,
@@ -118,8 +79,6 @@ const useAuthentication = (app: Express) => {
   if (config.AUTHENTICATION_SCOPES) {
     app.use(requiredScopes(config.AUTHENTICATION_SCOPES));
   }
-
-  app.get("/api/token", getTokenHandler as RequestHandler);
 };
 
 export default useAuthentication;

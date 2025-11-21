@@ -21,52 +21,19 @@
     }
   ],
   "paths": {
-    "/instrumentation/userId/{userId}": {
+    "/instrumentation/{token}": {
       "post": {
         "description": "This endpoint is called by the connect widget frontend and returns response headers that are saved for future requests from the connect widget",
         "parameters": [
           {
             "in": "path",
-            "name": "userId",
+            "name": "token",
             "required": true,
             "schema": {
               "type": "string"
             }
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "current_aggregator": {
-                    "type": "string"
-                  },
-                  "current_member_guid": {
-                    "type": "string"
-                  },
-                  "jobTypes": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "enum": [
-                        "accountNumber",
-                        "accountOwner",
-                        "transactions",
-                        "transactionHistory"
-                      ]
-                    }
-                  },
-                  "singleAccountSelect": {
-                    "type": "boolean"
-                  }
-                }
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Success",
@@ -81,6 +48,59 @@
                     "oauth_referral_source": "BROWSER",
                     "singleAccountSelect": true,
                     "updated": true
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "jobTypes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "accountNumber",
+                          "accountOwner",
+                          "transactions",
+                          "transactionHistory"
+                        ]
+                      }
+                    },
+                    "userId": {
+                      "type": "string"
+                    },
+                    "targetOrigin": {
+                      "type": "string"
+                    },
+                    "connectionId": {
+                      "type": "string"
+                    },
+                    "institutionId": {
+                      "type": "string"
+                    },
+                    "aggregator": {
+                      "type": "string"
+                    },
+                    "singleAccountSelect": {
+                      "type": "boolean"
+                    },
+                    "aggregatorOverride": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["userId", "targetOrigin", "jobTypes"],
+                  "example": {
+                    "jobTypes": ["transactions"],
+                    "userId": "testUserId",
+                    "targetOrigin": "http://localhost:8080",
+                    "connectionId": "testConnectionId",
+                    "institutionId": "testInstitutionId",
+                    "aggregator": "mx",
+                    "singleAccountSelect": true,
+                    "aggregatorOverride": "finicity"
                   }
                 }
               }

@@ -37,13 +37,13 @@ describe("context", () => {
       expect(res.context).toEqual(contextObject);
     });
 
-    it("sets the meta on send and calls the original send function", () => {
+    it("sets the meta on json and calls the original json function", () => {
       const req = {
         headers: {},
       } as any;
 
       const res = {
-        send: jest.fn(),
+        json: jest.fn(),
         set: jest.fn(),
       } as any;
 
@@ -52,11 +52,11 @@ describe("context", () => {
 
       expect(res.context).toEqual({});
 
-      res.send("1", "2");
+      res.json("1", "2");
 
       expect(res.set).toHaveBeenCalledWith("meta", JSON.stringify(res.context));
 
-      expect(res.send).toHaveBeenCalledWith("1", "2");
+      expect(res.json).toHaveBeenCalledWith("1", "2");
     });
   });
 });

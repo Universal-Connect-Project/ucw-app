@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import { ComboJobTypes, SOMETHING_WENT_WRONG_ERROR_TEXT } from "@repo/utils";
 import {
   createExpectPerformanceEvent,
+  createWidgetUrl,
   getAccessToken,
 } from "@repo/utils-e2e/playwright";
 import { MX_BANK_OAUTH_UCP_INSTITUTION_ID } from "../src/testInstitutions";
@@ -17,9 +18,12 @@ test("connects to mx bank with oAuth, tracks performance correctly, and does ref
 
   const accessToken = await getAccessToken(request);
 
-  await page.goto(
-    `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
-  );
+  const widgetUrl = await createWidgetUrl(request, {
+    jobTypes: [ComboJobTypes.TRANSACTIONS],
+    userId,
+  });
+
+  await page.goto(widgetUrl);
 
   page.evaluate(`
       window.addEventListener('message', (event) => {
@@ -73,9 +77,12 @@ test("connects to mx bank with oAuth, tracks performance correctly, and does ref
   });
 
   await authorizeTab.getByRole("button", { name: "Authorize" }).click();
-  await expect(
-    authorizeTab.getByText("Thank you for completing OAuth"),
-  ).toBeVisible();
+  if (!authorizeTab.isClosed()) {
+    await expect(
+      authorizeTab.getByText("Thank you for completing OAuth"),
+    ).toBeVisible({ timeout: 5000 });
+    await authorizeTab.waitForEvent("close", { timeout: 30000 });
+  }
 
   const connectedPromise = new Promise<void>((resolve, reject) => {
     const timer = setTimeout(() => reject("timed out"), 120000);
@@ -84,16 +91,23 @@ test("connects to mx bank with oAuth, tracks performance correctly, and does ref
       const obj = (await msg.args()[0].jsonValue())?.message;
       if (obj?.type === "connect/memberConnected") {
         clearTimeout(timer);
-        expect(obj.metadata.user_guid).not.toBeNull();
-        expect(obj.metadata.member_guid).not.toBeNull();
-        expect(obj.metadata.aggregator).toEqual("mx_int");
+        expect(obj.metadata.user_guid).toBeUndefined();
+        expect(obj.metadata.aggregatorUserId).not.toBeNull();
         expect(obj.metadata.connectionId).not.toBeNull();
+        expect(obj.metadata.member_guid).toBeUndefined();
+        expect(obj.metadata.aggregator).toEqual("mx_int");
 
-        const { member_guid, aggregator, ucpInstitutionId } = obj.metadata;
+        const { connectionId, aggregator, ucpInstitutionId } = obj.metadata;
 
-        await page.goto(
-          `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&aggregator=${aggregator}&institutionId=${ucpInstitutionId}&connectionId=${member_guid}`,
-        );
+        const refreshWidgetUrl = await createWidgetUrl(request, {
+          jobTypes: [ComboJobTypes.TRANSACTIONS],
+          userId,
+          aggregator,
+          institutionId: ucpInstitutionId,
+          connectionId,
+        });
+
+        await page.goto(refreshWidgetUrl);
 
         const popupPromise2 = page.waitForEvent("popup");
         await page.getByRole("link", { name: "Go to log in" }).click();
@@ -121,7 +135,7 @@ test("connects to mx bank with oAuth, tracks performance correctly, and does ref
   expect(performanceEvent.successMetric.isSuccess).toBe(true);
 
   await request.delete(
-    `http://localhost:8080/api/aggregator/mx_int/user/${userId}`,
+    `http://localhost:8080/api/user?userId=${userId}&aggregator=mx_int`,
   );
 });
 
@@ -135,9 +149,12 @@ test("results in a successful performance event even if you close the tab", asyn
 
   const accessToken = await getAccessToken(request);
 
-  await page.goto(
-    `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
-  );
+  const widgetUrl = await createWidgetUrl(request, {
+    jobTypes: [ComboJobTypes.TRANSACTIONS],
+    userId,
+  });
+
+  await page.goto(widgetUrl);
 
   page.evaluate(`
       window.addEventListener('message', (event) => {
@@ -204,20 +221,24 @@ test("results in a successful performance event even if you close the tab", asyn
   expect(isSuccess).toBe(true);
 
   await request.delete(
-    `http://localhost:8080/api/aggregator/mx_int/user/${userId}`,
+    `http://localhost:8080/api/user?userId=${userId}&aggregator=mx_int`,
   );
 });
 
 test("shows an error page if you deny an mx bank oauth connection", async ({
   page,
+  request,
 }) => {
   test.setTimeout(240000);
 
   const userId = crypto.randomUUID();
 
-  await page.goto(
-    `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
-  );
+  const widgetUrl = await createWidgetUrl(request, {
+    jobTypes: [ComboJobTypes.TRANSACTIONS],
+    userId,
+  });
+
+  await page.goto(widgetUrl);
 
   await page.getByPlaceholder("Search").fill("MX Bank (Oauth)");
 
@@ -237,6 +258,6 @@ test("shows an error page if you deny an mx bank oauth connection", async ({
 
   const apiRequest = page.context().request;
   await apiRequest.delete(
-    `http://localhost:8080/api/aggregator/mx_int/user/${userId}`,
+    `http://localhost:8080/api/user?userId=${userId}&aggregator=mx_int`,
   );
 });

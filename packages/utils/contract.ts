@@ -42,6 +42,7 @@ export type AdapterMap = {
   testAdapterId?: string;
   vcAdapter?: Function;
   createWidgetAdapter: () => WidgetAdapter;
+  userless?: boolean;
 };
 
 export interface Credential {
@@ -120,7 +121,7 @@ export enum ConnectionStatus {
 }
 
 export interface CreateConnectionRequest {
-  id?: string;
+  connectionId?: string;
   initial_job_type?: string;
   jobTypes?: ComboJobTypes[];
   background_aggregation_is_disabled?: boolean;
@@ -186,7 +187,7 @@ export interface Institutions {
 }
 
 export interface UpdateConnectionRequest {
-  id: string | undefined;
+  connectionId: string | undefined;
   job_type?: string;
   jobTypes?: ComboJobTypes[];
   credentials?: Credential[];

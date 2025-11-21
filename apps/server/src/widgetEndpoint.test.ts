@@ -1,239 +1,385 @@
 import type { Request, Response } from "express";
-import { widgetHandler } from "./widgetEndpoint";
+import {
+  createWidgetUrlHandler,
+  validateWidgetParams,
+  widgetHandler,
+} from "./widgetEndpoint";
 import { ComboJobTypes } from "@repo/utils";
-import { invalidAggregatorString } from "./utils/validators";
 import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
 import { nonTestAggregators } from "./adapterSetup";
-
-/* eslint-disable @typescript-eslint/unbound-method  */
+import { get, set } from "./services/storageClient/redis";
+import fs from "node:fs";
+import type { UUID } from "node:crypto";
 
 describe("server", () => {
+  describe("validateWidgetParams", () => {
+    it("is invalid if jobTypes is missing", () => {
+      const validation = validateWidgetParams({
+        userId: "testUserId",
+        targetOrigin: "https://example.com",
+      });
+
+      expect(validation.isValid).toBeFalsy();
+      expect(validation.error).toEqual("&#x22;jobTypes&#x22; is required");
+    });
+
+    it("is invalid if jobTypes is invalid", () => {
+      const validation = validateWidgetParams({
+        jobTypes: ["junk"],
+        userId: "testUserId",
+        targetOrigin: "https://example.com",
+      });
+
+      expect(validation.isValid).toBeFalsy();
+      expect(validation.error).toEqual(
+        "&#x22;jobTypes[0]&#x22; must be one of [accountNumber, accountOwner, transactions, transactionHistory]",
+      );
+    });
+
+    it("is invalid if userId is missing", () => {
+      const validation = validateWidgetParams({
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        targetOrigin: "https://example.com",
+      });
+
+      expect(validation.isValid).toBeFalsy();
+      expect(validation.error).toEqual("&#x22;userId&#x22; is required");
+    });
+
+    it("is invalid if aggregator is invalid", () => {
+      const validation = validateWidgetParams({
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        aggregator: "junk",
+        institutionId: "testInstitutionId",
+        connectionId: "testConnectionId",
+        userId: "testUserId",
+        targetOrigin: "https://example.com",
+      });
+
+      expect(validation.isValid).toBeFalsy();
+      expect(validation.error).toEqual(
+        "&#x22;aggregator&#x22; must be one of [akoya, akoya_sandbox, finicity, finicity_sandbox, mx, mx_int, sophtron, plaid, plaid_sandbox]",
+      );
+    });
+
+    it("is invalid if aggregator is provided with an institutionId and without a connectionId", () => {
+      const validation = validateWidgetParams({
+        institutionId: "testInstitutionId",
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        aggregator: MX_AGGREGATOR_STRING,
+        userId: "testUserId",
+        targetOrigin: "https://example.com",
+      });
+
+      expect(validation.isValid).toBeFalsy();
+      expect(validation.error).toEqual(
+        "aggregator missing required peer connectionId",
+      );
+    });
+
+    it("is invalid if aggregator is provided with a connectionId and without an institutionId", () => {
+      const validation = validateWidgetParams({
+        connectionId: "testConnectionId",
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        aggregator: MX_AGGREGATOR_STRING,
+        userId: "testUserId",
+        targetOrigin: "https://example.com",
+      });
+
+      expect(validation.isValid).toBeFalsy();
+      expect(validation.error).toEqual(
+        "aggregator missing required peer institutionId",
+      );
+    });
+
+    it("is invalid if connectionId is provided with an aggregator and without an institutionId", () => {
+      const validation = validateWidgetParams({
+        aggregator: MX_AGGREGATOR_STRING,
+        connectionId: "testConnectionId",
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        userId: "testUserId",
+        targetOrigin: "https://example.com",
+      });
+
+      expect(validation.isValid).toBeFalsy();
+      expect(validation.error).toEqual(
+        "aggregator missing required peer institutionId",
+      );
+    });
+
+    it("is invalid if connectionId is provided without an aggregator", () => {
+      const validation = validateWidgetParams({
+        connectionId: "testConnectionId",
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        institutionId: "testInstitutionId",
+        userId: "testUserId",
+        targetOrigin: "https://example.com",
+      });
+
+      expect(validation.isValid).toBeFalsy();
+      expect(validation.error).toEqual(
+        "&#x22;connectionId&#x22; missing required peer &#x22;aggregator&#x22;",
+      );
+    });
+
+    it("is invalid if aggregatorOverride is invalid", () => {
+      const validation = validateWidgetParams({
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        aggregatorOverride: "junk",
+        userId: "testUserId",
+        targetOrigin: "https://example.com",
+      });
+
+      expect(validation.isValid).toBeFalsy();
+      expect(validation.error).toEqual(
+        `&#x22;aggregatorOverride&#x22; must be one of [${nonTestAggregators.join(", ")}]`,
+      );
+    });
+
+    it("is invalid if singleAccountSelect isn't a bool", () => {
+      const validation = validateWidgetParams({
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        singleAccountSelect: "junk",
+        userId: "testUserId",
+        targetOrigin: "https://example.com",
+      });
+
+      expect(validation.isValid).toBeFalsy();
+      expect(validation.error).toEqual(
+        "&#x22;singleAccountSelect&#x22; must be a boolean",
+      );
+    });
+
+    it("is invalid if targetOrigin is missing", () => {
+      const validation = validateWidgetParams({
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        userId: "testUserId",
+      });
+
+      expect(validation.isValid).toBeFalsy();
+      expect(validation.error).toEqual("&#x22;targetOrigin&#x22; is required");
+    });
+
+    it("is invalid if targetOrigin is empty string", () => {
+      const validation = validateWidgetParams({
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        userId: "testUserId",
+        targetOrigin: "",
+      });
+
+      expect(validation.isValid).toBeFalsy();
+      expect(validation.error).toEqual(
+        "&#x22;targetOrigin&#x22; is not allowed to be empty",
+      );
+    });
+
+    it("is invalid if targetOrigin is not a valid URL", () => {
+      const validation = validateWidgetParams({
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        userId: "testUserId",
+        targetOrigin: "not-a-valid-url",
+      });
+
+      expect(validation.isValid).toBeFalsy();
+      expect(validation.error).toEqual(
+        "&#x22;targetOrigin&#x22; must be a valid uri with a scheme matching the http|https pattern",
+      );
+    });
+  });
+
   describe("widgetHandler", () => {
-    describe("validation", () => {
-      it("responds with a 400 if jobTypes is missing", () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn(),
-        } as unknown as Response;
+    it("returns HTML when a valid token is provided", async () => {
+      jest
+        .spyOn(fs, "readFileSync")
+        .mockReturnValueOnce("<html><body>Mock HTML content</body></html>");
 
-        widgetHandler(
-          {
-            query: {
-              userId: "testUserId",
-            },
-          } as unknown as Request,
-          res,
-        );
+      const token = "validToken123";
+      const widgetParams = {
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        userId: "testUserId",
+        targetOrigin: "https://example.com",
+      };
 
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith(
-          "&#x22;jobTypes&#x22; is required",
-        );
+      await set(`token-${token}`, widgetParams);
+
+      const res = {
+        send: jest.fn(),
+      } as unknown as Response;
+
+      const req = {
+        query: {
+          token,
+        },
+        context: {},
+      } as unknown as Request;
+
+      await widgetHandler(req, res);
+
+      expect(res.send).toHaveBeenCalledWith(
+        "<html><body>Mock HTML content</body></html>",
+      );
+    });
+
+    it("responds with a 400 if token is missing", async () => {
+      const res = {
+        send: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+      } as unknown as Response;
+
+      await widgetHandler(
+        {
+          query: {},
+          context: {},
+        } as unknown as Request,
+        res,
+      );
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith("A valid token is required");
+    });
+
+    it("responds with a 400 if token is invalid", async () => {
+      const res = {
+        send: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+      } as unknown as Response;
+
+      await widgetHandler(
+        {
+          query: {
+            token: "invalidToken",
+          },
+          context: {},
+        } as unknown as Request,
+        res,
+      );
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith("A valid token is required");
+    });
+  });
+
+  describe("createWidgetUrlHandler", () => {
+    it("stores widget params in redis and returns a widget URL with token", async () => {
+      const randomUUID = "111-222-333-444-555";
+      jest.spyOn(crypto, "randomUUID").mockReturnValueOnce(randomUUID);
+
+      const connectionId = "testConnectionId123";
+      const req = {
+        body: {
+          jobTypes: [ComboJobTypes.TRANSACTIONS],
+          userId: "testUserId",
+          targetOrigin: "https://example.com",
+          connectionId,
+          aggregator: MX_AGGREGATOR_STRING,
+          institutionId: "testInstitutionId",
+        },
+        headers: {},
+        get: (): string | undefined => "localhost:8080",
+        protocol: "http",
+      } as unknown as Request;
+
+      const res = {
+        json: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+      } as unknown as Response;
+
+      await createWidgetUrlHandler(req, res);
+
+      expect(res.json).toHaveBeenCalled();
+
+      const response = (res.json as jest.Mock).mock.calls[0][0];
+      expect(response).toHaveProperty("widgetUrl");
+
+      const widgetUrl = new URL(response.widgetUrl);
+
+      expect(widgetUrl.pathname).toBe("/widget");
+
+      const params = widgetUrl.searchParams;
+      expect(params.get("token")).toBe(randomUUID);
+
+      const storedData = await get(`token-${randomUUID}`);
+      expect(storedData).toMatchObject({
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        userId: "testUserId",
+        targetOrigin: "https://example.com",
+        connectionId,
+        aggregator: MX_AGGREGATOR_STRING,
+        institutionId: "testInstitutionId",
       });
+    });
 
-      it("responds with a 400 if jobTypes is invalid", () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn(),
-        } as unknown as Response;
+    it("stores the authorization JWT and widget params in redis", async () => {
+      const randomUUID = "111-111-111-111-111";
+      jest.spyOn(crypto, "randomUUID").mockReturnValueOnce(randomUUID);
 
-        widgetHandler(
-          {
-            query: {
-              jobTypes: "junk",
-              userId: "testUserId",
-            },
-          } as unknown as Request,
-          res,
-        );
+      const authorizationToken = "test-jwt-token";
+      const userId = "testUserId";
 
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith(
-          `&#x22;jobTypes&#x22; contains an invalid value`,
-        );
+      const req = {
+        headers: {
+          authorization: `Bearer ${authorizationToken}`,
+        },
+        body: {
+          jobTypes: [ComboJobTypes.TRANSACTIONS],
+          userId,
+          targetOrigin: "https://example.com",
+        },
+        get: (): string | undefined => "localhost:8080",
+        protocol: "http",
+      } as unknown as Request;
+      const res = {
+        json: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+      } as unknown as Response;
+
+      await createWidgetUrlHandler(req, res);
+
+      expect(res.json).toHaveBeenCalled();
+
+      const response = (res.json as jest.Mock).mock.calls[0][0];
+      const widgetUrl = new URL(response.widgetUrl);
+
+      expect(widgetUrl.searchParams.get("token")).toBe(randomUUID);
+
+      const storedData = await get(`token-${randomUUID}`);
+      expect(storedData).toMatchObject({
+        authorizationJwt: authorizationToken,
+        jobTypes: [ComboJobTypes.TRANSACTIONS],
+        userId,
+        targetOrigin: "https://example.com",
       });
+    });
 
-      it("responds with a 400 if userId is missing", () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn(),
-        } as unknown as Response;
+    it("creates the widget url with only token parameter", async () => {
+      const randomUUID = "test-uuid-1-2-3-4-5";
+      jest.spyOn(crypto, "randomUUID").mockReturnValueOnce(randomUUID as UUID);
 
-        widgetHandler(
-          {
-            query: {
-              jobTypes: ComboJobTypes.TRANSACTIONS,
-            },
-          } as unknown as Request,
-          res,
-        );
+      const req = {
+        body: {
+          jobTypes: [ComboJobTypes.TRANSACTIONS],
+          userId: "testUserId",
+          targetOrigin: "https://example.com",
+        },
+        headers: {},
+        get: (): string | undefined => "example",
+        protocol: "http",
+      } as unknown as Request;
+      const res = {
+        json: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+      } as unknown as Response;
 
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith("&#x22;userId&#x22; is required");
-      });
+      await createWidgetUrlHandler(req, res);
 
-      it("responds with a 400 if aggregator is invalid", () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn(),
-        } as unknown as Response;
+      expect(res.json).toHaveBeenCalled();
 
-        widgetHandler(
-          {
-            query: {
-              jobTypes: ComboJobTypes.TRANSACTIONS,
-              aggregator: "junk",
-              userId: "testUserId",
-            },
-          } as unknown as Request,
-          res,
-        );
+      const response = (res.json as jest.Mock).mock.calls[0][0];
+      const { widgetUrl } = response;
 
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith(invalidAggregatorString);
-      });
-
-      it("responds with a 400 if aggregator is provided with an institutionId and without a connectionId", () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn(),
-        } as unknown as Response;
-
-        widgetHandler(
-          {
-            query: {
-              institutionId: "testInstitutionId",
-              jobTypes: ComboJobTypes.TRANSACTIONS,
-              aggregator: MX_AGGREGATOR_STRING,
-              userId: "testUserId",
-            },
-          } as unknown as Request,
-          res,
-        );
-
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith(
-          "&#x22;aggregator&#x22; missing required peer &#x22;connectionId&#x22;",
-        );
-      });
-
-      it("responds with a 400 if aggregator is provided with a connectionId and without an institutionId", () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn(),
-        } as unknown as Response;
-
-        widgetHandler(
-          {
-            query: {
-              connectionId: "testConnectionId",
-              jobTypes: ComboJobTypes.TRANSACTIONS,
-              aggregator: MX_AGGREGATOR_STRING,
-              userId: "testUserId",
-            },
-          } as unknown as Request,
-          res,
-        );
-
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith(
-          "&#x22;aggregator&#x22; missing required peer &#x22;institutionId&#x22;",
-        );
-      });
-
-      it("responds with a 400 if connectionId is provided with an institutionId and without a aggregator", () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn(),
-        } as unknown as Response;
-
-        widgetHandler(
-          {
-            query: {
-              connectionId: "testConnectionId",
-              institutionId: "testInstitutionId",
-              jobTypes: ComboJobTypes.TRANSACTIONS,
-              userId: "testUserId",
-            },
-          } as unknown as Request,
-          res,
-        );
-
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith(
-          "&#x22;connectionId&#x22; missing required peer &#x22;aggregator&#x22;",
-        );
-      });
-
-      it("responds with a 400 if connectionId is provided with an aggregator and without an institutionId", () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn(),
-        } as unknown as Response;
-
-        widgetHandler(
-          {
-            query: {
-              aggregator: MX_AGGREGATOR_STRING,
-              connectionId: "testConnectionId",
-              jobTypes: ComboJobTypes.TRANSACTIONS,
-              userId: "testUserId",
-            },
-          } as unknown as Request,
-          res,
-        );
-
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith(
-          "&#x22;aggregator&#x22; missing required peer &#x22;institutionId&#x22;",
-        );
-      });
-
-      it("responds with a 400 if aggregatorOverride is invalid", () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn(),
-        } as unknown as Response;
-
-        widgetHandler(
-          {
-            query: {
-              jobTypes: ComboJobTypes.TRANSACTIONS,
-              aggregatorOverride: "junk",
-              userId: "testUserId",
-            },
-          } as unknown as Request,
-          res,
-        );
-
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith(
-          `&#x22;aggregatorOverride&#x22; must be one of [${nonTestAggregators.join(", ")}]`,
-        );
-      });
-
-      it("responds with a 400 if singleAccountSelect isn't a bool", () => {
-        const res = {
-          send: jest.fn(),
-          status: jest.fn(),
-        } as unknown as Response;
-
-        widgetHandler(
-          {
-            query: {
-              jobTypes: ComboJobTypes.TRANSACTIONS,
-              singleAccountSelect: "junk",
-              userId: "testUserId",
-            },
-          } as unknown as Request,
-          res,
-        );
-
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith(
-          "&#x22;singleAccountSelect&#x22; must be a boolean",
-        );
-      });
+      expect(widgetUrl).toEqual(
+        `http://localhost:8080/widget?token=${randomUUID}`,
+      );
     });
   });
 });

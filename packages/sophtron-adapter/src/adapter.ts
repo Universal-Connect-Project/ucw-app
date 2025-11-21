@@ -148,7 +148,7 @@ export class SophtronAdapter implements WidgetAdapter {
     ).value;
     const ret = await this.apiClient.updateMember(
       userId,
-      request.id,
+      request.connectionId,
       jobTypes,
       username,
       password,

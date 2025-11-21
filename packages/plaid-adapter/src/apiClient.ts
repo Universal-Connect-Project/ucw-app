@@ -9,6 +9,7 @@ interface CreateGetOauthUrlParams {
   webhookHostUrl: string;
   jobTypes: ComboJobTypes[];
   state: string;
+  accessToken?: string;
 }
 
 interface PlaidToken {
@@ -61,6 +62,7 @@ export async function createPlaidLinkToken({
   webhookHostUrl,
   jobTypes,
   state,
+  accessToken,
 }: CreateGetOauthUrlParams): Promise<PlaidToken> {
   const basePath = sandbox ? PLAID_BASE_PATH : PLAID_BASE_PATH_PROD;
   const aggregator = sandbox ? "plaid_sandbox" : "plaid";
@@ -77,6 +79,7 @@ export async function createPlaidLinkToken({
     },
     webhook,
     products: [],
+    ...(accessToken && { access_token: accessToken }),
     hosted_link: {
       completion_redirect_uri,
     },
@@ -294,4 +297,46 @@ export async function getIdentity({
   });
 
   return await handleApiResponse(response, "Error getting identity");
+}
+
+export async function getTransactions({
+  accessToken,
+  clientId,
+  secret,
+  sandbox,
+  accountIds,
+  startDate,
+  endDate,
+}: {
+  accessToken: string;
+  clientId: string;
+  secret: string;
+  sandbox: boolean;
+  accountIds?: string[];
+  startDate: string; // Format: YYYY-MM-DD
+  endDate: string; // Format: YYYY-MM-DD
+}): Promise<ApiResponse> {
+  const basePath = sandbox ? PLAID_BASE_PATH : PLAID_BASE_PATH_PROD;
+
+  const body = {
+    client_id: clientId,
+    secret,
+    access_token: accessToken,
+    start_date: startDate,
+    end_date: endDate,
+    options: {
+      count: 500, // maximum allowed by Plaid
+      ...(accountIds && { account_ids: accountIds }),
+    },
+  };
+
+  const response = await fetch(basePath + "/transactions/get", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  return await handleApiResponse(response, "Error getting transactions");
 }

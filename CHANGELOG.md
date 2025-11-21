@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0]
+
+See the [migration guide](MIGRATION_V1_TO_V2.md) if migrating from 1.x to 2.x
+
+### Added
+
+- Plaid Transaction Data endpoint
+- Plaid Refresh connection compatibility
+
+### Changed
+
+- start_time and end_time are no longer valid query params for the transactions data endpoint. Use startDate/endDate.
+- postmessage fields
+  - `member_guid` -> `connectionId`
+  - `user_guid` -> `aggregatorUserId`
+  - `connection_status` -> `connectionStatus`
+- `targetOrigin` is required on the widget request
+- Data Endpoints
+  - connectionId can be sensitive so it's in the header now
+  - all other params have been moved into query params
+
 ## [1.17.4]
 
 ### Changed

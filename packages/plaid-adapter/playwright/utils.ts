@@ -1,4 +1,6 @@
-import type { Expect, Page } from "@playwright/test";
+import type { APIRequestContext, Expect, Page } from "@playwright/test";
+import { ComboJobTypes } from "@repo/utils";
+import { createWidgetUrl } from "@repo/utils-e2e/playwright";
 import {
   AccountCategory,
   AccountStatus,
@@ -9,7 +11,10 @@ import {
 
 interface TestDataParams {
   request: {
-    get: (url: string) => Promise<{ json: () => Promise<unknown> }>;
+    get: (
+      url: string,
+      options?: { headers?: Record<string, string> },
+    ) => Promise<{ json: () => Promise<unknown> }>;
   };
   userId: string;
   connectionId: string;
@@ -17,16 +22,20 @@ interface TestDataParams {
   expect: Expect;
 }
 
-export async function testAccountsData({
+async function testAccountsData({
   request,
   userId,
   connectionId,
   aggregator,
   expect,
-}: TestDataParams) {
-  const url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/accounts`;
+}: TestDataParams): Promise<string> {
+  const url = `http://localhost:8080/api/data/accounts?aggregator=${aggregator}&userId=${userId}`;
 
-  const accountsResponse = await request.get(url);
+  const accountsResponse = await request.get(url, {
+    headers: {
+      "ucw-connection-id": connectionId,
+    },
+  });
   const accountsJson = (await accountsResponse.json()) as {
     accounts: { depositAccount?: unknown }[];
   };
@@ -81,18 +90,25 @@ export async function testAccountsData({
   );
 
   expect(accountId).not.toBeNull();
+  expect(accountId).toBeTruthy();
+
+  return accountId;
 }
 
-export async function testIdentityData({
+async function testIdentityData({
   request,
   userId,
   connectionId,
   aggregator,
   expect,
 }: TestDataParams) {
-  const url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/identity`;
+  const url = `http://localhost:8080/api/data/identity?aggregator=${aggregator}&userId=${userId}`;
 
-  const identityResponse = await request.get(url);
+  const identityResponse = await request.get(url, {
+    headers: {
+      "ucw-connection-id": connectionId,
+    },
+  });
   const identityJson = (await identityResponse.json()) as FdxIdentityResponse;
 
   expect(identityJson).toHaveProperty("customers");
@@ -145,6 +161,106 @@ export async function testIdentityData({
   });
 }
 
+interface TestTransactionsDataParams extends TestDataParams {
+  accountId: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+async function testTransactionsData({
+  request,
+  userId,
+  connectionId,
+  aggregator,
+  accountId,
+  startDate,
+  endDate,
+  expect,
+}: TestTransactionsDataParams) {
+  let url = `http://localhost:8080/api/data/transactions?aggregator=${aggregator}&userId=${userId}&accountId=${accountId}`;
+
+  if (startDate) {
+    url += `&startDate=${startDate}`;
+  }
+  if (endDate) {
+    url += `&endDate=${endDate}`;
+  }
+
+  const transactionsResponse = await request.get(url, {
+    headers: {
+      "ucw-connection-id": connectionId,
+    },
+  });
+  const transactionsJson = (await transactionsResponse.json()) as {
+    transactions: unknown[];
+  };
+
+  expect(transactionsJson).toHaveProperty("transactions");
+  expect(Array.isArray(transactionsJson.transactions)).toBe(true);
+  expect(transactionsJson.transactions.length).toBeGreaterThan(0);
+
+  const firstTransaction = transactionsJson.transactions[0] as Record<
+    string,
+    unknown
+  >;
+
+  const hasTransactionType =
+    "depositTransaction" in firstTransaction ||
+    "locTransaction" in firstTransaction ||
+    "loanTransaction" in firstTransaction ||
+    "investmentTransaction" in firstTransaction;
+
+  expect(hasTransactionType).toBe(true);
+
+  const transaction =
+    (firstTransaction.depositTransaction as Record<string, unknown>) ||
+    (firstTransaction.locTransaction as Record<string, unknown>) ||
+    (firstTransaction.loanTransaction as Record<string, unknown>) ||
+    (firstTransaction.investmentTransaction as Record<string, unknown>);
+
+  expect(transaction.transactionId).toBeTruthy();
+  expect(transaction.accountId).toBe(accountId);
+  expect(typeof transaction.amount).toBe("number");
+  expect(transaction.description).toBeTruthy();
+  expect(transaction.status).toBeTruthy();
+  expect(transaction.transactionType).toBeTruthy();
+  expect(transaction.postedTimestamp).toBeTruthy();
+  expect(transaction.transactionTimestamp).toBeTruthy();
+}
+
+export async function testDataEndpoints({
+  request,
+  userId,
+  connectionId,
+  aggregator,
+  expect,
+}: TestDataParams): Promise<void> {
+  const accountId = await testAccountsData({
+    request,
+    userId,
+    connectionId,
+    aggregator,
+    expect,
+  });
+
+  await testIdentityData({
+    request,
+    userId,
+    connectionId,
+    aggregator,
+    expect,
+  });
+
+  await testTransactionsData({
+    request,
+    userId,
+    connectionId,
+    aggregator,
+    accountId,
+    expect,
+  });
+}
+
 interface CreateConnectedPromiseParams {
   page: Page;
   userId: string;
@@ -154,14 +270,19 @@ interface CreateConnectedPromiseParams {
 
 /**
  * Creates a promise that resolves when the Plaid connection is successful
- * and returns the connectionId. Includes proper cleanup and error handling.
+ * and returns the full metadata. Includes proper cleanup and error handling.
  */
 export function createConnectedPromise({
   page,
   userId,
   expect,
   timeoutMs = 30000,
-}: CreateConnectedPromiseParams): Promise<string> {
+}: CreateConnectedPromiseParams): Promise<{
+  connectionId: string;
+  aggregator: string;
+  ucpInstitutionId: string;
+  aggregatorUserId: string;
+}> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(
       () =>
@@ -179,14 +300,24 @@ export function createConnectedPromise({
           clearTimeout(timer);
           page.off("console", messageHandler);
 
-          const connectionId = obj.metadata.connectionId;
+          const {
+            connectionId,
+            aggregator,
+            ucpInstitutionId,
+            aggregatorUserId,
+          } = obj.metadata;
 
-          expect(obj.metadata.user_guid).toEqual(userId);
-          expect(obj.metadata.member_guid).toContain("access-sandbox");
+          expect(aggregatorUserId).toEqual(userId);
+          expect(obj.metadata.member_guid).toBeUndefined();
           expect(connectionId).toContain("access-sandbox");
-          expect(obj.metadata.aggregator).toEqual("plaid_sandbox");
+          expect(aggregator).toEqual("plaid_sandbox");
 
-          resolve(connectionId);
+          resolve({
+            connectionId,
+            aggregator,
+            ucpInstitutionId,
+            aggregatorUserId,
+          });
         }
       } catch (error) {
         // Ignore JSON parsing errors for non-relevant console messages
@@ -198,4 +329,99 @@ export function createConnectedPromise({
       page.on("console", messageHandler);
     }, 100);
   });
+}
+
+interface MakeAConnectionParams {
+  jobTypes: ComboJobTypes[];
+  page: Page;
+  userId: string;
+  request: APIRequestContext;
+  expect: Expect;
+  institutionSearchText: string;
+  institutionName: string;
+  username?: string;
+  password?: string;
+}
+
+/**
+ * Helper function to connect to a Plaid institution through the widget flow.
+ * Returns connection metadata including connectionId, aggregator, and ucpInstitutionId.
+ */
+export async function makeAConnection({
+  jobTypes,
+  page,
+  userId,
+  request,
+  expect,
+  institutionSearchText,
+  institutionName,
+  username = "user_good",
+  password = "pass_good",
+}: MakeAConnectionParams): Promise<{
+  aggregator: string;
+  connectionId: string;
+  ucpInstitutionId: string;
+  userId: string;
+}> {
+  const widgetUrl = await createWidgetUrl(request, {
+    jobTypes,
+    userId,
+  });
+
+  await page.goto(widgetUrl);
+
+  page.evaluate(`
+    window.addEventListener('message', (event) => {
+      const message = event.data;
+      console.log({ message });
+    });
+  `);
+
+  await page.getByPlaceholder("Search").fill(institutionSearchText);
+  await page.getByLabel(`Add account with ${institutionSearchText}`).click();
+
+  const popupPromise = page.waitForEvent("popup");
+  await page.getByRole("link", { name: "Go to log in" }).click();
+
+  const connectedPromise = createConnectedPromise({
+    page,
+    userId,
+    expect,
+    timeoutMs: 50000,
+  });
+
+  const authorizeTab = await popupPromise;
+  const frame = authorizeTab.frameLocator("iframe[title='Plaid Link']");
+  await frame.getByText("Continue as guest").click();
+
+  await frame.locator("input[id='search-input-input']").fill(institutionName);
+  await frame.getByLabel(institutionName).click();
+
+  // Some institutions have multiple options and require clicking the exact match button
+  try {
+    await frame
+      .getByRole("button", { name: institutionName, exact: true })
+      .click({ timeout: 2000 });
+  } catch {
+    // Button doesn't exist, which is fine - continue with login
+  }
+
+  await frame.locator("input[type='text']:not([name='query'])").fill(username);
+  await frame.locator("input[type='password']").fill(password);
+  await frame.locator("button[type='submit']").click();
+
+  await frame.getByText("Continue").click({ timeout: 60000 });
+  await expect(frame.getByText("Finish without saving")).toBeEnabled({
+    timeout: 120000,
+  });
+  await frame
+    .getByText("Finish without saving", { exact: false })
+    .click({ timeout: 10000 });
+
+  const { connectionId, aggregator, ucpInstitutionId } = await connectedPromise;
+  await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
+    timeout: 200000,
+  });
+
+  return { aggregator, connectionId, ucpInstitutionId, userId };
 }

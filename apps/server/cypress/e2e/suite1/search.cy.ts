@@ -1,4 +1,9 @@
-import { searchByText, visitAgg, visitIdentity } from "@repo/utils-e2e/cypress";
+import {
+  createWidgetUrl,
+  searchByText,
+  visitAgg,
+  visitIdentity,
+} from "@repo/utils-e2e/cypress";
 import { ComboJobTypes } from "@repo/utils";
 import {
   MX_BANK_NAME,
@@ -35,9 +40,18 @@ describe("search", () => {
       institutionThatIsInFavoritesButDoesntSupportIdentification,
     ).should("exist");
 
-    cy.visit(
-      `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS},${ComboJobTypes.ACCOUNT_NUMBER},${ComboJobTypes.ACCOUNT_OWNER}&userId=${crypto.randomUUID()}`,
-    );
+    const userId = crypto.randomUUID();
+    createWidgetUrl({
+      jobTypes: [
+        ComboJobTypes.TRANSACTIONS,
+        ComboJobTypes.ACCOUNT_NUMBER,
+        ComboJobTypes.ACCOUNT_OWNER,
+      ],
+      userId,
+      targetOrigin: "http://localhost:8080",
+    }).then((widgetUrl) => {
+      cy.visit(widgetUrl);
+    });
 
     cy.findByText(institutionThatIsInFavoriteAndSupportsAll).should("exist");
 

@@ -1,4 +1,5 @@
 import { ComboJobTypes } from "@repo/utils/contract";
+import { createWidgetUrl } from "./createWidgetUrl";
 
 export const visitWithPostMessageSpy = (url: string) =>
   cy.visit(url, {
@@ -10,7 +11,13 @@ export const visitWithPostMessageSpy = (url: string) =>
 export const visitIdentity = () => {
   const userId = crypto.randomUUID();
 
-  cy.visit(`/widget?jobTypes=${ComboJobTypes.ACCOUNT_OWNER}&userId=${userId}`);
+  createWidgetUrl({
+    jobTypes: [ComboJobTypes.ACCOUNT_OWNER],
+    userId,
+    targetOrigin: "http://localhost:8080",
+  }).then((widgetUrl) => {
+    cy.visit(widgetUrl);
+  });
 
   return cy.wrap(userId);
 };
@@ -19,24 +26,21 @@ export const visitAgg = (options?: any) => {
   const {
     aggregatorOverride,
     failOnStatusCode,
-    token,
+    authToken,
     userId: userIdOverride,
   } = options || {};
 
   const userId = userIdOverride || crypto.randomUUID();
 
-  const tokenString = token ? `&token=${token}` : "";
-
-  const aggregatorOverrideString = aggregatorOverride
-    ? `&aggregatorOverride=${aggregatorOverride}`
-    : "";
-
-  cy.visit(
-    `/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}${tokenString}${aggregatorOverrideString}`,
-    {
-      failOnStatusCode,
-    },
-  );
+  createWidgetUrl({
+    jobTypes: [ComboJobTypes.TRANSACTIONS],
+    userId,
+    targetOrigin: "http://localhost:8080",
+    authToken,
+    aggregatorOverride,
+  }).then((widgetUrl) => {
+    cy.visit(widgetUrl, { failOnStatusCode });
+  });
 
   return cy.wrap(userId);
 };

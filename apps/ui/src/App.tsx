@@ -8,39 +8,37 @@ import { ComboJobTypes } from "@repo/utils";
 // eslint-disable-next-line react-refresh/only-export-components
 const App = () => {
   const [instrumentationFinished, setInstrumentationFinished] = useState(false);
+  const [connectionId, setConnectionId] = useState<string>("");
+  const [aggregator, setAggregator] = useState<string>("");
+  const [jobTypes, setJobTypes] = useState<ComboJobTypes[]>([]);
+  const [institutionId, setInstitutionId] = useState<string>("");
+  const [targetOrigin, setTargetOrigin] = useState<string>("");
 
   const queryParams = new URLSearchParams(window.location.search);
 
-  const connectionId = queryParams.get("connectionId") as string;
-  const aggregator = queryParams.get("aggregator") as string;
-  const jobTypes = queryParams.get("jobTypes")?.split(",") as ComboJobTypes[];
-  const institutionId = queryParams.get("institutionId") as string;
-  const userId = queryParams.get("userId") as string;
-  const singleAccountSelect =
-    queryParams.get("singleAccountSelect") !== "false";
-  const aggregatorOverride = queryParams.get("aggregatorOverride");
-  const targetOrigin = queryParams.get("targetOrigin") || undefined;
+  const token = queryParams.get("token") as string;
 
   const instrumentationProps = {
-    userId: userId,
-    current_member_guid: connectionId,
-    current_aggregator: aggregator,
-    jobTypes,
-    singleAccountSelect,
-    aggregatorOverride,
+    token,
   };
 
   const { showBoundary } = useErrorBoundary();
 
   useEffect(() => {
     instrumentation(instrumentationProps)
-      .then(() => {
+      .then((response) => {
+        setConnectionId(response.data.connectionId);
+        setAggregator(response.data.aggregator);
+        setJobTypes(response.data.jobTypes);
+        setInstitutionId(response.data.institutionId);
+        setTargetOrigin(response.data.targetOrigin);
         setInstrumentationFinished(true);
       })
       .catch((error) => {
         showBoundary(error);
       });
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!instrumentationFinished) {
     return null;

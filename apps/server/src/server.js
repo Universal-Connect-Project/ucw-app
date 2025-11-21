@@ -13,7 +13,7 @@ import { error as _error, info } from "./infra/logger";
 import { initialize as initializeElastic } from "./services/ElasticSearchClient";
 import { setInstitutionSyncSchedule } from "./services/institutionSyncer";
 import { initializePerformanceAndCleanup } from "./services/appInitializer";
-import { widgetHandler } from "./widgetEndpoint";
+import { widgetHandler, createWidgetUrlHandler } from "./widgetEndpoint";
 import { oauthRedirectHandler, webhookHandler } from "./connect/oauthEndpoints";
 import useInstitutionEndpoints from "./institutions/useInstitutionEndpoints";
 import { startNgrok, stopNgrok } from "./webhooks";
@@ -86,9 +86,10 @@ app.use(express.static(path.join(__dirname, "../../ui/dist")));
 
 useAuthentication(app);
 
-app.get("/widget", widgetHandler);
-
+app.post("/widgetUrl", createWidgetUrlHandler);
 app.use(contextHandler);
+
+app.get("/widget", widgetHandler);
 
 useConnect(app);
 usePerformanceEndpoints(app);

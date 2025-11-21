@@ -151,9 +151,7 @@ export const adapterMap: Record<string, AdapterMap> = {
   ...finicityAdapterMapObject,
   ...mxAdapterMapObject,
   ...sophtronAdapterMapObject,
-  ...(config.ENABLE_INSECURE_PLAID_ADAPTER === "true"
-    ? plaidAdapterMapObject
-    : {}),
+  ...plaidAdapterMapObject,
 };
 
 const testAdapterKeys = Object.values(adapterMap)
@@ -166,3 +164,7 @@ export const nonTestAggregators = Object.keys(adapterMap).filter(
 
 export type Aggregator = keyof typeof adapterMap;
 export const aggregators = Object.keys(adapterMap);
+
+export const userlessAggregatorIds = Object.entries(adapterMap)
+  .filter(([, adapter]) => adapter.userless)
+  .map(([key]) => key);

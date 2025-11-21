@@ -1,16 +1,19 @@
 import { expect, test } from "@playwright/test";
 import { ComboJobTypes } from "@repo/utils";
+import { createWidgetUrl } from "@repo/utils-e2e/playwright";
 
-const WIDGET_BASE_URL = "http://localhost:8080/widget";
-
-test("connects to mikomo bank with oAuth", async ({ page }) => {
+test("connects to mikomo bank with oAuth", async ({ page, request }) => {
   test.setTimeout(240000);
 
   const userId = crypto.randomUUID();
 
-  await page.goto(
-    `${WIDGET_BASE_URL}?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
-  );
+  const widgetUrl = await createWidgetUrl(request, {
+    jobTypes: [ComboJobTypes.TRANSACTIONS],
+    userId,
+    targetOrigin: "http://localhost:8080",
+  });
+
+  await page.goto(widgetUrl);
 
   page.evaluate(`
       window.addEventListener('message', (event) => {
@@ -42,8 +45,10 @@ test("connects to mikomo bank with oAuth", async ({ page }) => {
       const obj = (await msg.args()[0].jsonValue())?.message;
       if (obj?.type === "connect/memberConnected") {
         clearTimeout(timer);
-        expect(obj.metadata.user_guid).toEqual(userId);
-        expect(obj.metadata.member_guid).toEqual("mikomo");
+        expect(obj.metadata.user_guid).toBeUndefined();
+        expect(obj.metadata.aggregatorUserId).toEqual(userId);
+        expect(obj.metadata.member_guid).toBeUndefined();
+        expect(obj.metadata.connectionId).toEqual("mikomo");
         expect(obj.metadata.aggregator).toEqual("akoya_sandbox");
         expect(obj.metadata.akoyaAuthCode).not.toBeNull();
 
@@ -62,7 +67,7 @@ test("should return 400 with error message when requesting akoya data", async ({
   request,
 }) => {
   const response = await request.get(
-    "http://localhost:8080/api/data/aggregator/akoya/user/USR-234/account/abcd/transactions",
+    "http://localhost:8080/api/data/transactions?aggregator=akoya&userId=someUserId&accountId=someAccountId",
   );
 
   expect(response.status()).toBe(400);

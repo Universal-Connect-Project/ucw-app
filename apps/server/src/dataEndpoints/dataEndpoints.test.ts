@@ -1,19 +1,15 @@
-import type { Response } from "express";
-import type {
-  AccountsRequest,
-  IdentityRequest,
-  TransactionsRequest,
-} from "./dataEndpoints";
+import type { Request, Response } from "express";
 import {
   createAccountsDataHandler,
   createIdentityDataHandler,
   createTransactionsDataHandler,
+  connectionIdHeaderRequiredMessage,
 } from "./dataEndpoints";
 import type { Aggregator } from "../shared/contract";
 import { invalidAggregatorString } from "../utils/validators";
 import { getDataFromVCJwt, USER_NOT_RESOLVED_ERROR_TEXT } from "@repo/utils";
 import { MX_AGGREGATOR_STRING } from "@repo/mx-adapter";
-import { mxTestData, sophtronTestData } from "@repo/utils-dev-dependency";
+import { mxTestData } from "@repo/utils-dev-dependency";
 import { SOPHTRON_ADAPTER_NAME } from "@repo/sophtron-adapter/src/constants";
 
 const {
@@ -45,12 +41,14 @@ describe("dataEndpoints", () => {
 
       await vcAccountsDataHandler(
         {
-          params: {
-            connectionId: "testConnectionId",
+          query: {
             aggregator: MX_AGGREGATOR_STRING,
-            userId: "",
+            userId: "junk",
           },
-        },
+          headers: {
+            "UCW-Connection-Id": "testConnectionId",
+          },
+        } as unknown as Request,
         res,
       );
 
@@ -68,12 +66,14 @@ describe("dataEndpoints", () => {
 
       await vcAccountsDataHandler(
         {
-          params: {
-            connectionId: "testConnectionId",
+          query: {
             aggregator: "junk" as Aggregator,
             userId: "testUserId",
           },
-        },
+          headers: {
+            "UCW-Connection-Id": "testConnectionId",
+          },
+        } as unknown as Request,
         res,
       );
 
@@ -86,13 +86,15 @@ describe("dataEndpoints", () => {
         json: jest.fn(),
       } as unknown as Response;
 
-      const req: AccountsRequest = {
-        params: {
-          connectionId: "testConnectionId",
+      const req = {
+        query: {
           aggregator: MX_AGGREGATOR_STRING,
           userId: userIdThatExists,
         },
-      };
+        headers: {
+          "UCW-Connection-Id": "testConnectionId",
+        },
+      } as unknown as Request;
 
       await vcAccountsDataHandler(req, res);
 
@@ -101,22 +103,114 @@ describe("dataEndpoints", () => {
       });
     });
 
+    it("responds with the failure when connectionId is missing", async () => {
+      const res = {
+        status: jest.fn(),
+        json: jest.fn(),
+      } as unknown as Response;
+
+      const req = {
+        query: {
+          aggregator: MX_AGGREGATOR_STRING,
+          userId: userIdThatExists,
+        },
+        headers: {},
+      } as unknown as Request;
+
+      await createAccountsDataHandler(false)(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(
+        "UCW-Connection-Id header is required",
+      );
+    });
+
     it("responds with the data on success", async () => {
       const res = {
         json: jest.fn(),
       } as unknown as Response;
 
-      const req: AccountsRequest = {
-        params: {
-          connectionId: "testConnectionId",
+      const req = {
+        query: {
           aggregator: MX_AGGREGATOR_STRING,
           userId: userIdThatExists,
         },
-      };
+        headers: {
+          "UCW-Connection-Id": "testConnectionId",
+        },
+      } as unknown as Request;
 
       await createAccountsDataHandler(false)(req, res);
 
       expect(res.json).toHaveBeenCalledWith(getDataFromVCJwt(mxVcAccountsData));
+    });
+
+    it("responds with the failure when connectionId is missing", async () => {
+      const res = {
+        status: jest.fn(),
+        json: jest.fn(),
+      } as unknown as Response;
+
+      const req = {
+        query: {
+          aggregator: MX_AGGREGATOR_STRING,
+          userId: userIdThatExists,
+        },
+        headers: {},
+      } as unknown as Request;
+
+      await createAccountsDataHandler(false)(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(connectionIdHeaderRequiredMessage);
+    });
+
+    it("responds with a failure when userId is missing for non-plaid aggregators", async () => {
+      const res = {
+        status: jest.fn(),
+        json: jest.fn(),
+      } as unknown as Response;
+
+      const req = {
+        query: {
+          aggregator: MX_AGGREGATOR_STRING,
+          // userId is missing
+        },
+        headers: {
+          "UCW-Connection-Id": "testConnectionId",
+        },
+      } as unknown as Request;
+
+      await createAccountsDataHandler(false)(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.stringMatching(/userId.*required/),
+      );
+    });
+
+    it("responds with a success when userId is missing for plaid aggregators", async () => {
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      } as unknown as Response;
+
+      const req = {
+        query: {
+          aggregator: "plaid_sandbox" as Aggregator,
+        },
+        headers: {
+          "UCW-Connection-Id": "testConnectionId",
+        },
+      } as unknown as Request;
+
+      await createAccountsDataHandler(false)(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          accounts: expect.any(Array),
+        }),
+      );
     });
   });
 
@@ -129,12 +223,14 @@ describe("dataEndpoints", () => {
 
       await vcIdentityDataHandler(
         {
-          params: {
-            connectionId: "testConnectionId",
+          query: {
             aggregator: MX_AGGREGATOR_STRING,
             userId: "junk",
           },
-        },
+          headers: {
+            "UCW-Connection-Id": "testConnectionId",
+          },
+        } as unknown as Request,
         res,
       );
 
@@ -152,12 +248,14 @@ describe("dataEndpoints", () => {
 
       await vcIdentityDataHandler(
         {
-          params: {
-            connectionId: "testConnectionId",
+          query: {
             aggregator: "junk" as Aggregator,
             userId: "testUserId",
           },
-        },
+          headers: {
+            "UCW-Connection-Id": "testConnectionId",
+          },
+        } as unknown as Request,
         res,
       );
 
@@ -171,13 +269,15 @@ describe("dataEndpoints", () => {
         status: jest.fn().mockReturnThis(),
       } as unknown as Response;
 
-      const req: IdentityRequest = {
-        params: {
-          connectionId: "testConnectionId",
+      const req = {
+        query: {
           aggregator: MX_AGGREGATOR_STRING,
           userId: userIdThatExists,
         },
-      };
+        headers: {
+          "UCW-Connection-Id": "testConnectionId",
+        },
+      } as unknown as Request;
 
       await vcIdentityDataHandler(req, res);
 
@@ -192,17 +292,85 @@ describe("dataEndpoints", () => {
         status: jest.fn().mockReturnThis(),
       } as unknown as Response;
 
-      const req: IdentityRequest = {
-        params: {
-          connectionId: "testConnectionId",
+      const req = {
+        query: {
           aggregator: MX_AGGREGATOR_STRING,
           userId: userIdThatExists,
         },
-      };
+        headers: {
+          "UCW-Connection-Id": "testConnectionId",
+        },
+      } as unknown as Request;
 
       await createIdentityDataHandler(false)(req, res);
 
       expect(res.json).toHaveBeenCalledWith(getDataFromVCJwt(mxVcIdentityData));
+    });
+
+    it("responds with the failure when connectionId is missing", async () => {
+      const res = {
+        status: jest.fn(),
+        json: jest.fn(),
+      } as unknown as Response;
+
+      const req = {
+        query: {
+          aggregator: MX_AGGREGATOR_STRING,
+          userId: userIdThatExists,
+        },
+        headers: {},
+      } as unknown as Request;
+
+      await createIdentityDataHandler(false)(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(connectionIdHeaderRequiredMessage);
+    });
+
+    it("responds with a failure when userId is missing for non-plaid aggregators", async () => {
+      const res = {
+        status: jest.fn(),
+        json: jest.fn(),
+      } as unknown as Response;
+
+      const req = {
+        query: {
+          aggregator: MX_AGGREGATOR_STRING,
+        },
+        headers: {
+          "UCW-Connection-Id": "testConnectionId",
+        },
+      } as unknown as Request;
+
+      await createIdentityDataHandler(false)(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.stringMatching(/userId.*required/),
+      );
+    });
+
+    it("responds with a success when userId is missing for plaid aggregators", async () => {
+      const res = {
+        json: jest.fn(),
+      } as unknown as Response;
+
+      const req = {
+        query: {
+          aggregator: "plaid_sandbox" as Aggregator,
+        },
+        headers: {
+          "UCW-Connection-Id": "testConnectionId",
+        },
+      } as unknown as Request;
+
+      await createIdentityDataHandler(false)(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          customers: expect.any(Array),
+        }),
+      );
     });
   });
 
@@ -216,13 +384,15 @@ describe("dataEndpoints", () => {
 
         await vcTransactionsDataHandler(
           {
-            params: {
-              connectionId: "testConnectionId",
+            query: {
+              accountId: "testAccountId",
               aggregator: MX_AGGREGATOR_STRING,
               userId: "junk",
             },
-            query: {},
-          },
+            headers: {
+              "UCW-Connection-Id": "testConnectionId",
+            },
+          } as unknown as Request,
           res,
         );
 
@@ -238,17 +408,16 @@ describe("dataEndpoints", () => {
           status: jest.fn().mockReturnThis(),
         } as unknown as Response;
 
-        const req: TransactionsRequest = {
-          params: {
+        const req = {
+          query: {
             accountId: "testAccountId",
             aggregator: "junk" as Aggregator,
             userId: "testUserId",
           },
-          query: {
-            start_time: undefined,
-            end_time: undefined,
+          headers: {
+            "UCW-Connection-Id": "testConnectionId",
           },
-        };
+        } as unknown as Request;
 
         await vcTransactionsDataHandler(req, res);
 
@@ -262,14 +431,16 @@ describe("dataEndpoints", () => {
           status: jest.fn().mockReturnThis(),
         } as unknown as Response;
 
-        const req: TransactionsRequest = {
-          params: {
+        const req = {
+          query: {
             accountId: "testAccountId",
             aggregator: MX_AGGREGATOR_STRING,
             userId: userIdThatExists,
           },
-          query: {},
-        };
+          headers: {
+            "UCW-Connection-Id": "testConnectionId",
+          },
+        } as unknown as Request;
 
         await vcTransactionsDataHandler(req, res);
 
@@ -284,14 +455,16 @@ describe("dataEndpoints", () => {
           status: jest.fn().mockReturnThis(),
         } as unknown as Response;
 
-        const req: TransactionsRequest = {
-          params: {
+        const req = {
+          query: {
             accountId: "testAccountId",
             aggregator: MX_AGGREGATOR_STRING,
             userId: userIdThatExists,
           },
-          query: {},
-        };
+          headers: {
+            "UCW-Connection-Id": "testConnectionId",
+          },
+        } as unknown as Request;
 
         await createTransactionsDataHandler(false)(req, res);
 
@@ -300,16 +473,16 @@ describe("dataEndpoints", () => {
         );
       });
 
-      it("succeeds if using deprecated start_time/end_time as supported by sophtron", async () => {
+      it("fails if missing required accountId", async () => {
         const req = {
-          params: {
-            aggregator: SOPHTRON_ADAPTER_NAME,
-          },
           query: {
-            start_time: "2021/1/1",
-            end_time: "2025/1/5",
+            aggregator: SOPHTRON_ADAPTER_NAME,
+            userId: "testUserId",
           },
-        } as unknown as TransactionsRequest;
+          headers: {
+            "UCW-Connection-Id": "testConnectionId",
+          },
+        } as unknown as Request;
 
         const res = {
           json: jest.fn(),
@@ -319,23 +492,25 @@ describe("dataEndpoints", () => {
 
         await createTransactionsDataHandler(true)(req, res);
 
-        expect(res.json).toHaveBeenCalledWith({
-          jwt: sophtronTestData.sophtronVcTranscationsData,
-        });
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith(
+          expect.stringMatching(/accountId.*required/),
+        );
       });
 
       it("accepts valid ISO 8601 startDate and endDate", async () => {
         const req = {
-          params: {
+          query: {
             accountId: "testAccountId",
             aggregator: MX_AGGREGATOR_STRING,
             userId: userIdThatExists,
-          },
-          query: {
             startDate: "2021-01-01",
             endDate: "2022-01-01",
           },
-        } as unknown as TransactionsRequest;
+          headers: {
+            "UCW-Connection-Id": "testConnectionId",
+          },
+        } as unknown as Request;
 
         const res = {
           json: jest.fn(),
@@ -348,15 +523,16 @@ describe("dataEndpoints", () => {
 
       it("accepts only valid startDate", async () => {
         const req = {
-          params: {
+          query: {
             accountId: "testAccountId",
             aggregator: MX_AGGREGATOR_STRING,
             userId: userIdThatExists,
-          },
-          query: {
             startDate: "2021-01-01",
           },
-        } as unknown as TransactionsRequest;
+          headers: {
+            "UCW-Connection-Id": "testConnectionId",
+          },
+        } as unknown as Request;
 
         const res = {
           json: jest.fn(),
@@ -369,15 +545,16 @@ describe("dataEndpoints", () => {
 
       it("accepts only valid endDate", async () => {
         const req = {
-          params: {
+          query: {
             accountId: "testAccountId",
             aggregator: MX_AGGREGATOR_STRING,
             userId: userIdThatExists,
-          },
-          query: {
             endDate: "2022-01-01",
           },
-        } as unknown as TransactionsRequest;
+          headers: {
+            "UCW-Connection-Id": "testConnectionId",
+          },
+        } as unknown as Request;
 
         const res = {
           json: jest.fn(),
@@ -390,16 +567,17 @@ describe("dataEndpoints", () => {
 
       it("rejects if startDate is not ISO 8601", async () => {
         const req = {
-          params: {
+          query: {
             accountId: "testAccountId",
             aggregator: MX_AGGREGATOR_STRING,
             userId: userIdThatExists,
-          },
-          query: {
             startDate: "2021/01/01",
             endDate: "2022-01-01",
           },
-        } as unknown as TransactionsRequest;
+          headers: {
+            "UCW-Connection-Id": "testConnectionId",
+          },
+        } as unknown as Request;
 
         const res = {
           json: jest.fn(),
@@ -415,16 +593,17 @@ describe("dataEndpoints", () => {
 
       it("rejects if endDate is not ISO 8601", async () => {
         const req = {
-          params: {
+          query: {
             accountId: "testAccountId",
             aggregator: MX_AGGREGATOR_STRING,
             userId: userIdThatExists,
-          },
-          query: {
             startDate: "2021-01-01",
             endDate: "2022/01/01",
           },
-        } as unknown as TransactionsRequest;
+          headers: {
+            "UCW-Connection-Id": "testConnectionId",
+          },
+        } as unknown as Request;
 
         const res = {
           json: jest.fn(),
@@ -438,16 +617,17 @@ describe("dataEndpoints", () => {
 
       it("rejects if both are not ISO 8601", async () => {
         const req = {
-          params: {
+          query: {
             accountId: "testAccountId",
             aggregator: MX_AGGREGATOR_STRING,
             userId: userIdThatExists,
-          },
-          query: {
             startDate: "2021/01/01",
             endDate: "2022/01/01",
           },
-        } as unknown as TransactionsRequest;
+          headers: {
+            "UCW-Connection-Id": "testConnectionId",
+          },
+        } as unknown as Request;
 
         const res = {
           json: jest.fn(),
@@ -463,13 +643,15 @@ describe("dataEndpoints", () => {
 
       it("accepts if neither startDate nor endDate are provided", async () => {
         const req = {
-          params: {
+          query: {
             accountId: "testAccountId",
             aggregator: MX_AGGREGATOR_STRING,
             userId: userIdThatExists,
           },
-          query: {},
-        } as unknown as TransactionsRequest;
+          headers: {
+            "UCW-Connection-Id": "testConnectionId",
+          },
+        } as unknown as Request;
 
         const res = {
           json: jest.fn(),
@@ -482,16 +664,17 @@ describe("dataEndpoints", () => {
 
       it("rejects if startDate is empty string", async () => {
         const req = {
-          params: {
+          query: {
             accountId: "testAccountId",
             aggregator: MX_AGGREGATOR_STRING,
             userId: userIdThatExists,
-          },
-          query: {
             startDate: "",
             endDate: "2022-01-01",
           },
-        } as unknown as TransactionsRequest;
+          headers: {
+            "UCW-Connection-Id": "testConnectionId",
+          },
+        } as unknown as Request;
 
         const res = {
           json: jest.fn(),
@@ -507,16 +690,17 @@ describe("dataEndpoints", () => {
 
       it("rejects if endDate is empty string", async () => {
         const req = {
-          params: {
+          query: {
             accountId: "testAccountId",
             aggregator: MX_AGGREGATOR_STRING,
             userId: userIdThatExists,
-          },
-          query: {
             startDate: "2022-01-01",
             endDate: "",
           },
-        } as unknown as TransactionsRequest;
+          headers: {
+            "UCW-Connection-Id": "testConnectionId",
+          },
+        } as unknown as Request;
 
         const res = {
           json: jest.fn(),

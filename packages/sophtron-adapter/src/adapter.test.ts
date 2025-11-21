@@ -327,7 +327,7 @@ describe("sophtron adapter", () => {
               value: passwordValue,
             },
           ],
-          id: testId,
+          connectionId: testId,
           jobTypes: [ComboJobTypes.TRANSACTIONS],
         } as UpdateConnectionRequest,
         testUserId,

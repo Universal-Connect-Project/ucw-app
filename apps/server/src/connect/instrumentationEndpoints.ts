@@ -1,36 +1,39 @@
 import type { Request, Response } from "express";
+import { del, get } from "../services/storageClient/redis";
 
 export const instrumentationHandler = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params;
+    const { token } = req.params;
 
-    const { body } = req;
+    const widgetParams = await get(`token-${token}`);
 
     const {
-      current_aggregator,
-      current_member_guid,
       jobTypes,
       singleAccountSelect,
       aggregatorOverride,
-    } = body;
+      userId,
+      aggregator,
+      connectionId,
+    } = widgetParams;
 
     req.context.userId = userId;
-
-    if (Boolean(current_member_guid) && Boolean(current_aggregator)) {
-      req.context.aggregator = current_aggregator;
-      req.context.connectionId = current_member_guid;
+    req.context.jobTypes = jobTypes;
+    req.context.scheme = "vcs";
+    req.context.oauth_referral_source = "BROWSER";
+    req.context.singleAccountSelect = singleAccountSelect !== false;
+    if (Boolean(aggregator) && Boolean(connectionId)) {
+      req.context.aggregator = aggregator;
+      req.context.connectionId = connectionId;
     }
+
+    await del(`token-${token}`); // one time use
+
     if (aggregatorOverride) {
       req.context.aggregatorOverride = aggregatorOverride;
     }
 
-    req.context.jobTypes = jobTypes;
-    req.context.scheme = "vcs";
-    req.context.oauth_referral_source = "BROWSER";
-    req.context.singleAccountSelect = singleAccountSelect;
-
-    res.sendStatus(200);
+    res.status(200).json({ ...widgetParams });
   } catch (error) {
-    res.sendStatus(400);
+    res.status(400).json({ error: error.message });
   }
 };

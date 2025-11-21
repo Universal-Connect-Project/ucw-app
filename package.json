@@ -1,6 +1,6 @@
 {
   "name": "ucw-app",
-  "version": "1.17.4",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "build": "turbo build",

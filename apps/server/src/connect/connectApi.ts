@@ -34,19 +34,19 @@ import {
 } from "../shared/utils/context";
 
 function mapConnection(connection: Connection): Member {
-  const userId = connection.userId;
-  const memberGuid = connection.id;
+  const aggregatorUserId = connection.userId;
+  const connectionId = connection.id;
   const connectionStatus = connection.status ?? ConnectionStatus.CREATED;
 
   const sharedEventData = {
     aggregator: connection.aggregator,
-    member_guid: memberGuid,
-    user_guid: userId,
+    connectionId,
+    aggregatorUserId,
   };
 
   return {
     institution_guid: connection.institution_code,
-    guid: memberGuid,
+    guid: connectionId,
     connection_status: connectionStatus,
     most_recent_job_guid:
       connection.status === ConnectionStatus.CONNECTED
@@ -63,11 +63,11 @@ function mapConnection(connection: Connection): Member {
       memberStatusUpdate: {
         ...(connection.postMessageEventData?.memberStatusUpdate || {}),
         ...sharedEventData,
-        connection_status: connectionStatus,
+        connectionStatus,
       },
     },
     is_being_aggregated: connection.is_being_aggregated,
-    user_guid: userId,
+    user_guid: aggregatorUserId,
     mfa: {
       credentials: connection.challenges?.map((c) => {
         const ret = {
@@ -197,7 +197,7 @@ export class ConnectApi extends AggregatorAdapterBase {
       }
 
       const connection = await this.createConnection({
-        id: memberData.guid,
+        connectionId: memberData.guid,
         institutionId: memberData.institution_guid,
         is_oauth: isOauth,
         skip_aggregation: (memberData.skip_aggregation ?? false) && isOauth,
@@ -269,7 +269,7 @@ export class ConnectApi extends AggregatorAdapterBase {
         setLastUiUpdateTimestamp(this.context.performanceSessionId);
       const connection = await this.updateConnection({
         jobTypes: this.context.jobTypes,
-        id: member.guid,
+        connectionId: member.guid,
         credentials: member.credentials?.map((c) => ({
           id: c.guid,
           value: c.value,
@@ -282,6 +282,9 @@ export class ConnectApi extends AggregatorAdapterBase {
   async loadMembers(): Promise<Member[]> {
     if (this.context.connectionId != null && this.context.connectionId !== "") {
       const focusedMember = await this.getConnection(this.context.connectionId);
+      if (focusedMember == null) {
+        return [];
+      }
       return [mapConnection(focusedMember)];
     }
     return [];

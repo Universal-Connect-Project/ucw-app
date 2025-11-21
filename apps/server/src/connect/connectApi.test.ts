@@ -184,14 +184,14 @@ describe("connectApi", () => {
           postMessageEventData: {
             memberConnected: {
               aggregator: MX_AGGREGATOR_STRING,
-              member_guid: memberData.guid,
-              user_guid: resolvedUserId,
+              connectionId: memberData.guid,
+              aggregatorUserId: resolvedUserId,
             },
             memberStatusUpdate: {
               aggregator: MX_AGGREGATOR_STRING,
-              connection_status: 0,
-              member_guid: memberData.guid,
-              user_guid: resolvedUserId,
+              connectionStatus: 0,
+              connectionId: memberData.guid,
+              aggregatorUserId: resolvedUserId,
             },
           },
           user_guid: resolvedUserId,
@@ -284,14 +284,14 @@ describe("connectApi", () => {
           postMessageEventData: {
             memberConnected: {
               aggregator: MX_AGGREGATOR_STRING,
-              member_guid: mxTestMemberData.member.guid,
-              user_guid: undefined,
+              connectionId: mxTestMemberData.member.guid,
+              aggregatorUserId: undefined,
             },
             memberStatusUpdate: {
               aggregator: MX_AGGREGATOR_STRING,
-              connection_status: 0,
-              member_guid: mxTestMemberData.member.guid,
-              user_guid: undefined,
+              connectionStatus: 0,
+              connectionId: mxTestMemberData.member.guid,
+              aggregatorUserId: undefined,
             },
           },
           user_guid: undefined,
@@ -686,6 +686,81 @@ describe("connectApi", () => {
     });
   });
 
+  describe("loadMembers", () => {
+    it("returns empty array when no connectionId in context", async () => {
+      const response = await connectApi.loadMembers();
+      expect(response).toEqual([]);
+    });
+
+    it("returns empty array when connectionId is empty string", async () => {
+      const contextWithEmptyConnectionId = {
+        ...testContext,
+        connectionId: "",
+      };
+      const api = new ConnectApi({
+        context: contextWithEmptyConnectionId,
+      });
+      api.init();
+
+      const response = await api.loadMembers();
+      expect(response).toEqual([]);
+    });
+
+    it("returns array with single member when connectionId exists in context", async () => {
+      const response = await refreshingContextConnectApi.loadMembers();
+
+      expect(response).toHaveLength(1);
+      expect(response[0]).toEqual({
+        aggregator: testContext.aggregator,
+        connection_status: ConnectionStatus.CREATED,
+        guid: connectionByIdMemberData.member.guid,
+        institution_guid: connectionByIdMemberData.member.institution_code,
+        is_being_aggregated: false,
+        is_oauth: false,
+        mfa: {
+          credentials: undefined,
+        },
+        most_recent_job_guid: null,
+        oauth_window_uri: connectionByIdMemberData.member.oauth_window_uri,
+        postMessageEventData: {
+          memberConnected: {
+            aggregator: MX_AGGREGATOR_STRING,
+            connectionId: connectionByIdMemberData.member.guid,
+            aggregatorUserId: resolvedUserId,
+          },
+          memberStatusUpdate: {
+            aggregator: MX_AGGREGATOR_STRING,
+            connectionStatus: ConnectionStatus.CREATED,
+            connectionId: connectionByIdMemberData.member.guid,
+            aggregatorUserId: resolvedUserId,
+          },
+        },
+        user_guid: resolvedUserId,
+      });
+    });
+
+    it("returns empty array when connection is not found", async () => {
+      const contextWithNonexistentConnection = {
+        ...testContext,
+        connectionId: "nonexistent-connection-id",
+      };
+      const api = new ConnectApi({
+        context: contextWithNonexistentConnection,
+      });
+      api.init();
+
+      server.use(
+        http.get(
+          CONNECTION_BY_ID_PATH,
+          () => new HttpResponse(null, { status: 404 }),
+        ),
+      );
+
+      const response = await api.loadMembers();
+      expect(response).toEqual([]);
+    });
+  });
+
   describe("loadMemberByGuid", () => {
     it("returns a member array with a most recent job guid", async () => {
       const response = await connectApi.loadMemberByGuid("testGuid");
@@ -709,14 +784,14 @@ describe("connectApi", () => {
         postMessageEventData: {
           memberConnected: {
             aggregator: MX_AGGREGATOR_STRING,
-            member_guid: mxConnectionByIdMember.guid,
-            user_guid: resolvedUserId,
+            connectionId: mxConnectionByIdMember.guid,
+            aggregatorUserId: resolvedUserId,
           },
           memberStatusUpdate: {
             aggregator: MX_AGGREGATOR_STRING,
-            connection_status: 6,
-            member_guid: mxConnectionByIdMember.guid,
-            user_guid: resolvedUserId,
+            connectionStatus: 6,
+            connectionId: mxConnectionByIdMember.guid,
+            aggregatorUserId: resolvedUserId,
           },
         },
         user_guid: resolvedUserId,

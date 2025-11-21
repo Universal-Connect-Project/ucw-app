@@ -2,6 +2,7 @@ import { expect, test as base } from "@playwright/test";
 import { ComboJobTypes } from "@repo/utils";
 import {
   createExpectPerformanceEvent,
+  createWidgetUrl,
   getAccessToken,
 } from "@repo/utils-e2e/playwright";
 import { FINICITY_PROFILES_A_UCP_INSTITUTION_ID } from "../src/testInstitutions";
@@ -11,10 +12,14 @@ const makeAConnection = async (
   jobTypes: ComboJobTypes[],
   page,
   userId: string,
+  request,
 ) => {
-  await page.goto(
-    `http://localhost:8080/widget?jobTypes=${jobTypes.join(",")}&userId=${userId}`,
-  );
+  const widgetUrl = await createWidgetUrl(request, {
+    jobTypes,
+    userId,
+  });
+
+  await page.goto(widgetUrl);
 
   page.evaluate(`
       window.addEventListener('message', (event) => {
@@ -57,10 +62,11 @@ const makeAConnection = async (
   });
 
   const obj = (await msg.args()[0].jsonValue())?.message;
-  expect(obj.metadata.user_guid).not.toBeNull();
-  expect(obj.metadata.member_guid).not.toBeNull();
-  expect(obj.metadata.aggregator).toEqual("finicity_sandbox");
+  expect(obj.metadata.user_guid).toBeUndefined();
+  expect(obj.metadata.aggregatorUserId).not.toBeNull();
+  expect(obj.metadata.member_guid).toBeUndefined();
   expect(obj.metadata.connectionId).not.toBeNull();
+  expect(obj.metadata.aggregator).toEqual("finicity_sandbox");
 
   await expect(page.getByRole("button", { name: "Done" })).toBeVisible({
     timeout: 120000,
@@ -82,7 +88,7 @@ const test = base.extend<MyFixtures>({
       await use(userId);
 
       await request.delete(
-        `http://localhost:8080/api/aggregator/finicity_sandbox/user/${userId}`,
+        `http://localhost:8080/api/user?userId=${userId}&aggregator=finicity_sandbox`,
       );
     },
     { scope: "test" },
@@ -101,6 +107,7 @@ test.describe("Finicity Adapter Tests", () => {
       [ComboJobTypes.ACCOUNT_NUMBER],
       page,
       userId,
+      request,
     );
 
     await testDataEndpoints({
@@ -136,6 +143,7 @@ test.describe("Finicity Adapter Tests", () => {
       [ComboJobTypes.TRANSACTION_HISTORY],
       page,
       userId,
+      request,
     );
 
     const expectPerformanceEvent = createExpectPerformanceEvent({
@@ -163,13 +171,24 @@ test.describe("Finicity Adapter Tests", () => {
     test.setTimeout(300000);
 
     const { aggregator, connectionId, ucpInstitutionId } =
-      await makeAConnection([ComboJobTypes.TRANSACTIONS], page, userId);
+      await makeAConnection(
+        [ComboJobTypes.TRANSACTIONS],
+        page,
+        userId,
+        request,
+      );
 
     await testDataEndpoints({ request, userId, connectionId, aggregator });
 
-    await page.goto(
-      `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}&aggregator=${aggregator}&institutionId=${ucpInstitutionId}&connectionId=${connectionId}`,
-    );
+    const widgetUrl = await createWidgetUrl(request, {
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
+      aggregator: aggregator,
+      userId: userId,
+      institutionId: ucpInstitutionId,
+      connectionId: connectionId,
+    });
+
+    await page.goto(widgetUrl);
 
     await expect(page.getByText("Log in at FinBank Profiles - A")).toBeVisible({
       timeout: 8000,
@@ -190,12 +209,15 @@ test.describe("Finicity Adapter Tests", () => {
     });
   });
 
-  test("Failed connection", async ({ page, userId }) => {
+  test("Failed connection", async ({ page, userId, request }) => {
     test.setTimeout(300000);
 
-    await page.goto(
-      `http://localhost:8080/widget?jobTypes=${ComboJobTypes.TRANSACTIONS}&userId=${userId}`,
-    );
+    const widgetUrl = await createWidgetUrl(request, {
+      jobTypes: [ComboJobTypes.TRANSACTIONS],
+      userId,
+    });
+
+    await page.goto(widgetUrl);
 
     await page.getByPlaceholder("Search").fill("finbank");
     await page.getByLabel("Add account with FinBank Profiles - A").click();
@@ -226,9 +248,14 @@ test.describe("Finicity Adapter Tests", () => {
     aggregator,
     shouldExpectTransactions = true,
   }) {
-    let url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/accounts`;
+    let url = `http://localhost:8080/api/data/accounts?aggregator=${aggregator}&userId=${userId}`;
 
-    const accountsResponse = await request.get(url);
+    const accountsResponse = await request.get(url, {
+      headers: {
+        "UCW-Connection-Id": connectionId,
+      },
+    });
+
     const accountsJson = await accountsResponse.json();
     expect(accountsJson?.accounts?.length).toBeGreaterThanOrEqual(1);
 
@@ -261,9 +288,13 @@ test.describe("Finicity Adapter Tests", () => {
 
     expect(accountId).not.toBeNull();
 
-    url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/connection/${connectionId}/identity`;
+    url = `http://localhost:8080/api/data/identity?aggregator=${aggregator}&userId=${userId}`;
 
-    const identityResponse = await request.get(url);
+    const identityResponse = await request.get(url, {
+      headers: {
+        "UCW-Connection-Id": connectionId,
+      },
+    });
     const customers = await identityResponse.json();
     expect(customers).toEqual(
       expect.objectContaining({
@@ -296,12 +327,20 @@ test.describe("Finicity Adapter Tests", () => {
     const todayIso = new Date().toISOString().slice(0, 10);
 
     for (const dateRangeQueryParams of [
-      `?startDate=${oneMonthAgoIso}&endDate=${todayIso}`,
+      `startDate=${oneMonthAgoIso}&endDate=${todayIso}`,
       "",
     ]) {
-      url = `http://localhost:8080/api/data/aggregator/${aggregator}/user/${userId}/account/${accountId}/transactions${dateRangeQueryParams}`;
+      const queryParams = dateRangeQueryParams
+        ? `?aggregator=${aggregator}&userId=${userId}&accountId=${accountId}&${dateRangeQueryParams}`
+        : `?aggregator=${aggregator}&userId=${userId}&accountId=${accountId}`;
 
-      const transactionsResponse = await request.get(url);
+      url = `http://localhost:8080/api/data/transactions${queryParams}`;
+
+      const transactionsResponse = await request.get(url, {
+        headers: {
+          "UCW-Connection-Id": connectionId,
+        },
+      });
       const transactions = await transactionsResponse.json();
 
       if (shouldExpectTransactions) {

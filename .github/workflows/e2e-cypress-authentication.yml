@@ -81,6 +81,7 @@ jobs:
           CYPRESS_auth_widget_demo_delete_user_scope: ${{ vars.DELETE_USER_ENDPOINT_AUTHENTICATION_SCOPES }}
           CYPRESS_auth_client_id: ${{ vars.AUTHENTICATION_CLIENT_ID }}
           CYPRESS_auth_domain: ${{ vars.AUTHENTICATION_DOMAIN }}
+          CYPRESS_delete_mx_user_after_test: true
 
         with:
           config-file: cypress.config.authentication.ts
