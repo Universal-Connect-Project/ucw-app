@@ -1,0 +1,103 @@
+curl -X POST \
+   https://paramountcommercestg-api.private.fin.ag/v3/7c946575-d445-49d4-a26a-296c3425b7c8/BankingServices/Authorize \
+   -H 'Content-Type: application/json' \
+   -d '{
+   "LoginId": "396fc774-7f7a-4c31-7c44-08da172863b5",
+   "MostRecentCached": true
+ }'
+{
+  "HttpStatusCode": 203,
+  "Links": [
+    {
+      "rel": "Authorization",
+      "href": "/Authorize",
+      "example": null
+    }
+  ],
+  "SecurityChallenges": [
+    {
+      "Type": "QuestionAndAnswer",
+      "Prompt": "What is the best country on earth?"
+    }
+  ],
+  "InstitutionName": "FlinksCapital",
+  "InstitutionId": 14,
+  "Institution": "FlinksCapital",
+  "RequestId": "fd4e2952-95a8-46a3-b44c-84daf099ce13"
+}
+
+curl -X POST \
+   https://paramountcommercestg-api.private.fin.ag/v3/7c946575-d445-49d4-a26a-296c3425b7c8/BankingServices/Authorize \
+   -H 'Content-Type: application/json' \
+   -d '{
+   "LoginId": "396fc774-7f7a-4c31-7c44-08da172863b5",
+   "MostRecentCached": false,
+    "RequestId": "fd4e2952-95a8-46a3-b44c-84daf099ce13",
+    "SecurityResponses": {"What is the best country on earth?":["Canada"]}
+ }'
+
+{"HttpStatusCode":200,"Links":[{"rel":"AccountsDetail","href":"/GetAccountsDetail","example":null},{"rel":"AccountsSummary","href":"/GetAccountsSummary","example":null},{"rel":"Statements","href":"/GetStatements","example":null}],"InstitutionName":"FlinksCapital","InstitutionId":14,"Institution":"FlinksCapital","RequestId":"fd4e2952-95a8-46a3-b44c-84daf099ce13"}
+
+
+curl -X POST \
+  https://paramountcommercestg-api.private.fin.ag/v3/7c946575-d445-49d4-a26a-296c3425b7c8/BankingServices/GetAccountsSummary \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "RequestId": "fd4e2952-95a8-46a3-b44c-84daf099ce13"
+}'
+
+{"HttpStatusCode":200,"Accounts":[{"EftEligibleRatio":0.0,"ETransferEligibleRatio":0.0,"Title":"First Home Savings Account","AccountNumber":"FHSA1234567","LastFourDigits":null,"Balance":{"Available":null,"Current":200000.0,"Limit":null},"Category":"Products","Currency":"CAD","Holder":{"Name":"John Doe","Address":{"CivicAddress":"1275 avenue des Canadiens-de-Montréal","City":"Montréal","Province":"QC","PostalCode":"H3B 5E8","POBox":null,"Country":"CA"},"Email":"johndoe@flinks.io","PhoneNumber":"(514) 333-7777"},"AccountType":"Personal","Id":"5f5df68a-d8e0-4d3b-882b-0946892f714b"},{"EftEligibleRatio":1.0,"ETransferEligibleRatio":1.0,"Title":"Business Account","AccountNumber":"BA-12345","LastFourDigits":null,"Balance":{"Available":null,"Current":1000000.0,"Limit":null},"Category":"Operations","Currency":"CAD","Holder":{"Name":"John Doe","Address":{"CivicAddress":"1275 avenue des Canadiens-de-Montréal","City":"Montréal","Province":"QC","PostalCode":"H3B 5E8","POBox":null,"Country":"CA"},"Email":"johndoe@flinks.io","PhoneNumber":"(514) 333-7777"},"AccountType":"Business","Id":"ace16201-aa65-4009-8a4f-12bfeba9585f"},{"EftEligibleRatio":0.0,"ETransferEligibleRatio":0.0,"Title":"Personal loan","AccountNumber":"LO020202","LastFourDigits":null,"Balance":{"Available":null,"Current":200000.0,"Limit":null},"Category":"Credits","Currency":"CAD","Holder":{"Name":"John Doe","Address":{"CivicAddress":"1275 avenue des Canadiens-de-Montréal","City":"Montréal","Province":"QC","PostalCode":"H3B 5E8","POBox":null,"Country":"CA"},"Email":"johndoe@flinks.io","PhoneNumber":"(514) 333-7777"},"AccountType":"Personal","Id":"b9d0d212-2d21-45d3-947b-2a51464c8c50"},{"EftEligibleRatio":0.99,"ETransferEligibleRatio":0.5,"Title":"Chequing US","AccountNumber":"1111001","LastFourDigits":null,"Balance":{"Available":null,"Current":25000.0,"Limit":null},"Category":"Operations","Currency":"USD","Holder":{"Name":"John Doe","Address":{"CivicAddress":"1275 avenue des Canadiens-de-Montréal","City":"Montréal","Province":"QC","PostalCode":"H3B 5E8","POBox":null,"Country":"CA"},"Email":"johndoe@flinks.io","PhoneNumber":"(514) 333-7777"},"AccountType":"Personal","Id":"1732b74a-3648-4073-af75-3d6082e01036"},{"EftEligibleRatio":0.0,"ETransferEligibleRatio":0.0,"Title":"Investments","AccountNumber":"INV00001","LastFourDigits":null,"Balance":{"Available":null,"Current":100000.0,"Limit":null},"Category":"Products","Currency":"CAD","Holder":{"Name":"John Doe","Address":{"CivicAddress":"1275 avenue des Canadiens-de-Montréal","City":"Montréal","Province":"QC","PostalCode":"H3B 5E8","POBox":null,"Country":"CA"},"Email":"johndoe@flinks.io","PhoneNumber":"(514) 333-7777"},"AccountType":"Personal","Id":"30f6d1e8-3217-4a77-a03d-75b99b6fe82c"},{"EftEligibleRatio":1.00,"ETransferEligibleRatio":1.0,"Title":"Chequing CAD","AccountNumber":"1111000","LastFourDigits":null,"Balance":{"Available":null,"Current":50000.0,"Limit":null},"Category":"Operations","Currency":"CAD","Holder":{"Name":"John Doe","Address":{"CivicAddress":"1275 avenue des Canadiens-de-Montréal","City":"Montréal","Province":"QC","PostalCode":"H3B 5E8","POBox":null,"Country":"CA"},"Email":"johndoe@flinks.io","PhoneNumber":"(514) 333-7777"},"AccountType":"Personal","Id":"bfbab278-ec2d-455c-8439-8b9394a576a8"},{"EftEligibleRatio":0.0,"ETransferEligibleRatio":0.0,"Title":"Another Business Account","AccountNumber":"BA777","LastFourDigits":null,"Balance":{"Available":null,"Current":42.0,"Limit":null},"Category":"Credits","Currency":"CAD","Holder":{"Name":"John Doe","Address":{"CivicAddress":"1275 avenue des Canadiens-de-Montréal","City":"Montréal","Province":"QC","PostalCode":"H3B 5E8","POBox":null,"Country":"CA"},"Email":"johndoe@flinks.io","PhoneNumber":"(514) 333-7777"},"AccountType":"Business","Id":"a812ee2c-c65e-476c-b734-b3ecc53e1cca"},{"EftEligibleRatio":0.0,"ETransferEligibleRatio":0.0,"Title":"Line of Credit","AccountNumber":"LC010101","LastFourDigits":null,"Balance":{"Available":null,"Current":3000.0,"Limit":null},"Category":"Credits","Currency":"CAD","Holder":{"Name":"John Doe","Address":{"CivicAddress":"1275 avenue des Canadiens-de-Montréal","City":"Montréal","Province":"QC","PostalCode":"H3B 5E8","POBox":null,"Country":"CA"},"Email":"johndoe@flinks.io","PhoneNumber":"(514) 333-7777"},"AccountType":"Personal","Id":"fdb63729-1697-46e1-88aa-be339d5c169b"},{"EftEligibleRatio":0.0,"ETransferEligibleRatio":0.0,"Title":"Credit card","AccountNumber":"420024******4242","LastFourDigits":null,"Balance":{"Available":null,"Current":10000.0,"Limit":null},"Category":"Credits","Currency":"CAD","Holder":{"Name":"John Doe","Address":{"CivicAddress":"1275 avenue des Canadiens-de-Montréal","City":"Montréal","Province":"QC","PostalCode":"H3B 5E8","POBox":null,"Country":"CA"},"Email":"johndoe@flinks.io","PhoneNumber":"(514) 333-7777"},"AccountType":"Personal","Id":"502dcc28-f0ea-4b79-baf2-e5308d631e2a"}],"Links":[{"rel":"AccountsDetail","href":"/GetAccountsDetail","example":null},{"rel":"Statements","href":"/GetStatements","example":null}],"InstitutionName":"FlinksCapital","InstitutionId":14,"Institution":"FlinksCapital","RequestId":"fd4e2952-95a8-46a3-b44c-84daf099ce13"}
+
+curl -X POST \
+  https://paramountcommercestg-api.private.fin.ag/v3/7c946575-d445-49d4-a26a-296c3425b7c8/BankingServices/GetAccountsDetail \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "RequestId": "fd4e2952-95a8-46a3-b44c-84daf099ce13"
+}'
+{"FlinksCode":"OPERATION_PENDING","Links":[{"rel":"{Endpoint}Async","href":"/{Endpoint}Async","example":"/{Endpoint}Async/{requestId}"}],"HttpStatusCode":202,"Message":"Your operation is still processing","RequestId":"fd4e2952-95a8-46a3-b44c-84daf099ce13"}
+
+curl -X POST \
+  https://paramountcommercestg-api.private.fin.ag/v3/7c946575-d445-49d4-a26a-296c3425b7c8/BankingServices/GetStatements \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "RequestId": "f362426c-2480-4d3c-9b7b-546a8880338b",
+   "MostRecentCached": true
+}'
+{"HttpStatusCode":400,"Message":"RequestId is invalid or session has ended","FlinksCode":"SESSION_NONEXISTENT"}
+{"HttpStatusCode":200,"StatementsByAccount":[{"AccountNumber":"FHSA1234567","Statements":[]},{"AccountNumber":"BA12345","Statements":[]},{"AccountNumber":"LO020202","Statements":[]},{"AccountNumber":"1111001","Statements":[]},{"AccountNumber":"INV00001","Statements":[]},{"AccountNumber":"1111000","Statements":[]},{"AccountNumber":"BA777","Statements":[]},{"AccountNumber":"LC010101","Statements":[]},{"AccountNumber":"420024******4242","Statements":[]}],"InstitutionName":"FlinksCapital","Login":{"Username":"Greatday","IsScheduledRefresh":false,"LastRefresh":"2025-10-30T04:04:31.0777383","Type":"Personal","Id":"396fc774-7f7a-4c31-7c44-08da172863b5"},"InstitutionId":14,"Institution":"FlinksCapital","RequestId":"f362426c-2480-4d3c-9b7b-546a8880338b"}
+
+curl -X POST \
+   https://paramountcommercestg-api.private.fin.ag/v3/7c946575-d445-49d4-a26a-296c3425b7c8/BankingServices/Authorize \
+   -H 'Content-Type: application/json' \
+   -d '{
+    "Institution":"FlinksCapital",
+      "username": "Greatday",
+      "Password": "Everyday",
+      "MostRecentCached":false,
+      "Save": true
+  }'
+
+"HttpStatusCode":203,"Links":[{"rel":"Authorization","href":"/Authorize","example":null}],"SecurityChallenges":[{"Type":"QuestionAndAnswer","Prompt":"What shape do people like most?"}],"InstitutionName":"FlinksCapital","InstitutionId":14,"Institution":"FlinksCapital","RequestId":"b851931b-7d7c-4279-9b82-344c0e846b52"}
+
+
+curl -X POST \
+   https://paramountcommercestg-api.private.fin.ag/v3/7c946575-d445-49d4-a26a-296c3425b7c8/BankingServices/Authorize \
+   -H 'Content-Type: application/json' \
+   -d '{
+   "MostRecentCached": false,
+    "RequestId": "b851931b-7d7c-4279-9b82-344c0e846b52",
+    "SecurityResponses": {"What shape do people like most?":["Triangle"]}
+ }'
+
+ {"HttpStatusCode":200,"Links":[{"rel":"AccountsDetail","href":"/GetAccountsDetail","example":null},{"rel":"AccountsSummary","href":"/GetAccountsSummary","example":null},{"rel":"Statements","href":"/GetStatements","example":null}],"InstitutionName":"FlinksCapital","Login":{"Username":"Greatday","IsScheduledRefresh":false,"LastRefresh":"2025-10-30T04:04:31.0777383","Type":"Personal","Id":"396fc774-7f7a-4c31-7c44-08da172863b5"},"InstitutionId":14,"Institution":"FlinksCapital","RequestId":"b851931b-7d7c-4279-9b82-344c0e846b52"}
+ 
+ curl -X POST \
+  https://paramountcommercestg-api.private.fin.ag/v3/7c946575-d445-49d4-a26a-296c3425b7c8/BankingServices/GetAccountsDetail \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "RequestId": "b851931b-7d7c-4279-9b82-344c0e846b52",
+   "MostRecentCached": true
+}'
+{"FlinksCode":"OPERATION_PENDING","Links":[{"rel":"{Endpoint}Async","href":"/{Endpoint}Async","example":"/{Endpoint}Async/{requestId}"}],"HttpStatusCode":202,"Message":"Your operation is still processing","RequestId":"b851931b-7d7c-4279-9b82-344c0e846b52"}
+
+curl https://paramountcommercestg-api.private.fin.ag/v3/oauth/Authorize?institution_id=14&redirect_uri=localhost:8080&state=st
