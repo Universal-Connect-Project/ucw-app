@@ -3,6 +3,7 @@ import config from "../config";
 import { accessTokenResponse } from "./testData/auth0";
 import { finicityInsitutionData } from "./testData/institution";
 import { createCustomerData } from "./testData/users";
+import { m2mAccessTokenResponse } from "../shared/utils/test/testData/m2mAccessToken";
 
 const FINICITY_BASE_PATH = "https://api.finicity.com";
 export const FINICITY_INSTITUTION_BY_ID_PATH = `${FINICITY_BASE_PATH}/institution/v2/institutions/:institutionId`;
@@ -10,6 +11,7 @@ export const CREATE_CUSTOMER_PATH = `${FINICITY_BASE_PATH}/aggregation/v2/custom
 export const FINICITY_AUTH_PATH = `${FINICITY_BASE_PATH}/aggregation/v2/partners/authentication`;
 export const FINICITY_CONNECT_PATH = `${FINICITY_BASE_PATH}/connect/v2/generate/lite`;
 export const FINICITY_CONNECT_LITE_URL = "https://testconnect.com";
+export const FETCH_ACCESS_TOKEN_URL = `https://example-domain/oauth/token`;
 
 const handlers = [
   http.post(FINICITY_AUTH_PATH, () =>
@@ -40,6 +42,9 @@ const handlers = [
   http.post(
     `${config.PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionStart`,
     () => HttpResponse.json({}),
+  ),
+  http.post(FETCH_ACCESS_TOKEN_URL, () =>
+    HttpResponse.json(m2mAccessTokenResponse),
   ),
 ];
 
