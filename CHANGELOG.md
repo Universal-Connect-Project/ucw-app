@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0]
+
+### Changed
+
+- Now storing UCP access tokens in a file as a backup to redis to reduce machine to machine token usage
+
 ## [2.0.0]
 
 See the [migration guide](MIGRATION_V1_TO_V2.md) if migrating from 1.x to 2.x

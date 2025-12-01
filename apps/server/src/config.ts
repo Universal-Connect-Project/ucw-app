@@ -1,7 +1,7 @@
 import "./dotEnv";
 
 const keysToPullFromEnv = [
-  "AUTH0_TOKEN_URL",
+  "UCP_AUTH0_DOMAIN",
 
   "NGROK_AUTHTOKEN",
 

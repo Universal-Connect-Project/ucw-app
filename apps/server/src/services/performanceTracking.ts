@@ -2,7 +2,6 @@ import type { ComboJobTypes } from "@repo/utils";
 import type { Request } from "express";
 import { getConfig } from "../config";
 import { debug } from "../infra/logger";
-import { getAccessToken } from "./auth0Service";
 import {
   cleanupPerformanceObject,
   pausePolling,
@@ -13,6 +12,7 @@ import {
   addConnectionIdToCleanupObject,
 } from "../connectionCleanup/utils";
 import { setPerformanceSessionIdOnContext } from "../shared/utils/context";
+import { getUCPAccessToken } from "../shared/utils/ucpAccessToken";
 
 export const setPerformanceSessionId = (req: Request) => {
   const performanceSessionId = crypto.randomUUID();
@@ -41,12 +41,7 @@ async function sendPerformanceEvent({
   const { PERFORMANCE_SERVICE_URL } = getConfig();
 
   try {
-    const accessToken = await getAccessToken();
-
-    if (!accessToken) {
-      debug("UCP credentials need to be configured for performance features");
-      return;
-    }
+    const accessToken = await getUCPAccessToken();
 
     const url = `${PERFORMANCE_SERVICE_URL}/events/${connectionId}/${eventType}`;
 

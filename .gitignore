@@ -61,3 +61,5 @@ apps/server/cypress.env.json
 *.rdb
 
 *-test.sh
+
+**/tokenStorage/
