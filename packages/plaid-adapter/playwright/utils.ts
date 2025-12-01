@@ -398,12 +398,14 @@ export async function makeAConnection({
   await frame.getByLabel(institutionName).click();
 
   // Some institutions have multiple options and require clicking the exact match button
-  try {
-    await frame
-      .getByRole("button", { name: institutionName, exact: true })
-      .click({ timeout: 2000 });
-  } catch {
-    // Button doesn't exist, which is fine - continue with login
+  await page.waitForTimeout(2000);
+  const exactMatchButton = frame.getByRole("button", {
+    name: institutionName,
+    exact: true,
+  });
+  const buttonCount = await exactMatchButton.count();
+  if (buttonCount > 0) {
+    await exactMatchButton.click();
   }
 
   await frame.locator("input[type='text']:not([name='query'])").fill(username);

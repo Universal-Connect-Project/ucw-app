@@ -248,7 +248,8 @@ export class PlaidAdapter implements WidgetAdapter {
         });
       }
     } else if (webhook_code === "SESSION_FINISHED") {
-      if (connection.successWebhookReceivedAt) {
+      const { status } = request?.body || {};
+      if (connection.successWebhookReceivedAt || status === "success") {
         connection.status = ConnectionStatus.CONNECTED;
       } else {
         connection.status = ConnectionStatus.FAILED;

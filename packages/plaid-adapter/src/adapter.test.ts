@@ -615,5 +615,64 @@ describe("plaid aggregator", () => {
         expect(cachedConnection.status).toBe(ConnectionStatus.CONNECTED);
       });
     });
+
+    describe("SESSION_FINISHED webhook", () => {
+      it("should set status to CONNECTED when webhook body status is 'success'", async () => {
+        const requestId = "session-finished-success-456";
+
+        await cacheClient.set(requestId, {
+          id: requestId,
+          status: ConnectionStatus.PENDING,
+          // Note: no successWebhookReceivedAt property
+        });
+
+        const sessionFinishedRequest = {
+          query: {
+            connection_id: requestId,
+          },
+          body: {
+            webhook_code: "SESSION_FINISHED",
+            status: "success",
+          },
+        };
+
+        const result = await plaidAdapter.HandleOauthResponse(
+          sessionFinishedRequest,
+        );
+
+        expect(result.status).toBe(ConnectionStatus.CONNECTED);
+
+        const cachedConnection = await cacheClient.get(requestId);
+        expect(cachedConnection.status).toBe(ConnectionStatus.CONNECTED);
+      });
+
+      it("should set status to FAILED when neither successWebhookReceivedAt nor success status is present", async () => {
+        const requestId = "session-finished-failed-789";
+
+        await cacheClient.set(requestId, {
+          id: requestId,
+          status: ConnectionStatus.PENDING,
+        });
+
+        const sessionFinishedRequest = {
+          query: {
+            connection_id: requestId,
+          },
+          body: {
+            webhook_code: "SESSION_FINISHED",
+            status: "exited",
+          },
+        };
+
+        const result = await plaidAdapter.HandleOauthResponse(
+          sessionFinishedRequest,
+        );
+
+        expect(result.status).toBe(ConnectionStatus.FAILED);
+
+        const cachedConnection = await cacheClient.get(requestId);
+        expect(cachedConnection.status).toBe(ConnectionStatus.FAILED);
+      });
+    });
   });
 });
