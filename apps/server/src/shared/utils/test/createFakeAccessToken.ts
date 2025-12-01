@@ -12,7 +12,7 @@ export const createFakeAccessToken = ({
   };
   const payload = {
     iss: "https://auth-staging.universalconnectproject.org/",
-    sub: "sub",
+    sub: "U1S5r5EQ9bPqXD5ai6769u9oi63BD1S2@clients",
     aud: "ucp-widget-interactions",
     iat: 1741816827,
     exp: Math.round(dateInMillisecs / 1000) + expiresInSeconds,

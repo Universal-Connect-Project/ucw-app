@@ -3,8 +3,6 @@ import path from "path";
 import fs from "fs";
 import sanitize from "sanitize-filename";
 
-export const tokenStorageFolderPath = path.join(__dirname, "tokenStorage");
-
 const fetchNewToken = async ({
   audience,
   clientId,
@@ -133,6 +131,14 @@ export const createM2MTokenHandler = ({
   };
 
   const getLocalToken = () => localToken;
+
+  const isTestEnvironment = process.env.NODE_ENV === "test";
+
+  const tokenStorageFolderPath = path.join(
+    __dirname,
+    `tokenStorage`,
+    isTestEnvironment ? "test" : "prod",
+  );
 
   const tokenFileName: string = sanitize(
     `${domain}-${audience}-${clientId}-${fileName}.txt`,

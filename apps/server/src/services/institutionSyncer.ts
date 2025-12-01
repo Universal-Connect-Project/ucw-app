@@ -6,7 +6,6 @@ import {
   updateInstitutions,
 } from "../services/ElasticSearchClient";
 import type { CachedInstitution } from "@repo/utils";
-import { getAccessToken } from "./auth0Service";
 import { INSTITUTION_ETAG_REDIS_KEY } from "./storageClient/constants";
 import { get, setNoExpiration } from "./storageClient/redis";
 import {
@@ -15,6 +14,7 @@ import {
   UNAUTHORIZED_RESPONSE,
 } from "../infra/http/constants";
 import { addTestInstitutions } from "../testInstitutions/testInstitutions";
+import { getUCPAccessToken } from "../shared/utils/ucpAccessToken";
 
 export async function setInstitutionSyncSchedule(minutes: number = 1) {
   return setIntervalAsync(
@@ -57,7 +57,7 @@ export const syncInstitutions = async () => {
 
 export async function fetchInstitutions(): Promise<Response | null> {
   const institutionCacheETag = await get(INSTITUTION_ETAG_REDIS_KEY);
-  const accessToken = await getAccessToken();
+  const accessToken = await getUCPAccessToken();
   try {
     return await fetch(config.INSTITUTION_CACHE_LIST_URL, {
       headers: {

@@ -25,6 +25,7 @@ import { get } from "../services/storageClient/redis";
 import { clearRedisMock } from "../__mocks__/redis";
 import type { Request } from "express";
 import { getPerformanceSessionIdFromContext } from "../shared/utils/context";
+import { FETCH_ACCESS_TOKEN_URL } from "../test/handlers";
 
 async function setupRedisPerformanceObject(sessionId: string) {
   createPerformancePollingObject({
@@ -342,7 +343,7 @@ describe("performanceTracking", () => {
     const debugSpy = jest.spyOn(logger, "debug");
 
     server.use(
-      http.post(config.AUTH0_TOKEN_URL, async () => {
+      http.post(FETCH_ACCESS_TOKEN_URL, async () => {
         return new HttpResponse(null, {
           status: 401,
           statusText: "Unauthorized",

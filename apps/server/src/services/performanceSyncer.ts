@@ -1,7 +1,6 @@
 import { setIntervalAsync } from "set-interval-async";
 import { info, error } from "../infra/logger";
 import { getConfig } from "../config";
-import { getAccessToken } from "./auth0Service";
 import {
   RESPONSE_NOT_MODIFIED,
   SUCCESS_RESPONSE,
@@ -12,6 +11,7 @@ import {
   PERFORMANCE_ETAG_REDIS_KEY,
 } from "./storageClient/constants";
 import { get, setNoExpiration } from "./storageClient/redis";
+import { getUCPAccessToken } from "../shared/utils/ucpAccessToken";
 
 export const getPerformanceEnabled = () => {
   const { UCP_CLIENT_ID, UCP_CLIENT_SECRET } = getConfig();
@@ -53,7 +53,7 @@ export const syncPerformanceData = async () => {
 
 export async function fetchPerformanceData(): Promise<Response> {
   const performanceCacheETag = await get(PERFORMANCE_ETAG_REDIS_KEY);
-  const accessToken = await getAccessToken();
+  const accessToken = await getUCPAccessToken();
   return await fetch(
     `${getConfig().PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
     {

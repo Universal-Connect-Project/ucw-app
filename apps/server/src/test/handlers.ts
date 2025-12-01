@@ -1,6 +1,5 @@
 import { http, HttpResponse } from "msw";
 import config from "../config";
-import { accessTokenResponse } from "./testData/auth0";
 import { finicityInsitutionData } from "./testData/institution";
 import { createCustomerData } from "./testData/users";
 import { m2mAccessTokenResponse } from "../shared/utils/test/testData/m2mAccessToken";
@@ -24,9 +23,6 @@ const handlers = [
     HttpResponse.json({ link: FINICITY_CONNECT_LITE_URL }),
   ),
   http.post(CREATE_CUSTOMER_PATH, () => HttpResponse.json(createCustomerData)),
-  http.post(config.AUTH0_TOKEN_URL, () =>
-    HttpResponse.json(accessTokenResponse),
-  ),
   http.put(
     `${config.PERFORMANCE_SERVICE_URL}/events/:connectionId/connectionSuccess`,
     () => HttpResponse.json({}),
