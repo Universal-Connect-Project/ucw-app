@@ -288,3 +288,44 @@ test("make a connection then refresh then delete the connection", async ({
     throw new Error("connectionId was not set from connectedPromise");
   }
 });
+
+test("shows error message when user exits Plaid Link without completing connection", async ({
+  page,
+  request,
+}) => {
+  test.setTimeout(300000);
+
+  const userId = crypto.randomUUID();
+
+  const widgetUrl = await createWidgetUrl(request, {
+    jobTypes: [ComboJobTypes.TRANSACTIONS],
+    userId,
+  });
+
+  await page.goto(widgetUrl);
+
+  await page.getByPlaceholder("Search").fill("Houndstooth");
+
+  await page.getByLabel("Add account with Houndstooth Bank").click();
+
+  const popupPromise = page.waitForEvent("popup");
+  await page.getByRole("link", { name: "Go to log in" }).click();
+
+  const authorizeTab = await popupPromise;
+  const frame = authorizeTab.frameLocator("iframe[title='Plaid Link']");
+
+  await frame.getByText("Continue as guest").click();
+
+  // The delay is necessary for the button to become clickable
+  await page.waitForTimeout(2000);
+
+  await frame.getByRole("button", { name: "Exit" }).click();
+
+  await frame.getByRole("button", { name: "Yes, exit" }).click();
+
+  await authorizeTab.waitForEvent("close");
+
+  await expect(page.getByText("Something went wrong")).toBeVisible({
+    timeout: 10000,
+  });
+});

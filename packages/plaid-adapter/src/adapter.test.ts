@@ -420,6 +420,7 @@ describe("plaid aggregator", () => {
         await cacheClient.set(requestId, {
           id: requestId,
           status: ConnectionStatus.PENDING,
+          successWebhookReceivedAt: "2025-12-01T10:00:00Z",
         });
 
         const eventsWebhookRequest = {
@@ -442,6 +443,7 @@ describe("plaid aggregator", () => {
         expect(result).toEqual({
           id: requestId,
           status: ConnectionStatus.CONNECTED,
+          successWebhookReceivedAt: "2025-12-01T10:00:00Z",
         });
 
         expect(
@@ -579,6 +581,77 @@ describe("plaid aggregator", () => {
         expect(
           mockPerformanceClient.updateConnectionDuration,
         ).not.toHaveBeenCalled();
+      });
+
+      it("should return early and not update cache when EVENTS webhook received without prior success webhook", async () => {
+        const requestId = "no-success-connection-123";
+        const linkSessionId = "link-session-no-success";
+        const originalConnection = {
+          id: requestId,
+          status: ConnectionStatus.PENDING,
+          // Note: no successWebhookReceivedAt property
+        };
+
+        await cacheClient.set(requestId, originalConnection);
+
+        const eventsWebhookRequest = {
+          query: {
+            connection_id: requestId,
+          },
+          body: {
+            environment: "sandbox",
+            link_session_id: linkSessionId,
+            link_token: "link-sandbox-no-success-token",
+            webhook_code: "EVENTS",
+            webhook_type: "LINK",
+            events: sampleCredentialEvents,
+          },
+        };
+
+        const result =
+          await plaidAdapter.HandleOauthResponse(eventsWebhookRequest);
+
+        expect(result.status).toBe(ConnectionStatus.PENDING);
+
+        const cachedConnection = await cacheClient.get(requestId);
+        expect(cachedConnection).toEqual(originalConnection);
+
+        expect(
+          mockPerformanceClient.updateConnectionDuration,
+        ).not.toHaveBeenCalled();
+      });
+
+      it("should set status to CONNECTED when EVENTS webhook received after success webhook", async () => {
+        const requestId = "connected-connection-456";
+        const linkSessionId = "link-session-connected";
+
+        await cacheClient.set(requestId, {
+          id: requestId,
+          status: ConnectionStatus.PENDING,
+          successWebhookReceivedAt: "2025-12-01T10:00:00Z",
+        });
+
+        const eventsWebhookRequest = {
+          query: {
+            connection_id: requestId,
+          },
+          body: {
+            environment: "sandbox",
+            link_session_id: linkSessionId,
+            link_token: "link-sandbox-connected-token",
+            webhook_code: "EVENTS",
+            webhook_type: "LINK",
+            events: sampleCredentialEvents,
+          },
+        };
+
+        const result =
+          await plaidAdapter.HandleOauthResponse(eventsWebhookRequest);
+
+        expect(result.status).toBe(ConnectionStatus.CONNECTED);
+
+        const cachedConnection = await cacheClient.get(requestId);
+        expect(cachedConnection.status).toBe(ConnectionStatus.CONNECTED);
       });
     });
   });

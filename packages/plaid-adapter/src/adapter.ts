@@ -233,7 +233,15 @@ export class PlaidAdapter implements WidgetAdapter {
         },
       };
     } else if (webhook_code === "EVENTS") {
+      this.logger.info(
+        `Received webhook event for connection ${requestId} with data: ${JSON.stringify(
+          request.body,
+        )}`,
+      );
       // https://plaid.com/docs/api/link/#events
+      if (!connection.successWebhookReceivedAt) {
+        return connection;
+      }
       connection.status = ConnectionStatus.CONNECTED;
       const connectionDuration = calculateDurationFromEvents(
         request.body.events,
@@ -245,12 +253,12 @@ export class PlaidAdapter implements WidgetAdapter {
           additionalDuration: connectionDuration,
         });
       }
-
-      this.logger.info(
-        `Received webhook event for connection ${requestId} with data: ${JSON.stringify(
-          request.body,
-        )}`,
-      );
+    } else if (webhook_code === "SESSION_FINISHED") {
+      if (connection.successWebhookReceivedAt) {
+        connection.status = ConnectionStatus.CONNECTED;
+      } else {
+        connection.status = ConnectionStatus.FAILED;
+      }
     }
 
     await this.cacheClient.set(requestId, connection);
