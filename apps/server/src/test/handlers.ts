@@ -10,7 +10,7 @@ export const CREATE_CUSTOMER_PATH = `${FINICITY_BASE_PATH}/aggregation/v2/custom
 export const FINICITY_AUTH_PATH = `${FINICITY_BASE_PATH}/aggregation/v2/partners/authentication`;
 export const FINICITY_CONNECT_PATH = `${FINICITY_BASE_PATH}/connect/v2/generate/lite`;
 export const FINICITY_CONNECT_LITE_URL = "https://testconnect.com";
-export const FETCH_ACCESS_TOKEN_URL = `https://example-domain/oauth/token`;
+export const FETCH_ACCESS_TOKEN_URL = `https://${config.UCP_AUTH0_DOMAIN}/oauth/token`;
 
 const handlers = [
   http.post(FINICITY_AUTH_PATH, () =>

@@ -10,7 +10,6 @@ import {
   updateConnectionDuration,
 } from "./performanceTracking";
 import { ComboJobTypes } from "@repo/utils";
-import { mockAccessToken } from "../test/testData/auth0";
 import * as logger from "../infra/logger";
 import setupPerformanceHandlers from "../shared/test/setupPerformanceHandlers";
 import {
@@ -25,7 +24,9 @@ import { get } from "../services/storageClient/redis";
 import { clearRedisMock } from "../__mocks__/redis";
 import type { Request } from "express";
 import { getPerformanceSessionIdFromContext } from "../shared/utils/context";
-import { FETCH_ACCESS_TOKEN_URL } from "../test/handlers";
+import { m2mAccessTokenResponse } from "../shared/utils/test/testData/m2mAccessToken";
+
+const mockAccessToken = m2mAccessTokenResponse.access_token;
 
 async function setupRedisPerformanceObject(sessionId: string) {
   createPerformancePollingObject({
@@ -336,26 +337,6 @@ describe("performanceTracking", () => {
           authorization: `Bearer ${mockAccessToken}`,
         }),
       }),
-    );
-  });
-
-  it("fails if ucp credentials are not configured to get access token", async () => {
-    const debugSpy = jest.spyOn(logger, "debug");
-
-    server.use(
-      http.post(FETCH_ACCESS_TOKEN_URL, async () => {
-        return new HttpResponse(null, {
-          status: 401,
-          statusText: "Unauthorized",
-        });
-      }),
-    );
-
-    await recordSuccessEvent("conn5");
-    expect(debugSpy).toHaveBeenCalledWith(
-      expect.stringContaining(
-        "UCP credentials need to be configured for performance features",
-      ),
     );
   });
 

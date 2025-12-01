@@ -57,8 +57,9 @@ export const syncInstitutions = async () => {
 
 export async function fetchInstitutions(): Promise<Response | null> {
   const institutionCacheETag = await get(INSTITUTION_ETAG_REDIS_KEY);
-  const accessToken = await getUCPAccessToken();
   try {
+    const accessToken = await getUCPAccessToken();
+
     return await fetch(config.INSTITUTION_CACHE_LIST_URL, {
       headers: {
         Authorization: `Bearer ${accessToken}`,

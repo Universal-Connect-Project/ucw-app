@@ -5,6 +5,7 @@ import { http, HttpResponse } from "msw";
 import { createFakeAccessToken } from "./test/createFakeAccessToken";
 import { server } from "../../test/testServer";
 import { FETCH_ACCESS_TOKEN_URL } from "../../test/handlers";
+import config from "../../config";
 
 describe("m2mToken", () => {
   describe("createM2MTokenHandler", () => {
@@ -65,7 +66,7 @@ describe("m2mToken", () => {
     beforeEach(async () => {
       m2mTokenHandler = createM2MTokenHandler({
         audience: "https://api.example.com",
-        domain: "example-domain",
+        domain: config.UCP_AUTH0_DOMAIN,
         clientId: "your-client-id",
         clientSecret: "your-client-secret",
         fileName: "test-token",

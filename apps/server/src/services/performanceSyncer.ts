@@ -54,6 +54,7 @@ export const syncPerformanceData = async () => {
 export async function fetchPerformanceData(): Promise<Response> {
   const performanceCacheETag = await get(PERFORMANCE_ETAG_REDIS_KEY);
   const accessToken = await getUCPAccessToken();
+
   return await fetch(
     `${getConfig().PERFORMANCE_SERVICE_URL}/metrics/allPerformanceData`,
     {
