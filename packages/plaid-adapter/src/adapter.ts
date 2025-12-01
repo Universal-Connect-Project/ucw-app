@@ -233,16 +233,10 @@ export class PlaidAdapter implements WidgetAdapter {
         },
       };
     } else if (webhook_code === "EVENTS") {
-      this.logger.info(
-        `Received webhook event for connection ${requestId} with data: ${JSON.stringify(
-          request.body,
-        )}`,
-      );
       // https://plaid.com/docs/api/link/#events
-      if (!connection.successWebhookReceivedAt) {
-        return connection;
+      if (connection.successWebhookReceivedAt) {
+        connection.status = ConnectionStatus.CONNECTED;
       }
-      connection.status = ConnectionStatus.CONNECTED;
       const connectionDuration = calculateDurationFromEvents(
         request.body.events,
         connection.successWebhookReceivedAt, // this is a fallback in case the link widget gets closed before HANDOFF happens

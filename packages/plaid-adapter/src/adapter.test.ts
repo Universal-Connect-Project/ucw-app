@@ -371,47 +371,6 @@ describe("plaid aggregator", () => {
       );
     });
 
-    it("Logs info and returns the connection if EVENTS webhook is received", async () => {
-      const requestId = "abc123";
-      await cacheClient.set(requestId, {});
-
-      const result = await plaidAdapter.HandleOauthResponse({
-        query: {
-          connection_id: requestId,
-        },
-        body: {
-          environment: "sandbox",
-          link_session_id: "1daca4d5-9a0d-4e85-a2e9-1e905ecaa32e",
-          link_token: "link-sandbox-79e723b0-0e04-4248-8a33-15ceb6828a45",
-          webhook_code: "EVENTS",
-          webhook_type: "LINK",
-          events: [
-            {
-              event_id: "978b772c-f2cc-404f-9449-2113e4671c4f",
-              event_metadata: {
-                error_code: "INVALID_CREDENTIALS",
-                error_message: "the provided credentials were not correct",
-                error_type: "ITEM_ERROR",
-                exit_status: "requires_credentials",
-                institution_id: "ins_20",
-                institution_name: "Citizens Bank",
-                request_id: "u1HcAeiCKtz3qmm",
-              },
-              event_name: "EXIT",
-              timestamp: "2024-05-21T00:18:13Z",
-            },
-          ],
-        },
-      });
-
-      expect(logClient.info).toHaveBeenCalled();
-
-      const cachedConnection = (await cacheClient.get(requestId)) as {
-        status: string;
-      };
-      expect(result).toEqual(cachedConnection);
-    });
-
     describe("EVENTS webhook duration calculation", () => {
       it("should calculate duration and record performance event when EVENTS webhook with HANDOFF is received", async () => {
         const requestId = "test-connection-123";
@@ -583,16 +542,15 @@ describe("plaid aggregator", () => {
         ).not.toHaveBeenCalled();
       });
 
-      it("should return early and not update cache when EVENTS webhook received without prior success webhook", async () => {
+      it("should not change status but still record duration when EVENTS webhook received without prior success webhook", async () => {
         const requestId = "no-success-connection-123";
         const linkSessionId = "link-session-no-success";
-        const originalConnection = {
+
+        await cacheClient.set(requestId, {
           id: requestId,
           status: ConnectionStatus.PENDING,
           // Note: no successWebhookReceivedAt property
-        };
-
-        await cacheClient.set(requestId, originalConnection);
+        });
 
         const eventsWebhookRequest = {
           query: {
@@ -614,11 +572,14 @@ describe("plaid aggregator", () => {
         expect(result.status).toBe(ConnectionStatus.PENDING);
 
         const cachedConnection = await cacheClient.get(requestId);
-        expect(cachedConnection).toEqual(originalConnection);
+        expect(cachedConnection.status).toBe(ConnectionStatus.PENDING);
 
         expect(
           mockPerformanceClient.updateConnectionDuration,
-        ).not.toHaveBeenCalled();
+        ).toHaveBeenCalledWith({
+          connectionId: requestId,
+          additionalDuration: 7000,
+        });
       });
 
       it("should set status to CONNECTED when EVENTS webhook received after success webhook", async () => {
