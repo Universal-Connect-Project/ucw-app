@@ -55,7 +55,7 @@ export const set = async (
   params: object = {
     EX: config.REDIS_CACHE_TIME_SECONDS,
   },
-  safeToLog?: string,
+  safeToLog?: boolean,
 ) => {
   if (safeToLog) {
     debug(`Redis set: ${key}, ready: ${redisClient.isReady}`);
