@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Use jsonwebtoken as a dependency instead of a web dependency to fix build issues
+- Use jsonwebtoken as a dependency instead of a dev dependency to fix build issues
 
 ## [2.1.1]
 
