@@ -113,6 +113,8 @@ export async function createPlaidLinkToken({
     body: JSON.stringify(body),
   });
 
+  console.log("Plaid link token response status:", response.status);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (await response.json()) as PlaidToken;
 }

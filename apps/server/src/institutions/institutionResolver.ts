@@ -149,7 +149,7 @@ const resolveByAggregatorOverride = ({
   }
 
   debug(
-    `Resolving institution: ${ucpInstitutionId} to aggregator: ${aggregator} because it's a refresh`,
+    `Resolving institution: ${ucpInstitutionId} to aggregator: ${aggregator}`,
   );
 
   return {

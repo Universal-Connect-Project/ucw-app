@@ -81,6 +81,17 @@ export class PlaidAdapter implements WidgetAdapter {
   ): Promise<Connection | undefined> {
     const connectSessionId = request.performanceSessionId;
     const connectionId = request.connectionId;
+    console.log("link token request params", {
+      sandbox: this.sandbox,
+      clientName: this.credentials.clientName,
+      clientId: this.credentials.clientId,
+      secret: this.credentials.secret,
+      userId,
+      webhookHostUrl: this.getWebhookHostUrl(),
+      jobTypes: request.jobTypes,
+      state: connectSessionId,
+      accessToken: connectionId,
+    });
     const tokenObj = await createPlaidLinkToken({
       sandbox: this.sandbox,
       clientName: this.credentials.clientName,
