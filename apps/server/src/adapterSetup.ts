@@ -4,6 +4,7 @@ import { getSophtronAdapterMapObject } from "@repo/sophtron-adapter";
 import { getAkoyaAdapterMapObject } from "@repo/akoya-adapter";
 import { getPlaidAdapterMapObject } from "@repo/plaid-adapter";
 import { getFinicityAdapterMapObject } from "@repo/finicity-adapter";
+import { getFlinksAdapterMapObject } from "@repo/flinks-adapter";
 import config from "./config";
 import * as logger from "./infra/logger";
 import { get, set } from "./services/storageClient/redis";
@@ -146,9 +147,35 @@ const plaidAdapterMapObject: Record<string, AdapterMap> =
     },
   });
 
+
+const flinksAdapterMapObject: Record<string, AdapterMap> =
+  getFlinksAdapterMapObject({
+    cacheClient: {
+      set: set,
+      get: get,
+    },
+    logClient: logger,
+    aggregatorCredentials: {
+      flinksSandbox: {
+        instance: config.FLINKS_INSTANCE,
+        customerId: config.FLINKS_CUSTOMER_ID,
+        apiKey: config.FLINKS_API_KEY,
+      },
+      flinks: {
+        instance: config.FLINKS_INSTANCE_PROD,
+        customerId: config.FLINKS_CUSTOMER_ID_PROD,
+        apiKey: config.FLINKS_API_KEY_PROD,
+      },
+    },
+    envConfig: {
+      HostUrl: config.HOST_URL,
+    },
+  });
+
 export const adapterMap: Record<string, AdapterMap> = {
   ...akoyaAdapterMapObject,
   ...finicityAdapterMapObject,
+  ...flinksAdapterMapObject,
   ...mxAdapterMapObject,
   ...sophtronAdapterMapObject,
   ...plaidAdapterMapObject,

@@ -1,0 +1,13 @@
+{
+  "defaultAggregator": "flinks",
+
+  "supportedAggregators": ["flinks"],
+
+  "defaultAggregatorVolume": {},
+
+  "institutionAggregatorVolumeMap": {},
+
+  "hiddenInstitutions": [],
+
+  "recommendedInstitutions": ["FlinksCapital"]
+}

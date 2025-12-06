@@ -15,6 +15,7 @@ import {
 } from "./consts";
 
 import { testInstitutions as plaidTestInstitutions } from "@repo/plaid-adapter";
+import { testInstitutions as flinksTestInstitutions } from "@repo/flinks-adapter";
 
 export const testChaseBankToFilter: CachedInstitution = {
   name: CHASE_BANK_TEST_FILTER_NAME,
@@ -85,6 +86,7 @@ export const testInstitutions = buildTestInstitutions([
   akoyaTestInstitutions,
   [testChaseBankToFilter, mxAndSophtronTestInstitution],
   plaidTestInstitutions,
+  flinksTestInstitutions,
 ]);
 
 export const addTestInstitutions = (institutions: CachedInstitution[]) => [
