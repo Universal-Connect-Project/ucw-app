@@ -36,6 +36,7 @@
     "@opensearch-project/opensearch": "^2.13.0",
     "@repo/akoya-adapter": "*",
     "@repo/finicity-adapter": "*",
+    "@repo/flinks-adapter": "*",
     "@repo/mx-adapter": "*",
     "@repo/sophtron-adapter": "*",
     "@repo/utils": "*",
